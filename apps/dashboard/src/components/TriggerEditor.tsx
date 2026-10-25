@@ -15,6 +15,8 @@ const SOURCES: TriggerSource[] = [
   { type: 'like' },
   { type: 'follow' },
   { type: 'share' },
+  { type: 'comment' },
+  { type: 'join' },
 ]
 
 const encode = (source: TriggerSource) =>

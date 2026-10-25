@@ -9,10 +9,11 @@
   "scripts": {
     "dev": "concurrently -n server,dashboard,overlay -c yellow,cyan,magenta \"npm run dev -w @zerocade/server\" \"npm run dev -w @zerocade/dashboard\" \"npm run dev -w @zerocade/overlay\"",
     "build": "npm run build -w @zerocade/dashboard -w @zerocade/overlay",
-    "typecheck": "npm run typecheck --workspaces --if-present"
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "sqlite:upgrade": "node scripts/upgrade-sqlite.mjs"
   },
   "devDependencies": {
     "concurrently": "^10.0.6",
-    "typescript": "^7.0.2"
+    "typescript": "7.0.2"
   }
 }

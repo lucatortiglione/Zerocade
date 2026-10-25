@@ -3,6 +3,9 @@ import { useDashboard } from '../store'
 
 const LINKS = [
   { to: '/', label: 'Games', icon: '🎮' },
+  { to: '/sources', label: 'Sources', icon: '📡' },
+  { to: '/dj', label: 'DJ Pad', icon: '🎚️' },
+  { to: '/gifts', label: 'Gifts', icon: '🎁' },
   { to: '/setup', label: 'Setup', icon: '🔗' },
 ]
 

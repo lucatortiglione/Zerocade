@@ -1,0 +1,122 @@
+import { useEffect, useRef, useState } from 'react'
+import { GAMES, describeSource, triggersFor, type LiveEvent } from '@zerocade/shared'
+import { Engine } from './games/engine'
+import { createGame } from './games/registry'
+import { useOverlay } from './store'
+import { Widgets } from './Widgets'
+
+interface Toast {
+  id: number
+  text: string
+}
+
+export function App() {
+  const { connected, session, event, seq } = useOverlay()
+  const canvasRef = useRef<HTMLCanvasElement>(null)
+  const engineRef = useRef<Engine | null>(null)
+  const [toasts, setToasts] = useState<Toast[]>([])
+
+  // Boot the engine once.
+  useEffect(() => {
+    const canvas = canvasRef.current
+    if (!canvas) return
+    const ctx = canvas.getContext('2d')
+    if (!ctx) return
+    const resize = () => {
+      canvas.width = window.innerWidth
+      canvas.height = window.innerHeight
+    }
+    resize()
+    window.addEventListener('resize', resize)
+    const engine = new Engine(ctx)
+    engineRef.current = engine
+    engine.start()
+    return () => {
+      window.removeEventListener('resize', resize)
+      engine.stop()
+    }
+  }, [])
+
+  // Swap the game when the selection changes.
+  useEffect(() => {
+    if (!session) return
+    const game = GAMES.find((g) => g.id === session.gameId)
+    const instance = game ? createGame(game.id) : null
+    if (game && instance) engineRef.current?.setGame(instance, session.settings)
+  }, [session?.gameId])
+
+  // Tune settings live.
+  useEffect(() => {
+    engineRef.current?.setSettings(session?.settings ?? {})
+  }, [session?.settings])
+
+  // Dispatch matching triggers + toast on each incoming event.
+  useEffect(() => {
+    if (!event || !session) return
+    const game = GAMES.find((g) => g.id === session.gameId)
+    if (game) {
+      for (const t of triggersFor(session.triggers, event)) engineRef.current?.pushAction(t.action, event)
+    }
+    const id = Date.now() + Math.random()
+    setToasts((prev) => [...prev.slice(-4), { id, text: describeEvent(event) }])
+    const timer = setTimeout(() => setToasts((prev) => prev.filter((t) => t.id !== id)), 3200)
+    return () => clearTimeout(timer)
+  }, [seq])
+
+  const game = session ? GAMES.find((g) => g.id === session.gameId) : undefined
+
+  return (
+    <div className="overlay">
+      <canvas ref={canvasRef} className="overlay__canvas" />
+      <header className="overlay__top">
+        <span className="overlay__brand">{game?.emoji ?? '🎮'}</span>
+        <span className="overlay__title">{game?.name ?? 'Zerocade'}</span>
+        <span className={`dot${connected ? ' dot--on' : ''}`} />
+      </header>
+
+      <Widgets />
+
+      <div className="overlay__toasts">
+        {toasts.map((t) => (
+          <div key={t.id} className="toast">
+            {t.text}
+          </div>
+        ))}
+      </div>
+
+      {session && game && (
+        <footer className="overlay__guide">
+          {session.triggers.map((t, i) => {
+            const s = describeSource(t.source)
+            const a = game.actions.find((x) => x.id === t.action)
+            return (
+              <div key={i} className="guide-chip">
+                <span>{s.icon}</span>
+                <span className="guide-chip__label">{s.label}</span>
+                <span className="guide-chip__arrow">→</span>
+                <span>{a?.label ?? t.action}</span>
+              </div>
+            )
+          })}
+        </footer>
+      )}
+    </div>
+  )
+}
+
+function describeEvent(event: LiveEvent): string {
+  switch (event.type) {
+    case 'gift':
+      return `🎁 ${event.user.nickname} ×${event.count}`
+    case 'like':
+      return `👍 ${event.user.nickname} ×${event.count}`
+    case 'follow':
+      return `➕ ${event.user.nickname} followed`
+    case 'share':
+      return `🔁 ${event.user.nickname} shared`
+    case 'comment':
+      return `💬 ${event.user.nickname}: ${event.text}`
+    case 'join':
+      return `👋 ${event.user.nickname} joined`
+  }
+}

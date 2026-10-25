@@ -1,7 +1,9 @@
 import { GAMES } from '@zerocade/shared'
+import { SettingsPanel } from '../components/SettingsPanel'
 import { Simulator } from '../components/Simulator'
 import { TopGifters } from '../components/TopGifters'
 import { TriggerEditor } from '../components/TriggerEditor'
+import { WidgetsPanel } from '../components/WidgetsPanel'
 import { overlayUrl } from '../overlayKey'
 import { socket } from '../socket'
 import { useDashboard } from '../store'
@@ -22,13 +24,24 @@ export function GamesPage() {
                 aria-pressed={session?.gameId === game.id}
                 onClick={() => socket.emit('game:select', game.id)}
               >
-                <span className="game-card__name">{game.name}</span>
-                <span className="game-card__desc">{game.description}</span>
+                <span
+                  className="game-card__thumb"
+                  style={{ background: `linear-gradient(135deg, ${game.gradient[0]}, ${game.gradient[1]})` }}
+                  aria-hidden="true"
+                >
+                  {game.emoji}
+                </span>
+                <span className="game-card__body">
+                  <span className="game-card__name">{game.name}</span>
+                  <span className="game-card__desc">{game.description}</span>
+                </span>
               </button>
             ))}
           </div>
         </section>
         {session && <TriggerEditor session={session} />}
+        {session && <SettingsPanel session={session} />}
+        {session && <WidgetsPanel session={session} />}
       </aside>
 
       <main className="preview">
