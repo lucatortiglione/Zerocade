@@ -1,16 +1,10 @@
 import type { GameInstance } from './engine'
 import { addPoints, clamp, drawLeaderboard, drawTimerBar, newScores, normalize, shuffled } from './common'
+import { wordsFor } from '../content'
 
 // "Five Letters" — Wordle-style: viewers guess a 5-letter word in chat and get
 // green / gold / grey feedback per letter, with correct handling of repeats.
-
-const WORDS = [
-  'AMORE', 'BRAVO', 'CANTO', 'CORSO', 'CROCE', 'DONNA', 'FERRO', 'FIUME',
-  'FUOCO', 'GRANO', 'LARGO', 'LEGNO', 'LIBRO', 'LUNGO', 'MONDO', 'MONTE',
-  'NOTTE', 'PARCO', 'PERLA', 'PONTE', 'PORTA', 'PRATO', 'RAMPA', 'RICCO',
-  'ROSSO', 'SCALA', 'SPADA', 'TEMPO', 'TERRA', 'TESTA', 'TORRE', 'TRENO',
-  'VENTO', 'VERDE', 'VILLA', 'VISTA',
-]
+// The word bank is loaded from the server's SQLite-backed content store.
 
 type Tile = 'green' | 'gold' | 'grey'
 
@@ -56,7 +50,7 @@ export function createFiveLetters(): GameInstance {
   let solveBonus = 15
   let showBoard = true
 
-  let target = WORDS[0]
+  let target = ''
   let guesses: Guess[] = []
   let revealedIdx: number[] = []
   let ruledOut: string[] = []
@@ -67,7 +61,7 @@ export function createFiveLetters(): GameInstance {
   const scores = newScores()
 
   const pick = () => {
-    target = shuffled(WORDS)[0]
+    target = shuffled(wordsFor('five-letters'))[0] ?? ''
     guesses = []
     revealedIdx = []
     ruledOut = []

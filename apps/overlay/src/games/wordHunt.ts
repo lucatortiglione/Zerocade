@@ -1,14 +1,10 @@
 import type { GameInstance } from './engine'
 import { addPoints, drawLeaderboard, drawTimerBar, newScores, normalize, shuffled } from './common'
+import { wordsFor } from '../content'
 
 // "Word Hunt" — a word-search grid: viewers find the hidden words (by word or
 // by coordinates) in chat. Found words are highlighted on the board.
-
-const BANK = [
-  'SOLE', 'MARE', 'LUNA', 'CANE', 'GATTO', 'PIZZA', 'PASTA', 'FIORE', 'STELLA',
-  'ALBERO', 'MONTAGNA', 'OCEANO', 'CHITARRA', 'CALCIO', 'ROMA', 'VINO', 'PANE',
-  'LATTE', 'MUSICA', 'LIBRO', 'PORTA', 'TRENO', 'SERA', 'NOTTE', 'VERDE', 'ACQUA',
-]
+// The word bank is loaded from the server's SQLite-backed content store.
 
 interface Cell {
   r: number
@@ -50,7 +46,7 @@ export function createWordHunt(): GameInstance {
 
   const board = () => {
     fill()
-    const pool = shuffled(BANK).filter((w) => w.length >= 3 && w.length <= size - 2)
+    const pool = shuffled(wordsFor('word-hunt')).filter((w) => w.length >= 3 && w.length <= size - 2)
     placed = []
     const dirs = DIRS.filter((d) => (d[0] !== 0 && d[1] !== 0 ? diagonal : true) && (backwards ? true : d[0] >= 0 && d[1] >= 0))
     for (const word of pool) {

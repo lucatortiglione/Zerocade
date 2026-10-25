@@ -1,5 +1,6 @@
 import type { GameInstance } from './engine'
 import { addPoints, drawLeaderboard, drawTimerBar, newScores, shuffled } from './common'
+import { itemsFor } from '../content'
 
 // "True or False" — viewers judge a statement by typing V/F (or true/false).
 // The reveal shows the answer, the explanation and the winners.
@@ -10,32 +11,7 @@ interface Statement {
   why: string
 }
 
-const STATEMENTS: Statement[] = [
-  { text: 'Il miele non scade mai.', answer: true, why: 'Grazie alla bassa umidità e all’acidità, resta commestibile per anni.' },
-  { text: 'I pesci rossi hanno una memoria di soli 3 secondi.', answer: false, why: 'La loro memoria dura settimane, anche mesi.' },
-  { text: 'Il Sole è una stella.', answer: true, why: 'È la stella più vicina alla Terra.' },
-  { text: 'La Torre di Pisa è sempre stata inclinata.', answer: false, why: 'Ha iniziato a inclinarsi durante la costruzione.' },
-  { text: 'I ragni sono insetti.', answer: false, why: 'Sono aracnidi: hanno 8 zampe, non 6.' },
-  { text: 'La Grande Muraglia cinese è visibile dalla Luna.', answer: false, why: 'Non è visibile nemmeno dalla maggior parte delle orbite.' },
-  { text: 'L’acqua bolle a 100 °C ovunque.', answer: false, why: 'Dipende dalla pressione: in montagna bolle a temperature più basse.' },
-  { text: 'Le piante producono ossigeno.', answer: true, why: 'Lo rilasciano durante la fotosintesi.' },
-  { text: 'Gli elefanti sono i mammiferi più grandi del mondo.', answer: false, why: 'La balenottera azzurra è molto più grande.' },
-  { text: 'La lingua è il muscolo più forte del corpo.', answer: false, why: 'È formata da più muscoli, non è un singolo muscolo.' },
-  { text: 'I pipistrelli sono mammiferi.', answer: true, why: 'Sono gli unici mammiferi capaci di volo attivo.' },
-  { text: 'La luce del Sole impiega circa 8 minuti per arrivare sulla Terra.', answer: true, why: 'Viaggia a circa 300.000 km/s.' },
-  { text: 'Gli struzzi nascondono la testa nella sabbia.', answer: false, why: 'È un mito: si sdraiano solo per mimetizzarsi.' },
-  { text: 'Il caffè contiene caffeina.', answer: true, why: 'È una delle principali fonti naturali di caffeina.' },
-  { text: 'Il deserto del Sahara è il più grande del mondo.', answer: false, why: 'Il più grande è l’Antartide, un deserto freddo.' },
-  { text: 'La banana è una bacca.', answer: true, why: 'Botanicamente la banana è classificata come bacca.' },
-  { text: 'I delfini sono pesci.', answer: false, why: 'Sono mammiferi marini e respirano aria.' },
-  { text: 'Roma è la capitale d’Italia.', answer: true, why: 'È la capitale dal 1871.' },
-  { text: 'L’olio galleggia sull’acqua.', answer: true, why: 'È meno denso dell’acqua.' },
-  { text: 'I leoni vivono nella giungla.', answer: false, why: 'Vivono principalmente nella savana.' },
-  { text: 'Il vetro è un liquido che scorre lentamente.', answer: false, why: 'Il vetro è un solido amorfo.' },
-  { text: 'Il Monte Everest è la montagna più alta del mondo.', answer: true, why: 'Misura 8.849 metri sul livello del mare.' },
-  { text: 'I serpenti hanno le palpebre.', answer: false, why: 'Hanno una squama trasparente che protegge l’occhio.' },
-  { text: 'Il corpo umano adulto ha 206 ossa.', answer: true, why: 'Alla nascita ne ha circa 270, che si fondono crescendo.' },
-]
+// Statements are loaded from the server's SQLite-backed content store.
 export function createTrueOrFalse(): GameInstance {
   let width = 0
   let height = 0
@@ -46,7 +22,7 @@ export function createTrueOrFalse(): GameInstance {
   let speedBonus = true
   let showBoard = true
 
-  let current = STATEMENTS[0]
+  let current: Statement = { text: '', answer: true, why: '' }
   let timer = 25
   let revealed = false
   let answered = new Set<string>()
@@ -54,7 +30,7 @@ export function createTrueOrFalse(): GameInstance {
   const scores = newScores()
 
   const pick = () => {
-    current = shuffled(STATEMENTS)[0]
+    current = shuffled(itemsFor<Statement>('true-or-false'))[0] ?? { text: '', answer: true, why: '' }
     timer = stmtSecs
     revealed = false
     answered = new Set()

@@ -1,9 +1,10 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, useSyncExternalStore } from 'react'
 import { GAMES, describeSource, triggersFor, type LiveEvent } from '@zerocade/shared'
 import { Engine } from './games/engine'
 import { createGame } from './games/registry'
 import { useOverlay } from './store'
 import { Widgets } from './Widgets'
+import { isContentReady, loadContent, subscribeContent } from './content'
 
 interface Toast {
   id: number
@@ -12,12 +13,14 @@ interface Toast {
 
 export function App() {
   const { connected, session, event, seq } = useOverlay()
+  const contentReady = useSyncExternalStore(subscribeContent, isContentReady)
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const engineRef = useRef<Engine | null>(null)
   const [toasts, setToasts] = useState<Toast[]>([])
 
   // Boot the engine once.
   useEffect(() => {
+    void loadContent()
     const canvas = canvasRef.current
     if (!canvas) return
     const ctx = canvas.getContext('2d')
@@ -37,13 +40,13 @@ export function App() {
     }
   }, [])
 
-  // Swap the game when the selection changes.
+  // Swap the game when the selection changes (only once content is loaded).
   useEffect(() => {
-    if (!session) return
+    if (!session || !contentReady) return
     const game = GAMES.find((g) => g.id === session.gameId)
     const instance = game ? createGame(game.id) : null
     if (game && instance) engineRef.current?.setGame(instance, session.settings)
-  }, [session?.gameId])
+  }, [session?.gameId, contentReady])
 
   // Tune settings live.
   useEffect(() => {

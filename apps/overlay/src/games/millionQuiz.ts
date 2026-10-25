@@ -1,5 +1,6 @@
 import type { GameInstance } from './engine'
 import { addPoints, drawLeaderboard, drawTimerBar, newScores, shuffled } from './common'
+import { itemsFor } from '../content'
 
 // "Million Quiz" — a Who-Wants-To-Be-A-Millionaire style game. The crowd votes
 // A/B/C/D and the majority answer is locked in. Correct answers climb the prize
@@ -12,29 +13,7 @@ interface Q {
   difficulty: 1 | 2 | 3
 }
 
-const QUESTIONS: Q[] = [
-  { q: 'Quante zampe ha un ragno?', options: ['6', '8', '10', '12'], answer: 1, difficulty: 1 },
-  { q: 'Qual è la capitale d’Italia?', options: ['Milano', 'Roma', 'Napoli', 'Torino'], answer: 1, difficulty: 1 },
-  { q: 'Blu più giallo fa…', options: ['Verde', 'Viola', 'Arancione', 'Marrone'], answer: 0, difficulty: 1 },
-  { q: 'Quanti continenti ci sono?', options: ['5', '6', '7', '8'], answer: 2, difficulty: 1 },
-  { q: 'Quale pianeta è detto il Pianeta Rosso?', options: ['Venere', 'Giove', 'Marte', 'Saturno'], answer: 2, difficulty: 1 },
-  { q: 'Quale animale è il re della savana?', options: ['Tigre', 'Leone', 'Ghepardo', 'Iena'], answer: 1, difficulty: 2 },
-  { q: 'Quanto fa 12 × 8?', options: ['84', '96', '104', '88'], answer: 1, difficulty: 2 },
-  { q: 'Quale strumento ha 88 tasti?', options: ['Chitarra', 'Violino', 'Pianoforte', 'Flauto'], answer: 2, difficulty: 2 },
-  { q: 'Qual è il fiume più lungo del mondo?', options: ['Nilo', 'Rio delle Amazzoni', 'Mississippi', 'Po'], answer: 1, difficulty: 2 },
-  { q: 'Chi ha dipinto la Gioconda?', options: ['Van Gogh', 'Picasso', 'Da Vinci', 'Rembrandt'], answer: 2, difficulty: 2 },
-  { q: 'Qual è l’oceano più grande?', options: ['Atlantico', 'Indiano', 'Pacifico', 'Artico'], answer: 2, difficulty: 2 },
-  { q: 'Quale gas respiriamo?', options: ['Anidride carbonica', 'Ossigeno', 'Idrogeno', 'Elio'], answer: 1, difficulty: 1 },
-  { q: 'Qual è la valuta dell’Italia?', options: ['Lira', 'Euro', 'Dollaro', 'Sterlina'], answer: 1, difficulty: 2 },
-  { q: 'Quanti lati ha un esagono?', options: ['5', '6', '7', '8'], answer: 1, difficulty: 2 },
-  { q: 'Quale animale produce il miele?', options: ['Vespa', 'Ape', 'Mosca', 'Farfalla'], answer: 1, difficulty: 1 },
-  { q: 'Qual è la montagna più alta?', options: ['Monte Bianco', 'Everest', 'K2', 'Fuji'], answer: 1, difficulty: 3 },
-  { q: 'Chi scrisse la Divina Commedia?', options: ['Dante', 'Petrarca', 'Boccaccio', 'Leopardi'], answer: 0, difficulty: 3 },
-  { q: 'Quale elemento ha simbolo O?', options: ['Oro', 'Ossigeno', 'Osmio', 'Idrogeno'], answer: 1, difficulty: 3 },
-  { q: 'Quanto vale π circa?', options: ['3,14', '2,71', '1,61', '4,20'], answer: 0, difficulty: 3 },
-  { q: 'Quale paese ha più abitanti?', options: ['India', 'Cina', 'USA', 'Indonesia'], answer: 0, difficulty: 3 },
-]
-
+// Questions are loaded from the server's SQLite-backed content store.
 const LADDER = [100, 200, 300, 500, 1000, 2000, 4000, 8000, 16000, 32000, 64000, 125000, 250000, 500000, 1000000]
 const SAFE = [4, 9, 14]
 
@@ -51,9 +30,10 @@ export function createMillionQuiz(): GameInstance {
   let fiftyMax = 3
   let skipMax = 3
   let showBoard = true
+  let bank: Q[] = []
 
   let level = 0
-  let question: Q = QUESTIONS[0]
+  let question: Q = { q: '', options: [], answer: 0, difficulty: 1 }
   let timer = 30
   let phase: 'voting' | 'locked' | 'finale' | 'break' = 'voting'
   let removed: number[] = []
@@ -67,9 +47,10 @@ export function createMillionQuiz(): GameInstance {
   const scores = newScores()
 
   const pickQuestion = () => {
+    bank = itemsFor<Q>('million-quiz')
     const diff: 1 | 2 | 3 = level <= 4 ? 1 : level <= 9 ? 2 : 3
-    const pool = QUESTIONS.filter((q) => q.difficulty === diff)
-    question = shuffled(pool)[0] ?? QUESTIONS[0]
+    const pool = bank.filter((q) => q.difficulty === diff)
+    question = shuffled(pool)[0] ?? { q: '', options: [], answer: 0, difficulty: 1 }
   }
 
   const resetVotes = () => {

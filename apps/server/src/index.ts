@@ -10,6 +10,7 @@ import {
   type ServerToClientEvents,
 } from '@zerocade/shared'
 import { getRanking, listEvents, recordEvent } from './db.js'
+import { getContent } from './content.js'
 import { getSession, selectGame, setScene, setSettings, setTriggers } from './sessions.js'
 import { RoomSources } from './sources.js'
 import { sanitizeDj, sanitizeEvent, sanitizeScene, sanitizeSettings, sanitizeSourceConfig, sanitizeTriggers } from './validate.js'
@@ -21,6 +22,7 @@ await app.register(helmet)
 
 app.get('/api/health', async () => ({ ok: true }))
 app.get('/api/games', async () => GAMES)
+app.get('/api/content', async () => getContent())
 app.get('/api/events', async (req) => {
   const q = (req.query ?? {}) as { key?: string; limit?: number }
   const key = q.key ?? ''

@@ -21,6 +21,21 @@ import { createGuessLocation } from './guessLocation'
 import { createGuessDrawing } from './guessDrawing'
 import { createContext } from './context'
 import { createMillionQuiz } from './millionQuiz'
+import { createAssociations } from './associations'
+import { createConnectWord } from './connectWord'
+import { createCrossWorld } from './crossWorld'
+import { createCrostic } from './crostic'
+import { createCrucintarsio } from './crucintarsio'
+import { createPalora } from './palora'
+import { createParolePopolari } from './parolePopolari'
+import { createParoleSolitario } from './paroleSolitario'
+import { createPerleParole } from './perleParole'
+import { createQuizBlitz } from './quizBlitz'
+import { createQuizzland } from './quizzland'
+import { createRuzzle } from './ruzzle'
+import { createTop7 } from './top7'
+import { createWildWords } from './wildWords'
+import { createWordMerge } from './wordMerge'
 
 const registry: Record<string, () => GameInstance> = {
   'gift-drop': createGiftDrop,
@@ -45,6 +60,21 @@ const registry: Record<string, () => GameInstance> = {
   'guess-drawing': createGuessDrawing,
   context: createContext,
   'million-quiz': createMillionQuiz,
+  associations: createAssociations,
+  'connect-word': createConnectWord,
+  'cross-world': createCrossWorld,
+  crostic: createCrostic,
+  crucintarsio: createCrucintarsio,
+  palora: createPalora,
+  'parole-popolari': createParolePopolari,
+  'parole-solitario': createParoleSolitario,
+  'perle-parole': createPerleParole,
+  'quiz-blitz': createQuizBlitz,
+  quizzland: createQuizzland,
+  ruzzle: createRuzzle,
+  'top-7': createTop7,
+  'wild-words': createWildWords,
+  'word-merge': createWordMerge,
 }
 
 export const createGame = (gameId: string): GameInstance | null => registry[gameId]?.() ?? null

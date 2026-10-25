@@ -1,5 +1,6 @@
 import type { GameInstance } from './engine'
 import { addPoints, drawLeaderboard, drawTimerBar, newScores, shuffled } from './common'
+import { itemsFor } from '../content'
 
 // "Trivia Time" — four-answer quiz with leaderboard, speed bonus and a 50/50 help.
 
@@ -9,28 +10,7 @@ interface Q {
   answer: number
 }
 
-const QUESTIONS: Q[] = [
-  { q: 'Quante zampe ha un ragno?', options: ['6', '8', '10', '12'], answer: 1 },
-  { q: 'Quale pianeta è detto Pianeta Rosso?', options: ['Venere', 'Giove', 'Marte', 'Saturno'], answer: 2 },
-  { q: 'Qual è la capitale d’Italia?', options: ['Milano', 'Roma', 'Napoli', 'Torino'], answer: 1 },
-  { q: 'Quanti continenti ci sono?', options: ['5', '6', '7', '8'], answer: 2 },
-  { q: 'Blu mescolato al giallo forma…', options: ['Verde', 'Viola', 'Arancione', 'Marrone'], answer: 0 },
-  { q: 'Qual è l’animale più grande?', options: ['Elefante', 'Balena azzurra', 'Giraffa', 'Squalo'], answer: 1 },
-  { q: 'Quanto fa 12 × 8?', options: ['84', '96', '104', '88'], answer: 1 },
-  { q: 'Chi ha dipinto la Gioconda?', options: ['Van Gogh', 'Picasso', 'Da Vinci', 'Rembrandt'], answer: 2 },
-  { q: 'Quale animale è il re della savana?', options: ['Tigre', 'Leone', 'Ghepardo', 'Iena'], answer: 1 },
-  { q: 'Quanti minuti ci sono in un’ora?', options: ['30', '60', '90', '120'], answer: 1 },
-  { q: 'Quale frutto è noto per la vitamina C?', options: ['Mela', 'Banana', 'Arancia', 'Pera'], answer: 2 },
-  { q: 'Quale strumento ha 88 tasti?', options: ['Chitarra', 'Violino', 'Pianoforte', 'Flauto'], answer: 2 },
-  { q: 'Qual è il fiume più lungo del mondo?', options: ['Nilo', 'Rio delle Amazzoni', 'Mississippi', 'Po'], answer: 1 },
-  { q: 'Quante settimane ci sono in un anno?', options: ['48', '50', '52', '54'], answer: 2 },
-  { q: 'Quale gas respiriamo?', options: ['Anidride carbonica', 'Ossigeno', 'Idrogeno', 'Elio'], answer: 1 },
-  { q: 'Qual è la valuta dell’Italia?', options: ['Lira', 'Euro', 'Dollaro', 'Sterlina'], answer: 1 },
-  { q: 'Quanti lati ha un esagono?', options: ['5', '6', '7', '8'], answer: 1 },
-  { q: 'Quale animale produce il miele?', options: ['Vespa', 'Ape', 'Mosca', 'Farfalla'], answer: 1 },
-  { q: 'In quale stagione cadono le foglie?', options: ['Primavera', 'Estate', 'Autunno', 'Inverno'], answer: 2 },
-  { q: 'Qual è l’oceano più grande?', options: ['Atlantico', 'Indiano', 'Pacifico', 'Artico'], answer: 2 },
-]
+// Questions are loaded from the server's SQLite-backed content store.
 export function createTriviaTime(): GameInstance {
   let width = 0
   let height = 0
@@ -41,6 +21,7 @@ export function createTriviaTime(): GameInstance {
   let speedBonus = true
   let showBoard = true
   let showVotes = true
+  let bank: Q[] = []
 
   let order: number[] = []
   let index = 0
@@ -50,10 +31,11 @@ export function createTriviaTime(): GameInstance {
   let answers = new Map<string, number>()
   const scores = newScores()
 
-  const current = () => QUESTIONS[order[index]]
+  const current = () => bank[order[index]]
 
   const shuffle = () => {
-    order = shuffled(QUESTIONS.map((_, i) => i))
+    bank = itemsFor<Q>('trivia-time')
+    order = shuffled(bank.map((_, i) => i))
     index = 0
     timer = qSecs
     revealed = false

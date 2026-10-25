@@ -1,0 +1,305 @@
+{
+  "five-letters": [
+    "AMORE", "BRAVO", "CANTO", "CORSO", "CROCE", "DONNA", "FERRO", "FIUME",
+    "FUOCO", "GRANO", "LARGO", "LEGNO", "LIBRO", "LUNGO", "MONDO", "MONTE",
+    "NOTTE", "PARCO", "PERLA", "PONTE", "PORTA", "PRATO", "RAMPA", "RICCO",
+    "ROSSO", "SCALA", "SPADA", "TEMPO", "TERRA", "TESTA", "TORRE", "TRENO",
+    "VENTO", "VERDE", "VILLA", "VISTA"
+  ],
+  "find-the-word": [
+    "SOLE", "LUNA", "MARE", "CIELO", "GATTO", "PIZZA", "PASTA", "FIORE",
+    "STELLA", "MONTAGNA", "OCEANO", "BICICLETTA", "CHITARRA", "CALCIO",
+    "FAMIGLIA", "AMICIZIA", "FORTUNA", "LIBERTA", "VIAGGIO", "MUSICA"
+  ],
+  "word-hunt": [
+    "SOLE", "MARE", "LUNA", "CANE", "GATTO", "PIZZA", "PASTA", "FIORE",
+    "STELLA", "ALBERO", "MONTAGNA", "OCEANO", "CHITARRA", "CALCIO", "ROMA",
+    "VINO", "PANE", "LATTE", "MUSICA", "LIBRO", "PORTA", "TRENO", "SERA",
+    "NOTTE", "VERDE", "ACQUA"
+  ],
+  "word-association": [
+    { "prompt": "COLORI", "words": ["ROSSO", "BLU", "VERDE", "GIALLO", "VIOLA", "ARANCIONE"] },
+    { "prompt": "ANIMALI", "words": ["CANE", "GATTO", "CAVALLO", "LEONE", "TIGRE", "ELEFANTE"] },
+    { "prompt": "SPORT", "words": ["CALCIO", "TENNIS", "NUOTO", "PALLAVOLO", "CICLISMO", "PALLA"] },
+    { "prompt": "FRUTTA", "words": ["MELA", "BANANA", "ARANCIA", "FRAGOLA", "UVA", "PERA"] },
+    { "prompt": "AL MARE", "words": ["SABBIA", "ONDE", "CONCHIGLIA", "BAGNINO", "OMBRELLONE", "SALE"] },
+    { "prompt": "SCUOLA", "words": ["LIBRO", "MAESTRA", "ZAINO", "PENNA", "BANCO", "LEZIONE"] },
+    { "prompt": "MUSICA", "words": ["CHITARRA", "PIANO", "CANZONE", "BATTERIA", "CONCERTO", "NOTA"] },
+    { "prompt": "INVERNO", "words": ["NEVE", "GELO", "SCI", "BABBO NATALE", "CAMINO", "PUPAZZO"] },
+    { "prompt": "CUCINA", "words": ["FORNELLI", "PADELLA", "RICETTA", "SALE", "ZUPPA", "TAVOLO"] },
+    { "prompt": "CITTA", "words": ["STRADA", "PALAZZO", "TRAFFICO", "METRO", "PIAZZA", "MUSEO"] },
+    { "prompt": "VIAGGIO", "words": ["AEREO", "VALIGIA", "MAPPA", "HOTEL", "PASSAPORTO", "VACANZA"] },
+    { "prompt": "NATURA", "words": ["ALBERO", "FIORE", "MONTAGNA", "FIUME", "FORESTA", "PRATO"] },
+    { "prompt": "TECNOLOGIA", "words": ["COMPUTER", "TELEFONO", "SCHERMO", "INTERNET", "ROBOT", "TASTIERA"] },
+    { "prompt": "COLAZIONE", "words": ["CAFFE", "LATTE", "BISCOTTO", "PANINO", "MARMELLATA", "SUCCO"] }
+  ],
+  "word-cross": [
+    {
+      "entries": [
+        { "word": "AMORE", "clue": "Un sentimento" },
+        { "word": "CANE", "clue": "Il migliore amico" },
+        { "word": "MARE", "clue": "Acqua salata" },
+        { "word": "GATTO", "clue": "Fa le fusa" },
+        { "word": "PANE", "clue": "Si compra dal fornaio" },
+        { "word": "LATTE", "clue": "Bevanda bianca" }
+      ]
+    },
+    {
+      "entries": [
+        { "word": "SOLE", "clue": "Stella del giorno" },
+        { "word": "ROMA", "clue": "Capitale d'Italia" },
+        { "word": "VINO", "clue": "Bevanda dall'uva" },
+        { "word": "PORTO", "clue": "Approdo delle navi" },
+        { "word": "MONDO", "clue": "Il pianeta" },
+        { "word": "ORO", "clue": "Metallo prezioso" }
+      ]
+    },
+    {
+      "entries": [
+        { "word": "VERDE", "clue": "Colore della natura" },
+        { "word": "PERA", "clue": "Un frutto" },
+        { "word": "NEVE", "clue": "Fiocchi bianchi" },
+        { "word": "TRENO", "clue": "Mezzo su rotaia" },
+        { "word": "SERA", "clue": "Dopo il pomeriggio" },
+        { "word": "TERRA", "clue": "Il nostro pianeta" }
+      ]
+    }
+  ],
+  "true-or-false": [
+    { "text": "Il miele non scade mai.", "answer": true, "why": "Grazie alla bassa umidità e all'acidità, resta commestibile per anni." },
+    { "text": "I pesci rossi hanno una memoria di soli 3 secondi.", "answer": false, "why": "La loro memoria dura settimane, anche mesi." },
+    { "text": "Il Sole è una stella.", "answer": true, "why": "È la stella più vicina alla Terra." },
+    { "text": "La Torre di Pisa è sempre stata inclinata.", "answer": false, "why": "Ha iniziato a inclinarsi durante la costruzione." },
+    { "text": "I ragni sono insetti.", "answer": false, "why": "Sono aracnidi: hanno 8 zampe, non 6." },
+    { "text": "La Grande Muraglia cinese è visibile dalla Luna.", "answer": false, "why": "Non è visibile nemmeno dalla maggior parte delle orbite." },
+    { "text": "L'acqua bolle a 100 gradi ovunque.", "answer": false, "why": "Dipende dalla pressione: in montagna bolle a temperature più basse." },
+    { "text": "Le piante producono ossigeno.", "answer": true, "why": "Lo rilasciano durante la fotosintesi." },
+    { "text": "Gli elefanti sono i mammiferi più grandi del mondo.", "answer": false, "why": "La balenottera azzurra è molto più grande." },
+    { "text": "La lingua è il muscolo più forte del corpo.", "answer": false, "why": "È formata da più muscoli, non è un singolo muscolo." },
+    { "text": "I pipistrelli sono mammiferi.", "answer": true, "why": "Sono gli unici mammiferi capaci di volo attivo." },
+    { "text": "La luce del Sole impiega circa 8 minuti per arrivare sulla Terra.", "answer": true, "why": "Viaggia a circa 300.000 km al secondo." },
+    { "text": "Gli struzzi nascondono la testa nella sabbia.", "answer": false, "why": "È un mito: si sdraiano solo per mimetizzarsi." },
+    { "text": "Il caffè contiene caffeina.", "answer": true, "why": "È una delle principali fonti naturali di caffeina." },
+    { "text": "Il deserto del Sahara è il più grande del mondo.", "answer": false, "why": "Il più grande è l'Antartide, un deserto freddo." },
+    { "text": "La banana è una bacca.", "answer": true, "why": "Botanicamente la banana è classificata come bacca." },
+    { "text": "I delfini sono pesci.", "answer": false, "why": "Sono mammiferi marini e respirano aria." },
+    { "text": "Roma è la capitale d'Italia.", "answer": true, "why": "È la capitale dal 1871." },
+    { "text": "L'olio galleggia sull'acqua.", "answer": true, "why": "È meno denso dell'acqua." },
+    { "text": "I leoni vivono nella giungla.", "answer": false, "why": "Vivono principalmente nella savana." },
+    { "text": "Il vetro è un liquido che scorre lentamente.", "answer": false, "why": "Il vetro è un solido amorfo." },
+    { "text": "Il Monte Everest è la montagna più alta del mondo.", "answer": true, "why": "Misura 8.849 metri sul livello del mare." },
+    { "text": "I serpenti hanno le palpebre.", "answer": false, "why": "Hanno una squama trasparente che protegge l'occhio." },
+    { "text": "Il corpo umano adulto ha 206 ossa.", "answer": true, "why": "Alla nascita ne ha circa 270, che si fondono crescendo." }
+  ],
+  "trivia-time": [
+    { "q": "Quante zampe ha un ragno?", "options": ["6", "8", "10", "12"], "answer": 1 },
+    { "q": "Quale pianeta è detto Pianeta Rosso?", "options": ["Venere", "Giove", "Marte", "Saturno"], "answer": 2 },
+    { "q": "Qual è la capitale d'Italia?", "options": ["Milano", "Roma", "Napoli", "Torino"], "answer": 1 },
+    { "q": "Quanti continenti ci sono?", "options": ["5", "6", "7", "8"], "answer": 2 },
+    { "q": "Blu mescolato al giallo forma…", "options": ["Verde", "Viola", "Arancione", "Marrone"], "answer": 0 },
+    { "q": "Qual è l'animale più grande?", "options": ["Elefante", "Balena azzurra", "Giraffa", "Squalo"], "answer": 1 },
+    { "q": "Quanto fa 12 x 8?", "options": ["84", "96", "104", "88"], "answer": 1 },
+    { "q": "Chi ha dipinto la Gioconda?", "options": ["Van Gogh", "Picasso", "Da Vinci", "Rembrandt"], "answer": 2 },
+    { "q": "Quale animale è il re della savana?", "options": ["Tigre", "Leone", "Ghepardo", "Iena"], "answer": 1 },
+    { "q": "Quanti minuti ci sono in un'ora?", "options": ["30", "60", "90", "120"], "answer": 1 },
+    { "q": "Quale frutto è noto per la vitamina C?", "options": ["Mela", "Banana", "Arancia", "Pera"], "answer": 2 },
+    { "q": "Quale strumento ha 88 tasti?", "options": ["Chitarra", "Violino", "Pianoforte", "Flauto"], "answer": 2 },
+    { "q": "Qual è il fiume più lungo del mondo?", "options": ["Nilo", "Rio delle Amazzoni", "Mississippi", "Po"], "answer": 1 },
+    { "q": "Quante settimane ci sono in un anno?", "options": ["48", "50", "52", "54"], "answer": 2 },
+    { "q": "Quale gas respiriamo?", "options": ["Anidride carbonica", "Ossigeno", "Idrogeno", "Elio"], "answer": 1 },
+    { "q": "Qual è la valuta dell'Italia?", "options": ["Lira", "Euro", "Dollaro", "Sterlina"], "answer": 1 },
+    { "q": "Quanti lati ha un esagono?", "options": ["5", "6", "7", "8"], "answer": 1 },
+    { "q": "Quale animale produce il miele?", "options": ["Vespa", "Ape", "Mosca", "Farfalla"], "answer": 1 },
+    { "q": "In quale stagione cadono le foglie?", "options": ["Primavera", "Estate", "Autunno", "Inverno"], "answer": 2 },
+    { "q": "Qual è l'oceano più grande?", "options": ["Atlantico", "Indiano", "Pacifico", "Artico"], "answer": 2 }
+  ],
+  "million-quiz": [
+    { "q": "Quante zampe ha un ragno?", "options": ["6", "8", "10", "12"], "answer": 1, "difficulty": 1 },
+    { "q": "Qual è la capitale d'Italia?", "options": ["Milano", "Roma", "Napoli", "Torino"], "answer": 1, "difficulty": 1 },
+    { "q": "Blu più giallo fa…", "options": ["Verde", "Viola", "Arancione", "Marrone"], "answer": 0, "difficulty": 1 },
+    { "q": "Quanti continenti ci sono?", "options": ["5", "6", "7", "8"], "answer": 2, "difficulty": 1 },
+    { "q": "Quale pianeta è detto il Pianeta Rosso?", "options": ["Venere", "Giove", "Marte", "Saturno"], "answer": 2, "difficulty": 1 },
+    { "q": "Quale animale è il re della savana?", "options": ["Tigre", "Leone", "Ghepardo", "Iena"], "answer": 1, "difficulty": 2 },
+    { "q": "Quanto fa 12 x 8?", "options": ["84", "96", "104", "88"], "answer": 1, "difficulty": 2 },
+    { "q": "Quale strumento ha 88 tasti?", "options": ["Chitarra", "Violino", "Pianoforte", "Flauto"], "answer": 2, "difficulty": 2 },
+    { "q": "Qual è il fiume più lungo del mondo?", "options": ["Nilo", "Rio delle Amazzoni", "Mississippi", "Po"], "answer": 1, "difficulty": 2 },
+    { "q": "Chi ha dipinto la Gioconda?", "options": ["Van Gogh", "Picasso", "Da Vinci", "Rembrandt"], "answer": 2, "difficulty": 2 },
+    { "q": "Qual è l'oceano più grande?", "options": ["Atlantico", "Indiano", "Pacifico", "Artico"], "answer": 2, "difficulty": 2 },
+    { "q": "Quale gas respiriamo?", "options": ["Anidride carbonica", "Ossigeno", "Idrogeno", "Elio"], "answer": 1, "difficulty": 1 },
+    { "q": "Qual è la valuta dell'Italia?", "options": ["Lira", "Euro", "Dollaro", "Sterlina"], "answer": 1, "difficulty": 2 },
+    { "q": "Quanti lati ha un esagono?", "options": ["5", "6", "7", "8"], "answer": 1, "difficulty": 2 },
+    { "q": "Quale animale produce il miele?", "options": ["Vespa", "Ape", "Mosca", "Farfalla"], "answer": 1, "difficulty": 1 },
+    { "q": "Qual è la montagna più alta?", "options": ["Monte Bianco", "Everest", "K2", "Fuji"], "answer": 1, "difficulty": 3 },
+    { "q": "Chi scrisse la Divina Commedia?", "options": ["Dante", "Petrarca", "Boccaccio", "Leopardi"], "answer": 0, "difficulty": 3 },
+    { "q": "Quale elemento ha simbolo O?", "options": ["Oro", "Ossigeno", "Osmio", "Idrogeno"], "answer": 1, "difficulty": 3 },
+    { "q": "Quanto vale pi greco circa?", "options": ["3,14", "2,71", "1,61", "4,20"], "answer": 0, "difficulty": 3 },
+    { "q": "Quale paese ha più abitanti?", "options": ["India", "Cina", "USA", "Indonesia"], "answer": 0, "difficulty": 3 }
+  ],
+  "guess-logo": [
+    { "name": "COCA COLA", "aliases": ["COCACOLA", "COLA"], "emoji": "🥤", "color": "#e61e2b", "difficulty": "easy" },
+    { "name": "NIKE", "aliases": [], "emoji": "👟", "color": "#111111", "difficulty": "easy" },
+    { "name": "APPLE", "aliases": [], "emoji": "🍎", "color": "#a2aaad", "difficulty": "easy" },
+    { "name": "MCDONALD'S", "aliases": ["MCDONALDS", "MAC"], "emoji": "🍔", "color": "#ffbc0d", "difficulty": "easy" },
+    { "name": "STARBUCKS", "aliases": [], "emoji": "☕", "color": "#00704a", "difficulty": "easy" },
+    { "name": "ADIDAS", "aliases": [], "emoji": "👕", "color": "#111111", "difficulty": "easy" },
+    { "name": "GOOGLE", "aliases": [], "emoji": "🔍", "color": "#4285f4", "difficulty": "easy" },
+    { "name": "NETFLIX", "aliases": [], "emoji": "🎬", "color": "#e50914", "difficulty": "easy" },
+    { "name": "SPOTIFY", "aliases": [], "emoji": "🎵", "color": "#1db954", "difficulty": "medium" },
+    { "name": "AMAZON", "aliases": [], "emoji": "📦", "color": "#ff9900", "difficulty": "easy" },
+    { "name": "TESLA", "aliases": [], "emoji": "🚗", "color": "#cc0000", "difficulty": "medium" },
+    { "name": "LEGO", "aliases": [], "emoji": "🧱", "color": "#d01012", "difficulty": "easy" },
+    { "name": "PLAYSTATION", "aliases": ["PS"], "emoji": "🎮", "color": "#003791", "difficulty": "medium" },
+    { "name": "XBOX", "aliases": [], "emoji": "🕹️", "color": "#107c10", "difficulty": "medium" },
+    { "name": "FERRARI", "aliases": [], "emoji": "🏎️", "color": "#dc0000", "difficulty": "medium" },
+    { "name": "YOUTUBE", "aliases": [], "emoji": "▶️", "color": "#ff0000", "difficulty": "easy" },
+    { "name": "INSTAGRAM", "aliases": ["IG"], "emoji": "📸", "color": "#e1306c", "difficulty": "easy" },
+    { "name": "TWITTER", "aliases": ["X"], "emoji": "🐦", "color": "#1da1f2", "difficulty": "medium" },
+    { "name": "PEPSI", "aliases": [], "emoji": "🥤", "color": "#004b93", "difficulty": "medium" },
+    { "name": "RED BULL", "aliases": ["REDBULL"], "emoji": "🐂", "color": "#c8102e", "difficulty": "medium" },
+    { "name": "ROLEX", "aliases": [], "emoji": "⌚", "color": "#006039", "difficulty": "hard" },
+    { "name": "GUCCI", "aliases": [], "emoji": "👜", "color": "#0f5c46", "difficulty": "hard" },
+    { "name": "VOLKSWAGEN", "aliases": ["VW"], "emoji": "🚙", "color": "#003a70", "difficulty": "hard" },
+    { "name": "NINTENDO", "aliases": [], "emoji": "🍄", "color": "#e60012", "difficulty": "medium" }
+  ],
+  "guess-location": [
+    { "country": "ITALIA", "city": "ROMA", "region": "Europa", "emoji": "🏛️", "hints": ["Colosseo", "Pasta", "Fontana di Trevi"] },
+    { "country": "FRANCIA", "city": "PARIGI", "region": "Europa", "emoji": "🗼", "hints": ["Torre Eiffel", "Croissant", "Louvre"] },
+    { "country": "EGITTO", "city": "IL CAIRO", "region": "Africa", "emoji": "🐫", "hints": ["Piramidi", "Nilo", "Sfinge"] },
+    { "country": "GIAPPONE", "city": "TOKYO", "region": "Asia", "emoji": "🗾", "hints": ["Monte Fuji", "Sushi", "Sakura"] },
+    { "country": "USA", "city": "NEW YORK", "region": "Americhe", "emoji": "🗽", "hints": ["Statua della Libertà", "Grattacieli"] },
+    { "country": "BRASILE", "city": "RIO DE JANEIRO", "region": "Americhe", "emoji": "🏖️", "hints": ["Cristo Redentore", "Carnevale"] },
+    { "country": "CINA", "city": "PECHINO", "region": "Asia", "emoji": "🏯", "hints": ["Grande Muraglia", "Dragone"] },
+    { "country": "AUSTRALIA", "city": "SYDNEY", "region": "Oceania", "emoji": "🦘", "hints": ["Opera House", "Canguri"] },
+    { "country": "SPAGNA", "city": "BARCELLONA", "region": "Europa", "emoji": "💃", "hints": ["Sagrada Familia", "Paella"] },
+    { "country": "REGNO UNITO", "city": "LONDRA", "region": "Europa", "emoji": "🎡", "hints": ["Big Ben", "London Eye"] },
+    { "country": "GRECIA", "city": "ATENE", "region": "Europa", "emoji": "🏺", "hints": ["Partenone", "Olimpiadi"] },
+    { "country": "INDIA", "city": "NUOVA DELHI", "region": "Asia", "emoji": "🕌", "hints": ["Taj Mahal", "Curry"] },
+    { "country": "MESSICO", "city": "CITTA DEL MESSICO", "region": "Americhe", "emoji": "🌮", "hints": ["Piramidi Maya", "Tacos"] },
+    { "country": "CANADA", "city": "TORONTO", "region": "Americhe", "emoji": "🍁", "hints": ["Foglia d'acero", "Niagara"] },
+    { "country": "RUSSIA", "city": "MOSCA", "region": "Europa", "emoji": "🪆", "hints": ["Cremlino", "Matrioska"] },
+    { "country": "KENYA", "city": "NAIROBI", "region": "Africa", "emoji": "🦁", "hints": ["Safari", "Savana"] },
+    { "country": "TAILANDIA", "city": "BANGKOK", "region": "Asia", "emoji": "🐘", "hints": ["Templi", "Elefanti"] },
+    { "country": "ARGENTINA", "city": "BUENOS AIRES", "region": "Americhe", "emoji": "💃", "hints": ["Tango", "Patagonia"] },
+    { "country": "GERMANIA", "city": "BERLINO", "region": "Europa", "emoji": "🏰", "hints": ["Porta di Brandeburgo", "Salsicce"] },
+    { "country": "ISLANDA", "city": "REYKJAVIK", "region": "Europa", "emoji": "🌋", "hints": ["Geyser", "Aurora boreale"] }
+  ],
+  "guess-drawing": [
+    { "key": "casa", "word": "CASA", "aliases": [] },
+    { "key": "sole", "word": "SOLE", "aliases": [] },
+    { "key": "pesce", "word": "PESCE", "aliases": ["PESCIOLINO"] },
+    { "key": "albero", "word": "ALBERO", "aliases": [] },
+    { "key": "barca", "word": "BARCA", "aliases": ["BARCHE"] },
+    { "key": "gatto", "word": "GATTO", "aliases": [] },
+    { "key": "cuore", "word": "CUORE", "aliases": ["AMORE"] },
+    { "key": "stella", "word": "STELLA", "aliases": [] },
+    { "key": "ombrello", "word": "OMBRELLO", "aliases": [] },
+    { "key": "fiore", "word": "FIORE", "aliases": [] },
+    { "key": "macchina", "word": "MACCHINA", "aliases": ["AUTO", "CAR"] },
+    { "key": "fungo", "word": "FUNGO", "aliases": [] },
+    { "key": "mela", "word": "MELA", "aliases": [] },
+    { "key": "luna", "word": "LUNA", "aliases": [] }
+  ],
+  "context": [
+    { "word": "SPIAGGIA", "hint": "Ci vai d'estate per nuotare", "close": ["MARE", "SABBIA", "ONDA", "BAGNINO"], "medium": ["SOLE", "COSTUME", "OMBRELLONE", "BARCHE"] },
+    { "word": "PIZZA", "hint": "Piatto italiano tondo", "close": ["MOZZARELLA", "FORNO", "IMPASTO", "MARINARA"], "medium": ["PASTA", "ITALIA", "POMODORO", "FARINA"] },
+    { "word": "CALCIO", "hint": "Sport con il pallone", "close": ["PALLA", "GOL", "PORTIERE", "STADIO"], "medium": ["SQUADRA", "CAMPIONATO", "TIFOSI", "ARBITRO"] },
+    { "word": "MUSICA", "hint": "Suoni e melodie", "close": ["CANZONE", "CONCERTO", "NOTA", "MELODIA"], "medium": ["CHITARRA", "PIANO", "BATTERIA", "CANTANTE"] },
+    { "word": "INVERNO", "hint": "La stagione più fredda", "close": ["NEVE", "GELO", "FREDDO", "SCI"], "medium": ["GUANTI", "CAMINO", "BABBO NATALE", "SCIARPA"] },
+    { "word": "OSPEDALE", "hint": "Ci si va quando si sta male", "close": ["MEDICO", "INFERMIERE", "PAZIENTE", "CURA"], "medium": ["AMBULANZA", "FARMACIA", "SALA", "CHIRURGO"] },
+    { "word": "SCUOLA", "hint": "Si impara in classe", "close": ["MAESTRA", "LEZIONE", "BANCO", "ZAINO"], "medium": ["LIBRO", "PENNA", "COMPITI", "ALUNNO"] },
+    { "word": "AEREO", "hint": "Vola nel cielo", "close": ["VOLO", "PILOTA", "PISTA", "AEROPORTO"], "medium": ["ALI", "CIELO", "PASSEGGERO", "TURBOLENZA"] },
+    { "word": "RISTORANTE", "hint": "Ci si mangia fuori", "close": ["MENU", "CAMERIERE", "TAVOLO", "CUCINA"], "medium": ["PIATTO", "CONTO", "CHEF", "PRENOTAZIONE"] },
+    { "word": "FORESTA", "hint": "Piena di alberi", "close": ["ALBERO", "BOSCO", "FOGLIE", "SELVA"], "medium": ["NATURA", "ANIMALI", "RADICI", "VERDE"] },
+    { "word": "FOTOGRAFIA", "hint": "Si scatta con la macchina", "close": ["FOTO", "OBIETTIVO", "SCATTO", "IMMAGINE"], "medium": ["CAMERA", "ALBUM", "LUCE", "RITRATTO"] },
+    { "word": "CIOCCOLATO", "hint": "Dolce e fondente", "close": ["CACAO", "TAVOLETTA", "DOLCE", "FONDENTE"], "medium": ["LATTE", "ZUCCHERO", "DESSERT", "PRALINA"] }
+  ],
+  "parole-popolari": [
+    { "prompt": "Cosa trovi in una spiaggia?", "answers": [
+      { "text": "SABBIA", "score": 10 }, { "text": "MARE", "score": 9 },
+      { "text": "OMBRELLONE", "score": 8 }, { "text": "CONCHIGLIE", "score": 6 },
+      { "text": "BAGNINO", "score": 5 }, { "text": "CASTELLI DI SABBIA", "score": 3 },
+      { "text": "ONDE", "score": 2 }
+    ] },
+    { "prompt": "Cosa metti su una pizza?", "answers": [
+      { "text": "MOZZARELLA", "score": 10 }, { "text": "POMODORO", "score": 9 },
+      { "text": "BASILICO", "score": 7 }, { "text": "FUNGHI", "score": 5 },
+      { "text": "PROSCIUTTO", "score": 4 }, { "text": "OLIVE", "score": 3 },
+      { "text": "ANANAS", "score": 2 }
+    ] },
+    { "prompt": "Quali animali vivono in fattoria?", "answers": [
+      { "text": "MUCCA", "score": 10 }, { "text": "CAVALLO", "score": 8 },
+      { "text": "MAIALE", "score": 7 }, { "text": "GALLINA", "score": 6 },
+      { "text": "PECORA", "score": 5 }, { "text": "CAPRA", "score": 3 },
+      { "text": "CONIGLIO", "score": 2 }
+    ] },
+    { "prompt": "Cosa porti in vacanza?", "answers": [
+      { "text": "COSTUME", "score": 10 }, { "text": "OCCHIALI DA SOLE", "score": 8 },
+      { "text": "VALIGIA", "score": 7 }, { "text": "CREMA SOLARE", "score": 6 },
+      { "text": "ASCIUGAMANO", "score": 5 }, { "text": "FOTOCAMERA", "score": 3 },
+      { "text": "LIBRO", "score": 2 }
+    ] },
+    { "prompt": "Cosa fai la mattina?", "answers": [
+      { "text": "COLAZIONE", "score": 10 }, { "text": "LAVARSI I DENTI", "score": 8 },
+      { "text": "DOCCIA", "score": 7 }, { "text": "CAFFE", "score": 6 },
+      { "text": "VESTIRSI", "score": 5 }, { "text": "SVEGLIA", "score": 4 },
+      { "text": "TELEFONO", "score": 2 }
+    ] },
+    { "prompt": "Quali sport si giocano con una palla?", "answers": [
+      { "text": "CALCIO", "score": 10 }, { "text": "BASKET", "score": 8 },
+      { "text": "TENNIS", "score": 7 }, { "text": "PALLAVOLO", "score": 6 },
+      { "text": "RUGBY", "score": 4 }, { "text": "GOLF", "score": 3 },
+      { "text": "BASEBALL", "score": 2 }
+    ] }
+  ],
+  "top-7": [
+    { "prompt": "Paesi d'Europa", "answers": ["ITALIA", "FRANCIA", "SPAGNA", "GERMANIA", "GRECIA", "PORTOGALLO", "SVEZIA"] },
+    { "prompt": "Frutti rossi", "answers": ["FRAGOLA", "CILIEGIA", "MELA", "LAMPONE", "ANGURIA", "POMODORO", "RIBES"] },
+    { "prompt": "Cose blu", "answers": ["MARE", "CIELO", "JEANS", "OCEANO", "MIRTILLI", "NETTUNO", "ZAFFIRO"] },
+    { "prompt": "Tipi di pasta", "answers": ["SPAGHETTI", "PENNE", "FUSILLI", "TAGLIATELLE", "LASAGNE", "RAVIOLI", "RIGATONI"] },
+    { "prompt": "Pianeti del sistema solare", "answers": ["MERCURIO", "VENERE", "TERRA", "MARTE", "GIOVE", "SATURNO", "URANO"] },
+    { "prompt": "Strumenti musicali", "answers": ["CHITARRA", "PIANO", "BATTERIA", "VIOLINO", "FLAUTO", "TROMBA", "SAX"] }
+  ],
+  "crostic": [
+    { "phrase": "AMORE", "answers": [
+      { "clue": "Frutto giallo ricurvo", "word": "ANANAS" },
+      { "clue": "Capitale della Lombardia", "word": "MILANO" },
+      { "clue": "Gas che respiriamo", "word": "OSSIGENO" },
+      { "clue": "Capitale d'Italia", "word": "ROMA" },
+      { "clue": "Il monte più alto del mondo", "word": "EVEREST" }
+    ] },
+    { "phrase": "VITA", "answers": [
+      { "clue": "Bevanda dall'uva", "word": "VINO" },
+      { "clue": "Paese a forma di stivale", "word": "ITALIA" },
+      { "clue": "Bevanda calda inglese", "word": "TE" },
+      { "clue": "Frutto arancione ricco di vitamina C", "word": "ARANCIA" }
+    ] },
+    { "phrase": "GIOCO", "answers": [
+      { "clue": "Dolce freddo al cucchiaio", "word": "GELATO" },
+      { "clue": "Paese a forma di stivale", "word": "ITALIA" },
+      { "clue": "Gas che respiriamo", "word": "OSSIGENO" },
+      { "clue": "Bevanda con caffeina", "word": "CAFFE" },
+      { "clue": "Metallo prezioso giallo", "word": "ORO" }
+    ] },
+    { "phrase": "MARE", "answers": [
+      { "clue": "Capitale della Lombardia", "word": "MILANO" },
+      { "clue": "Frutto arancione ricco di vitamina C", "word": "ARANCIA" },
+      { "clue": "Capitale d'Italia", "word": "ROMA" },
+      { "clue": "Il monte più alto del mondo", "word": "EVEREST" }
+    ] }
+  ],
+  "quizzland": [
+    { "q": "Quale numero segue: 2, 4, 8, 16, ...?", "options": ["24", "32", "30", "28"], "answer": 1 },
+    { "q": "Se 5 gatti prendono 5 topi in 5 minuti, quanto impiega 1 gatto a prendere 1 topo?", "options": ["1 minuto", "5 minuti", "25 minuti", "10 minuti"], "answer": 1 },
+    { "q": "Quanti mesi hanno 28 giorni?", "options": ["1", "12", "2", "6"], "answer": 1 },
+    { "q": "Quanto fa la metà di 2 + 2?", "options": ["2", "3", "4", "1"], "answer": 1 },
+    { "q": "Un padre ha 4 figlie e ogni figlia ha 1 fratello. Quanti figli ha?", "options": ["4", "5", "8", "6"], "answer": 1 },
+    { "q": "Quale parola è scritta scorrettamente in tutti i dizionari?", "options": ["Male", "Scorrettamente", "Dizionario", "Parola"], "answer": 1 },
+    { "q": "Cosa pesa di più: 1 kg di ferro o 1 kg di piume?", "options": ["Ferro", "Piume", "Pesano uguale", "Dipende"], "answer": 2 },
+    { "q": "Se superi il secondo in una gara, in che posizione sei?", "options": ["Primo", "Secondo", "Terzo", "Ultimo"], "answer": 1 }
+  ]
+}
+
+
+
+
+

@@ -1,5 +1,6 @@
 import type { GameInstance } from './engine'
 import { addPoints, drawLeaderboard, drawTimerBar, newScores, normalize, shuffled } from './common'
+import { itemsFor } from '../content'
 
 // "Word Association" — a prompt is shown and several connected words are hidden.
 // Viewers type any connected word in chat; the first solver of each slot scores.
@@ -8,23 +9,6 @@ interface Theme {
   prompt: string
   words: string[]
 }
-
-const THEMES: Theme[] = [
-  { prompt: 'COLORI', words: ['ROSSO', 'BLU', 'VERDE', 'GIALLO', 'VIOLA', 'ARANCIONE'] },
-  { prompt: 'ANIMALI', words: ['CANE', 'GATTO', 'CAVALLO', 'LEONE', 'TIGRE', 'ELEFANTE'] },
-  { prompt: 'SPORT', words: ['CALCIO', 'TENNIS', 'NUOTO', 'PALLAVOLO', 'CICLISMO', 'PALLA'] },
-  { prompt: 'FRUTTA', words: ['MELA', 'BANANA', 'ARANCIA', 'FRAGOLA', 'UVA', 'PERA'] },
-  { prompt: 'AL MARE', words: ['SABBIA', 'ONDE', 'CONCHIGLIA', 'BAGNINO', 'OMBRELLONE', 'SALE'] },
-  { prompt: 'SCUOLA', words: ['LIBRO', 'MAESTRA', 'ZAINO', 'PENNA', 'BANCO', 'LEZIONE'] },
-  { prompt: 'MUSICA', words: ['CHITARRA', 'PIANO', 'CANZONE', 'BATTERIA', 'CONCERTO', 'NOTA'] },
-  { prompt: 'INVERNO', words: ['NEVE', 'GELO', 'SCI', 'BABBO NATALE', 'CAMINO', 'PUPazzo'] },
-  { prompt: 'CUCINA', words: ['FORNELLI', 'PADELLA', 'RICETTA', 'SALE', 'ZUPPA', 'TAVOLO'] },
-  { prompt: 'CITTÀ', words: ['STRADA', 'PALAZZO', 'TRAFFICO', 'METRO', 'PIAZZA', 'MUSEO'] },
-  { prompt: 'VIAGGIO', words: ['AEREO', 'VALIGIA', 'MAPPA', 'HOTEL', 'PASSAPORTO', 'VACANZA'] },
-  { prompt: 'NATURA', words: ['ALBERO', 'FIORE', 'MONTAGNA', 'FIUME', 'FORESTA', 'PRATO'] },
-  { prompt: 'TECNOLOGIA', words: ['COMPUTER', 'TELEFONO', 'SCHERMO', 'INTERNET', 'ROBOT', 'TASTIERA'] },
-  { prompt: 'COLAZIONE', words: ['CAFFE', 'LATTE', 'BISCOTTO', 'PANINO', 'MARMELLATA', 'SUCCO'] },
-]
 export function createWordAssociation(): GameInstance {
   let width = 0
   let height = 0
@@ -36,7 +20,7 @@ export function createWordAssociation(): GameInstance {
   let drip = true
   let showBoard = true
 
-  let theme = THEMES[0]
+  let theme: Theme = { prompt: '', words: [] }
   let found = new Set<string>()
   let revealed = false
   let timer = 60
@@ -48,7 +32,7 @@ export function createWordAssociation(): GameInstance {
   const allFound = () => theme.words.every((w) => found.has(w))
 
   const pick = () => {
-    theme = shuffled(THEMES)[0]
+    theme = shuffled(itemsFor<Theme>('word-association'))[0] ?? { prompt: '', words: [] }
     found = new Set()
     revealed = false
     timer = roundSecs

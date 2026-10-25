@@ -1,5 +1,6 @@
 import type { GameInstance } from './engine'
 import { addPoints, drawLeaderboard, drawTimerBar, newScores, normalize, shuffled } from './common'
+import { itemsFor } from '../content'
 
 // "Word Cross" — a small crossword built from a set of letters. Viewers type the
 // words in chat to fill the intersecting grid.
@@ -26,33 +27,6 @@ interface Board {
   minC: number
   maxC: number
 }
-
-const PUZZLES: Entry[][] = [
-  [
-    { word: 'AMORE', clue: 'Un sentimento' },
-    { word: 'CANE', clue: 'Il migliore amico' },
-    { word: 'MARE', clue: 'Acqua salata' },
-    { word: 'GATTO', clue: 'Fa le fusa' },
-    { word: 'PANE', clue: 'Si compra dal fornaio' },
-    { word: 'LATTE', clue: 'Bevanda bianca' },
-  ],
-  [
-    { word: 'SOLE', clue: 'Stella del giorno' },
-    { word: 'ROMA', clue: 'Capitale d’Italia' },
-    { word: 'VINO', clue: 'Bevanda dall’uva' },
-    { word: 'PORTO', clue: 'Approdo delle navi' },
-    { word: 'MONDO', clue: 'Il pianeta' },
-    { word: 'ORO', clue: 'Metallo prezioso' },
-  ],
-  [
-    { word: 'VERDE', clue: 'Colore della natura' },
-    { word: 'PERA', clue: 'Un frutto' },
-    { word: 'NEVE', clue: 'Fiocchi bianchi' },
-    { word: 'TRENO', clue: 'Mezzo su rotaia' },
-    { word: 'SERA', clue: 'Dopo il pomeriggio' },
-    { word: 'TERRA', clue: 'Il nostro pianeta' },
-  ],
-]
 
 const key = (r: number, c: number) => `${r},${c}`
 
@@ -130,7 +104,7 @@ export function createWordCross(): GameInstance {
   let credit = true
   let showBoard = true
 
-  let board: Board = buildBoard(PUZZLES[0])
+  let board: Board = buildBoard([])
   let found = new Set<string>()
   let revealed = false
   let timer = breakSecs
@@ -138,7 +112,7 @@ export function createWordCross(): GameInstance {
   const scores = newScores()
 
   const pick = () => {
-    board = buildBoard(shuffled(PUZZLES)[0])
+    board = buildBoard(shuffled(itemsFor<{ entries: Entry[] }>('word-cross'))[0]?.entries ?? [])
     found = new Set()
     revealed = false
     timer = breakSecs

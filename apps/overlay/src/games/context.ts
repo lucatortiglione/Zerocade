@@ -1,5 +1,6 @@
 import type { GameInstance } from './engine'
 import { addPoints, drawLeaderboard, drawTimerBar, newScores, normalize, shuffled } from './common'
+import { itemsFor } from '../content'
 
 // "Context" — a Semantle-style game: find the hidden word by semantic closeness.
 // Every guess is ranked closer/farther using a local thesaurus-like bank.
@@ -11,20 +12,7 @@ interface Target {
   medium: string[]
 }
 
-const TARGETS: Target[] = [
-  { word: 'SPIAGGIA', hint: 'Ci vai d’estate per nuotare', close: ['MARE', 'SABBIA', 'ONDA', 'BAGNINO'], medium: ['SOLE', 'COSTUME', 'OMBRELLONE', 'BARCHE'] },
-  { word: 'PIZZA', hint: 'Piatto italiano tondo', close: ['MOZZARELLA', 'FORNO', 'IMPASTO', 'MARINARA'], medium: ['PASTA', 'ITALIA', 'POMODORO', 'FARINA'] },
-  { word: 'CALCIO', hint: 'Sport con il pallone', close: ['PALLA', 'GOL', 'PORTIERE', 'STADIO'], medium: ['SQUADRA', 'CAMPIONATO', 'TIFOSI', 'ARBITRO'] },
-  { word: 'MUSICA', hint: 'Suoni e melodie', close: ['CANZONE', 'CONCERTO', 'NOTA', 'MELODIA'], medium: ['CHITARRA', 'PIANO', 'BATTERIA', 'CANTANTE'] },
-  { word: 'INVERNO', hint: 'La stagione più fredda', close: ['NEVE', 'GELO', 'FREDDO', 'SCI'], medium: ['GUANTI', 'CAMINO', 'BABBO NATALE', 'SCIARPA'] },
-  { word: 'OSPEDALE', hint: 'Ci si va quando si sta male', close: ['MEDICO', 'INFERMIERE', 'PAZIENTE', 'CURA'], medium: ['AMBULANZA', 'FARMACIA', 'SALA', 'CHIRURGO'] },
-  { word: 'SCUOLA', hint: 'Si impara in classe', close: ['MAESTRA', 'LEZIONE', 'BANCO', 'ZAINO'], medium: ['LIBRO', 'PENNA', 'COMPITI', 'ALUNNO'] },
-  { word: 'AEREO', hint: 'Vola nel cielo', close: ['VOLO', 'PILOTA', 'PISTA', 'AEROPORTO'], medium: ['ALI', 'CIELO', 'PASSEGGERO', 'TURBOLENZA'] },
-  { word: 'RISTORANTE', hint: 'Ci si mangia fuori', close: ['MENU', 'CAMERIERE', 'TAVOLO', 'CUCINA'], medium: ['PIATTO', 'CONTO', 'CHEF', 'PRENOTAZIONE'] },
-  { word: 'FORESTA', hint: 'Piena di alberi', close: ['ALBERO', 'BOSCO', 'FOGLIE', 'SELVA'], medium: ['NATURA', 'ANIMALI', 'RADICI', 'VERDE'] },
-  { word: 'FOTOGRAFIA', hint: 'Si scatta con la macchina', close: ['FOTO', 'OBIETTIVO', 'SCATTO', 'IMMAGINE'], medium: ['CAMERA', 'ALBUM', 'LUCE', 'RITRATTO'] },
-  { word: 'CIOCCOLATO', hint: 'Dolce e fondente', close: ['CACAO', 'TAVOLETTA', 'DOLCE', 'FONDENTE'], medium: ['LATTE', 'ZUCCHERO', 'DESSERT', 'PRALINA'] },
-]
+// Targets are loaded from the server's SQLite-backed content store.
 export function createContext(): GameInstance {
   let width = 0
   let height = 0
@@ -35,7 +23,7 @@ export function createContext(): GameInstance {
   let maxHints = 5
   let showBoard = true
 
-  let target = TARGETS[0]
+  let target: Target = { word: '', hint: '', close: [], medium: [] }
   let timer = 45
   let revealed = false
   let solver = ''
@@ -46,7 +34,7 @@ export function createContext(): GameInstance {
   const scores = newScores()
 
   const pick = () => {
-    target = shuffled(TARGETS)[0]
+    target = shuffled(itemsFor<Target>('context'))[0] ?? { word: '', hint: '', close: [], medium: [] }
     timer = autoHintSecs
     revealed = false
     solver = ''

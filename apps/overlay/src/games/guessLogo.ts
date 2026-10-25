@@ -1,5 +1,6 @@
 import type { GameInstance } from './engine'
 import { addPoints, clamp, drawLeaderboard, drawTimerBar, newScores, normalize, shuffled } from './common'
+import { itemsFor } from '../content'
 
 // "Guess the Logo" — a brand logo is progressively revealed (blur / zoom /
 // scramble / none). Viewers guess the brand name (aliases accepted).
@@ -12,32 +13,7 @@ interface Brand {
   difficulty: 'easy' | 'medium' | 'hard'
 }
 
-const BRANDS: Brand[] = [
-  { name: 'COCA COLA', aliases: ['COCACOLA', 'COLA'], emoji: '🥤', color: '#e61e2b', difficulty: 'easy' },
-  { name: 'NIKE', aliases: [], emoji: '👟', color: '#111111', difficulty: 'easy' },
-  { name: 'APPLE', aliases: [], emoji: '🍎', color: '#a2aaad', difficulty: 'easy' },
-  { name: 'MCDONALD’S', aliases: ['MCDONALDS', 'MAC'], emoji: '🍔', color: '#ffbc0d', difficulty: 'easy' },
-  { name: 'STARBUCKS', aliases: [], emoji: '☕', color: '#00704a', difficulty: 'easy' },
-  { name: 'ADIDAS', aliases: [], emoji: '👕', color: '#111111', difficulty: 'easy' },
-  { name: 'GOOGLE', aliases: [], emoji: '🔍', color: '#4285f4', difficulty: 'easy' },
-  { name: 'NETFLIX', aliases: [], emoji: '🎬', color: '#e50914', difficulty: 'easy' },
-  { name: 'SPOTIFY', aliases: [], emoji: '🎵', color: '#1db954', difficulty: 'medium' },
-  { name: 'AMAZON', aliases: [], emoji: '📦', color: '#ff9900', difficulty: 'easy' },
-  { name: 'TESLA', aliases: [], emoji: '🚗', color: '#cc0000', difficulty: 'medium' },
-  { name: 'LEGO', aliases: [], emoji: '🧱', color: '#d01012', difficulty: 'easy' },
-  { name: 'PLAYSTATION', aliases: ['PS'], emoji: '🎮', color: '#003791', difficulty: 'medium' },
-  { name: 'XBOX', aliases: [], emoji: '🕹️', color: '#107c10', difficulty: 'medium' },
-  { name: 'FERRARI', aliases: [], emoji: '🏎️', color: '#dc0000', difficulty: 'medium' },
-  { name: 'YOUTUBE', aliases: [], emoji: '▶️', color: '#ff0000', difficulty: 'easy' },
-  { name: 'INSTAGRAM', aliases: ['IG'], emoji: '📸', color: '#e1306c', difficulty: 'easy' },
-  { name: 'TWITTER', aliases: ['X'], emoji: '🐦', color: '#1da1f2', difficulty: 'medium' },
-  { name: 'PEPSI', aliases: [], emoji: '🥤', color: '#004b93', difficulty: 'medium' },
-  { name: 'RED BULL', aliases: ['REDBULL'], emoji: '🐂', color: '#c8102e', difficulty: 'medium' },
-  { name: 'ROLEX', aliases: [], emoji: '⌚', color: '#006039', difficulty: 'hard' },
-  { name: 'GUCCI', aliases: [], emoji: '👜', color: '#0f5c46', difficulty: 'hard' },
-  { name: 'VOLKSWAGEN', aliases: ['VW'], emoji: '🚙', color: '#003a70', difficulty: 'hard' },
-  { name: 'NINTENDO', aliases: [], emoji: '🍄', color: '#e60012', difficulty: 'medium' },
-]
+// Brands are loaded from the server's SQLite-backed content store.
 export function createGuessLogo(): GameInstance {
   let width = 0
   let height = 0
@@ -49,7 +25,7 @@ export function createGuessLogo(): GameInstance {
   let winnerBonus = 5
   let showBoard = true
 
-  let brand = BRANDS[0]
+  let brand: Brand = { name: '', aliases: [], emoji: '❓', color: '#333333', difficulty: 'easy' }
   let timer = 20
   let revealed = false
   let solver = ''
@@ -57,7 +33,7 @@ export function createGuessLogo(): GameInstance {
   const scores = newScores()
 
   const pick = () => {
-    brand = shuffled(BRANDS)[0]
+    brand = shuffled(itemsFor<Brand>('guess-logo'))[0] ?? { name: '', aliases: [], emoji: '❓', color: '#333333', difficulty: 'easy' }
     timer = roundSecs
     revealed = false
     solver = ''

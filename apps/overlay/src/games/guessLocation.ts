@@ -1,5 +1,6 @@
 import type { GameInstance } from './engine'
 import { addPoints, drawLeaderboard, drawTimerBar, newScores, normalize, shuffled } from './common'
+import { itemsFor } from '../content'
 
 // "Guess the Location" — a stylised panorama with a landmark. Viewers guess the
 // country (and optionally the city). Letters reveal progressively as hints.
@@ -12,28 +13,7 @@ interface Location {
   hints: string[]
 }
 
-const LOCATIONS: Location[] = [
-  { country: 'ITALIA', city: 'ROMA', region: 'Europa', emoji: '🏛️', hints: ['Colosseo', 'Pasta', 'Fontana di Trevi'] },
-  { country: 'FRANCIA', city: 'PARIGI', region: 'Europa', emoji: '🗼', hints: ['Torre Eiffel', 'Croissant', 'Louvre'] },
-  { country: 'EGITTO', city: 'IL CAIRO', region: 'Africa', emoji: '🐫', hints: ['Piramidi', 'Nilo', 'Sfinge'] },
-  { country: 'GIAPPONE', city: 'TOKYO', region: 'Asia', emoji: '🗾', hints: ['Monte Fuji', 'Sushi', 'Sakura'] },
-  { country: 'USA', city: 'NEW YORK', region: 'Americhe', emoji: '🗽', hints: ['Statua della Libertà', 'Grattacieli'] },
-  { country: 'BRASILE', city: 'RIO DE JANEIRO', region: 'Americhe', emoji: '🏖️', hints: ['Cristo Redentore', 'Carnevale'] },
-  { country: 'CINA', city: 'PECHINO', region: 'Asia', emoji: '🏯', hints: ['Grande Muraglia', 'Dragone'] },
-  { country: 'AUSTRALIA', city: 'SYDNEY', region: 'Oceania', emoji: '🦘', hints: ['Opera House', 'Canguri'] },
-  { country: 'SPAGNA', city: 'BARCELLONA', region: 'Europa', emoji: '💃', hints: ['Sagrada Familia', 'Paella'] },
-  { country: 'REGNO UNITO', city: 'LONDRA', region: 'Europa', emoji: '🎡', hints: ['Big Ben', 'London Eye'] },
-  { country: 'GRECIA', city: 'ATENE', region: 'Europa', emoji: '🏺', hints: ['Partenone', 'Olimpiadi'] },
-  { country: 'INDIA', city: 'NUOVA DELHI', region: 'Asia', emoji: '🕌', hints: ['Taj Mahal', 'Curry'] },
-  { country: 'MESSICO', city: 'CITTÀ DEL MESSICO', region: 'Americhe', emoji: '🌮', hints: ['Piramidi Maya', 'Tacos'] },
-  { country: 'CANADA', city: 'TORONTO', region: 'Americhe', emoji: '🍁', hints: ['Foglia d’acero', 'Niagara'] },
-  { country: 'RUSSIA', city: 'MOSCA', region: 'Europa', emoji: '🪆', hints: ['Cremlino', 'Matrioska'] },
-  { country: 'KENYA', city: 'NAIROBI', region: 'Africa', emoji: '🦁', hints: ['Safari', 'Savana'] },
-  { country: 'TAILANDIA', city: 'BANGKOK', region: 'Asia', emoji: '🐘', hints: ['Templi', 'Elefanti'] },
-  { country: 'ARGENTINA', city: 'BUENOS AIRES', region: 'Americhe', emoji: '💃', hints: ['Tango', 'Patagonia'] },
-  { country: 'GERMANIA', city: 'BERLINO', region: 'Europa', emoji: '🏰', hints: ['Porta di Brandeburgo', 'Salsicce'] },
-  { country: 'ISLANDA', city: 'REYKJAVIK', region: 'Europa', emoji: '🌋', hints: ['Geyser', 'Aurora boreale'] },
-]
+// Locations are loaded from the server's SQLite-backed content store.
 export function createGuessLocation(): GameInstance {
   let width = 0
   let height = 0
@@ -45,7 +25,7 @@ export function createGuessLocation(): GameInstance {
   let autoHints = true
   let showBoard = true
 
-  let loc = LOCATIONS[0]
+  let loc: Location = { country: '', region: 'Europa', emoji: '📍', hints: [] }
   let timer = 45
   let revealed = false
   let countryFound = false
@@ -58,7 +38,7 @@ export function createGuessLocation(): GameInstance {
   const scores = newScores()
 
   const pick = () => {
-    loc = shuffled(LOCATIONS)[0]
+    loc = shuffled(itemsFor<Location>('guess-location'))[0] ?? { country: '', region: 'Europa', emoji: '📍', hints: [] }
     timer = roundSecs
     revealed = false
     countryFound = false

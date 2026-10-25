@@ -1,14 +1,10 @@
 import type { GameInstance } from './engine'
 import { addPoints, drawLeaderboard, drawTimerBar, newScores, normalize, shuffled } from './common'
+import { wordsFor } from '../content'
 
 // "Find the Word" — the visible prefix of a hidden word grows as viewers guess.
 // Guessing the next letter advances the word; guessing the full word solves it.
-
-const WORDS = [
-  'SOLE', 'LUNA', 'MARE', 'CIELO', 'GATTO', 'PIZZA', 'PASTA', 'FIORE',
-  'STELLA', 'MONTAGNA', 'OCEANO', 'BICICLETTA', 'CHITARRA', 'CALCIO',
-  'FAMIGLIA', 'AMICIZIA', 'FORTUNA', 'LIBERTA', 'VIAGGIO', 'MUSICA',
-]
+// The word bank is loaded from the server's SQLite-backed content store.
 
 export function createFindTheWord(): GameInstance {
   let width = 0
@@ -19,7 +15,7 @@ export function createFindTheWord(): GameInstance {
   let fullBonus = 5
   let showBoard = true
 
-  let word = WORDS[0]
+  let word = ''
   let revealed = 0
   let timer = 24
   let done = false
@@ -27,7 +23,7 @@ export function createFindTheWord(): GameInstance {
   const scores = newScores()
 
   const pick = () => {
-    word = shuffled(WORDS)[0]
+    word = shuffled(wordsFor('find-the-word'))[0] ?? ''
     revealed = 1
     timer = roundSecs
     done = false
