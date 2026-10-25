@@ -1,0 +1,91 @@
+import { drawAvatar } from './avatar'
+
+// Small helpers shared by the quiz/word games: normalisation, scoreboards,
+// leaderboard rendering and the timer bar.
+
+export interface Score {
+  name: string
+  pts: number
+  avatar?: string
+}
+
+export type Scores = Map<string, Score>
+
+export const normalize = (s: string) => s.toUpperCase().replace(/[^A-Z0-9]/g, '')
+
+export const newScores = (): Scores => new Map()
+
+export function addPoints(map: Scores, id: string, name: string, avatar: string | undefined, pts: number) {
+  const cur = map.get(id)
+  map.set(id, { name, pts: (cur?.pts ?? 0) + pts, avatar: avatar ?? cur?.avatar })
+}
+
+export const topOf = (map: Scores, n: number) =>
+  [...map.entries()].sort((a, b) => b[1].pts - a[1].pts).slice(0, n)
+
+export function drawLeaderboard(ctx: CanvasRenderingContext2D, map: Scores, size: number) {
+  const top = topOf(map, size)
+  if (!top.length) return
+  ctx.textAlign = 'left'
+  ctx.font = 'bold 20px system-ui'
+  ctx.fillStyle = '#ffffff'
+  ctx.fillText('Top players', 40, 60)
+  top.forEach(([, p], i) => {
+    const y = 88 + i * 26
+    drawAvatar(ctx, p.avatar, 52, y - 8, 11)
+    ctx.font = '18px system-ui'
+    ctx.fillStyle = i === 0 ? '#f5b14c' : '#f0f0f2'
+    ctx.fillText(`${i + 1}. ${p.name} — ${p.pts}`, 70, y)
+  })
+}
+
+export const clamp = (v: number, a: number, b: number) => Math.max(a, Math.min(b, v))
+
+export function drawTimerBar(ctx: CanvasRenderingContext2D, width: number, height: number, frac: number, color: string) {
+  ctx.fillStyle = '#00000055'
+  ctx.fillRect(40, height - 56, width - 80, 14)
+  ctx.fillStyle = color
+  ctx.fillRect(40, height - 56, (width - 80) * clamp(frac, 0, 1), 14)
+}
+
+// Fisher–Yates shuffle that never mutates the source array.
+export function shuffled<T>(arr: T[]): T[] {
+  const a = [...arr]
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1))
+    ;[a[i], a[j]] = [a[j], a[i]]
+  }
+  return a
+}
+
+// Draw a row of blank/letter tiles for "guess the word" games.
+export function drawWordTiles(
+  ctx: CanvasRenderingContext2D,
+  word: string,
+  cx: number,
+  y: number,
+  tile: number,
+  gap: number,
+  revealed: string,
+  shownColor: string,
+  hiddenColor: string,
+) {
+  const total = word.length * tile + (word.length - 1) * gap
+  let x = cx - total / 2 + tile / 2
+  for (const ch of word) {
+    const known = revealed.includes(ch)
+    ctx.fillStyle = known ? shownColor : hiddenColor
+    ctx.beginPath()
+    ctx.roundRect(x - tile / 2, y - tile / 2, tile, tile, 8)
+    ctx.fill()
+    if (known) {
+      ctx.fillStyle = '#ffffff'
+      ctx.font = `bold ${Math.round(tile * 0.55)}px system-ui`
+      ctx.textAlign = 'center'
+      ctx.textBaseline = 'middle'
+      ctx.fillText(ch, x, y + 1)
+      ctx.textBaseline = 'alphabetic'
+    }
+    x += tile + gap
+  }
+}
