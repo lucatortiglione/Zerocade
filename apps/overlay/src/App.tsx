@@ -63,8 +63,9 @@ export function App() {
     if (game) {
       for (const t of triggersFor(session.triggers, event)) engineRef.current?.pushAction(t.action, event)
     }
-    // In Bivio comments are the votes, already listed under the options.
-    if (session.gameId === 'bivio' && event.type === 'comment') return
+    // Bivio has no room for toasts over its title: votes show as bubbles, and gifts,
+    // likes and follows can still use the Avvisi widget.
+    if (session.gameId === 'bivio') return
     const id = Date.now() + Math.random()
     setToasts((prev) => [...prev.slice(-4), { id, text: describeEvent(event) }])
     const timer = setTimeout(() => setToasts((prev) => prev.filter((t) => t.id !== id)), 3200)

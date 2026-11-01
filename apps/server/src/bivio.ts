@@ -2,16 +2,17 @@ import { randomUUID } from 'node:crypto'
 import { existsSync, readFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import type {
-  BivioChoice,
-  BivioCommand,
-  BivioLang,
-  BivioState,
-  BivioStats,
-  BivioTally,
-  BivioVoter,
-  GameSettings,
-  LiveEvent,
+import {
+  BIVIO_CROWD_SIZE,
+  type BivioChoice,
+  type BivioCommand,
+  type BivioLang,
+  type BivioState,
+  type BivioStats,
+  type BivioTally,
+  type BivioVoter,
+  type GameSettings,
+  type LiveEvent,
 } from '@zerocade/shared'
 import { bivioTotals, bivioTotalsByQuestion, recordBivioVote } from './db.js'
 
@@ -135,6 +136,9 @@ const str = (s: GameSettings, id: string, fallback: string) => (typeof s[id] ===
 const EMIT_EVERY_MS = 200
 const VOTERS_SHOWN = 6
 const EXTRA_TIME_MS = 10_000
+// Voters kept per side; the overlay gets the newest BIVIO_CROWD_SIZE of them, so a viewer
+// who switches side is replaced by an older voter instead of leaving a gap.
+const CROWD_KEPT = BIVIO_CROWD_SIZE * 4
 const MAX_PHASE_MS = 600_000
 
 class BivioRoom {
@@ -146,6 +150,7 @@ class BivioRoom {
   private votes: BivioTally = { a: 0, b: 0 }
   private allTime: BivioTally | null = null
   private voters: BivioVoter[] = []
+  private crowd: Record<BivioChoice, BivioVoter[]> = { a: [], b: [] }
   private played = 0
   // While the timer runs the phase ends at `endsAt`; otherwise `leftMs` is what is left.
   // A phase with leftMs = 0 and no timer waits for the dashboard.
@@ -246,6 +251,7 @@ class BivioRoom {
       durationMs: this.durationMs,
       liveCounts: this.settings.liveCounts !== false,
       voters: this.voters,
+      crowd: { a: this.crowd.a.slice(0, BIVIO_CROWD_SIZE), b: this.crowd.b.slice(0, BIVIO_CROWD_SIZE) },
       played: this.played,
     }
   }
@@ -282,6 +288,7 @@ class BivioRoom {
     this.votes = { a: 0, b: 0 }
     this.allTime = null
     this.voters = []
+    this.crowd = { a: [], b: [] }
     if (this.current) {
       this.phase = 'voting'
       this.played++
@@ -322,7 +329,11 @@ class BivioRoom {
     this.ballots.set(event.user.id, choice)
     const { id: userId, nickname, avatar } = event.user
     recordBivioVote({ roundId: this.roundId, key: this.key, questionId: this.current.id, lang: this.lang, userId, nickname, choice })
-    this.voters = [{ nickname, avatar, choice }, ...this.voters.filter((v) => v.nickname !== nickname)].slice(0, VOTERS_SHOWN)
+    const voter: BivioVoter = { id: userId, nickname, avatar, choice }
+    this.voters = [voter, ...this.voters.filter((v) => v.id !== userId)].slice(0, VOTERS_SHOWN)
+    // A viewer who changes side leaves the other option's crowd.
+    if (prev) this.crowd[prev] = this.crowd[prev].filter((v) => v.id !== userId)
+    this.crowd[choice] = [voter, ...this.crowd[choice]].slice(0, CROWD_KEPT)
     this.queueEmit()
   }
 

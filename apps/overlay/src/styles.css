@@ -171,9 +171,108 @@ body { background: #0b0b0e; overflow: hidden; }
   background: #ffffff2e;
   transition: height 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
+
+/* Voter bubbles, under the option text. Three layers, one transform each: the spot
+   (left/top, centred), a slow float, and the entrance: the bubble rises out of the
+   bottom of the card, overshoots, settles and sends out a ring; its name shows briefly. */
+.bivio-opt__crowd { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
+.bivio-bubble {
+  position: absolute;
+  width: 6.5vmin;
+  width: 15cqi;
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%);
+}
+.bivio-bubble__float {
+  display: block;
+  width: 100%;
+  height: 100%;
+  animation: bubble-float 2.8s ease-in-out var(--float-delay, 0s) infinite alternate;
+}
+.bivio-bubble__pop {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: var(--tint, #6b7280);
+  color: #ffffff;
+  font-size: 2.8vmin;
+  font-size: 6.5cqi;
+  font-weight: 800;
+  box-shadow: 0 0 0 0.25vmin #ffffffd0, 0 0.6vmin 1.6vmin #00000066;
+  box-shadow: 0 0 0 0.6cqi #ffffffd0, 0 1.4cqi 3.6cqi #00000066;
+  animation: bubble-pop 0.8s ease-out both;
+}
+.bivio-bubble__pop img { position: absolute; inset: 0; width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
+/* Soap-bubble shine on top of the picture. */
+.bivio-bubble__pop::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 32% 26%, #ffffffc0 0 9%, transparent 24%),
+    radial-gradient(circle at 50% 50%, transparent 60%, #ffffff38 74%, transparent 80%);
+}
+.bivio-bubble__pop::after {
+  content: '';
+  position: absolute;
+  inset: -8%;
+  border: 0.35vmin solid #ffffff;
+  border: 0.8cqi solid #ffffff;
+  border-radius: 50%;
+  opacity: 0;
+  animation: bubble-ring 0.9s ease-out 0.4s;
+}
+.bivio-bubble__name {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  max-width: 60cqi;
+  margin-bottom: 1cqi;
+  padding: 0.3vmin 1vmin;
+  padding: 0.6cqi 2.4cqi;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #000000aa;
+  color: #ffffff;
+  font-size: 2.2vmin;
+  font-size: 5.5cqi;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  opacity: 0;
+  transform: translateX(-50%);
+  animation: bubble-name 2.6s ease 0.3s;
+}
+
+@keyframes bubble-pop {
+  0% { opacity: 0; transform: translateY(170%) scale(0.25); }
+  45% { opacity: 1; transform: translateY(-14%) scale(1.18); }
+  65% { transform: translateY(5%) scale(0.94); }
+  82% { transform: translateY(-2%) scale(1.03); }
+  100% { opacity: 1; transform: none; }
+}
+@keyframes bubble-ring {
+  0% { opacity: 0.9; transform: scale(0.9); }
+  100% { opacity: 0; transform: scale(1.9); }
+}
+@keyframes bubble-float {
+  from { transform: translateY(-5%) rotate(-4deg); }
+  to { transform: translateY(5%) rotate(4deg); }
+}
+@keyframes bubble-name {
+  0% { opacity: 0; transform: translate(-50%, 40%); }
+  15%, 75% { opacity: 1; transform: translate(-50%, 0); }
+  100% { opacity: 0; transform: translate(-50%, 0); }
+}
 .bivio-opt__body {
   position: absolute;
   inset: 0;
+  z-index: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -284,6 +383,10 @@ body.bivio-see-through { background: transparent; }
 .bivio__options--stacked .bivio-opt__votes { font-size: 3vmin; }
 .bivio__options--stacked .bivio-opt__all { font-size: 2.8vmin; }
 .bivio__options--stacked .bivio__or { margin: -3.4vmin 0; }
+.bivio__options--stacked .bivio-bubble { width: 7vmin; }
+.bivio__options--stacked .bivio-bubble__pop { font-size: 3vmin; box-shadow: 0 0 0 0.25vmin #ffffffd0, 0 0.6vmin 1.6vmin #00000066; }
+.bivio__options--stacked .bivio-bubble__pop::after { border-width: 0.35vmin; }
+.bivio__options--stacked .bivio-bubble__name { max-width: 30vmin; margin-bottom: 0.4vmin; padding: 0.3vmin 1vmin; font-size: 2.2vmin; }
 
 /* A message the creator sends from the dashboard, over any game. */
 .overlay-message {

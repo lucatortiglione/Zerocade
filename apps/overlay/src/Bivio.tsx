@@ -1,4 +1,4 @@
-import { useEffect, useState, type CSSProperties } from 'react'
+import { useEffect, useRef, useState, type CSSProperties } from 'react'
 import {
   BIVIO_DEFAULT_COLORS,
   bivioCategoryById,
@@ -6,6 +6,7 @@ import {
   type BivioLang,
   type BivioState,
   type BivioTally,
+  type BivioVoter,
   type GameSettings,
 } from '@zerocade/shared'
 import appDark from '@bivio/backgrounds/app_dark.svg'
@@ -192,6 +193,7 @@ function Round({ state, at, settings }: { state: BivioState; at: number; setting
     stacked: look.stacked,
     outcome: winner ? (winner === choice ? 'win' : 'lose') : null,
     allTime: allTime ? `${ui.allLives}: ${shareOf(allTime, choice)}%` : null,
+    crowd: state.crowd[choice],
     lang: state.lang,
   })
 
@@ -238,7 +240,7 @@ function Round({ state, at, settings }: { state: BivioState; at: number; setting
             <p className="bivio__status">{[status, votesLabel(state.lang, total)].filter(Boolean).join(' · ')}</p>
             <div className="bivio__voters">
               {state.voters.map((v) => (
-                <span key={v.nickname} className={`bivio__voter bivio__voter--${v.choice}`}>
+                <span key={v.id} className={`bivio__voter bivio__voter--${v.choice}`}>
                   {v.nickname} → {v.choice.toUpperCase()}
                 </span>
               ))}
@@ -260,18 +262,30 @@ interface OptionProps {
   stacked: boolean
   outcome: 'win' | 'lose' | null
   allTime: string | null
+  crowd: BivioVoter[]
   lang: BivioLang
 }
 
-function Option({ choice, text, background, share, votes, showCounts, stacked, outcome, allTime, lang }: OptionProps) {
+function Option({ choice, text, background, share, votes, showCounts, stacked, outcome, allTime, crowd, lang }: OptionProps) {
   // Side-by-side cards fill from the bottom, stacked ones from the left.
   const fill = showCounts ? `${share}%` : '0%'
+  const slots = useSlots(crowd)
   return (
     <div
       className={`bivio-opt bivio-opt--${choice}${outcome ? ` bivio-opt--${outcome}` : ''}`}
       style={{ backgroundImage: background }}
     >
       <div className="bivio-opt__fill" style={stacked ? { width: fill } : { height: fill }} />
+      {/* Keyed by viewer: only a new voter mounts, and so only a new voter pops in. */}
+      <div className="bivio-opt__crowd" aria-hidden="true">
+        {crowd.map((v, i) => (
+          <Bubble
+            key={v.id}
+            voter={v}
+            style={{ ...bubbleSpot(v.id, slots.get(v.id) ?? i, stacked), zIndex: crowd.length - i }}
+          />
+        ))}
+      </div>
       <div className="bivio-opt__body">
         <span className="bivio-opt__letter">{choice.toUpperCase()}</span>
         <p className={`bivio-opt__text${textSize(text)}`}>{capitalize(text)}</p>
@@ -284,5 +298,72 @@ function Option({ choice, text, background, share, votes, showCounts, stacked, o
         {allTime && <span className="bivio-opt__all">{allTime}</span>}
       </div>
     </div>
+  )
+}
+
+// Bubble centres (% of the card), filled in this order. Side-by-side cards build a
+// honeycomb pile up from the bottom; stacked cards, wide and short, use the side margins.
+const SIDE_SLOTS: [number, number][] = [
+  [50, 91], [31, 91], [69, 91], [12, 91], [88, 91],
+  [40.5, 82.5], [59.5, 82.5], [21.5, 82.5], [78.5, 82.5],
+  [50, 74], [31, 74], [69, 74],
+]
+const STACKED_SLOTS: [number, number][] = [
+  [7, 30], [93, 30], [7, 58], [93, 58], [7, 86], [93, 86],
+  [16, 44], [84, 44], [16, 72], [84, 72], [16, 16], [84, 16],
+]
+
+// Each voter keeps the slot it landed in, so bubbles never jump when others leave; a
+// newcomer takes the first free one. Option is keyed by round, so slots reset with it.
+function useSlots(crowd: BivioVoter[]): Map<string, number> {
+  const slots = useRef(new Map<string, number>()).current
+  const present = new Set(crowd.map((v) => v.id))
+  for (const id of slots.keys()) if (!present.has(id)) slots.delete(id)
+  const taken = new Set(slots.values())
+  for (const v of [...crowd].reverse()) {
+    if (slots.has(v.id)) continue
+    let slot = 0
+    while (taken.has(slot)) slot++
+    slots.set(v.id, slot)
+    taken.add(slot)
+  }
+  return slots
+}
+
+const hashOf = (s: string) => [...s].reduce((h, c) => (Math.imul(h, 31) + c.charCodeAt(0)) >>> 0, 7)
+
+// The slot, nudged a little per viewer so the pile looks loose, plus a float phase and a
+// fallback colour, all from the viewer's id.
+function bubbleSpot(id: string, slot: number, stacked: boolean): CSSProperties {
+  const slotList = stacked ? STACKED_SLOTS : SIDE_SLOTS
+  const [x, y] = slotList[slot % slotList.length]
+  const h = hashOf(id)
+  const r1 = (h % 1000) / 1000
+  const r2 = ((h >>> 10) % 1000) / 1000
+  const r3 = ((h >>> 20) % 1000) / 1000
+  return {
+    left: `${(x + (r1 - 0.5) * 4).toFixed(1)}%`,
+    top: `${(y + (r2 - 0.5) * 3).toFixed(1)}%`,
+    '--float-delay': `${(-r3 * 3).toFixed(2)}s`,
+    '--tint': `hsl(${Math.round(r3 * 360)} 65% 45%)`,
+  } as CSSProperties
+}
+
+// The viewer's TikTok picture in a bubble, or their initial if there is none (Twitch)
+// or it fails to load.
+function Bubble({ voter, style }: { voter: BivioVoter; style: CSSProperties }) {
+  const [broken, setBroken] = useState(false)
+  return (
+    <span className="bivio-bubble" style={style}>
+      <span className="bivio-bubble__float">
+        <span className="bivio-bubble__pop">
+          {voter.nickname.charAt(0).toUpperCase()}
+          {voter.avatar && !broken && (
+            <img src={voter.avatar} alt="" referrerPolicy="no-referrer" onError={() => setBroken(true)} />
+          )}
+        </span>
+      </span>
+      <span className="bivio-bubble__name">{voter.nickname}</span>
+    </span>
   )
 }

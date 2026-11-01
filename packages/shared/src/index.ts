@@ -226,10 +226,16 @@ export interface BivioTally {
 }
 
 export interface BivioVoter {
+  // The viewer's id: stable across rounds and side changes, so the overlay can tell a new
+  // voter from one it already shows.
+  id: string
   nickname: string
   avatar?: string
   choice: BivioChoice
 }
+
+// How many voters each option keeps for the overlay's avatar bubbles.
+export const BIVIO_CROWD_SIZE = 12
 
 export interface BivioState {
   // 'break' is the pause between a result and the next dilemma; 'empty' when no
@@ -247,6 +253,8 @@ export interface BivioState {
   durationMs: number
   liveCounts: boolean
   voters: BivioVoter[]
+  // The latest voters on each side, newest first: one avatar bubble each in that option.
+  crowd: Record<BivioChoice, BivioVoter[]>
   played: number
 }
 
