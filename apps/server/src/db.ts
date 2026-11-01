@@ -2,14 +2,15 @@ import { mkdirSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import Database from 'better-sqlite3'
-import { giftById, type Gifter, type LiveEvent } from '@zerocade/shared'
+import { giftById, type BivioChoice, type BivioTally, type Gifter, type LiveEvent } from '@zerocade/shared'
 
 // Local persistence via better-sqlite3 (latest stable SQLite engine). The DB file
 // lives in apps/server/data and is gitignored; set ZEROCADE_DB to override the path.
 
 const here = dirname(fileURLToPath(import.meta.url))
 const dbPath = process.env.ZEROCADE_DB ?? join(here, '..', 'data', 'zerocade.db')
-mkdirSync(dirname(dbPath), { recursive: true })
+export const dataDir = dirname(dbPath)
+mkdirSync(dataDir, { recursive: true })
 
 const db = new Database(dbPath)
 db.exec('PRAGMA journal_mode = WAL;')
@@ -38,6 +39,18 @@ db.exec(`
     created_at TEXT NOT NULL DEFAULT (datetime('now'))
   );
   CREATE INDEX IF NOT EXISTS idx_events_key ON events (key, id);
+  CREATE TABLE IF NOT EXISTS bivio_votes (
+    round_id TEXT NOT NULL,
+    key TEXT NOT NULL,
+    question_id TEXT NOT NULL,
+    lang TEXT NOT NULL,
+    user_id TEXT NOT NULL,
+    nickname TEXT NOT NULL,
+    choice TEXT NOT NULL CHECK (choice IN ('a', 'b')),
+    voted_at TEXT NOT NULL DEFAULT (datetime('now')),
+    PRIMARY KEY (round_id, user_id)
+  );
+  CREATE INDEX IF NOT EXISTS idx_bivio_votes_question ON bivio_votes (question_id);
 `)
 
 // Migrate databases created before the widgets/goal columns existed.
@@ -129,3 +142,43 @@ export const recordEvent = (key: string, event: LiveEvent): void => {
     gifterUpsert.run(key, event.user.id, event.user.nickname, coins)
   }
 }
+// --- Bivio votes ---
+// One row per viewer per round; a changed vote overwrites the previous one.
+
+const bivioVoteUpsert = db.prepare(`
+  INSERT INTO bivio_votes (round_id, key, question_id, lang, user_id, nickname, choice) VALUES (?, ?, ?, ?, ?, ?, ?)
+  ON CONFLICT(round_id, user_id) DO UPDATE SET
+    nickname = excluded.nickname,
+    choice = excluded.choice,
+    voted_at = datetime('now')
+`)
+const bivioQuestionTotals = db.prepare(`
+  SELECT COALESCE(SUM(choice = 'a'), 0) AS a, COALESCE(SUM(choice = 'b'), 0) AS b FROM bivio_votes WHERE question_id = ?
+`)
+const bivioAllTotals = db.prepare(`
+  SELECT question_id AS id, SUM(choice = 'a') AS a, SUM(choice = 'b') AS b, COUNT(DISTINCT round_id) AS rounds
+  FROM bivio_votes GROUP BY question_id
+`)
+
+export interface BivioVote {
+  roundId: string
+  key: string
+  questionId: string
+  lang: string
+  userId: string
+  nickname: string
+  choice: BivioChoice
+}
+
+export interface BivioTotalsRow extends BivioTally {
+  id: string
+  rounds: number
+}
+
+export const recordBivioVote = (v: BivioVote): void => {
+  bivioVoteUpsert.run(v.roundId, v.key, v.questionId, v.lang, v.userId, v.nickname, v.choice)
+}
+
+export const bivioTotals = (questionId: string): BivioTally => bivioQuestionTotals.get(questionId) as BivioTally
+
+export const bivioTotalsByQuestion = (): BivioTotalsRow[] => bivioAllTotals.all() as unknown as BivioTotalsRow[]

@@ -1,5 +1,5 @@
 import { useSyncExternalStore } from 'react'
-import { giftById, type Gifter, type LiveEvent, type SessionState } from '@zerocade/shared'
+import { giftById, type BivioState, type Gifter, type LiveEvent, type SessionState } from '@zerocade/shared'
 import { socket } from './socket'
 import { playSound } from './audio'
 
@@ -11,6 +11,12 @@ interface OverlayState {
   ranking: Gifter[]
   lastFollower: string | null
   totalCoins: number
+  bivio: BivioState | null
+  // performance.now() when `bivio` arrived, to count its remainingMs down locally.
+  bivioAt: number
+  // The creator's latest message, shown for a few seconds; messageSeq keys each one.
+  message: string | null
+  messageSeq: number
 }
 
 let state: OverlayState = {
@@ -21,6 +27,10 @@ let state: OverlayState = {
   ranking: [],
   lastFollower: null,
   totalCoins: 0,
+  bivio: null,
+  bivioAt: 0,
+  message: null,
+  messageSeq: 0,
 }
 const listeners = new Set<() => void>()
 
@@ -40,6 +50,16 @@ socket.on('live:event', (event) => {
   update(patch)
 })
 socket.on('dj:play', (play) => playSound(play))
+socket.on('bivio:state', (bivio) => update({ bivio, bivioAt: performance.now() }))
+
+const MESSAGE_MS = 8000
+socket.on('overlay:message', (message) => {
+  const messageSeq = state.messageSeq + 1
+  update({ message, messageSeq })
+  setTimeout(() => {
+    if (state.messageSeq === messageSeq) update({ message: null })
+  }, MESSAGE_MS)
+})
 
 function subscribe(listener: () => void) {
   listeners.add(listener)

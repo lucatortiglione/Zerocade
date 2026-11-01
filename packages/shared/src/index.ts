@@ -152,10 +152,20 @@ export const MAX_TRIGGERS = 16
 
 // --- Live-tunable settings ---
 
-export type GameSetting =
-  | { id: string; label: string; kind: 'number'; min: number; max: number; step: number; default: number }
-  | { id: string; label: string; kind: 'toggle'; default: boolean }
-  | { id: string; label: string; kind: 'select'; options: { value: string; label: string }[]; default: string }
+// `group` puts a setting under a sub-heading in the dashboard, `hint` explains it.
+// A 'multi' value is a comma-separated list of option values, '' meaning all of them;
+// an 'image' value is the URL of an image uploaded to the server, '' meaning none.
+type SettingBase = { id: string; label: string; group?: string; hint?: string }
+
+export type GameSetting = SettingBase &
+  (
+    | { kind: 'number'; min: number; max: number; step: number; default: number }
+    | { kind: 'toggle'; default: boolean }
+    | { kind: 'select'; options: { value: string; label: string }[]; default: string }
+    | { kind: 'multi'; options: { value: string; label: string }[]; default: string }
+    | { kind: 'color'; default: string }
+    | { kind: 'image'; default: string }
+  )
 
 export type GameSettings = Record<string, number | boolean | string>
 
@@ -175,6 +185,93 @@ export interface GameDef {
   actions: { id: string; label: string }[]
   settings: GameSetting[]
   defaultTriggers: Trigger[]
+}
+
+// --- Bivio ("Preferiresti…?") ---
+// The one server-driven game: the server picks the dilemma, counts the A/B votes from
+// chat (once per room, however many overlays are open) and stores them in SQLite.
+// The overlay and the dashboard only render the BivioState it sends.
+
+export type BivioLang = 'it' | 'en'
+export type BivioChoice = 'a' | 'b'
+
+export interface BivioCategory {
+  id: string
+  it: string
+  en: string
+  colors: [string, string]
+}
+
+// Same ids and colours as gioco-dilemmi/tools/make_category_assets.py.
+export const BIVIO_CATEGORIES: BivioCategory[] = [
+  { id: 'cibo', it: 'Cibo', en: 'Food', colors: ['#ffb547', '#f97316'] },
+  { id: 'soldi', it: 'Soldi', en: 'Money', colors: ['#4ade80', '#15803d'] },
+  { id: 'fantasia', it: 'Fantasia', en: 'Fantasy', colors: ['#c084fc', '#7e22ce'] },
+  { id: 'sopravvivenza', it: 'Sopravvivenza', en: 'Survival', colors: ['#a3a36b', '#4d5b2a'] },
+  { id: 'viaggi', it: 'Viaggi', en: 'Travel', colors: ['#38bdf8', '#0369a1'] },
+  { id: 'scuola_lavoro', it: 'Scuola e lavoro', en: 'School & work', colors: ['#94a3b8', '#334155'] },
+  { id: 'social_tech', it: 'Social e tech', en: 'Social & tech', colors: ['#f472b6', '#be185d'] },
+  { id: 'sport', it: 'Sport', en: 'Sports', colors: ['#fb7185', '#b91c1c'] },
+  { id: 'tempo', it: 'Tempo', en: 'Time', colors: ['#fcd34d', '#b45309'] },
+  { id: 'amici_famiglia', it: 'Amici e famiglia', en: 'Friends & family', colors: ['#5eead4', '#0f766e'] },
+  { id: 'dilemmi', it: 'Dilemmi', en: 'Dilemmas', colors: ['#818cf8', '#3730a3'] },
+  { id: 'assurde', it: 'Assurde', en: 'Absurd', colors: ['#facc15', '#ea580c'] },
+]
+
+export const bivioCategoryById = (id: string) => BIVIO_CATEGORIES.find((c) => c.id === id)
+
+export interface BivioTally {
+  a: number
+  b: number
+}
+
+export interface BivioVoter {
+  nickname: string
+  avatar?: string
+  choice: BivioChoice
+}
+
+export interface BivioState {
+  // 'break' is the pause between a result and the next dilemma; 'empty' when no
+  // dilemma matches the chosen language, categories and difficulty.
+  phase: 'voting' | 'reveal' | 'break' | 'empty'
+  paused: boolean
+  lang: BivioLang
+  roundId: string
+  question: { id: string; category: string; difficulty: string; a: string; b: string } | null
+  votes: BivioTally
+  // Every vote ever stored for this dilemma, across all lives; sent with the reveal.
+  allTime: BivioTally | null
+  // Time left in the current phase when the state was sent; 0 with no timer running.
+  remainingMs: number
+  durationMs: number
+  liveCounts: boolean
+  voters: BivioVoter[]
+  played: number
+}
+
+export type BivioCommand = 'next' | 'reveal' | 'extra-time' | 'pause' | 'resume' | 'restart'
+
+// Default look, taken from gioco-dilemmi/assets: with these values the overlay uses the
+// game's own artwork instead of flat colours.
+export const BIVIO_DEFAULT_COLORS = { a: '#2dd4bf', b: '#a78bfa', accent: '#ffffff', text: '#ffffff', background: '#0b0c18' }
+
+// Path the server hosts a room's uploaded Bivio background at.
+export const bivioBackgroundPath = (key: string) => `/api/bivio/background/${key}`
+
+export interface BivioQuestionStats {
+  id: string
+  category: string
+  a: string
+  b: string
+  votesA: number
+  votesB: number
+  rounds: number
+}
+
+export interface BivioStats {
+  totalVotes: number
+  questions: BivioQuestionStats[]
 }
 
 export const GAMES: GameDef[] = [
@@ -922,6 +1019,121 @@ export const GAMES: GameDef[] = [
     ],
     defaultTriggers: [{ source: { type: 'comment' }, action: 'guess' }],
   },
+  {
+    id: 'bivio',
+    name: 'Bivio',
+    category: 'Party',
+    description: 'Preferiresti…? Il pubblico vota A o B in chat; ogni risposta resta salvata sul PC.',
+    emoji: '🔀',
+    gradient: ['#2dd4bf', '#5b21b6'],
+    actions: [
+      { id: 'vote', label: 'Vota' },
+      { id: 'extra_time', label: 'Tempo extra' },
+      { id: 'next', label: 'Prossima domanda' },
+    ],
+    settings: [
+      {
+        id: 'lang',
+        label: 'Lingua',
+        kind: 'select',
+        default: 'it',
+        options: [
+          { value: 'it', label: 'Italiano' },
+          { value: 'en', label: 'English' },
+        ],
+      },
+      {
+        id: 'categories',
+        label: 'Categorie',
+        kind: 'multi',
+        default: '',
+        options: BIVIO_CATEGORIES.map((c) => ({ value: c.id, label: c.it })),
+      },
+      {
+        id: 'difficulty',
+        label: 'Domande',
+        hint: 'Leggere: dilemmi veloci. Impegnative: scelte più difficili.',
+        kind: 'select',
+        default: 'all',
+        options: [
+          { value: 'all', label: 'Miste' },
+          { value: 'light', label: 'Leggere' },
+          { value: 'tough', label: 'Impegnative' },
+        ],
+      },
+      { id: 'voteSeconds', label: 'Secondi per votare', kind: 'number', min: 10, max: 120, step: 1, default: 30 },
+      { id: 'revealSeconds', label: 'Secondi sul risultato', kind: 'number', min: 3, max: 30, step: 1, default: 8 },
+      { id: 'breakSeconds', label: 'Secondi tra le domande', kind: 'number', min: 0, max: 30, step: 1, default: 2 },
+      {
+        id: 'inputMode',
+        label: 'Cosa scrivono gli spettatori',
+        hint: 'Automatico accetta A/B, 1/2 e 🅰️/🅱️. Un commento conta solo se contiene solo la scelta.',
+        kind: 'select',
+        default: 'auto',
+        options: [
+          { value: 'auto', label: 'Automatico' },
+          { value: 'letters', label: 'A o B' },
+          { value: 'numbers', label: '1 o 2' },
+        ],
+      },
+      {
+        id: 'allowChange',
+        label: 'Gli spettatori possono cambiare lato',
+        hint: 'Se attivo, vale l’ultimo voto di ogni spettatore; altrimenti il primo.',
+        kind: 'toggle',
+        default: true,
+      },
+      { id: 'autoNext', label: 'Avanza da solo', kind: 'toggle', default: true },
+      {
+        id: 'tts',
+        label: 'Leggi la domanda ad alta voce (TTS)',
+        hint: 'Usa la sintesi vocale del browser dell’overlay; l’anteprima della dashboard resta muta.',
+        kind: 'toggle',
+        default: false,
+      },
+      {
+        id: 'layout',
+        label: 'Layout',
+        group: 'Aspetto',
+        kind: 'select',
+        default: 'side',
+        options: [
+          { value: 'side', label: 'Affiancate' },
+          { value: 'stacked', label: 'Una sopra l’altra' },
+        ],
+      },
+      { id: 'colorA', label: 'Prima opzione', group: 'Aspetto', kind: 'color', default: BIVIO_DEFAULT_COLORS.a },
+      { id: 'colorB', label: 'Seconda opzione', group: 'Aspetto', kind: 'color', default: BIVIO_DEFAULT_COLORS.b },
+      {
+        id: 'accent',
+        label: 'Accento',
+        hint: 'Barra del tempo, bordo dell’opzione vincente e cerchio «o».',
+        group: 'Aspetto',
+        kind: 'color',
+        default: BIVIO_DEFAULT_COLORS.accent,
+      },
+      {
+        id: 'textColor',
+        label: 'Testo sullo sfondo',
+        hint: 'Titolo, stato e nomi di chi vota; il testo sulle opzioni resta bianco.',
+        group: 'Aspetto',
+        kind: 'color',
+        default: BIVIO_DEFAULT_COLORS.text,
+      },
+      { id: 'bgColor', label: 'Colore', group: 'Sfondo', kind: 'color', default: BIVIO_DEFAULT_COLORS.background },
+      { id: 'bgTransparent', label: 'Trasparente', group: 'Sfondo', kind: 'toggle', default: false },
+      { id: 'bgImage', label: 'Immagine (sostituisce il colore)', group: 'Sfondo', kind: 'image', default: '' },
+      {
+        id: 'liveCounts',
+        label: 'Percentuali durante il voto',
+        hint: 'Se spento, le percentuali compaiono solo con il risultato.',
+        group: 'Effetti',
+        kind: 'toggle',
+        default: true,
+      },
+    ],
+    defaultTriggers: [{ source: { type: 'comment' }, action: 'vote' }],
+  },
 ]
 
 
@@ -1016,6 +1228,9 @@ export interface ServerToClientEvents {
   'dj:play': (play: DjPlay) => void
   'source:status': (status: SourceStatus) => void
   'ranking:update': (ranking: Gifter[]) => void
+  'bivio:state': (state: BivioState) => void
+  // A short text the creator shows on the overlay ("Invia messaggio").
+  'overlay:message': (text: string) => void
 }
 
 export interface ClientToServerEvents {
@@ -1027,6 +1242,8 @@ export interface ClientToServerEvents {
   'source:connect': (config: SourceConfig) => void
   'source:disconnect': (kind: SourceKind) => void
   'scene:set': (scene: Partial<WidgetConfig>) => void
+  'bivio:control': (command: BivioCommand) => void
+  'message:send': (text: string) => void
 }
 
 export type ClientType = 'dashboard' | 'overlay'

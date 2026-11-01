@@ -26,10 +26,12 @@ export function getSession(key: string): SessionState {
   const row = loadSession(key)
   if (row) {
     try {
+      const game = GAMES.find((g) => g.id === row.game_id) ?? GAMES[0]
       return {
-        gameId: GAMES.some((g) => g.id === row.game_id) ? row.game_id : GAMES[0].id,
+        gameId: game.id,
         triggers: JSON.parse(row.triggers) as Trigger[],
-        settings: JSON.parse(row.settings) as GameSettings,
+        // Settings added to a game after this session was saved start at their default.
+        settings: { ...defaultSettings(game.settings), ...(JSON.parse(row.settings) as GameSettings) },
         widgets: JSON.parse(row.widgets ?? '{}') as SessionState['widgets'],
         goal: typeof row.goal === 'number' ? row.goal : DEFAULT_WIDGETS.goal,
       }

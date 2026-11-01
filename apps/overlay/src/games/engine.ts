@@ -35,11 +35,19 @@ export class Engine {
     instance.reset(settings, this.ctx.canvas.width, this.ctx.canvas.height)
   }
 
+  // No canvas game (Bivio renders in the DOM, or the id is unknown): blank the canvas.
+  clear() {
+    this.instance = null
+    this.actions.length = 0
+    this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height)
+  }
+
   setSettings(settings: GameSettings) {
     this.settings = settings
   }
 
   pushAction(action: string, event: LiveEvent) {
+    if (!this.instance) return
     this.actions.push({ action, event, now: performance.now() })
     if (this.actions.length > 300) this.actions.shift()
   }

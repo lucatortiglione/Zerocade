@@ -24,7 +24,8 @@ const encode = (source: TriggerSource) =>
 
 const decode = (value: string) => SOURCES.find((s) => encode(s) === value) ?? SOURCES[0]
 
-export function TriggerEditor({ session }: { session: SessionState }) {
+// `titled` = false when a collapsible section around it already names it.
+export function TriggerEditor({ session, titled = true }: { session: SessionState; titled?: boolean }) {
   const game = GAMES.find((g) => g.id === session.gameId)
   if (!game) return null
 
@@ -35,7 +36,7 @@ export function TriggerEditor({ session }: { session: SessionState }) {
 
   return (
     <section>
-      <h2 className="section-label">Triggers</h2>
+      {titled && <h2 className="section-label">Triggers</h2>}
       <p className="text-muted small">Viewers see these in the overlay's side columns.</p>
       <ul className="trigger-list">
         {session.triggers.map((trigger, i) => (

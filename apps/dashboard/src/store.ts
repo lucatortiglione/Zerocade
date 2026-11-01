@@ -1,5 +1,5 @@
 import { useSyncExternalStore } from 'react'
-import { type Gifter, type SessionState, type SourceKind, type SourceStatus } from '@zerocade/shared'
+import { type BivioState, type Gifter, type SessionState, type SourceKind, type SourceStatus } from '@zerocade/shared'
 import { socket } from './socket'
 
 // A small external store fed by the socket; components read it with useDashboard().
@@ -9,9 +9,10 @@ interface DashboardState {
   session: SessionState | null
   gifters: Gifter[]
   sources: Partial<Record<SourceKind, SourceStatus>>
+  bivio: BivioState | null
 }
 
-let state: DashboardState = { connected: false, session: null, gifters: [], sources: {} }
+let state: DashboardState = { connected: false, session: null, gifters: [], sources: {}, bivio: null }
 const listeners = new Set<() => void>()
 
 function update(patch: Partial<DashboardState>) {
@@ -26,6 +27,7 @@ socket.on('ranking:update', (ranking) => update({ gifters: ranking }))
 socket.on('source:status', (status) => {
   update({ sources: { ...state.sources, [status.kind]: status } })
 })
+socket.on('bivio:state', (bivio) => update({ bivio }))
 
 function subscribe(listener: () => void) {
   listeners.add(listener)

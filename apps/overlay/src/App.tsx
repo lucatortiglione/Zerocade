@@ -4,6 +4,7 @@ import { Engine } from './games/engine'
 import { createGame } from './games/registry'
 import { useOverlay } from './store'
 import { Widgets } from './Widgets'
+import { Bivio } from './Bivio'
 import { isContentReady, loadContent, subscribeContent } from './content'
 
 interface Toast {
@@ -12,7 +13,7 @@ interface Toast {
 }
 
 export function App() {
-  const { connected, session, event, seq } = useOverlay()
+  const { connected, session, event, seq, message, messageSeq } = useOverlay()
   const contentReady = useSyncExternalStore(subscribeContent, isContentReady)
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const engineRef = useRef<Engine | null>(null)
@@ -41,11 +42,13 @@ export function App() {
   }, [])
 
   // Swap the game when the selection changes (only once content is loaded).
+  // Games without a canvas instance (Bivio) leave the canvas blank.
   useEffect(() => {
     if (!session || !contentReady) return
     const game = GAMES.find((g) => g.id === session.gameId)
     const instance = game ? createGame(game.id) : null
     if (game && instance) engineRef.current?.setGame(instance, session.settings)
+    else engineRef.current?.clear()
   }, [session?.gameId, contentReady])
 
   // Tune settings live.
@@ -60,6 +63,8 @@ export function App() {
     if (game) {
       for (const t of triggersFor(session.triggers, event)) engineRef.current?.pushAction(t.action, event)
     }
+    // In Bivio comments are the votes, already listed under the options.
+    if (session.gameId === 'bivio' && event.type === 'comment') return
     const id = Date.now() + Math.random()
     setToasts((prev) => [...prev.slice(-4), { id, text: describeEvent(event) }])
     const timer = setTimeout(() => setToasts((prev) => prev.filter((t) => t.id !== id)), 3200)
@@ -71,6 +76,7 @@ export function App() {
   return (
     <div className="overlay">
       <canvas ref={canvasRef} className="overlay__canvas" />
+      {session?.gameId === 'bivio' && <Bivio />}
       <header className="overlay__top">
         <span className="overlay__brand">{game?.emoji ?? '🎮'}</span>
         <span className="overlay__title">{game?.name ?? 'Zerocade'}</span>
@@ -78,6 +84,12 @@ export function App() {
       </header>
 
       <Widgets />
+
+      {message && (
+        <div key={messageSeq} className="overlay-message" role="status">
+          {message}
+        </div>
+      )}
 
       <div className="overlay__toasts">
         {toasts.map((t) => (

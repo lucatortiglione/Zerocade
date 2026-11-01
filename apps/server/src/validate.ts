@@ -3,6 +3,7 @@ import {
   MAX_TRIGGERS,
   djSoundById,
   giftById,
+  type BivioCommand,
   type DjPlay,
   type GameSettings,
   type LiveEvent,
@@ -83,15 +84,35 @@ export function sanitizeSettings(gameId: string, raw: unknown): GameSettings | n
   const out: GameSettings = {}
   for (const s of game.settings) {
     const v = r[s.id]
-    if (s.kind === 'number') {
-      if (typeof v !== 'number' || !Number.isFinite(v)) return null
-      out[s.id] = Math.min(s.max, Math.max(s.min, v))
-    } else if (s.kind === 'toggle') {
-      if (typeof v !== 'boolean') return null
-      out[s.id] = v
-    } else {
-      if (typeof v !== 'string' || !s.options.some((o) => o.value === v)) return null
-      out[s.id] = v
+    switch (s.kind) {
+      case 'number':
+        if (typeof v !== 'number' || !Number.isFinite(v)) return null
+        out[s.id] = Math.min(s.max, Math.max(s.min, v))
+        break
+      case 'toggle':
+        if (typeof v !== 'boolean') return null
+        out[s.id] = v
+        break
+      case 'select':
+        if (typeof v !== 'string' || !s.options.some((o) => o.value === v)) return null
+        out[s.id] = v
+        break
+      case 'multi': {
+        if (typeof v !== 'string') return null
+        const values = v ? v.split(',') : []
+        if (values.some((x) => !s.options.some((o) => o.value === x))) return null
+        out[s.id] = [...new Set(values)].join(',')
+        break
+      }
+      case 'color':
+        if (typeof v !== 'string' || !/^#[0-9a-f]{6}$/i.test(v)) return null
+        out[s.id] = v.toLowerCase()
+        break
+      case 'image':
+        // Only images uploaded to this server (POST /api/bivio/background/:key).
+        if (typeof v !== 'string' || (v !== '' && !/^\/api\/bivio\/background\/[A-Za-z0-9-]{8,64}\?v=\d{1,15}$/.test(v))) return null
+        out[s.id] = v
+        break
     }
   }
   return out
@@ -135,4 +156,14 @@ export function sanitizeScene(raw: unknown): Partial<WidgetConfig> | null {
     out.goal = Math.min(1_000_000, Math.floor(r.goal))
   }
   return out
+}
+
+const BIVIO_COMMANDS: BivioCommand[] = ['next', 'reveal', 'extra-time', 'pause', 'resume', 'restart']
+
+export const sanitizeBivioCommand = (raw: unknown): BivioCommand | null =>
+  BIVIO_COMMANDS.includes(raw as BivioCommand) ? (raw as BivioCommand) : null
+
+export function sanitizeMessage(raw: unknown): string | null {
+  if (typeof raw !== 'string') return null
+  return raw.replace(/\s+/g, ' ').trim().slice(0, 140) || null
 }

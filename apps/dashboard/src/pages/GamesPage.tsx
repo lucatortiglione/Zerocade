@@ -1,15 +1,26 @@
-import { GAMES } from '@zerocade/shared'
+import { GAMES, type SessionState } from '@zerocade/shared'
+import { BivioSidebar } from '../components/BivioSidebar'
 import { SettingsPanel } from '../components/SettingsPanel'
 import { Simulator } from '../components/Simulator'
 import { TopGifters } from '../components/TopGifters'
 import { TriggerEditor } from '../components/TriggerEditor'
 import { WidgetsPanel } from '../components/WidgetsPanel'
-import { overlayUrl } from '../overlayKey'
+import { overlayUrl, previewUrl } from '../overlayKey'
 import { socket } from '../socket'
 import { useDashboard } from '../store'
 
 export function GamesPage() {
   const { session } = useDashboard()
+
+  // Bivio has its own control column (game switcher included) next to the preview.
+  if (session?.gameId === 'bivio') {
+    return (
+      <div className="games games--bivio">
+        <BivioSidebar session={session} />
+        <Preview session={session} />
+      </div>
+    )
+  }
 
   return (
     <div className="games">
@@ -44,27 +55,33 @@ export function GamesPage() {
         {session && <WidgetsPanel session={session} />}
       </aside>
 
-      <main className="preview">
-        <div className="preview__head">
-          <div className="preview__title">
-            <span className="preview__dot" aria-hidden="true" />
-            Live preview
-            {session && <span className="preview__game">{GAMES.find((g) => g.id === session.gameId)?.name}</span>}
-          </div>
-          <a className="btn btn--ghost btn--small" href={overlayUrl} target="_blank" rel="noreferrer">
-            Open ↗
-          </a>
-        </div>
-        <div className="preview__frame">
-          <iframe title="Overlay preview" src={overlayUrl} />
-        </div>
-        <p className="text-muted small">This is exactly what your viewers see on stream.</p>
-      </main>
+      <Preview session={session} />
 
       <aside className="panel right-panel">
         <Simulator />
         <TopGifters />
       </aside>
     </div>
+  )
+}
+
+function Preview({ session }: { session: SessionState | null }) {
+  return (
+    <main className="preview">
+      <div className="preview__head">
+        <div className="preview__title">
+          <span className="preview__dot" aria-hidden="true" />
+          Live preview
+          {session && <span className="preview__game">{GAMES.find((g) => g.id === session.gameId)?.name}</span>}
+        </div>
+        <a className="btn btn--ghost btn--small" href={overlayUrl} target="_blank" rel="noreferrer">
+          Open ↗
+        </a>
+      </div>
+      <div className="preview__frame">
+        <iframe title="Overlay preview" src={previewUrl} />
+      </div>
+      <p className="text-muted small">This is exactly what your viewers see on stream.</p>
+    </main>
   )
 }

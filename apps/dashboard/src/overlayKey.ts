@@ -17,6 +17,16 @@ function loadKey() {
 
 export const overlayKey = loadKey()
 
-const OVERLAY_ORIGIN: string = import.meta.env.VITE_OVERLAY_ORIGIN ?? 'http://localhost:5174'
+// In dev the overlay has its own Vite server; a build is hosted by the Zerocade server
+// itself, under /overlay/ on the same origin as this dashboard.
+const OVERLAY_ORIGIN: string | undefined = import.meta.env.VITE_OVERLAY_ORIGIN
+const overlayBase = OVERLAY_ORIGIN
+  ? `${OVERLAY_ORIGIN}/`
+  : import.meta.env.DEV
+    ? 'http://localhost:5174/'
+    : `${window.location.origin}/overlay/`
 
-export const overlayUrl = `${OVERLAY_ORIGIN}/?key=${overlayKey}`
+export const overlayUrl = `${overlayBase}?key=${overlayKey}`
+
+// The dashboard's own preview of the overlay, which stays silent (no text-to-speech).
+export const previewUrl = `${overlayUrl}&preview=1`

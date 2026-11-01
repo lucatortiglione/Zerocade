@@ -119,3 +119,204 @@ body { background: #0b0b0e; overflow: hidden; }
   from { opacity: 0; transform: translateX(-50%) translateY(-12px); }
   to { opacity: 1; transform: translateX(-50%) translateY(0); }
 }
+
+/* Bivio: sized in vmin, so it reads the same in the dashboard preview and at 1080 × 1920. */
+.bivio {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2.4vh;
+  padding: 9vh 6vw 12vh;
+  background-size: cover;
+  background-position: center;
+  overflow: hidden;
+}
+.bivio__head { display: flex; flex-direction: column; align-items: center; gap: 1.4vh; text-align: center; }
+.bivio__chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 1.2vmin;
+  padding: 0.8vmin 2.6vmin 0.8vmin 1.4vmin;
+  border-radius: 999px;
+  color: #ffffff;
+  font-size: 3vmin;
+  font-weight: 700;
+  box-shadow: 0 0.6vmin 2vmin #00000066;
+}
+.bivio__chip img { width: 4.4vmin; height: 4.4vmin; }
+.bivio__ask { font-size: 6.6vmin; font-weight: 800; letter-spacing: -0.02em; text-shadow: 0 0.4vmin 2vmin #00000088; }
+
+/* The options are portrait cards side by side, A on the left and B on the right: as wide
+   as half the scene, or as the height between title and footer allows. Everything inside
+   is sized on the card (cqi), after a vmin value for browsers without container queries. */
+.bivio__options { flex: 1; min-height: 0; display: flex; align-items: center; justify-content: center; }
+.bivio-opt {
+  container-type: inline-size;
+  position: relative;
+  width: min(43vw, calc((70vh - 30vmin) * 0.6));
+  max-height: 100%;
+  aspect-ratio: 3 / 5;
+  border-radius: 4vmin;
+  background-size: cover;
+  color: #ffffff;
+  text-align: center;
+  overflow: hidden;
+  box-shadow: 0 1.6vmin 5vmin #00000077, inset 0 0 0 0.3vmin #ffffff22;
+  transition: transform 0.35s ease, opacity 0.35s ease, box-shadow 0.35s ease;
+}
+.bivio-opt__fill {
+  position: absolute;
+  inset: auto 0 0 0;
+  background: #ffffff2e;
+  transition: height 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.bivio-opt__body {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.4vh;
+  gap: 3cqi;
+  padding: 9vmin 4vmin 4vmin;
+  padding: 20cqi 9cqi 8cqi;
+}
+.bivio-opt__letter {
+  position: absolute;
+  top: 2.4vmin;
+  top: 5cqi;
+  left: 50%;
+  transform: translateX(-50%);
+  display: grid;
+  place-items: center;
+  width: 7vmin;
+  width: 15cqi;
+  height: 7vmin;
+  height: 15cqi;
+  border-radius: 50%;
+  background: #00000040;
+  font-size: 4vmin;
+  font-size: 9cqi;
+  font-weight: 800;
+}
+.bivio-opt__text {
+  font-size: 5.4vmin;
+  font-size: 13cqi;
+  font-weight: 800;
+  line-height: 1.15;
+  overflow-wrap: anywhere;
+  text-shadow: 0 0.3vmin 1.2vmin #00000066;
+}
+.bivio-opt__text--mid { font-size: 4.8vmin; font-size: 11.5cqi; }
+.bivio-opt__text--long { font-size: 4.1vmin; font-size: 9.5cqi; }
+.bivio-opt__result { display: flex; flex-direction: column; align-items: center; font-variant-numeric: tabular-nums; }
+.bivio-opt__share { font-size: 7vmin; font-size: 17cqi; font-weight: 900; line-height: 1.1; }
+.bivio-opt__votes { font-size: 3vmin; font-size: 7cqi; font-weight: 600; opacity: 0.85; }
+.bivio-opt__all { font-size: 2.8vmin; font-size: 6.5cqi; opacity: 0.85; }
+.bivio-opt--win { transform: scale(1.03); box-shadow: 0 0 0 0.6vmin var(--bivio-accent, #ffffff), 0 1.6vmin 6vmin #000000aa; }
+.bivio-opt--lose { transform: scale(0.97); opacity: 0.55; }
+
+.bivio__or {
+  z-index: 1;
+  align-self: center;
+  display: grid;
+  place-items: center;
+  width: 10vmin;
+  height: 10vmin;
+  margin: 0 -2.6vmin;
+  border: 0.6vmin solid var(--bivio-accent, #ffffff);
+  border-radius: 50%;
+  background: #0b0c18;
+  color: #ffffff;
+  font-size: 4.4vmin;
+  font-weight: 900;
+  text-transform: uppercase;
+  box-shadow: 0 0.8vmin 3vmin #000000aa;
+}
+
+.bivio__foot { display: flex; flex-direction: column; align-items: center; gap: 1.2vh; }
+.bivio__timer { width: 100%; height: 1.4vmin; border-radius: 999px; background: #ffffff1f; overflow: hidden; }
+.bivio__timer-fill { height: 100%; background: var(--bivio-timer, #ffffff); transform-origin: left; }
+.bivio__status { font-size: 3.4vmin; font-weight: 700; text-align: center; }
+.bivio__voters { display: flex; flex-wrap: wrap; justify-content: center; gap: 1vmin; min-height: 4.6vmin; }
+.bivio__voter {
+  padding: 0.6vmin 1.8vmin;
+  border-radius: 999px;
+  background: #ffffff14;
+  font-size: 2.6vmin;
+  font-weight: 600;
+  animation: bivio-pop 0.25s ease-out;
+}
+.bivio__voter--a { box-shadow: inset 0 0 0 0.25vmin var(--bivio-a, #2dd4bf); }
+.bivio__voter--b { box-shadow: inset 0 0 0 0.25vmin var(--bivio-b, #a78bfa); }
+.bivio__empty { margin: auto; font-size: 4vmin; text-align: center; opacity: 0.8; }
+.bivio__break {
+  flex: 1;
+  display: grid;
+  place-items: center;
+  font-size: 6vmin;
+  font-weight: 800;
+  text-shadow: 0 0.4vmin 2vmin #00000088;
+  animation: bivio-pop 0.3s ease-out;
+}
+body.bivio-see-through { background: transparent; }
+
+/* "Una sopra l'altra": wide cards, one above the other, sized on the scene. */
+.bivio__options--stacked { flex-direction: column; align-items: stretch; }
+.bivio__options--stacked .bivio-opt { flex: 1; width: auto; min-height: 0; max-height: none; aspect-ratio: auto; }
+.bivio__options--stacked .bivio-opt__fill { inset: 0 auto 0 0; transition-property: width; }
+.bivio__options--stacked .bivio-opt__body { gap: 1.4vh; padding: 5vmin 8vmin; }
+.bivio__options--stacked .bivio-opt__letter {
+  top: 2.4vmin;
+  left: 2.4vmin;
+  transform: none;
+  width: 7vmin;
+  height: 7vmin;
+  font-size: 4vmin;
+}
+.bivio__options--stacked .bivio-opt__text { font-size: 6.6vmin; }
+.bivio__options--stacked .bivio-opt__text--mid { font-size: 5.6vmin; }
+.bivio__options--stacked .bivio-opt__text--long { font-size: 4.8vmin; }
+.bivio__options--stacked .bivio-opt__result { flex-direction: row; align-items: baseline; gap: 2vmin; }
+.bivio__options--stacked .bivio-opt__share { font-size: 7vmin; }
+.bivio__options--stacked .bivio-opt__votes { font-size: 3vmin; }
+.bivio__options--stacked .bivio-opt__all { font-size: 2.8vmin; }
+.bivio__options--stacked .bivio__or { margin: -3.4vmin 0; }
+
+/* A message the creator sends from the dashboard, over any game. */
+.overlay-message {
+  position: absolute;
+  top: 1.2vh;
+  left: 50%;
+  z-index: 5;
+  width: max-content;
+  max-width: 86vw;
+  padding: 1.4vmin 3.6vmin;
+  border: 0.3vmin solid #ffffff33;
+  border-radius: 3vmin;
+  background: #111322ee;
+  box-shadow: 0 1.6vmin 5vmin #000000aa;
+  font-size: 3.8vmin;
+  font-weight: 800;
+  text-align: center;
+  overflow-wrap: anywhere;
+  transform: translateX(-50%);
+  animation: message-in 0.3s ease-out;
+}
+@keyframes message-in {
+  from { opacity: 0; transform: translateX(-50%) scale(0.92); }
+  to { opacity: 1; transform: translateX(-50%) scale(1); }
+}
+
+/* A 16:9 scene has width to spare and little height: the cards get less tall. */
+@media (orientation: landscape) {
+  .bivio { padding: 8vh 4vw 11vh; }
+  .bivio-opt { width: calc((70vh - 30vmin) * 0.72); aspect-ratio: 3 / 4.2; }
+}
+
+@keyframes bivio-pop {
+  from { opacity: 0; transform: translateY(0.8vmin); }
+  to { opacity: 1; transform: none; }
+}

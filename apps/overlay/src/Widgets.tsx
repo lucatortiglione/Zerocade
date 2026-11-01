@@ -24,10 +24,13 @@ export function Widgets() {
   const { session, event, seq, ranking, lastFollower, totalCoins } = useOverlay()
   if (!session) return null
   const w = session.widgets
+  // In Bivio comments are the votes: they are listed under the options, and an alert
+  // would sit on top of option A.
+  const alert = session.gameId === 'bivio' && event?.type === 'comment' ? null : event
 
   return (
     <>
-      {w.alerts && event && <Alert key={seq} event={event} />}
+      {w.alerts && alert && <Alert key={seq} event={alert} />}
       {w.follower && lastFollower && <div className="widget widget--follower">➕ {lastFollower} followed!</div>}
       {w.goal && <Goal total={totalCoins} target={session.goal} />}
       {w.gifters && ranking.length > 0 && <Gifters ranking={ranking} />}

@@ -7,7 +7,7 @@ export function SettingsPanel({ session }: { session: SessionState }) {
   if (!game || game.settings.length === 0) return null
 
   const set = (id: string, value: number | boolean | string) =>
-    socket.emit('settings:set', { ...session.settings, [id]: value })
+    socket.emit('settings:set', { [id]: value })
 
   return (
     <section>
@@ -37,6 +37,7 @@ export function SettingsPanel({ session }: { session: SessionState }) {
               </label>
             )
           }
+          if (s.kind !== 'number') return null
           return (
             <label key={s.id} className="setting">
               <span className="setting__label">{s.label}</span>
