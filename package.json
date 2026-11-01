@@ -2,6 +2,9 @@
   "name": "zerocade",
   "private": true,
   "type": "module",
+  "engines": {
+    "node": ">=26"
+  },
   "workspaces": [
     "packages/*",
     "apps/*"
@@ -15,5 +18,9 @@
   "devDependencies": {
     "concurrently": "^10.0.6",
     "typescript": "7.0.2"
+  },
+  "allowScripts": {
+    "better-sqlite3@13.0.3": true,
+    "esbuild@0.28.2": true
   }
 }

@@ -1,0 +1,10 @@
+<!-- Android adaptive icon foreground: 108x108 canvas, artwork kept inside the 66x66 safe zone (21..87). -->
+<svg xmlns="http://www.w3.org/2000/svg" width="108" height="108" viewBox="0 0 108 108">
+  <g fill="none" stroke-width="7" stroke-linecap="round">
+    <path d="M54 84V60" stroke="#f4f5ff"/>
+    <path d="M54 60C54 50 45 46 38 39" stroke="#2dd4bf"/>
+    <path d="M54 60C54 50 63 46 70 39" stroke="#a78bfa"/>
+  </g>
+  <circle cx="37" cy="38" r="6.5" fill="#2dd4bf"/>
+  <circle cx="71" cy="38" r="6.5" fill="#a78bfa"/>
+</svg>

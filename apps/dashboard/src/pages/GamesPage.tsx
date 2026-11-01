@@ -45,10 +45,20 @@ export function GamesPage() {
       </aside>
 
       <main className="preview">
+        <div className="preview__head">
+          <div className="preview__title">
+            <span className="preview__dot" aria-hidden="true" />
+            Live preview
+            {session && <span className="preview__game">{GAMES.find((g) => g.id === session.gameId)?.name}</span>}
+          </div>
+          <a className="btn btn--ghost btn--small" href={overlayUrl} target="_blank" rel="noreferrer">
+            Open ↗
+          </a>
+        </div>
         <div className="preview__frame">
           <iframe title="Overlay preview" src={overlayUrl} />
         </div>
-        <p className="text-muted small">Live preview: this is what your viewers see.</p>
+        <p className="text-muted small">This is exactly what your viewers see on stream.</p>
       </main>
 
       <aside className="panel right-panel">
