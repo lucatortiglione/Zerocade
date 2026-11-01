@@ -1218,6 +1218,82 @@ export const djSoundById = (id: string) => DJ_SOUNDS.find((s) => s.id === id)
 export interface DjPlay {
   soundId?: string
   url?: string
+  // 0–1, the pad board's volume; set by the server.
+  volume?: number
+}
+
+// --- Pads: the Sounds and GIFs boards in the dashboard's right column ---
+
+export type PadKind = 'sound' | 'gif'
+
+export const PAD_SLOTS = 12
+
+export const PAD_COLORS = ['#f43f5e', '#6366f1', '#06b6d4', '#d946ef', '#22c55e', '#10b981', '#eab308', '#f97316']
+
+export interface Pad {
+  id: string
+  kind: PadKind
+  slot: number
+  label: string
+  color: string
+  // A sound pad plays a built-in DJ sound or an uploaded file; a GIF pad always has a file.
+  soundId?: string
+  file?: string
+}
+
+export interface PadBoard {
+  volume: number
+  pads: Pad[]
+}
+
+// Sent to POST /api/pads/:key. `upload` is the file as base64; without `id` a new pad is made.
+export interface PadInput {
+  id?: string
+  kind: PadKind
+  slot: number
+  label: string
+  color: string
+  soundId?: string
+  upload?: { type: string; data: string }
+}
+
+export const padFilePath = (file: string) => `/api/pads/file/${file}`
+
+export interface GifShow {
+  url: string
+  label: string
+}
+
+// --- Feed: creators live on this Zerocade and the gifts they received ---
+
+export interface FeedCreator {
+  kind: SourceKind
+  username: string
+  gameId: string
+  viewers?: number
+  // ms epoch: when the live started (live list) or ended (recent list).
+  at: number
+}
+
+export interface FeedGift {
+  id: number
+  // 'tiktok:<username>', or '' for a gift sent from the simulator.
+  creator: string
+  gameId: string
+  nickname: string
+  giftId: string
+  count: number
+  coins: number
+  at: number
+}
+
+export interface Feed {
+  live: FeedCreator[]
+  recent: FeedCreator[]
+  // Every creator the gift list can be filtered by.
+  creators: string[]
+  top: FeedGift | null
+  gifts: FeedGift[]
 }
 
 // --- Socket.IO contract ---
@@ -1239,6 +1315,10 @@ export interface ServerToClientEvents {
   'bivio:state': (state: BivioState) => void
   // A short text the creator shows on the overlay ("Invia messaggio").
   'overlay:message': (text: string) => void
+  'pads:state': (board: PadBoard) => void
+  'gif:show': (gif: GifShow) => void
+  // Stops every sound and GIF the pads started.
+  'dj:stop': () => void
 }
 
 export interface ClientToServerEvents {
@@ -1252,6 +1332,10 @@ export interface ClientToServerEvents {
   'scene:set': (scene: Partial<WidgetConfig>) => void
   'bivio:control': (command: BivioCommand) => void
   'message:send': (text: string) => void
+  'pad:play': (id: string) => void
+  'pad:stop': () => void
+  'pad:volume': (volume: number) => void
+  'pad:remove': (id: string) => void
 }
 
 export type ClientType = 'dashboard' | 'overlay'

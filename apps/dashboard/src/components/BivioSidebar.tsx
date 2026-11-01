@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type ReactNode } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import {
   DEFAULT_WIDGETS,
   GAMES,
@@ -12,6 +12,7 @@ import {
 } from '@zerocade/shared'
 import { socket } from '../socket'
 import { useDashboard } from '../store'
+import { Section } from './Section'
 import { SettingsForm } from './SettingsForm'
 import { TriggerEditor } from './TriggerEditor'
 
@@ -71,18 +72,6 @@ export function BivioSidebar({ session }: { session: SessionState }) {
         <SettingsForm session={session} />
       </Section>
     </aside>
-  )
-}
-
-function Section({ title, extra, open = true, children }: { title: string; extra?: ReactNode; open?: boolean; children: ReactNode }) {
-  return (
-    <details className="side-section" open={open}>
-      <summary className="side-section__head">
-        <span>{title}</span>
-        {extra && <span className="side-section__extra">{extra}</span>}
-      </summary>
-      <div className="side-section__body">{children}</div>
-    </details>
   )
 }
 

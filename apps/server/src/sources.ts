@@ -31,6 +31,13 @@ const toViewer = (id: unknown, nickname: unknown, avatar?: unknown): Viewer => (
   avatar: typeof avatar === 'string' && /^https?:\/\//.test(avatar) ? avatar.slice(0, 512) : undefined,
 })
 
+export interface LiveSource {
+  kind: SourceKind
+  username: string
+  since: number
+  viewers?: number
+}
+
 const clampCount = (n: unknown, fallback = 1) => {
   const v = Math.floor(Number(n))
   return Number.isFinite(v) && v > 0 ? Math.min(v, 100) : fallback
@@ -44,6 +51,10 @@ export class RoomSources {
   private twitchUser = ''
   private tiktokState: SourceStatus['state'] = 'idle'
   private twitchState: SourceStatus['state'] = 'idle'
+  // For the dashboard's Creators list: when each feed went live, and TikTok's viewer count.
+  private tiktokSince = 0
+  private twitchSince = 0
+  private tiktokViewers: number | undefined
 
   constructor(
     private emit: (event: LiveEvent) => void,
@@ -64,6 +75,14 @@ export class RoomSources {
     const out: SourceStatus[] = []
     if (this.tiktokUser) out.push({ kind: 'tiktok', username: this.tiktokUser, state: this.tiktokState })
     if (this.twitchUser) out.push({ kind: 'twitch', username: this.twitchUser, state: this.twitchState })
+    return out
+  }
+
+  live(): LiveSource[] {
+    const out: LiveSource[] = []
+    if (this.tiktokState === 'connected')
+      out.push({ kind: 'tiktok', username: this.tiktokUser, since: this.tiktokSince, viewers: this.tiktokViewers })
+    if (this.twitchState === 'connected') out.push({ kind: 'twitch', username: this.twitchUser, since: this.twitchSince })
     return out
   }
 
@@ -116,7 +135,17 @@ export class RoomSources {
         const d = rec(data)
         this.emit({ type: 'join', user: toViewer(d.userId, d.uniqueId ?? d.nickname, d.profilePictureUrl) })
       })
+      conn.on('roomUser', (data) => {
+        const d = rec(data)
+        const viewers = Math.floor(Number(d.viewerCount ?? d.total))
+        if (Number.isFinite(viewers) && viewers >= 0) this.tiktokViewers = viewers
+      })
+      // The creator ended the live: the connector is closed, so show it as disconnected.
+      conn.on('streamEnd', () => {
+        if (this.tiktok === conn) this.disconnectTiktok()
+      })
       await conn.connect()
+      this.tiktokSince = Date.now()
       this.tiktokState = 'connected'
       this.status({ kind: 'tiktok', username: uname, state: 'connected' })
     } catch (err) {
@@ -144,6 +173,7 @@ export class RoomSources {
       this.status({ kind: 'tiktok', username: this.tiktokUser, state: 'idle' })
       this.tiktokUser = ''
       this.tiktokState = 'idle'
+      this.tiktokViewers = undefined
     }
   }
 
@@ -184,6 +214,7 @@ export class RoomSources {
           note = ` EventSub: ${err instanceof Error ? err.message : String(err)}`
         }
       }
+      this.twitchSince = Date.now()
       this.twitchState = 'connected'
       this.status({ kind: 'twitch', username: ch, state: 'connected', message: note || undefined })
     } catch (err) {

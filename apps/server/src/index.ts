@@ -10,15 +10,32 @@ import {
   GAMES,
   bivioBackgroundPath,
   isValidKey,
+  padFilePath,
   triggersFor,
   type ClientToServerEvents,
+  type Feed,
+  type FeedCreator,
   type HandshakeAuth,
   type LiveEvent,
   type ServerToClientEvents,
 } from '@zerocade/shared'
 import { BivioRooms, bivioCsv, bivioStats } from './bivio.js'
-import { dataDir, getRanking, listEvents, recordEvent } from './db.js'
+import {
+  dataDir,
+  getPad,
+  getRanking,
+  giftedCreators,
+  latestGifts,
+  listEvents,
+  recentCreators,
+  recordEvent,
+  recordGift,
+  setPadVolume,
+  topGiftSince,
+  touchCreator,
+} from './db.js'
 import { getContent } from './content.js'
+import { PAD_FILE_MAX, padBoard, padFile, removePad, savePadInput } from './pads.js'
 import { getSession, selectGame, setScene, setSettings, setTriggers } from './sessions.js'
 import { RoomSources } from './sources.js'
 import {
@@ -105,6 +122,39 @@ app.get('/api/bivio/background/:key', async (req, reply) => {
   return reply.header('content-type', found[0]).send(readFileSync(backgroundFile(key, found[1])))
 })
 
+// Pads: a new or edited pad arrives as JSON, with any uploaded file inside as base64.
+app.post('/api/pads/:key', { bodyLimit: Math.ceil((PAD_FILE_MAX * 4) / 3) + 64 * 1024 }, async (req, reply) => {
+  const { key } = req.params as { key: string }
+  if (!isValidKey(key)) return reply.code(400).send({ error: 'Chiave non valida.' })
+  const error = savePadInput(key, req.body)
+  if (error) return reply.code(400).send({ error })
+  const board = padBoard(key)
+  io.to(key).emit('pads:state', board)
+  return board
+})
+app.get('/api/pads/file/:name', async (req, reply) => {
+  const file = padFile((req.params as { name: string }).name)
+  if (!file) return reply.code(404).send({ error: 'not found' })
+  return reply.header('content-type', file.type).header('cache-control', 'public, max-age=31536000, immutable').send(file.body)
+})
+
+// Creators live on this Zerocade (every overlay key) and the gifts they received.
+// ?creator= narrows the gifts: 'tiktok:<username>', or 'sim' for the simulator.
+app.get('/api/feed', async (req): Promise<Feed> => {
+  const { creator: q } = (req.query ?? {}) as { creator?: string }
+  const creator = q === 'sim' ? '' : q && q !== 'all' ? q.slice(0, 80) : undefined
+  const live = liveCreators()
+  const isLive = new Set(live.map((c) => `${c.kind}:${c.username}`))
+  const midnight = new Date().setHours(0, 0, 0, 0)
+  return {
+    live,
+    recent: recentCreators(20).filter((c) => !isLive.has(`${c.kind}:${c.username}`)),
+    creators: giftedCreators(),
+    top: topGiftSince(creator, midnight),
+    gifts: latestGifts(creator, 40),
+  }
+})
+
 if (overlayDir) {
   await app.register(fastifyStatic, { root: overlayDir, prefix: '/overlay/' })
   // A link pasted without the trailing slash would otherwise load the dashboard.
@@ -126,8 +176,10 @@ const bivio = new BivioRooms((key, state) => io.to(key).emit('bivio:state', stat
 
 // Persist + relay every live event (simulated or real), and keep the gifters ranking.
 // Bivio runs on the server, so its triggers are applied here rather than in the overlay.
-function broadcastEvent(key: string, event: LiveEvent) {
+// `creator` is the live feed the event came from ('tiktok:<username>'), '' when simulated.
+function broadcastEvent(key: string, event: LiveEvent, creator = '') {
   recordEvent(key, event)
+  if (event.type === 'gift') recordGift(key, creator, getSession(key).gameId, event)
   io.to(key).emit('live:event', event)
   if (event.type === 'gift') io.to(key).emit('ranking:update', getRanking(key))
   const room = bivio.get(key)
@@ -140,13 +192,36 @@ const roomSources = (key: string) => {
   let room = sources.get(key)
   if (!room) {
     room = new RoomSources(
-      (event) => broadcastEvent(key, event),
-      (status) => io.to(key).emit('source:status', status),
+      (event) => {
+        const tiktok = sources.get(key)?.live().find((s) => s.kind === 'tiktok')
+        broadcastEvent(key, event, tiktok ? `tiktok:${tiktok.username}` : '')
+      },
+      (status) => {
+        io.to(key).emit('source:status', status)
+        if (status.state === 'connected') touchCreator(status.kind, status.username, getSession(key).gameId)
+      },
     )
     sources.set(key, room)
   }
   return room
 }
+
+const liveCreators = (): FeedCreator[] => {
+  const seen = new Map<string, FeedCreator>()
+  for (const [key, room] of sources) {
+    for (const s of room.live()) {
+      const creator: FeedCreator = { kind: s.kind, username: s.username, gameId: getSession(key).gameId, at: s.since }
+      if (s.viewers !== undefined) creator.viewers = s.viewers
+      seen.set(`${s.kind}:${s.username}`, creator)
+    }
+  }
+  return [...seen.values()].sort((a, b) => (b.viewers ?? -1) - (a.viewers ?? -1) || a.at - b.at)
+}
+
+// Keeps each live creator's game, viewers and last time seen for the Recent list.
+setInterval(() => {
+  for (const c of liveCreators()) touchCreator(c.kind, c.username, c.gameId, c.viewers)
+}, 30_000).unref()
 
 io.use((socket, next) => {
   const { clientType, key } = socket.handshake.auth as Partial<HandshakeAuth>
@@ -172,6 +247,7 @@ io.on('connection', (socket) => {
   if (clientType !== 'dashboard') return
 
   socket.emit('ranking:update', getRanking(key))
+  socket.emit('pads:state', padBoard(key))
   for (const status of roomSources(key).statuses()) socket.emit('source:status', status)
 
   socket.on('source:connect', (raw: unknown) => {
@@ -229,7 +305,32 @@ io.on('connection', (socket) => {
 
   socket.on('dj:play', (raw: unknown) => {
     const play = sanitizeDj(raw)
-    if (play) io.to(key).emit('dj:play', play)
+    if (play) io.to(key).emit('dj:play', { ...play, volume: padBoard(key).volume })
+  })
+
+  socket.on('pad:play', (id: unknown) => {
+    const pad = typeof id === 'string' ? getPad(key, id) : undefined
+    if (!pad) return
+    if (pad.kind === 'gif' && pad.file) io.to(key).emit('gif:show', { url: padFilePath(pad.file), label: pad.label })
+    if (pad.kind === 'sound') {
+      const volume = padBoard(key).volume
+      io.to(key).emit('dj:play', pad.file ? { url: padFilePath(pad.file), volume } : { soundId: pad.soundId, volume })
+    }
+  })
+
+  socket.on('pad:stop', () => io.to(key).emit('dj:stop'))
+
+  socket.on('pad:volume', (raw: unknown) => {
+    const volume = Number(raw)
+    if (!Number.isFinite(volume)) return
+    setPadVolume(key, Math.min(1, Math.max(0, Math.round(volume * 100) / 100)))
+    io.to(key).emit('pads:state', padBoard(key))
+  })
+
+  socket.on('pad:remove', (id: unknown) => {
+    if (typeof id !== 'string') return
+    removePad(key, id)
+    io.to(key).emit('pads:state', padBoard(key))
   })
 })
 

@@ -13,7 +13,7 @@ interface Toast {
 }
 
 export function App() {
-  const { connected, session, event, seq, message, messageSeq } = useOverlay()
+  const { connected, session, event, seq, message, messageSeq, gif, gifSeq } = useOverlay()
   const contentReady = useSyncExternalStore(subscribeContent, isContentReady)
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const engineRef = useRef<Engine | null>(null)
@@ -68,8 +68,8 @@ export function App() {
     if (session.gameId === 'bivio') return
     const id = Date.now() + Math.random()
     setToasts((prev) => [...prev.slice(-4), { id, text: describeEvent(event) }])
-    const timer = setTimeout(() => setToasts((prev) => prev.filter((t) => t.id !== id)), 3200)
-    return () => clearTimeout(timer)
+    // Not cleared when the next event arrives: every toast removes itself.
+    setTimeout(() => setToasts((prev) => prev.filter((t) => t.id !== id)), 3200)
   }, [seq])
 
   const game = session ? GAMES.find((g) => g.id === session.gameId) : undefined
@@ -85,6 +85,8 @@ export function App() {
       </header>
 
       <Widgets />
+
+      {gif && <img key={gifSeq} className="overlay-gif" src={gif.url} alt={gif.label} />}
 
       {message && (
         <div key={messageSeq} className="overlay-message" role="status">

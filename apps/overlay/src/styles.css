@@ -105,7 +105,7 @@ body { background: #0b0b0e; overflow: hidden; }
   background: #1b1b21ee;
   border: 1px solid #26262e;
   font-size: 22px;
-  animation: alert-in 0.25s ease-out;
+  animation: alert-in 0.25s ease-out, alert-out 0.4s ease-in 4.6s forwards;
 }
 .widget-alert__icon { font-size: 34px; }
 
@@ -118,6 +118,9 @@ body { background: #0b0b0e; overflow: hidden; }
 @keyframes alert-in {
   from { opacity: 0; transform: translateX(-50%) translateY(-12px); }
   to { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+@keyframes alert-out {
+  to { opacity: 0; transform: translateX(-50%) translateY(-12px); }
 }
 
 /* Bivio: sized in vmin, so it reads the same in the dashboard preview and at 1080 × 1920. */
@@ -422,4 +425,26 @@ body.bivio-see-through { background: transparent; }
 @keyframes bivio-pop {
   from { opacity: 0; transform: translateY(0.8vmin); }
   to { opacity: 1; transform: none; }
+}
+
+/* GIF pads: the GIF pops in mid-screen above the game and fades out after 5 s (GIF_MS). */
+.overlay-gif {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 6;
+  max-width: 62vmin;
+  max-height: 46vh;
+  border-radius: 3vmin;
+  box-shadow: 0 2vmin 6vmin #000000aa;
+  transform: translate(-50%, -50%);
+  animation: gif-in 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), gif-out 0.4s ease-in 4.6s forwards;
+  pointer-events: none;
+}
+@keyframes gif-in {
+  from { opacity: 0; transform: translate(-50%, -50%) scale(0.6); }
+  to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+}
+@keyframes gif-out {
+  to { opacity: 0; transform: translate(-50%, -50%) scale(0.92); }
 }

@@ -1,7 +1,7 @@
 import { useSyncExternalStore } from 'react'
-import { giftById, type BivioState, type Gifter, type LiveEvent, type SessionState } from '@zerocade/shared'
+import { giftById, type BivioState, type GifShow, type Gifter, type LiveEvent, type SessionState } from '@zerocade/shared'
 import { socket } from './socket'
-import { playSound } from './audio'
+import { playSound, stopSounds } from './audio'
 
 interface OverlayState {
   connected: boolean
@@ -17,6 +17,9 @@ interface OverlayState {
   // The creator's latest message, shown for a few seconds; messageSeq keys each one.
   message: string | null
   messageSeq: number
+  // The GIF pad last pressed, shown for a few seconds; gifSeq keys each one.
+  gif: GifShow | null
+  gifSeq: number
 }
 
 let state: OverlayState = {
@@ -31,6 +34,8 @@ let state: OverlayState = {
   bivioAt: 0,
   message: null,
   messageSeq: 0,
+  gif: null,
+  gifSeq: 0,
 }
 const listeners = new Set<() => void>()
 
@@ -50,6 +55,10 @@ socket.on('live:event', (event) => {
   update(patch)
 })
 socket.on('dj:play', (play) => playSound(play))
+socket.on('dj:stop', () => {
+  stopSounds()
+  update({ gif: null })
+})
 socket.on('bivio:state', (bivio) => update({ bivio, bivioAt: performance.now() }))
 
 const MESSAGE_MS = 8000
@@ -59,6 +68,15 @@ socket.on('overlay:message', (message) => {
   setTimeout(() => {
     if (state.messageSeq === messageSeq) update({ message: null })
   }, MESSAGE_MS)
+})
+
+const GIF_MS = 5000
+socket.on('gif:show', (gif) => {
+  const gifSeq = state.gifSeq + 1
+  update({ gif, gifSeq })
+  setTimeout(() => {
+    if (state.gifSeq === gifSeq) update({ gif: null })
+  }, GIF_MS)
 })
 
 function subscribe(listener: () => void) {
