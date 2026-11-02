@@ -40,6 +40,7 @@ import {
   touchCreator,
 } from './db.js'
 import { getContent } from './content.js'
+import { HOSTS_LINE, LOCAL_DOMAIN, domainRegistered, ensureDomain } from './hosts.js'
 import { PAD_FILE_MAX, padBoard, padFile, removePad, savePadInput } from './pads.js'
 import { getSession, selectGame, setScene, setSettings, setTriggers } from './sessions.js'
 import { RoomSources } from './sources.js'
@@ -58,6 +59,8 @@ import {
 
 const PORT = Number(process.env.PORT ?? 3001)
 const LOCAL_URL = `http://localhost:${PORT}/`
+// The link for OBS and TikTok LIVE Studio, which take a domain name (see hosts.ts).
+const OVERLAY_URL = `http://${LOCAL_DOMAIN}:${PORT}/overlay/`
 
 // Built pages (npm start, or the Windows package) are hosted here too: the dashboard
 // at / and the overlay at /overlay/. In dev the Vite servers serve them instead.
@@ -81,16 +84,20 @@ await app.register(helmet, {
   },
 })
 
-// Only pages that reach this PC by its own name get an answer. A website that points one of
-// its names at 127.0.0.1 (DNS rebinding) would otherwise be same-origin with Zerocade and
-// could read the room key.
-const LOCAL_HOST = /^(localhost|127\.0\.0\.1|\[::1\])(:\d+)?$/
+// Only pages that reach this PC by its own name, or by zerocade.test (which no real site can
+// own), get an answer. A website that points one of its names at 127.0.0.1 (DNS rebinding)
+// would otherwise be same-origin with Zerocade and could read the room key.
+const LOCAL_HOST = /^(localhost|127\.0\.0\.1|\[::1\]|zerocade\.test)(:\d+)?$/
 app.addHook('onRequest', async (req, reply) => {
   if (!LOCAL_HOST.test(req.headers.host ?? '')) return reply.code(403).send({ error: 'forbidden' })
 })
 
 app.get('/api/health', async () => ({ ok: true }))
-app.get('/api/room', async (): Promise<RoomInfo> => ({ key: roomKey, overlayUrl: `${LOCAL_URL}overlay/` }))
+app.get('/api/room', async (): Promise<RoomInfo> => ({
+  key: roomKey,
+  overlayUrl: OVERLAY_URL,
+  hostsLine: domainRegistered() ? undefined : HOSTS_LINE,
+}))
 app.get('/api/games', async () => GAMES)
 app.get('/api/content', async () => getContent())
 app.get('/api/events', async (req) => {
@@ -405,6 +412,9 @@ try {
   openDashboard()
   process.exit(1)
 }
+
+// Before the dashboard opens, so the link it shows already works.
+await ensureDomain(OVERLAY_URL)
 
 if (dashboardDir) {
   console.log(`\nZerocade è avviato: apri ${LOCAL_URL} (chiudi questa finestra per fermarlo)\n`)

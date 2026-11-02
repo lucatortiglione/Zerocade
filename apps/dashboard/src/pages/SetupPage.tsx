@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { overlayUrl } from '../overlayKey'
+import { hostsLine, overlayUrl } from '../overlayKey'
 
 export function SetupPage() {
   const [copied, setCopied] = useState(false)
@@ -27,6 +27,12 @@ export function SetupPage() {
           {copied ? 'Copied' : 'Copy'}
         </button>
       </div>
+      {hostsLine && (
+        <p className="setup-warning small">
+          This link won't open yet: the Windows hosts file needs the line <code>{hostsLine}</code>. Restart Zerocade
+          and accept the administrator prompt, or add the line by hand to C:\Windows\System32\drivers\etc\hosts.
+        </p>
+      )}
       <p className="text-muted small">
         The link stays the same whatever browser opens this dashboard. It works on this PC only, while Zerocade is
         running.

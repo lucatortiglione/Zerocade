@@ -1548,4 +1548,6 @@ export const isValidKey = (key: unknown): key is string =>
 export interface RoomInfo {
   key: string
   overlayUrl: string
+  // Set while this PC's hosts file lacks the overlay link's domain: the line it needs.
+  hostsLine?: string
 }
