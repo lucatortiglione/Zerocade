@@ -288,6 +288,7 @@ export interface BivioStats {
 }
 
 // --- Incastro (letter wheel and crossword) ---
+// Shown as ZeroWords; the code, the saved settings and the database still say incastro.
 // Server-driven like Bivio: the server holds the level, checks the words typed in chat
 // and saves how far each overlay key has got. Levels, chapters and artwork come from
 // gioco-parole/ (generated from a free Italian dictionary by its tools/). Italian only.
@@ -325,6 +326,12 @@ export type IncastroMoment = { seq: number } & (
   | { kind: 'shuffle'; by: IncastroPlayer | null }
 )
 
+// The longest word found this live, grid or extra; at equal length the first finder keeps it.
+export interface IncastroRecord {
+  word: string
+  by: IncastroPlayer
+}
+
 export interface IncastroChapter {
   id: number
   name: string
@@ -335,12 +342,21 @@ export interface IncastroChapter {
   size: number
 }
 
+// The three grids of a level (DDA): easier, as generated, harder.
+export type IncastroVariant = 'easy' | 'standard' | 'expert'
+
 export interface IncastroState {
-  // 'complete' is the summary between levels; 'empty' when no levels were found.
-  phase: 'playing' | 'complete' | 'empty'
+  // 'complete' is the summary between levels; 'loading' while the level is being generated;
+  // 'empty' when no level can be made (the generator's files are missing).
+  phase: 'playing' | 'complete' | 'loading' | 'empty'
   paused: boolean
+  // Levels never run out: they are generated as the game gets to them.
   level: number
-  levelCount: number
+  // The grid in play, and the one the next level will use.
+  variant: IncastroVariant
+  nextVariant: IncastroVariant
+  // Simulated difficulty of the grid in play and its target, 0..100.
+  difficulty: { target: number; dsim: number } | null
   chapter: IncastroChapter
   // The wheel in its current order; `shuffles` counts this level's shuffles.
   letters: string
@@ -358,6 +374,7 @@ export interface IncastroState {
   // This live (since the game was picked), and this level only.
   scores: IncastroScore[]
   levelScores: IncastroScore[]
+  longest: IncastroRecord | null
   // Level timer while playing (0 = no limit), summary countdown when complete.
   remainingMs: number
   durationMs: number
@@ -1250,10 +1267,10 @@ export const GAMES: GameDef[] = [
   },
   {
     id: 'incastro',
-    name: 'Incastro',
+    name: 'ZeroWords',
     category: 'Parole',
     description:
-      'Ruota di lettere e schema a incastro: il pubblico scrive in chat le parole che trova. 600 livelli in 30 capitoli, e il giardino cresce.',
+      'Ruota di lettere e schema a incastro: il pubblico scrive in chat le parole che trova. Livelli senza fine, generati durante la partita; a ogni capitolo il giardino cresce.',
     emoji: '🌱',
     gradient: ['#8bd17c', '#1f5f3a'],
     actions: [
@@ -1266,12 +1283,19 @@ export const GAMES: GameDef[] = [
     settings: [
       {
         id: 'autoHints',
-        label: 'Aiuti automatici',
-        hint: 'Se nessuno trova una parola per un po’, si rivela una lettera da sola.',
+        label: 'Lettera automatica',
+        hint: 'Ogni tot secondi si rivela una lettera da sola. Il conto riparte quando qualcuno trova una parola.',
         kind: 'toggle',
         default: true,
       },
-      { id: 'hintSeconds', label: 'Secondi senza parole prima di un aiuto', kind: 'number', min: 10, max: 180, step: 5, default: 30 },
+      { id: 'hintSeconds', label: 'Secondi tra una lettera e l’altra', kind: 'number', min: 10, max: 180, step: 5, default: 30 },
+      {
+        id: 'dda',
+        label: 'Difficoltà automatica',
+        hint: 'Il livello successivo usa la griglia Agevolata, Standard o Esperto secondo com’è andato quello appena finito: più facile se è scaduto il tempo o gli aiuti hanno mostrato almeno un terzo delle parole, più difficile se la chat le ha trovate tutte senza aiuti.',
+        kind: 'toggle',
+        default: true,
+      },
       {
         id: 'giftHints',
         label: 'Aiuti dai trigger per livello',
@@ -1526,6 +1550,8 @@ export interface ClientToServerEvents {
   'bivio:control': (command: BivioCommand) => void
   'incastro:control': (command: IncastroCommand) => void
   'incastro:goto': (level: number) => void
+  // The only one an overlay may send: a click on the wheel.
+  'incastro:shuffle': () => void
   'message:send': (text: string) => void
   'pad:play': (id: string) => void
   'pad:stop': () => void

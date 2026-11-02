@@ -7,9 +7,12 @@
 //   LEGGIMI.txt
 //   runtime/node.exe                the Node.js runtime this script runs on (or its download)
 //   app/server.mjs                  the server, bundled with esbuild
+//   app/wordgen-worker.mjs          ZeroWords' level generator, run in a worker thread
 //   app/public/{dashboard,overlay}  the built pages
-//   app/content.seed.json, app/domande_master.csv
-//   app/incastro/                   Incastro's levels and chapters (gioco-parole/data), with credits
+//   app/content.seed.json
+//   app/domande.db                  Bivio's questions (SQLite, gioco-dilemmi/data/domande.db)
+//   app/incastro/                   what ZeroWords' generator reads: chapters.json, curve.json,
+//                                   lexicon/words.tsv and blocklist.txt, with the word list's credits
 //   app/node_modules/better-sqlite3 the prebuilt win32-x64 SQLite binding
 //   data/                           databases, created on first start (Bivio votes and Incastro
 //                                   progress live here)
@@ -48,8 +51,13 @@ try {
 for (const dir of [app, `${app}.old`, runtime]) rmSync(dir, { recursive: true, force: true })
 mkdirSync(app, { recursive: true })
 await build({
-  entryPoints: [join(root, 'apps', 'server', 'src', 'index.ts')],
-  outfile: join(app, 'server.mjs'),
+  // The level generator runs in its own thread (wordgen/levels.ts looks for wordgen-worker.mjs).
+  entryPoints: {
+    server: join(root, 'apps', 'server', 'src', 'index.ts'),
+    'wordgen-worker': join(root, 'apps', 'server', 'src', 'wordgen', 'worker.ts'),
+  },
+  outdir: app,
+  outExtension: { '.js': '.mjs' },
   bundle: true,
   platform: 'node',
   format: 'esm',
@@ -65,10 +73,15 @@ step('Copying pages, content and the SQLite binding')
 cpSync(join(root, 'apps', 'dashboard', 'dist'), join(app, 'public', 'dashboard'), { recursive: true })
 cpSync(join(root, 'apps', 'overlay', 'dist'), join(app, 'public', 'overlay'), { recursive: true })
 copyFileSync(join(root, 'apps', 'server', 'src', 'content.seed.json'), join(app, 'content.seed.json'))
-copyFileSync(join(root, 'gioco-dilemmi', 'data', 'domande_master.csv'), join(app, 'domande_master.csv'))
-// Incastro: levels and chapters next to the server (incastro.ts looks for app/incastro), and the
-// attribution the word list asks for.
-cpSync(join(root, 'gioco-parole', 'data'), join(app, 'incastro'), { recursive: true })
+copyFileSync(join(root, 'gioco-dilemmi', 'data', 'domande.db'), join(app, 'domande.db'))
+// ZeroWords: what the generator reads to make levels on the fly (wordgen/files.ts looks for
+// app/incastro), and the attribution the word list asks for.
+const words = join(app, 'incastro', 'lexicon')
+mkdirSync(words, { recursive: true })
+copyFileSync(join(root, 'gioco-parole', 'data', 'chapters.json'), join(app, 'incastro', 'chapters.json'))
+copyFileSync(join(root, 'gioco-parole', 'tools', 'curve.json'), join(app, 'incastro', 'curve.json'))
+copyFileSync(join(root, 'gioco-parole', 'lexicon', 'it', 'words.tsv'), join(words, 'words.tsv'))
+copyFileSync(join(root, 'gioco-parole', 'lexicon', 'blocklist_it.txt'), join(words, 'blocklist.txt'))
 copyFileSync(join(root, 'gioco-parole', 'lexicon', 'it', 'SOURCE'), join(app, 'incastro', 'CREDITI.txt'))
 
 const sqliteDir = dirname(createRequire(join(root, 'apps', 'server', 'package.json')).resolve('better-sqlite3/package.json'))
@@ -142,28 +155,40 @@ writeFileSync(
     '  corso, risposte raccolte (con "Esporta CSV"), trigger e impostazioni: categorie, tempi,',
     '  colori, layout affiancato o in colonna, sfondo a colore, trasparente o con immagine.',
     '',
-    'INCASTRO (ruota di lettere e schema a incastro)',
-    '  1. Nella dashboard scegli il gioco "Incastro"; TikTok come per Bivio.',
+    'ZEROWORDS (ruota di lettere e schema a incastro)',
+    '  1. Nella dashboard scegli il gioco "ZeroWords"; TikTok come per Bivio.',
     '  2. Il pubblico scrive in chat le parole che trova con le lettere della ruota (anche',
     '     senza accenti, fino a 4 parole per commento). Una parola dello schema vale un punto',
     '     per lettera, +3 se usa tutte le lettere; una parola extra valida vale 1 punto.',
     '  3. Trigger predefiniti: Rose = rivela una lettera, Donut = rivela una parola,',
-    '     condivisione = mescola la ruota. Se nessuno trova parole, ogni 30 secondi si',
-    '     rivela una lettera da sola (Impostazioni gioco).',
-    '  600 livelli in italiano, in 30 capitoli da 20: a ogni capitolo il giardino dello',
-    '  sfondo cresce. Il livello raggiunto resta salvato: la live successiva riparte da lì.',
+    '     condivisione = mescola la ruota. Con "Lettera automatica" acceso (Info partita),',
+    '     se nessuno trova parole si rivela una lettera da sola ogni 30 secondi (regolabile).',
+    '  Un clic sulla ruota (nell\'anteprima della dashboard o nella pagina dell\'overlay) la',
+    '  mescola.',
+    '  Livelli senza fine, in italiano: Zerocade li genera durante la partita (il prossimo è',
+    '  pronto mentre si gioca quello in corso). Ogni 20 livelli un capitolo nuovo, e il',
+    '  giardino dello sfondo cresce. Il livello raggiunto resta salvato: la live successiva',
+    '  riparte da lì.',
+    '  Ogni livello ha tre griglie sulla stessa ruota: Agevolata, Standard ed Esperto. Con',
+    '  "Difficoltà automatica" acceso (Info partita) il livello successivo usa quella più',
+    '  facile se è scaduto il tempo o gli aiuti hanno mostrato almeno un terzo delle parole,',
+    '  quella più difficile se la chat ha trovato tutto senza aiuti.',
     '  Dalla colonna di regia: salta, torna indietro, vai al livello N, aiuti, pausa,',
-    '  soluzione del livello (solo in dashboard) e classifica della live.',
-    '  Livelli e capitoli: app\\incastro. Licenza della lista di parole: app\\incastro\\CREDITI.txt',
+    '  soluzione del livello (solo in dashboard) e classifica della live. Sotto la classifica',
+    '  compare la parola più lunga trovata nella live e chi l\'ha trovata per primo.',
+    '  Parole, capitoli e curva di difficoltà: app\\incastro. Licenza della lista di parole:',
+    '  app\\incastro\\CREDITI.txt',
     '',
     'DATI',
     '  data\\zerocade.db   la stanza dell\'overlay (tabella meta), sessioni, eventi, tutti i',
-    '                     voti di Bivio (bivio_votes) e il livello di Incastro (incastro_progress)',
+    '                     voti di Bivio (bivio_votes) e il livello di ZeroWords (incastro_progress)',
     '  data\\content.db    contenuti degli altri giochi',
     '  Per spostare Zerocade su un altro PC copia tutta la cartella, data compresa.',
     '',
-    'DOMANDE',
-    '  app\\domande_master.csv, stesso formato di gioco-dilemmi/data/domande_master.csv.',
+    'DOMANDE DI BIVIO',
+    '  app\\domande.db, un database SQLite: tabella dilemmi (id, categoria, difficolta,',
+    '  esplicita, ordine) e tabella testi (una riga per dilemma e lingua: dilemma, lingua, a, b).',
+    '  Si modifica con un programma per SQLite, per esempio DB Browser for SQLite (gratuito).',
     '  Dopo una modifica riavvia Zerocade. Non riusare l\'id di una domanda cancellata:',
     '  i voti salvati sono legati all\'id.',
     '',

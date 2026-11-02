@@ -5,15 +5,17 @@ import type {
   GameSettings,
   IncastroMoment,
   IncastroPlayer,
+  IncastroRecord,
   IncastroScore,
   IncastroState,
 } from '@zerocade/shared'
 import { gameSound, type GameSound } from './audio'
+import { socket } from './socket'
 import { useOverlay } from './store'
 
 // Incastro is drawn in the DOM (and SVG for the wheel), like Bivio: the server runs the
-// level and this renders its IncastroState. Sizes are in vmin/vh, so the dashboard
-// preview and the 1080 × 1920 browser source look the same. The fonts (Fredoka, Nunito:
+// level and this renders its IncastroState. Sizes are in vmin/vh, within the 9:16 frame
+// main.tsx keeps, so the dashboard preview and the 1080 × 1920 browser source look the same. The fonts (Fredoka, Nunito:
 // OFL) are bundled, so OBS needs no network to show them.
 
 // Chapter background file name -> URL, from gioco-parole/assets/backgrounds.
@@ -42,6 +44,7 @@ const UI: Record<string, string> = {
   revealAuto: 'Rivelata',
   shuffleBy: 'ha mescolato la ruota',
   shuffleAuto: 'Ruota mescolata',
+  shuffleClick: 'Clicca per mescolare la ruota',
   complete: 'Livello completato!',
   timeUp: 'Tempo scaduto',
   best: 'Migliore del livello',
@@ -53,6 +56,7 @@ const UI: Record<string, string> = {
   empty: 'Nessun livello trovato',
   leaderboard: 'Classifica',
   noScores: 'Il primo che trova una parola sale qui',
+  longest: 'Parola più lunga',
   point: 'punto',
   points: 'punti',
   word: 'parola',
@@ -203,7 +207,7 @@ function Game({ state, at, settings }: { state: IncastroState; at: number; setti
   const playing = useWheelQueue(state.moments, state.level, sounds)
   const bg = backgroundOf(settings, state.chapter.background)
   const accent = state.chapter.accent
-  const running = !state.paused && state.phase !== 'empty'
+  const running = !state.paused && state.phase !== 'empty' && state.phase !== 'loading'
   const remaining = useCountdown(state.remainingMs, at, running)
   const hintIn = useCountdown(state.hintInMs, at, running && state.phase === 'playing')
 
@@ -230,16 +234,18 @@ function Game({ state, at, settings }: { state: IncastroState; at: number; setti
 
   const style = { '--inc-accent': accent, backgroundColor: bg.color } as CSSProperties
 
-  if (state.phase === 'empty') {
+  // No grid yet: the level is being generated (a moment), or it cannot be.
+  if (state.phase === 'empty' || state.phase === 'loading') {
     return (
       <div className="inc" style={style}>
         <Backdrop url={bg.url} ambient={!bg.seeThrough} />
-        <p className="inc__empty">{ui.empty}</p>
+        <p className="inc__empty">{state.phase === 'loading' ? ui.waiting : ui.empty}</p>
       </div>
     )
   }
 
   const showBoard = settings.showLeaderboard !== false
+  const canShuffle = state.phase === 'playing' && !state.paused
 
   return (
     <div className="inc" style={style}>
@@ -285,8 +291,16 @@ function Game({ state, at, settings }: { state: IncastroState; at: number; setti
       <Feed moments={state.moments} playing={playing?.seq} ui={ui} />
 
       <section className="inc__play">
-        <aside className="inc__side inc__side--left">{showBoard && <Leaderboard scores={state.scores} ui={ui} />}</aside>
-        <div className="inc__wheel-wrap">
+        <aside className="inc__side inc__side--left">
+          {showBoard && <Leaderboard scores={state.scores} longest={state.longest} ui={ui} />}
+        </aside>
+        {/* A click shuffles the wheel (the server takes this one command from an overlay). */}
+        <div
+          className={`inc__wheel-wrap${canShuffle ? ' inc__wheel-wrap--click' : ''}`}
+          role={canShuffle ? 'button' : undefined}
+          title={canShuffle ? ui.shuffleClick : undefined}
+          onClick={canShuffle ? () => socket.emit('incastro:shuffle') : undefined}
+        >
           <Bubble moment={playing} ui={ui} />
           <Wheel letters={state.letters} moment={playing} />
         </div>
@@ -575,7 +589,15 @@ function feedText(m: IncastroMoment, ui: Record<string, string>): string {
   }
 }
 
-function Leaderboard({ scores, ui }: { scores: IncastroScore[]; ui: Record<string, string> }) {
+function Leaderboard({
+  scores,
+  longest,
+  ui,
+}: {
+  scores: IncastroScore[]
+  longest: IncastroRecord | null
+  ui: Record<string, string>
+}) {
   return (
     <div className="inc-board-list">
       <h2 className="inc-board-list__title">
@@ -595,6 +617,16 @@ function Leaderboard({ scores, ui }: { scores: IncastroScore[]; ui: Record<strin
             </li>
           ))}
         </ol>
+      )}
+      {longest && (
+        <div className="inc-record">
+          <span className="inc-record__label">{ui.longest}</span>
+          <span className="inc-record__word">{longest.word}</span>
+          <span className="inc-record__who">
+            <Avatar player={longest.by} className="inc-record__avatar" />
+            <span className="inc-record__name">{longest.by.nickname}</span>
+          </span>
+        </div>
       )}
     </div>
   )

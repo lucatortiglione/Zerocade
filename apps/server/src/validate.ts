@@ -183,7 +183,7 @@ export const sanitizeIncastroCommand = (raw: unknown): IncastroCommand | null =>
 
 // A level number for "Vai al livello"; the room wraps it into its own range.
 export const sanitizeLevel = (raw: unknown): number | null =>
-  typeof raw === 'number' && Number.isInteger(raw) && raw >= 1 && raw <= 100_000 ? raw : null
+  typeof raw === 'number' && Number.isInteger(raw) && raw >= 1 && raw <= 1_000_000 ? raw : null
 
 export function sanitizeMessage(raw: unknown): string | null {
   if (typeof raw !== 'string') return null

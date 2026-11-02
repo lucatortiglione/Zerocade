@@ -19,16 +19,17 @@ function groupsOf(settings: GameSetting[]): Group[] {
   return groups
 }
 
-export function SettingsForm({ session }: { session: SessionState }) {
+// Only the changed field: the server merges it onto the current settings.
+const set = (id: string, value: Value) => socket.emit('settings:set', { [id]: value })
+
+// `omit` leaves out the settings a control column already shows on their own (SettingField).
+export function SettingsForm({ session, omit = [] }: { session: SessionState; omit?: string[] }) {
   const game = GAMES.find((g) => g.id === session.gameId)
   if (!game) return null
 
-  // Only the changed field: the server merges it onto the current settings.
-  const set = (id: string, value: Value) => socket.emit('settings:set', { [id]: value })
-
   return (
     <div className="form">
-      {groupsOf(game.settings).map((group, i) => {
+      {groupsOf(game.settings.filter((s) => !omit.includes(s.id))).map((group, i) => {
         const fields = group.settings.map((s) => (
           <Field
             key={s.id}
@@ -49,6 +50,14 @@ export function SettingsForm({ session }: { session: SessionState }) {
       })}
     </div>
   )
+}
+
+// One setting of the current game, outside the form.
+export function SettingField({ session, id }: { session: SessionState; id: string }) {
+  const game = GAMES.find((g) => g.id === session.gameId)
+  const setting = game?.settings.find((s) => s.id === id)
+  if (!game || !setting) return null
+  return <Field gameId={game.id} setting={setting} value={session.settings[id] ?? setting.default} onChange={(v) => set(id, v)} />
 }
 
 function Label({ setting }: { setting: GameSetting }) {

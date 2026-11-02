@@ -1,4 +1,4 @@
-"""Convert the master question file into a Livecade "Would You Rather" import CSV.
+"""Convert the questions (data/domande.db) into a Livecade "Would You Rather" import CSV.
 
 Livecade imports one language per file (CSV UTF-8, max 16 MB / 20,000 rows) and
 does not publish the column names of each game. The reliable way is to export the
@@ -16,6 +16,8 @@ import json
 import re
 import sys
 from collections import Counter
+
+from domande import DB, load
 
 DEFAULT_HEADER = ["ref", "source", "language", "option_a", "option_b", "category", "difficulty"]
 
@@ -55,7 +57,7 @@ def detect_roles(header):
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("master")
+    ap.add_argument("db", nargs="?", default=DB, help="the questions database (default data/domande.db)")
     ap.add_argument("--lang", required=True, help="language code, e.g. it or en (needs <lang>_a/<lang>_b columns)")
     ap.add_argument("--out", required=True)
     ap.add_argument("--template", help="a CSV exported from Livecade (same game and language)")
@@ -89,31 +91,30 @@ def main():
     known = {role: Counter(r.get(col, "") for r in template_rows) for col, role in roles.items()
              if role in ("category", "difficulty")}
 
-    a_col, b_col = f"{args.lang}_a", f"{args.lang}_b"
+    dilemmas = load(args.db)
+    if not any(args.lang in d["testi"] for d in dilemmas):
+        sys.exit(f"{args.db} has no {args.lang} text")
     out_rows, problems, seen = [], [], set()
-    with open(args.master, encoding="utf-8-sig", newline="") as fh:
-        for row in csv.DictReader(fh):
-            if a_col not in row:
-                sys.exit(f"master file has no {a_col}/{b_col} columns")
-            if row["esplicita"] == "1" and not args.include_explicit:
-                continue
-            a, b = row[a_col].strip(), row[b_col].strip()
-            if not a or not b:
-                problems.append(f"{row['id']}: missing {args.lang} text")
-                continue
-            if (a.lower(), b.lower()) in seen:
-                problems.append(f"{row['id']}: duplicate of an earlier row")
-                continue
-            seen.add((a.lower(), b.lower()))
-            for text in (a, b):
-                if len(text) > MAX_OPTION_LEN:
-                    problems.append(f"{row['id']}: option longer than {MAX_OPTION_LEN} chars: {text!r}")
-            values = {
-                "ref": "", "source": "", "language": args.lang, "option_a": a, "option_b": b,
-                "category": cat_values.get(row["categoria"], row["categoria"]),
-                "difficulty": diff_values.get(row["difficolta"], row["difficolta"]),
-            }
-            out_rows.append({col: values.get(role, "") for col, role in roles.items()})
+    for d in dilemmas:
+        if d["esplicita"] and not args.include_explicit:
+            continue
+        a, b = d["testi"].get(args.lang, ("", ""))
+        if not a or not b:
+            problems.append(f"{d['id']}: missing {args.lang} text")
+            continue
+        if (a.lower(), b.lower()) in seen:
+            problems.append(f"{d['id']}: duplicate of an earlier row")
+            continue
+        seen.add((a.lower(), b.lower()))
+        for text in (a, b):
+            if len(text) > MAX_OPTION_LEN:
+                problems.append(f"{d['id']}: option longer than {MAX_OPTION_LEN} chars: {text!r}")
+        values = {
+            "ref": "", "source": "", "language": args.lang, "option_a": a, "option_b": b,
+            "category": cat_values.get(d["categoria"], d["categoria"]),
+            "difficulty": diff_values.get(d["difficolta"], d["difficolta"]),
+        }
+        out_rows.append({col: values.get(role, "") for col, role in roles.items()})
 
     for col, role in roles.items():
         if role in known and known[role]:

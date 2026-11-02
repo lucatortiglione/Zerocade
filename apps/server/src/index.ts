@@ -290,7 +290,11 @@ io.on('connection', (socket) => {
     incastro.get(key)?.suspend()
   })
 
-  // Overlays only listen; everything that changes state comes from the dashboard.
+  // A click on ZeroWords' wheel shuffles it: in the dashboard's preview, the overlay page in a
+  // browser, or OBS's Interact window.
+  socket.on('incastro:shuffle', () => incastro.get(key)?.control('shuffle'))
+
+  // Otherwise overlays only listen; everything that changes state comes from the dashboard.
   if (clientType !== 'dashboard') return
 
   void socket.join(dashboardRoom(key))

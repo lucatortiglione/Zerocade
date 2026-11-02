@@ -9,6 +9,15 @@
 html, body, #root { width: 100%; height: 100%; }
 body { background: #0b0b0e; overflow: hidden; }
 
+/* The page around the scene (main.tsx): see-through, so a window wider or taller than the
+   scene shows nothing beside it. */
+body.scene-host { background: transparent; }
+body.scene-host #root { display: grid; place-items: center; }
+.scene-frame { display: block; border: 0; width: min(100vw, 100vh * 9 / 16); height: min(100vh, 100vw * 16 / 9); }
+@media (orientation: landscape) {
+  .scene-frame { width: min(100vw, 100vh * 16 / 9); height: min(100vh, 100vw * 9 / 16); }
+}
+
 .overlay { position: relative; width: 100%; height: 100%; }
 .overlay__canvas { display: block; width: 100%; height: 100%; }
 
@@ -730,6 +739,8 @@ body.incastro-on .guide-chip__arrow { color: rgb(255 255 255 / 0.45); }
   padding-top: 12vmin;
 }
 .inc__wheel-wrap { position: relative; }
+.inc__wheel-wrap--click { cursor: pointer; transition: transform 0.15s ease-out; }
+.inc__wheel-wrap--click:active { transform: scale(0.97); }
 /* The frosted disc: CSS, so it can blur the garden behind it. */
 .inc__wheel-wrap::before {
   content: '';
@@ -852,6 +863,21 @@ body.incastro-on .guide-chip__arrow { color: rgb(255 255 255 / 0.45); }
 .inc-board-list__name { flex: 1; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
 .inc-board-list__pts { font-family: var(--inc-display); font-weight: 600; font-variant-numeric: tabular-nums; }
 .inc-board-list__empty { font-size: 2vmin; opacity: 0.8; }
+/* The live's longest word, under the ranking. */
+.inc-record {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6vmin;
+  margin-top: 1.4vmin;
+  padding-top: 1.2vmin;
+  border-top: 0.15vmin solid rgb(255 255 255 / 0.16);
+  animation: inc-slide 0.3s ease-out both;
+}
+.inc-record__label { font-size: 1.6vmin; font-weight: 800; letter-spacing: 0.2vmin; text-transform: uppercase; color: var(--inc-gold); }
+.inc-record__word { font-family: var(--inc-display); font-size: 2.8vmin; font-weight: 600; line-height: 1.05; letter-spacing: 0.2vmin; overflow-wrap: anywhere; }
+.inc-record__who { display: flex; align-items: center; gap: 0.9vmin; min-width: 0; font-size: 2vmin; font-weight: 700; }
+.inc-record__avatar { width: 3vmin; font-size: 1.4vmin; }
+.inc-record__name { min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
 
 .inc-stat {
   display: grid;

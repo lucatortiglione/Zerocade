@@ -6,6 +6,7 @@ import {
   type IncastroCommand,
   type IncastroSolution,
   type IncastroState,
+  type IncastroVariant,
   type LiveEvent,
   type SessionState,
 } from '@zerocade/shared'
@@ -22,17 +23,21 @@ import {
   simViewer,
 } from './Regia'
 import { Section } from './Section'
-import { SettingsForm } from './SettingsForm'
+import { SettingField, SettingsForm } from './SettingsForm'
 import { TriggerEditor } from './TriggerEditor'
 
-// The Incastro control column: connection and simulator, stream widgets, the level in
-// progress with its solution, the live's leaderboard, triggers and game settings.
+// The Incastro (ZeroWords) control column: connection and simulator, stream widgets, the
+// level in progress with its solution, the live's leaderboard, triggers and game settings.
+
+// The automatic letter and the automatic difficulty sit by the level's controls instead of
+// among the game settings.
+const AT_HAND = ['autoHints', 'hintSeconds', 'dda']
 
 export function IncastroSidebar({ session }: { session: SessionState }) {
   const game = GAMES.find((g) => g.id === session.gameId)
 
   const reset = () => {
-    if (game && window.confirm('Ripristinare le impostazioni predefinite di Incastro?')) {
+    if (game && window.confirm('Ripristinare le impostazioni predefinite di ZeroWords?')) {
       socket.emit('settings:set', defaultSettings(game.settings))
     }
   }
@@ -50,14 +55,14 @@ export function IncastroSidebar({ session }: { session: SessionState }) {
       </Section>
 
       <div className="side__game">
-        <span>🌱 Incastro · ruota e schema</span>
+        <span>🌱 ZeroWords · ruota e schema</span>
         <button type="button" className="side__link" onClick={reset}>
           Ripristina
         </button>
       </div>
 
       <Section title="Info partita">
-        <GameInfo />
+        <GameInfo session={session} />
       </Section>
 
       <Section title="Soluzione" open={false}>
@@ -73,7 +78,7 @@ export function IncastroSidebar({ session }: { session: SessionState }) {
       </Section>
 
       <Section title="Impostazioni gioco">
-        <SettingsForm session={session} />
+        <SettingsForm session={session} omit={AT_HAND} />
       </Section>
     </aside>
   )
@@ -102,7 +107,7 @@ function Connection() {
       <button
         type="button"
         className="side-action side-action--blue"
-        disabled={!incastro || incastro.phase === 'empty'}
+        disabled={!incastro || incastro.phase === 'empty' || incastro.phase === 'loading'}
         onClick={() => control(incastro?.paused ? 'resume' : 'pause')}
       >
         {incastro?.paused ? '▶ Riprendi gioco' : '⏸ Metti in pausa'}
@@ -145,10 +150,17 @@ function fakeEvent(state: IncastroState | null, solution: IncastroSolution | nul
 const PHASE: Record<IncastroState['phase'], string> = {
   playing: 'In gioco',
   complete: 'Riepilogo',
+  loading: 'Preparazione livello…',
   empty: 'Nessun livello',
 }
 
-function GameInfo() {
+const VARIANT: Record<IncastroVariant, string> = {
+  easy: 'Agevolata',
+  standard: 'Standard',
+  expert: 'Esperto',
+}
+
+function GameInfo({ session }: { session: SessionState }) {
   const { incastro } = useDashboard()
   const [target, setTarget] = useState('')
   if (!incastro) return <p className="text-muted small">In attesa del server…</p>
@@ -177,10 +189,21 @@ function GameInfo() {
       </div>
       <div className="info-row">
         <span>Livello</span>
+        <strong>{incastro.level}</strong>
+      </div>
+      <div className="info-row">
+        <span>Griglia</span>
         <strong>
-          {incastro.level} di {incastro.levelCount}
+          {VARIANT[incastro.variant]}
+          {incastro.difficulty && ` · difficoltà ${Math.round(incastro.difficulty.dsim)}`}
         </strong>
       </div>
+      {incastro.phase === 'complete' && incastro.nextVariant !== incastro.variant && (
+        <div className="info-row">
+          <span>Prossimo livello</span>
+          <strong>{VARIANT[incastro.nextVariant]}</strong>
+        </div>
+      )}
       <div className="info-row">
         <span>Parole · extra</span>
         <strong>
@@ -212,6 +235,11 @@ function GameInfo() {
           +30 s
         </button>
       )}
+      <div className="form">
+        <SettingField session={session} id="autoHints" />
+        {session.settings.autoHints !== false && <SettingField session={session} id="hintSeconds" />}
+        <SettingField session={session} id="dda" />
+      </div>
       <form
         className="side-message"
         onSubmit={(e) => {
@@ -222,7 +250,6 @@ function GameInfo() {
         <input
           type="number"
           min={1}
-          max={incastro.levelCount || undefined}
           placeholder="Vai al livello…"
           aria-label="Vai al livello"
           value={target}
@@ -271,8 +298,17 @@ function Solution() {
 function Scores() {
   const { incastro } = useDashboard()
   const scores = incastro?.scores ?? []
+  const longest = incastro?.longest
   return (
     <>
+      {longest && (
+        <div className="info-row">
+          <span>Parola più lunga</span>
+          <strong>
+            {longest.word} · {longest.by.nickname}
+          </strong>
+        </div>
+      )}
       {scores.length === 0 ? (
         <p className="text-muted small">Nessun punto ancora.</p>
       ) : (

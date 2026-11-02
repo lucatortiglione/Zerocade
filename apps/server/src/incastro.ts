@@ -1,39 +1,31 @@
-import { existsSync, readFileSync, readdirSync } from 'node:fs'
-import { dirname, join } from 'node:path'
-import { fileURLToPath } from 'node:url'
+import { existsSync, readFileSync } from 'node:fs'
 import type {
   GameSettings,
   IncastroChapter,
   IncastroCommand,
   IncastroMoment,
   IncastroPlayer,
+  IncastroRecord,
   IncastroScore,
   IncastroSolution,
   IncastroState,
+  IncastroVariant,
   LiveEvent,
 } from '@zerocade/shared'
 import { incastroLevel, saveIncastroLevel } from './db.js'
+import { files } from './wordgen/files.js'
+import type { Placed } from './wordgen/board.js'
+import type { GeneratedLevel, Grid } from './wordgen/generator.js'
+import { levels } from './wordgen/levels.js'
 
-// Incastro, the word game: a wheel of letters and a crossword to fill from chat, in
-// Italian. The levels are the packs generated in gioco-parole/data/levels/it
-// (tools/generate_levels.py), with the chapters of data/chapters.json. The Windows
-// package ships a copy next to the server; ZEROCADE_INCASTRO_DATA points elsewhere.
+// Incastro (shown as ZeroWords), the word game: a wheel of letters and a crossword to fill
+// from chat, in Italian. Levels never run out: the generator (wordgen/, GENERATORE.md in
+// gioco-parole) makes level n when the game gets near it, with an easier and a harder grid on
+// the same wheel; the chapters of chapters.json repeat. DDA picks the grid of each level from
+// how the chat did on the one before.
 
-interface LevelWord {
-  w: string
-  r: number
-  c: number
-  d: 'H' | 'V'
-}
-
-interface Level {
-  id: number
-  letters: string
-  rows: number
-  cols: number
-  words: LevelWord[]
-  extras: string[]
-}
+// The grid in play: the level's standard grid or one of its variants.
+type Level = Grid & { id: number; letters: string }
 
 interface Chapter {
   id: number
@@ -42,34 +34,20 @@ interface Chapter {
   accent: string
 }
 
-const here = dirname(fileURLToPath(import.meta.url))
-const dataDir = [
-  process.env.ZEROCADE_INCASTRO_DATA,
-  join(here, 'incastro'),
-  join(here, '..', '..', '..', 'gioco-parole', 'data'),
-].find((p): p is string => p !== undefined && existsSync(join(p, 'chapters.json')))
-
-function loadLevels(): Level[] {
-  const dir = dataDir && join(dataDir, 'levels', 'it')
-  if (!dir || !existsSync(dir)) return []
-  return readdirSync(dir)
-    .filter((f) => /^pack_\d+\.json$/.test(f))
-    .sort()
-    .flatMap((f) => (JSON.parse(readFileSync(join(dir, f), 'utf-8')) as { levels: Level[] }).levels)
-}
-
-const LEVELS = loadLevels()
-const CHAPTER_DATA = dataDir
-  ? (JSON.parse(readFileSync(join(dataDir, 'chapters.json'), 'utf-8')) as { levelsPerChapter: number; chapters: Chapter[] })
+const CHAPTER_DATA = existsSync(files.chapters)
+  ? (JSON.parse(readFileSync(files.chapters, 'utf-8')) as { levelsPerChapter: number; chapters: Chapter[] })
   : { levelsPerChapter: 20, chapters: [] }
-if (!LEVELS.length) console.warn('[incastro] gioco-parole/data not found: the game has no levels')
 
-// Chat text -> the words to check: accents folded (CITTÀ -> CITTA), upper case, 3-8
-// letters. A comment can carry a few words ("amo ora"), not a whole list.
+const VARIANTS: IncastroVariant[] = ['easy', 'standard', 'expert']
+// DDA: hints that showed this share of the words mean the chat struggled.
+const STRUGGLE_SHARE = 1 / 3
+
+// Chat text -> the words to check: accents folded (CITTÀ -> CITTA), upper case, 3-10
+// letters (wheels have up to 9). A comment can carry a few words ("amo ora"), not a whole list.
 const MAX_WORDS_PER_COMMENT = 4
 export function wordsIn(text: string): string[] {
   const folded = text.normalize('NFD').replace(/\p{M}/gu, '').toUpperCase()
-  const words = folded.split(/[^A-Z]+/).filter((w) => w.length >= 3 && w.length <= 8)
+  const words = folded.split(/[^A-Z]+/).filter((w) => w.length >= 3 && w.length <= 10)
   return [...new Set(words)].slice(0, MAX_WORDS_PER_COMMENT)
 }
 
@@ -116,8 +94,16 @@ type CellState = 'hidden' | 'hint' | 'found'
 type NewMoment = IncastroMoment extends infer M ? (M extends unknown ? Omit<M, 'seq'> : never) : never
 
 class IncastroRoom {
+  // Level number - 1.
   private index = 0
   private level: Level | null = null
+  // DDA: the grid in play, and the one the next level will use.
+  private playing: IncastroVariant = 'standard'
+  private variant: IncastroVariant = 'standard'
+  // Letters and words shown by hints in this level (automatic, gifts or the dashboard).
+  private hints = 0
+  // Bumped by every level start, so a level generated too late is not started.
+  private loading = 0
   private letters = ''
   private shuffles = 0
   private cells = new Map<string, { letter: string; state: CellState }>()
@@ -128,6 +114,7 @@ class IncastroRoom {
   private wordIndex = new Map<string, number>()
   private scores = new Map<string, IncastroScore>()
   private levelScores = new Map<string, IncastroScore>()
+  private longest: IncastroRecord | null = null
   private moments: IncastroMoment[] = []
   private seq = 0
   private phase: IncastroState['phase'] = 'empty'
@@ -209,10 +196,13 @@ class IncastroRoom {
         return this.emitNow()
       case 'restart':
         this.scores.clear()
+        this.longest = null
+        this.variant = 'standard'
         return this.startLevel(0)
       case 'clear-scores':
         this.scores.clear()
         this.levelScores.clear()
+        this.longest = null
         return this.emitNow()
     }
   }
@@ -263,6 +253,7 @@ class IncastroRoom {
   }
 
   dispose(): void {
+    this.loading++
     clearTimeout(this.timer)
     clearTimeout(this.hintTimer)
     clearTimeout(this.emitTimer)
@@ -297,8 +288,10 @@ class IncastroRoom {
     return {
       phase: this.phase,
       paused: this.paused,
-      level: level?.id ?? 0,
-      levelCount: LEVELS.length,
+      level: this.index + 1,
+      variant: this.playing,
+      nextVariant: this.variant,
+      difficulty: level ? { target: level.metrics.target, dsim: level.metrics.dsim } : null,
       chapter,
       letters: this.letters,
       shuffles: this.shuffles,
@@ -323,6 +316,7 @@ class IncastroRoom {
       moments: this.moments,
       scores: top(this.scores, SCORES_SHOWN),
       levelScores: top(this.levelScores, 3),
+      longest: this.longest,
       remainingMs: this.timeLeft(),
       durationMs: this.durationMs,
       hintInMs: this.hintTimer ? Math.max(0, this.hintEndsAt - Date.now()) : this.hintLeftMs,
@@ -331,19 +325,36 @@ class IncastroRoom {
     }
   }
 
+  // Level index + 1 at once when it is already made, otherwise once the generator has it
+  // (the overlay shows the level coming meanwhile).
   private startLevel(index: number): void {
-    const count = LEVELS.length
     clearTimeout(this.hintTimer)
     this.hintTimer = undefined
-    if (!count) {
-      this.level = null
-      this.phase = 'empty'
-      this.setTimer(0)
-      return this.emitNow()
-    }
-    // Past the last level the garden starts over from level 1.
-    this.index = ((index % count) + count) % count
-    const level = LEVELS[this.index]
+    this.index = Math.max(0, index)
+    const n = this.index + 1
+    const ticket = ++this.loading
+    const made = levels.ready(n)
+    if (made) return this.begin(made)
+    this.level = null
+    this.phase = 'loading'
+    this.setTimer(0)
+    this.emitNow()
+    levels.get(n).then(
+      (level) => {
+        if (ticket === this.loading) this.begin(level)
+      },
+      () => {
+        if (ticket !== this.loading) return
+        this.phase = 'empty'
+        this.emitNow()
+      },
+    )
+  }
+
+  private begin(made: GeneratedLevel): void {
+    this.playing = this.variant
+    const grid = this.variant === 'standard' ? made : made.variants[this.variant]
+    const level: Level = { ...grid, id: made.id, letters: made.letters }
     this.level = level
     this.letters = level.letters
     this.shuffles = 0
@@ -364,6 +375,7 @@ class IncastroRoom {
     this.missed = false
     this.chapterDone = false
     this.triggerHints = 0
+    this.hints = 0
     this.moments = []
     this.phase = 'playing'
     saveIncastroLevel(this.key, level.id)
@@ -371,17 +383,33 @@ class IncastroRoom {
     this.restartHintTimer()
     this.emitNow()
     this.emitSolution(this.solution())
+    // Made while this one is played.
+    levels.prefetch(level.id + 1)
   }
 
   private complete(): void {
     if (this.phase !== 'playing') return
     this.phase = 'complete'
+    this.variant = this.nextVariant()
     this.chapterDone = (this.index + 1) % CHAPTER_DATA.levelsPerChapter === 0
     clearTimeout(this.hintTimer)
     this.hintTimer = undefined
     this.hintLeftMs = 0
     this.setTimer(this.settings.autoNext === false ? 0 : this.summaryMs())
     this.emitNow()
+  }
+
+  // DDA: one step easier when the chat struggled (time ran out, or hints showed at least a
+  // third of the words), one step harder when it found every word with no hint at all; the
+  // standard grid when DDA is off.
+  private nextVariant(): IncastroVariant {
+    if (this.settings.dda === false) return 'standard'
+    const words = this.level?.words.length ?? 0
+    const byHints = [...this.found.values()].filter((by) => by === null).length
+    const struggled = this.missed || (words > 0 && byHints / words >= STRUGGLE_SHARE)
+    const cruised = !this.missed && this.hints === 0
+    const at = VARIANTS.indexOf(this.variant) + (struggled ? -1 : cruised ? 1 : 0)
+    return VARIANTS[Math.max(0, Math.min(VARIANTS.length - 1, at))]
   }
 
   private summaryMs(): number {
@@ -404,6 +432,7 @@ class IncastroRoom {
       } else if (this.settings.extras !== false && this.extraWords.has(word) && !this.extras.has(word)) {
         this.extras.add(word)
         this.addPoints(by, EXTRA_POINTS, 0)
+        this.noteLongest(word, by)
         this.addMoment({ kind: 'extra', word, by, points: EXTRA_POINTS })
       }
       if (this.phase !== 'playing') break
@@ -419,6 +448,7 @@ class IncastroRoom {
     this.found.set(i, by)
     this.cellsOf(word).forEach((cell) => (cell.state = 'found'))
     this.addPoints(by, points, 1)
+    this.noteLongest(word.w, by)
     this.addMoment({ kind: 'found', word: word.w, by, points, full })
     this.restartHintTimer()
     this.checkDone()
@@ -435,6 +465,7 @@ class IncastroRoom {
       : open.flatMap((w) => this.cellsOf(w)).filter((c) => c.state === 'hidden')
     if (!pool.length) return false
     pool[Math.floor(Math.random() * pool.length)].state = 'hint'
+    this.hints++
     this.addMoment({ kind: 'hint', by })
     this.completeShownWords()
     this.restartHintTimer()
@@ -448,6 +479,7 @@ class IncastroRoom {
     if (!open.length) return false
     const { w } = open[Math.floor(Math.random() * open.length)]
     for (const cell of this.cellsOf(w)) if (cell.state === 'hidden') cell.state = 'hint'
+    this.hints++
     this.addMoment({ kind: 'reveal', word: w.w, by })
     this.completeShownWords()
     this.restartHintTimer()
@@ -485,7 +517,7 @@ class IncastroRoom {
     this.emitNow()
   }
 
-  private cellsOf(w: LevelWord) {
+  private cellsOf(w: Placed) {
     return [...w.w].map((_, k) => this.cells.get(w.d === 'H' ? `${w.r},${w.c + k}` : `${w.r + k},${w.c}`)!)
   }
 
@@ -500,6 +532,11 @@ class IncastroRoom {
         words: (cur?.words ?? 0) + words,
       })
     }
+  }
+
+  // A longer word takes the record; one of the same length leaves it to whoever was first.
+  private noteLongest(word: string, by: IncastroPlayer): void {
+    if (word.length > (this.longest?.word.length ?? 0)) this.longest = { word, by }
   }
 
   private addMoment(moment: NewMoment): void {

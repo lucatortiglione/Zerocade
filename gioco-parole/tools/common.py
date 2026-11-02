@@ -1,7 +1,8 @@
-"""Helpers shared by the lexicon builder, the level generator and the validator.
+"""Helpers shared by the lexicon builder and the level validator. The level generator is
+TypeScript, in the Zerocade server (apps/server/src/wordgen; GENERATORE.md).
 
-Incastro is played in Italian only: the lexicon lives in lexicon/it and the levels in
-data/levels/it (the folders keep the language in their name, as do the level packs).
+ZeroWords is played in Italian only: the lexicon lives in lexicon/it and the level packs the
+generator writes for checking in data/levels/it (the folders keep the language in their name).
 """
 import os
 import unicodedata
