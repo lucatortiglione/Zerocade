@@ -33,7 +33,7 @@ Il riferimento tecnico resta in `../Words_of_Wonders_RE/` e **non** va copiato q
 | `lexicon/it/not_in_grid.txt` | Parole valide che non vanno mai nello schema (nomi, sigle, prestiti, interiezioni) | ✅ prima revisione |
 | `lexicon/blocklist_it.txt` | Parole escluse ovunque: volgari, offensive, sensibili | ✅ prima revisione |
 | `tools/build_lexicon.py` | M1: Morph-it! + frequenze wordfreq → `words.tsv` | ✅ |
-| `apps/server/src/wordgen/` (fuori da questa cartella) | M2: generatore dei livelli in TypeScript, dentro il server di Zerocade: livelli senza fine, creati durante la partita e deterministici dal numero; `npm run wordgen -w @zerocade/server` per tararlo ([GENERATORE.md](GENERATORE.md)) | ✅ |
+| `apps/server/src/wordgen/` (fuori da questa cartella) | M2: generatore dei livelli in TypeScript, dentro il server di Zerocade: livelli senza fine, creati durante la partita e deterministici dal numero; `npm run wordgen -w @zerocade/server` per tararlo ([ALGORITMO.md](ALGORITMO.md)) | ✅ |
 | `tools/validate_levels.py` | M2: validatore dei livelli scritti dal generatore (esce con 1 se un livello è sbagliato) | ✅ livelli 1–600, 0 errori |
 | `tools/curve.json` | Curva di difficoltà (al posto di `curve.yaml`: niente dipendenza da PyYAML) | ✅ da tarare col playtest |
 | `tools/make_backgrounds.py` | Disegna gli sfondi dei capitoli e scrive `data/chapters.json` | ✅ |
@@ -168,8 +168,8 @@ RAMO     L'esempio rispetta le regole del validatore: AMO e ORA incrociano RAMO
 .O.A     (comprese le extra) è componibile con R, A, M, O.
 ```
 
-- [x] **Algoritmo di generazione** (`apps/server/src/wordgen`): pipeline a sei stadi dalla curva a dente di squalo T(c, i): ruote sintetiche dall'indice dei multinsiemi, scheletro dell'archetipo (A telaio asimmetrico, B doppio lobo a ponte, C arcipelago ad albero, D arena densa), riempimento CSP con funzione di costo J, validazione con il solver umano simulato (D_sim entro ±3 da T), ordine della ruota, varianti DDA Agevolata (T − 15) ed Esperto (T + 12). Descrizione completa in [GENERATORE.md](GENERATORE.md).
-- [ ] **Curva di difficoltà** in `tools/curve.json`: forma del dente, rampa, matrice per archetipo, pesi di J e del solver. I valori non fissati dalla specifica sono ipotesi (elenco in GENERATORE.md): **tararli con il playtest**.
+- [x] **Algoritmo di generazione** (`apps/server/src/wordgen`): pipeline a sei stadi dalla curva a dente di squalo T(c, i): ruote sintetiche dall'indice dei multinsiemi, scheletro dell'archetipo (A telaio asimmetrico, B doppio lobo a ponte, C arcipelago ad albero, D arena densa), riempimento CSP con funzione di costo J, validazione con il solver umano simulato (D_sim entro ±3 da T), ordine della ruota, varianti DDA Agevolata (T − 15) ed Esperto (T + 12). Descrizione completa in [ALGORITMO.md](ALGORITMO.md).
+- [ ] **Curva di difficoltà** in `tools/curve.json`: forma del dente, rampa, matrice per archetipo, pesi di J e del solver. I valori non fissati dalla specifica sono ipotesi (elenco in ALGORITMO.md): **tararli con il playtest**.
 - [ ] **Livelli tutorial** (i primi 5–10) fatti a mano e marcati `"handmade": true`
 - [ ] **Validatore** (`tools/validate_levels.py`, eseguito in CI). Fallisce se:
   - una parola esce dallo schema, o due parole si contraddicono in una casella;

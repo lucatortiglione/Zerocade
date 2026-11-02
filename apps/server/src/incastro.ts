@@ -13,13 +13,14 @@ import type {
   LiveEvent,
 } from '@zerocade/shared'
 import { incastroLevel, saveIncastroLevel } from './db.js'
+import { nasaPhotos, randomPhoto, type NasaPhoto } from './nasa.js'
 import { files } from './wordgen/files.js'
 import type { Placed } from './wordgen/board.js'
 import type { GeneratedLevel, Grid } from './wordgen/generator.js'
 import { levels } from './wordgen/levels.js'
 
 // Incastro (shown as ZeroWords), the word game: a wheel of letters and a crossword to fill
-// from chat, in Italian. Levels never run out: the generator (wordgen/, GENERATORE.md in
+// from chat, in Italian. Levels never run out: the generator (wordgen/, ALGORITMO.md in
 // gioco-parole) makes level n when the game gets near it, with an easier and a harder grid on
 // the same wheel; the chapters of chapters.json repeat. DDA picks the grid of each level from
 // how the chat did on the one before.
@@ -104,6 +105,8 @@ class IncastroRoom {
   private hints = 0
   // Bumped by every level start, so a level generated too late is not started.
   private loading = 0
+  // The NASA picture behind this level (background 'nasa').
+  private photo: NasaPhoto | null = null
   private letters = ''
   private shuffles = 0
   private cells = new Map<string, { letter: string; state: CellState }>()
@@ -216,6 +219,7 @@ class IncastroRoom {
     this.settings = settings
     const changed = (id: string) => prev[id] !== settings[id]
     if (this.phase === 'playing' && (changed('autoHints') || changed('hintSeconds'))) this.restartHintTimer()
+    if (changed('background')) this.pickPhoto()
     if (this.phase === 'playing' && changed('levelSeconds')) {
       this.freeze()
       const ms = num(settings, 'levelSeconds', 0) * 1000
@@ -292,6 +296,7 @@ class IncastroRoom {
       variant: this.playing,
       nextVariant: this.variant,
       difficulty: level ? { target: level.metrics.target, dsim: level.metrics.dsim } : null,
+      photo: this.photo,
       chapter,
       letters: this.letters,
       shuffles: this.shuffles,
@@ -385,6 +390,22 @@ class IncastroRoom {
     this.emitSolution(this.solution())
     // Made while this one is played.
     levels.prefetch(level.id + 1)
+    this.pickPhoto()
+  }
+
+  // A new NASA picture for the level in play, once the feed has answered (the overlay keeps
+  // the garden meanwhile, or if NASA cannot be reached).
+  private pickPhoto(): void {
+    if (this.settings.background !== 'nasa') {
+      this.photo = null
+      return
+    }
+    const ticket = this.loading
+    void nasaPhotos().then((list) => {
+      if (ticket !== this.loading || this.settings.background !== 'nasa') return
+      this.photo = randomPhoto(list, this.photo?.url) ?? this.photo
+      this.emitNow()
+    })
   }
 
   private complete(): void {

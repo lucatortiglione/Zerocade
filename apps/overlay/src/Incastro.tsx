@@ -30,8 +30,6 @@ const PREVIEW = new URLSearchParams(window.location.search).has('preview')
 
 // Every text on the overlay: Incastro is played in Italian only.
 const UI: Record<string, string> = {
-  chapter: 'Capitolo',
-  level: 'Livello',
   prompt: 'Scrivi in chat le parole che trovi',
   extras: 'extra',
   hintIn: 'Aiuto tra',
@@ -67,13 +65,15 @@ const UI: Record<string, string> = {
 const hex = (v: unknown, fallback: string) =>
   typeof v === 'string' && /^#[0-9a-f]{6}$/i.test(v) ? v.toLowerCase() : fallback
 
-function backgroundOf(s: GameSettings, chapterBackground: string) {
-  const mode = typeof s.background === 'string' ? s.background : 'garden'
+// 'nasa' shows the level's NASA picture, and the chapter's garden until there is one.
+function backgroundOf(s: GameSettings, chapterBackground: string, photo: IncastroState['photo']) {
+  const mode = typeof s.background === 'string' ? s.background : 'nasa'
   const image = typeof s.bgImage === 'string' ? s.bgImage : ''
-  if (mode === 'transparent') return { seeThrough: true, url: '', color: 'transparent' }
-  if (mode === 'color') return { seeThrough: false, url: '', color: hex(s.bgColor, '#173b2c') }
-  if (mode === 'image' && image) return { seeThrough: false, url: image, color: '#173b2c' }
-  return { seeThrough: false, url: BACKGROUNDS[chapterBackground] ?? '', color: '#173b2c' }
+  if (mode === 'transparent') return { seeThrough: true, url: '', color: 'transparent', photo: false }
+  if (mode === 'color') return { seeThrough: false, url: '', color: hex(s.bgColor, '#173b2c'), photo: false }
+  if (mode === 'image' && image) return { seeThrough: false, url: image, color: '#173b2c', photo: false }
+  if (mode === 'nasa' && photo) return { seeThrough: false, url: photo.url, color: '#05080f', photo: true }
+  return { seeThrough: false, url: BACKGROUNDS[chapterBackground] ?? '', color: '#173b2c', photo: false }
 }
 
 // Counts a server duration down locally, ticking ten times a second.
@@ -205,7 +205,7 @@ function Game({ state, at, settings }: { state: IncastroState; at: number; setti
   const ui = UI
   const sounds = settings.sounds !== false && !PREVIEW
   const playing = useWheelQueue(state.moments, state.level, sounds)
-  const bg = backgroundOf(settings, state.chapter.background)
+  const bg = backgroundOf(settings, state.chapter.background, state.photo)
   const accent = state.chapter.accent
   const running = !state.paused && state.phase !== 'empty' && state.phase !== 'loading'
   const remaining = useCountdown(state.remainingMs, at, running)
@@ -238,7 +238,7 @@ function Game({ state, at, settings }: { state: IncastroState; at: number; setti
   if (state.phase === 'empty' || state.phase === 'loading') {
     return (
       <div className="inc" style={style}>
-        <Backdrop url={bg.url} ambient={!bg.seeThrough} />
+        <Backdrop url={bg.url} ambient={!bg.seeThrough} photo={bg.photo} />
         <p className="inc__empty">{state.phase === 'loading' ? ui.waiting : ui.empty}</p>
       </div>
     )
@@ -249,28 +249,11 @@ function Game({ state, at, settings }: { state: IncastroState; at: number; setti
 
   return (
     <div className="inc" style={style}>
-      <Backdrop url={bg.url} ambient={!bg.seeThrough} />
+      <Backdrop url={bg.url} ambient={!bg.seeThrough} photo={bg.photo} />
 
+      {/* Only the prompt, in the top bar between the name and the dot: the grid gets the
+          height (chapter and level are in the dashboard). */}
       <header className="inc__head">
-        <p className="inc__eyebrow">
-          {ui.chapter} {state.chapter.id}
-          <span className="inc__level">
-            {ui.level} {state.level}
-          </span>
-        </p>
-        <h1 className="inc__chapter">{state.chapter.name}</h1>
-        <div className="inc__leaves" aria-hidden="true">
-          {Array.from({ length: state.chapter.size }, (_, i) => {
-            const n = i + 1
-            const done = n < state.chapter.levelInChapter || (n === state.chapter.levelInChapter && state.phase === 'complete')
-            return (
-              <span
-                key={i}
-                className={`inc__leaf${done ? ' inc__leaf--done' : n === state.chapter.levelInChapter ? ' inc__leaf--now' : ''}`}
-              />
-            )
-          })}
-        </div>
         <p className="inc__prompt">
           <Icon name="chat" />
           {ui.prompt}
@@ -288,9 +271,8 @@ function Game({ state, at, settings }: { state: IncastroState; at: number; setti
         )}
       </section>
 
-      <Feed moments={state.moments} playing={playing?.seq} ui={ui} />
-
       <section className="inc__play">
+        <Feed moments={state.moments} playing={playing?.seq} ui={ui} />
         <aside className="inc__side inc__side--left">
           {showBoard && <Leaderboard scores={state.scores} longest={state.longest} ui={ui} />}
         </aside>
@@ -330,6 +312,8 @@ function Game({ state, at, settings }: { state: IncastroState; at: number; setti
         </aside>
       </section>
 
+      {bg.photo && state.photo && <p className="inc__credit">NASA · {state.photo.title}</p>}
+
       {state.phase === 'complete' && state.chapterDone && <LeafRain />}
     </div>
   )
@@ -346,24 +330,39 @@ const POLLEN = Array.from({ length: 12 }, (_, i) => ({
 // The chapter's garden. When the chapter changes the new one fades in over the old. Over
 // it a soft veil keeps the text readable, and a little pollen drifts up; neither is drawn
 // on a transparent background, which has to stay clear for OBS.
-function Backdrop({ url, ambient }: { url: string; ambient: boolean }) {
-  const [layers, setLayers] = useState<string[]>(url ? [url] : [])
+function Backdrop({ url, ambient, photo }: { url: string; ambient: boolean; photo: boolean }) {
+  const [layers, setLayers] = useState<string[]>([])
+  // A new picture comes in only once it has loaded, over the old one: a remote photo never
+  // leaves an empty background while it downloads (or if it fails to).
   useEffect(() => {
-    setLayers((prev) => (prev.at(-1) === url ? prev : [...prev, url].filter(Boolean).slice(-2)))
+    if (!url) return setLayers([])
+    let current = true
+    const img = new Image()
+    img.onload = () => current && setLayers((prev) => (prev.at(-1) === url ? prev : [...prev, url].slice(-2)))
+    img.src = url
+    return () => {
+      current = false
+    }
   }, [url])
   return (
     <div className="inc__backdrop" aria-hidden="true">
       {layers.map((u, i) => (
-        <div key={u} className={`inc__bg${i > 0 ? ' inc__bg--in' : ''}`} style={{ backgroundImage: `url("${u}")` }} />
+        <div
+          key={u}
+          className={`inc__bg${photo ? ' inc__bg--photo' : ''}${i > 0 ? ' inc__bg--in' : ''}`}
+          style={{ backgroundImage: `url("${u}")` }}
+        />
       ))}
       {ambient && (
         <>
-          <div className="inc__veil" />
-          <div className="inc__pollen">
-            {POLLEN.map((p, i) => (
-              <span key={i} style={p as CSSProperties} />
-            ))}
-          </div>
+          <div className={`inc__veil${photo ? ' inc__veil--photo' : ''}`} />
+          {!photo && (
+            <div className="inc__pollen">
+              {POLLEN.map((p, i) => (
+                <span key={i} style={p as CSSProperties} />
+              ))}
+            </div>
+          )}
         </>
       )}
     </div>
@@ -552,10 +551,11 @@ function Bubble({ moment, ui }: { moment: Played | null; ui: Record<string, stri
 const FEED_ICON: Partial<Record<IncastroMoment['kind'], IconName>> = { hint: 'bulb', reveal: 'bulb', shuffle: 'shuffle' }
 
 // The latest news, without repeats and without the word the wheel is playing right now.
+// The latest moment, in the strip above the wheel; hidden while a word's bubble is up there.
 function Feed({ moments, playing, ui }: { moments: IncastroMoment[]; playing?: number; ui: Record<string, string> }) {
-  const shown = moments.filter((m) => m.kind !== 'repeat' && m.seq !== playing).slice(0, 2)
+  const shown = moments.filter((m) => m.kind !== 'repeat' && m.seq !== playing).slice(0, 1)
   return (
-    <ol className="inc-feed">
+    <ol className={`inc-feed${playing !== undefined ? ' inc-feed--hidden' : ''}`}>
       {shown.map((m) => (
         <li key={m.seq} className={`inc-feed__item inc-feed__item--${m.kind}`}>
           {'by' in m && m.by ? (

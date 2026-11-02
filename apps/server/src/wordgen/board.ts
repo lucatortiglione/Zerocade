@@ -1,6 +1,6 @@
 import { CURVE } from './curve.js'
 
-// The board the generator lays words on, with the hard rules of the CSP (GENERATORE.md,
+// The board the generator lays words on, with the hard rules of the CSP (ALGORITMO.md,
 // stage 3): letters agree, both ends free, no letter side by side with another word.
 
 export type Dir = 'H' | 'V'

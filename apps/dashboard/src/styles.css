@@ -605,6 +605,7 @@ input[type='number']:focus { border-color: var(--accent); outline: none; }
 .side-message { display: flex; gap: 6px; }
 .side-message input { flex: 1; }
 .side-controls { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+.side-flag { display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: 13px; }
 
 .switch-row { display: flex; align-items: center; gap: 10px; font-size: 14px; cursor: pointer; }
 .switch-row input[type='checkbox'] { margin-left: auto; }

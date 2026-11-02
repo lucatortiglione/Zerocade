@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto'
-import { existsSync } from 'node:fs'
+import { existsSync, writeFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import Database from 'better-sqlite3'
@@ -15,7 +15,7 @@ import {
   type GameSettings,
   type LiveEvent,
 } from '@zerocade/shared'
-import { bivioTotals, bivioTotalsByQuestion, recordBivioVote } from './db.js'
+import { bivioFlags, bivioTotals, bivioTotalsByQuestion, dataDir, flagBivio, recordBivioVote, unflagBivio } from './db.js'
 
 // Bivio ("Preferiresti…?"), the server-driven game. Questions come from the game's
 // SQLite file, gioco-dilemmi/data/domande.db (the one tools/to_livecade.py exports from;
@@ -80,6 +80,27 @@ function loadDilemmas(): Dilemma[] {
 }
 
 export const DILEMMAS = loadDilemmas()
+
+// Questions marked as wrong from the dashboard (any overlay key): out of the game until
+// unmarked, and listed in data/bivio-domande-sbagliate.csv to be fixed in domande.db.
+const FLAGS_FILE = join(dataDir, 'bivio-domande-sbagliate.csv')
+const flagged = new Set(bivioFlags().map((f) => f.question_id))
+
+function setFlag(id: string, lang: string, on: boolean): void {
+  if (on === flagged.has(id)) return
+  if (on) {
+    flagBivio(id, lang)
+    flagged.add(id)
+  } else {
+    unflagBivio(id)
+    flagged.delete(id)
+  }
+  try {
+    writeFileSync(FLAGS_FILE, bivioFlagsCsv())
+  } catch (err) {
+    console.warn(`[bivio] ${FLAGS_FILE}: ${err instanceof Error ? err.message : String(err)}`)
+  }
+}
 
 const textFor = (d: Dilemma, lang: string) => d.text[lang] ?? Object.values(d.text)[0]
 
@@ -177,6 +198,11 @@ class BivioRoom {
         this.paused = false
         this.buildDeck()
         return this.startRound()
+      case 'flag':
+      case 'unflag':
+        // The round goes on; a flagged question is just not dealt again.
+        if (this.current) setFlag(this.current.id, this.lang, command === 'flag')
+        return this.emitNow()
     }
   }
 
@@ -222,7 +248,11 @@ class BivioRoom {
       paused: this.paused,
       lang: this.lang,
       roundId: this.roundId,
-      question: q && text ? { id: q.id, category: q.category, difficulty: q.difficulty, a: text.a, b: text.b } : null,
+      question:
+        q && text
+          ? { id: q.id, category: q.category, difficulty: q.difficulty, a: text.a, b: text.b, flagged: flagged.has(q.id) }
+          : null,
+      flagged: flagged.size,
       votes: { ...this.votes },
       allTime: this.allTime,
       remainingMs: this.timeLeft(),
@@ -252,7 +282,7 @@ class BivioRoom {
   // votes before any of them comes back, across restarts too.
   private buildDeck(): void {
     const rounds = new Map(bivioTotalsByQuestion().map((r) => [r.id, r.rounds]))
-    this.deck = shuffle(DILEMMAS.filter((d) => this.matches(d))).sort(
+    this.deck = shuffle(DILEMMAS.filter((d) => this.matches(d) && !flagged.has(d.id))).sort(
       (x, y) => (rounds.get(x.id) ?? 0) - (rounds.get(y.id) ?? 0),
     )
     if (this.deck.length > 1 && this.deck[0].id === this.current?.id) this.deck.push(this.deck.shift()!)
@@ -415,6 +445,21 @@ export function bivioStats(lang: BivioLang): BivioStats {
 const csvField = (v: string | number) => {
   const s = String(v)
   return /[",\r\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s
+}
+
+// The questions marked as wrong, oldest first, with their texts in every language of
+// domande.db: the list to fix there. Excel-friendly like bivioCsv.
+export function bivioFlagsCsv(): string {
+  const byId = new Map(DILEMMAS.map((d) => [d.id, d]))
+  const langs = [...new Set(DILEMMAS.flatMap((d) => Object.keys(d.text)))]
+  const header = ['id', 'categoria', 'difficolta', 'segnalata_il', 'lingua_in_gioco', ...langs.flatMap((l) => [`${l}_a`, `${l}_b`])]
+  const rows: string[][] = [header]
+  for (const f of bivioFlags()) {
+    const d = byId.get(f.question_id)
+    const texts = langs.flatMap((l) => [d?.text[l]?.a ?? '', d?.text[l]?.b ?? ''])
+    rows.push([f.question_id, d?.category ?? '', d?.difficulty ?? '', f.flagged_at, f.lang, ...texts])
+  }
+  return '﻿' + rows.map((r) => r.map(csvField).join(',')).join('\r\n') + '\r\n'
 }
 
 // Results per dilemma, with every language of domande.db, to spot the lopsided

@@ -16,7 +16,7 @@ import { TwitchEventSub } from './twitch-eventsub.js'
 
 type LegacyTikTokConn = {
   connect: () => Promise<unknown>
-  disconnect: () => void
+  disconnect: () => unknown
   on: (event: string, listener: (data: unknown) => void) => unknown
 }
 
@@ -30,6 +30,18 @@ const toViewer = (id: unknown, nickname: unknown, avatar?: unknown): Viewer => (
   nickname: String(nickname ?? '').slice(0, 32) || 'anonymous',
   avatar: typeof avatar === 'string' && /^https?:\/\//.test(avatar) ? avatar.slice(0, 512) : undefined,
 })
+
+// The connector's most common failures, in the dashboard's language; anything else as it is.
+function tiktokError(err: unknown, user: string): string {
+  const message = err instanceof Error ? err.message : String(err)
+  if (err instanceof Error && err.constructor.name === 'UserOfflineError') {
+    return `@${user} non è in diretta: avvia la LIVE su TikTok, poi ricollega.`
+  }
+  if (/room id/i.test(message)) {
+    return `Diretta di @${user} non trovata: controlla il nome utente (quello dopo la @ nel profilo) e che la LIVE sia avviata.`
+  }
+  return message
+}
 
 export interface LiveSource {
   kind: SourceKind
@@ -98,9 +110,20 @@ export class RoomSources {
     this.tiktokState = 'connecting'
     this.status({ kind: 'tiktok', username: uname, state: 'connecting' })
 
-    const conn = new LegacyConn(uname)
-    this.tiktok = conn
+    let conn: LegacyTikTokConn | null = null
     try {
+      // Version 2 of the connector needs the options object, even empty: without it the
+      // constructor throws before any request.
+      conn = new LegacyConn(uname, {})
+      this.tiktok = conn
+      // An 'error' event with nobody listening would bring the whole server down. The
+      // connector sends { info, exception }; a failed connect also rejects, which the
+      // dashboard gets below.
+      conn.on('error', (err) => {
+        const e = rec(err)
+        const detail = err instanceof Error ? err.message : [e.info, e.exception instanceof Error ? e.exception.message : ''].filter(Boolean).join(': ')
+        console.warn(`[tiktok] ${detail}`)
+      })
       conn.on('chat', (data) => {
         const d = rec(data)
         this.emit({
@@ -145,29 +168,33 @@ export class RoomSources {
         if (this.tiktok === conn) this.disconnectTiktok()
       })
       await conn.connect()
+      // Disconnected, or replaced by another account, while connecting: close this one.
+      if (this.tiktok !== conn) {
+        void Promise.resolve(conn.disconnect()).catch(() => {})
+        return
+      }
       this.tiktokSince = Date.now()
       this.tiktokState = 'connected'
       this.status({ kind: 'tiktok', username: uname, state: 'connected' })
     } catch (err) {
+      // A late failure of an attempt already replaced says nothing about the current one.
+      if (conn && this.tiktok !== conn) return
       this.tiktok = null
       this.tiktokState = 'error'
-      this.status({
-        kind: 'tiktok',
-        username: uname,
-        state: 'error',
-        message: err instanceof Error ? err.message : String(err),
-      })
+      this.status({ kind: 'tiktok', username: uname, state: 'error', message: tiktokError(err, uname) })
     }
   }
 
   private disconnectTiktok(): void {
     if (this.tiktok) {
+      const conn = this.tiktok
+      this.tiktok = null
       try {
-        this.tiktok.disconnect()
+        // A promise in version 2 of the connector; it rejects when the connection never opened.
+        void Promise.resolve(conn.disconnect()).catch(() => {})
       } catch {
         // noop
       }
-      this.tiktok = null
     }
     if (this.tiktokUser) {
       this.status({ kind: 'tiktok', username: this.tiktokUser, state: 'idle' })
@@ -232,7 +259,8 @@ export class RoomSources {
   private disconnectTwitch(): void {
     if (this.twitch) {
       try {
-        void this.twitch.disconnect()
+        // Rejects when the chat never connected.
+        void this.twitch.disconnect().catch(() => {})
       } catch {
         // noop
       }

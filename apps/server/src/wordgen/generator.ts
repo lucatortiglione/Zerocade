@@ -3,7 +3,7 @@ import { CURVE, clamp, lerp, matrix, size, target, type Archetype, type Archetyp
 import { Lexicon, MIN_LEN, signature } from './lexicon.js'
 
 // ZeroWords' level generator: from the target T(c, i) of the sawtooth curve to a grid, in the
-// six stages of gioco-parole/GENERATORE.md. Level n depends on n alone (and on the lexicon
+// six stages of gioco-parole/ALGORITMO.md. Level n depends on n alone (and on the lexicon
 // and the curve), so any level can be made at any time, in any order, for ever.
 
 const WINDOW: Record<ArchetypeId, number> = { A: 6, B: 6, C: 6, D: 40 } // words weighed per fill step

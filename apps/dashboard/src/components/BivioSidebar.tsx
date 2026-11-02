@@ -171,6 +171,28 @@ function GameInfo() {
           +10 s
         </button>
       </div>
+      {/* A wrong question (typo, bad translation, nonsense) is saved to a file and not dealt again. */}
+      {q && bivio.phase !== 'empty' && (
+        <div className="side-flag">
+          {q.flagged ? (
+            <>
+              <span className="source-status source-status--error">Segnata come sbagliata: non tornerà</span>
+              <button type="button" className="btn btn--small" onClick={() => socket.emit('bivio:control', 'unflag')}>
+                Annulla
+              </button>
+            </>
+          ) : (
+            <button type="button" className="btn btn--small" onClick={() => socket.emit('bivio:control', 'flag')}>
+              ⚠ Domanda sbagliata
+            </button>
+          )}
+        </div>
+      )}
+      {bivio.flagged > 0 && (
+        <a className="btn btn--small side__export" href="/api/bivio/flagged.csv" download>
+          ⬇ Domande sbagliate ({bivio.flagged})
+        </a>
+      )}
     </>
   )
 }

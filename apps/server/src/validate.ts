@@ -159,7 +159,7 @@ export function sanitizeScene(raw: unknown): Partial<WidgetConfig> | null {
   return out
 }
 
-const BIVIO_COMMANDS: BivioCommand[] = ['next', 'reveal', 'extra-time', 'pause', 'resume', 'restart']
+const BIVIO_COMMANDS: BivioCommand[] = ['next', 'reveal', 'extra-time', 'pause', 'resume', 'restart', 'flag', 'unflag']
 
 export const sanitizeBivioCommand = (raw: unknown): BivioCommand | null =>
   BIVIO_COMMANDS.includes(raw as BivioCommand) ? (raw as BivioCommand) : null

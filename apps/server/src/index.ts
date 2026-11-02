@@ -22,7 +22,7 @@ import {
   type RoomInfo,
   type ServerToClientEvents,
 } from '@zerocade/shared'
-import { BivioRooms, bivioCsv, bivioStats } from './bivio.js'
+import { BivioRooms, bivioCsv, bivioFlagsCsv, bivioStats } from './bivio.js'
 import { IncastroRooms } from './incastro.js'
 import {
   dataDir,
@@ -71,6 +71,9 @@ const dashboardDir = pagesDir('dashboard')
 const overlayDir = pagesDir('overlay')
 
 const app = Fastify({ logger: { level: process.env.LOG_LEVEL ?? 'info' } })
+// A stray rejected promise (a live feed failing, a socket closing) is logged: it must not
+// take the server, and the stream with it, down.
+process.on('unhandledRejection', (err) => app.log.error({ err }, 'unhandled rejection'))
 await app.register(helmet, {
   contentSecurityPolicy: {
     directives: {
@@ -117,6 +120,13 @@ app.get('/api/bivio/export.csv', async (_req, reply) => {
     .header('content-disposition', `attachment; filename="bivio-risultati-${day}.csv"`)
     .send(bivioCsv())
 })
+// The questions marked as wrong (also saved as data/bivio-domande-sbagliate.csv).
+app.get('/api/bivio/flagged.csv', async (_req, reply) =>
+  reply
+    .header('content-type', 'text/csv; charset=utf-8')
+    .header('content-disposition', 'attachment; filename="bivio-domande-sbagliate.csv"')
+    .send(bivioFlagsCsv()),
+)
 
 // Background images (Bivio, Incastro): one per game and overlay key, stored in the data
 // folder next to the databases. No SVG, which could carry scripts.

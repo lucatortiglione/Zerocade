@@ -244,7 +244,10 @@ export interface BivioState {
   paused: boolean
   lang: BivioLang
   roundId: string
-  question: { id: string; category: string; difficulty: string; a: string; b: string } | null
+  // `flagged`: marked as wrong from the dashboard (it will not come back).
+  question: { id: string; category: string; difficulty: string; a: string; b: string; flagged: boolean } | null
+  // Questions marked as wrong so far, saved in data/bivio-domande-sbagliate.csv.
+  flagged: number
   votes: BivioTally
   // Every vote ever stored for this dilemma, across all lives; sent with the reveal.
   allTime: BivioTally | null
@@ -258,7 +261,8 @@ export interface BivioState {
   played: number
 }
 
-export type BivioCommand = 'next' | 'reveal' | 'extra-time' | 'pause' | 'resume' | 'restart'
+// 'flag' / 'unflag' mark the question in play as wrong, or take the mark back.
+export type BivioCommand = 'next' | 'reveal' | 'extra-time' | 'pause' | 'resume' | 'restart' | 'flag' | 'unflag'
 
 // Default look, taken from gioco-dilemmi/assets: with these values the overlay uses the
 // game's own artwork instead of flat colours.
@@ -357,6 +361,8 @@ export interface IncastroState {
   nextVariant: IncastroVariant
   // Simulated difficulty of the grid in play and its target, 0..100.
   difficulty: { target: number; dsim: number } | null
+  // NASA's Image of the Day behind this level, when the background is 'nasa'.
+  photo: { url: string; title: string; link: string } | null
   chapter: IncastroChapter
   // The wheel in its current order; `shuffles` counts this level's shuffles.
   letters: string
@@ -1338,8 +1344,9 @@ export const GAMES: GameDef[] = [
         label: 'Sfondo',
         group: 'Aspetto',
         kind: 'select',
-        default: 'garden',
+        default: 'nasa',
         options: [
+          { value: 'nasa', label: 'Foto NASA del giorno, una a caso per livello' },
           { value: 'garden', label: 'Il giardino del capitolo' },
           { value: 'color', label: 'Colore' },
           { value: 'transparent', label: 'Trasparente' },

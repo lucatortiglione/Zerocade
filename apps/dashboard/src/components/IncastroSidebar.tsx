@@ -210,6 +210,16 @@ function GameInfo({ session }: { session: SessionState }) {
           {found}/{incastro.words.length} · {incastro.extrasFound}/{incastro.extrasTotal}
         </strong>
       </div>
+      {incastro.phase === 'complete' && (
+        <>
+          <button type="button" className="side-action side-action--blue" onClick={() => control('next')}>
+            ▶ Prossimo livello
+          </button>
+          {session.settings.autoNext === false && (
+            <p className="text-muted small">“Avanza da solo” è spento: il riepilogo resta finché non premi qui.</p>
+          )}
+        </>
+      )}
       <div className="side-controls">
         <button type="button" className="btn btn--small" onClick={() => control('prev')}>
           ⏮ Indietro

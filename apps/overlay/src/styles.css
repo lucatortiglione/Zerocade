@@ -470,16 +470,17 @@ body.bivio-see-through { background: transparent; }
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1.2vh;
-  /* The bottom is left to the trigger chips of the play guide. */
-  padding: 6vh 4vw 10vh;
+  gap: 0.8vh;
+  /* The top clears the top bar (where the prompt sits), the bottom is left to the trigger
+     chips of the play guide. */
+  padding: 7vmin 2.5vw 7.5vh;
   overflow: hidden;
   color: #ffffff;
   font-family: var(--inc-text);
 }
 body.incastro-see-through { background: transparent; }
-/* The gift alert sits over the chapter title for its few seconds, not over the board. */
-body.incastro-on .widget-alert { top: 5.5vh; z-index: 4; padding: 1.2vmin 3vmin; font-size: 2.8vmin; }
+/* The gift alert sits over the top bar for its few seconds, not over the board. */
+body.incastro-on .widget-alert { top: 0.8vmin; z-index: 4; padding: 1.2vmin 3vmin; font-size: 2.8vmin; }
 /* The app's top bar and play guide, scaled with the scene and dressed like it. */
 body.incastro-on .overlay__top { padding: 1.4vmin 2.4vmin; gap: 1vmin; background: none; }
 body.incastro-on .overlay__brand { font-size: 2.6vmin; }
@@ -507,11 +508,29 @@ body.incastro-on .guide-chip__arrow { color: rgb(255 255 255 / 0.45); }
 .inc__backdrop { z-index: 0; overflow: hidden; }
 .inc__bg { background-size: cover; background-position: center bottom; }
 .inc__bg--in { animation: inc-fade 1.6s ease-out both; }
+.inc__bg--photo { background-position: center; }
 /* A little darker at the edges and behind the title, where text sits on the garden. */
 .inc__veil {
   background:
     radial-gradient(130% 75% at 50% 48%, transparent 55%, rgb(8 20 14 / 0.38)),
     linear-gradient(rgb(8 20 14 / 0.32), transparent 24%, transparent 72%, rgb(8 20 14 / 0.28));
+}
+/* NASA's pictures: darker all over, so the grid reads on a bright one too. */
+.inc__veil--photo { background: linear-gradient(rgb(4 8 16 / 0.5), rgb(4 8 16 / 0.32) 35%, rgb(4 8 16 / 0.36) 65%, rgb(4 8 16 / 0.55)); }
+/* Whose picture it is, small in the bottom-right corner. */
+.inc > p.inc__credit {
+  position: absolute;
+  right: 1.6vmin;
+  bottom: 0.6vmin;
+  z-index: 2;
+  max-width: 34vw;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-size: 1.5vmin;
+  font-weight: 700;
+  color: rgb(255 255 255 / 0.78);
+  text-shadow: 0 0.2vmin 0.6vmin rgb(0 0 0 / 0.7);
 }
 .inc__pollen span {
   position: absolute;
@@ -537,79 +556,39 @@ body.incastro-on .guide-chip__arrow { color: rgb(255 255 255 / 0.45); }
 .inc-icon { display: block; flex: none; fill: currentColor; }
 .inc-icon__line { fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
 
-.inc__head { display: flex; flex-direction: column; align-items: center; gap: 0.8vh; text-align: center; }
-.inc__eyebrow {
-  display: flex;
-  align-items: center;
-  gap: 1.4vmin;
-  font-size: 2.2vmin;
-  font-weight: 800;
-  letter-spacing: 0.35vmin;
-  text-transform: uppercase;
-  text-shadow: 0 0.2vmin 0.8vmin rgb(0 0 0 / 0.55);
-}
-.inc__level {
-  padding: 0.5vmin 1.8vmin;
-  border-radius: 999px;
-  background: linear-gradient(color-mix(in srgb, var(--inc-accent), #ffffff 18%), var(--inc-accent));
-  letter-spacing: 0.15vmin;
-  text-shadow: 0 0.2vmin 0 rgb(0 0 0 / 0.2);
-  box-shadow: inset 0 0.25vmin 0 rgb(255 255 255 / 0.35), 0 0.6vmin 1.6vmin rgb(0 0 0 / 0.25);
-}
-.inc__chapter {
-  font-family: var(--inc-display);
-  font-size: 5.8vmin;
-  font-weight: 600;
-  line-height: 1.05;
-  text-shadow: 0 0.3vmin 0 rgb(0 0 0 / 0.16), 0 0.6vmin 2.6vmin rgb(0 0 0 / 0.5);
-}
-/* One leaf per level of the chapter. */
-.inc__leaves { display: flex; gap: 0.7vmin; padding-top: 0.3vh; }
-.inc__leaf {
-  width: 1.8vmin;
-  height: 1.8vmin;
-  border-radius: 100% 0;
-  background: rgb(255 255 255 / 0.32);
-  box-shadow: 0 0.2vmin 0.6vmin rgb(0 0 0 / 0.25);
-}
-.inc__leaf--done { background: linear-gradient(135deg, #d4f5b4, #5fbf62); }
-.inc__leaf--now {
-  background: var(--inc-accent);
-  box-shadow: 0 0 0 0.3vmin #ffffff, 0 0 1.8vmin var(--inc-accent);
-  animation: inc-pulse 1.4s ease-in-out infinite;
-}
+.inc > .inc__head { position: absolute; top: 1.2vmin; left: 50%; z-index: 2; transform: translateX(-50%); white-space: nowrap; }
 .inc__prompt {
   display: flex;
   align-items: center;
   gap: 1vmin;
-  margin-top: 0.4vh;
-  padding: 0.7vmin 2.4vmin 0.7vmin 1.8vmin;
+  padding: 0.6vmin 2.2vmin 0.6vmin 1.6vmin;
   border-radius: 999px;
-  font-size: 2.2vmin;
+  font-size: 2vmin;
   font-weight: 700;
 }
 .inc__prompt .inc-icon { width: 2.6vmin; color: #c6efb4; }
 
 .inc__stage { flex: 1 1 auto; min-height: 0; width: 100%; display: grid; place-items: center; }
 .inc-board {
-  --cell: min(calc(84vw / var(--cols)), calc(26vh / var(--rows)), 12vmin);
+  --cell: min(calc(92vw / var(--cols)), calc(44vh / var(--rows)), 16vmin);
   position: relative;
   display: grid;
   grid-template-columns: repeat(var(--cols), var(--cell));
   grid-template-rows: repeat(var(--rows), var(--cell));
-  padding: 2.2vmin;
+  padding: 1.4vmin;
   border: 0.2vmin solid rgb(255 255 255 / 0.55);
   border-radius: 3.4vmin;
   background: linear-gradient(160deg, rgb(255 255 255 / 0.34), rgb(255 255 255 / 0.12));
   backdrop-filter: blur(1.4vmin) saturate(1.2);
   box-shadow: inset 0 0.2vmin 0 rgb(255 255 255 / 0.45), 0 2vmin 5vmin rgb(0 0 0 / 0.22);
 }
-/* Where container units work the board fills exactly the room the stage has left
-   (the 5vmin are its padding and border); elsewhere the vh guess above stands. */
+/* Where container units work the board fills all the room the stage has left (the 3.4vmin
+   are its padding and border), up to big tiles for small grids; elsewhere the vh guess
+   above stands. */
 @supports (height: 1cqh) {
   .inc__stage { container-type: size; }
   .inc-board {
-    --cell: min(calc((100cqw - 5vmin) / var(--cols)), calc((100cqh - 5vmin) / var(--rows)), 12vmin);
+    --cell: min(calc((100cqw - 3.4vmin) / var(--cols)), calc((100cqh - 3.4vmin) / var(--rows)), 16vmin);
   }
 }
 /* An empty slot, sunk into the glass. */
@@ -700,27 +679,28 @@ body.incastro-on .guide-chip__arrow { color: rgb(255 255 255 / 0.45); }
 .inc-avatar img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 
 .inc-feed {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 7vmin;
   list-style: none;
-  height: 7vh;
-  width: 100%;
   display: flex;
-  flex-direction: column;
   align-items: center;
-  justify-content: flex-start;
-  gap: 0.7vh;
+  justify-content: center;
 }
+.inc-feed--hidden { visibility: hidden; }
 .inc-feed__item {
   display: flex;
   align-items: center;
   gap: 1.2vmin;
   max-width: 92%;
-  padding: 0.6vmin 2.2vmin 0.6vmin 0.6vmin;
+  padding: 0.5vmin 2vmin 0.5vmin 0.5vmin;
   border-radius: 999px;
-  font-size: 2.4vmin;
+  font-size: 2.2vmin;
   font-weight: 700;
   animation: inc-slide 0.35s ease-out both;
 }
-.inc-feed__item:nth-child(2) { opacity: 0.72; font-size: 2.1vmin; }
 .inc-feed__item--found { border-color: color-mix(in srgb, var(--inc-accent), transparent 30%); }
 .inc-feed__item--extra { border-color: rgb(246 196 83 / 0.7); }
 .inc-feed__avatar { width: 3.6vmin; font-size: 1.6vmin; }
@@ -732,11 +712,12 @@ body.incastro-on .guide-chip__arrow { color: rgb(255 255 255 / 0.45); }
   flex: none;
   width: 100%;
   display: grid;
-  grid-template-columns: 1fr 44vmin 1fr;
+  position: relative;
+  grid-template-columns: 1fr 40vmin 1fr;
   align-items: center;
   gap: 2vmin;
-  /* Room for the word bubble above the wheel. */
-  padding-top: 12vmin;
+  /* The strip above the wheel: the latest moment, or the bubble of a word just found. */
+  padding-top: 7vmin;
 }
 .inc__wheel-wrap { position: relative; }
 .inc__wheel-wrap--click { cursor: pointer; transition: transform 0.15s ease-out; }
@@ -783,10 +764,9 @@ body.incastro-on .guide-chip__arrow { color: rgb(255 255 255 / 0.45); }
   bottom: 100%;
   left: 50%;
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 0.9vmin;
-  margin-bottom: 1vmin;
+  gap: 1.4vmin;
+  margin-bottom: 0.8vmin;
   transform: translateX(-50%);
   white-space: nowrap;
   animation: inc-bubble-out 0.3s ease-in 1.2s forwards;
@@ -794,15 +774,15 @@ body.incastro-on .guide-chip__arrow { color: rgb(255 255 255 / 0.45); }
 .inc-bubble--idle { display: none; }
 .inc-bubble--extra { --inc-accent: #e9a400; animation-delay: 0.85s; }
 .inc-bubble--repeat { --inc-accent: #8f9aa5; animation-delay: 0.65s; }
-.inc-bubble__tiles { display: flex; gap: 0.7vmin; }
+.inc-bubble__tiles { display: flex; gap: 0.6vmin; }
 .inc-bubble__tile {
   display: grid;
   place-items: center;
-  width: 6.6vmin;
-  height: 6.6vmin;
-  border-radius: 1.6vmin;
+  width: 5.4vmin;
+  height: 5.4vmin;
+  border-radius: 1.3vmin;
   font-family: var(--inc-display);
-  font-size: 4.3vmin;
+  font-size: 3.6vmin;
   font-weight: 600;
   text-shadow: 0 0.25vmin 0 rgb(0 0 0 / 0.22);
   box-shadow:
@@ -1039,16 +1019,14 @@ body.incastro-on .guide-chip__arrow { color: rgb(255 255 255 / 0.45); }
 @media (orientation: landscape) {
   .inc {
     display: grid;
-    grid-template-columns: 1.25fr 1fr;
-    grid-template-rows: auto 1fr auto;
-    grid-template-areas: 'head head' 'stage play' 'feed play';
-    padding: 5vh 3vw 9vh;
-    column-gap: 3vw;
+    grid-template-columns: 1.3fr 1fr;
+    grid-template-rows: 1fr;
+    grid-template-areas: 'stage play';
+    padding: 7vmin 2.5vw 8.5vh;
+    column-gap: 2.5vw;
   }
-  .inc__head { grid-area: head; }
   /* Stretched: a size container would otherwise be as tall as its content, which is none. */
   .inc__stage { grid-area: stage; align-self: stretch; }
-  .inc-feed { grid-area: feed; height: auto; min-height: 9vh; }
   .inc__play {
     grid-area: play;
     grid-template-columns: minmax(0, 1fr) 40vh;
@@ -1059,6 +1037,6 @@ body.incastro-on .guide-chip__arrow { color: rgb(255 255 255 / 0.45); }
   .inc__side--left { grid-area: left; align-self: end; }
   .inc__side--right { grid-area: right; align-self: start; align-items: stretch; }
   @supports not (height: 1cqh) {
-    .inc-board { --cell: min(calc(48vw / var(--cols)), calc(50vh / var(--rows)), 10vmin); }
+    .inc-board { --cell: min(calc(52vw / var(--cols)), calc(80vh / var(--rows)), 14vmin); }
   }
 }

@@ -4,6 +4,7 @@ Livecade imports one language per file (CSV UTF-8, max 16 MB / 20,000 rows) and
 does not publish the column names of each game. The reliable way is to export the
 Would You Rather bank from the Livecade dashboard first and pass it as --template:
 the header is copied from it and our fields are mapped onto its columns.
+tools/from_livecade.py does the reverse, with the same --map file.
 
 Usage:
   python tools/to_livecade.py data/domande_master.csv --lang it --out data/livecade/wyr_it.csv

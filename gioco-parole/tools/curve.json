@@ -1,5 +1,5 @@
 {
-  "_comment": "Difficulty curve and matrix of the ZeroWords generator (apps/server/src/wordgen, described in GENERATORE.md). Levels never run out: every value below works for any level number. Tune after playtests; GENERATORE.md lists which values are guesses.",
+  "_comment": "Difficulty curve and matrix of the ZeroWords generator (apps/server/src/wordgen, described in ALGORITMO.md). Levels never run out: every value below works for any level number. Tune after playtests; ALGORITMO.md lists which values are guesses.",
   "levelsPerChapter": 20,
   "packLevels": 600,
   "tooth": {

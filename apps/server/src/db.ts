@@ -63,6 +63,11 @@ db.exec(`
     PRIMARY KEY (round_id, user_id)
   );
   CREATE INDEX IF NOT EXISTS idx_bivio_votes_question ON bivio_votes (question_id);
+  CREATE TABLE IF NOT EXISTS bivio_flags (
+    question_id TEXT PRIMARY KEY,
+    lang TEXT NOT NULL,
+    flagged_at TEXT NOT NULL DEFAULT (datetime('now', 'localtime'))
+  );
   CREATE TABLE IF NOT EXISTS pad_boards (
     key TEXT PRIMARY KEY,
     volume REAL NOT NULL DEFAULT 0.8
@@ -259,6 +264,23 @@ export const recordBivioVote = (v: BivioVote): void => {
 export const bivioTotals = (questionId: string): BivioTally => bivioQuestionTotals.get(questionId) as BivioTally
 
 export const bivioTotalsByQuestion = (): BivioTotalsRow[] => bivioAllTotals.all() as unknown as BivioTotalsRow[]
+
+// --- Bivio questions marked as wrong from the dashboard ---
+// For every overlay key; they stay out of the game until unmarked.
+
+export interface BivioFlag {
+  question_id: string
+  lang: string
+  flagged_at: string
+}
+
+const bivioFlagInsert = db.prepare(`INSERT OR IGNORE INTO bivio_flags (question_id, lang) VALUES (?, ?)`)
+const bivioFlagDelete = db.prepare(`DELETE FROM bivio_flags WHERE question_id = ?`)
+const bivioFlagAll = db.prepare(`SELECT question_id, lang, flagged_at FROM bivio_flags ORDER BY flagged_at, question_id`)
+
+export const bivioFlags = (): BivioFlag[] => bivioFlagAll.all() as unknown as BivioFlag[]
+export const flagBivio = (questionId: string, lang: string): void => void bivioFlagInsert.run(questionId, lang)
+export const unflagBivio = (questionId: string): void => void bivioFlagDelete.run(questionId)
 
 // --- Incastro progress ---
 // The level each overlay key is on, so the next live starts where this one stopped.

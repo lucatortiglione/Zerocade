@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs'
 import { files } from './files.js'
 
-// The difficulty curve and matrix of gioco-parole/tools/curve.json (GENERATORE.md explains
+// The difficulty curve and matrix of gioco-parole/tools/curve.json (ALGORITMO.md explains
 // every value). Levels never run out: the ramp of the sawtooth and the growth of wheels and
 // grids level off instead of ending at a last level.
 

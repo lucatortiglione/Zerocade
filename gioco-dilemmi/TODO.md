@@ -26,6 +26,7 @@ Questo piano nasce dal reverse engineering di Dilemmaly 1.4.1 (`com.vanilla.woul
 | `tools/domande.py` | Importa le domande da un CSV in `domande.db` ed esporta `domande.db` in CSV, per chi le modifica in un foglio di calcolo |
 | `data/livecade/wyr_it.csv`, `wyr_en.csv` | Gli stessi dilemmi nel formato di importazione Livecade (intestazione provvisoria, vedi sezione 3, M11) |
 | `tools/to_livecade.py` | Convertitore da `domande.db` al CSV Livecade, con mappatura automatica sull'intestazione di un export reale |
+| `tools/from_livecade.py` | Il contrario: importa in `domande.db` un CSV Livecade (un export della dashboard o un file di `to_livecade.py`). Riconosce le colonne allo stesso modo, riporta categorie e difficoltà ai nostri valori, dà id nuovi (b0121…) e salta le domande già presenti, anche con A e B invertite. `--dry-run` mostra cosa importerebbe |
 | `tools/make_category_assets.py` | Genera icone, card e sfondi delle categorie |
 | `assets/icon/` | Icona dell'app (SVG 1024) e icona adattiva Android (primo piano e sfondo) |
 | `assets/category-icons/` | 12 icone bianche 100×100 |

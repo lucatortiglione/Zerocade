@@ -1,5 +1,5 @@
 """Helpers shared by the lexicon builder and the level validator. The level generator is
-TypeScript, in the Zerocade server (apps/server/src/wordgen; GENERATORE.md).
+TypeScript, in the Zerocade server (apps/server/src/wordgen; ALGORITMO.md).
 
 ZeroWords is played in Italian only: the lexicon lives in lexicon/it and the level packs the
 generator writes for checking in data/levels/it (the folders keep the language in their name).
