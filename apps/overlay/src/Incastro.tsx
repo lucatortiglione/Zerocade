@@ -80,6 +80,18 @@ function backgroundOf(s: GameSettings, chapterBackground: string, photo: Incastr
   return { seeThrough: false, url: BACKGROUNDS[chapterBackground] ?? '', color: '#173b2c', photo: false }
 }
 
+// Downloads a picture ahead of time and holds on to it, so it is in the browser's cache
+// when it is shown.
+function usePreload(url: string | null) {
+  const held = useRef<HTMLImageElement | null>(null)
+  useEffect(() => {
+    if (!url) return
+    const img = new Image()
+    img.src = url
+    held.current = img
+  }, [url])
+}
+
 // Counts a server duration down locally, ticking ten times a second.
 function useCountdown(ms: number, at: number, running: boolean) {
   const [now, setNow] = useState(() => performance.now())
@@ -222,6 +234,7 @@ function Game({ state, at, settings }: { state: IncastroState; at: number; setti
   const running = !state.paused && state.phase !== 'empty' && state.phase !== 'loading'
   const remaining = useCountdown(state.remainingMs, at, running)
   const hintIn = useCountdown(state.hintInMs, at, running && state.phase === 'playing')
+  usePreload(state.nextPhoto)
 
   // A transparent background has to reach the page itself for OBS to key it out.
   useEffect(() => {
@@ -252,6 +265,22 @@ function Game({ state, at, settings }: { state: IncastroState; at: number; setti
       <div className="inc" style={style}>
         <Backdrop url={bg.url} ambient={!bg.seeThrough} photo={bg.photo} />
         <p className="inc__empty">{state.phase === 'loading' ? ui.waiting : ui.empty}</p>
+      </div>
+    )
+  }
+
+  // A new level opens on its background alone, without the veil; the grid comes after.
+  if (state.phase === 'intro') {
+    return (
+      <div className="inc inc--intro" style={style}>
+        <Backdrop url={bg.url} ambient={!bg.seeThrough} photo={bg.photo} />
+        {bg.photo && state.photo && <p className="inc__caption">{state.photo.title}</p>}
+        {state.paused && (
+          <div className="inc__paused">
+            <Icon name="pause" />
+            {ui.paused}
+          </div>
+        )}
       </div>
     )
   }

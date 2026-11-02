@@ -355,9 +355,10 @@ export type IncastroVariant = 'easy' | 'standard' | 'expert'
 export type IncastroOutcome = 'easier' | 'harder' | 'steady' | 'idle'
 
 export interface IncastroState {
+  // 'intro' shows the new level's background alone for a few seconds, before the grid;
   // 'complete' is the summary between levels; 'loading' while the level is being generated;
   // 'empty' when no level can be made (the generator's files are missing).
-  phase: 'playing' | 'complete' | 'loading' | 'empty'
+  phase: 'intro' | 'playing' | 'complete' | 'loading' | 'empty'
   paused: boolean
   // Levels never run out: they are generated as the game gets to them.
   level: number
@@ -374,6 +375,8 @@ export interface IncastroState {
   difficulty: { target: number; dsim: number } | null
   // NASA's Image of the Day behind this level, when the background is 'nasa'.
   photo: { url: string; title: string; link: string } | null
+  // The next level's picture, for the overlay to load ahead of time.
+  nextPhoto: string | null
   chapter: IncastroChapter
   // The wheel in its current order; `shuffles` counts this level's shuffles.
   letters: string
@@ -395,7 +398,8 @@ export interface IncastroState {
   // The level's secret word: from the wheel, never in the grid, a new length each level.
   // `word` stays null until someone finds it or the level ends.
   secret: { length: number; word: string | null; by: IncastroPlayer | null } | null
-  // Level timer while playing (0 = no limit), summary countdown when complete.
+  // Level timer while playing (0 = no limit), summary countdown when complete, the
+  // background's seconds in the intro.
   remainingMs: number
   durationMs: number
   // Until the next automatic hint; 0 when off or not playing.
@@ -1370,6 +1374,17 @@ export const GAMES: GameDef[] = [
       },
       { id: 'bgColor', label: 'Colore', group: 'Aspetto', kind: 'color', default: '#173b2c' },
       { id: 'bgImage', label: 'Immagine', group: 'Aspetto', kind: 'image', default: '' },
+      {
+        id: 'introSeconds',
+        label: 'Secondi sullo sfondo',
+        hint: 'A ogni nuovo livello si vede solo lo sfondo per questi secondi, poi compare la griglia. 0 = subito la griglia. Con sfondo a colore o trasparente la griglia compare subito.',
+        group: 'Aspetto',
+        kind: 'number',
+        min: 0,
+        max: 15,
+        step: 1,
+        default: 4,
+      },
     ],
     defaultTriggers: [
       { source: { type: 'comment' }, action: 'guess' },

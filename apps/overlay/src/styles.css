@@ -517,6 +517,30 @@ body.incastro-on .guide-chip__arrow { color: rgb(255 255 255 / 0.45); }
 }
 /* NASA's pictures: darker all over, so the grid reads on a bright one too. */
 .inc__veil--photo { background: linear-gradient(rgb(4 8 16 / 0.5), rgb(4 8 16 / 0.32) 35%, rgb(4 8 16 / 0.36) 65%, rgb(4 8 16 / 0.55)); }
+/* A new level opens on its background alone: the veil comes in with the grid, and so does
+   everything over it. */
+.inc__veil { transition: opacity 1.2s ease-out; }
+.inc--intro .inc__veil { opacity: 0; }
+.inc--intro > .inc__paused { margin: auto; }
+.inc__head, .inc__play { animation: inc-fade 0.8s ease-out both; }
+.inc-board { animation: inc-summary-in 0.5s ease-out both; }
+/* The picture's title, under it while it is shown alone. */
+.inc > p.inc__caption {
+  position: absolute;
+  left: 50%;
+  bottom: 9vh;
+  z-index: 2;
+  width: max-content;
+  max-width: 86vw;
+  transform: translateX(-50%);
+  font-family: var(--inc-display);
+  font-size: 3.2vmin;
+  font-weight: 600;
+  text-align: center;
+  color: rgb(255 255 255 / 0.92);
+  text-shadow: 0 0.3vmin 1.2vmin rgb(0 0 0 / 0.75);
+  animation: inc-fade 1s ease-out 0.6s both;
+}
 /* Whose picture it is, small in the bottom-right corner. */
 .inc > p.inc__credit {
   position: absolute;

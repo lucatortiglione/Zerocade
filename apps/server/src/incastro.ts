@@ -175,8 +175,11 @@ class IncastroRoom {
   private clockSince = 0
   // Bumped by every level start, so a level generated too late is not started.
   private loading = 0
-  // The NASA picture behind this level (background 'nasa').
+  // The level as generated, kept for its play row (saved when the grid comes in).
+  private made: GeneratedLevel | null = null
+  // The NASA picture behind this level (background 'nasa'), and the next level's.
   private photo: NasaPhoto | null = null
+  private nextPhoto: NasaPhoto | null = null
   private letters = ''
   private shuffles = 0
   private cells = new Map<string, { letter: string; state: CellState }>()
@@ -383,6 +386,7 @@ class IncastroRoom {
       ddaNeeded: DDA_STREAK,
       difficulty: level ? { target: level.metrics.target, dsim: level.metrics.dsim } : null,
       photo: this.photo,
+      nextPhoto: this.nextPhoto?.url ?? null,
       chapter,
       letters: this.letters,
       shuffles: this.shuffles,
@@ -483,29 +487,49 @@ class IncastroRoom {
     this.hints = { auto: 0, streamer: 0, trigger: 0 }
     this.helped.clear()
     this.moments = []
-    this.phase = 'playing'
+    this.made = made
     saveIncastroLevel(this.key, level.id)
-    this.startPlay(made)
-    this.setTimer(num(this.settings, 'levelSeconds', 0) * 1000)
-    this.restartHintTimer()
-    this.emitNow()
+    this.pickPhoto()
     this.emitSolution(this.solution())
     // Made while this one is played.
     levels.prefetch(level.id + 1)
-    this.pickPhoto()
+    // The background alone for a few seconds, then the grid; at once on a plain colour or a
+    // see-through background, which have nothing to show.
+    const bg = this.settings.background
+    const introMs = bg === 'color' || bg === 'transparent' ? 0 : num(this.settings, 'introSeconds', 4) * 1000
+    if (introMs <= 0) return this.go()
+    this.phase = 'intro'
+    this.hintLeftMs = 0
+    this.setTimer(introMs)
+    this.emitNow()
   }
 
-  // A new NASA picture for the level in play, once the feed has answered (the overlay keeps
-  // the garden meanwhile, or if NASA cannot be reached).
+  // The grid comes in: the level's clock, its time limit and the automatic letters start.
+  private go(): void {
+    this.phase = 'playing'
+    this.startPlay(this.made!)
+    this.setTimer(num(this.settings, 'levelSeconds', 0) * 1000)
+    this.restartHintTimer()
+    this.emitNow()
+  }
+
+  // The level's NASA picture: the one picked (and preloaded by the overlays) during the level
+  // before, or one at random once the feed has answered (the overlay keeps the garden
+  // meanwhile, or if NASA cannot be reached). Then the next level's, to preload.
   private pickPhoto(): void {
     if (this.settings.background !== 'nasa') {
       this.photo = null
+      this.nextPhoto = null
       return
     }
+    const ready = this.nextPhoto
+    if (ready) this.photo = ready
+    this.nextPhoto = null
     const ticket = this.loading
     void nasaPhotos().then((list) => {
       if (ticket !== this.loading || this.settings.background !== 'nasa') return
-      this.photo = randomPhoto(list, this.photo?.url) ?? this.photo
+      if (!ready) this.photo = randomPhoto(list, this.photo?.url) ?? this.photo
+      this.nextPhoto = randomPhoto(list, this.photo?.url)
       this.emitNow()
     })
   }
@@ -831,6 +855,7 @@ class IncastroRoom {
         this.timer = undefined
         this.leftMs = 0
         if (this.phase === 'playing') this.timeUp()
+        else if (this.phase === 'intro') this.go()
         else if (this.phase === 'complete') this.startLevel(this.index + 1)
       }, this.leftMs)
     }

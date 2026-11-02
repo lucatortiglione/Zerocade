@@ -149,6 +149,7 @@ function fakeEvent(state: IncastroState | null, solution: IncastroSolution | nul
 // --- Info partita ---
 
 const PHASE: Record<IncastroState['phase'], string> = {
+  intro: 'Sfondo, poi la griglia',
   playing: 'In gioco',
   complete: 'Riepilogo',
   loading: 'Preparazione livello…',
