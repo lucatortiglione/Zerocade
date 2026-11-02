@@ -10,8 +10,9 @@
     "rampTeeth": 30,
     "archetypes": ["A", "A", "A", "B", "B", "B", "B", "B", "C", "D"]
   },
-  "_size": "Wheel letters and grid words grow from the first value towards the second, 63% of the way after growthLevels levels; each archetype scales the word count and may add a wheel letter.",
+  "_size": "Wheel letters grow from the first value towards the second, 63% of the way after wheelGrowthLevels levels (every wheel is the anagram of a real word, so a big wheel is a big word to find); grid words likewise after growthLevels. Each archetype scales the word count and may add a wheel letter.",
   "growthLevels": 300,
+  "wheelGrowthLevels": 500,
   "wheel": [6, 9],
   "words": [8, 20],
   "aspect": 1.3,
@@ -27,23 +28,27 @@
   },
   "cost": { "crossRatio": 6.0, "prefix": 1.0, "cycles": 1.5, "aspect": 1.5 },
   "rarity": {
-    "_comment": "Word rarity r in 0..1 picks the frequency rank the seed and the grid words aim at (log scale between the two ranks). It starts at T/100 and moves by gain per point of D_sim - T between attempts.",
-    "seedRank": [400, 16000],
+    "_comment": "Word rarity r in 0..1 picks the seed (the wheel's full word) at that place among the seeds of its length, most familiar first, none below seedZipf; and the frequency rank the grid words aim at (log scale between the two ranks). It starts at T/100 and moves by gain per point of D_sim - T between attempts.",
+    "seedZipf": 2.8,
     "wordRank": [600, 22000],
     "gain": 0.012
   },
-  "extraLetters": { "E": 11.8, "A": 11.7, "I": 11.3, "O": 9.8, "N": 6.9, "L": 6.5, "R": 6.4, "T": 5.6, "S": 5.0, "C": 4.5 },
   "variants": {
-    "_comment": "DDA variants on the same wheel: target T + easy and T + expert, reached with at most `steps` edits of the standard grid.",
+    "_comment": "DDA variants on the same wheel: target T + easy and T + expert (kept within the 0..100 scale), reached with at most `steps` edits of the standard grid. A variant less than minGap points of D_sim away from the standard one is left out: the server plays the standard grid instead.",
     "easy": -15,
     "expert": 12,
-    "steps": 6
+    "steps": 6,
+    "minGap": 5
   },
   "solver": {
+    "_comment": "Effort of a word: cold = alpha L^1.4 + beta ln(1 + rank), brought down to input (reading and typing it) as its letters show, plus lambda times its ambiguity: log2 of how many words of the wheel, weighed 10^(gamma Zipf), still fit the slot. D_sim scales k . (start, mean, peak) from scale[0]..scale[1] to 0..100.",
     "alpha": 1.0,
     "beta": 1.2,
+    "input": 1.2,
+    "gamma": 1.0,
+    "lambda": 2.0,
     "eta": { "first": 0.45, "second": 0.25, "rareConsonant": 0.18, "consonant": 0.14, "vowel": 0.10, "last": 0.05 },
-    "k": [0.3, 0.4, 0.3, 1.0],
-    "scale": [8, 30]
+    "k": [0.3, 0.4, 0.3],
+    "scale": [16.5, 32.5]
   }
 }

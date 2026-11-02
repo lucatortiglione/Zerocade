@@ -546,7 +546,7 @@ body.incastro-on .guide-chip__arrow { color: rgb(255 255 255 / 0.45); }
 .inc__empty { margin: auto; font-family: var(--inc-display); font-size: 4vmin; font-weight: 600; }
 
 /* Dark frosted glass behind the small panels. */
-.inc__prompt, .inc__paused, .inc-feed__item, .inc-bubble__who, .inc-board-list, .inc-stat {
+.inc__prompt, .inc__paused, .inc-feed__item, .inc-bubble__who, .inc-board-list, .inc-stat, .inc-secret {
   border: 0.15vmin solid rgb(255 255 255 / 0.16);
   background: linear-gradient(160deg, rgb(30 56 43 / 0.6), rgb(10 22 16 / 0.7));
   backdrop-filter: blur(1.2vmin) saturate(1.2);
@@ -773,6 +773,7 @@ body.incastro-on .guide-chip__arrow { color: rgb(255 255 255 / 0.45); }
 }
 .inc-bubble--idle { display: none; }
 .inc-bubble--extra { --inc-accent: #e9a400; animation-delay: 0.85s; }
+.inc-bubble--secret { --inc-accent: #e9a400; animation-delay: 2.1s; }
 .inc-bubble--repeat { --inc-accent: #8f9aa5; animation-delay: 0.65s; }
 .inc-bubble__tiles { display: flex; gap: 0.6vmin; }
 .inc-bubble__tile {
@@ -814,6 +815,49 @@ body.incastro-on .guide-chip__arrow { color: rgb(255 255 255 / 0.45); }
 .inc-bubble__note .inc-icon { width: 2.2vmin; color: #fff3c4; }
 
 .inc-board-list { padding: 1.6vmin 1.8vmin; border-radius: 2.6vmin; }
+/* The secret word, top of the right column: gold-edged empty tiles, the letters once found. */
+.inc-secret {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.8vmin;
+  padding: 1.3vmin 1.4vmin;
+  border-color: rgb(246 196 83 / 0.55);
+  border-radius: 2.6vmin;
+}
+.inc-secret__label {
+  display: flex;
+  align-items: center;
+  gap: 0.7vmin;
+  font-size: 1.6vmin;
+  font-weight: 800;
+  letter-spacing: 0.2vmin;
+  text-transform: uppercase;
+  color: var(--inc-gold);
+}
+.inc-secret__label .inc-icon { width: 2vmin; }
+.inc-secret__tiles { display: flex; gap: 0.35vmin; }
+.inc-secret__tile {
+  display: grid;
+  place-items: center;
+  width: 2.4vmin;
+  height: 2.8vmin;
+  border: 0.15vmin solid rgb(246 196 83 / 0.6);
+  border-radius: 0.6vmin;
+  background: rgb(255 255 255 / 0.08);
+  font-family: var(--inc-display);
+  font-size: 1.9vmin;
+  font-weight: 600;
+}
+.inc-secret--open .inc-secret__tile {
+  border-color: transparent;
+  background: linear-gradient(#ffe7a1, #e2a21a);
+  color: #4a3200;
+  animation: inc-pop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) var(--d) both;
+}
+.inc-secret__who { display: flex; align-items: center; gap: 0.8vmin; max-width: 100%; font-size: 1.7vmin; font-weight: 700; opacity: 0.9; }
+.inc-secret__avatar { width: 2.6vmin; font-size: 1.2vmin; }
+.inc-secret__name { min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
 .inc-board-list__title {
   display: flex;
   align-items: center;

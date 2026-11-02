@@ -98,7 +98,7 @@ export function playSound(play: DjPlay) {
 // Incastro's sounds, also synthesized. A found word climbs a major scale, one note per
 // letter, the way the line crosses the wheel; an extra word is a lighter two-note chime.
 const SCALE = [523.25, 587.33, 659.25, 698.46, 783.99, 880, 987.77, 1046.5]
-export type GameSound = 'found' | 'extra' | 'repeat' | 'hint' | 'shuffle' | 'complete' | 'chapter'
+export type GameSound = 'found' | 'extra' | 'secret' | 'repeat' | 'hint' | 'shuffle' | 'complete' | 'chapter'
 
 export function gameSound(kind: GameSound, letters = 3) {
   try {
@@ -110,6 +110,11 @@ export function gameSound(kind: GameSound, letters = 3) {
       case 'extra':
         tone(783.99, 0.12, 'sine', 0.12)
         tone(1174.66, 0.22, 'sine', 0.1, 0.09)
+        break
+      case 'secret':
+        // A bright run up and a held chord: the secret word is the big find of a level.
+        ;[659.25, 783.99, 987.77, 1318.5].forEach((f, i) => tone(f, 0.18, 'triangle', 0.12, i * 0.07))
+        ;[1318.5, 1567.98, 1975.53].forEach((f) => tone(f, 0.7, 'sine', 0.06, 0.3))
         break
       case 'repeat':
         tone(330, 0.12, 'triangle', 0.08)

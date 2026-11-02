@@ -15,6 +15,7 @@ import {
   type GameSettings,
   type LiveEvent,
 } from '@zerocade/shared'
+import { toCsv } from './csv.js'
 import { bivioFlags, bivioTotals, bivioTotalsByQuestion, dataDir, flagBivio, recordBivioVote, unflagBivio } from './db.js'
 
 // Bivio ("Preferiresti…?"), the server-driven game. Questions come from the game's
@@ -442,11 +443,6 @@ export function bivioStats(lang: BivioLang): BivioStats {
   return { totalVotes, questions }
 }
 
-const csvField = (v: string | number) => {
-  const s = String(v)
-  return /[",\r\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s
-}
-
 // The questions marked as wrong, oldest first, with their texts in every language of
 // domande.db: the list to fix there. Excel-friendly like bivioCsv.
 export function bivioFlagsCsv(): string {
@@ -459,7 +455,7 @@ export function bivioFlagsCsv(): string {
     const texts = langs.flatMap((l) => [d?.text[l]?.a ?? '', d?.text[l]?.b ?? ''])
     rows.push([f.question_id, d?.category ?? '', d?.difficulty ?? '', f.flagged_at, f.lang, ...texts])
   }
-  return '﻿' + rows.map((r) => r.map(csvField).join(',')).join('\r\n') + '\r\n'
+  return toCsv(rows)
 }
 
 // Results per dilemma, with every language of domande.db, to spot the lopsided
@@ -476,5 +472,5 @@ export function bivioCsv(): string {
     const texts = langs.flatMap((l) => [d.text[l]?.a ?? '', d.text[l]?.b ?? ''])
     rows.push([d.id, d.category, d.difficulty, ...texts, a, b, a + b, a + b ? Math.round((a / (a + b)) * 100) : '', t?.rounds ?? 0])
   }
-  return '﻿' + rows.map((r) => r.map(csvField).join(',')).join('\r\n') + '\r\n'
+  return toCsv(rows)
 }

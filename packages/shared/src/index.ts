@@ -324,6 +324,7 @@ export interface IncastroWord {
 export type IncastroMoment = { seq: number } & (
   | { kind: 'found'; word: string; by: IncastroPlayer; points: number; full: boolean }
   | { kind: 'extra'; word: string; by: IncastroPlayer; points: number }
+  | { kind: 'secret'; word: string; by: IncastroPlayer; points: number }
   | { kind: 'repeat'; word: string; by: IncastroPlayer }
   | { kind: 'hint'; by: IncastroPlayer | null }
   | { kind: 'reveal'; word: string; by: IncastroPlayer | null }
@@ -349,6 +350,10 @@ export interface IncastroChapter {
 // The three grids of a level (DDA): easier, as generated, harder.
 export type IncastroVariant = 'easy' | 'standard' | 'expert'
 
+// How the chat did on a level, for DDA: it needs an easier grid, a harder one, the same, or
+// nobody played (no signal).
+export type IncastroOutcome = 'easier' | 'harder' | 'steady' | 'idle'
+
 export interface IncastroState {
   // 'complete' is the summary between levels; 'loading' while the level is being generated;
   // 'empty' when no level can be made (the generator's files are missing).
@@ -356,9 +361,15 @@ export interface IncastroState {
   paused: boolean
   // Levels never run out: they are generated as the game gets to them.
   level: number
-  // The grid in play, and the one the next level will use.
+  // The grid in play, and the one the next level will use (while playing: the one this
+  // level asked for, when its wheel has no such variant and the standard one is played).
   variant: IncastroVariant
   nextVariant: IncastroVariant
+  // DDA: how the chat did on the last level finished, and how many levels in a row went that
+  // way; the grid changes after ddaNeeded alike.
+  ddaOutcome: IncastroOutcome | null
+  ddaStreak: number
+  ddaNeeded: number
   // Simulated difficulty of the grid in play and its target, 0..100.
   difficulty: { target: number; dsim: number } | null
   // NASA's Image of the Day behind this level, when the background is 'nasa'.
@@ -381,6 +392,9 @@ export interface IncastroState {
   scores: IncastroScore[]
   levelScores: IncastroScore[]
   longest: IncastroRecord | null
+  // The level's secret word: from the wheel, never in the grid, a new length each level.
+  // `word` stays null until someone finds it or the level ends.
+  secret: { length: number; word: string | null; by: IncastroPlayer | null } | null
   // Level timer while playing (0 = no limit), summary countdown when complete.
   remainingMs: number
   durationMs: number
@@ -396,6 +410,7 @@ export interface IncastroSolution {
   level: number
   words: string[]
   extras: string[]
+  secret: string | null
 }
 
 export type IncastroCommand =
@@ -1298,7 +1313,7 @@ export const GAMES: GameDef[] = [
       {
         id: 'dda',
         label: 'Difficoltà automatica',
-        hint: 'Il livello successivo usa la griglia Agevolata, Standard o Esperto secondo com’è andato quello appena finito: più facile se è scaduto il tempo o gli aiuti hanno mostrato almeno un terzo delle parole, più difficile se la chat le ha trovate tutte senza aiuti.',
+        hint: 'La griglia passa ad Agevolata, Standard o Esperto dopo due livelli andati allo stesso modo: più facile se è scaduto il tempo o le lettere automatiche e i tuoi aiuti hanno completato almeno un terzo delle parole, più difficile se la chat le ha trovate quasi senza lettere automatiche. Gli aiuti dei regali non contano, un livello in cui nessuno gioca non conta.',
         kind: 'toggle',
         default: true,
       },

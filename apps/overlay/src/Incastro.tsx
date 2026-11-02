@@ -55,6 +55,10 @@ const UI: Record<string, string> = {
   leaderboard: 'Classifica',
   noScores: 'Il primo che trova una parola sale qui',
   longest: 'Parola più lunga',
+  secret: 'Parola segreta',
+  secretFound: 'ha trovato la parola segreta',
+  secretWorth: 'vale il doppio',
+  secretNobody: 'Nessuno l’ha trovata',
   point: 'punto',
   points: 'punti',
   word: 'parola',
@@ -92,8 +96,8 @@ const clock = (ms: number) => {
   return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`
 }
 
-type Played = Extract<IncastroMoment, { kind: 'found' | 'extra' | 'repeat' }>
-const PLAY_MS: Record<Played['kind'], number> = { found: 1500, extra: 1100, repeat: 900 }
+type Played = Extract<IncastroMoment, { kind: 'found' | 'extra' | 'secret' | 'repeat' }>
+const PLAY_MS: Record<Played['kind'], number> = { found: 1500, extra: 1100, secret: 2400, repeat: 900 }
 const QUEUE_MAX = 4
 
 // The words found in chat, played one after the other on the wheel. A busy chat queues
@@ -121,7 +125,9 @@ function useWheelQueue(moments: IncastroMoment[], level: number, sounds: boolean
     const fresh = moments.filter((m) => m.seq > (seen.current ?? 0)).reverse()
     if (!fresh.length) return
     seen.current = newest
-    const playable = fresh.filter((m): m is Played => m.kind === 'found' || m.kind === 'extra' || m.kind === 'repeat')
+    const playable = fresh.filter(
+      (m): m is Played => m.kind === 'found' || m.kind === 'extra' || m.kind === 'secret' || m.kind === 'repeat',
+    )
     if (playable.length) setQueue((q) => [...q, ...playable].slice(-QUEUE_MAX))
     if (sounds) {
       const other = fresh.find((m) => m.kind === 'hint' || m.kind === 'reveal' || m.kind === 'shuffle')
@@ -182,6 +188,12 @@ const ICONS = {
     <>
       <rect x="6" y="4.5" width="4.4" height="15" rx="1.6" />
       <rect x="13.6" y="4.5" width="4.4" height="15" rx="1.6" />
+    </>
+  ),
+  lock: (
+    <>
+      <rect x="5" y="10.5" width="14" height="10" rx="2.2" />
+      <path className="inc-icon__line" d="M8.2 10.5V8a3.8 3.8 0 0 1 7.6 0v2.5" />
     </>
   ),
   shuffle: <path className="inc-icon__line" d="M3.5 7h3.6c4.4 0 5.4 10 9.6 10h3.8M3.5 17h3.6c1.7 0 2.7-1.5 3.5-3.5m2.8-4.2C14.2 7.9 15.2 7 16.7 7h3.8M18 4.5 20.5 7 18 9.5M18 14.5l2.5 2.5-2.5 2.5" />,
@@ -287,6 +299,7 @@ function Game({ state, at, settings }: { state: IncastroState; at: number; setti
           <Wheel letters={state.letters} moment={playing} />
         </div>
         <aside className="inc__side inc__side--right">
+          {state.secret && <Secret secret={state.secret} ui={ui} />}
           <div className="inc-stat">
             <Icon name="star" className="inc-stat__icon" />
             <span className="inc-stat__value">
@@ -527,6 +540,10 @@ function Bubble({ moment, ui }: { moment: Played | null; ui: Record<string, stri
       <>
         <Icon name="star" /> {ui.extra} +{moment.points}
       </>
+    ) : moment.kind === 'secret' ? (
+      <>
+        <Icon name="lock" /> {ui.secret} +{moment.points}
+      </>
     ) : (
       ui.repeat
     )
@@ -578,6 +595,8 @@ function feedText(m: IncastroMoment, ui: Record<string, string>): string {
       return `${m.by.nickname} ${ui.found} ${m.word} · +${m.points}`
     case 'extra':
       return `${m.by.nickname} · ${ui.extra} ${m.word} · +${m.points}`
+    case 'secret':
+      return `${m.by.nickname} ${ui.secretFound} ${m.word} · +${m.points}`
     case 'repeat':
       return `${m.word} ${ui.repeat}`
     case 'hint':
@@ -587,6 +606,37 @@ function feedText(m: IncastroMoment, ui: Record<string, string>): string {
     case 'shuffle':
       return m.by ? `${m.by.nickname} ${ui.shuffleBy}` : ui.shuffleAuto
   }
+}
+
+// The secret word: its letters as empty tiles until someone finds it (or the level ends).
+function Secret({ secret, ui }: { secret: NonNullable<IncastroState['secret']>; ui: Record<string, string> }) {
+  return (
+    <div className={`inc-secret${secret.word ? ' inc-secret--open' : ''}`}>
+      <span className="inc-secret__label">
+        <Icon name="lock" />
+        {ui.secret}
+      </span>
+      <span className="inc-secret__tiles">
+        {Array.from({ length: secret.length }, (_, i) => (
+          <span key={i} className="inc-secret__tile" style={{ '--d': `${i * 0.07}s` } as CSSProperties}>
+            {secret.word?.[i] ?? ''}
+          </span>
+        ))}
+      </span>
+      <span className="inc-secret__who">
+        {secret.by ? (
+          <>
+            <Avatar player={secret.by} className="inc-secret__avatar" />
+            <span className="inc-secret__name">{secret.by.nickname}</span>
+          </>
+        ) : secret.word ? (
+          ui.secretNobody
+        ) : (
+          ui.secretWorth
+        )}
+      </span>
+    </div>
+  )
 }
 
 function Leaderboard({

@@ -27,6 +27,7 @@ export interface Curve {
   packLevels: number
   tooth: { length: number; shape: number[]; ramp: [number, number]; rampTeeth: number; archetypes: ArchetypeId[] }
   growthLevels: number
+  wheelGrowthLevels: number
   wheel: [number, number]
   words: [number, number]
   aspect: number
@@ -36,14 +37,16 @@ export interface Curve {
   attempts: number
   archetypes: Record<ArchetypeId, Archetype>
   cost: { crossRatio: number; prefix: number; cycles: number; aspect: number }
-  rarity: { seedRank: [number, number]; wordRank: [number, number]; gain: number }
-  extraLetters: Record<string, number>
-  variants: { easy: number; expert: number; steps: number }
+  rarity: { seedZipf: number; wordRank: [number, number]; gain: number }
+  variants: { easy: number; expert: number; steps: number; minGap: number }
   solver: {
     alpha: number
     beta: number
+    input: number
+    gamma: number
+    lambda: number
     eta: { first: number; second: number; rareConsonant: number; consonant: number; vowel: number; last: number }
-    k: [number, number, number, number]
+    k: [number, number, number]
     scale: [number, number]
   }
 }
@@ -64,13 +67,14 @@ export function target(level: number): { T: number; arche: ArchetypeId } {
 }
 
 // Wheel letters and grid words, growing towards their maximum (63% of the way after
-// growthLevels levels).
+// wheelGrowthLevels and growthLevels levels).
 export function size(level: number, arche: ArchetypeId): { wheel: number; words: number } {
-  const g = 1 - Math.exp(-(level - 1) / CURVE.growthLevels)
+  const grow = (levels: number) => 1 - Math.exp(-(level - 1) / levels)
   const a = CURVE.archetypes[arche]
+  const wheel = Math.round(lerp(CURVE.wheel[0], CURVE.wheel[1], grow(CURVE.wheelGrowthLevels))) + (a.wheelBonus ?? 0)
   return {
-    wheel: Math.min(CURVE.wheel[1], Math.round(lerp(CURVE.wheel[0], CURVE.wheel[1], g)) + (a.wheelBonus ?? 0)),
-    words: Math.round(lerp(CURVE.words[0], CURVE.words[1], g) * a.words),
+    wheel: Math.min(CURVE.wheel[1], wheel),
+    words: Math.round(lerp(CURVE.words[0], CURVE.words[1], grow(CURVE.growthLevels)) * a.words),
   }
 }
 

@@ -6,14 +6,17 @@ import { Lexicon, MIN_LEN, signature } from './lexicon.js'
 // six stages of gioco-parole/ALGORITMO.md. Level n depends on n alone (and on the lexicon
 // and the curve), so any level can be made at any time, in any order, for ever.
 
+// Changes whenever the same n would give another level: kept with every level played.
+export const GENERATOR_VERSION = 'zw-2'
+
 const WINDOW: Record<ArchetypeId, number> = { A: 6, B: 6, C: 6, D: 40 } // words weighed per fill step
 const BRANCH = 3 // slots tried at each step before backing up
 const NODE_LIMIT = 250
 const SEEDS_PER_ATTEMPT = 10 // seeds that reach the board; the cheap checks before it do not count
 const SEEDS_SCANNED = 400
-const SEED_BAND = 300 // seeds closest to the aimed rank, where each level starts at its own place
-// Seeds fall into this many fixed groups and level n draws from group n mod REPEAT_GAP only, so
-// levels less than REPEAT_GAP apart never share a seed (nor its wheel).
+const SEED_BAND = 300 // seeds closest to the aimed familiarity, where each level starts at its own place
+// Seeds (wheels) fall into this many fixed groups by their letters and level n draws from
+// group n mod REPEAT_GAP only, so levels less than REPEAT_GAP apart never share a wheel.
 const REPEAT_GAP = 50
 const LEAVES = 30 // leaf words tried per expert swap, longest and rarest first
 const PHI = (Math.sqrt(5) - 1) / 2
@@ -72,10 +75,17 @@ export interface Grid {
 
 export interface GeneratedLevel extends Grid {
   id: number
+  version: string
   letters: string
+  // The word the wheel is an anagram of: its full word, on every grid.
   seed: string
   archetype: ArchetypeId
-  variants: { easy: Grid; expert: Grid }
+  // A word of the wheel in none of the three grids, its length new each level: the chat's
+  // secret word. Null only when the grids hold every word of the wheel.
+  secret: string | null
+  // Null when no grid on this wheel is far enough from the standard one: the standard
+  // grid is played instead.
+  variants: { easy: Grid | null; expert: Grid | null }
 }
 
 interface Sim {
@@ -99,66 +109,47 @@ interface Got {
 
 // --- 1. Wheels ---
 
-// Seed words of 6 and 7 letters, one per letter set, by frequency rank.
+// A wheel is the anagram of a real word as long as the wheel (its seed and full word): no
+// letter on it is there by chance, and every level has a word that takes all of them. Seeds
+// of 6 to 9 letters, one per letter set (its most common word), most familiar first, none
+// below CURVE.rarity.seedZipf.
 class Seeds {
   private byLen = new Map<number, string[]>()
-  private logRank = new Map<string, number>()
+  // Place among the seeds of its length: 0 the most familiar, 1 the least.
+  private place = new Map<string, number>()
   private group = new Map<string, number>()
 
   constructor(lex: Lexicon) {
-    for (const n of [6, 7]) {
+    const [lo, hi] = CURVE.wheel
+    for (let n = lo; n <= hi; n++) {
       const seen = new Set<string>()
       const out: string[] = []
-      const words = lex.mainWords().filter((w) => w.length === n)
+      const words = lex.mainWords().filter((w) => w.length === n && lex.zipf.get(w)! >= CURVE.rarity.seedZipf)
       words.sort((a, b) => lex.rank.get(a)! - lex.rank.get(b)!)
       for (const w of words) {
-        if (seen.has(signature(w))) continue
-        seen.add(signature(w))
+        const sig = signature(w)
+        if (seen.has(sig)) continue
+        seen.add(sig)
         out.push(w)
-        this.logRank.set(w, Math.log(lex.rank.get(w)!))
-        this.group.set(w, Math.floor(rngFrom(w)() * REPEAT_GAP))
+        // By its letters: the group of the wheel itself.
+        this.group.set(w, Math.floor(rngFrom(sig)() * REPEAT_GAP))
       }
+      out.forEach((w, i) => this.place.set(w, i / Math.max(1, out.length - 1)))
       this.byLen.set(n, out)
     }
   }
 
-  // Seeds of n letters from the level's group, around the rank rarity r aims at: the
+  // Seeds of n letters from the level's group, around the place rarity r aims at: the
   // SEED_BAND closest first, each level starting at its own place among them (golden-ratio
   // steps, so levels of one group aiming alike still start far apart), then the rest.
   near(n: number, r: number, level: number): string[] {
-    const [lo, hi] = CURVE.rarity.seedRank
-    const aim = lerp(Math.log(lo), Math.log(hi), r)
-    const gap = (w: string) => Math.abs(this.logRank.get(w)! - aim)
+    const gap = (w: string) => Math.abs(this.place.get(w)! - r)
     const group = level % REPEAT_GAP
-    const sorted = this.byLen
-      .get(n)!
-      .filter((w) => this.group.get(w) === group)
-      .sort((a, b) => gap(a) - gap(b))
+    const sorted = (this.byLen.get(n) ?? []).filter((w) => this.group.get(w) === group).sort((a, b) => gap(a) - gap(b))
     const band = sorted.slice(0, SEED_BAND)
     const start = Math.floor(((level * PHI) % 1) * band.length)
     return [...band.slice(start), ...band.slice(0, start), ...sorted.slice(SEED_BAND)]
   }
-}
-
-// The seed's letters plus common letters up to `size`, weighted by their frequency in
-// Italian (no letter more than 3 times).
-function makeWheel(seed: string, size: number, rng: Rng): string {
-  const letters = [...seed]
-  const pool = Object.keys(CURVE.extraLetters).sort()
-  const total = pool.reduce((s, ch) => s + CURVE.extraLetters[ch], 0)
-  while (letters.length < size) {
-    let x = rng() * total
-    let ch = pool[pool.length - 1]
-    for (const p of pool) {
-      x -= CURVE.extraLetters[p]
-      if (x < 0) {
-        ch = p
-        break
-      }
-    }
-    if (letters.filter((l) => l === ch).length < 3) letters.push(ch)
-  }
-  return letters.join('')
 }
 
 // --- 2-3. Skeletons and the CSP fill ---
@@ -171,6 +162,8 @@ interface Context {
   rng: Rng
   // Start of a tooth: at least longShare of the grid words have 5+ letters.
   shortCap: number
+  // Wheel letters: a word this long (the full word) is on every grid.
+  full: number
 }
 
 interface Option {
@@ -205,12 +198,14 @@ function cost(board: Board, ctx: Context, word: string, r: number, c: number, d:
   )
 }
 
-// The best slots for the next few words that fit somewhere.
+// The best slots for the next few words that fit somewhere. While the board has no full
+// word (B's bridge may be shorter), only a full word may come next.
 function options(board: Board, ctx: Context, remaining: string[]): Option[] {
   const shorts = board.placed.filter((p) => p.w.length === MIN_LEN).length
+  const owed = !board.placed.some((p) => p.w.length === ctx.full)
   let found = 0
   let opts: Option[] = []
-  for (const word of remaining) {
+  for (const word of owed ? remaining.filter((w) => w.length === ctx.full) : remaining) {
     if (word.length === MIN_LEN && shorts >= ctx.shortCap) continue
     const mine: Option[] = []
     for (const [r, c, d] of board.slots(word)) {
@@ -326,7 +321,8 @@ function carriers(board: Board, ctx: Context, order: string[], w0: string, r0: n
 
 // B · two lobes and a bridge: a vertical word of 7-8 letters (rank in bridgeRank) with its
 // first two letters in the top lobe and its last two in the bottom one; the rows of its body
-// are blocked, so it is the only way across.
+// are blocked, so it is the only way across. When it is not a full word, the fill places one
+// first, in a lobe.
 function skeletonB(board: Board, ctx: Context, order: string[]): boolean {
   const longest = Math.max(...order.map((w) => w.length))
   const lengths = longest >= 7 ? [7, 8] : [longest]
@@ -380,16 +376,69 @@ function eta(p: number, ch: string, n: number): number {
   return RARE_CONSONANTS.has(ch) ? e.rareConsonant : e.consonant
 }
 
+// The words of the wheel a slot of `word`'s length could hold, with their weight
+// 10^(gamma Zipf): what a player weighs it against.
+export type Rivals = [string, number][]
+
+export function rivalsOf(word: string, made: string[], lex: Lexicon): Rivals {
+  const gamma = CURVE.solver.gamma
+  return made.filter((v) => v.length === word.length).map((v) => [v, 10 ** (gamma * (lex.zipf.get(v) ?? 0))])
+}
+
+// Effort of `word` with the letters at `shown` on the board, rivals already on it (solved)
+// left out. Cold = alpha L^1.4 + beta ln(1 + rank) with nothing shown; each shown letter
+// takes off its share eta, normalized so that the whole word shown costs exactly the input
+// (reading and typing it): d = input + (cold - input) (P - P_all) / (1 - P_all), with P the
+// product of (1 - eta) over the shown letters, worked out with log1p / expm1 so that it stays
+// exact near the ends. On top, lambda times the ambiguity log2(sum of the weights of the
+// rivals that still fit / the word's own), 0 once nothing else fits. Never grows as letters
+// show: `--selftest` checks it.
+export function wordEffort(word: string, rank: number, shown: Set<number>, rivals: Rivals, solved?: Set<string>): number {
+  const s = CURVE.solver
+  const n = word.length
+  const cold = s.alpha * n ** 1.4 + s.beta * Math.log(1 + rank)
+  const input = Math.min(s.input, cold)
+  if (shown.size >= n) return input
+  let logP = 0
+  let logAll = 0
+  for (let p = 0; p < n; p++) {
+    const l = Math.log1p(-eta(p, word[p], n))
+    logAll += l
+    if (shown.has(p)) logP += l
+  }
+  const den = -Math.expm1(logAll)
+  // Every eta 0 (a degenerate curve.json): the share of letters still hidden.
+  const g = den > 1e-12 ? (Math.exp(logP) * -Math.expm1(logAll - logP)) / den : (n - shown.size) / n
+  let own = 1
+  let fit = 0
+  for (const [v, q] of rivals) {
+    if (v === word) own = q
+    else if (solved?.has(v)) continue
+    let ok = true
+    for (const p of shown) {
+      if (v[p] !== word[p]) {
+        ok = false
+        break
+      }
+    }
+    if (ok) fit += q
+  }
+  return input + (cold - input) * clamp(g, 0, 1) + s.lambda * Math.log2(Math.max(1, fit / own))
+}
+
 // Solve the grid like a player: always the word that is easiest right now, whose letters
-// then show on the words crossing it.
-function simulate(placed: Placed[], lex: Lexicon, bait: number): Sim {
+// then show on the words crossing it (ties: the word placed first).
+function simulate(placed: Placed[], lex: Lexicon, made: string[]): Sim {
   const s = CURVE.solver
   const n = placed.length
   const words = placed.map((p) => p.w)
-  const cold = words.map((w) => s.alpha * w.length ** 1.4 + s.beta * Math.log(1 + lex.rank.get(w)!))
+  const ranks = words.map((w) => lex.rank.get(w)!)
+  const rivals = new Map<number, Rivals>()
+  for (const w of words) if (!rivals.has(w.length)) rivals.set(w.length, rivalsOf(w, made, lex))
   const links = linksOf(placed)
   const shown = placed.map(() => new Set<number>())
   const solved = placed.map(() => false)
+  const taken = new Set<string>()
   const efforts: number[] = []
   const order: number[] = []
   for (let step = 0; step < n; step++) {
@@ -397,8 +446,7 @@ function simulate(placed: Placed[], lex: Lexicon, bait: number): Sim {
     let bestD = Infinity
     for (let i = 0; i < n; i++) {
       if (solved[i]) continue
-      let d = cold[i]
-      for (const p of shown[i]) d *= 1 - eta(p, words[i][p], words[i].length)
+      const d = wordEffort(words[i], ranks[i], shown[i], rivals.get(words[i].length)!, taken)
       if (d < bestD) {
         best = i
         bestD = d
@@ -407,13 +455,14 @@ function simulate(placed: Placed[], lex: Lexicon, bait: number): Sim {
     efforts.push(bestD)
     order.push(best)
     solved[best] = true
+    taken.add(words[best])
     for (const [, j, q] of links[best]) if (!solved[j]) shown[j].add(q)
   }
-  const [k1, k2, k3, k4] = s.k
+  const [k1, k2, k3] = s.k
   const start = efforts[0]
   const mean = efforts.reduce((a, b) => a + b, 0) / n
   const peak = Math.max(...efforts)
-  const raw = k1 * start + k2 * mean + k3 * peak + (k4 * bait) / n
+  const raw = k1 * start + k2 * mean + k3 * peak
   const [lo, hi] = s.scale
   const score = (100 * (raw - lo)) / (hi - lo)
   const hardest = efforts
@@ -440,21 +489,21 @@ function cycleShare(placed: Placed[]): number {
 
 // --- One level ---
 
-// Grid candidates (main words), most wanted first: frequency rank close to what rarity r
-// asks, longer words a little earlier. Short words beyond the archetype's cap stay out: they
-// are bonus words.
-function gridPool(lex: Lexicon, made: string[], r: number, ctx: Context): string[] {
+// Grid candidates (main words), the seed first, then the most wanted: frequency rank close
+// to what rarity r asks, longer words a little earlier. Short words beyond the archetype's
+// cap stay out: they are bonus words.
+function gridPool(lex: Lexicon, made: string[], seed: string, r: number, ctx: Context): string[] {
   const [lo, hi] = CURVE.rarity.wordRank
   const aim = lerp(Math.log(lo), Math.log(hi), r)
   const score = new Map<string, number>()
   for (const w of made) {
-    if (!lex.isMain(w)) continue
+    if (!lex.isMain(w) || w === seed) continue
     score.set(w, -Math.abs(Math.log(lex.rank.get(w)!) - aim) + 0.25 * w.length + ctx.rng() * 0.7)
   }
   const ranked = [...score.keys()].sort((a, b) => score.get(b)! - score.get(a)!)
   const shorts = new Set(ranked.filter((w) => w.length === MIN_LEN).slice(0, ctx.shortCap + 2))
   const pool = ranked.filter((w) => w.length > MIN_LEN || shorts.has(w))
-  return pool.slice(0, Math.max(3 * ctx.words, ctx.words + 12))
+  return [seed, ...pool.slice(0, Math.max(3 * ctx.words, ctx.words + 12) - 1)]
 }
 
 export class Generator {
@@ -471,23 +520,23 @@ export class Generator {
       words,
       rng,
       shortCap: a.longShare !== undefined ? Math.floor(words * (1 - a.longShare)) : words,
+      full: wheel,
     }
     let tried = 0
     let found: Got | null = null
     let fallback: Got | null = null // D: the grid closest to the rectangle share, if none reaches it
-    for (const seed of this.seeds.near(wheel >= 7 ? 7 : 6, r, level).slice(0, SEEDS_SCANNED)) {
+    for (const seed of this.seeds.near(wheel, r, level).slice(0, SEEDS_SCANNED)) {
       if (tried === SEEDS_PER_ATTEMPT) break
-      const letters = makeWheel(seed, wheel, rng)
-      const made = this.lex.madeFrom(letters)
+      const made = this.lex.madeFrom(seed)
       if (made.length / words < a.baitRatio) continue
-      const order = gridPool(this.lex, made, r, ctx)
+      const order = gridPool(this.lex, made, seed, r, ctx)
       if (order.length < words || order.filter((w) => w.length > MIN_LEN).length < words - ctx.shortCap) continue
       tried++
       const longest = Math.max(...order.map((w) => w.length))
       const { rows, cols } = matrix(words, longest, arche)
       const board = new Board(rows, cols)
       if (!SKELETONS[arche](board, ctx, order) || !fill(board, ctx, order)) continue
-      const got: Got = { seed, letters, placed: board.placed.map((p) => ({ ...p })), made }
+      const got: Got = { seed, letters: seed, placed: board.placed.map((p) => ({ ...p })), made }
       if (arche === 'D') {
         got.share = cycleShare(got.placed)
         if (got.share < a.cycleShare!) {
@@ -500,8 +549,7 @@ export class Generator {
     }
     found ??= fallback
     if (!found) return null
-    const on = new Set(found.placed.map((p) => p.w))
-    found.sim = simulate(found.placed, this.lex, found.made.filter((w) => !on.has(w)).length)
+    found.sim = simulate(found.placed, this.lex, found.made)
     return found
   }
 
@@ -525,18 +573,43 @@ export class Generator {
     }
     if (!best) return null
     const grid = this.grid(T, best.letters, best.placed, best.made, best.sim!)
-    return {
-      id: n,
-      letters: wheelOrder(best.letters, grid.words[0].w, new Set(grid.words.map((w) => w.w)), rng),
-      seed: best.seed,
-      archetype: arche,
-      ...grid,
-      variants: this.variants(T, best),
-    }
+    const variants = this.variants(T, best, arche)
+    const grids = [grid, variants.easy, variants.expert].filter((g): g is Grid => g !== null)
+    // The words of every grid that may be played on this wheel.
+    const gridWords = new Set(grids.flatMap((g) => g.words.map((w) => w.w)))
+    let letters = wheelOrder(best.letters, gridWords, rng)
+    // From a stream of its own, so the wheel and the grids stay what they were before there was a secret.
+    const secretRng = rngFrom(`zerowords:${n}:secret`)
+    const secret = this.secret(best.made, grids, secretRng)
+    // Never readable around the wheel: the wheel is shuffled again when it would be.
+    if (secret && reads(letters, secret)) letters = wheelOrder(best.letters, gridWords, secretRng, secret)
+    return { id: n, version: GENERATOR_VERSION, letters, seed: best.seed, archetype: arche, ...grid, secret, variants }
+  }
+
+  // The secret word: a main word of the wheel in none of the three grids (an extra one when
+  // the grids took every main word). Its length is drawn among the lengths there are, then it
+  // is one of the three most common words of that length, so the chat has a fair chance at it.
+  private secret(made: string[], grids: Grid[], rng: Rng): string | null {
+    const used = new Set(grids.flatMap((g) => g.words.map((w) => w.w)))
+    const free = made.filter((w) => !used.has(w))
+    const main = free.filter((w) => this.lex.isMain(w))
+    const pool = main.length ? main : free
+    if (!pool.length) return null
+    const lengths = [...new Set(pool.map((w) => w.length))].sort((a, b) => a - b)
+    const length = lengths[Math.floor(rng() * lengths.length)]
+    const rank = (w: string) => this.lex.rank.get(w)!
+    const common = pool
+      .filter((w) => w.length === length)
+      .sort((a, b) => rank(a) - rank(b))
+      .slice(0, 3)
+    return common[Math.floor(rng() * common.length)]
   }
 
   private grid(T: number, letters: string, placed: Placed[], made: string[], sim: Sim): Grid {
     const { words, rows, cols } = crop(placed)
+    // A full word first (B's bridge may come before it).
+    const full = words.findIndex((w) => w.w.length === letters.length)
+    if (full > 0) words.unshift(...words.splice(full, 1))
     const on = new Set(words.map((w) => w.w))
     const links = linksOf(placed)
     const crossings = links.reduce((s, l) => s + l.length, 0) / 2
@@ -564,19 +637,23 @@ export class Generator {
   }
 
   private measure(placed: Placed[], made: string[]): Sim {
-    const on = new Set(placed.map((p) => p.w))
-    return simulate(placed, this.lex, made.filter((w) => !on.has(w)).length)
+    return simulate(placed, this.lex, made)
   }
 
   // --- 6. DDA variants ---
 
   // Easy (T - 15) and expert (T + 12) grids on the same wheel, each a few edits away from the
-  // standard one, re-measured by the solver after every edit.
-  private variants(T: number, got: Got): { easy: Grid; expert: Grid } {
+  // standard one, re-measured by the solver after every edit. Their targets stay within the
+  // scale (a boss at T 98 has no T + 12 to aim at), and a variant that does not end up
+  // minGap points of D_sim away from the standard grid, on its side, is left out (null).
+  private variants(T: number, got: Got, arche: ArchetypeId): { easy: Grid | null; expert: Grid | null } {
     const tol = CURVE.tolerance
-    const out = {} as { easy: Grid; expert: Grid }
+    const a = CURVE.archetypes[arche]
+    // A tree stays a tree.
+    const maxCycles = a.hardCycles ? a.maxCycles : Infinity
+    const out: { easy: Grid | null; expert: Grid | null } = { easy: null, expert: null }
     for (const name of ['easy', 'expert'] as const) {
-      const aim = T + CURVE.variants[name]
+      const aim = clamp(T + CURVE.variants[name], tol, 100 - tol)
       let board = rebuild(got.placed)!
       let sim = got.sim!
       for (let step = 0; step < CURVE.variants.steps; step++) {
@@ -584,15 +661,21 @@ export class Generator {
         let moved: Sim | null
         if (name === 'easy') {
           moved = this.easyStep(board, got.made, sim, aim)
+          if (!moved) {
+            const swapped = this.easySwap(board, got.made, got.letters.length, maxCycles, sim, aim)
+            moved = swapped?.sim ?? null
+            if (swapped) board = rebuild(swapped.placed)!
+          }
         } else {
-          const swapped = this.expertStep(board, got.made, sim, aim)
+          const swapped = this.expertStep(board, got.made, got.letters.length, sim, aim)
           moved = swapped?.sim ?? null
           if (swapped) board = rebuild(swapped.placed)!
         }
         if (!moved) break
         sim = moved
       }
-      out[name] = this.grid(aim, got.letters, board.placed, got.made, sim)
+      const apart = name === 'easy' ? got.sim!.score - sim.score : sim.score - got.sim!.score
+      if (apart >= CURVE.variants.minGap) out[name] = this.grid(aim, got.letters, board.placed, got.made, sim)
     }
     return out
   }
@@ -639,15 +722,55 @@ export class Generator {
     return null
   }
 
+  // When no graft helps: one of the hardest words (never the last full word) leaves the grid
+  // and a more common word takes its place, anywhere it crosses the rest: of the swaps, the
+  // one leaving D_sim closest to aim. The grid keeps its number of words. Null when no swap
+  // lowers D_sim.
+  private easySwap(board: Board, made: string[], full: number, maxCycles: number, sim: Sim, aim: number): { sim: Sim; placed: Placed[] } | null {
+    const placed = board.placed
+    const on = new Set(placed.map((p) => p.w))
+    const fulls = placed.filter((p) => p.w.length === full).length
+    const rank = (w: string) => this.lex.rank.get(w)!
+    const common = made
+      .filter((w) => this.lex.isMain(w) && !on.has(w))
+      .sort((a, b) => rank(a) - rank(b))
+      .slice(0, LEAVES)
+    let best: { sim: Sim; placed: Placed[] } | null = null
+    for (const hard of sim.hardest.slice(0, 3)) {
+      const i = placed.findIndex((p) => p.w === hard)
+      if (placed[i].w.length === full && fulls === 1) continue
+      const kept = placed.filter((_, n) => n !== i)
+      const trial = kept.length >= 2 && connected(kept) ? rebuild(kept) : null
+      if (!trial) continue
+      for (const w of common) {
+        if (rank(w) >= rank(hard)) continue
+        for (const [r, c, d] of trial.slots(w)) {
+          const crossings = trial.fits(w, r, c, d)
+          if (!crossings?.length) continue
+          trial.put(w, r, c, d, crossings)
+          if (trial.withinLimits() && trial.cycles <= maxCycles) {
+            const s = this.measure(trial.placed, made)
+            if (s.score < sim.score && (!best || Math.abs(s.score - aim) < Math.abs(best.sim.score - aim))) {
+              best = { sim: s, placed: trial.placed.map((p) => ({ ...p })) }
+            }
+          }
+          trial.take()
+        }
+      }
+    }
+    return best
+  }
+
   // A short word that gives away letter 0 or 1 of a longer word leaves the grid, and a leaf
   // (crossing one word only) hooked on the last letter of a word takes its place: of the
   // swaps, the one leaving D_sim closest to aim. Only when no such word allows a swap that
   // raises D_sim (J already steers A, B and C away from prefix crossings) do the other words
-  // go instead. Null when no swap raises D_sim.
-  private expertStep(board: Board, made: string[], sim: Sim, aim: number): { sim: Sim; placed: Placed[] } | null {
+  // go instead; the last full word never does. Null when no swap raises D_sim.
+  private expertStep(board: Board, made: string[], full: number, sim: Sim, aim: number): { sim: Sim; placed: Placed[] } | null {
     const placed = board.placed
     const links = linksOf(placed)
     const on = new Set(placed.map((p) => p.w))
+    const fulls = placed.filter((p) => p.w.length === full).length
     const rank = (w: string) => this.lex.rank.get(w)!
     const leaves = made
       .filter((w) => this.lex.isMain(w) && !on.has(w))
@@ -658,6 +781,7 @@ export class Generator {
     for (const helpers of [all.filter(prefix), all.filter((i) => !prefix(i))]) {
       let best: { sim: Sim; placed: Placed[] } | null = null
       for (const i of helpers) {
+        if (placed[i].w.length === full && fulls === 1) continue
         const kept = placed.filter((_, n) => n !== i)
         const trial = kept.length >= 2 && connected(kept) ? rebuild(kept) : null
         if (!trial) continue
@@ -687,9 +811,14 @@ export class Generator {
 
 // --- 5. Wheel order ---
 
-// Letters around the wheel, reading as few grid words as possible (clockwise or not), and
-// never the longest word when there is any way to avoid it.
-function wheelOrder(letters: string, longest: string, gridWords: Set<string>, rng: Rng): string {
+const reads = (letters: string, word: string) => {
+  const ring = letters.repeat(2)
+  return ring.includes(word) || [...ring].reverse().join('').includes(word)
+}
+
+// Letters around the wheel, reading as few words of the grids as possible (clockwise or
+// not), and never a full word, nor the secret one, when there is any way to avoid it.
+function wheelOrder(letters: string, gridWords: Set<string>, rng: Rng, secret?: string): string {
   const order = [...letters]
   const sorted = [...gridWords].sort()
   let best: [number, string] | null = null
@@ -698,7 +827,8 @@ function wheelOrder(letters: string, longest: string, gridWords: Set<string>, rn
     const ring = order.join('').repeat(2)
     const back = [...ring].reverse().join('')
     let penalty = 0
-    for (const w of sorted) if (ring.includes(w) || back.includes(w)) penalty += w === longest ? 100 : w.length
+    for (const w of sorted) if (ring.includes(w) || back.includes(w)) penalty += w.length === letters.length ? 100 : w.length
+    if (secret && (ring.includes(secret) || back.includes(secret))) penalty += 100
     if (!best || penalty < best[0]) best = [penalty, order.join('')]
     if (!penalty) break
   }

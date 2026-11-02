@@ -169,7 +169,10 @@ RAMO     L'esempio rispetta le regole del validatore: AMO e ORA incrociano RAMO
 ```
 
 - [x] **Algoritmo di generazione** (`apps/server/src/wordgen`): pipeline a sei stadi dalla curva a dente di squalo T(c, i): ruote sintetiche dall'indice dei multinsiemi, scheletro dell'archetipo (A telaio asimmetrico, B doppio lobo a ponte, C arcipelago ad albero, D arena densa), riempimento CSP con funzione di costo J, validazione con il solver umano simulato (D_sim entro ±3 da T), ordine della ruota, varianti DDA Agevolata (T − 15) ed Esperto (T + 12). Descrizione completa in [ALGORITMO.md](ALGORITMO.md).
-- [ ] **Curva di difficoltà** in `tools/curve.json`: forma del dente, rampa, matrice per archetipo, pesi di J e del solver. I valori non fissati dalla specifica sono ipotesi (elenco in ALGORITMO.md): **tararli con il playtest**.
+- [x] **Revisione v2.1 del generatore** (versione `zw-2`, ALGORITMO.md §16): ruota = anagramma di una parola vera sempre nello schema, solver con sforzo normalizzato e ambiguità pesata per familiarità, scala fissa, varianti con bersagli raggiungibili e sostituzione per l'Agevolata, difficoltà automatica con aiuti per origine e due esiti uguali, dati delle partite in `zerowords_plays` / `zerowords_answers`.
+- [ ] **Curva di difficoltà** in `tools/curve.json`: forma del dente, rampa, matrice per archetipo, pesi di J e del solver. I valori non fissati dalla specifica sono ipotesi (elenco in ALGORITMO.md): **tararli con i dati delle partite** (ALGORITMO.md §10.4) dopo alcune decine di live, su insiemi di stima e di verifica separati.
+- [ ] **Lemmi nel lessico:** tenere in `words.tsv` il lemma di Morph-it! (ricostruendo il lessico) e limitare le forme dello stesso lemma per griglia.
+- [ ] **Rating della chat** (media mobile su circa dieci livelli) al posto della serie di due esiti, quando i dati delle partite diranno come pesare tempi, stalli e partecipanti.
 - [ ] **Livelli tutorial** (i primi 5–10) fatti a mano e marcati `"handmade": true`
 - [ ] **Validatore** (`tools/validate_levels.py`, eseguito in CI). Fallisce se:
   - una parola esce dallo schema, o due parole si contraddicono in una casella;

@@ -109,6 +109,41 @@ db.exec(`
     level INTEGER NOT NULL,
     updated_at TEXT NOT NULL DEFAULT (datetime('now'))
   );
+  CREATE TABLE IF NOT EXISTS zerowords_plays (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    key TEXT NOT NULL,
+    level INTEGER NOT NULL,
+    variant TEXT NOT NULL,
+    generator TEXT NOT NULL,
+    archetype TEXT NOT NULL,
+    seed TEXT NOT NULL,
+    target REAL NOT NULL,
+    dsim REAL NOT NULL,
+    words INTEGER NOT NULL,
+    hint_seconds INTEGER NOT NULL,
+    started_at INTEGER NOT NULL,
+    ended_at INTEGER,
+    active_ms INTEGER,
+    result TEXT,
+    outcome TEXT,
+    players INTEGER,
+    attempts INTEGER,
+    wrong INTEGER,
+    hints_auto INTEGER,
+    hints_streamer INTEGER,
+    hints_trigger INTEGER,
+    first_ms INTEGER,
+    stall_ms INTEGER
+  );
+  CREATE TABLE IF NOT EXISTS zerowords_answers (
+    play INTEGER NOT NULL,
+    at_ms INTEGER NOT NULL,
+    kind TEXT NOT NULL,
+    word TEXT,
+    how TEXT NOT NULL,
+    shown TEXT
+  );
+  CREATE INDEX IF NOT EXISTS zerowords_answers_play ON zerowords_answers (play);
   CREATE TABLE IF NOT EXISTS meta (
     name TEXT PRIMARY KEY,
     value TEXT NOT NULL
@@ -297,6 +332,97 @@ export const incastroLevel = (key: string): number | undefined =>
 export const saveIncastroLevel = (key: string, level: number): void => {
   incastroLevelSet.run(key, level)
 }
+
+// --- ZeroWords plays ---
+// Every level played, with the chat's answers and the hints as they came (times in played
+// milliseconds since the level began, pauses left out): the data to calibrate the
+// generator's difficulty on (gioco-parole/ALGORITMO.md). Nothing about who answered.
+
+export interface ZerowordsPlayStart {
+  key: string
+  level: number
+  variant: string
+  generator: string
+  archetype: string
+  // The wheel's full word.
+  seed: string
+  target: number
+  dsim: number
+  words: number
+  hint_seconds: number
+}
+
+export interface ZerowordsPlayEnd {
+  active_ms: number
+  result: 'complete' | 'time-up' | 'left'
+  outcome: string | null
+  players: number
+  attempts: number
+  wrong: number
+  hints_auto: number
+  hints_streamer: number
+  hints_trigger: number
+  first_ms: number | null
+  stall_ms: number
+}
+
+export interface ZerowordsAnswer {
+  play: number
+  at_ms: number
+  // grid | extra | secret | hint
+  kind: string
+  word: string | null
+  // chat | auto | streamer | trigger | missed
+  how: string
+  // A grid word: its letters on the board just before (V_G___).
+  shown: string | null
+}
+
+const ZEROWORDS_DAYS_KEPT = 365
+{
+  const old = Date.now() - ZEROWORDS_DAYS_KEPT * 86_400_000
+  db.prepare('DELETE FROM zerowords_answers WHERE play IN (SELECT id FROM zerowords_plays WHERE started_at < ?)').run(old)
+  db.prepare('DELETE FROM zerowords_plays WHERE started_at < ?').run(old)
+}
+
+const zwPlayInsert = db.prepare(`
+  INSERT INTO zerowords_plays (key, level, variant, generator, archetype, seed, target, dsim, words, hint_seconds, started_at)
+  VALUES (@key, @level, @variant, @generator, @archetype, @seed, @target, @dsim, @words, @hint_seconds, @started_at)
+`)
+const zwPlayEnd = db.prepare(`
+  UPDATE zerowords_plays SET ended_at = @ended_at, active_ms = @active_ms, result = @result, outcome = @outcome,
+    players = @players, attempts = @attempts, wrong = @wrong, hints_auto = @hints_auto,
+    hints_streamer = @hints_streamer, hints_trigger = @hints_trigger, first_ms = @first_ms, stall_ms = @stall_ms
+  WHERE id = @id
+`)
+const zwAnswerInsert = db.prepare(`
+  INSERT INTO zerowords_answers (play, at_ms, kind, word, how, shown) VALUES (@play, @at_ms, @kind, @word, @how, @shown)
+`)
+const zwPlaysAll = db.prepare('SELECT * FROM zerowords_plays ORDER BY id')
+const zwAnswersAll = db.prepare(`
+  SELECT a.play, p.level, p.variant, a.at_ms, a.kind, a.word, a.how, a.shown
+  FROM zerowords_answers a JOIN zerowords_plays p ON p.id = a.play ORDER BY a.rowid
+`)
+
+export const startZerowordsPlay = (play: ZerowordsPlayStart): number =>
+  Number(zwPlayInsert.run({ ...play, started_at: Date.now() }).lastInsertRowid)
+
+export const endZerowordsPlay = (id: number, end: ZerowordsPlayEnd): void => {
+  zwPlayEnd.run({ ...end, id, ended_at: Date.now() })
+}
+
+export const addZerowordsAnswer = (answer: ZerowordsAnswer): void => {
+  zwAnswerInsert.run(answer)
+}
+
+// Column names and rows, for the CSV downloads.
+const table = (stmt: Database.Statement) => ({
+  columns: stmt.columns().map((c) => c.name),
+  rows: stmt.raw().all() as (string | number | null)[][],
+})
+
+export const zerowordsPlays = () => table(zwPlaysAll)
+export const zerowordsAnswers = () => table(zwAnswersAll)
 
 // --- Pads ---
 // A key gets a pad_boards row the first time its board is read, so a board emptied on

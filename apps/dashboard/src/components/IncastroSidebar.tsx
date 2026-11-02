@@ -4,6 +4,7 @@ import {
   GIFTS,
   defaultSettings,
   type IncastroCommand,
+  type IncastroOutcome,
   type IncastroSolution,
   type IncastroState,
   type IncastroVariant,
@@ -160,6 +161,14 @@ const VARIANT: Record<IncastroVariant, string> = {
   expert: 'Esperto',
 }
 
+// How the chat did on the last level, as the automatic difficulty reads it.
+const OUTCOME: Record<IncastroOutcome, string> = {
+  easier: 'In difficoltà',
+  harder: 'Troppo facile',
+  steady: 'Nella media',
+  idle: 'Nessuno ha giocato',
+}
+
 function GameInfo({ session }: { session: SessionState }) {
   const { incastro } = useDashboard()
   const [target, setTarget] = useState('')
@@ -198,6 +207,20 @@ function GameInfo({ session }: { session: SessionState }) {
           {incastro.difficulty && ` · difficoltà ${Math.round(incastro.difficulty.dsim)}`}
         </strong>
       </div>
+      {incastro.phase === 'playing' && incastro.nextVariant !== incastro.variant && (
+        <p className="text-muted small">Questa ruota non ha la griglia {VARIANT[incastro.nextVariant]}: si gioca la Standard.</p>
+      )}
+      {session.settings.dda !== false && incastro.ddaOutcome && (
+        <div className="info-row">
+          <span>Andamento chat</span>
+          <strong>
+            {OUTCOME[incastro.ddaOutcome]}
+            {(incastro.ddaOutcome === 'easier' || incastro.ddaOutcome === 'harder') &&
+              incastro.ddaStreak > 0 &&
+              ` · ${Math.min(incastro.ddaStreak, incastro.ddaNeeded)}/${incastro.ddaNeeded}`}
+          </strong>
+        </div>
+      )}
       {incastro.phase === 'complete' && incastro.nextVariant !== incastro.variant && (
         <div className="info-row">
           <span>Prossimo livello</span>
@@ -269,6 +292,15 @@ function GameInfo({ session }: { session: SessionState }) {
           Vai
         </button>
       </form>
+      <p className="text-muted small">Dati delle partite, per tarare la difficoltà:</p>
+      <div className="side-controls">
+        <a className="btn btn--small" href="/api/zerowords/plays.csv" download>
+          ⬇ Partite
+        </a>
+        <a className="btn btn--small" href="/api/zerowords/answers.csv" download>
+          ⬇ Risposte
+        </a>
+      </div>
     </>
   )
 }
@@ -294,6 +326,14 @@ function Solution() {
           )
         })}
       </ol>
+      {incastroSolution.secret && (
+        <div className="info-row">
+          <span>Parola segreta</span>
+          <strong>
+            {incastroSolution.secret} · {incastro.secret?.by ? incastro.secret.by.nickname : 'da trovare'}
+          </strong>
+        </div>
+      )}
       <details className="inc-extras">
         <summary className="text-muted small">{incastroSolution.extras.length} parole extra valide</summary>
         <p className="small">{incastroSolution.extras.join(' · ') || '—'}</p>

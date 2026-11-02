@@ -23,7 +23,7 @@ import {
   type ServerToClientEvents,
 } from '@zerocade/shared'
 import { BivioRooms, bivioCsv, bivioFlagsCsv, bivioStats } from './bivio.js'
-import { IncastroRooms } from './incastro.js'
+import { IncastroRooms, zerowordsCsv } from './incastro.js'
 import {
   dataDir,
   getPad,
@@ -127,6 +127,16 @@ app.get('/api/bivio/flagged.csv', async (_req, reply) =>
     .header('content-disposition', 'attachment; filename="bivio-domande-sbagliate.csv"')
     .send(bivioFlagsCsv()),
 )
+// ZeroWords' plays (one row per level) and the answers and hints within them: the data to
+// calibrate the level generator on.
+for (const which of ['plays', 'answers'] as const) {
+  app.get(`/api/zerowords/${which}.csv`, async (_req, reply) =>
+    reply
+      .header('content-type', 'text/csv; charset=utf-8')
+      .header('content-disposition', `attachment; filename="zerowords-${which === 'plays' ? 'partite' : 'risposte'}.csv"`)
+      .send(zerowordsCsv(which)),
+  )
+}
 
 // Background images (Bivio, Incastro): one per game and overlay key, stored in the data
 // folder next to the databases. No SVG, which could carry scripts.
