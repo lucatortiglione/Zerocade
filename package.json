@@ -22,6 +22,11 @@
     "esbuild": "0.28.2",
     "typescript": "7.0.2"
   },
+  "overrides": {
+    "@fastify/static": {
+      "glob": "^14.0.3"
+    }
+  },
   "allowScripts": {
     "better-sqlite3@13.0.3": true,
     "esbuild@0.28.2": true

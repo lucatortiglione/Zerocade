@@ -1,8 +1,20 @@
+import { randomUUID } from 'node:crypto'
 import { mkdirSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import Database from 'better-sqlite3'
-import { giftById, type BivioChoice, type BivioTally, type Gifter, type LiveEvent } from '@zerocade/shared'
+import {
+  giftById,
+  type BivioChoice,
+  type BivioTally,
+  type FeedCreator,
+  type FeedGift,
+  type GiftEvent,
+  type Gifter,
+  type LiveEvent,
+  type Pad,
+  type SourceKind,
+} from '@zerocade/shared'
 
 // Local persistence via better-sqlite3 (latest stable SQLite engine). The DB file
 // lives in apps/server/data and is gitignored; set ZEROCADE_DB to override the path.
@@ -51,6 +63,51 @@ db.exec(`
     PRIMARY KEY (round_id, user_id)
   );
   CREATE INDEX IF NOT EXISTS idx_bivio_votes_question ON bivio_votes (question_id);
+  CREATE TABLE IF NOT EXISTS pad_boards (
+    key TEXT PRIMARY KEY,
+    volume REAL NOT NULL DEFAULT 0.8
+  );
+  CREATE TABLE IF NOT EXISTS pads (
+    id TEXT PRIMARY KEY,
+    key TEXT NOT NULL,
+    kind TEXT NOT NULL CHECK (kind IN ('sound', 'gif')),
+    slot INTEGER NOT NULL,
+    label TEXT NOT NULL,
+    color TEXT NOT NULL,
+    sound_id TEXT,
+    file TEXT,
+    UNIQUE (key, kind, slot)
+  );
+  CREATE TABLE IF NOT EXISTS gifts (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    key TEXT NOT NULL,
+    creator TEXT NOT NULL,
+    game_id TEXT NOT NULL,
+    user_id TEXT NOT NULL,
+    nickname TEXT NOT NULL,
+    gift_id TEXT NOT NULL,
+    count INTEGER NOT NULL,
+    coins INTEGER NOT NULL,
+    at INTEGER NOT NULL
+  );
+  CREATE INDEX IF NOT EXISTS idx_gifts_at ON gifts (at);
+  CREATE TABLE IF NOT EXISTS creators (
+    kind TEXT NOT NULL,
+    username TEXT NOT NULL,
+    game_id TEXT NOT NULL,
+    viewers INTEGER,
+    last_live INTEGER NOT NULL,
+    PRIMARY KEY (kind, username)
+  );
+  CREATE TABLE IF NOT EXISTS incastro_progress (
+    key TEXT PRIMARY KEY,
+    level INTEGER NOT NULL,
+    updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+  );
+  CREATE TABLE IF NOT EXISTS meta (
+    name TEXT PRIMARY KEY,
+    value TEXT NOT NULL
+  );
 `)
 
 // Migrate databases created before the widgets/goal columns existed.
@@ -64,6 +121,26 @@ try {
 } catch {
   // column already present on fresh schema
 }
+
+// --- Room ---
+// This Zerocade's one room: the dashboard, the overlay link and every game use its key,
+// whatever browser opens them. A database from before keys were kept here carries on with
+// the room it was used with most (the key with the most events); a new one gets a fresh key.
+
+function loadRoomKey(): string {
+  const saved = db.prepare("SELECT value FROM meta WHERE name = 'room_key'").get() as { value: string } | undefined
+  if (saved) return saved.value
+  const busiest = db
+    .prepare(
+      'SELECT s.key FROM sessions s LEFT JOIN events e ON e.key = s.key GROUP BY s.key ORDER BY count(e.id) DESC, s.updated_at DESC LIMIT 1',
+    )
+    .get() as { key: string } | undefined
+  const key = busiest?.key ?? randomUUID()
+  db.prepare("INSERT INTO meta (name, value) VALUES ('room_key', ?)").run(key)
+  return key
+}
+
+export const roomKey = loadRoomKey()
 
 // --- Sessions ---
 
@@ -182,3 +259,131 @@ export const recordBivioVote = (v: BivioVote): void => {
 export const bivioTotals = (questionId: string): BivioTally => bivioQuestionTotals.get(questionId) as BivioTally
 
 export const bivioTotalsByQuestion = (): BivioTotalsRow[] => bivioAllTotals.all() as unknown as BivioTotalsRow[]
+
+// --- Incastro progress ---
+// The level each overlay key is on, so the next live starts where this one stopped.
+
+const incastroLevelGet = db.prepare('SELECT level FROM incastro_progress WHERE key = ?')
+const incastroLevelSet = db.prepare(`
+  INSERT INTO incastro_progress (key, level) VALUES (?, ?)
+  ON CONFLICT(key) DO UPDATE SET level = excluded.level, updated_at = datetime('now')
+`)
+
+export const incastroLevel = (key: string): number | undefined =>
+  (incastroLevelGet.get(key) as { level: number } | undefined)?.level
+
+export const saveIncastroLevel = (key: string, level: number): void => {
+  incastroLevelSet.run(key, level)
+}
+
+// --- Pads ---
+// A key gets a pad_boards row the first time its board is read, so a board emptied on
+// purpose is not filled with the defaults again.
+
+const padBoardGet = db.prepare('SELECT volume FROM pad_boards WHERE key = ?')
+const padBoardInsert = db.prepare('INSERT INTO pad_boards (key) VALUES (?)')
+const padBoardVolume = db.prepare('UPDATE pad_boards SET volume = ? WHERE key = ?')
+const PAD_COLUMNS = 'SELECT id, kind, slot, label, color, sound_id AS soundId, file FROM pads'
+const padSelect = db.prepare(`${PAD_COLUMNS} WHERE key = ? ORDER BY kind, slot`)
+const padGet = db.prepare(`${PAD_COLUMNS} WHERE key = ? AND id = ?`)
+const padInSlot = db.prepare(`${PAD_COLUMNS} WHERE key = ? AND kind = ? AND slot = ?`)
+const padUpsert = db.prepare(`
+  INSERT INTO pads (id, key, kind, slot, label, color, sound_id, file) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+  ON CONFLICT(id) DO UPDATE SET
+    slot = excluded.slot,
+    label = excluded.label,
+    color = excluded.color,
+    sound_id = excluded.sound_id,
+    file = excluded.file
+`)
+const padDelete = db.prepare('DELETE FROM pads WHERE key = ? AND id = ?')
+
+type PadRow = Omit<Pad, 'soundId' | 'file'> & { soundId: string | null; file: string | null }
+
+const toPad = ({ soundId, file, ...rest }: PadRow): Pad => ({
+  ...rest,
+  ...(soundId ? { soundId } : {}),
+  ...(file ? { file } : {}),
+})
+
+export const padVolume = (key: string): number | undefined =>
+  (padBoardGet.get(key) as { volume: number } | undefined)?.volume
+
+export const setPadVolume = (key: string, volume: number): void => {
+  padBoardVolume.run(volume, key)
+}
+
+export const listPads = (key: string): Pad[] => (padSelect.all(key) as unknown as PadRow[]).map(toPad)
+
+export const getPad = (key: string, id: string): Pad | undefined => {
+  const row = padGet.get(key, id) as PadRow | undefined
+  return row && toPad(row)
+}
+
+export const padAt = (key: string, kind: Pad['kind'], slot: number): Pad | undefined => {
+  const row = padInSlot.get(key, kind, slot) as PadRow | undefined
+  return row && toPad(row)
+}
+
+export const savePad = (key: string, pad: Pad): void => {
+  padUpsert.run(pad.id, key, pad.kind, pad.slot, pad.label, pad.color, pad.soundId ?? null, pad.file ?? null)
+}
+
+export const deletePad = (key: string, id: string): void => {
+  padDelete.run(key, id)
+}
+
+export const createPadBoard = db.transaction((key: string, pads: Pad[]) => {
+  padBoardInsert.run(key)
+  for (const pad of pads) savePad(key, pad)
+})
+
+// --- Feed: gifts and creators across every key on this server ---
+
+const GIFT_DAYS_KEPT = 30
+db.prepare('DELETE FROM gifts WHERE at < ?').run(Date.now() - GIFT_DAYS_KEPT * 86_400_000)
+
+const giftInsert = db.prepare(`
+  INSERT INTO gifts (key, creator, game_id, user_id, nickname, gift_id, count, coins, at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+`)
+const GIFT_COLUMNS = 'SELECT id, creator, game_id AS gameId, nickname, gift_id AS giftId, count, coins, at FROM gifts'
+const giftsLatest = db.prepare(`${GIFT_COLUMNS} WHERE (@creator IS NULL OR creator = @creator) ORDER BY id DESC LIMIT @limit`)
+const giftTop = db.prepare(
+  `${GIFT_COLUMNS} WHERE (@creator IS NULL OR creator = @creator) AND at >= @since ORDER BY coins DESC, id DESC LIMIT 1`,
+)
+const giftCreators = db.prepare('SELECT DISTINCT creator FROM gifts')
+
+export const recordGift = (key: string, creator: string, gameId: string, event: GiftEvent): void => {
+  const coins = (giftById(event.giftId)?.coins ?? 0) * event.count
+  giftInsert.run(key, creator, gameId, event.user.id, event.user.nickname, event.giftId, event.count, coins, Date.now())
+}
+
+// `creator` undefined means every creator; '' the simulator.
+export const latestGifts = (creator: string | undefined, limit: number): FeedGift[] =>
+  giftsLatest.all({ creator: creator ?? null, limit }) as unknown as FeedGift[]
+
+export const topGiftSince = (creator: string | undefined, since: number): FeedGift | null =>
+  (giftTop.get({ creator: creator ?? null, since }) as FeedGift | undefined) ?? null
+
+export const giftedCreators = (): string[] => (giftCreators.all() as { creator: string }[]).map((r) => r.creator)
+
+const creatorUpsert = db.prepare(`
+  INSERT INTO creators (kind, username, game_id, viewers, last_live) VALUES (?, ?, ?, ?, ?)
+  ON CONFLICT(kind, username) DO UPDATE SET
+    game_id = excluded.game_id,
+    viewers = COALESCE(excluded.viewers, creators.viewers),
+    last_live = excluded.last_live
+`)
+const creatorsRecent = db.prepare(
+  'SELECT kind, username, game_id AS gameId, viewers, last_live AS at FROM creators ORDER BY last_live DESC LIMIT ?',
+)
+
+// Called while a creator is live, so last_live ends up close to when the live ended.
+export const touchCreator = (kind: SourceKind, username: string, gameId: string, viewers?: number): void => {
+  creatorUpsert.run(kind, username, gameId, viewers ?? null, Date.now())
+}
+
+export const recentCreators = (limit: number): FeedCreator[] =>
+  (creatorsRecent.all(limit) as (Omit<FeedCreator, 'viewers'> & { viewers: number | null })[]).map(({ viewers, ...c }) =>
+    viewers === null ? c : { ...c, viewers },
+  )

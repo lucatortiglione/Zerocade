@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { giftById, type Gifter, type LiveEvent } from '@zerocade/shared'
 import { useOverlay } from './store'
 
@@ -25,8 +26,8 @@ export function Widgets() {
   if (!session) return null
   const w = session.widgets
   // In Bivio comments are the votes: they are listed under the options, and an alert
-  // would sit on top of option A.
-  const alert = session.gameId === 'bivio' && event?.type === 'comment' ? null : event
+  // would sit on top of option A. In Incastro they are the words played.
+  const alert = (session.gameId === 'bivio' || session.gameId === 'incastro') && event?.type === 'comment' ? null : event
 
   return (
     <>
@@ -38,10 +39,14 @@ export function Widgets() {
   )
 }
 
+// Keyed by event, so each one mounts afresh; it fades out by itself (alert-out in
+// styles.css) and is then removed.
 function Alert({ event }: { event: LiveEvent }) {
+  const [gone, setGone] = useState(false)
+  if (gone) return null
   const { icon, text } = alertText(event)
   return (
-    <div className="widget-alert">
+    <div className="widget-alert" onAnimationEnd={(e) => e.animationName === 'alert-out' && setGone(true)}>
       <span className="widget-alert__icon">{icon}</span>
       <span className="widget-alert__text">{text}</span>
     </div>

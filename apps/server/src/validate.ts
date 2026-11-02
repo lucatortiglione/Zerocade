@@ -6,6 +6,7 @@ import {
   type BivioCommand,
   type DjPlay,
   type GameSettings,
+  type IncastroCommand,
   type LiveEvent,
   type SourceConfig,
   type Trigger,
@@ -109,8 +110,8 @@ export function sanitizeSettings(gameId: string, raw: unknown): GameSettings | n
         out[s.id] = v.toLowerCase()
         break
       case 'image':
-        // Only images uploaded to this server (POST /api/bivio/background/:key).
-        if (typeof v !== 'string' || (v !== '' && !/^\/api\/bivio\/background\/[A-Za-z0-9-]{8,64}\?v=\d{1,15}$/.test(v))) return null
+        // Only images uploaded to this server (POST /api/<game>/background/:key).
+        if (typeof v !== 'string' || (v !== '' && !/^\/api\/(bivio|incastro)\/background\/[A-Za-z0-9-]{8,64}\?v=\d{1,15}$/.test(v))) return null
         out[s.id] = v
         break
     }
@@ -162,6 +163,27 @@ const BIVIO_COMMANDS: BivioCommand[] = ['next', 'reveal', 'extra-time', 'pause',
 
 export const sanitizeBivioCommand = (raw: unknown): BivioCommand | null =>
   BIVIO_COMMANDS.includes(raw as BivioCommand) ? (raw as BivioCommand) : null
+
+const INCASTRO_COMMANDS: IncastroCommand[] = [
+  'next',
+  'prev',
+  'hint',
+  'reveal-word',
+  'shuffle',
+  'extra-time',
+  'pause',
+  'resume',
+  'replay',
+  'restart',
+  'clear-scores',
+]
+
+export const sanitizeIncastroCommand = (raw: unknown): IncastroCommand | null =>
+  INCASTRO_COMMANDS.includes(raw as IncastroCommand) ? (raw as IncastroCommand) : null
+
+// A level number for "Vai al livello"; the room wraps it into its own range.
+export const sanitizeLevel = (raw: unknown): number | null =>
+  typeof raw === 'number' && Number.isInteger(raw) && raw >= 1 && raw <= 100_000 ? raw : null
 
 export function sanitizeMessage(raw: unknown): string | null {
   if (typeof raw !== 'string') return null

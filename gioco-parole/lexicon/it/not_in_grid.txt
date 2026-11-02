@@ -1,0 +1,7 @@
+# Parole valide che non vanno mai nello schema: in chat restano accettate come extra.
+# Sembrano nomi, prestiti o sigle, oppure sono forme rare che il pubblico non cercherebbe.
+# Una o più per riga, in maiuscolo.
+
+ACE ALO BEA IMO IVI OLA OLE REI RIA RUE ALMA
+LIVE MIDI RAVE CORE DORA LEDA MARCO MEGA PROMO MICRO RETRO ELITE BEIGE MIMI
+DESI SITA MASO PACO VIGO RUBI CRONO DACIA DIANO MECCA SARDI UMBRI EGIZI

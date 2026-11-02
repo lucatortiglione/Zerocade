@@ -9,8 +9,10 @@
 //   app/server.mjs                  the server, bundled with esbuild
 //   app/public/{dashboard,overlay}  the built pages
 //   app/content.seed.json, app/domande_master.csv
+//   app/incastro/                   Incastro's levels and chapters (gioco-parole/data), with credits
 //   app/node_modules/better-sqlite3 the prebuilt win32-x64 SQLite binding
-//   data/                           databases, created on first start (Bivio votes live here)
+//   data/                           databases, created on first start (Bivio votes and Incastro
+//                                   progress live here)
 //
 // data/ is never deleted by a rebuild, and is left out of the zip.
 
@@ -64,6 +66,10 @@ cpSync(join(root, 'apps', 'dashboard', 'dist'), join(app, 'public', 'dashboard')
 cpSync(join(root, 'apps', 'overlay', 'dist'), join(app, 'public', 'overlay'), { recursive: true })
 copyFileSync(join(root, 'apps', 'server', 'src', 'content.seed.json'), join(app, 'content.seed.json'))
 copyFileSync(join(root, 'gioco-dilemmi', 'data', 'domande_master.csv'), join(app, 'domande_master.csv'))
+// Incastro: levels and chapters next to the server (incastro.ts looks for app/incastro), and the
+// attribution the word list asks for.
+cpSync(join(root, 'gioco-parole', 'data'), join(app, 'incastro'), { recursive: true })
+copyFileSync(join(root, 'gioco-parole', 'lexicon', 'it', 'SOURCE'), join(app, 'incastro', 'CREDITI.txt'))
 
 const sqliteDir = dirname(createRequire(join(root, 'apps', 'server', 'package.json')).resolve('better-sqlite3/package.json'))
 const sqliteOut = join(app, 'node_modules', 'better-sqlite3')
@@ -114,21 +120,39 @@ writeFileSync(
     '  la dashboard su http://localhost:3001/ . Per fermare Zerocade chiudi quella finestra.',
     '  Non serve installare nulla: Node.js è già nella cartella runtime.',
     '',
+    'OVERLAY (una volta sola, vale per tutti i giochi)',
+    '  In OBS o TikTok LIVE Studio aggiungi una sorgente browser con il link',
+    '  http://localhost:3001/overlay/ (lo trovi anche nella pagina Setup), 1080 x 1920, o',
+    '  1920 x 1080 per una scena orizzontale. Il gioco che scegli nella dashboard compare lì;',
+    '  il link non cambia, qualunque browser usi per la dashboard.',
+    '',
     'BIVIO (Preferiresti…?)',
     '  1. Nella dashboard scegli il gioco "Bivio".',
-    '  2. Pagina Setup: copia il link dell\'overlay e aggiungilo come sorgente browser in',
-    '     TikTok LIVE Studio o OBS, 1080 x 1920. Il link vale per il browser in cui apri la',
-    '     dashboard: usa sempre lo stesso.',
-    '  3. Pagina Sources: collega l\'account TikTok (o il canale Twitch).',
-    '  4. Il pubblico vota scrivendo A o B (oppure 1 o 2) in chat: un voto per spettatore a',
+    '  2. Pagina Sources: collega l\'account TikTok (o il canale Twitch).',
+    '  3. Il pubblico vota scrivendo A o B (oppure 1 o 2) in chat: un voto per spettatore a',
     '     domanda. Con "Consenti cambio voto" vale l\'ultimo.',
     '  Con Bivio scelto, la pagina Giochi mostra la colonna di regia: collegamento TikTok e',
     '  simulatore, Metti in pausa, Riavvia gioco, Invia messaggio, info sulla domanda in',
     '  corso, risposte raccolte (con "Esporta CSV"), trigger e impostazioni: categorie, tempi,',
     '  colori, layout affiancato o in colonna, sfondo a colore, trasparente o con immagine.',
     '',
+    'INCASTRO (ruota di lettere e schema a incastro)',
+    '  1. Nella dashboard scegli il gioco "Incastro"; TikTok come per Bivio.',
+    '  2. Il pubblico scrive in chat le parole che trova con le lettere della ruota (anche',
+    '     senza accenti, fino a 4 parole per commento). Una parola dello schema vale un punto',
+    '     per lettera, +3 se usa tutte le lettere; una parola extra valida vale 1 punto.',
+    '  3. Trigger predefiniti: Rose = rivela una lettera, Donut = rivela una parola,',
+    '     condivisione = mescola la ruota. Se nessuno trova parole, ogni 30 secondi si',
+    '     rivela una lettera da sola (Impostazioni gioco).',
+    '  600 livelli in italiano, in 30 capitoli da 20: a ogni capitolo il giardino dello',
+    '  sfondo cresce. Il livello raggiunto resta salvato: la live successiva riparte da lì.',
+    '  Dalla colonna di regia: salta, torna indietro, vai al livello N, aiuti, pausa,',
+    '  soluzione del livello (solo in dashboard) e classifica della live.',
+    '  Livelli e capitoli: app\\incastro. Licenza della lista di parole: app\\incastro\\CREDITI.txt',
+    '',
     'DATI',
-    '  data\\zerocade.db   sessioni, eventi e tutti i voti di Bivio (tabella bivio_votes)',
+    '  data\\zerocade.db   la stanza dell\'overlay (tabella meta), sessioni, eventi, tutti i',
+    '                     voti di Bivio (bivio_votes) e il livello di Incastro (incastro_progress)',
     '  data\\content.db    contenuti degli altri giochi',
     '  Per spostare Zerocade su un altro PC copia tutta la cartella, data compresa.',
     '',

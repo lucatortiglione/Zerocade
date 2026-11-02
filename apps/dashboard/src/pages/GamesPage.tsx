@@ -1,5 +1,7 @@
 import { GAMES, type SessionState } from '@zerocade/shared'
 import { BivioSidebar } from '../components/BivioSidebar'
+import { IncastroSidebar } from '../components/IncastroSidebar'
+import { LiveColumn } from '../components/LiveColumn'
 import { SettingsPanel } from '../components/SettingsPanel'
 import { Simulator } from '../components/Simulator'
 import { TopGifters } from '../components/TopGifters'
@@ -12,12 +14,14 @@ import { useDashboard } from '../store'
 export function GamesPage() {
   const { session } = useDashboard()
 
-  // Bivio has its own control column (game switcher included) next to the preview.
-  if (session?.gameId === 'bivio') {
+  // Bivio and Incastro have their own control column (game switcher included) next to the
+  // preview. Every game gets the same right column: pads, creators and latest gifts.
+  if (session?.gameId === 'bivio' || session?.gameId === 'incastro') {
     return (
       <div className="games games--bivio">
-        <BivioSidebar session={session} />
+        {session.gameId === 'bivio' ? <BivioSidebar session={session} /> : <IncastroSidebar session={session} />}
         <Preview session={session} />
+        <LiveColumn />
       </div>
     )
   }
@@ -50,17 +54,16 @@ export function GamesPage() {
             ))}
           </div>
         </section>
+        <Simulator />
         {session && <TriggerEditor session={session} />}
         {session && <SettingsPanel session={session} />}
         {session && <WidgetsPanel session={session} />}
+        <TopGifters />
       </aside>
 
       <Preview session={session} />
 
-      <aside className="panel right-panel">
-        <Simulator />
-        <TopGifters />
-      </aside>
+      <LiveColumn />
     </div>
   )
 }

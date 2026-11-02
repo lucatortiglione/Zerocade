@@ -1,0 +1,16 @@
+{
+  "_comment": "Difficulty curve for tools/generate_levels.py. Nothing gets easier from one level to the next. Each stage runs up to level `to` with its wheel letters; its grid words grow from words[0] to words[1], and the next stage starts where this one ends. A grid word (and the full-length word) needs a frequency of at least minZipf, which drops from minZipf[0] at level 1 to minZipf[1] at the last level. Tune after playtests.",
+  "levels": 600,
+  "levelsPerChapter": 20,
+  "maxRows": 10,
+  "maxCols": 11,
+  "minZipf": [3.6, 2.6],
+  "stages": [
+    { "to": 20, "letters": 5, "words": [3, 5] },
+    { "to": 60, "letters": 6, "words": [5, 7] },
+    { "to": 140, "letters": 7, "words": [7, 9] },
+    { "to": 260, "letters": 8, "words": [9, 11] },
+    { "to": 420, "letters": 9, "words": [11, 13] },
+    { "to": 600, "letters": 10, "words": [13, 15] }
+  ]
+}

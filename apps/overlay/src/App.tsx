@@ -5,6 +5,7 @@ import { createGame } from './games/registry'
 import { useOverlay } from './store'
 import { Widgets } from './Widgets'
 import { Bivio } from './Bivio'
+import { Incastro } from './Incastro'
 import { isContentReady, loadContent, subscribeContent } from './content'
 
 interface Toast {
@@ -13,7 +14,7 @@ interface Toast {
 }
 
 export function App() {
-  const { connected, session, event, seq, message, messageSeq } = useOverlay()
+  const { connected, session, event, seq, message, messageSeq, gif, gifSeq } = useOverlay()
   const contentReady = useSyncExternalStore(subscribeContent, isContentReady)
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const engineRef = useRef<Engine | null>(null)
@@ -63,12 +64,14 @@ export function App() {
     if (game) {
       for (const t of triggersFor(session.triggers, event)) engineRef.current?.pushAction(t.action, event)
     }
-    // In Bivio comments are the votes, already listed under the options.
-    if (session.gameId === 'bivio' && event.type === 'comment') return
+    // Bivio has no room for toasts over its title: votes show as bubbles, and gifts,
+    // likes and follows can still use the Avvisi widget. In Incastro every comment is a
+    // guess: the words found have their own feed.
+    if (session.gameId === 'bivio' || session.gameId === 'incastro') return
     const id = Date.now() + Math.random()
     setToasts((prev) => [...prev.slice(-4), { id, text: describeEvent(event) }])
-    const timer = setTimeout(() => setToasts((prev) => prev.filter((t) => t.id !== id)), 3200)
-    return () => clearTimeout(timer)
+    // Not cleared when the next event arrives: every toast removes itself.
+    setTimeout(() => setToasts((prev) => prev.filter((t) => t.id !== id)), 3200)
   }, [seq])
 
   const game = session ? GAMES.find((g) => g.id === session.gameId) : undefined
@@ -77,6 +80,7 @@ export function App() {
     <div className="overlay">
       <canvas ref={canvasRef} className="overlay__canvas" />
       {session?.gameId === 'bivio' && <Bivio />}
+      {session?.gameId === 'incastro' && <Incastro />}
       <header className="overlay__top">
         <span className="overlay__brand">{game?.emoji ?? '🎮'}</span>
         <span className="overlay__title">{game?.name ?? 'Zerocade'}</span>
@@ -84,6 +88,8 @@ export function App() {
       </header>
 
       <Widgets />
+
+      {gif && <img key={gifSeq} className="overlay-gif" src={gif.url} alt={gif.label} />}
 
       {message && (
         <div key={messageSeq} className="overlay-message" role="status">
