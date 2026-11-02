@@ -101,6 +101,9 @@ export interface SourceStatus {
   message?: string
 }
 
+// The TikTok and Twitch names last entered for this room, kept for the next lives.
+export type SavedSources = Partial<Record<SourceKind, string>>
+
 // Map a real TikTok gift (name + coins) onto our curated catalog: exact name match
 // first, otherwise the catalog gift with the closest coin amount.
 export function giftIdForTiktok(name: string, coins: number): string {
@@ -1562,6 +1565,8 @@ export interface ServerToClientEvents {
   'live:event': (event: LiveEvent) => void
   'dj:play': (play: DjPlay) => void
   'source:status': (status: SourceStatus) => void
+  // Dashboards only.
+  'source:saved': (saved: SavedSources) => void
   'ranking:update': (ranking: Gifter[]) => void
   'bivio:state': (state: BivioState) => void
   'incastro:state': (state: IncastroState) => void

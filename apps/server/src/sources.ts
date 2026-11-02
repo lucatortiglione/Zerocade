@@ -31,6 +31,11 @@ const toViewer = (id: unknown, nickname: unknown, avatar?: unknown): Viewer => (
   avatar: typeof avatar === 'string' && /^https?:\/\//.test(avatar) ? avatar.slice(0, 512) : undefined,
 })
 
+// The viewer of a TikTok event. Version 2 of the connector sometimes leaves userId empty (the
+// @name stands in) and keeps the picture in userDetails rather than profilePictureUrl.
+const tiktokViewer = (d: Record<string, unknown>): Viewer =>
+  toViewer(d.userId, d.uniqueId ?? d.nickname, d.profilePictureUrl ?? rec(d.userDetails).profilePictureUrls)
+
 // The connector's most common failures, in the dashboard's language; anything else as it is.
 function tiktokError(err: unknown, user: string): string {
   const message = err instanceof Error ? err.message : String(err)
@@ -41,6 +46,12 @@ function tiktokError(err: unknown, user: string): string {
     return `Diretta di @${user} non trovata: controlla il nome utente (quello dopo la @ nel profilo) e che la LIVE sia avviata.`
   }
   return message
+}
+
+// The name as typed -> as connected (and saved): TikTok without the @, a Twitch channel
+// without the # and in lower case.
+export function sourceUsername(kind: SourceKind, raw: string): string {
+  return kind === 'tiktok' ? raw.replace(/^@/, '').trim() : raw.replace(/^#/, '').trim().toLowerCase()
 }
 
 export interface LiveSource {
@@ -105,7 +116,7 @@ export class RoomSources {
 
   private async connectTiktok(username: string): Promise<void> {
     this.disconnectTiktok()
-    const uname = username.replace(/^@/, '').trim()
+    const uname = sourceUsername('tiktok', username)
     this.tiktokUser = uname
     this.tiktokState = 'connecting'
     this.status({ kind: 'tiktok', username: uname, state: 'connecting' })
@@ -124,40 +135,29 @@ export class RoomSources {
         const detail = err instanceof Error ? err.message : [e.info, e.exception instanceof Error ? e.exception.message : ''].filter(Boolean).join(': ')
         console.warn(`[tiktok] ${detail}`)
       })
+      // Version 2 of the connector has the text in `content` (`comment` in version 1) and
+      // the likes in `count` (`likeCount`).
       conn.on('chat', (data) => {
         const d = rec(data)
-        this.emit({
-          type: 'comment',
-          user: toViewer(d.userId, d.uniqueId ?? d.nickname, d.profilePictureUrl),
-          text: String(d.comment ?? '').slice(0, 140),
-        })
+        this.emit({ type: 'comment', user: tiktokViewer(d), text: String(d.content ?? d.comment ?? '').slice(0, 140) })
       })
       conn.on('gift', (data) => {
         const d = rec(data)
         if (Number(d.repeatEnd) === 1) return
         this.emit({
           type: 'gift',
-          user: toViewer(d.userId, d.uniqueId ?? d.nickname, d.profilePictureUrl),
+          user: tiktokViewer(d),
           giftId: giftIdForTiktok(String(d.giftName ?? ''), clampCount(d.diamondCount, 1)),
           count: clampCount(d.repeatCount, 1),
         })
       })
       conn.on('like', (data) => {
         const d = rec(data)
-        this.emit({ type: 'like', user: toViewer(d.userId, d.uniqueId ?? d.nickname, d.profilePictureUrl), count: clampCount(d.likeCount, 1) })
+        this.emit({ type: 'like', user: tiktokViewer(d), count: clampCount(d.likeCount ?? d.count, 1) })
       })
-      conn.on('follow', (data) => {
-        const d = rec(data)
-        this.emit({ type: 'follow', user: toViewer(d.userId, d.uniqueId ?? d.nickname, d.profilePictureUrl) })
-      })
-      conn.on('share', (data) => {
-        const d = rec(data)
-        this.emit({ type: 'share', user: toViewer(d.userId, d.uniqueId ?? d.nickname, d.profilePictureUrl) })
-      })
-      conn.on('member', (data) => {
-        const d = rec(data)
-        this.emit({ type: 'join', user: toViewer(d.userId, d.uniqueId ?? d.nickname, d.profilePictureUrl) })
-      })
+      conn.on('follow', (data) => this.emit({ type: 'follow', user: tiktokViewer(rec(data)) }))
+      conn.on('share', (data) => this.emit({ type: 'share', user: tiktokViewer(rec(data)) }))
+      conn.on('member', (data) => this.emit({ type: 'join', user: tiktokViewer(rec(data)) }))
       conn.on('roomUser', (data) => {
         const d = rec(data)
         const viewers = Math.floor(Number(d.viewerCount ?? d.total))
@@ -206,7 +206,7 @@ export class RoomSources {
 
   private async connectTwitch(channel: string): Promise<void> {
     this.disconnectTwitch()
-    const ch = channel.replace(/^#/, '').trim().toLowerCase()
+    const ch = sourceUsername('twitch', channel)
     this.twitchUser = ch
     this.twitchState = 'connecting'
     this.status({ kind: 'twitch', username: ch, state: 'connecting' })

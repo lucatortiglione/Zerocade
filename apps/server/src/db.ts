@@ -13,6 +13,7 @@ import {
   type Gifter,
   type LiveEvent,
   type Pad,
+  type SavedSources,
   type SourceKind,
 } from '@zerocade/shared'
 
@@ -103,6 +104,13 @@ db.exec(`
     viewers INTEGER,
     last_live INTEGER NOT NULL,
     PRIMARY KEY (kind, username)
+  );
+  CREATE TABLE IF NOT EXISTS source_accounts (
+    key TEXT NOT NULL,
+    kind TEXT NOT NULL,
+    username TEXT NOT NULL,
+    updated_at TEXT NOT NULL DEFAULT (datetime('now')),
+    PRIMARY KEY (key, kind)
   );
   CREATE TABLE IF NOT EXISTS incastro_progress (
     key TEXT PRIMARY KEY,
@@ -316,6 +324,23 @@ const bivioFlagAll = db.prepare(`SELECT question_id, lang, flagged_at FROM bivio
 export const bivioFlags = (): BivioFlag[] => bivioFlagAll.all() as unknown as BivioFlag[]
 export const flagBivio = (questionId: string, lang: string): void => void bivioFlagInsert.run(questionId, lang)
 export const unflagBivio = (questionId: string): void => void bivioFlagDelete.run(questionId)
+
+// --- TikTok and Twitch accounts ---
+// The name last entered for each source, per overlay key: the dashboard fills it in again
+// at the next live.
+
+const sourceAccountsGet = db.prepare('SELECT kind, username FROM source_accounts WHERE key = ?')
+const sourceAccountSet = db.prepare(`
+  INSERT INTO source_accounts (key, kind, username) VALUES (?, ?, ?)
+  ON CONFLICT(key, kind) DO UPDATE SET username = excluded.username, updated_at = datetime('now')
+`)
+
+export const savedSources = (key: string): SavedSources =>
+  Object.fromEntries((sourceAccountsGet.all(key) as { kind: SourceKind; username: string }[]).map((r) => [r.kind, r.username]))
+
+export const saveSource = (key: string, kind: SourceKind, username: string): void => {
+  sourceAccountSet.run(key, kind, username)
+}
 
 // --- Incastro progress ---
 // The level each overlay key is on, so the next live starts where this one stopped.

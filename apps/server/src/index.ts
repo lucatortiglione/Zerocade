@@ -35,6 +35,8 @@ import {
   recordEvent,
   recordGift,
   roomKey,
+  saveSource,
+  savedSources,
   setPadVolume,
   topGiftSince,
   touchCreator,
@@ -43,7 +45,7 @@ import { getContent } from './content.js'
 import { HOSTS_LINE, LOCAL_DOMAIN, domainRegistered, ensureDomain } from './hosts.js'
 import { PAD_FILE_MAX, padBoard, padFile, removePad, savePadInput } from './pads.js'
 import { getSession, selectGame, setScene, setSettings, setTriggers } from './sessions.js'
-import { RoomSources } from './sources.js'
+import { RoomSources, sourceUsername } from './sources.js'
 import {
   sanitizeBivioCommand,
   sanitizeDj,
@@ -323,10 +325,18 @@ io.on('connection', (socket) => {
   socket.emit('ranking:update', getRanking(key))
   socket.emit('pads:state', padBoard(key))
   for (const status of roomSources(key).statuses()) socket.emit('source:status', status)
+  socket.emit('source:saved', savedSources(key))
 
+  // The name entered is saved for the next lives, whether this connection works or not.
   socket.on('source:connect', (raw: unknown) => {
     const config = sanitizeSourceConfig(raw)
-    if (config) roomSources(key).connect(config)
+    if (!config) return
+    const username = sourceUsername(config.kind, config.username)
+    if (username) {
+      saveSource(key, config.kind, username)
+      io.to(dashboardRoom(key)).emit('source:saved', savedSources(key))
+    }
+    roomSources(key).connect(config)
   })
 
   socket.on('source:disconnect', (kind: unknown) => {

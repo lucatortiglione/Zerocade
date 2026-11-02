@@ -5,6 +5,7 @@ import {
   type IncastroSolution,
   type IncastroState,
   type PadBoard,
+  type SavedSources,
   type SessionState,
   type SourceKind,
   type SourceStatus,
@@ -18,6 +19,8 @@ interface DashboardState {
   session: SessionState | null
   gifters: Gifter[]
   sources: Partial<Record<SourceKind, SourceStatus>>
+  // The account names entered last time, to fill the fields in.
+  savedSources: SavedSources
   bivio: BivioState | null
   incastro: IncastroState | null
   incastroSolution: IncastroSolution | null
@@ -29,6 +32,7 @@ let state: DashboardState = {
   session: null,
   gifters: [],
   sources: {},
+  savedSources: {},
   bivio: null,
   incastro: null,
   incastroSolution: null,
@@ -48,6 +52,7 @@ socket.on('ranking:update', (ranking) => update({ gifters: ranking }))
 socket.on('source:status', (status) => {
   update({ sources: { ...state.sources, [status.kind]: status } })
 })
+socket.on('source:saved', (savedSources) => update({ savedSources }))
 socket.on('bivio:state', (bivio) => update({ bivio }))
 socket.on('incastro:state', (incastro) => update({ incastro }))
 socket.on('incastro:solution', (incastroSolution) => update({ incastroSolution }))

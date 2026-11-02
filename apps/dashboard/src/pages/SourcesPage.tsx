@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { type SourceKind, type SourceStatus } from '@zerocade/shared'
 import { socket } from '../socket'
 import { useDashboard } from '../store'
@@ -19,8 +19,12 @@ const SOURCES: { kind: SourceKind; label: string; placeholder: string; hint: str
 ]
 
 export function SourcesPage() {
-  const { sources } = useDashboard()
-  const [inputs, setInputs] = useState<Record<SourceKind, string>>({ tiktok: '', twitch: '' })
+  const { sources, savedSources } = useDashboard()
+  const saved = { tiktok: savedSources.tiktok ?? '', twitch: savedSources.twitch ?? '' }
+  const [inputs, setInputs] = useState<Record<SourceKind, string>>(saved)
+  // The names saved on the server fill the fields once they arrive.
+  useEffect(() => setInputs((prev) => ({ ...prev, tiktok: saved.tiktok })), [saved.tiktok])
+  useEffect(() => setInputs((prev) => ({ ...prev, twitch: saved.twitch })), [saved.twitch])
 
   return (
     <div className="sources">

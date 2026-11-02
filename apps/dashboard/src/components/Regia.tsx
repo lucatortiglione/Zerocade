@@ -30,9 +30,12 @@ export function ConnectionBadge() {
 }
 
 export function TiktokAccount() {
-  const { sources } = useDashboard()
+  const { sources, savedSources } = useDashboard()
   const tiktok = sources.tiktok
-  const [username, setUsername] = useState('')
+  const saved = savedSources.tiktok ?? ''
+  const [username, setUsername] = useState(saved)
+  // The name saved on the server fills the field once it arrives.
+  useEffect(() => setUsername(saved), [saved])
 
   return (
     <>
