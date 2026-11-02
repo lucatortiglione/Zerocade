@@ -1,0 +1,19 @@
+words.tsv (italiano) è derivato da:
+
+1. Morph-it! 0.4.8 (23/02/2009), lessico morfologico dell'italiano
+   Marco Baroni, Eros Zanchetta. https://docs.sslmit.unibo.it/doku.php?id=resources:morph-it
+   File: morph-it.tgz -> current_version/morph-it_048.txt (Latin-1)
+   Licenza: doppia, Creative Commons Attribution-ShareAlike 2.0 oppure GNU LGPL.
+   Uso commerciale consentito con attribuzione; le opere derivate (words.tsv e i livelli
+   generati) si distribuiscono con la stessa licenza CC BY-SA.
+
+2. wordfreq (Robyn Speer et al.), frequenze Zipf della lingua "it"
+   https://github.com/rspeer/wordfreq — codice Apache 2.0, dati CC BY-SA 4.0.
+
+Rigenerare:
+  pip install wordfreq
+  python tools/build_lexicon.py it <percorso>/morph-it_048.txt
+
+Attribuzione da mostrare (crediti del gioco e LEGGIMI):
+  Parole: Morph-it! di M. Baroni ed E. Zanchetta (CC BY-SA 2.0) e frequenze wordfreq
+  (CC BY-SA 4.0). Livelli e lessico di Incastro: CC BY-SA.

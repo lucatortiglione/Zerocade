@@ -1,32 +1,36 @@
-// The overlay key ties this dashboard to the overlays it controls. Until accounts exist it lives
-// in this browser only, so clearing site data gives you a new overlay link.
+import type { RoomInfo } from '@zerocade/shared'
 
-const STORAGE_KEY = 'zerocade.overlayKey'
+// The room comes from the server, so every browser that opens the dashboard drives the same
+// overlay and the overlay link never changes. In dev the server may start after this page:
+// until it answers, the dashboard waits.
 
-function loadKey() {
-  try {
-    const saved = localStorage.getItem(STORAGE_KEY)
-    if (saved) return saved
-    const key = crypto.randomUUID()
-    localStorage.setItem(STORAGE_KEY, key)
-    return key
-  } catch {
-    return crypto.randomUUID()
+async function loadRoom(): Promise<RoomInfo> {
+  for (;;) {
+    try {
+      const res = await fetch('/api/room')
+      if (res.ok) return (await res.json()) as RoomInfo
+    } catch {
+      // Server not up yet.
+    }
+    await new Promise((resolve) => setTimeout(resolve, 1000))
   }
 }
 
-export const overlayKey = loadKey()
+const room = await loadRoom()
 
-// In dev the overlay has its own Vite server; a build is hosted by the Zerocade server
-// itself, under /overlay/ on the same origin as this dashboard.
+export const overlayKey = room.key
+
+// An overlay hosted on another origin can't ask this server for the room, so its link
+// names it. Otherwise the link is the server's own, the same for every game.
 const OVERLAY_ORIGIN: string | undefined = import.meta.env.VITE_OVERLAY_ORIGIN
-const overlayBase = OVERLAY_ORIGIN
+export const overlayUrl = OVERLAY_ORIGIN ? `${OVERLAY_ORIGIN}/?key=${overlayKey}` : room.overlayUrl
+
+// The dashboard's own preview of the overlay, which stays silent (no text-to-speech). In dev
+// it is the overlay's Vite server, so changes show up live; a build is hosted by the
+// Zerocade server under /overlay/.
+const previewBase = OVERLAY_ORIGIN
   ? `${OVERLAY_ORIGIN}/`
   : import.meta.env.DEV
     ? 'http://localhost:5174/'
     : `${window.location.origin}/overlay/`
-
-export const overlayUrl = `${overlayBase}?key=${overlayKey}`
-
-// The dashboard's own preview of the overlay, which stays silent (no text-to-speech).
-export const previewUrl = `${overlayUrl}&preview=1`
+export const previewUrl = `${previewBase}?key=${overlayKey}&preview=1`

@@ -7,19 +7,23 @@ import helmet from '@fastify/helmet'
 import fastifyStatic from '@fastify/static'
 import { Server } from 'socket.io'
 import {
+  BACKGROUND_GAMES,
   GAMES,
-  bivioBackgroundPath,
+  backgroundPath,
   isValidKey,
   padFilePath,
   triggersFor,
+  type BackgroundGame,
   type ClientToServerEvents,
   type Feed,
   type FeedCreator,
   type HandshakeAuth,
   type LiveEvent,
+  type RoomInfo,
   type ServerToClientEvents,
 } from '@zerocade/shared'
 import { BivioRooms, bivioCsv, bivioStats } from './bivio.js'
+import { IncastroRooms } from './incastro.js'
 import {
   dataDir,
   getPad,
@@ -30,6 +34,7 @@ import {
   recentCreators,
   recordEvent,
   recordGift,
+  roomKey,
   setPadVolume,
   topGiftSince,
   touchCreator,
@@ -42,6 +47,8 @@ import {
   sanitizeBivioCommand,
   sanitizeDj,
   sanitizeEvent,
+  sanitizeIncastroCommand,
+  sanitizeLevel,
   sanitizeMessage,
   sanitizeScene,
   sanitizeSettings,
@@ -74,7 +81,16 @@ await app.register(helmet, {
   },
 })
 
+// Only pages that reach this PC by its own name get an answer. A website that points one of
+// its names at 127.0.0.1 (DNS rebinding) would otherwise be same-origin with Zerocade and
+// could read the room key.
+const LOCAL_HOST = /^(localhost|127\.0\.0\.1|\[::1\])(:\d+)?$/
+app.addHook('onRequest', async (req, reply) => {
+  if (!LOCAL_HOST.test(req.headers.host ?? '')) return reply.code(403).send({ error: 'forbidden' })
+})
+
 app.get('/api/health', async () => ({ ok: true }))
+app.get('/api/room', async (): Promise<RoomInfo> => ({ key: roomKey, overlayUrl: `${LOCAL_URL}overlay/` }))
 app.get('/api/games', async () => GAMES)
 app.get('/api/content', async () => getContent())
 app.get('/api/events', async (req) => {
@@ -95,31 +111,39 @@ app.get('/api/bivio/export.csv', async (_req, reply) => {
     .send(bivioCsv())
 })
 
-// Bivio background image: one per overlay key, stored in the data folder next to the
-// databases. No SVG, which could carry scripts.
+// Background images (Bivio, Incastro): one per game and overlay key, stored in the data
+// folder next to the databases. No SVG, which could carry scripts.
 const BACKGROUND_TYPES: Record<string, string> = { 'image/png': 'png', 'image/jpeg': 'jpg', 'image/webp': 'webp', 'image/gif': 'gif' }
 const backgroundsDir = join(dataDir, 'backgrounds')
-const backgroundFile = (key: string, ext: string) => join(backgroundsDir, `${key}.${ext}`)
+// Bivio's files keep the name they had before other games could have one.
+const backgroundFile = (game: BackgroundGame, key: string, ext: string) =>
+  join(backgroundsDir, game === 'bivio' ? `${key}.${ext}` : `${game}-${key}.${ext}`)
+const backgroundGame = (raw: string) => BACKGROUND_GAMES.find((g) => g === raw)
 app.addContentTypeParser(Object.keys(BACKGROUND_TYPES), { parseAs: 'buffer', bodyLimit: 8 * 1024 * 1024 }, (_req, body, done) =>
   done(null, body),
 )
-app.post('/api/bivio/background/:key', async (req, reply) => {
-  const { key } = req.params as { key: string }
+app.post('/api/:game/background/:key', async (req, reply) => {
+  const params = req.params as { game: string; key: string }
+  const { key } = params
+  const game = backgroundGame(params.game)
   const ext = BACKGROUND_TYPES[String(req.headers['content-type']).split(';')[0].trim()]
-  if (!isValidKey(key) || !ext || !Buffer.isBuffer(req.body)) return reply.code(400).send({ error: 'bad request' })
+  if (!game || !isValidKey(key) || !ext || !Buffer.isBuffer(req.body)) return reply.code(400).send({ error: 'bad request' })
   mkdirSync(backgroundsDir, { recursive: true })
-  for (const old of Object.values(BACKGROUND_TYPES)) rmSync(backgroundFile(key, old), { force: true })
-  writeFileSync(backgroundFile(key, ext), req.body)
+  for (const old of Object.values(BACKGROUND_TYPES)) rmSync(backgroundFile(game, key, old), { force: true })
+  writeFileSync(backgroundFile(game, key, ext), req.body)
   // The version busts the overlay's cached copy when the image is replaced.
-  return { url: `${bivioBackgroundPath(key)}?v=${Date.now()}` }
+  return { url: `${backgroundPath(game, key)}?v=${Date.now()}` }
 })
-app.get('/api/bivio/background/:key', async (req, reply) => {
-  const { key } = req.params as { key: string }
-  const found = isValidKey(key)
-    ? Object.entries(BACKGROUND_TYPES).find(([, ext]) => existsSync(backgroundFile(key, ext)))
-    : undefined
-  if (!found) return reply.code(404).send({ error: 'not found' })
-  return reply.header('content-type', found[0]).send(readFileSync(backgroundFile(key, found[1])))
+app.get('/api/:game/background/:key', async (req, reply) => {
+  const params = req.params as { game: string; key: string }
+  const { key } = params
+  const game = backgroundGame(params.game)
+  const found =
+    game && isValidKey(key)
+      ? Object.entries(BACKGROUND_TYPES).find(([, ext]) => existsSync(backgroundFile(game, key, ext)))
+      : undefined
+  if (!game || !found) return reply.code(404).send({ error: 'not found' })
+  return reply.header('content-type', found[0]).send(readFileSync(backgroundFile(game, key, found[1])))
 })
 
 // Pads: a new or edited pad arrives as JSON, with any uploaded file inside as base64.
@@ -170,19 +194,32 @@ if (dashboardDir) {
 }
 
 // The client bundle comes from Vite, so Socket.IO does not need to serve its own.
-const io = new Server<ClientToServerEvents, ServerToClientEvents>(app.server, { path: '/socket.io', serveClient: false })
+// The same local-only rule as the HTTP routes, checked before the socket's handshake.
+const io = new Server<ClientToServerEvents, ServerToClientEvents>(app.server, {
+  path: '/socket.io',
+  serveClient: false,
+  allowRequest: (req, callback) => callback(null, LOCAL_HOST.test(req.headers.host ?? '')),
+})
 
 const bivio = new BivioRooms((key, state) => io.to(key).emit('bivio:state', state))
 
+// Incastro's solution goes to the dashboards only, which also join `<key>#dashboard`.
+const dashboardRoom = (key: string) => `${key}#dashboard`
+const incastro = new IncastroRooms(
+  (key, state) => io.to(key).emit('incastro:state', state),
+  (key, solution) => io.to(dashboardRoom(key)).emit('incastro:solution', solution),
+)
+
 // Persist + relay every live event (simulated or real), and keep the gifters ranking.
-// Bivio runs on the server, so its triggers are applied here rather than in the overlay.
-// `creator` is the live feed the event came from ('tiktok:<username>'), '' when simulated.
+// Bivio and Incastro run on the server, so their triggers are applied here rather than in
+// the overlay. `creator` is the live feed the event came from ('tiktok:<username>'), ''
+// when simulated.
 function broadcastEvent(key: string, event: LiveEvent, creator = '') {
   recordEvent(key, event)
   if (event.type === 'gift') recordGift(key, creator, getSession(key).gameId, event)
   io.to(key).emit('live:event', event)
   if (event.type === 'gift') io.to(key).emit('ranking:update', getRanking(key))
-  const room = bivio.get(key)
+  const room = bivio.get(key) ?? incastro.get(key)
   if (room) for (const t of triggersFor(getSession(key).triggers, event)) room.action(t.action, event)
 }
 
@@ -238,14 +275,20 @@ io.on('connection', (socket) => {
   const session = getSession(key)
   socket.emit('session:state', session)
   if (session.gameId === 'bivio') socket.emit('bivio:state', bivio.open(key, session.settings))
+  if (session.gameId === 'incastro') socket.emit('incastro:state', incastro.open(key, session.settings))
 
   socket.on('disconnect', () => {
-    if (!io.sockets.adapter.rooms.get(key)?.size) bivio.get(key)?.suspend()
+    if (io.sockets.adapter.rooms.get(key)?.size) return
+    bivio.get(key)?.suspend()
+    incastro.get(key)?.suspend()
   })
 
   // Overlays only listen; everything that changes state comes from the dashboard.
   if (clientType !== 'dashboard') return
 
+  void socket.join(dashboardRoom(key))
+  const words = incastro.get(key)
+  if (words) socket.emit('incastro:solution', words.solution())
   socket.emit('ranking:update', getRanking(key))
   socket.emit('pads:state', padBoard(key))
   for (const status of roomSources(key).statuses()) socket.emit('source:status', status)
@@ -268,9 +311,12 @@ io.on('connection', (socket) => {
     const state = selectGame(key, gameId)
     if (!state) return
     io.to(key).emit('session:state', state)
-    // Selecting Bivio again starts a fresh round.
+    // Selecting Bivio again starts a fresh round; Incastro picks up its saved level with
+    // a fresh leaderboard.
     bivio.close(key)
+    incastro.close(key)
     if (state.gameId === 'bivio') bivio.open(key, state.settings)
+    if (state.gameId === 'incastro') incastro.open(key, state.settings)
   })
 
   socket.on('triggers:set', (raw: unknown) => {
@@ -286,11 +332,22 @@ io.on('connection', (socket) => {
     if (!settings) return
     io.to(key).emit('session:state', setSettings(key, settings))
     bivio.get(key)?.applySettings(settings)
+    incastro.get(key)?.applySettings(settings)
   })
 
   socket.on('bivio:control', (raw: unknown) => {
     const command = sanitizeBivioCommand(raw)
     if (command) bivio.get(key)?.control(command)
+  })
+
+  socket.on('incastro:control', (raw: unknown) => {
+    const command = sanitizeIncastroCommand(raw)
+    if (command) incastro.get(key)?.control(command)
+  })
+
+  socket.on('incastro:goto', (raw: unknown) => {
+    const level = sanitizeLevel(raw)
+    if (level) incastro.get(key)?.goto(level)
   })
 
   socket.on('message:send', (raw: unknown) => {

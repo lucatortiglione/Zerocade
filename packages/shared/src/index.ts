@@ -264,8 +264,13 @@ export type BivioCommand = 'next' | 'reveal' | 'extra-time' | 'pause' | 'resume'
 // game's own artwork instead of flat colours.
 export const BIVIO_DEFAULT_COLORS = { a: '#2dd4bf', b: '#a78bfa', accent: '#ffffff', text: '#ffffff', background: '#0b0c18' }
 
-// Path the server hosts a room's uploaded Bivio background at.
-export const bivioBackgroundPath = (key: string) => `/api/bivio/background/${key}`
+// Games whose look can take an uploaded background image (an 'image' setting).
+export const BACKGROUND_GAMES = ['bivio', 'incastro'] as const
+export type BackgroundGame = (typeof BACKGROUND_GAMES)[number]
+
+// Path the server hosts a room's uploaded background at, for one of those games.
+export const backgroundPath = (game: BackgroundGame, key: string) => `/api/${game}/background/${key}`
+export const bivioBackgroundPath = (key: string) => backgroundPath('bivio', key)
 
 export interface BivioQuestionStats {
   id: string
@@ -281,6 +286,107 @@ export interface BivioStats {
   totalVotes: number
   questions: BivioQuestionStats[]
 }
+
+// --- Incastro (letter wheel and crossword) ---
+// Server-driven like Bivio: the server holds the level, checks the words typed in chat
+// and saves how far each overlay key has got. Levels, chapters and artwork come from
+// gioco-parole/ (generated from a free Italian dictionary by its tools/). Italian only.
+
+export interface IncastroPlayer {
+  id: string
+  nickname: string
+  avatar?: string
+}
+
+export interface IncastroScore extends IncastroPlayer {
+  points: number
+  words: number
+}
+
+export interface IncastroWord {
+  r: number
+  c: number
+  d: 'H' | 'V'
+  length: number
+  // Null until the word is on the board: found by a viewer (`by`), completed by hints
+  // (`by` null), or shown in grey when the time ran out (`missed`).
+  text: string | null
+  by: IncastroPlayer | null
+  missed: boolean
+}
+
+// What just happened, for the overlay's animations and feed; `seq` grows with each one.
+export type IncastroMoment = { seq: number } & (
+  | { kind: 'found'; word: string; by: IncastroPlayer; points: number; full: boolean }
+  | { kind: 'extra'; word: string; by: IncastroPlayer; points: number }
+  | { kind: 'repeat'; word: string; by: IncastroPlayer }
+  | { kind: 'hint'; by: IncastroPlayer | null }
+  | { kind: 'reveal'; word: string; by: IncastroPlayer | null }
+  | { kind: 'shuffle'; by: IncastroPlayer | null }
+)
+
+export interface IncastroChapter {
+  id: number
+  name: string
+  accent: string
+  // File name in gioco-parole/assets/backgrounds.
+  background: string
+  levelInChapter: number
+  size: number
+}
+
+export interface IncastroState {
+  // 'complete' is the summary between levels; 'empty' when no levels were found.
+  phase: 'playing' | 'complete' | 'empty'
+  paused: boolean
+  level: number
+  levelCount: number
+  chapter: IncastroChapter
+  // The wheel in its current order; `shuffles` counts this level's shuffles.
+  letters: string
+  shuffles: number
+  rows: number
+  cols: number
+  // One string per row: '.' no cell, '_' hidden, lower case shown by a hint, upper case
+  // found (or missed: see the words).
+  grid: string[]
+  words: IncastroWord[]
+  extrasFound: number
+  extrasTotal: number
+  // Newest first.
+  moments: IncastroMoment[]
+  // This live (since the game was picked), and this level only.
+  scores: IncastroScore[]
+  levelScores: IncastroScore[]
+  // Level timer while playing (0 = no limit), summary countdown when complete.
+  remainingMs: number
+  durationMs: number
+  // Until the next automatic hint; 0 when off or not playing.
+  hintInMs: number
+  timeUp: boolean
+  // The level just finished closed its chapter: the garden grows.
+  chapterDone: boolean
+}
+
+// Sent to the dashboard only, for the control column and the simulator.
+export interface IncastroSolution {
+  level: number
+  words: string[]
+  extras: string[]
+}
+
+export type IncastroCommand =
+  | 'next'
+  | 'prev'
+  | 'hint'
+  | 'reveal-word'
+  | 'shuffle'
+  | 'extra-time'
+  | 'pause'
+  | 'resume'
+  | 'replay'
+  | 'restart'
+  | 'clear-scores'
 
 export const GAMES: GameDef[] = [
   {
@@ -1142,6 +1248,90 @@ export const GAMES: GameDef[] = [
     ],
     defaultTriggers: [{ source: { type: 'comment' }, action: 'vote' }],
   },
+  {
+    id: 'incastro',
+    name: 'Incastro',
+    category: 'Parole',
+    description:
+      'Ruota di lettere e schema a incastro: il pubblico scrive in chat le parole che trova. 600 livelli in 30 capitoli, e il giardino cresce.',
+    emoji: '🌱',
+    gradient: ['#8bd17c', '#1f5f3a'],
+    actions: [
+      { id: 'guess', label: 'Parola' },
+      { id: 'hint', label: 'Rivela una lettera' },
+      { id: 'reveal_word', label: 'Rivela una parola' },
+      { id: 'shuffle', label: 'Mescola la ruota' },
+      { id: 'extra_time', label: 'Tempo extra' },
+    ],
+    settings: [
+      {
+        id: 'autoHints',
+        label: 'Aiuti automatici',
+        hint: 'Se nessuno trova una parola per un po’, si rivela una lettera da sola.',
+        kind: 'toggle',
+        default: true,
+      },
+      { id: 'hintSeconds', label: 'Secondi senza parole prima di un aiuto', kind: 'number', min: 10, max: 180, step: 5, default: 30 },
+      {
+        id: 'giftHints',
+        label: 'Aiuti dai trigger per livello',
+        hint: 'Quante lettere o parole possono rivelare regali e trigger in un livello, al massimo una ogni 2 secondi.',
+        kind: 'number',
+        min: 0,
+        max: 30,
+        step: 1,
+        default: 6,
+      },
+      {
+        id: 'levelSeconds',
+        label: 'Secondi per livello',
+        hint: '0 = senza limite. Allo scadere le parole mancanti compaiono in grigio e si passa oltre.',
+        kind: 'number',
+        min: 0,
+        max: 900,
+        step: 10,
+        default: 0,
+      },
+      { id: 'completeSeconds', label: 'Secondi sul riepilogo', kind: 'number', min: 3, max: 30, step: 1, default: 8 },
+      { id: 'autoNext', label: 'Avanza da solo', kind: 'toggle', default: true },
+      {
+        id: 'extras',
+        label: 'Accetta parole extra',
+        hint: 'Parole valide che non sono nello schema: 1 punto ciascuna.',
+        kind: 'toggle',
+        default: true,
+      },
+      { id: 'showLeaderboard', label: 'Classifica', kind: 'toggle', default: true },
+      {
+        id: 'sounds',
+        label: 'Suoni del gioco',
+        hint: 'Suoni sintetizzati nell’overlay; l’anteprima della dashboard resta muta.',
+        kind: 'toggle',
+        default: true,
+      },
+      {
+        id: 'background',
+        label: 'Sfondo',
+        group: 'Aspetto',
+        kind: 'select',
+        default: 'garden',
+        options: [
+          { value: 'garden', label: 'Il giardino del capitolo' },
+          { value: 'color', label: 'Colore' },
+          { value: 'transparent', label: 'Trasparente' },
+          { value: 'image', label: 'Immagine caricata' },
+        ],
+      },
+      { id: 'bgColor', label: 'Colore', group: 'Aspetto', kind: 'color', default: '#173b2c' },
+      { id: 'bgImage', label: 'Immagine', group: 'Aspetto', kind: 'image', default: '' },
+    ],
+    defaultTriggers: [
+      { source: { type: 'comment' }, action: 'guess' },
+      { source: { type: 'gift', giftId: 'rose' }, action: 'hint' },
+      { source: { type: 'gift', giftId: 'donut' }, action: 'reveal_word' },
+      { source: { type: 'share' }, action: 'shuffle' },
+    ],
+  },
 ]
 
 
@@ -1313,6 +1503,9 @@ export interface ServerToClientEvents {
   'source:status': (status: SourceStatus) => void
   'ranking:update': (ranking: Gifter[]) => void
   'bivio:state': (state: BivioState) => void
+  'incastro:state': (state: IncastroState) => void
+  // Dashboards only.
+  'incastro:solution': (solution: IncastroSolution) => void
   // A short text the creator shows on the overlay ("Invia messaggio").
   'overlay:message': (text: string) => void
   'pads:state': (board: PadBoard) => void
@@ -1331,6 +1524,8 @@ export interface ClientToServerEvents {
   'source:disconnect': (kind: SourceKind) => void
   'scene:set': (scene: Partial<WidgetConfig>) => void
   'bivio:control': (command: BivioCommand) => void
+  'incastro:control': (command: IncastroCommand) => void
+  'incastro:goto': (level: number) => void
   'message:send': (text: string) => void
   'pad:play': (id: string) => void
   'pad:stop': () => void
@@ -1347,3 +1542,10 @@ export interface HandshakeAuth {
 
 export const isValidKey = (key: unknown): key is string =>
   typeof key === 'string' && /^[A-Za-z0-9-]{8,64}$/.test(key)
+
+// GET /api/room: this Zerocade's room, and the one overlay link to give OBS or TikTok LIVE
+// Studio. The link carries no key: the overlay asks for the room the same way.
+export interface RoomInfo {
+  key: string
+  overlayUrl: string
+}

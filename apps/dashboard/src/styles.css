@@ -412,7 +412,6 @@ select:focus, input[type='text']:focus { border-color: var(--accent); outline: n
 .setup h1 { font-size: 26px; letter-spacing: -0.02em; }
 .url-box { display: flex; gap: 8px; }
 .url-box input { flex: 1; font-family: ui-monospace, 'Cascadia Mono', 'Consolas', monospace; }
-.setup__warning { color: var(--warning); font-size: 13px; }
 
 /* Live settings */
 .settings { display: flex; flex-direction: column; gap: 12px; }
@@ -937,3 +936,8 @@ input[type='number']:focus { border-color: var(--accent); outline: none; }
   text-overflow: ellipsis;
 }
 .top-gift__name { overflow: hidden; font-size: 16px; font-weight: 800; text-overflow: ellipsis; white-space: nowrap; }
+
+/* Incastro: words still to find in the solution list, and the extras. */
+.inc-open { color: var(--text-muted); }
+.inc-extras summary { cursor: pointer; }
+.inc-extras p { margin-top: 6px; line-height: 1.5; overflow-wrap: anywhere; }

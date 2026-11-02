@@ -5,6 +5,7 @@ import { createGame } from './games/registry'
 import { useOverlay } from './store'
 import { Widgets } from './Widgets'
 import { Bivio } from './Bivio'
+import { Incastro } from './Incastro'
 import { isContentReady, loadContent, subscribeContent } from './content'
 
 interface Toast {
@@ -64,8 +65,9 @@ export function App() {
       for (const t of triggersFor(session.triggers, event)) engineRef.current?.pushAction(t.action, event)
     }
     // Bivio has no room for toasts over its title: votes show as bubbles, and gifts,
-    // likes and follows can still use the Avvisi widget.
-    if (session.gameId === 'bivio') return
+    // likes and follows can still use the Avvisi widget. In Incastro every comment is a
+    // guess: the words found have their own feed.
+    if (session.gameId === 'bivio' || session.gameId === 'incastro') return
     const id = Date.now() + Math.random()
     setToasts((prev) => [...prev.slice(-4), { id, text: describeEvent(event) }])
     // Not cleared when the next event arrives: every toast removes itself.
@@ -78,6 +80,7 @@ export function App() {
     <div className="overlay">
       <canvas ref={canvasRef} className="overlay__canvas" />
       {session?.gameId === 'bivio' && <Bivio />}
+      {session?.gameId === 'incastro' && <Incastro />}
       <header className="overlay__top">
         <span className="overlay__brand">{game?.emoji ?? '🎮'}</span>
         <span className="overlay__title">{game?.name ?? 'Zerocade'}</span>

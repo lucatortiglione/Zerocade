@@ -1,5 +1,13 @@
 import { useSyncExternalStore } from 'react'
-import { giftById, type BivioState, type GifShow, type Gifter, type LiveEvent, type SessionState } from '@zerocade/shared'
+import {
+  giftById,
+  type BivioState,
+  type GifShow,
+  type Gifter,
+  type IncastroState,
+  type LiveEvent,
+  type SessionState,
+} from '@zerocade/shared'
 import { socket } from './socket'
 import { playSound, stopSounds } from './audio'
 
@@ -14,6 +22,9 @@ interface OverlayState {
   bivio: BivioState | null
   // performance.now() when `bivio` arrived, to count its remainingMs down locally.
   bivioAt: number
+  incastro: IncastroState | null
+  // performance.now() when `incastro` arrived, for its timers.
+  incastroAt: number
   // The creator's latest message, shown for a few seconds; messageSeq keys each one.
   message: string | null
   messageSeq: number
@@ -32,6 +43,8 @@ let state: OverlayState = {
   totalCoins: 0,
   bivio: null,
   bivioAt: 0,
+  incastro: null,
+  incastroAt: 0,
   message: null,
   messageSeq: 0,
   gif: null,
@@ -60,6 +73,7 @@ socket.on('dj:stop', () => {
   update({ gif: null })
 })
 socket.on('bivio:state', (bivio) => update({ bivio, bivioAt: performance.now() }))
+socket.on('incastro:state', (incastro) => update({ incastro, incastroAt: performance.now() }))
 
 const MESSAGE_MS = 8000
 socket.on('overlay:message', (message) => {

@@ -1,3 +1,4 @@
+import { randomUUID } from 'node:crypto'
 import { mkdirSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -98,6 +99,15 @@ db.exec(`
     last_live INTEGER NOT NULL,
     PRIMARY KEY (kind, username)
   );
+  CREATE TABLE IF NOT EXISTS incastro_progress (
+    key TEXT PRIMARY KEY,
+    level INTEGER NOT NULL,
+    updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+  );
+  CREATE TABLE IF NOT EXISTS meta (
+    name TEXT PRIMARY KEY,
+    value TEXT NOT NULL
+  );
 `)
 
 // Migrate databases created before the widgets/goal columns existed.
@@ -111,6 +121,26 @@ try {
 } catch {
   // column already present on fresh schema
 }
+
+// --- Room ---
+// This Zerocade's one room: the dashboard, the overlay link and every game use its key,
+// whatever browser opens them. A database from before keys were kept here carries on with
+// the room it was used with most (the key with the most events); a new one gets a fresh key.
+
+function loadRoomKey(): string {
+  const saved = db.prepare("SELECT value FROM meta WHERE name = 'room_key'").get() as { value: string } | undefined
+  if (saved) return saved.value
+  const busiest = db
+    .prepare(
+      'SELECT s.key FROM sessions s LEFT JOIN events e ON e.key = s.key GROUP BY s.key ORDER BY count(e.id) DESC, s.updated_at DESC LIMIT 1',
+    )
+    .get() as { key: string } | undefined
+  const key = busiest?.key ?? randomUUID()
+  db.prepare("INSERT INTO meta (name, value) VALUES ('room_key', ?)").run(key)
+  return key
+}
+
+export const roomKey = loadRoomKey()
 
 // --- Sessions ---
 
@@ -229,6 +259,22 @@ export const recordBivioVote = (v: BivioVote): void => {
 export const bivioTotals = (questionId: string): BivioTally => bivioQuestionTotals.get(questionId) as BivioTally
 
 export const bivioTotalsByQuestion = (): BivioTotalsRow[] => bivioAllTotals.all() as unknown as BivioTotalsRow[]
+
+// --- Incastro progress ---
+// The level each overlay key is on, so the next live starts where this one stopped.
+
+const incastroLevelGet = db.prepare('SELECT level FROM incastro_progress WHERE key = ?')
+const incastroLevelSet = db.prepare(`
+  INSERT INTO incastro_progress (key, level) VALUES (?, ?)
+  ON CONFLICT(key) DO UPDATE SET level = excluded.level, updated_at = datetime('now')
+`)
+
+export const incastroLevel = (key: string): number | undefined =>
+  (incastroLevelGet.get(key) as { level: number } | undefined)?.level
+
+export const saveIncastroLevel = (key: string, level: number): void => {
+  incastroLevelSet.run(key, level)
+}
 
 // --- Pads ---
 // A key gets a pad_boards row the first time its board is read, so a board emptied on

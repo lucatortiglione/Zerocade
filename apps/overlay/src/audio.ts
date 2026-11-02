@@ -95,6 +95,45 @@ export function playSound(play: DjPlay) {
   builtin(sound.id)
 }
 
+// Incastro's sounds, also synthesized. A found word climbs a major scale, one note per
+// letter, the way the line crosses the wheel; an extra word is a lighter two-note chime.
+const SCALE = [523.25, 587.33, 659.25, 698.46, 783.99, 880, 987.77, 1046.5]
+export type GameSound = 'found' | 'extra' | 'repeat' | 'hint' | 'shuffle' | 'complete' | 'chapter'
+
+export function gameSound(kind: GameSound, letters = 3) {
+  try {
+    switch (kind) {
+      case 'found':
+        for (let i = 0; i < Math.min(letters, SCALE.length); i++) tone(SCALE[i], 0.16, 'triangle', 0.13, i * 0.08)
+        tone(SCALE[Math.min(letters, SCALE.length) - 1] * 2, 0.35, 'sine', 0.08, letters * 0.08)
+        break
+      case 'extra':
+        tone(783.99, 0.12, 'sine', 0.12)
+        tone(1174.66, 0.22, 'sine', 0.1, 0.09)
+        break
+      case 'repeat':
+        tone(330, 0.12, 'triangle', 0.08)
+        break
+      case 'hint':
+        tone(1318.5, 0.1, 'sine', 0.08)
+        tone(1760, 0.18, 'sine', 0.07, 0.07)
+        break
+      case 'shuffle':
+        for (let i = 0; i < 4; i++) tone(440 + i * 90, 0.06, 'triangle', 0.06, i * 0.04)
+        break
+      case 'complete':
+        ;[523.25, 659.25, 783.99, 1046.5].forEach((f, i) => tone(f, 0.3, 'triangle', 0.12, i * 0.11))
+        break
+      case 'chapter':
+        ;[523.25, 659.25, 783.99, 1046.5, 1318.5].forEach((f, i) => tone(f, 0.45, 'triangle', 0.12, i * 0.13))
+        tone(261.63, 1.1, 'sine', 0.1, 0.5)
+        break
+    }
+  } catch {
+    // No audio device, or the browser source has not allowed sound yet.
+  }
+}
+
 export function stopSounds() {
   for (const a of playing) a.pause()
   playing.clear()

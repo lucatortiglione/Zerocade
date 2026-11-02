@@ -1,5 +1,14 @@
 import { useSyncExternalStore } from 'react'
-import { type BivioState, type Gifter, type PadBoard, type SessionState, type SourceKind, type SourceStatus } from '@zerocade/shared'
+import {
+  type BivioState,
+  type Gifter,
+  type IncastroSolution,
+  type IncastroState,
+  type PadBoard,
+  type SessionState,
+  type SourceKind,
+  type SourceStatus,
+} from '@zerocade/shared'
 import { socket } from './socket'
 
 // A small external store fed by the socket; components read it with useDashboard().
@@ -10,10 +19,21 @@ interface DashboardState {
   gifters: Gifter[]
   sources: Partial<Record<SourceKind, SourceStatus>>
   bivio: BivioState | null
+  incastro: IncastroState | null
+  incastroSolution: IncastroSolution | null
   pads: PadBoard | null
 }
 
-let state: DashboardState = { connected: false, session: null, gifters: [], sources: {}, bivio: null, pads: null }
+let state: DashboardState = {
+  connected: false,
+  session: null,
+  gifters: [],
+  sources: {},
+  bivio: null,
+  incastro: null,
+  incastroSolution: null,
+  pads: null,
+}
 const listeners = new Set<() => void>()
 
 function update(patch: Partial<DashboardState>) {
@@ -29,6 +49,8 @@ socket.on('source:status', (status) => {
   update({ sources: { ...state.sources, [status.kind]: status } })
 })
 socket.on('bivio:state', (bivio) => update({ bivio }))
+socket.on('incastro:state', (incastro) => update({ incastro }))
+socket.on('incastro:solution', (incastroSolution) => update({ incastroSolution }))
 socket.on('pads:state', (pads) => update({ pads }))
 
 function subscribe(listener: () => void) {

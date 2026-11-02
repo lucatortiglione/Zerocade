@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Incastro · sfondi dei capitoli</title>
+<style>
+  :root { color-scheme: dark; font-family: system-ui, sans-serif; }
+  body { margin: 0; padding: 24px; background: #101219; color: #eef0f4; }
+  h1 { margin: 0 0 4px; font-size: 22px; }
+  p { margin: 0 0 20px; color: #a6abb8; font-size: 14px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 16px; }
+  figure { margin: 0; }
+  img { width: 100%; aspect-ratio: 9 / 16; display: block; border-radius: 10px; background: #222; }
+  figcaption { margin-top: 6px; font-size: 13px; }
+  figcaption span { color: #a6abb8; }
+</style>
+</head>
+<body>
+<h1>Incastro · il giardino che cresce</h1>
+<p>Uno sfondo per capitolo (20 livelli ciascuno), 1080 × 1920. Rigenerare con <code>python tools/make_backgrounds.py</code>.</p>
+<div class="grid" id="grid"></div>
+<script>
+  fetch('../data/chapters.json')
+    .then((r) => r.json())
+    .then(({ chapters }) => {
+      document.getElementById('grid').innerHTML = chapters
+        .map((c) => `<figure><img src="backgrounds/${c.background}" alt=""><figcaption>${c.id}. ${c.it} <span>· ${c.en}</span></figcaption></figure>`)
+        .join('')
+    })
+    .catch(() => {
+      // Opened from disk, where fetch is blocked: list the files by number instead.
+      document.getElementById('grid').innerHTML = Array.from({ length: 30 }, (_, i) => {
+        const n = String(i + 1).padStart(2, '0')
+        return `<figure><img src="backgrounds/chapter_${n}.svg" alt=""><figcaption>${i + 1}</figcaption></figure>`
+      }).join('')
+    })
+</script>
+</body>
+</html>
