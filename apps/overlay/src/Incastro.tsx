@@ -73,23 +73,159 @@ const hex = (v: unknown, fallback: string) =>
 function backgroundOf(s: GameSettings, chapterBackground: string, photo: IncastroState['photo']) {
   const mode = typeof s.background === 'string' ? s.background : 'nasa'
   const image = typeof s.bgImage === 'string' ? s.bgImage : ''
-  if (mode === 'transparent') return { seeThrough: true, url: '', color: 'transparent', photo: false }
-  if (mode === 'color') return { seeThrough: false, url: '', color: hex(s.bgColor, '#173b2c'), photo: false }
-  if (mode === 'image' && image) return { seeThrough: false, url: image, color: '#173b2c', photo: false }
-  if (mode === 'nasa' && photo) return { seeThrough: false, url: photo.url, color: '#05080f', photo: true }
-  return { seeThrough: false, url: BACKGROUNDS[chapterBackground] ?? '', color: '#173b2c', photo: false }
+  const none = { seeThrough: false, url: '', photo: false, garden: false }
+  if (mode === 'transparent') return { ...none, seeThrough: true, color: 'transparent' }
+  if (mode === 'color') return { ...none, color: hex(s.bgColor, '#173b2c') }
+  if (mode === 'image' && image) return { ...none, url: image, color: '#173b2c' }
+  if (mode === 'nasa' && photo) return { ...none, url: photo.url, color: '#05080f', photo: true }
+  return { ...none, url: BACKGROUNDS[chapterBackground] ?? '', color: '#173b2c', garden: true }
 }
 
-// Downloads a picture ahead of time and holds on to it, so it is in the browser's cache
-// when it is shown.
-function usePreload(url: string | null) {
-  const held = useRef<HTMLImageElement | null>(null)
+// --- Colours from the picture ---
+
+// The game's colours, taken from the picture behind it. Its dominant hue tints the glass,
+// the slots and the wheel (`tint` is how much: 0 for a grey picture); its most vivid colour is
+// the accent of the found tiles, the chips and the line (null: the chapter's).
+interface Theme {
+  hue: number
+  tint: number
+  accent: string | null
+}
+
+const GREY: Theme = { hue: 155, tint: 0, accent: null }
+const clamp = (v: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, v))
+const accentOf = (chroma: number, hue: number) => `oklch(0.62 ${clamp(chroma * 1.6, 0.12, 0.19).toFixed(3)} ${hue.toFixed(1)})`
+
+// sRGB 0-255 -> OKLCH (lightness 0-1, chroma, hue in degrees): perceptual, so one lightness
+// gives the same contrast whatever the hue.
+const LINEAR = Array.from({ length: 256 }, (_, i) => (i <= 10 ? i / 255 / 12.92 : ((i / 255 + 0.055) / 1.055) ** 2.4))
+function oklch(r8: number, g8: number, b8: number): [number, number, number] {
+  const [r, g, b] = [LINEAR[r8], LINEAR[g8], LINEAR[b8]]
+  const l = Math.cbrt(0.4122214708 * r + 0.5363325363 * g + 0.0514459929 * b)
+  const m = Math.cbrt(0.2119034982 * r + 0.6806995451 * g + 0.1073969566 * b)
+  const s = Math.cbrt(0.0883024619 * r + 0.2817188376 * g + 0.6299787005 * b)
+  const A = 1.9779984951 * l - 2.428592205 * m + 0.4505937099 * s
+  const B = 0.0259040371 * l + 0.7827717662 * m - 0.808675766 * s
+  return [0.2104542553 * l + 0.793617785 * m - 0.0040720468 * s, Math.hypot(A, B), ((Math.atan2(B, A) * 180) / Math.PI + 360) % 360]
+}
+
+// The colour pixels in 24 bins of hue. The dominant hue has the most colour (chroma summed);
+// the accent is the most vivid colour (chroma squared) at least 60° away from it, so the
+// tiles stand out on the picture, unless that is much weaker than the most vivid overall.
+// Each bin counts with half its neighbours, so a hue split across two bins still wins.
+// Near-grey, near-black and near-white pixels say nothing about the hue.
+const BINS = 24
+const ACCENT_APART = 4
+const ACCENT_SHARE = 0.3
+function themeOfPixels(data: Uint8ClampedArray): Theme {
+  const bins = Array.from({ length: BINS }, () => ({ sum: 0, square: 0, x: 0, y: 0 }))
+  let pixels = 0
+  let coloured = 0
+  let chroma = 0
+  for (let i = 0; i < data.length; i += 4) {
+    if (data[i + 3] < 128) continue
+    pixels++
+    const [l, c, h] = oklch(data[i], data[i + 1], data[i + 2])
+    if (c < 0.03 || l < 0.18 || l > 0.96) continue
+    coloured++
+    chroma += c
+    const bin = bins[Math.floor(h / (360 / BINS)) % BINS]
+    bin.sum += c
+    bin.square += c * c
+    bin.x += Math.cos((h * Math.PI) / 180) * c
+    bin.y += Math.sin((h * Math.PI) / 180) * c
+  }
+  const share = pixels ? coloured / pixels : 0
+  const mean = coloured ? chroma / coloured : 0
+  if (share < 0.04 || mean < 0.04) return GREY
+  const near = (i: number) => [bins[(i + BINS - 1) % BINS], bins[i], bins[(i + 1) % BINS]]
+  const score = (i: number, key: 'sum' | 'square') => {
+    const [a, b, c] = near(i)
+    return a[key] / 2 + b[key] + c[key] / 2
+  }
+  const best = (key: 'sum' | 'square', allowed: (i: number) => boolean = () => true) => {
+    let top = -1
+    bins.forEach((_, i) => {
+      if (allowed(i) && (top < 0 || score(i, key) > score(top, key))) top = i
+    })
+    return top
+  }
+  const hueAt = (i: number) => {
+    const group = near(i)
+    const x = group.reduce((t, b) => t + b.x, 0)
+    const y = group.reduce((t, b) => t + b.y, 0)
+    return ((Math.atan2(y, x) * 180) / Math.PI + 360) % 360
+  }
+  const main = best('sum')
+  const vivid = best('square')
+  const apart = best('square', (i) => Math.min((i - main + BINS) % BINS, (main - i + BINS) % BINS) >= ACCENT_APART)
+  const accent = apart >= 0 && score(apart, 'square') >= ACCENT_SHARE * score(vivid, 'square') ? apart : vivid
+  const group = near(accent)
+  const accentChroma = group.reduce((t, b) => t + b.square, 0) / Math.max(1e-6, group.reduce((t, b) => t + b.sum, 0))
+  return {
+    hue: hueAt(main),
+    tint: clamp(mean * (0.4 + 0.6 * share), 0.012, 0.06),
+    accent: accentOf(accentChroma, hueAt(accent)),
+  }
+}
+
+// The part of the picture the scene shows (it covers the frame), 48 × 48 pixels of it.
+function themeOfImage(img: HTMLImageElement): Theme | null {
+  const size = 48
+  const canvas = document.createElement('canvas')
+  canvas.width = canvas.height = size
+  const ctx = canvas.getContext('2d', { willReadFrequently: true })
+  const w = img.naturalWidth
+  const h = img.naturalHeight
+  if (!ctx || !w || !h) return null
+  const frame = window.innerWidth / Math.max(1, window.innerHeight)
+  const [sw, sh] = w / h > frame ? [h * frame, h] : [w, w / frame]
+  ctx.drawImage(img, (w - sw) / 2, (h - sh) / 2, sw, sh, 0, 0, size, size)
+  try {
+    return themeOfPixels(ctx.getImageData(0, 0, size, size).data)
+  } catch {
+    // A picture from a site that does not allow reading it.
+    return null
+  }
+}
+
+function themeOfColor(hex: string): Theme {
+  const n = parseInt(hex.slice(1), 16)
+  const [, c, h] = oklch((n >> 16) & 255, (n >> 8) & 255, n & 255)
+  return c < 0.03 ? GREY : { hue: h, tint: clamp(c * 0.4, 0.012, 0.06), accent: accentOf(c, h) }
+}
+
+// Each picture is read once (null when it cannot be). Reading it also downloads it, so the
+// next level's picture is read ahead: it is in the browser's cache when it is shown.
+const themes = new Map<string, Promise<Theme | null>>()
+function themeOfPicture(url: string): Promise<Theme | null> {
+  let theme = themes.get(url)
+  if (!theme) {
+    theme = new Promise((resolve) => {
+      const img = new Image()
+      img.crossOrigin = 'anonymous'
+      img.onload = () => resolve(themeOfImage(img))
+      img.onerror = () => resolve(null)
+      img.src = url
+    })
+    themes.set(url, theme)
+  }
+  return theme
+}
+
+// The theme of the picture shown; the last one stays until the new picture is read (the
+// backdrop too keeps the old picture until the new one has loaded).
+function usePictureTheme(url: string): Theme | null {
+  const [theme, setTheme] = useState<Theme | null>(null)
   useEffect(() => {
-    if (!url) return
-    const img = new Image()
-    img.src = url
-    held.current = img
+    if (!url) return setTheme(null)
+    let current = true
+    void themeOfPicture(url).then((t) => current && setTheme(t))
+    return () => {
+      current = false
+    }
   }, [url])
+  return theme
 }
 
 // Counts a server duration down locally, ticking ten times a second.
@@ -234,7 +370,11 @@ function Game({ state, at, settings }: { state: IncastroState; at: number; setti
   const running = !state.paused && state.phase !== 'empty' && state.phase !== 'loading'
   const remaining = useCountdown(state.remainingMs, at, running)
   const hintIn = useCountdown(state.hintInMs, at, running && state.phase === 'playing')
-  usePreload(state.nextPhoto)
+  const pictureTheme = usePictureTheme(bg.url)
+  const theme = bg.seeThrough ? null : bg.url ? pictureTheme : themeOfColor(bg.color)
+  useEffect(() => {
+    if (state.nextPhoto) void themeOfPicture(state.nextPhoto)
+  }, [state.nextPhoto])
 
   // A transparent background has to reach the page itself for OBS to key it out.
   useEffect(() => {
@@ -257,7 +397,14 @@ function Game({ state, at, settings }: { state: IncastroState; at: number; setti
     phaseRef.current = state.phase
   }, [state.phase])
 
-  const style = { '--inc-accent': accent, backgroundColor: bg.color } as CSSProperties
+  // With no picture to read (see-through, or one that cannot be read) the stylesheet's
+  // green and the chapter's accent. The garden keeps its chapter's accent, chosen for it
+  // (its own dominant colour is always the grass).
+  const style = {
+    '--inc-accent': (!bg.garden && theme?.accent) || accent,
+    ...(theme && { '--inc-hue': theme.hue.toFixed(1), '--inc-tint': theme.tint.toFixed(3) }),
+    backgroundColor: bg.color,
+  } as CSSProperties
 
   // No grid yet: the level is being generated (a moment), or it cannot be.
   if (state.phase === 'empty' || state.phase === 'loading') {
