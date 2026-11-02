@@ -1,10 +1,22 @@
 import { useEffect, useState, type CSSProperties } from 'react'
-import { GAMES, TIER_COLORS, giftById, type Feed, type FeedCreator, type FeedGift, type GiftTier } from '@zerocade/shared'
+import {
+  GAMES,
+  TIER_COLORS,
+  giftById,
+  type EventOrigin,
+  type Feed,
+  type FeedCreator,
+  type FeedGift,
+  type GiftTier,
+  type Viewer,
+} from '@zerocade/shared'
+import { useDashboard, type FeedItem, type FeedMark } from '../store'
 import { Pads } from './Pads'
 import { Section } from './Section'
 
-// The right column of the Games page, the same for every game: the Sounds/GIFs pads, the
-// creators live on this Zerocade and the latest gifts they received.
+// The right column of the Games page, the same for every game: the chat and events of the
+// live, the Sounds/GIFs pads, the creators live on this Zerocade and the latest gifts they
+// received.
 
 const FEED_MS = 3000
 
@@ -63,10 +75,148 @@ export function LiveColumn() {
   const now = useNow()
   return (
     <aside className="panel right-panel side live-col">
+      <ChatFeed now={now} />
       <Pads />
       <Creators feed={feed} now={now} />
       <LatestGifts feed={feed} now={now} creator={creator} onCreator={setCreator} />
     </aside>
+  )
+}
+
+// --- Chat and events ---
+
+type ChatFilter = 'all' | 'chat' | 'events'
+
+const ORIGIN_LABELS: Record<EventOrigin, string> = { tiktok: 'TikTok', twitch: 'Twitch', sim: 'Sim' }
+
+const MARKS: Record<FeedMark, { icon: string; label: string }> = {
+  found: { icon: '✓', label: 'Parola trovata' },
+  extra: { icon: '★', label: 'Parola extra' },
+  secret: { icon: '🔒', label: 'Parola segreta' },
+  repeat: { icon: '↺', label: 'Parola già trovata' },
+}
+
+// Newest first. TikTok sends likes in small bursts: one viewer's likes in a row make one line.
+function chatRows(feed: FeedItem[], filter: ChatFilter): FeedItem[] {
+  const rows: FeedItem[] = []
+  for (const item of feed) {
+    const isChat = item.event.type === 'comment'
+    if ((filter === 'chat' && !isChat) || (filter === 'events' && isChat)) continue
+    const last = rows.at(-1)
+    if (
+      item.event.type === 'like' &&
+      last?.event.type === 'like' &&
+      last.origin === item.origin &&
+      last.event.user.id === item.event.user.id
+    ) {
+      rows[rows.length - 1] = { ...item, event: { ...item.event, count: last.event.count + item.event.count } }
+    } else rows.push(item)
+  }
+  return rows.reverse()
+}
+
+function ChatFeed({ now }: { now: number }) {
+  const { feed } = useDashboard()
+  const [filter, setFilter] = useState<ChatFilter>('all')
+  const rows = chatRows(feed, filter)
+  const tab = (id: ChatFilter, label: string) => (
+    <button type="button" role="tab" aria-selected={filter === id} className="mini-tabs__btn" onClick={() => setFilter(id)}>
+      {label}
+    </button>
+  )
+  return (
+    <Section
+      title="Chat ed eventi"
+      extra={
+        <span className="mini-tabs" role="tablist" aria-label="Chat ed eventi">
+          {tab('all', 'Tutto')}
+          {tab('chat', 'Chat')}
+          {tab('events', 'Eventi')}
+        </span>
+      }
+    >
+      {rows.length ? (
+        <ul className="feed-list chat-feed">
+          {rows.map((item) => (
+            <ChatRow key={item.seq} item={item} now={now} />
+          ))}
+        </ul>
+      ) : (
+        <p className="text-muted small">
+          {filter === 'events'
+            ? 'Nessun evento ancora.'
+            : 'I messaggi della chat TikTok e Twitch compaiono qui appena colleghi la diretta (o dal simulatore).'}
+        </p>
+      )}
+    </Section>
+  )
+}
+
+function eventText(item: FeedItem): { icon: string; text: string } | null {
+  const e = item.event
+  switch (e.type) {
+    case 'comment':
+      return null
+    case 'gift': {
+      const gift = giftById(e.giftId)
+      return { icon: gift?.emoji ?? '🎁', text: `${gift?.name ?? e.giftId}${e.count > 1 ? ` ×${e.count}` : ''}` }
+    }
+    case 'like':
+      return item.origin === 'twitch'
+        ? { icon: '💎', text: `${e.count} bit` }
+        : { icon: '❤️', text: `${e.count} like` }
+    case 'follow':
+      return { icon: '➕', text: 'ti segue' }
+    case 'share':
+      return { icon: '🔁', text: 'ha condiviso la diretta' }
+    case 'join':
+      return { icon: '👋', text: 'è entrato' }
+  }
+}
+
+function ChatRow({ item, now }: { item: FeedItem; now: number }) {
+  const e = item.event
+  const ev = eventText(item)
+  const mark = item.mark ? MARKS[item.mark] : null
+  return (
+    <li className={`chat-row${ev ? ' chat-row--event' : ''}`}>
+      <ChatAvatar user={e.user} />
+      <span className="chat-row__body">
+        <span className="chat-row__head">
+          <span className="chat-row__name">{e.user.nickname}</span>
+          <span className={`chat-row__origin chat-row__origin--${item.origin}`}>{ORIGIN_LABELS[item.origin]}</span>
+        </span>
+        {e.type === 'comment' ? (
+          <span className="chat-row__text">{e.text || <em className="text-muted">messaggio vuoto</em>}</span>
+        ) : (
+          ev && (
+            <span className="chat-row__text chat-row__text--event">
+              <span aria-hidden="true">{ev.icon}</span> {ev.text}
+            </span>
+          )
+        )}
+      </span>
+      <span className="chat-row__end">
+        {mark && (
+          <span className={`chat-row__mark chat-row__mark--${item.mark}`} title={mark.label} aria-label={mark.label}>
+            {mark.icon}
+          </span>
+        )}
+        <span className="text-muted" title={new Date(item.at).toLocaleTimeString()}>
+          {ago(now - item.at)}
+        </span>
+      </span>
+    </li>
+  )
+}
+
+function ChatAvatar({ user }: { user: Viewer }) {
+  const [broken, setBroken] = useState(false)
+  return (
+    <span className="chat-row__avatar" aria-hidden="true">
+      {user.nickname.charAt(0).toUpperCase()}
+      {user.avatar && !broken && <img src={user.avatar} alt="" referrerPolicy="no-referrer" onError={() => setBroken(true)} />}
+    </span>
   )
 }
 

@@ -8,6 +8,7 @@ import {
   type IncastroSolution,
   type IncastroState,
   type IncastroVariant,
+  type IncastroWord,
   type LiveEvent,
   type SessionState,
 } from '@zerocade/shared'
@@ -28,7 +29,8 @@ import { SettingField, SettingsForm } from './SettingsForm'
 import { TriggerEditor } from './TriggerEditor'
 
 // The Incastro (ZeroWords) control column: connection and simulator, stream widgets, the
-// level in progress with its solution, the live's leaderboard, triggers and game settings.
+// words of the level in progress, its controls, the live's leaderboard, triggers and game
+// settings.
 
 // The automatic letter and the automatic difficulty sit by the level's controls instead of
 // among the game settings.
@@ -62,12 +64,12 @@ export function IncastroSidebar({ session }: { session: SessionState }) {
         </button>
       </div>
 
-      <Section title="Info partita">
-        <GameInfo session={session} />
+      <Section title="Parole del round" extra={<FoundCount />}>
+        <RoundWords />
       </Section>
 
-      <Section title="Soluzione" open={false}>
-        <Solution />
+      <Section title="Info partita">
+        <GameInfo session={session} />
       </Section>
 
       <Section title="Classifica della live">
@@ -306,40 +308,84 @@ function GameInfo({ session }: { session: SessionState }) {
   )
 }
 
-// --- Soluzione ---
+// --- Parole del round ---
 
-function Solution() {
+// The solution of the level on screen (null while the next one is on its way).
+function useRound() {
   const { incastro, incastroSolution } = useDashboard()
-  if (!incastro || !incastroSolution || incastroSolution.level !== incastro.level) {
-    return <p className="text-muted small">In attesa del livello…</p>
+  return incastro && incastroSolution && incastroSolution.level === incastro.level ? { incastro, solution: incastroSolution } : null
+}
+
+function FoundCount() {
+  const round = useRound()
+  if (!round) return null
+  const found = round.incastro.words.filter((w) => w.text).length
+  return (
+    <span className="text-muted">
+      {found}/{round.incastro.words.length}
+    </span>
+  )
+}
+
+// A word as the chat sees it on the board: its letters already there (found in a crossing
+// word, or given by a hint), a dot for each one still hidden.
+function shownOf(state: IncastroState, w: IncastroWord): string {
+  let out = ''
+  for (let k = 0; k < w.length; k++) {
+    const ch = w.d === 'H' ? state.grid[w.r]?.[w.c + k] : state.grid[w.r + k]?.[w.c]
+    out += !ch || ch === '_' || ch === '.' ? '·' : ch.toUpperCase()
   }
+  return out
+}
+
+// The level's words, for the streamer to help the chat with: first the ones still to find,
+// shortest first, each with what the board already shows; then the ones found. Only the
+// dashboard gets them: the overlay never receives the solution.
+function RoundWords() {
+  const round = useRound()
+  if (!round) return <p className="text-muted small">In attesa del livello…</p>
+  const { incastro, solution } = round
+  const rows = solution.words.map((word, i) => ({ word, w: incastro.words[i] }))
+  const open = rows
+    .filter((r) => r.w && !r.w.text)
+    .sort((a, b) => a.word.length - b.word.length || a.word.localeCompare(b.word))
+  const done = rows.filter((r) => !r.w || r.w.text)
+  const secret = incastro.secret
   return (
     <>
-      <ol className="answers">
-        {incastroSolution.words.map((word, i) => {
-          const w = incastro.words[i]
-          const status = !w?.text ? 'da trovare' : w.missed ? 'mancata' : w.by ? w.by.nickname : 'con gli aiuti'
-          return (
-            <li key={word}>
-              <span className={`answers__text${w?.text ? '' : ' inc-open'}`}>{word}</span>
-              <span className="answers__num">{status}</span>
+      {open.length > 0 && (
+        <ul className="round-words">
+          {open.map(({ word, w }) => (
+            <li key={word} className="round-word">
+              <span className="round-word__word">{word}</span>
+              <span className="round-word__shown" title="Quello che il pubblico vede sullo schema">
+                {shownOf(incastro, w)}
+              </span>
             </li>
-          )
-        })}
-      </ol>
-      {incastroSolution.secret && (
-        <div className="info-row">
-          <span>Parola segreta</span>
-          <strong>
-            {incastroSolution.secret} · {incastro.secret?.by ? incastro.secret.by.nickname : 'da trovare'}
-          </strong>
+          ))}
+        </ul>
+      )}
+      {solution.secret && (
+        <div className={`round-word round-word--secret${secret?.word ? ' round-word--done' : ''}`}>
+          <span className="round-word__word">🔒 {solution.secret}</span>
+          <span className="round-word__who">{secret?.by ? secret.by.nickname : secret?.word ? 'nessuno' : 'parola segreta'}</span>
         </div>
       )}
+      {done.length > 0 && (
+        <ul className="round-words">
+          {done.map(({ word, w }) => (
+            <li key={word} className={`round-word round-word--done${w?.missed ? ' round-word--missed' : ''}`}>
+              <span className="round-word__word">{word}</span>
+              <span className="round-word__who">{w?.missed ? 'mancata' : w?.by ? w.by.nickname : 'con gli aiuti'}</span>
+            </li>
+          ))}
+        </ul>
+      )}
       <details className="inc-extras">
-        <summary className="text-muted small">{incastroSolution.extras.length} parole extra valide</summary>
-        <p className="small">{incastroSolution.extras.join(' · ') || '—'}</p>
+        <summary className="text-muted small">{solution.extras.length} parole extra valide</summary>
+        <p className="small">{solution.extras.filter((x) => x !== solution.secret).join(' · ') || '—'}</p>
       </details>
-      <p className="text-muted small">Qui soltanto: l’overlay non riceve mai la soluzione.</p>
+      <p className="text-muted small">Solo qui: l’overlay non riceve mai la soluzione.</p>
     </>
   )
 }

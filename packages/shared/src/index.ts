@@ -104,6 +104,38 @@ export interface SourceStatus {
 // The TikTok and Twitch names last entered for this room, kept for the next lives.
 export type SavedSources = Partial<Record<SourceKind, string>>
 
+// ZeroFollowerBot's event bridge: ZeroFollowerBot, on this PC, already reads the TikTok live (through Euler
+// Stream) and the Twitch chat, and repeats them on a local port; Zerocade listens there instead of opening its own
+// connections. The port is ZeroFollowerBot's (Account tab, "Zerocade").
+export const BRIDGE_DEFAULT_PORT = 8780
+
+export interface BridgeConfig {
+  enabled: boolean
+  port: number
+}
+
+export interface BridgeStatus extends BridgeConfig {
+  // 'connecting' also while ZeroFollowerBot is closed: Zerocade keeps trying.
+  state: 'off' | 'connecting' | 'connected'
+  // Why it is not connected, in the dashboard's language.
+  message?: string
+  // The accounts ZeroFollowerBot is reading now ('' = none).
+  tiktok: string
+  twitch: string
+}
+
+// Where a live event came from: a real feed, or the dashboard's simulator.
+export type EventOrigin = SourceKind | 'sim'
+
+// One line of the dashboard's chat and events box.
+export interface FeedEvent {
+  seq: number
+  // ms epoch.
+  at: number
+  origin: EventOrigin
+  event: LiveEvent
+}
+
 // Map a real TikTok gift (name + coins) onto our curated catalog: exact name match
 // first, otherwise the catalog gift with the closest coin amount.
 export function giftIdForTiktok(name: string, coins: number): string {
@@ -1567,6 +1599,10 @@ export interface ServerToClientEvents {
   'source:status': (status: SourceStatus) => void
   // Dashboards only.
   'source:saved': (saved: SavedSources) => void
+  // Dashboards only: the latest live events on connecting, then each new one.
+  'feed:events': (items: FeedEvent[]) => void
+  // Dashboards only.
+  'bridge:status': (status: BridgeStatus) => void
   'ranking:update': (ranking: Gifter[]) => void
   'bivio:state': (state: BivioState) => void
   'incastro:state': (state: IncastroState) => void
@@ -1588,6 +1624,7 @@ export interface ClientToServerEvents {
   'dj:play': (play: DjPlay) => void
   'source:connect': (config: SourceConfig) => void
   'source:disconnect': (kind: SourceKind) => void
+  'bridge:set': (config: BridgeConfig) => void
   'scene:set': (scene: Partial<WidgetConfig>) => void
   'bivio:control': (command: BivioCommand) => void
   'incastro:control': (command: IncastroCommand) => void

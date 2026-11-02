@@ -4,8 +4,10 @@ import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import Database from 'better-sqlite3'
 import {
+  BRIDGE_DEFAULT_PORT,
   giftById,
   type BivioChoice,
+  type BridgeConfig,
   type BivioTally,
   type FeedCreator,
   type FeedGift,
@@ -189,6 +191,30 @@ function loadRoomKey(): string {
 }
 
 export const roomKey = loadRoomKey()
+
+// --- ZeroFollowerBot's event bridge ---
+// Whether Zerocade listens to ZeroFollowerBot, and on which port: one setting for this Zerocade.
+
+const bridgeGet = db.prepare("SELECT value FROM meta WHERE name = 'zfb_bridge'")
+const bridgeSet = db.prepare(`
+  INSERT INTO meta (name, value) VALUES ('zfb_bridge', ?)
+  ON CONFLICT(name) DO UPDATE SET value = excluded.value
+`)
+
+export function bridgeConfig(): BridgeConfig {
+  const row = bridgeGet.get() as { value: string } | undefined
+  try {
+    const saved = row ? (JSON.parse(row.value) as Partial<BridgeConfig>) : {}
+    return {
+      enabled: saved.enabled === true,
+      port: Number.isInteger(saved.port) ? (saved.port as number) : BRIDGE_DEFAULT_PORT,
+    }
+  } catch {
+    return { enabled: false, port: BRIDGE_DEFAULT_PORT }
+  }
+}
+
+export const saveBridgeConfig = (config: BridgeConfig): void => void bridgeSet.run(JSON.stringify(config))
 
 // --- Sessions ---
 

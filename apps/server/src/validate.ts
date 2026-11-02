@@ -4,6 +4,7 @@ import {
   djSoundById,
   giftById,
   type BivioCommand,
+  type BridgeConfig,
   type DjPlay,
   type GameSettings,
   type IncastroCommand,
@@ -128,6 +129,15 @@ export function sanitizeDj(raw: unknown): DjPlay | null {
   }
   if (typeof r.soundId === 'string' && djSoundById(r.soundId)) return { soundId: r.soundId }
   return null
+}
+
+// ZeroFollowerBot's bridge: on or off, and a port that can be opened without privileges.
+export function sanitizeBridgeConfig(raw: unknown): BridgeConfig | null {
+  const r = asRecord(raw)
+  if (!r || typeof r.enabled !== 'boolean') return null
+  const port = Number(r.port)
+  if (!Number.isInteger(port) || port < 1024 || port > 65535) return null
+  return { enabled: r.enabled, port }
 }
 
 export function sanitizeSourceConfig(raw: unknown): SourceConfig | null {

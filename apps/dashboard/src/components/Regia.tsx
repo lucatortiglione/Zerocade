@@ -23,23 +23,31 @@ export function GameSwitch({ session }: { session: SessionState }) {
 }
 
 export function ConnectionBadge() {
-  const { connected, sources } = useDashboard()
-  const live = sources.tiktok?.state === 'connected' || sources.twitch?.state === 'connected'
+  const { connected, sources, bridge } = useDashboard()
+  const fromBridge = bridge?.state === 'connected' && Boolean(bridge.tiktok || bridge.twitch)
+  const live = sources.tiktok?.state === 'connected' || sources.twitch?.state === 'connected' || fromBridge
   const label = !connected ? 'Offline' : live ? 'Live' : 'Pronto'
   return <span className={`side-badge side-badge--${label.toLowerCase()}`}>{label}</span>
 }
 
 export function TiktokAccount() {
-  const { sources, savedSources } = useDashboard()
+  const { sources, savedSources, bridge } = useDashboard()
   const tiktok = sources.tiktok
   const saved = savedSources.tiktok ?? ''
   const [username, setUsername] = useState(saved)
   // The name saved on the server fills the field once it arrives.
   useEffect(() => setUsername(saved), [saved])
+  // ZeroFollowerBot already reads this live: connecting here too would bring every event twice.
+  const viaBridge = bridge?.state === 'connected' && bridge.tiktok ? bridge.tiktok : ''
 
   return (
     <>
-      {tiktok?.state === 'connected' || tiktok?.state === 'connecting' ? (
+      {viaBridge && tiktok?.state !== 'connected' && tiktok?.state !== 'connecting' ? (
+        <div className="side-account">
+          <span className="side-account__name">@{viaBridge}</span>
+          <span className="source-status source-status--connected">da ZeroFollowerBot</span>
+        </div>
+      ) : tiktok?.state === 'connected' || tiktok?.state === 'connecting' ? (
         <div className="side-account">
           <span className="side-account__name">@{tiktok.username}</span>
           <span className={`source-status source-status--${tiktok.state}`}>
@@ -70,6 +78,59 @@ export function TiktokAccount() {
         </form>
       )}
       {tiktok?.state === 'error' && <p className="source-status source-status--error">{tiktok.message ?? 'Errore'}</p>}
+      <BridgeSummary />
+    </>
+  )
+}
+
+// One line on ZeroFollowerBot's bridge, when it is on: what it is reading, or why it is not connected.
+export function BridgeSummary() {
+  const { bridge } = useDashboard()
+  if (!bridge?.enabled) return null
+  const accounts = [bridge.tiktok && `TikTok @${bridge.tiktok}`, bridge.twitch && `Twitch ${bridge.twitch}`].filter(Boolean)
+  return (
+    <p className={`bridge-line bridge-line--${bridge.state}`}>
+      <span className="bridge-line__name">ZeroFollowerBot</span>
+      {bridge.state === 'connected'
+        ? accounts.length
+          ? accounts.join(' · ')
+          : 'collegato, nessuna diretta aperta'
+        : (bridge.message ?? 'collegamento…')}
+    </p>
+  )
+}
+
+// The bridge's switch and port (Sources page): Zerocade listens to ZeroFollowerBot on this PC.
+export function BridgeControl() {
+  const { bridge } = useDashboard()
+  const [port, setPort] = useState('')
+  useEffect(() => {
+    if (bridge) setPort(String(bridge.port))
+  }, [bridge?.port])
+  if (!bridge) return null
+  const portNumber = Number(port)
+  const validPort = Number.isInteger(portNumber) && portNumber >= 1024 && portNumber <= 65535
+  const set = (enabled: boolean) => validPort && socket.emit('bridge:set', { enabled, port: portNumber })
+  return (
+    <>
+      <label className="bridge-toggle">
+        <input type="checkbox" checked={bridge.enabled} disabled={!validPort} onChange={(e) => set(e.target.checked)} />
+        Ricevi chat ed eventi da ZeroFollowerBot
+      </label>
+      <div className="source-card__row">
+        <label className="bridge-port">
+          Porta
+          <input
+            type="number"
+            min={1024}
+            max={65535}
+            value={port}
+            onChange={(e) => setPort(e.target.value)}
+            onBlur={() => bridge.enabled && portNumber !== bridge.port && set(true)}
+          />
+        </label>
+      </div>
+      <BridgeSummary />
     </>
   )
 }

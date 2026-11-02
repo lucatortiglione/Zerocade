@@ -15,8 +15,10 @@ import {
   triggersFor,
   type BackgroundGame,
   type ClientToServerEvents,
+  type EventOrigin,
   type Feed,
   type FeedCreator,
+  type FeedEvent,
   type HandshakeAuth,
   type LiveEvent,
   type RoomInfo,
@@ -29,12 +31,14 @@ import {
   getPad,
   getRanking,
   giftedCreators,
+  bridgeConfig,
   latestGifts,
   listEvents,
   recentCreators,
   recordEvent,
   recordGift,
   roomKey,
+  saveBridgeConfig,
   saveSource,
   savedSources,
   setPadVolume,
@@ -46,6 +50,7 @@ import { HOSTS_LINE, LOCAL_DOMAIN, domainRegistered, ensureDomain } from './host
 import { PAD_FILE_MAX, padBoard, padFile, removePad, savePadInput } from './pads.js'
 import { getSession, selectGame, setScene, setSettings, setTriggers } from './sessions.js'
 import { RoomSources, sourceUsername } from './sources.js'
+import { ZfbBridge } from './zfb.js'
 import {
   sanitizeBivioCommand,
   sanitizeDj,
@@ -55,6 +60,7 @@ import {
   sanitizeMessage,
   sanitizeScene,
   sanitizeSettings,
+  sanitizeBridgeConfig,
   sanitizeSourceConfig,
   sanitizeTriggers,
 } from './validate.js'
@@ -239,14 +245,22 @@ const incastro = new IncastroRooms(
   (key, solution) => io.to(dashboardRoom(key)).emit('incastro:solution', solution),
 )
 
+// The latest live events of each key, for the dashboard's chat box when it opens.
+const FEED_KEPT = 100
+const feeds = new Map<string, FeedEvent[]>()
+let feedSeq = 0
+
 // Persist + relay every live event (simulated or real), and keep the gifters ranking.
 // Bivio and Incastro run on the server, so their triggers are applied here rather than in
-// the overlay. `creator` is the live feed the event came from ('tiktok:<username>'), ''
-// when simulated.
-function broadcastEvent(key: string, event: LiveEvent, creator = '') {
+// the overlay. `origin` is the feed the event came from, `creator` that feed's account
+// ('tiktok:<username>'), '' when simulated.
+function broadcastEvent(key: string, event: LiveEvent, origin: EventOrigin = 'sim', creator = '') {
   recordEvent(key, event)
   if (event.type === 'gift') recordGift(key, creator, getSession(key).gameId, event)
   io.to(key).emit('live:event', event)
+  const item: FeedEvent = { seq: ++feedSeq, at: Date.now(), origin, event }
+  feeds.set(key, [...(feeds.get(key) ?? []).slice(1 - FEED_KEPT), item])
+  io.to(dashboardRoom(key)).emit('feed:events', [item])
   if (event.type === 'gift') io.to(key).emit('ranking:update', getRanking(key))
   const room = bivio.get(key) ?? incastro.get(key)
   if (room) for (const t of triggersFor(getSession(key).triggers, event)) room.action(t.action, event)
@@ -258,9 +272,9 @@ const roomSources = (key: string) => {
   let room = sources.get(key)
   if (!room) {
     room = new RoomSources(
-      (event) => {
-        const tiktok = sources.get(key)?.live().find((s) => s.kind === 'tiktok')
-        broadcastEvent(key, event, tiktok ? `tiktok:${tiktok.username}` : '')
+      (event, kind) => {
+        const live = sources.get(key)?.live().find((s) => s.kind === kind)
+        broadcastEvent(key, event, kind, live ? `${kind}:${live.username}` : '')
       },
       (status) => {
         io.to(key).emit('source:status', status)
@@ -272,6 +286,16 @@ const roomSources = (key: string) => {
   return room
 }
 
+// ZeroFollowerBot's event bridge, for this Zerocade's room: its events go where the direct feeds' go.
+const zfb = new ZfbBridge(
+  (event, kind, account) => broadcastEvent(roomKey, event, kind, account ? `${kind}:${account}` : ''),
+  (status) => {
+    io.to(dashboardRoom(roomKey)).emit('bridge:status', status)
+    for (const a of zfb.accounts()) touchCreator(a.kind, a.username, getSession(roomKey).gameId)
+  },
+)
+zfb.configure(bridgeConfig())
+
 const liveCreators = (): FeedCreator[] => {
   const seen = new Map<string, FeedCreator>()
   for (const [key, room] of sources) {
@@ -280,6 +304,10 @@ const liveCreators = (): FeedCreator[] => {
       if (s.viewers !== undefined) creator.viewers = s.viewers
       seen.set(`${s.kind}:${s.username}`, creator)
     }
+  }
+  for (const a of zfb.accounts()) {
+    const id = `${a.kind}:${a.username}`
+    if (!seen.has(id)) seen.set(id, { kind: a.kind, username: a.username, gameId: getSession(roomKey).gameId, at: a.since })
   }
   return [...seen.values()].sort((a, b) => (b.viewers ?? -1) - (a.viewers ?? -1) || a.at - b.at)
 }
@@ -326,6 +354,15 @@ io.on('connection', (socket) => {
   socket.emit('pads:state', padBoard(key))
   for (const status of roomSources(key).statuses()) socket.emit('source:status', status)
   socket.emit('source:saved', savedSources(key))
+  socket.emit('feed:events', feeds.get(key) ?? [])
+  socket.emit('bridge:status', zfb.status())
+
+  socket.on('bridge:set', (raw: unknown) => {
+    const config = sanitizeBridgeConfig(raw)
+    if (!config) return
+    saveBridgeConfig(config)
+    zfb.configure(config)
+  })
 
   // The name entered is saved for the next lives, whether this connection works or not.
   socket.on('source:connect', (raw: unknown) => {

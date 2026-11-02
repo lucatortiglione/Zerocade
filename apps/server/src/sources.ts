@@ -80,7 +80,8 @@ export class RoomSources {
   private tiktokViewers: number | undefined
 
   constructor(
-    private emit: (event: LiveEvent) => void,
+    // Each event with the feed it came from.
+    private emit: (event: LiveEvent, kind: SourceKind) => void,
     private status: (status: SourceStatus) => void,
   ) {}
 
@@ -120,6 +121,7 @@ export class RoomSources {
     this.tiktokUser = uname
     this.tiktokState = 'connecting'
     this.status({ kind: 'tiktok', username: uname, state: 'connecting' })
+    const emit = (event: LiveEvent) => this.emit(event, 'tiktok')
 
     let conn: LegacyTikTokConn | null = null
     try {
@@ -139,12 +141,12 @@ export class RoomSources {
       // the likes in `count` (`likeCount`).
       conn.on('chat', (data) => {
         const d = rec(data)
-        this.emit({ type: 'comment', user: tiktokViewer(d), text: String(d.content ?? d.comment ?? '').slice(0, 140) })
+        emit({ type: 'comment', user: tiktokViewer(d), text: String(d.content ?? d.comment ?? '').slice(0, 140) })
       })
       conn.on('gift', (data) => {
         const d = rec(data)
         if (Number(d.repeatEnd) === 1) return
-        this.emit({
+        emit({
           type: 'gift',
           user: tiktokViewer(d),
           giftId: giftIdForTiktok(String(d.giftName ?? ''), clampCount(d.diamondCount, 1)),
@@ -153,11 +155,11 @@ export class RoomSources {
       })
       conn.on('like', (data) => {
         const d = rec(data)
-        this.emit({ type: 'like', user: tiktokViewer(d), count: clampCount(d.likeCount ?? d.count, 1) })
+        emit({ type: 'like', user: tiktokViewer(d), count: clampCount(d.likeCount ?? d.count, 1) })
       })
-      conn.on('follow', (data) => this.emit({ type: 'follow', user: tiktokViewer(rec(data)) }))
-      conn.on('share', (data) => this.emit({ type: 'share', user: tiktokViewer(rec(data)) }))
-      conn.on('member', (data) => this.emit({ type: 'join', user: tiktokViewer(rec(data)) }))
+      conn.on('follow', (data) => emit({ type: 'follow', user: tiktokViewer(rec(data)) }))
+      conn.on('share', (data) => emit({ type: 'share', user: tiktokViewer(rec(data)) }))
+      conn.on('member', (data) => emit({ type: 'join', user: tiktokViewer(rec(data)) }))
       conn.on('roomUser', (data) => {
         const d = rec(data)
         const viewers = Math.floor(Number(d.viewerCount ?? d.total))
@@ -210,20 +212,21 @@ export class RoomSources {
     this.twitchUser = ch
     this.twitchState = 'connecting'
     this.status({ kind: 'twitch', username: ch, state: 'connecting' })
+    const emit = (event: LiveEvent) => this.emit(event, 'twitch')
 
     const client = new TmiClient({ channels: [ch] })
     this.twitch = client
     try {
       client.on('message', (_channel, tags, message, self) => {
         if (self) return
-        this.emit({
+        emit({
           type: 'comment',
           user: toViewer(tags['user-id'], tags['display-name'] ?? tags.username),
           text: message.slice(0, 140),
         })
       })
       client.on('cheer', (_channel, tags, _message) => {
-        this.emit({
+        emit({
           type: 'like',
           user: toViewer(tags['user-id'], tags['display-name'] ?? tags.username),
           count: clampCount(tags.bits, 1),
@@ -234,7 +237,7 @@ export class RoomSources {
       let note = ''
       if (process.env.TWITCH_CLIENT_ID && process.env.TWITCH_CLIENT_SECRET) {
         try {
-          const ev = new TwitchEventSub(ch, (e) => this.emit(e))
+          const ev = new TwitchEventSub(ch, emit)
           await ev.start()
           this.twitchEv = ev
         } catch (err) {
