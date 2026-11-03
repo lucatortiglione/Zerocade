@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type CSSProperties } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from 'react'
 import {
   BIVIO_DEFAULT_COLORS,
   bivioCategoryById,
@@ -272,6 +272,7 @@ function Option({ choice, text, background, share, votes, showCounts, stacked, o
   // Side-by-side cards fill from the bottom, stacked ones from the left.
   const fill = showCounts ? `${share}%` : '0%'
   const slots = useSlots(crowd)
+  const textRef = useWholeWords(text, stacked)
   return (
     <div
       className={`bivio-opt bivio-opt--${choice}${outcome ? ` bivio-opt--${outcome}` : ''}`}
@@ -290,7 +291,9 @@ function Option({ choice, text, background, share, votes, showCounts, stacked, o
       </div>
       <div className="bivio-opt__body">
         <span className="bivio-opt__letter">{choice.toUpperCase()}</span>
-        <p className={`bivio-opt__text${textSize(text)}`}>{capitalize(text)}</p>
+        <p ref={textRef} className={`bivio-opt__text${textSize(text)}`}>
+          {capitalize(text)}
+        </p>
         {showCounts && (
           <p className="bivio-opt__result">
             <span className="bivio-opt__share">{share}%</span>
@@ -301,6 +304,34 @@ function Option({ choice, text, background, share, votes, showCounts, stacked, o
       </div>
     </div>
   )
+}
+
+// Words are never broken across lines: when the longest one does not fit the card, the whole
+// option's text gets smaller until it does. Measured again when the card changes size and once
+// the font has loaded.
+function useWholeWords(text: string, stacked: boolean) {
+  const ref = useRef<HTMLParagraphElement>(null)
+  useLayoutEffect(() => {
+    const el = ref.current
+    const body = el?.parentElement
+    if (!el || !body) return
+    const fit = () => {
+      el.style.fontSize = ''
+      let size = parseFloat(getComputedStyle(el).fontSize)
+      // A word that does not fit sticks out of the line (scrollWidth); it shrinks about in
+      // step with the font, so a few rounds are enough.
+      for (let i = 0; i < 4 && el.scrollWidth > el.clientWidth; i++) {
+        size *= (el.clientWidth / el.scrollWidth) * 0.98
+        el.style.fontSize = `${size}px`
+      }
+    }
+    fit()
+    const observer = new ResizeObserver(fit)
+    observer.observe(body)
+    void document.fonts.ready.then(fit)
+    return () => observer.disconnect()
+  }, [text, stacked])
+  return ref
 }
 
 // Bubble centres (% of the card), filled in this order. Side-by-side cards build a
