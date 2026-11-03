@@ -223,6 +223,7 @@ export interface GameDef {
 }
 
 // --- Bivio ("Preferiresti…?") ---
+// Shown as ZeroDubbi; the code, the saved settings and the database still say bivio.
 // The one server-driven game: the server picks the dilemma, counts the A/B votes from
 // chat (once per room, however many overlays are open) and stores them in SQLite.
 // The overlay and the dashboard only render the BivioState it sends.
@@ -1215,7 +1216,7 @@ export const GAMES: GameDef[] = [
   },
   {
     id: 'bivio',
-    name: 'Bivio',
+    name: 'ZeroDubbi',
     category: 'Party',
     description: 'Preferiresti…? Il pubblico vota A o B in chat; ogni risposta resta salvata sul PC.',
     emoji: '🔀',
