@@ -23,18 +23,33 @@ type LegacyTikTokConn = {
 const rec = (x: unknown): Record<string, unknown> =>
   x && typeof x === 'object' ? (x as Record<string, unknown>) : {}
 
-// Version 2.5 of the connector decodes TikTok's messages in their v3 shape, where the viewer
-// count keeps its top viewers in `ranks`, but its legacy layer still reads `ranksList`: that
-// message threw "Cannot read properties of undefined (reading 'map')", and when it came with the
-// first batch the connection failed. The list is copied under the old name before it is read.
+// A v3 picture (ImageModel) that has an address.
+const hasPicture = (image: unknown) => {
+  const urls = rec(image).urlList
+  return Array.isArray(urls) && typeof urls[0] === 'string' && urls[0] !== ''
+}
+
+// Version 2.5 of the connector decodes TikTok's messages in their v3 shape, but its legacy layer
+// still reads some of them as they were; they are put right before it reads them.
+// - The viewer count keeps its top viewers in `ranks`, the legacy layer reads `ranksList`: that
+//   message threw "Cannot read properties of undefined (reading 'map')", and when it came with
+//   the first batch the connection failed. The list is copied under the old name.
+// - The viewer's picture is read from `avatarLarge`, which TikTok leaves empty on comments, votes
+//   and likes: no picture ever reached the games. The small one (`avatarThumb`, the picture of
+//   version 1) or the medium one stands in.
 class PushConnection extends WebcastPushConnection {
   protected override async processProtoMessageFetchResult(
     fetchResult: Parameters<WebcastPushConnection['processProtoMessageFetchResult']>[0],
   ): Promise<void> {
     for (const message of fetchResult.messages) {
-      if (message.method !== 'WebcastRoomUserSeqMessage') continue
       const data = rec(rec(rec(message).decodedData).data)
-      if (!Array.isArray(data.ranksList)) data.ranksList = Array.isArray(data.ranks) ? data.ranks : []
+      if (message.method === 'WebcastRoomUserSeqMessage' && !Array.isArray(data.ranksList))
+        data.ranksList = Array.isArray(data.ranks) ? data.ranks : []
+      const user = rec(data.user)
+      if (!hasPicture(user.avatarLarge)) {
+        const picture = [user.avatarThumb, user.avatarMedium].find(hasPicture)
+        if (picture) user.avatarLarge = picture
+      }
     }
     return super.processProtoMessageFetchResult(fetchResult)
   }
@@ -49,7 +64,8 @@ const toViewer = (id: unknown, nickname: unknown, avatar?: unknown): Viewer => (
 })
 
 // The viewer of a TikTok event. Version 2 of the connector sometimes leaves userId empty (the
-// @name stands in) and keeps the picture in userDetails rather than profilePictureUrl.
+// @name stands in) and keeps the picture in userDetails rather than profilePictureUrl (which it
+// always leaves null; the picture itself is put there by PushConnection).
 const tiktokViewer = (d: Record<string, unknown>): Viewer =>
   toViewer(d.userId, d.uniqueId ?? d.nickname, d.profilePictureUrl ?? rec(d.userDetails).profilePictureUrls)
 
