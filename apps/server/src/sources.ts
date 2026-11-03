@@ -20,10 +20,27 @@ type LegacyTikTokConn = {
   on: (event: string, listener: (data: unknown) => void) => unknown
 }
 
-const LegacyConn = WebcastPushConnection as unknown as new (uniqueId: string, options?: unknown) => LegacyTikTokConn
-
 const rec = (x: unknown): Record<string, unknown> =>
   x && typeof x === 'object' ? (x as Record<string, unknown>) : {}
+
+// Version 2.5 of the connector decodes TikTok's messages in their v3 shape, where the viewer
+// count keeps its top viewers in `ranks`, but its legacy layer still reads `ranksList`: that
+// message threw "Cannot read properties of undefined (reading 'map')", and when it came with the
+// first batch the connection failed. The list is copied under the old name before it is read.
+class PushConnection extends WebcastPushConnection {
+  protected override async processProtoMessageFetchResult(
+    fetchResult: Parameters<WebcastPushConnection['processProtoMessageFetchResult']>[0],
+  ): Promise<void> {
+    for (const message of fetchResult.messages) {
+      if (message.method !== 'WebcastRoomUserSeqMessage') continue
+      const data = rec(rec(rec(message).decodedData).data)
+      if (!Array.isArray(data.ranksList)) data.ranksList = Array.isArray(data.ranks) ? data.ranks : []
+    }
+    return super.processProtoMessageFetchResult(fetchResult)
+  }
+}
+
+const LegacyConn = PushConnection as unknown as new (uniqueId: string, options?: unknown) => LegacyTikTokConn
 
 const toViewer = (id: unknown, nickname: unknown, avatar?: unknown): Viewer => ({
   id: String(id ?? '').slice(0, 64) || String(nickname ?? '').slice(0, 32) || 'anonymous',
