@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { giftById, type Gifter, type LiveEvent } from '@zerocade/shared'
 import { useOverlay } from './store'
+import { ViewerAvatar } from './ViewerAvatar'
 
 function alertText(e: LiveEvent): { icon: string; text: string } {
   switch (e.type) {
@@ -32,7 +33,11 @@ export function Widgets() {
   return (
     <>
       {w.alerts && alert && <Alert key={seq} event={alert} />}
-      {w.follower && lastFollower && <div className="widget widget--follower">➕ {lastFollower} followed!</div>}
+      {w.follower && lastFollower && (
+        <div className="widget widget--follower">
+          ➕ <ViewerAvatar viewer={lastFollower} /> {lastFollower.nickname} followed!
+        </div>
+      )}
       {w.goal && <Goal total={totalCoins} target={session.goal} />}
       {w.gifters && ranking.length > 0 && <Gifters ranking={ranking} />}
     </>
@@ -48,6 +53,7 @@ function Alert({ event }: { event: LiveEvent }) {
   return (
     <div className="widget-alert" onAnimationEnd={(e) => e.animationName === 'alert-out' && setGone(true)}>
       <span className="widget-alert__icon">{icon}</span>
+      <ViewerAvatar viewer={event.user} />
       <span className="widget-alert__text">{text}</span>
     </div>
   )
@@ -74,6 +80,7 @@ function Gifters({ ranking }: { ranking: Gifter[] }) {
       {ranking.slice(0, 3).map((g, i) => (
         <div key={g.id} className="widget-gifters__row">
           <span>{i + 1}.</span>
+          <ViewerAvatar viewer={g} />
           <span>{g.nickname}</span>
           <span>{g.coins.toLocaleString()}</span>
         </div>

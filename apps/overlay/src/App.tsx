@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, useSyncExternalStore } from 'react'
-import { GAMES, describeSource, triggersFor, type LiveEvent } from '@zerocade/shared'
+import { GAMES, describeSource, triggersFor, type LiveEvent, type Viewer } from '@zerocade/shared'
 import { Engine } from './games/engine'
 import { createGame } from './games/registry'
 import { useOverlay } from './store'
@@ -7,9 +7,12 @@ import { Widgets } from './Widgets'
 import { Bivio } from './Bivio'
 import { Incastro } from './Incastro'
 import { isContentReady, loadContent, subscribeContent } from './content'
+import { ViewerAvatar } from './ViewerAvatar'
 
 interface Toast {
   id: number
+  icon: string
+  user: Viewer
   text: string
 }
 
@@ -69,7 +72,7 @@ export function App() {
     // guess: the words found have their own feed.
     if (session.gameId === 'bivio' || session.gameId === 'incastro') return
     const id = Date.now() + Math.random()
-    setToasts((prev) => [...prev.slice(-4), { id, text: describeEvent(event) }])
+    setToasts((prev) => [...prev.slice(-4), { id, user: event.user, ...describeEvent(event) }])
     // Not cleared when the next event arrives: every toast removes itself.
     setTimeout(() => setToasts((prev) => prev.filter((t) => t.id !== id)), 3200)
   }, [seq])
@@ -100,7 +103,9 @@ export function App() {
       <div className="overlay__toasts">
         {toasts.map((t) => (
           <div key={t.id} className="toast">
-            {t.text}
+            <span>{t.icon}</span>
+            <ViewerAvatar viewer={t.user} />
+            <span className="toast__text">{t.text}</span>
           </div>
         ))}
       </div>
@@ -125,19 +130,20 @@ export function App() {
   )
 }
 
-function describeEvent(event: LiveEvent): string {
+// The toast's icon, and its text after the viewer's picture.
+function describeEvent(event: LiveEvent): { icon: string; text: string } {
   switch (event.type) {
     case 'gift':
-      return `🎁 ${event.user.nickname} ×${event.count}`
+      return { icon: '🎁', text: `${event.user.nickname} ×${event.count}` }
     case 'like':
-      return `👍 ${event.user.nickname} ×${event.count}`
+      return { icon: '👍', text: `${event.user.nickname} ×${event.count}` }
     case 'follow':
-      return `➕ ${event.user.nickname} followed`
+      return { icon: '➕', text: `${event.user.nickname} followed` }
     case 'share':
-      return `🔁 ${event.user.nickname} shared`
+      return { icon: '🔁', text: `${event.user.nickname} shared` }
     case 'comment':
-      return `💬 ${event.user.nickname}: ${event.text}`
+      return { icon: '💬', text: `${event.user.nickname}: ${event.text}` }
     case 'join':
-      return `👋 ${event.user.nickname} joined`
+      return { icon: '👋', text: `${event.user.nickname} joined` }
   }
 }

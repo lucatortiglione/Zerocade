@@ -1,4 +1,6 @@
+import type { Viewer } from '@zerocade/shared'
 import type { GameInstance } from './engine'
+import { fillTextWithAvatar } from './avatar'
 import { addPoints, drawLeaderboard, drawTimerBar, newScores, normalize, shuffled } from './common'
 import { wordsFor } from '../content'
 
@@ -16,7 +18,7 @@ export function createPerleParole(): GameInstance {
   let rotation = 0
   let timer = 45
   let revealed = false
-  let solver = ''
+  let solver: Viewer | null = null
   const scores = newScores()
 
   const pick = () => {
@@ -24,7 +26,7 @@ export function createPerleParole(): GameInstance {
     rotation = Math.floor(Math.random() * word.length)
     timer = roundSecs
     revealed = false
-    solver = ''
+    solver = null
   }
 
   return {
@@ -41,7 +43,7 @@ export function createPerleParole(): GameInstance {
       if (event.type !== 'comment' || revealed) return
       if (normalize(event.text) !== normalize(word)) return
       revealed = true
-      solver = event.user.nickname
+      solver = event.user
       timer = breakSecs
       addPoints(scores, event.user.id, event.user.nickname, event.user.avatar, word.length)
     },
@@ -93,7 +95,8 @@ export function createPerleParole(): GameInstance {
       if (revealed) {
         ctx.fillStyle = '#3ccf7a'
         ctx.font = 'bold 28px system-ui'
-        ctx.fillText(`${solver ? solver + ' ha indovinato: ' : 'La parola era: '}${word}`, cx, height * 0.72)
+        if (solver) fillTextWithAvatar(ctx, `${solver.nickname} ha indovinato: ${word}`, cx, height * 0.72, solver)
+        else ctx.fillText(`La parola era: ${word}`, cx, height * 0.72)
       }
 
       drawTimerBar(ctx, width, height, Math.max(0, timer / (revealed ? breakSecs : roundSecs)), revealed ? '#3ccf7a' : '#f5b14c')

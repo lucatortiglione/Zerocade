@@ -7,6 +7,7 @@ import {
   type IncastroState,
   type LiveEvent,
   type SessionState,
+  type Viewer,
 } from '@zerocade/shared'
 import { socket } from './socket'
 import { playSound, stopSounds } from './audio'
@@ -17,7 +18,7 @@ interface OverlayState {
   event: LiveEvent | null
   seq: number
   ranking: Gifter[]
-  lastFollower: string | null
+  lastFollower: Viewer | null
   totalCoins: number
   bivio: BivioState | null
   // performance.now() when `bivio` arrived, to count its remainingMs down locally.
@@ -63,7 +64,7 @@ socket.on('session:state', (session) => update({ session }))
 socket.on('ranking:update', (ranking) => update({ ranking }))
 socket.on('live:event', (event) => {
   const patch: Partial<OverlayState> = { event, seq: state.seq + 1 }
-  if (event.type === 'follow') patch.lastFollower = event.user.nickname
+  if (event.type === 'follow') patch.lastFollower = event.user
   if (event.type === 'gift') patch.totalCoins = state.totalCoins + (giftById(event.giftId)?.coins ?? 0) * event.count
   update(patch)
 })

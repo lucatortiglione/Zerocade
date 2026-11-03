@@ -1,4 +1,6 @@
+import type { Viewer } from '@zerocade/shared'
 import type { GameInstance } from './engine'
+import { fillTextWithAvatar } from './avatar'
 import { addPoints, drawLeaderboard, drawTimerBar, newScores, normalize, shuffled } from './common'
 import { wordsFor } from '../content'
 
@@ -19,7 +21,7 @@ export function createFindTheWord(): GameInstance {
   let revealed = 0
   let timer = 24
   let done = false
-  let solver = ''
+  let solver: Viewer | null = null
   const scores = newScores()
 
   const pick = () => {
@@ -27,7 +29,7 @@ export function createFindTheWord(): GameInstance {
     revealed = 1
     timer = roundSecs
     done = false
-    solver = ''
+    solver = null
   }
 
   return {
@@ -51,7 +53,7 @@ export function createFindTheWord(): GameInstance {
       const text = normalize(event.text)
       if (text === word) {
         done = true
-        solver = event.user.nickname
+        solver = event.user
         timer = breakSecs
         addPoints(scores, event.user.id, event.user.nickname, event.user.avatar, fullBonus + (word.length - revealed) * perLetter)
         return
@@ -83,7 +85,8 @@ export function createFindTheWord(): GameInstance {
       ctx.fillStyle = '#ffffff'
       ctx.font = 'bold 40px system-ui'
       ctx.textAlign = 'center'
-      ctx.fillText(done ? (solver ? `${solver} ha vinto!` : 'La parola era:') : 'FIND THE WORD', cx, 84)
+      if (done && solver) fillTextWithAvatar(ctx, `${solver.nickname} ha vinto!`, cx, 84, solver)
+      else ctx.fillText(done ? 'La parola era:' : 'FIND THE WORD', cx, 84)
       ctx.fillStyle = '#8a8a96'
       ctx.font = '22px system-ui'
       ctx.fillText('Indovina la parola scrivendo in chat', cx, 122)

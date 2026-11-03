@@ -1,4 +1,6 @@
+import type { Viewer } from '@zerocade/shared'
 import type { GameInstance } from './engine'
+import { fillTextWithAvatar } from './avatar'
 import { addPoints, clamp, drawLeaderboard, drawTimerBar, newScores, normalize, shuffled } from './common'
 import { itemsFor } from '../content'
 
@@ -28,7 +30,7 @@ export function createGuessLogo(): GameInstance {
   let brand: Brand = { name: '', aliases: [], emoji: '❓', color: '#333333', difficulty: 'easy' }
   let timer = 20
   let revealed = false
-  let solver = ''
+  let solver: Viewer | null = null
   const solvedBy = new Set<string>()
   const scores = newScores()
 
@@ -36,7 +38,7 @@ export function createGuessLogo(): GameInstance {
     brand = shuffled(itemsFor<Brand>('guess-logo'))[0] ?? { name: '', aliases: [], emoji: '❓', color: '#333333', difficulty: 'easy' }
     timer = roundSecs
     revealed = false
-    solver = ''
+    solver = null
     solvedBy.clear()
   }
 
@@ -52,7 +54,7 @@ export function createGuessLogo(): GameInstance {
     if (solvedBy.has(id)) return
     solvedBy.add(id)
     const first = !solver
-    if (first) solver = name
+    if (first) solver = { id, nickname: name, avatar }
     addPoints(scores, id, name, avatar, pts + (first ? winnerBonus : 0))
     if (roundMode === 'firstWins' && first) {
       revealed = true
@@ -119,7 +121,7 @@ export function createGuessLogo(): GameInstance {
         if (solver) {
           ctx.fillStyle = '#3ccf7a'
           ctx.font = 'bold 26px system-ui'
-          ctx.fillText(`🏆 ${solver} ha indovinato!`, cx, height * 0.7)
+          fillTextWithAvatar(ctx, `🏆 ${solver.nickname} ha indovinato!`, cx, height * 0.7, solver)
         }
       }
 

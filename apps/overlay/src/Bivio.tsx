@@ -13,6 +13,7 @@ import appDark from '@bivio/backgrounds/app_dark.svg'
 import optionA from '@bivio/backgrounds/option_a.svg'
 import optionB from '@bivio/backgrounds/option_b.svg'
 import { useOverlay } from './store'
+import { ViewerAvatar } from './ViewerAvatar'
 
 // Bivio is drawn in the DOM rather than on the canvas, so long options wrap and the
 // percentages animate in CSS. The server runs the round; this renders its BivioState,
@@ -241,6 +242,7 @@ function Round({ state, at, settings }: { state: BivioState; at: number; setting
             <div className="bivio__voters">
               {state.voters.map((v) => (
                 <span key={v.id} className={`bivio__voter bivio__voter--${v.choice}`}>
+                  <ViewerAvatar viewer={v} />
                   {v.nickname} → {v.choice.toUpperCase()}
                 </span>
               ))}

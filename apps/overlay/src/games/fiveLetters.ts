@@ -1,4 +1,6 @@
+import type { Viewer } from '@zerocade/shared'
 import type { GameInstance } from './engine'
+import { fillTextWithAvatar } from './avatar'
 import { addPoints, clamp, drawLeaderboard, drawTimerBar, newScores, normalize, shuffled } from './common'
 import { wordsFor } from '../content'
 
@@ -56,7 +58,7 @@ export function createFiveLetters(): GameInstance {
   let ruledOut: string[] = []
   let solved = false
   let revealed = false
-  let solver = ''
+  let solver: Viewer | null = null
   let hintClock = 0
   const scores = newScores()
 
@@ -67,7 +69,7 @@ export function createFiveLetters(): GameInstance {
     ruledOut = []
     solved = false
     revealed = false
-    solver = ''
+    solver = null
     hintClock = 0
     timer = seconds
   }
@@ -136,7 +138,7 @@ export function createFiveLetters(): GameInstance {
       if (w === target) {
         solved = true
         revealed = true
-        solver = event.user.nickname
+        solver = event.user
         timer = breakSecs
         let pts = solveBonus
         for (const t of tiles) pts += t === 'green' ? ptsGreen : t === 'gold' ? ptsGold : 0
@@ -207,7 +209,8 @@ export function createFiveLetters(): GameInstance {
         ctx.fillStyle = '#3ccf7a'
         ctx.font = 'bold 34px system-ui'
         ctx.textAlign = 'center'
-        ctx.fillText(solved ? `${solver} ha indovinato!` : target, cx, height * 0.68)
+        if (solved && solver) fillTextWithAvatar(ctx, `${solver.nickname} ha indovinato!`, cx, height * 0.68, solver)
+        else ctx.fillText(target, cx, height * 0.68)
       }
       if (revealedIdx.length) {
         ctx.fillStyle = '#f0f0f2'

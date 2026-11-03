@@ -1,4 +1,6 @@
+import type { Viewer } from '@zerocade/shared'
 import type { GameInstance } from './engine'
+import { fillTextWithAvatar } from './avatar'
 import { addPoints, clamp, drawLeaderboard, drawTimerBar, newScores, normalize, shuffled } from './common'
 import { itemsFor } from '../content'
 
@@ -100,7 +102,7 @@ export function createGuessDrawing(): GameInstance {
   let drawing: DrawItem = { key: 'casa', word: 'CASA', aliases: [] }
   let timer = 30
   let revealed = false
-  let solver = ''
+  let solver: Viewer | null = null
   const solvedBy = new Set<string>()
   const scores = newScores()
 
@@ -108,7 +110,7 @@ export function createGuessDrawing(): GameInstance {
     drawing = shuffled(itemsFor<DrawItem>('guess-drawing'))[0] ?? { key: 'casa', word: '', aliases: [] }
     timer = roundSecs
     revealed = false
-    solver = ''
+    solver = null
     solvedBy.clear()
   }
 
@@ -140,7 +142,7 @@ export function createGuessDrawing(): GameInstance {
       if (!matches(event.text)) return
       if (solvedBy.has(event.user.id)) return
       solvedBy.add(event.user.id)
-      if (!solver) solver = event.user.nickname
+      if (!solver) solver = event.user
       const early = roundMode === 'timed' ? Math.round((timer / roundSecs) * basePoints) : basePoints
       addPoints(scores, event.user.id, event.user.nickname, event.user.avatar, early)
       if (roundMode === 'untilSolved') {
@@ -193,7 +195,7 @@ export function createGuessDrawing(): GameInstance {
         if (solver) {
           ctx.fillStyle = '#f5b14c'
           ctx.font = 'bold 24px system-ui'
-          ctx.fillText(`🏆 ${solver} ha indovinato!`, cx, height * 0.74)
+          fillTextWithAvatar(ctx, `🏆 ${solver.nickname} ha indovinato!`, cx, height * 0.74, solver)
         }
       }
 

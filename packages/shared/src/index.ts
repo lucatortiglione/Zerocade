@@ -1464,6 +1464,7 @@ export const triggersFor = (triggers: Trigger[], event: LiveEvent) =>
 export interface Gifter {
   id: string
   nickname: string
+  avatar?: string
   coins: number
 }
 
@@ -1471,8 +1472,8 @@ export function addToRanking(ranking: Gifter[], event: GiftEvent): Gifter[] {
   const coins = (giftById(event.giftId)?.coins ?? 0) * event.count
   const existing = ranking.find((g) => g.id === event.user.id)
   const next = existing
-    ? ranking.map((g) => (g === existing ? { ...g, coins: g.coins + coins } : g))
-    : [...ranking, { id: event.user.id, nickname: event.user.nickname, coins }]
+    ? ranking.map((g) => (g === existing ? { ...g, avatar: event.user.avatar ?? g.avatar, coins: g.coins + coins } : g))
+    : [...ranking, { id: event.user.id, nickname: event.user.nickname, avatar: event.user.avatar, coins }]
   return next.sort((a, b) => b.coins - a.coins)
 }
 

@@ -171,6 +171,12 @@ try {
 } catch {
   // column already present on fresh schema
 }
+// The gifter's profile picture, for the Top donatori widget.
+try {
+  db.exec('ALTER TABLE gifters ADD COLUMN avatar TEXT')
+} catch {
+  // column already present
+}
 
 // --- Room ---
 // This Zerocade's one room: the dashboard, the overlay link and every game use its key,
@@ -254,16 +260,21 @@ export const saveSession = (
 // --- Gifters ---
 
 const gifterUpsert = db.prepare(`
-  INSERT INTO gifters (key, user_id, nickname, coins) VALUES (?, ?, ?, ?)
+  INSERT INTO gifters (key, user_id, nickname, avatar, coins) VALUES (?, ?, ?, ?, ?)
   ON CONFLICT(key, user_id) DO UPDATE SET
     nickname = excluded.nickname,
+    avatar = coalesce(excluded.avatar, gifters.avatar),
     coins = gifters.coins + excluded.coins
 `)
 const gifterSelect = db.prepare(`
-  SELECT user_id AS id, nickname, coins FROM gifters WHERE key = ? ORDER BY coins DESC, nickname ASC LIMIT 50
+  SELECT user_id AS id, nickname, avatar, coins FROM gifters WHERE key = ? ORDER BY coins DESC, nickname ASC LIMIT 50
 `)
 
-export const getRanking = (key: string): Gifter[] => gifterSelect.all(key) as unknown as Gifter[]
+// Gifters without a picture (Twitch, or saved before pictures were) leave the field out.
+export const getRanking = (key: string): Gifter[] =>
+  (gifterSelect.all(key) as unknown as (Omit<Gifter, 'avatar'> & { avatar: string | null })[]).map(({ avatar, ...g }) =>
+    avatar ? { ...g, avatar } : g,
+  )
 
 // --- Events ---
 
@@ -290,7 +301,7 @@ export const recordEvent = (key: string, event: LiveEvent): void => {
   eventPrune.run(key, key)
   if (event.type === 'gift') {
     const coins = (giftById(event.giftId)?.coins ?? 0) * event.count
-    gifterUpsert.run(key, event.user.id, event.user.nickname, coins)
+    gifterUpsert.run(key, event.user.id, event.user.nickname, event.user.avatar ?? null, coins)
   }
 }
 // --- Bivio votes ---

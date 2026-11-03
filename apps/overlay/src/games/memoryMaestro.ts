@@ -1,4 +1,6 @@
+import type { Viewer } from '@zerocade/shared'
 import type { GameInstance } from './engine'
+import { fillTextWithAvatar } from './avatar'
 import { addPoints, drawLeaderboard, drawTimerBar, newScores } from './common'
 
 // "Memory Maestro" — a numeric sequence is shown briefly, then hidden. Viewers
@@ -18,7 +20,7 @@ export function createMemoryMaestro(): GameInstance {
   let sequence = ''
   let phase: 'memorize' | 'answer' | 'reveal' | 'break' = 'memorize'
   let timer = 1.5
-  let solver = ''
+  let solver: Viewer | null = null
   const scores = newScores()
 
   const newRound = (grow: boolean) => {
@@ -26,7 +28,7 @@ export function createMemoryMaestro(): GameInstance {
     sequence = Array.from({ length: level }, () => String(Math.floor(Math.random() * 10))).join('')
     phase = 'memorize'
     timer = memSecs
-    solver = ''
+    solver = null
   }
 
   return {
@@ -60,7 +62,7 @@ export function createMemoryMaestro(): GameInstance {
       if (text === sequence) {
         phase = 'reveal'
         timer = revealSecs
-        solver = event.user.nickname
+        solver = event.user
         addPoints(scores, event.user.id, event.user.nickname, event.user.avatar, level * 10)
       } else {
         addPoints(scores, event.user.id, event.user.nickname, event.user.avatar, 0)
@@ -116,11 +118,12 @@ export function createMemoryMaestro(): GameInstance {
       let hint = ''
       if (phase === 'memorize') hint = 'Memorizza la sequenza…'
       else if (phase === 'answer') hint = 'Scrivi la sequenza in chat!'
-      else if (phase === 'reveal') hint = solver ? `${solver} ha indovinato!` : 'Tempo scaduto'
+      else if (phase === 'reveal') hint = solver ? `${solver.nickname} ha indovinato!` : 'Tempo scaduto'
       else hint = 'Prossimo livello…'
       ctx.fillStyle = phase === 'answer' ? '#3ccf7a' : '#8a8a96'
       ctx.font = 'bold 24px system-ui'
-      ctx.fillText(hint, cx, height * 0.56)
+      if (phase === 'reveal' && solver) fillTextWithAvatar(ctx, hint, cx, height * 0.56, solver)
+      else ctx.fillText(hint, cx, height * 0.56)
 
       const total = phase === 'memorize' ? memSecs : phase === 'answer' ? answerSecs : phase === 'reveal' ? revealSecs : breakSecs
       drawTimerBar(ctx, width, height, Math.max(0, timer / total), phase === 'answer' ? '#3ccf7a' : '#f5b14c')

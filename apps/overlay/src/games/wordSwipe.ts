@@ -146,7 +146,7 @@ export function createWordSwipe(): GameInstance {
         ctx.beginPath()
         ctx.roundRect(px, py - 26, pw, 52, 26)
         ctx.fill()
-        drawAvatar(ctx, lastFound.avatar, px + 38, py, 22)
+        drawAvatar(ctx, lastFound.avatar, px + 38, py, 22, lastFound.name)
         ctx.fillStyle = '#3ccf7a'
         ctx.textAlign = 'left'
         ctx.fillText(text, px + 70, py + 9)
@@ -188,7 +188,7 @@ export function createWordSwipe(): GameInstance {
         ctx.fillText('Top players', 40, 60)
         topPlayers.forEach(([, p], i) => {
           const y = 88 + i * 26
-          drawAvatar(ctx, p.avatar, 52, y - 8, 11)
+          drawAvatar(ctx, p.avatar, 52, y - 8, 11, p.name)
           ctx.font = '18px system-ui'
           ctx.fillStyle = i === 0 ? '#f5b14c' : '#f0f0f2'
           ctx.fillText(`${i + 1}. ${p.name} — ${p.pts}`, 70, y)

@@ -50,6 +50,9 @@ body.scene-host #root { display: grid; place-items: center; }
   pointer-events: none;
 }
 .toast {
+  display: flex;
+  align-items: center;
+  gap: 6px;
   padding: 8px 14px;
   border-radius: 999px;
   background: #1b1b21ee;
@@ -58,8 +61,27 @@ body.scene-host #root { display: grid; place-items: center; }
   white-space: nowrap;
   max-width: 80vw;
   overflow: hidden;
-  text-overflow: ellipsis;
 }
+.toast__text { overflow: hidden; text-overflow: ellipsis; }
+
+/* A viewer's picture next to their name (ViewerAvatar): sized on the text around it, with
+   their initial underneath for when there is no picture. */
+.viewer-avatar {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  width: 1.6em;
+  aspect-ratio: 1;
+  vertical-align: middle;
+  border-radius: 50%;
+  overflow: hidden;
+  background: var(--tint, #3a3a44);
+  color: #ffffff;
+  font-weight: 700;
+  line-height: 1;
+}
+.viewer-avatar img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 
 .overlay__guide {
   position: absolute;
@@ -122,7 +144,8 @@ body.scene-host #root { display: grid; place-items: center; }
 .widget-goal__bar { height: 12px; border-radius: 6px; background: #00000055; overflow: hidden; }
 .widget-goal__fill { height: 100%; background: #7c5cff; transition: width 0.3s ease; }
 
-.widget-gifters__row { display: flex; gap: 8px; justify-content: flex-end; }
+.widget-gifters__row { display: flex; align-items: center; gap: 8px; justify-content: flex-end; }
+.widget-gifters__row + .widget-gifters__row { margin-top: 4px; }
 
 @keyframes alert-in {
   from { opacity: 0; transform: translateX(-50%) translateY(-12px); }
@@ -353,7 +376,10 @@ body.scene-host #root { display: grid; place-items: center; }
 .bivio__status { font-size: 3.4vmin; font-weight: 700; text-align: center; }
 .bivio__voters { display: flex; flex-wrap: wrap; justify-content: center; gap: 1vmin; min-height: 4.6vmin; }
 .bivio__voter {
-  padding: 0.6vmin 1.8vmin;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.8vmin;
+  padding: 0.6vmin 1.8vmin 0.6vmin 0.6vmin;
   border-radius: 999px;
   background: #ffffff14;
   font-size: 2.6vmin;

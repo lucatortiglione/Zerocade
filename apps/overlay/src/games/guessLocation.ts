@@ -1,4 +1,6 @@
+import type { Viewer } from '@zerocade/shared'
 import type { GameInstance } from './engine'
+import { fillTextWithAvatar } from './avatar'
 import { addPoints, drawLeaderboard, drawTimerBar, newScores, normalize, shuffled } from './common'
 import { itemsFor } from '../content'
 
@@ -33,7 +35,7 @@ export function createGuessLocation(): GameInstance {
   let revealCountry = 0
   let revealCity = 0
   let hintClock = 0
-  let winner = ''
+  let winner: Viewer | null = null
   const solvedBy = new Set<string>()
   const scores = newScores()
 
@@ -46,7 +48,7 @@ export function createGuessLocation(): GameInstance {
     revealCountry = 0
     revealCity = 0
     hintClock = 0
-    winner = ''
+    winner = null
     solvedBy.clear()
   }
 
@@ -91,7 +93,7 @@ export function createGuessLocation(): GameInstance {
       const gotCity = answerMode === 'both' && loc.city ? text === cityNorm : false
       if (!gotCountry && !gotCity) return
       solvedBy.add(event.user.id)
-      if (!winner) winner = event.user.nickname
+      if (!winner) winner = event.user
       if (gotCountry && !countryFound) {
         countryFound = true
         addPoints(scores, event.user.id, event.user.nickname, event.user.avatar, countryPts)
@@ -157,7 +159,7 @@ export function createGuessLocation(): GameInstance {
         if (winner) {
           ctx.fillStyle = '#3ccf7a'
           ctx.font = 'bold 22px system-ui'
-          ctx.fillText(`🏆 ${winner} ha indovinato!`, cx, height * 0.92)
+          fillTextWithAvatar(ctx, `🏆 ${winner.nickname} ha indovinato!`, cx, height * 0.92, winner)
         }
       }
 

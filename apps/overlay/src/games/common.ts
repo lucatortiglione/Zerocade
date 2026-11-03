@@ -32,7 +32,7 @@ export function drawLeaderboard(ctx: CanvasRenderingContext2D, map: Scores, size
   ctx.fillText('Top players', 40, 60)
   top.forEach(([, p], i) => {
     const y = 88 + i * 26
-    drawAvatar(ctx, p.avatar, 52, y - 8, 11)
+    drawAvatar(ctx, p.avatar, 52, y - 8, 11, p.name)
     ctx.font = '18px system-ui'
     ctx.fillStyle = i === 0 ? '#f5b14c' : '#f0f0f2'
     ctx.fillText(`${i + 1}. ${p.name} — ${p.pts}`, 70, y)
