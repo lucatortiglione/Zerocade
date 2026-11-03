@@ -951,7 +951,10 @@ body.incastro-on .guide-chip__arrow { color: rgb(255 255 255 / 0.45); }
 .inc-board-list__row:nth-child(2) .inc-board-list__rank { background: linear-gradient(#f4f7fa, #a9b4c0); color: #26303a; }
 .inc-board-list__row:nth-child(3) .inc-board-list__rank { background: linear-gradient(#f6cfaa, #c27a44); color: #3d220f; }
 .inc-board-list__avatar { width: 3.4vmin; font-size: 1.5vmin; }
-.inc-board-list__name { flex: 1; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.inc-board-list__who { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.inc-board-list__name, .inc-board-list__word { min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+/* The player's longest word of this level, under the name. */
+.inc-board-list__word { font-family: var(--inc-display); font-size: 1.6vmin; font-weight: 600; line-height: 1.1; letter-spacing: 0.15vmin; color: var(--inc-gold); }
 .inc-board-list__pts { font-family: var(--inc-display); font-weight: 600; font-variant-numeric: tabular-nums; }
 .inc-board-list__empty { font-size: 2vmin; opacity: 0.8; }
 /* The live's longest word, under the ranking. */
@@ -1064,6 +1067,11 @@ body.incastro-on .guide-chip__arrow { color: rgb(255 255 255 / 0.45); }
 .inc-summary__name { font-family: var(--inc-display); font-size: 4.2vmin; font-weight: 600; }
 .inc-summary__pts { font-size: 2.5vmin; font-weight: 800; color: var(--inc-accent); }
 .inc-summary__others { display: flex; gap: 2.4vmin; font-size: 2.3vmin; font-weight: 700; color: var(--inc-muted); }
+.inc-summary__others > span { display: inline-flex; align-items: center; gap: 0.7vmin; }
+.inc-summary__mini { width: 3.6vmin; font-size: 1.6vmin; }
+/* Each player's longest word of the level. */
+.inc-summary__longest { font-size: 2.1vmin; font-weight: 700; color: var(--inc-muted); }
+.inc-summary__word { font-family: var(--inc-display); font-weight: 600; letter-spacing: 0.15vmin; color: var(--inc-accent); }
 .inc-summary__chapter {
   display: flex;
   align-items: center;

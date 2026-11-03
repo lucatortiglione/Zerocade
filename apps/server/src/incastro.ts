@@ -141,6 +141,8 @@ const REPEAT_GAP_MS = 4000
 const CHAPTER_BONUS_MS = 4000
 
 type CellState = 'hidden' | 'hint' | 'found'
+// A score as counted; the level's longest word is added when it is sent.
+type Tally = Omit<IncastroScore, 'levelLongest'>
 // A moment before it gets its number (Omit over each member of the union).
 type NewMoment = IncastroMoment extends infer M ? (M extends unknown ? Omit<M, 'seq'> : never) : never
 
@@ -188,9 +190,11 @@ class IncastroRoom {
   private extras = new Set<string>()
   private extraWords = new Set<string>()
   private wordIndex = new Map<string, number>()
-  private scores = new Map<string, IncastroScore>()
-  private levelScores = new Map<string, IncastroScore>()
+  private scores = new Map<string, Tally>()
+  private levelScores = new Map<string, Tally>()
   private longest: IncastroRecord | null = null
+  // Each player's longest word in this level, by player id.
+  private levelLongest = new Map<string, string>()
   // Who found the level's secret word (null with secretFound means nobody yet).
   private secretFound = false
   private secretBy: IncastroPlayer | null = null
@@ -307,6 +311,7 @@ class IncastroRoom {
         this.scores.clear()
         this.levelScores.clear()
         this.longest = null
+        this.levelLongest.clear()
         return this.emitNow()
     }
   }
@@ -392,8 +397,11 @@ class IncastroRoom {
         grid.push(row)
       }
     }
-    const top = (map: Map<string, IncastroScore>, n: number) =>
-      [...map.values()].sort((a, b) => b.points - a.points || b.words - a.words).slice(0, n)
+    const top = (map: Map<string, Tally>, n: number): IncastroScore[] =>
+      [...map.values()]
+        .sort((a, b) => b.points - a.points || b.words - a.words)
+        .slice(0, n)
+        .map((s) => ({ ...s, levelLongest: this.levelLongest.get(s.id) ?? null }))
     return {
       phase: this.phase,
       paused: this.paused,
@@ -499,6 +507,7 @@ class IncastroRoom {
     this.found.clear()
     this.extras.clear()
     this.levelScores.clear()
+    this.levelLongest.clear()
     this.lastRepeat.clear()
     this.missed = false
     this.chapterDone = false
@@ -839,8 +848,10 @@ class IncastroRoom {
   }
 
   // A longer word takes the record; one of the same length leaves it to whoever was first.
+  // The same for each player's longest word of the level, where the first of a length stays.
   private noteLongest(word: string, by: IncastroPlayer): void {
     if (word.length > (this.longest?.word.length ?? 0)) this.longest = { word, by }
+    if (word.length > (this.levelLongest.get(by.id)?.length ?? 0)) this.levelLongest.set(by.id, word)
   }
 
   private addMoment(moment: NewMoment): void {

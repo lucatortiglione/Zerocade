@@ -341,6 +341,9 @@ export interface IncastroPlayer {
 export interface IncastroScore extends IncastroPlayer {
   points: number
   words: number
+  // The longest word this player found in the level in play (grid, extra or secret), in the
+  // live's ranking too; null when they have found none in it yet.
+  levelLongest: string | null
 }
 
 export interface IncastroWord {

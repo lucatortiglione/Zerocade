@@ -838,7 +838,11 @@ function Leaderboard({
             <li key={s.id} className="inc-board-list__row">
               <span className="inc-board-list__rank">{i + 1}</span>
               <Avatar player={s} className="inc-board-list__avatar" />
-              <span className="inc-board-list__name">{s.nickname}</span>
+              {/* Under the name, their longest word of this level. */}
+              <span className="inc-board-list__who">
+                <span className="inc-board-list__name">{s.nickname}</span>
+                {s.levelLongest && <span className="inc-board-list__word">{s.levelLongest}</span>}
+              </span>
               <span className="inc-board-list__pts">{s.points}</span>
             </li>
           ))}
@@ -898,6 +902,11 @@ function Summary({
             <span className="inc-summary__pts">
               {best.points} {best.points === 1 ? ui.point : ui.points} · {best.words} {best.words === 1 ? ui.word : ui.words}
             </span>
+            {best.levelLongest && (
+              <span className="inc-summary__longest">
+                {ui.longest} <span className="inc-summary__word">{best.levelLongest}</span>
+              </span>
+            )}
           </div>
         </div>
       ) : (
@@ -907,7 +916,8 @@ function Summary({
         <p className="inc-summary__others">
           {others.map((s, i) => (
             <span key={s.id}>
-              {i + 2}. {s.nickname} · {s.points}
+              {i + 2}. <Avatar player={s} className="inc-summary__mini" /> {s.nickname} · {s.points}
+              {s.levelLongest && <span className="inc-summary__word">{s.levelLongest}</span>}
             </span>
           ))}
         </p>
