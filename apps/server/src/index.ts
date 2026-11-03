@@ -288,7 +288,17 @@ const roomSources = (key: string) => {
 
 // ZeroFollowerBot's event bridge, for this Zerocade's room: its events go where the direct feeds' go.
 const zfb = new ZfbBridge(
-  (event, kind, account) => broadcastEvent(roomKey, event, kind, account ? `${kind}:${account}` : ''),
+  (event, kind, account, id) => {
+    // A ZeroWords guess that only repeats words the level already has: ZeroFollowerBot's voice need not read it.
+    // Asked before the game plays the comment, so the one that finds a word is still read.
+    const repeat =
+      id !== '' &&
+      event.type === 'comment' &&
+      triggersFor(getSession(roomKey).triggers, event).some((t) => t.action === 'guess') &&
+      incastro.get(roomKey)?.alreadyGuessed(event.text) === true
+    broadcastEvent(roomKey, event, kind, account ? `${kind}:${account}` : '')
+    if (repeat) zfb.skip(id)
+  },
   (status) => {
     io.to(dashboardRoom(roomKey)).emit('bridge:status', status)
     for (const a of zfb.accounts()) touchCreator(a.kind, a.username, getSession(roomKey).gameId)

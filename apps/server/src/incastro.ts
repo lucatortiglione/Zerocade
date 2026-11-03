@@ -83,9 +83,9 @@ export function zerowordsCsv(which: 'plays' | 'answers'): string {
 // Chat text -> the words to check: accents folded (CITTÀ -> CITTA), upper case, 3-10
 // letters (wheels have up to 9). A comment can carry a few words ("amo ora"), not a whole list.
 const MAX_WORDS_PER_COMMENT = 4
+const lettersOf = (text: string) => text.normalize('NFD').replace(/\p{M}/gu, '').toUpperCase().split(/[^A-Z]+/)
 export function wordsIn(text: string): string[] {
-  const folded = text.normalize('NFD').replace(/\p{M}/gu, '').toUpperCase()
-  const words = folded.split(/[^A-Z]+/).filter((w) => w.length >= 3 && w.length <= 10)
+  const words = lettersOf(text).filter((w) => w.length >= 3 && w.length <= 10)
   return [...new Set(words)].slice(0, MAX_WORDS_PER_COMMENT)
 }
 
@@ -224,6 +224,25 @@ class IncastroRoom {
   ) {
     // From where this overlay key stopped last time.
     this.startLevel((incastroLevel(this.key) ?? 1) - 1)
+  }
+
+  // Whether a comment only repeats words this level already has (on the board, the secret word
+  // once found, extra words once played): ZeroFollowerBot's voice need not read it. Asked before
+  // the comment is played, so the one that finds a word is still read. Words under three letters
+  // ("è", "ok") are chatter around a guess; anything longer that is not a word already had keeps
+  // the comment.
+  alreadyGuessed(text: string): boolean {
+    const level = this.level
+    if (!level) return false
+    const words = lettersOf(text).filter((w) => w.length >= 3)
+    return (
+      words.length > 0 &&
+      words.every((word) => {
+        const i = this.wordIndex.get(word)
+        if (i !== undefined) return this.found.has(i)
+        return word === level.secret ? this.secretFound : this.extras.has(word)
+      })
+    )
   }
 
   action(action: string, event: LiveEvent): void {
