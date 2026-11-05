@@ -15,34 +15,43 @@ import {
   triggersFor,
   type BackgroundGame,
   type ClientToServerEvents,
+  type EventOrigin,
   type Feed,
   type FeedCreator,
+  type FeedEvent,
   type HandshakeAuth,
   type LiveEvent,
   type RoomInfo,
   type ServerToClientEvents,
 } from '@zerocade/shared'
-import { BivioRooms, bivioCsv, bivioStats } from './bivio.js'
-import { IncastroRooms } from './incastro.js'
+import { BivioRooms, bivioCsv, bivioFlagsCsv, bivioStats } from './bivio.js'
+import { IncastroRooms, zerowordsCsv } from './incastro.js'
+import { QuizzlandRooms, quizzlandCsv, quizzlandStats } from './quizzland.js'
 import {
   dataDir,
   getPad,
   getRanking,
   giftedCreators,
+  bridgeConfig,
   latestGifts,
   listEvents,
   recentCreators,
   recordEvent,
   recordGift,
   roomKey,
+  saveBridgeConfig,
+  saveSource,
+  savedSources,
   setPadVolume,
   topGiftSince,
   touchCreator,
 } from './db.js'
 import { getContent } from './content.js'
+import { HOSTS_LINE, LOCAL_DOMAIN, domainRegistered, ensureDomain } from './hosts.js'
 import { PAD_FILE_MAX, padBoard, padFile, removePad, savePadInput } from './pads.js'
 import { getSession, selectGame, setScene, setSettings, setTriggers } from './sessions.js'
-import { RoomSources } from './sources.js'
+import { RoomSources, sourceUsername } from './sources.js'
+import { ZfbBridge } from './zfb.js'
 import {
   sanitizeBivioCommand,
   sanitizeDj,
@@ -50,14 +59,18 @@ import {
   sanitizeIncastroCommand,
   sanitizeLevel,
   sanitizeMessage,
+  sanitizeQuizzlandCommand,
   sanitizeScene,
   sanitizeSettings,
+  sanitizeBridgeConfig,
   sanitizeSourceConfig,
   sanitizeTriggers,
 } from './validate.js'
 
 const PORT = Number(process.env.PORT ?? 3001)
 const LOCAL_URL = `http://localhost:${PORT}/`
+// The link for OBS and TikTok LIVE Studio, which take a domain name (see hosts.ts).
+const OVERLAY_URL = `http://${LOCAL_DOMAIN}:${PORT}/overlay/`
 
 // Built pages (npm start, or the Windows package) are hosted here too: the dashboard
 // at / and the overlay at /overlay/. In dev the Vite servers serve them instead.
@@ -68,6 +81,9 @@ const dashboardDir = pagesDir('dashboard')
 const overlayDir = pagesDir('overlay')
 
 const app = Fastify({ logger: { level: process.env.LOG_LEVEL ?? 'info' } })
+// A stray rejected promise (a live feed failing, a socket closing) is logged: it must not
+// take the server, and the stream with it, down.
+process.on('unhandledRejection', (err) => app.log.error({ err }, 'unhandled rejection'))
 await app.register(helmet, {
   contentSecurityPolicy: {
     directives: {
@@ -81,16 +97,20 @@ await app.register(helmet, {
   },
 })
 
-// Only pages that reach this PC by its own name get an answer. A website that points one of
-// its names at 127.0.0.1 (DNS rebinding) would otherwise be same-origin with Zerocade and
-// could read the room key.
-const LOCAL_HOST = /^(localhost|127\.0\.0\.1|\[::1\])(:\d+)?$/
+// Only pages that reach this PC by its own name, or by zerocade.test (which no real site can
+// own), get an answer. A website that points one of its names at 127.0.0.1 (DNS rebinding)
+// would otherwise be same-origin with Zerocade and could read the room key.
+const LOCAL_HOST = /^(localhost|127\.0\.0\.1|\[::1\]|zerocade\.test)(:\d+)?$/
 app.addHook('onRequest', async (req, reply) => {
   if (!LOCAL_HOST.test(req.headers.host ?? '')) return reply.code(403).send({ error: 'forbidden' })
 })
 
 app.get('/api/health', async () => ({ ok: true }))
-app.get('/api/room', async (): Promise<RoomInfo> => ({ key: roomKey, overlayUrl: `${LOCAL_URL}overlay/` }))
+app.get('/api/room', async (): Promise<RoomInfo> => ({
+  key: roomKey,
+  overlayUrl: OVERLAY_URL,
+  hostsLine: domainRegistered() ? undefined : HOSTS_LINE,
+}))
 app.get('/api/games', async () => GAMES)
 app.get('/api/content', async () => getContent())
 app.get('/api/events', async (req) => {
@@ -110,8 +130,33 @@ app.get('/api/bivio/export.csv', async (_req, reply) => {
     .header('content-disposition', `attachment; filename="bivio-risultati-${day}.csv"`)
     .send(bivioCsv())
 })
+// The questions marked as wrong (also saved as data/bivio-domande-sbagliate.csv).
+app.get('/api/bivio/flagged.csv', async (_req, reply) =>
+  reply
+    .header('content-type', 'text/csv; charset=utf-8')
+    .header('content-disposition', 'attachment; filename="bivio-domande-sbagliate.csv"')
+    .send(bivioFlagsCsv()),
+)
+app.get('/api/quizzland/stats', async () => quizzlandStats())
+app.get('/api/quizzland/export.csv', async (_req, reply) => {
+  const day = new Date().toISOString().slice(0, 10)
+  return reply
+    .header('content-type', 'text/csv; charset=utf-8')
+    .header('content-disposition', `attachment; filename="zeroquizz-risposte-${day}.csv"`)
+    .send(quizzlandCsv())
+})
+// ZeroWords' plays (one row per level) and the answers and hints within them: the data to
+// calibrate the level generator on.
+for (const which of ['plays', 'answers'] as const) {
+  app.get(`/api/zerowords/${which}.csv`, async (_req, reply) =>
+    reply
+      .header('content-type', 'text/csv; charset=utf-8')
+      .header('content-disposition', `attachment; filename="zerowords-${which === 'plays' ? 'partite' : 'risposte'}.csv"`)
+      .send(zerowordsCsv(which)),
+  )
+}
 
-// Background images (Bivio, Incastro): one per game and overlay key, stored in the data
+// Background images (Bivio, Incastro, Quizzland): one per game and overlay key, stored in the data
 // folder next to the databases. No SVG, which could carry scripts.
 const BACKGROUND_TYPES: Record<string, string> = { 'image/png': 'png', 'image/jpeg': 'jpg', 'image/webp': 'webp', 'image/gif': 'gif' }
 const backgroundsDir = join(dataDir, 'backgrounds')
@@ -208,18 +253,37 @@ const dashboardRoom = (key: string) => `${key}#dashboard`
 const incastro = new IncastroRooms(
   (key, state) => io.to(key).emit('incastro:state', state),
   (key, solution) => io.to(dashboardRoom(key)).emit('incastro:solution', solution),
+  // The right answers of the level in this Zerocade's room go to ZeroFollowerBot's voice (see zfb.ts): of the
+  // comments made of a single word it reads only a right answer, the first time.
+  (key, answers, fresh) => {
+    if (key === roomKey) zfb.setWords(answers, fresh)
+  },
 )
 
+// Quizzland's right answer, like Incastro's solution, goes to the dashboards only.
+const quizzland = new QuizzlandRooms(
+  (key, state) => io.to(key).emit('quizzland:state', state),
+  (key, solution) => io.to(dashboardRoom(key)).emit('quizzland:solution', solution),
+)
+
+// The latest live events of each key, for the dashboard's chat box when it opens.
+const FEED_KEPT = 100
+const feeds = new Map<string, FeedEvent[]>()
+let feedSeq = 0
+
 // Persist + relay every live event (simulated or real), and keep the gifters ranking.
-// Bivio and Incastro run on the server, so their triggers are applied here rather than in
-// the overlay. `creator` is the live feed the event came from ('tiktok:<username>'), ''
-// when simulated.
-function broadcastEvent(key: string, event: LiveEvent, creator = '') {
+// Bivio, Incastro and Quizzland run on the server, so their triggers are applied here rather than in
+// the overlay. `origin` is the feed the event came from, `creator` that feed's account
+// ('tiktok:<username>'), '' when simulated.
+function broadcastEvent(key: string, event: LiveEvent, origin: EventOrigin = 'sim', creator = '') {
   recordEvent(key, event)
   if (event.type === 'gift') recordGift(key, creator, getSession(key).gameId, event)
   io.to(key).emit('live:event', event)
+  const item: FeedEvent = { seq: ++feedSeq, at: Date.now(), origin, event }
+  feeds.set(key, [...(feeds.get(key) ?? []).slice(1 - FEED_KEPT), item])
+  io.to(dashboardRoom(key)).emit('feed:events', [item])
   if (event.type === 'gift') io.to(key).emit('ranking:update', getRanking(key))
-  const room = bivio.get(key) ?? incastro.get(key)
+  const room = bivio.get(key) ?? incastro.get(key) ?? quizzland.get(key)
   if (room) for (const t of triggersFor(getSession(key).triggers, event)) room.action(t.action, event)
 }
 
@@ -229,9 +293,9 @@ const roomSources = (key: string) => {
   let room = sources.get(key)
   if (!room) {
     room = new RoomSources(
-      (event) => {
-        const tiktok = sources.get(key)?.live().find((s) => s.kind === 'tiktok')
-        broadcastEvent(key, event, tiktok ? `tiktok:${tiktok.username}` : '')
+      (event, kind) => {
+        const live = sources.get(key)?.live().find((s) => s.kind === kind)
+        broadcastEvent(key, event, kind, live ? `${kind}:${live.username}` : '')
       },
       (status) => {
         io.to(key).emit('source:status', status)
@@ -243,6 +307,26 @@ const roomSources = (key: string) => {
   return room
 }
 
+// ZeroFollowerBot's event bridge, for this Zerocade's room: its events go where the direct feeds' go.
+const zfb = new ZfbBridge(
+  (event, kind, account, id) => {
+    // A ZeroWords guess that only repeats words the level already has: ZeroFollowerBot's voice need not read it.
+    // Asked before the game plays the comment, so the one that finds a word is still read.
+    const repeat =
+      id !== '' &&
+      event.type === 'comment' &&
+      triggersFor(getSession(roomKey).triggers, event).some((t) => t.action === 'guess') &&
+      incastro.get(roomKey)?.alreadyGuessed(event.text) === true
+    broadcastEvent(roomKey, event, kind, account ? `${kind}:${account}` : '')
+    if (repeat) zfb.skip(id)
+  },
+  (status) => {
+    io.to(dashboardRoom(roomKey)).emit('bridge:status', status)
+    for (const a of zfb.accounts()) touchCreator(a.kind, a.username, getSession(roomKey).gameId)
+  },
+)
+zfb.configure(bridgeConfig())
+
 const liveCreators = (): FeedCreator[] => {
   const seen = new Map<string, FeedCreator>()
   for (const [key, room] of sources) {
@@ -251,6 +335,10 @@ const liveCreators = (): FeedCreator[] => {
       if (s.viewers !== undefined) creator.viewers = s.viewers
       seen.set(`${s.kind}:${s.username}`, creator)
     }
+  }
+  for (const a of zfb.accounts()) {
+    const id = `${a.kind}:${a.username}`
+    if (!seen.has(id)) seen.set(id, { kind: a.kind, username: a.username, gameId: getSession(roomKey).gameId, at: a.since })
   }
   return [...seen.values()].sort((a, b) => (b.viewers ?? -1) - (a.viewers ?? -1) || a.at - b.at)
 }
@@ -276,26 +364,51 @@ io.on('connection', (socket) => {
   socket.emit('session:state', session)
   if (session.gameId === 'bivio') socket.emit('bivio:state', bivio.open(key, session.settings))
   if (session.gameId === 'incastro') socket.emit('incastro:state', incastro.open(key, session.settings))
+  if (session.gameId === 'quizzland') socket.emit('quizzland:state', quizzland.open(key, session.settings))
 
   socket.on('disconnect', () => {
     if (io.sockets.adapter.rooms.get(key)?.size) return
     bivio.get(key)?.suspend()
     incastro.get(key)?.suspend()
+    quizzland.get(key)?.suspend()
   })
 
-  // Overlays only listen; everything that changes state comes from the dashboard.
+  // A click on ZeroWords' wheel shuffles it: in the dashboard's preview, the overlay page in a
+  // browser, or OBS's Interact window.
+  socket.on('incastro:shuffle', () => incastro.get(key)?.control('shuffle'))
+
+  // Otherwise overlays only listen; everything that changes state comes from the dashboard.
   if (clientType !== 'dashboard') return
 
   void socket.join(dashboardRoom(key))
   const words = incastro.get(key)
   if (words) socket.emit('incastro:solution', words.solution())
+  const quiz = quizzland.get(key)?.solution()
+  if (quiz) socket.emit('quizzland:solution', quiz)
   socket.emit('ranking:update', getRanking(key))
   socket.emit('pads:state', padBoard(key))
   for (const status of roomSources(key).statuses()) socket.emit('source:status', status)
+  socket.emit('source:saved', savedSources(key))
+  socket.emit('feed:events', feeds.get(key) ?? [])
+  socket.emit('bridge:status', zfb.status())
 
+  socket.on('bridge:set', (raw: unknown) => {
+    const config = sanitizeBridgeConfig(raw)
+    if (!config) return
+    saveBridgeConfig(config)
+    zfb.configure(config)
+  })
+
+  // The name entered is saved for the next lives, whether this connection works or not.
   socket.on('source:connect', (raw: unknown) => {
     const config = sanitizeSourceConfig(raw)
-    if (config) roomSources(key).connect(config)
+    if (!config) return
+    const username = sourceUsername(config.kind, config.username)
+    if (username) {
+      saveSource(key, config.kind, username)
+      io.to(dashboardRoom(key)).emit('source:saved', savedSources(key))
+    }
+    roomSources(key).connect(config)
   })
 
   socket.on('source:disconnect', (kind: unknown) => {
@@ -311,12 +424,14 @@ io.on('connection', (socket) => {
     const state = selectGame(key, gameId)
     if (!state) return
     io.to(key).emit('session:state', state)
-    // Selecting Bivio again starts a fresh round; Incastro picks up its saved level with
-    // a fresh leaderboard.
+    // Selecting Bivio or Quizzland again starts a fresh round (and Quizzland a fresh
+    // leaderboard); Incastro picks up its saved level with a fresh leaderboard.
     bivio.close(key)
     incastro.close(key)
+    quizzland.close(key)
     if (state.gameId === 'bivio') bivio.open(key, state.settings)
     if (state.gameId === 'incastro') incastro.open(key, state.settings)
+    if (state.gameId === 'quizzland') quizzland.open(key, state.settings)
   })
 
   socket.on('triggers:set', (raw: unknown) => {
@@ -333,6 +448,7 @@ io.on('connection', (socket) => {
     io.to(key).emit('session:state', setSettings(key, settings))
     bivio.get(key)?.applySettings(settings)
     incastro.get(key)?.applySettings(settings)
+    quizzland.get(key)?.applySettings(settings)
   })
 
   socket.on('bivio:control', (raw: unknown) => {
@@ -343,6 +459,11 @@ io.on('connection', (socket) => {
   socket.on('incastro:control', (raw: unknown) => {
     const command = sanitizeIncastroCommand(raw)
     if (command) incastro.get(key)?.control(command)
+  })
+
+  socket.on('quizzland:control', (raw: unknown) => {
+    const command = sanitizeQuizzlandCommand(raw)
+    if (command) quizzland.get(key)?.control(command)
   })
 
   socket.on('incastro:goto', (raw: unknown) => {
@@ -405,6 +526,9 @@ try {
   openDashboard()
   process.exit(1)
 }
+
+// Before the dashboard opens, so the link it shows already works.
+await ensureDomain(OVERLAY_URL)
 
 if (dashboardDir) {
   console.log(`\nZerocade è avviato: apri ${LOCAL_URL} (chiudi questa finestra per fermarlo)\n`)

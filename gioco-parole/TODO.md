@@ -1,7 +1,7 @@
-# Incastro · TODO
+# ZeroWords · TODO
 
 Gioco di parole per Android (poi iOS): una ruota di lettere e uno schema a incastro da completare trascinando il dito sulle lettere.
-"Incastro" è un titolo provvisorio (vedi [1. Decisioni](#1-decisioni-da-prendere-prima-di-scrivere-codice)).
+"ZeroWords" è il nome scelto (prima "Incastro", titolo provvisorio; nel codice resta `incastro`). Va ancora verificato: vedi [1. Decisioni](#1-decisioni-da-prendere-prima-di-scrivere-codice).
 
 Il genere è noto e diffuso. Questo piano usa come studio il reverse engineering di Words of Wonders 5.10.4 (`com.fugo.wow`). Il report completo è in `../Words_of_Wonders_RE/README.md`. Dall'analisi prendiamo **solo** meccaniche di genere e lezioni tecniche. Incastro **non** è una copia di Words of Wonders:
 - tema, progressione, meta-gioco e identità sono nostri;
@@ -33,11 +33,11 @@ Il riferimento tecnico resta in `../Words_of_Wonders_RE/` e **non** va copiato q
 | `lexicon/it/not_in_grid.txt` | Parole valide che non vanno mai nello schema (nomi, sigle, prestiti, interiezioni) | ✅ prima revisione |
 | `lexicon/blocklist_it.txt` | Parole escluse ovunque: volgari, offensive, sensibili | ✅ prima revisione |
 | `tools/build_lexicon.py` | M1: Morph-it! + frequenze wordfreq → `words.tsv` | ✅ |
-| `tools/generate_levels.py` | M2: generatore deterministico (stessi file a ogni esecuzione) con impaginazione a incastro e backtracking | ✅ |
-| `tools/validate_levels.py` | M2: validatore (esce con 1 se un livello è sbagliato) | ✅ 600 livelli, 0 errori |
+| `apps/server/src/wordgen/` (fuori da questa cartella) | M2: generatore dei livelli in TypeScript, dentro il server di Zerocade: livelli senza fine, creati durante la partita e deterministici dal numero; `npm run wordgen -w @zerocade/server` per tararlo ([ALGORITMO.md](ALGORITMO.md)) | ✅ |
+| `tools/validate_levels.py` | M2: validatore dei livelli scritti dal generatore (esce con 1 se un livello è sbagliato) | ✅ livelli 1–600, 0 errori |
 | `tools/curve.json` | Curva di difficoltà (al posto di `curve.yaml`: niente dipendenza da PyYAML) | ✅ da tarare col playtest |
 | `tools/make_backgrounds.py` | Disegna gli sfondi dei capitoli e scrive `data/chapters.json` | ✅ |
-| `data/levels/it/pack_NNN.json` | 600 livelli, 100 per file | ✅ |
+| `data/levels/it/pack_NNN.json` | Livelli scritti solo per il controllo (`--write N`), 100 per file; il server non li legge | ✅ |
 | `data/chapters.json` | 30 capitoli da 20 livelli: nome, stagione, ora, sfondo, colore | ✅ (JSON invece di CSV) |
 | `assets/backgrounds/chapter_NN.svg` | 30 sfondi 1080 × 1920: il giardino che cresce | ✅ |
 | `assets/anteprima.html` | Tutti gli sfondi insieme (va aperta da un server locale, per esempio `python -m http.server`) | ✅ |
@@ -46,19 +46,19 @@ Rigenerare tutto (serve `pip install wordfreq`; le liste sorgente non stanno nel
 
 ```
 python tools/build_lexicon.py <percorso>/morph-it_048.txt
-python tools/generate_levels.py
+npm run wordgen -w @zerocade/server -- --write 600
 python tools/validate_levels.py
 python tools/make_backgrounds.py
 ```
 
 ### Versione PC per Zerocade (fatta)
 
-Prima dell'app Android, Incastro gira come gioco di **Zerocade** per le dirette TikTok/Twitch, sul modello di Bivio: il pubblico scrive in chat le parole che trova.
+Prima dell'app Android, ZeroWords gira come gioco di **Zerocade** per le dirette TikTok/Twitch, sul modello di Bivio: il pubblico scrive in chat le parole che trova.
 
-- **Server** (`apps/server/src/incastro.ts`): carica i livelli di `data/levels` e i capitoli, controlla le parole della chat (accenti ignorati, fino a 4 parole per commento), assegna i punti (1 per lettera, +3 per la parola con tutte le lettere, 1 per una parola extra), gestisce aiuti automatici, aiuti dai trigger (con limite per livello e uno ogni 2 s), mescola, timer facoltativo, riepilogo e avanzamento. Il livello raggiunto è salvato per ogni overlay (`incastro_progress` in SQLite).
-- **Overlay** (`apps/overlay/src/Incastro.tsx`): schema, ruota con la linea che collega le lettere della parola trovata, fumetto con chi l'ha trovata, feed, classifica, parole extra, anello dell'aiuto, riepilogo con il migliore del livello, festa di fine capitolo e nuovo giardino. Suoni sintetizzati (nessun file audio). Sfondo: giardino del capitolo, colore, trasparente o immagine caricata.
-- **Dashboard** (`apps/dashboard/src/components/IncastroSidebar.tsx`): collegamento TikTok, simulatore, pausa, salta/indietro/rigioca/vai al livello N, lettera, parola, mescola, soluzione del livello (solo in dashboard), classifica della live, trigger e impostazioni.
-- **Pacchetto Windows**: `npm run package:win` copia `data/` in `app/incastro` e scrive i crediti delle liste di parole.
+- **Server** (`apps/server/src/incastro.ts`): genera i livelli durante la partita (`wordgen/`, in un thread a parte, il successivo già pronto mentre si gioca), sceglie la variante Agevolata, Standard o Esperto del livello successivo secondo com'è andato il precedente (difficoltà automatica), legge i capitoli, controlla le parole della chat (accenti ignorati, fino a 4 parole per commento), assegna i punti (1 per lettera, +3 per la parola con tutte le lettere, 1 per una parola extra), gestisce aiuti automatici, aiuti dai trigger (con limite per livello e uno ogni 2 s), mescola, timer facoltativo, riepilogo e avanzamento. Il livello raggiunto è salvato per ogni overlay (`incastro_progress` in SQLite).
+- **Overlay** (`apps/overlay/src/Incastro.tsx`): schema, ruota con la linea che collega le lettere della parola trovata, fumetto con chi l'ha trovata, feed, classifica, parole extra, anello dell'aiuto, riepilogo con il migliore del livello, festa di fine capitolo e nuovo giardino. Suoni sintetizzati (nessun file audio). Sfondo: foto NASA del giorno (la successiva scaricata in anticipo), giardino del capitolo, colore, trasparente o immagine caricata; a ogni livello qualche secondo di solo sfondo prima della griglia (fase `intro`, chat e tempi fermi). Griglia senza pannello, direttamente sull'immagine; i colori vengono dall'immagine (letta in un canvas 48 × 48, in OKLCH): tonalità dominante per vetri, caselle e ruota, colore più vivace e lontano da quella per le tessere trovate (sul giardino l'accento del capitolo).
+- **Dashboard** (`apps/dashboard/src/components/IncastroSidebar.tsx`): collegamento TikTok, simulatore, pausa, salta/indietro/rigioca/vai al livello N, lettera, parola, mescola, "Parole del round" sotto il nome del gioco (solo in dashboard: da trovare con le lettere già visibili, segreta, trovate), classifica della live, trigger e impostazioni. Colonna di destra: "Chat ed eventi" di TikTok e Twitch, con il segno della parola su ogni messaggio.
+- **Pacchetto Windows**: `npm run package:win` mette il generatore in `app/wordgen-worker.mjs` e in `app/incastro` capitoli, `curve.json`, lessico e blocklist, con i crediti delle liste di parole.
 
 Decisioni prese per questa versione, da confermare per l'app: tema B (il giardino che cresce), parole accentate solo come extra (`CITTA`, `PERCHE` non vanno nello schema). Si gioca solo in italiano (decisione 1).
 
@@ -77,21 +77,21 @@ Decisioni prese per questa versione, da confermare per l'app: tema B (il giardin
   - B. Gratis con N capitoli, più un acquisto unico "Tutti i capitoli" (non consumabile).
   - C. Gratis con monete acquistabili per gli aiuti.
 
-  Il riferimento usa monete, pubblicità con circa 25 reti in mediazione, offerte e ruota della fortuna. In Incastro niente pubblicità né meccaniche d'azzardo: le monete si guadagnano solo giocando, con le parole extra e i capitoli completati.
+  Il riferimento usa monete, pubblicità con circa 25 reti in mediazione, offerte e ruota della fortuna. In ZeroWords niente pubblicità né meccaniche d'azzardo: le monete si guadagnano solo giocando, con le parole extra e i capitoli completati.
 - [x] **Lingua.** Solo italiano. Un'altra lingua richiederebbe dizionario libero, blocklist, livelli e revisione di un madrelingua: non è prevista.
 - [ ] **Lettere accentate in italiano.** Proposta: lo schema e la ruota usano la lettera base (`CITTÀ` → `CITTA`), e la parola trovata si mostra con l'accento nella scheda di definizione (v2).
 - [ ] **Stack.** Flutter, come Bivio: una sola base di codice e una sola toolchain. La ruota e la linea si disegnano con `CustomPainter`; Flame non serve.
-- [ ] **Nome definitivo.** Verificare "Incastro" su EUIPO, UIBM e Play Store. Evitare qualsiasi nome che contenga "Wonders", "WoW" o ricordi il riferimento.
+- [ ] **Nome definitivo.** Scelto "ZeroWords" (era "Incastro"): verificarlo su EUIPO, UIBM e Play Store. Evitare qualsiasi nome che contenga "Wonders", "WoW" o ricordi il riferimento.
 - [ ] **Analytics.** Nessuno, o un servizio rispettoso della privacy senza Advertising ID. Il riferimento usa Firebase, AppMetrica, AppsFlyer e geolocalizzazione via IP: niente di tutto questo.
 - [ ] **Definizioni delle parole (v2).** Da una fonte con licenza compatibile (es. Wiktionary, CC BY-SA, con attribuzione), oppure scritte da noi.
 
 ---
 
-## 2. Funzioni del riferimento e cosa fare in Incastro
+## 2. Funzioni del riferimento e cosa fare in ZeroWords
 
 Ricavate da nomi di classi e metodi IL2CPP, dal codice decompilato e dai dati. Le funzioni sono osservate; tempi, animazioni e bilanciamento non sono stati visti, perché l'app non è stata eseguita.
 
-| Funzione nel riferimento | Incastro |
+| Funzione nel riferimento | ZeroWords |
 |---|---|
 | Ruota di lettere: trascinamento, linea tra le lettere, deselezione tornando indietro, mescola (`WheelController`, `LineController`, `TouchController`) | **Tenere.** È il cuore del genere |
 | Schema a incastro con parole orizzontali e verticali (`BoardController`) | **Tenere**, con layout e generatore nostri |
@@ -168,18 +168,11 @@ RAMO     L'esempio rispetta le regole del validatore: AMO e ORA incrociano RAMO
 .O.A     (comprese le extra) è componibile con R, A, M, O.
 ```
 
-- [ ] **Algoritmo di generazione** (`tools/generate_levels.py`):
-  1. Scegliere la **parola seme** della lunghezza prevista dalla curva di difficoltà (3–4 lettere all'inizio, poi fino a 7–8). Il seme deve avere almeno K sotto-parole "principali".
-  2. Elencare le **sotto-parole**: tutte quelle componibili con il multinsieme delle lettere del seme (confronto con `Counter`).
-  3. Scegliere le parole dello schema: il seme più le sotto-parole più frequenti, fino al numero previsto dalla curva. Le altre parole valide diventano `extras`.
-  4. **Impaginazione dello schema** con backtracking e ripartenze casuali:
-     - si piazza la parola più lunga;
-     - ogni parola successiva deve incrociarne una già piazzata su una lettera uguale;
-     - due parole parallele non possono toccarsi;
-     - lo schema non deve uscire dalle dimensioni massime (proposta: 12×12 su telefono).
-  5. Punteggio di ogni impaginazione: numero di incroci, compattezza, rapporto d'aspetto adatto allo schermo. Si tiene la migliore su N tentativi, con `seed` salvato per la riproducibilità.
-  6. Si scarta il livello se manca il numero di parole richiesto o se lo schema ha più di una componente connessa.
-- [ ] **Curva di difficoltà**, una funzione dell'indice del livello: numero di lettere, numero di parole, frequenza media delle parole, lunghezza massima, densità degli incroci. Tabella dei parametri in `tools/curve.yaml`.
+- [x] **Algoritmo di generazione** (`apps/server/src/wordgen`): pipeline a sei stadi dalla curva a dente di squalo T(c, i): ruote sintetiche dall'indice dei multinsiemi, scheletro dell'archetipo (A telaio asimmetrico, B doppio lobo a ponte, C arcipelago ad albero, D arena densa), riempimento CSP con funzione di costo J, validazione con il solver umano simulato (D_sim entro ±3 da T), ordine della ruota, varianti DDA Agevolata (T − 15) ed Esperto (T + 12). Descrizione completa in [ALGORITMO.md](ALGORITMO.md).
+- [x] **Revisione v2.1 del generatore** (versione `zw-2`, ALGORITMO.md §16): ruota = anagramma di una parola vera sempre nello schema, solver con sforzo normalizzato e ambiguità pesata per familiarità, scala fissa, varianti con bersagli raggiungibili e sostituzione per l'Agevolata, difficoltà automatica con aiuti per origine e due esiti uguali, dati delle partite in `zerowords_plays` / `zerowords_answers`.
+- [ ] **Curva di difficoltà** in `tools/curve.json`: forma del dente, rampa, matrice per archetipo, pesi di J e del solver. I valori non fissati dalla specifica sono ipotesi (elenco in ALGORITMO.md): **tararli con i dati delle partite** (ALGORITMO.md §10.4) dopo alcune decine di live, su insiemi di stima e di verifica separati.
+- [ ] **Lemmi nel lessico:** tenere in `words.tsv` il lemma di Morph-it! (ricostruendo il lessico) e limitare le forme dello stesso lemma per griglia.
+- [ ] **Rating della chat** (media mobile su circa dieci livelli) al posto della serie di due esiti, quando i dati delle partite diranno come pesare tempi, stalli e partecipanti.
 - [ ] **Livelli tutorial** (i primi 5–10) fatti a mano e marcati `"handmade": true`
 - [ ] **Validatore** (`tools/validate_levels.py`, eseguito in CI). Fallisce se:
   - una parola esce dallo schema, o due parole si contraddicono in una casella;
@@ -292,7 +285,7 @@ Tutto nostro o con licenza libera. Le quantità del riferimento servono solo a s
 
 ## 5. Cosa manca per renderlo completo
 
-| Area | Riferimento | Incastro oggi | Cosa manca | Peso |
+| Area | Riferimento | ZeroWords oggi | Cosa manca | Peso |
 |---|---|---|---|---|
 | **Dizionario** | implicito nei livelli, 36 lingue | nessuno | Fonte con licenza verificata, normalizzazione, frequenze, blocklist (M1) | Grande |
 | **Livelli** | 14.980 per lingua principale, più varianti easy | nessuno | Generatore, validatore e curva (M2); 600 livelli al lancio, rivisti in playtest | Grande |

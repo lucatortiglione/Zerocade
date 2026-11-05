@@ -5,15 +5,17 @@ import type {
   GameSettings,
   IncastroMoment,
   IncastroPlayer,
+  IncastroRecord,
   IncastroScore,
   IncastroState,
 } from '@zerocade/shared'
 import { gameSound, type GameSound } from './audio'
+import { socket } from './socket'
 import { useOverlay } from './store'
 
 // Incastro is drawn in the DOM (and SVG for the wheel), like Bivio: the server runs the
-// level and this renders its IncastroState. Sizes are in vmin/vh, so the dashboard
-// preview and the 1080 × 1920 browser source look the same. The fonts (Fredoka, Nunito:
+// level and this renders its IncastroState. Sizes are in vmin/vh, within the 9:16 frame
+// main.tsx keeps, so the dashboard preview and the 1080 × 1920 browser source look the same. The fonts (Fredoka, Nunito:
 // OFL) are bundled, so OBS needs no network to show them.
 
 // Chapter background file name -> URL, from gioco-parole/assets/backgrounds.
@@ -28,8 +30,6 @@ const PREVIEW = new URLSearchParams(window.location.search).has('preview')
 
 // Every text on the overlay: Incastro is played in Italian only.
 const UI: Record<string, string> = {
-  chapter: 'Capitolo',
-  level: 'Livello',
   prompt: 'Scrivi in chat le parole che trovi',
   extras: 'extra',
   hintIn: 'Aiuto tra',
@@ -42,6 +42,7 @@ const UI: Record<string, string> = {
   revealAuto: 'Rivelata',
   shuffleBy: 'ha mescolato la ruota',
   shuffleAuto: 'Ruota mescolata',
+  shuffleClick: 'Clicca per mescolare la ruota',
   complete: 'Livello completato!',
   timeUp: 'Tempo scaduto',
   best: 'Migliore del livello',
@@ -53,6 +54,11 @@ const UI: Record<string, string> = {
   empty: 'Nessun livello trovato',
   leaderboard: 'Classifica',
   noScores: 'Il primo che trova una parola sale qui',
+  longest: 'Parola più lunga',
+  secret: 'Parola segreta',
+  secretFound: 'ha trovato la parola segreta',
+  secretWorth: 'vale il doppio',
+  secretNobody: 'Nessuno l’ha trovata',
   point: 'punto',
   points: 'punti',
   word: 'parola',
@@ -63,13 +69,163 @@ const UI: Record<string, string> = {
 const hex = (v: unknown, fallback: string) =>
   typeof v === 'string' && /^#[0-9a-f]{6}$/i.test(v) ? v.toLowerCase() : fallback
 
-function backgroundOf(s: GameSettings, chapterBackground: string) {
-  const mode = typeof s.background === 'string' ? s.background : 'garden'
+// 'nasa' shows the level's NASA picture, and the chapter's garden until there is one.
+function backgroundOf(s: GameSettings, chapterBackground: string, photo: IncastroState['photo']) {
+  const mode = typeof s.background === 'string' ? s.background : 'nasa'
   const image = typeof s.bgImage === 'string' ? s.bgImage : ''
-  if (mode === 'transparent') return { seeThrough: true, url: '', color: 'transparent' }
-  if (mode === 'color') return { seeThrough: false, url: '', color: hex(s.bgColor, '#173b2c') }
-  if (mode === 'image' && image) return { seeThrough: false, url: image, color: '#173b2c' }
-  return { seeThrough: false, url: BACKGROUNDS[chapterBackground] ?? '', color: '#173b2c' }
+  const none = { seeThrough: false, url: '', photo: false, garden: false }
+  if (mode === 'transparent') return { ...none, seeThrough: true, color: 'transparent' }
+  if (mode === 'color') return { ...none, color: hex(s.bgColor, '#173b2c') }
+  if (mode === 'image' && image) return { ...none, url: image, color: '#173b2c' }
+  if (mode === 'nasa' && photo) return { ...none, url: photo.url, color: '#05080f', photo: true }
+  return { ...none, url: BACKGROUNDS[chapterBackground] ?? '', color: '#173b2c', garden: true }
+}
+
+// --- Colours from the picture ---
+
+// The game's colours, taken from the picture behind it. Its dominant hue tints the glass,
+// the slots and the wheel (`tint` is how much: 0 for a grey picture); its most vivid colour is
+// the accent of the found tiles, the chips and the line (null: the chapter's).
+interface Theme {
+  hue: number
+  tint: number
+  accent: string | null
+}
+
+const GREY: Theme = { hue: 155, tint: 0, accent: null }
+const clamp = (v: number, lo: number, hi: number) => Math.min(hi, Math.max(lo, v))
+const accentOf = (chroma: number, hue: number) => `oklch(0.62 ${clamp(chroma * 1.6, 0.12, 0.19).toFixed(3)} ${hue.toFixed(1)})`
+
+// sRGB 0-255 -> OKLCH (lightness 0-1, chroma, hue in degrees): perceptual, so one lightness
+// gives the same contrast whatever the hue.
+const LINEAR = Array.from({ length: 256 }, (_, i) => (i <= 10 ? i / 255 / 12.92 : ((i / 255 + 0.055) / 1.055) ** 2.4))
+function oklch(r8: number, g8: number, b8: number): [number, number, number] {
+  const [r, g, b] = [LINEAR[r8], LINEAR[g8], LINEAR[b8]]
+  const l = Math.cbrt(0.4122214708 * r + 0.5363325363 * g + 0.0514459929 * b)
+  const m = Math.cbrt(0.2119034982 * r + 0.6806995451 * g + 0.1073969566 * b)
+  const s = Math.cbrt(0.0883024619 * r + 0.2817188376 * g + 0.6299787005 * b)
+  const A = 1.9779984951 * l - 2.428592205 * m + 0.4505937099 * s
+  const B = 0.0259040371 * l + 0.7827717662 * m - 0.808675766 * s
+  return [0.2104542553 * l + 0.793617785 * m - 0.0040720468 * s, Math.hypot(A, B), ((Math.atan2(B, A) * 180) / Math.PI + 360) % 360]
+}
+
+// The colour pixels in 24 bins of hue. The dominant hue has the most colour (chroma summed);
+// the accent is the most vivid colour (chroma squared) at least 60° away from it, so the
+// tiles stand out on the picture, unless that is much weaker than the most vivid overall.
+// Each bin counts with half its neighbours, so a hue split across two bins still wins.
+// Near-grey, near-black and near-white pixels say nothing about the hue.
+const BINS = 24
+const ACCENT_APART = 4
+const ACCENT_SHARE = 0.3
+function themeOfPixels(data: Uint8ClampedArray): Theme {
+  const bins = Array.from({ length: BINS }, () => ({ sum: 0, square: 0, x: 0, y: 0 }))
+  let pixels = 0
+  let coloured = 0
+  let chroma = 0
+  for (let i = 0; i < data.length; i += 4) {
+    if (data[i + 3] < 128) continue
+    pixels++
+    const [l, c, h] = oklch(data[i], data[i + 1], data[i + 2])
+    if (c < 0.03 || l < 0.18 || l > 0.96) continue
+    coloured++
+    chroma += c
+    const bin = bins[Math.floor(h / (360 / BINS)) % BINS]
+    bin.sum += c
+    bin.square += c * c
+    bin.x += Math.cos((h * Math.PI) / 180) * c
+    bin.y += Math.sin((h * Math.PI) / 180) * c
+  }
+  const share = pixels ? coloured / pixels : 0
+  const mean = coloured ? chroma / coloured : 0
+  if (share < 0.04 || mean < 0.04) return GREY
+  const near = (i: number) => [bins[(i + BINS - 1) % BINS], bins[i], bins[(i + 1) % BINS]]
+  const score = (i: number, key: 'sum' | 'square') => {
+    const [a, b, c] = near(i)
+    return a[key] / 2 + b[key] + c[key] / 2
+  }
+  const best = (key: 'sum' | 'square', allowed: (i: number) => boolean = () => true) => {
+    let top = -1
+    bins.forEach((_, i) => {
+      if (allowed(i) && (top < 0 || score(i, key) > score(top, key))) top = i
+    })
+    return top
+  }
+  const hueAt = (i: number) => {
+    const group = near(i)
+    const x = group.reduce((t, b) => t + b.x, 0)
+    const y = group.reduce((t, b) => t + b.y, 0)
+    return ((Math.atan2(y, x) * 180) / Math.PI + 360) % 360
+  }
+  const main = best('sum')
+  const vivid = best('square')
+  const apart = best('square', (i) => Math.min((i - main + BINS) % BINS, (main - i + BINS) % BINS) >= ACCENT_APART)
+  const accent = apart >= 0 && score(apart, 'square') >= ACCENT_SHARE * score(vivid, 'square') ? apart : vivid
+  const group = near(accent)
+  const accentChroma = group.reduce((t, b) => t + b.square, 0) / Math.max(1e-6, group.reduce((t, b) => t + b.sum, 0))
+  return {
+    hue: hueAt(main),
+    tint: clamp(mean * (0.4 + 0.6 * share), 0.012, 0.06),
+    accent: accentOf(accentChroma, hueAt(accent)),
+  }
+}
+
+// The part of the picture the scene shows (it covers the frame), 48 × 48 pixels of it.
+function themeOfImage(img: HTMLImageElement): Theme | null {
+  const size = 48
+  const canvas = document.createElement('canvas')
+  canvas.width = canvas.height = size
+  const ctx = canvas.getContext('2d', { willReadFrequently: true })
+  const w = img.naturalWidth
+  const h = img.naturalHeight
+  if (!ctx || !w || !h) return null
+  const frame = window.innerWidth / Math.max(1, window.innerHeight)
+  const [sw, sh] = w / h > frame ? [h * frame, h] : [w, w / frame]
+  ctx.drawImage(img, (w - sw) / 2, (h - sh) / 2, sw, sh, 0, 0, size, size)
+  try {
+    return themeOfPixels(ctx.getImageData(0, 0, size, size).data)
+  } catch {
+    // A picture from a site that does not allow reading it.
+    return null
+  }
+}
+
+function themeOfColor(hex: string): Theme {
+  const n = parseInt(hex.slice(1), 16)
+  const [, c, h] = oklch((n >> 16) & 255, (n >> 8) & 255, n & 255)
+  return c < 0.03 ? GREY : { hue: h, tint: clamp(c * 0.4, 0.012, 0.06), accent: accentOf(c, h) }
+}
+
+// Each picture is read once (null when it cannot be). Reading it also downloads it, so the
+// next level's picture is read ahead: it is in the browser's cache when it is shown.
+const themes = new Map<string, Promise<Theme | null>>()
+function themeOfPicture(url: string): Promise<Theme | null> {
+  let theme = themes.get(url)
+  if (!theme) {
+    theme = new Promise((resolve) => {
+      const img = new Image()
+      img.crossOrigin = 'anonymous'
+      img.onload = () => resolve(themeOfImage(img))
+      img.onerror = () => resolve(null)
+      img.src = url
+    })
+    themes.set(url, theme)
+  }
+  return theme
+}
+
+// The theme of the picture shown; the last one stays until the new picture is read (the
+// backdrop too keeps the old picture until the new one has loaded).
+function usePictureTheme(url: string): Theme | null {
+  const [theme, setTheme] = useState<Theme | null>(null)
+  useEffect(() => {
+    if (!url) return setTheme(null)
+    let current = true
+    void themeOfPicture(url).then((t) => current && setTheme(t))
+    return () => {
+      current = false
+    }
+  }, [url])
+  return theme
 }
 
 // Counts a server duration down locally, ticking ten times a second.
@@ -88,8 +244,8 @@ const clock = (ms: number) => {
   return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`
 }
 
-type Played = Extract<IncastroMoment, { kind: 'found' | 'extra' | 'repeat' }>
-const PLAY_MS: Record<Played['kind'], number> = { found: 1500, extra: 1100, repeat: 900 }
+type Played = Extract<IncastroMoment, { kind: 'found' | 'extra' | 'secret' | 'repeat' }>
+const PLAY_MS: Record<Played['kind'], number> = { found: 1500, extra: 1100, secret: 2400, repeat: 900 }
 const QUEUE_MAX = 4
 
 // The words found in chat, played one after the other on the wheel. A busy chat queues
@@ -117,7 +273,9 @@ function useWheelQueue(moments: IncastroMoment[], level: number, sounds: boolean
     const fresh = moments.filter((m) => m.seq > (seen.current ?? 0)).reverse()
     if (!fresh.length) return
     seen.current = newest
-    const playable = fresh.filter((m): m is Played => m.kind === 'found' || m.kind === 'extra' || m.kind === 'repeat')
+    const playable = fresh.filter(
+      (m): m is Played => m.kind === 'found' || m.kind === 'extra' || m.kind === 'secret' || m.kind === 'repeat',
+    )
     if (playable.length) setQueue((q) => [...q, ...playable].slice(-QUEUE_MAX))
     if (sounds) {
       const other = fresh.find((m) => m.kind === 'hint' || m.kind === 'reveal' || m.kind === 'shuffle')
@@ -180,6 +338,12 @@ const ICONS = {
       <rect x="13.6" y="4.5" width="4.4" height="15" rx="1.6" />
     </>
   ),
+  lock: (
+    <>
+      <rect x="5" y="10.5" width="14" height="10" rx="2.2" />
+      <path className="inc-icon__line" d="M8.2 10.5V8a3.8 3.8 0 0 1 7.6 0v2.5" />
+    </>
+  ),
   shuffle: <path className="inc-icon__line" d="M3.5 7h3.6c4.4 0 5.4 10 9.6 10h3.8M3.5 17h3.6c1.7 0 2.7-1.5 3.5-3.5m2.8-4.2C14.2 7.9 15.2 7 16.7 7h3.8M18 4.5 20.5 7 18 9.5M18 14.5l2.5 2.5-2.5 2.5" />,
 }
 type IconName = keyof typeof ICONS
@@ -201,11 +365,16 @@ function Game({ state, at, settings }: { state: IncastroState; at: number; setti
   const ui = UI
   const sounds = settings.sounds !== false && !PREVIEW
   const playing = useWheelQueue(state.moments, state.level, sounds)
-  const bg = backgroundOf(settings, state.chapter.background)
+  const bg = backgroundOf(settings, state.chapter.background, state.photo)
   const accent = state.chapter.accent
-  const running = !state.paused && state.phase !== 'empty'
+  const running = !state.paused && state.phase !== 'empty' && state.phase !== 'loading'
   const remaining = useCountdown(state.remainingMs, at, running)
   const hintIn = useCountdown(state.hintInMs, at, running && state.phase === 'playing')
+  const pictureTheme = usePictureTheme(bg.url)
+  const theme = bg.seeThrough ? null : bg.url ? pictureTheme : themeOfColor(bg.color)
+  useEffect(() => {
+    if (state.nextPhoto) void themeOfPicture(state.nextPhoto)
+  }, [state.nextPhoto])
 
   // A transparent background has to reach the page itself for OBS to key it out.
   useEffect(() => {
@@ -228,43 +397,51 @@ function Game({ state, at, settings }: { state: IncastroState; at: number; setti
     phaseRef.current = state.phase
   }, [state.phase])
 
-  const style = { '--inc-accent': accent, backgroundColor: bg.color } as CSSProperties
+  // With no picture to read (see-through, or one that cannot be read) the stylesheet's
+  // green and the chapter's accent. The garden keeps its chapter's accent, chosen for it
+  // (its own dominant colour is always the grass).
+  const style = {
+    '--inc-accent': (!bg.garden && theme?.accent) || accent,
+    ...(theme && { '--inc-hue': theme.hue.toFixed(1), '--inc-tint': theme.tint.toFixed(3) }),
+    backgroundColor: bg.color,
+  } as CSSProperties
 
-  if (state.phase === 'empty') {
+  // No grid yet: the level is being generated (a moment), or it cannot be.
+  if (state.phase === 'empty' || state.phase === 'loading') {
     return (
       <div className="inc" style={style}>
-        <Backdrop url={bg.url} ambient={!bg.seeThrough} />
-        <p className="inc__empty">{ui.empty}</p>
+        <Backdrop url={bg.url} ambient={!bg.seeThrough} photo={bg.photo} />
+        <p className="inc__empty">{state.phase === 'loading' ? ui.waiting : ui.empty}</p>
+      </div>
+    )
+  }
+
+  // A new level opens on its background alone, without the veil; the grid comes after.
+  if (state.phase === 'intro') {
+    return (
+      <div className="inc inc--intro" style={style}>
+        <Backdrop url={bg.url} ambient={!bg.seeThrough} photo={bg.photo} />
+        {bg.photo && state.photo && <p className="inc__caption">{state.photo.title}</p>}
+        {state.paused && (
+          <div className="inc__paused">
+            <Icon name="pause" />
+            {ui.paused}
+          </div>
+        )}
       </div>
     )
   }
 
   const showBoard = settings.showLeaderboard !== false
+  const canShuffle = state.phase === 'playing' && !state.paused
 
   return (
     <div className="inc" style={style}>
-      <Backdrop url={bg.url} ambient={!bg.seeThrough} />
+      <Backdrop url={bg.url} ambient={!bg.seeThrough} photo={bg.photo} />
 
+      {/* Only the prompt, in the top bar between the name and the dot: the grid gets the
+          height (chapter and level are in the dashboard). */}
       <header className="inc__head">
-        <p className="inc__eyebrow">
-          {ui.chapter} {state.chapter.id}
-          <span className="inc__level">
-            {ui.level} {state.level}
-          </span>
-        </p>
-        <h1 className="inc__chapter">{state.chapter.name}</h1>
-        <div className="inc__leaves" aria-hidden="true">
-          {Array.from({ length: state.chapter.size }, (_, i) => {
-            const n = i + 1
-            const done = n < state.chapter.levelInChapter || (n === state.chapter.levelInChapter && state.phase === 'complete')
-            return (
-              <span
-                key={i}
-                className={`inc__leaf${done ? ' inc__leaf--done' : n === state.chapter.levelInChapter ? ' inc__leaf--now' : ''}`}
-              />
-            )
-          })}
-        </div>
         <p className="inc__prompt">
           <Icon name="chat" />
           {ui.prompt}
@@ -282,15 +459,23 @@ function Game({ state, at, settings }: { state: IncastroState; at: number; setti
         )}
       </section>
 
-      <Feed moments={state.moments} playing={playing?.seq} ui={ui} />
-
       <section className="inc__play">
-        <aside className="inc__side inc__side--left">{showBoard && <Leaderboard scores={state.scores} ui={ui} />}</aside>
-        <div className="inc__wheel-wrap">
+        <Feed moments={state.moments} playing={playing?.seq} ui={ui} />
+        <aside className="inc__side inc__side--left">
+          {showBoard && <Leaderboard scores={state.scores} longest={state.longest} ui={ui} />}
+        </aside>
+        {/* A click shuffles the wheel (the server takes this one command from an overlay). */}
+        <div
+          className={`inc__wheel-wrap${canShuffle ? ' inc__wheel-wrap--click' : ''}`}
+          role={canShuffle ? 'button' : undefined}
+          title={canShuffle ? ui.shuffleClick : undefined}
+          onClick={canShuffle ? () => socket.emit('incastro:shuffle') : undefined}
+        >
           <Bubble moment={playing} ui={ui} />
           <Wheel letters={state.letters} moment={playing} />
         </div>
         <aside className="inc__side inc__side--right">
+          {state.secret && <Secret secret={state.secret} ui={ui} />}
           <div className="inc-stat">
             <Icon name="star" className="inc-stat__icon" />
             <span className="inc-stat__value">
@@ -316,6 +501,8 @@ function Game({ state, at, settings }: { state: IncastroState; at: number; setti
         </aside>
       </section>
 
+      {bg.photo && state.photo && <p className="inc__credit">NASA · {state.photo.title}</p>}
+
       {state.phase === 'complete' && state.chapterDone && <LeafRain />}
     </div>
   )
@@ -332,24 +519,39 @@ const POLLEN = Array.from({ length: 12 }, (_, i) => ({
 // The chapter's garden. When the chapter changes the new one fades in over the old. Over
 // it a soft veil keeps the text readable, and a little pollen drifts up; neither is drawn
 // on a transparent background, which has to stay clear for OBS.
-function Backdrop({ url, ambient }: { url: string; ambient: boolean }) {
-  const [layers, setLayers] = useState<string[]>(url ? [url] : [])
+function Backdrop({ url, ambient, photo }: { url: string; ambient: boolean; photo: boolean }) {
+  const [layers, setLayers] = useState<string[]>([])
+  // A new picture comes in only once it has loaded, over the old one: a remote photo never
+  // leaves an empty background while it downloads (or if it fails to).
   useEffect(() => {
-    setLayers((prev) => (prev.at(-1) === url ? prev : [...prev, url].filter(Boolean).slice(-2)))
+    if (!url) return setLayers([])
+    let current = true
+    const img = new Image()
+    img.onload = () => current && setLayers((prev) => (prev.at(-1) === url ? prev : [...prev, url].slice(-2)))
+    img.src = url
+    return () => {
+      current = false
+    }
   }, [url])
   return (
     <div className="inc__backdrop" aria-hidden="true">
       {layers.map((u, i) => (
-        <div key={u} className={`inc__bg${i > 0 ? ' inc__bg--in' : ''}`} style={{ backgroundImage: `url("${u}")` }} />
+        <div
+          key={u}
+          className={`inc__bg${photo ? ' inc__bg--photo' : ''}${i > 0 ? ' inc__bg--in' : ''}`}
+          style={{ backgroundImage: `url("${u}")` }}
+        />
       ))}
       {ambient && (
         <>
-          <div className="inc__veil" />
-          <div className="inc__pollen">
-            {POLLEN.map((p, i) => (
-              <span key={i} style={p as CSSProperties} />
-            ))}
-          </div>
+          <div className={`inc__veil${photo ? ' inc__veil--photo' : ''}`} />
+          {!photo && (
+            <div className="inc__pollen">
+              {POLLEN.map((p, i) => (
+                <span key={i} style={p as CSSProperties} />
+              ))}
+            </div>
+          )}
         </>
       )}
     </div>
@@ -514,6 +716,10 @@ function Bubble({ moment, ui }: { moment: Played | null; ui: Record<string, stri
       <>
         <Icon name="star" /> {ui.extra} +{moment.points}
       </>
+    ) : moment.kind === 'secret' ? (
+      <>
+        <Icon name="lock" /> {ui.secret} +{moment.points}
+      </>
     ) : (
       ui.repeat
     )
@@ -538,10 +744,11 @@ function Bubble({ moment, ui }: { moment: Played | null; ui: Record<string, stri
 const FEED_ICON: Partial<Record<IncastroMoment['kind'], IconName>> = { hint: 'bulb', reveal: 'bulb', shuffle: 'shuffle' }
 
 // The latest news, without repeats and without the word the wheel is playing right now.
+// The latest moment, in the strip above the wheel; hidden while a word's bubble is up there.
 function Feed({ moments, playing, ui }: { moments: IncastroMoment[]; playing?: number; ui: Record<string, string> }) {
-  const shown = moments.filter((m) => m.kind !== 'repeat' && m.seq !== playing).slice(0, 2)
+  const shown = moments.filter((m) => m.kind !== 'repeat' && m.seq !== playing).slice(0, 1)
   return (
-    <ol className="inc-feed">
+    <ol className={`inc-feed${playing !== undefined ? ' inc-feed--hidden' : ''}`}>
       {shown.map((m) => (
         <li key={m.seq} className={`inc-feed__item inc-feed__item--${m.kind}`}>
           {'by' in m && m.by ? (
@@ -564,6 +771,8 @@ function feedText(m: IncastroMoment, ui: Record<string, string>): string {
       return `${m.by.nickname} ${ui.found} ${m.word} · +${m.points}`
     case 'extra':
       return `${m.by.nickname} · ${ui.extra} ${m.word} · +${m.points}`
+    case 'secret':
+      return `${m.by.nickname} ${ui.secretFound} ${m.word} · +${m.points}`
     case 'repeat':
       return `${m.word} ${ui.repeat}`
     case 'hint':
@@ -575,7 +784,46 @@ function feedText(m: IncastroMoment, ui: Record<string, string>): string {
   }
 }
 
-function Leaderboard({ scores, ui }: { scores: IncastroScore[]; ui: Record<string, string> }) {
+// The secret word: its letters as empty tiles until someone finds it (or the level ends).
+function Secret({ secret, ui }: { secret: NonNullable<IncastroState['secret']>; ui: Record<string, string> }) {
+  return (
+    <div className={`inc-secret${secret.word ? ' inc-secret--open' : ''}`}>
+      <span className="inc-secret__label">
+        <Icon name="lock" />
+        {ui.secret}
+      </span>
+      <span className="inc-secret__tiles">
+        {Array.from({ length: secret.length }, (_, i) => (
+          <span key={i} className="inc-secret__tile" style={{ '--d': `${i * 0.07}s` } as CSSProperties}>
+            {secret.word?.[i] ?? ''}
+          </span>
+        ))}
+      </span>
+      <span className="inc-secret__who">
+        {secret.by ? (
+          <>
+            <Avatar player={secret.by} className="inc-secret__avatar" />
+            <span className="inc-secret__name">{secret.by.nickname}</span>
+          </>
+        ) : secret.word ? (
+          ui.secretNobody
+        ) : (
+          ui.secretWorth
+        )}
+      </span>
+    </div>
+  )
+}
+
+function Leaderboard({
+  scores,
+  longest,
+  ui,
+}: {
+  scores: IncastroScore[]
+  longest: IncastroRecord | null
+  ui: Record<string, string>
+}) {
   return (
     <div className="inc-board-list">
       <h2 className="inc-board-list__title">
@@ -590,11 +838,25 @@ function Leaderboard({ scores, ui }: { scores: IncastroScore[]; ui: Record<strin
             <li key={s.id} className="inc-board-list__row">
               <span className="inc-board-list__rank">{i + 1}</span>
               <Avatar player={s} className="inc-board-list__avatar" />
-              <span className="inc-board-list__name">{s.nickname}</span>
+              {/* Under the name, their longest word of this level. */}
+              <span className="inc-board-list__who">
+                <span className="inc-board-list__name">{s.nickname}</span>
+                {s.levelLongest && <span className="inc-board-list__word">{s.levelLongest}</span>}
+              </span>
               <span className="inc-board-list__pts">{s.points}</span>
             </li>
           ))}
         </ol>
+      )}
+      {longest && (
+        <div className="inc-record">
+          <span className="inc-record__label">{ui.longest}</span>
+          <span className="inc-record__word">{longest.word}</span>
+          <span className="inc-record__who">
+            <Avatar player={longest.by} className="inc-record__avatar" />
+            <span className="inc-record__name">{longest.by.nickname}</span>
+          </span>
+        </div>
       )}
     </div>
   )
@@ -640,6 +902,11 @@ function Summary({
             <span className="inc-summary__pts">
               {best.points} {best.points === 1 ? ui.point : ui.points} · {best.words} {best.words === 1 ? ui.word : ui.words}
             </span>
+            {best.levelLongest && (
+              <span className="inc-summary__longest">
+                {ui.longest} <span className="inc-summary__word">{best.levelLongest}</span>
+              </span>
+            )}
           </div>
         </div>
       ) : (
@@ -649,7 +916,8 @@ function Summary({
         <p className="inc-summary__others">
           {others.map((s, i) => (
             <span key={s.id}>
-              {i + 2}. {s.nickname} · {s.points}
+              {i + 2}. <Avatar player={s} className="inc-summary__mini" /> {s.nickname} · {s.points}
+              {s.levelLongest && <span className="inc-summary__word">{s.levelLongest}</span>}
             </span>
           ))}
         </p>

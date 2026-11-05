@@ -6,7 +6,9 @@ import {
   type Gifter,
   type IncastroState,
   type LiveEvent,
+  type QuizzlandState,
   type SessionState,
+  type Viewer,
 } from '@zerocade/shared'
 import { socket } from './socket'
 import { playSound, stopSounds } from './audio'
@@ -17,7 +19,7 @@ interface OverlayState {
   event: LiveEvent | null
   seq: number
   ranking: Gifter[]
-  lastFollower: string | null
+  lastFollower: Viewer | null
   totalCoins: number
   bivio: BivioState | null
   // performance.now() when `bivio` arrived, to count its remainingMs down locally.
@@ -25,6 +27,9 @@ interface OverlayState {
   incastro: IncastroState | null
   // performance.now() when `incastro` arrived, for its timers.
   incastroAt: number
+  quizzland: QuizzlandState | null
+  // performance.now() when `quizzland` arrived, to count its remainingMs down locally.
+  quizzlandAt: number
   // The creator's latest message, shown for a few seconds; messageSeq keys each one.
   message: string | null
   messageSeq: number
@@ -45,6 +50,8 @@ let state: OverlayState = {
   bivioAt: 0,
   incastro: null,
   incastroAt: 0,
+  quizzland: null,
+  quizzlandAt: 0,
   message: null,
   messageSeq: 0,
   gif: null,
@@ -63,7 +70,7 @@ socket.on('session:state', (session) => update({ session }))
 socket.on('ranking:update', (ranking) => update({ ranking }))
 socket.on('live:event', (event) => {
   const patch: Partial<OverlayState> = { event, seq: state.seq + 1 }
-  if (event.type === 'follow') patch.lastFollower = event.user.nickname
+  if (event.type === 'follow') patch.lastFollower = event.user
   if (event.type === 'gift') patch.totalCoins = state.totalCoins + (giftById(event.giftId)?.coins ?? 0) * event.count
   update(patch)
 })
@@ -74,6 +81,7 @@ socket.on('dj:stop', () => {
 })
 socket.on('bivio:state', (bivio) => update({ bivio, bivioAt: performance.now() }))
 socket.on('incastro:state', (incastro) => update({ incastro, incastroAt: performance.now() }))
+socket.on('quizzland:state', (quizzland) => update({ quizzland, quizzlandAt: performance.now() }))
 
 const MESSAGE_MS = 8000
 socket.on('overlay:message', (message) => {

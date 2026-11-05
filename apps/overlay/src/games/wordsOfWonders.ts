@@ -261,7 +261,7 @@ export function createWordsOfWonders(): GameInstance {
         ctx.beginPath()
         ctx.roundRect(px, py - 24, pw, 48, 24)
         ctx.fill()
-        drawAvatar(ctx, last.avatar, px + 36, py, 20)
+        drawAvatar(ctx, last.avatar, px + 36, py, 20, last.name)
         ctx.fillStyle = '#3ccf7a'
         ctx.textAlign = 'left'
         ctx.fillText(text, px + 66, py + 8)
@@ -283,7 +283,7 @@ export function createWordsOfWonders(): GameInstance {
         ctx.fillText('Top players', 40, 60)
         topPlayers.forEach(([, p], i) => {
           const y = 88 + i * 26
-          drawAvatar(ctx, p.avatar, 52, y - 8, 11)
+          drawAvatar(ctx, p.avatar, 52, y - 8, 11, p.name)
           ctx.font = '18px system-ui'
           ctx.fillStyle = i === 0 ? '#f5b14c' : '#f0f0f2'
           ctx.fillText(`${i + 1}. ${p.name} — ${p.pts}`, 70, y)

@@ -1,4 +1,5 @@
 import type { GameInstance } from './engine'
+import { fillTextWithAvatar } from './avatar'
 import { addPoints, drawLeaderboard, drawTimerBar, newScores, normalize, shuffled } from './common'
 import { itemsFor } from '../content'
 
@@ -133,7 +134,7 @@ export function createWordAssociation(): GameInstance {
       if (flash > 0 && last.name) {
         ctx.fillStyle = '#f5b14c'
         ctx.font = 'bold 26px system-ui'
-        ctx.fillText(`${last.name} +${last.pts} — ${last.word}`, cx, height * 0.7)
+        fillTextWithAvatar(ctx, `${last.name} +${last.pts} — ${last.word}`, cx, height * 0.7, { nickname: last.name, avatar: last.avatar })
       }
 
       drawTimerBar(ctx, width, height, Math.max(0, timer / (revealed ? breakSecs : roundSecs)), revealed ? '#3ccf7a' : '#f5b14c')

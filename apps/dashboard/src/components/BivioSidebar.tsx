@@ -24,14 +24,14 @@ import { Section } from './Section'
 import { SettingsForm } from './SettingsForm'
 import { TriggerEditor } from './TriggerEditor'
 
-// The whole Bivio control column: connection and simulator, stream widgets, the round in
+// The whole Bivio (ZeroDubbi) control column: connection and simulator, stream widgets, the round in
 // progress, collected answers, triggers and game settings, as collapsible sections.
 
 export function BivioSidebar({ session }: { session: SessionState }) {
   const game = GAMES.find((g) => g.id === session.gameId)
 
   const reset = () => {
-    if (game && window.confirm('Ripristinare le impostazioni predefinite di Bivio?')) {
+    if (game && window.confirm('Ripristinare le impostazioni predefinite di ZeroDubbi?')) {
       socket.emit('settings:set', defaultSettings(game.settings))
     }
   }
@@ -49,7 +49,7 @@ export function BivioSidebar({ session }: { session: SessionState }) {
       </Section>
 
       <div className="side__game">
-        <span>🔀 Bivio · Preferiresti…?</span>
+        <span>🔀 ZeroDubbi · Preferiresti…?</span>
         <button type="button" className="side__link" onClick={reset}>
           Ripristina
         </button>
@@ -171,6 +171,28 @@ function GameInfo() {
           +10 s
         </button>
       </div>
+      {/* A wrong question (typo, bad translation, nonsense) is saved to a file and not dealt again. */}
+      {q && bivio.phase !== 'empty' && (
+        <div className="side-flag">
+          {q.flagged ? (
+            <>
+              <span className="source-status source-status--error">Segnata come sbagliata: non tornerà</span>
+              <button type="button" className="btn btn--small" onClick={() => socket.emit('bivio:control', 'unflag')}>
+                Annulla
+              </button>
+            </>
+          ) : (
+            <button type="button" className="btn btn--small" onClick={() => socket.emit('bivio:control', 'flag')}>
+              ⚠ Domanda sbagliata
+            </button>
+          )}
+        </div>
+      )}
+      {bivio.flagged > 0 && (
+        <a className="btn btn--small side__export" href="/api/bivio/flagged.csv" download>
+          ⬇ Domande sbagliate ({bivio.flagged})
+        </a>
+      )}
     </>
   )
 }

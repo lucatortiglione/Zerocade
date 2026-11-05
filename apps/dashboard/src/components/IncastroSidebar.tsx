@@ -4,8 +4,11 @@ import {
   GIFTS,
   defaultSettings,
   type IncastroCommand,
+  type IncastroOutcome,
   type IncastroSolution,
   type IncastroState,
+  type IncastroVariant,
+  type IncastroWord,
   type LiveEvent,
   type SessionState,
 } from '@zerocade/shared'
@@ -22,17 +25,22 @@ import {
   simViewer,
 } from './Regia'
 import { Section } from './Section'
-import { SettingsForm } from './SettingsForm'
+import { SettingField, SettingsForm } from './SettingsForm'
 import { TriggerEditor } from './TriggerEditor'
 
-// The Incastro control column: connection and simulator, stream widgets, the level in
-// progress with its solution, the live's leaderboard, triggers and game settings.
+// The Incastro (ZeroWords) control column: connection and simulator, stream widgets, the
+// words of the level in progress, its controls, the live's leaderboard, triggers and game
+// settings.
+
+// The automatic letter and the automatic difficulty sit by the level's controls instead of
+// among the game settings.
+const AT_HAND = ['autoHints', 'hintSeconds', 'dda']
 
 export function IncastroSidebar({ session }: { session: SessionState }) {
   const game = GAMES.find((g) => g.id === session.gameId)
 
   const reset = () => {
-    if (game && window.confirm('Ripristinare le impostazioni predefinite di Incastro?')) {
+    if (game && window.confirm('Ripristinare le impostazioni predefinite di ZeroWords?')) {
       socket.emit('settings:set', defaultSettings(game.settings))
     }
   }
@@ -50,18 +58,18 @@ export function IncastroSidebar({ session }: { session: SessionState }) {
       </Section>
 
       <div className="side__game">
-        <span>🌱 Incastro · ruota e schema</span>
+        <span>🌱 ZeroWords · ruota e schema</span>
         <button type="button" className="side__link" onClick={reset}>
           Ripristina
         </button>
       </div>
 
-      <Section title="Info partita">
-        <GameInfo />
+      <Section title="Parole del round" extra={<FoundCount />}>
+        <RoundWords />
       </Section>
 
-      <Section title="Soluzione" open={false}>
-        <Solution />
+      <Section title="Info partita">
+        <GameInfo session={session} />
       </Section>
 
       <Section title="Classifica della live">
@@ -73,7 +81,7 @@ export function IncastroSidebar({ session }: { session: SessionState }) {
       </Section>
 
       <Section title="Impostazioni gioco">
-        <SettingsForm session={session} />
+        <SettingsForm session={session} omit={AT_HAND} />
       </Section>
     </aside>
   )
@@ -102,7 +110,7 @@ function Connection() {
       <button
         type="button"
         className="side-action side-action--blue"
-        disabled={!incastro || incastro.phase === 'empty'}
+        disabled={!incastro || incastro.phase === 'empty' || incastro.phase === 'loading'}
         onClick={() => control(incastro?.paused ? 'resume' : 'pause')}
       >
         {incastro?.paused ? '▶ Riprendi gioco' : '⏸ Metti in pausa'}
@@ -143,12 +151,28 @@ function fakeEvent(state: IncastroState | null, solution: IncastroSolution | nul
 // --- Info partita ---
 
 const PHASE: Record<IncastroState['phase'], string> = {
+  intro: 'Sfondo, poi la griglia',
   playing: 'In gioco',
   complete: 'Riepilogo',
+  loading: 'Preparazione livello…',
   empty: 'Nessun livello',
 }
 
-function GameInfo() {
+const VARIANT: Record<IncastroVariant, string> = {
+  easy: 'Agevolata',
+  standard: 'Standard',
+  expert: 'Esperto',
+}
+
+// How the chat did on the last level, as the automatic difficulty reads it.
+const OUTCOME: Record<IncastroOutcome, string> = {
+  easier: 'In difficoltà',
+  harder: 'Troppo facile',
+  steady: 'Nella media',
+  idle: 'Nessuno ha giocato',
+}
+
+function GameInfo({ session }: { session: SessionState }) {
   const { incastro } = useDashboard()
   const [target, setTarget] = useState('')
   if (!incastro) return <p className="text-muted small">In attesa del server…</p>
@@ -177,16 +201,51 @@ function GameInfo() {
       </div>
       <div className="info-row">
         <span>Livello</span>
+        <strong>{incastro.level}</strong>
+      </div>
+      <div className="info-row">
+        <span>Griglia</span>
         <strong>
-          {incastro.level} di {incastro.levelCount}
+          {VARIANT[incastro.variant]}
+          {incastro.difficulty && ` · difficoltà ${Math.round(incastro.difficulty.dsim)}`}
         </strong>
       </div>
+      {incastro.phase === 'playing' && incastro.nextVariant !== incastro.variant && (
+        <p className="text-muted small">Questa ruota non ha la griglia {VARIANT[incastro.nextVariant]}: si gioca la Standard.</p>
+      )}
+      {session.settings.dda !== false && incastro.ddaOutcome && (
+        <div className="info-row">
+          <span>Andamento chat</span>
+          <strong>
+            {OUTCOME[incastro.ddaOutcome]}
+            {(incastro.ddaOutcome === 'easier' || incastro.ddaOutcome === 'harder') &&
+              incastro.ddaStreak > 0 &&
+              ` · ${Math.min(incastro.ddaStreak, incastro.ddaNeeded)}/${incastro.ddaNeeded}`}
+          </strong>
+        </div>
+      )}
+      {incastro.phase === 'complete' && incastro.nextVariant !== incastro.variant && (
+        <div className="info-row">
+          <span>Prossimo livello</span>
+          <strong>{VARIANT[incastro.nextVariant]}</strong>
+        </div>
+      )}
       <div className="info-row">
         <span>Parole · extra</span>
         <strong>
           {found}/{incastro.words.length} · {incastro.extrasFound}/{incastro.extrasTotal}
         </strong>
       </div>
+      {incastro.phase === 'complete' && (
+        <>
+          <button type="button" className="side-action side-action--blue" onClick={() => control('next')}>
+            ▶ Prossimo livello
+          </button>
+          {session.settings.autoNext === false && (
+            <p className="text-muted small">“Avanza da solo” è spento: il riepilogo resta finché non premi qui.</p>
+          )}
+        </>
+      )}
       <div className="side-controls">
         <button type="button" className="btn btn--small" onClick={() => control('prev')}>
           ⏮ Indietro
@@ -212,6 +271,11 @@ function GameInfo() {
           +30 s
         </button>
       )}
+      <div className="form">
+        <SettingField session={session} id="autoHints" />
+        {session.settings.autoHints !== false && <SettingField session={session} id="hintSeconds" />}
+        <SettingField session={session} id="dda" />
+      </div>
       <form
         className="side-message"
         onSubmit={(e) => {
@@ -222,7 +286,6 @@ function GameInfo() {
         <input
           type="number"
           min={1}
-          max={incastro.levelCount || undefined}
           placeholder="Vai al livello…"
           aria-label="Vai al livello"
           value={target}
@@ -232,36 +295,97 @@ function GameInfo() {
           Vai
         </button>
       </form>
+      <p className="text-muted small">Dati delle partite, per tarare la difficoltà:</p>
+      <div className="side-controls">
+        <a className="btn btn--small" href="/api/zerowords/plays.csv" download>
+          ⬇ Partite
+        </a>
+        <a className="btn btn--small" href="/api/zerowords/answers.csv" download>
+          ⬇ Risposte
+        </a>
+      </div>
     </>
   )
 }
 
-// --- Soluzione ---
+// --- Parole del round ---
 
-function Solution() {
+// The solution of the level on screen (null while the next one is on its way).
+function useRound() {
   const { incastro, incastroSolution } = useDashboard()
-  if (!incastro || !incastroSolution || incastroSolution.level !== incastro.level) {
-    return <p className="text-muted small">In attesa del livello…</p>
+  return incastro && incastroSolution && incastroSolution.level === incastro.level ? { incastro, solution: incastroSolution } : null
+}
+
+function FoundCount() {
+  const round = useRound()
+  if (!round) return null
+  const found = round.incastro.words.filter((w) => w.text).length
+  return (
+    <span className="text-muted">
+      {found}/{round.incastro.words.length}
+    </span>
+  )
+}
+
+// A word as the chat sees it on the board: its letters already there (found in a crossing
+// word, or given by a hint), a dot for each one still hidden.
+function shownOf(state: IncastroState, w: IncastroWord): string {
+  let out = ''
+  for (let k = 0; k < w.length; k++) {
+    const ch = w.d === 'H' ? state.grid[w.r]?.[w.c + k] : state.grid[w.r + k]?.[w.c]
+    out += !ch || ch === '_' || ch === '.' ? '·' : ch.toUpperCase()
   }
+  return out
+}
+
+// The level's words, for the streamer to help the chat with: first the ones still to find,
+// shortest first, each with what the board already shows; then the ones found. Only the
+// dashboard gets them: the overlay never receives the solution.
+function RoundWords() {
+  const round = useRound()
+  if (!round) return <p className="text-muted small">In attesa del livello…</p>
+  const { incastro, solution } = round
+  const rows = solution.words.map((word, i) => ({ word, w: incastro.words[i] }))
+  const open = rows
+    .filter((r) => r.w && !r.w.text)
+    .sort((a, b) => a.word.length - b.word.length || a.word.localeCompare(b.word))
+  const done = rows.filter((r) => !r.w || r.w.text)
+  const secret = incastro.secret
   return (
     <>
-      <ol className="answers">
-        {incastroSolution.words.map((word, i) => {
-          const w = incastro.words[i]
-          const status = !w?.text ? 'da trovare' : w.missed ? 'mancata' : w.by ? w.by.nickname : 'con gli aiuti'
-          return (
-            <li key={word}>
-              <span className={`answers__text${w?.text ? '' : ' inc-open'}`}>{word}</span>
-              <span className="answers__num">{status}</span>
+      {open.length > 0 && (
+        <ul className="round-words">
+          {open.map(({ word, w }) => (
+            <li key={word} className="round-word">
+              <span className="round-word__word">{word}</span>
+              <span className="round-word__shown" title="Quello che il pubblico vede sullo schema">
+                {shownOf(incastro, w)}
+              </span>
             </li>
-          )
-        })}
-      </ol>
+          ))}
+        </ul>
+      )}
+      {solution.secret && (
+        <div className={`round-word round-word--secret${secret?.word ? ' round-word--done' : ''}`}>
+          <span className="round-word__word">🔒 {solution.secret}</span>
+          <span className="round-word__who">{secret?.by ? secret.by.nickname : secret?.word ? 'nessuno' : 'parola segreta'}</span>
+        </div>
+      )}
+      {done.length > 0 && (
+        <ul className="round-words">
+          {done.map(({ word, w }) => (
+            <li key={word} className={`round-word round-word--done${w?.missed ? ' round-word--missed' : ''}`}>
+              <span className="round-word__word">{word}</span>
+              <span className="round-word__who">{w?.missed ? 'mancata' : w?.by ? w.by.nickname : 'con gli aiuti'}</span>
+            </li>
+          ))}
+        </ul>
+      )}
       <details className="inc-extras">
-        <summary className="text-muted small">{incastroSolution.extras.length} parole extra valide</summary>
-        <p className="small">{incastroSolution.extras.join(' · ') || '—'}</p>
+        <summary className="text-muted small">{solution.extras.length} parole extra valide</summary>
+        <p className="small">{solution.extras.filter((x) => x !== solution.secret).join(' · ') || '—'}</p>
       </details>
-      <p className="text-muted small">Qui soltanto: l’overlay non riceve mai la soluzione.</p>
+      <p className="text-muted small">Solo qui: l’overlay non riceve mai la soluzione.</p>
     </>
   )
 }
@@ -271,8 +395,17 @@ function Solution() {
 function Scores() {
   const { incastro } = useDashboard()
   const scores = incastro?.scores ?? []
+  const longest = incastro?.longest
   return (
     <>
+      {longest && (
+        <div className="info-row">
+          <span>Parola più lunga</span>
+          <strong>
+            {longest.word} · {longest.by.nickname}
+          </strong>
+        </div>
+      )}
       {scores.length === 0 ? (
         <p className="text-muted small">Nessun punto ancora.</p>
       ) : (

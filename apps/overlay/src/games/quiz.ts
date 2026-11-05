@@ -1,4 +1,5 @@
 import type { GameInstance } from './engine'
+import { drawAvatar } from './avatar'
 
 interface Q {
   q: string
@@ -27,7 +28,7 @@ export function createTrivia(): GameInstance {
   let timer = 20
   let revealed = false
   let answered: string[] = []
-  const scores = new Map<string, { name: string; pts: number }>()
+  const scores = new Map<string, { name: string; pts: number; avatar?: string }>()
 
   const current = () => QUESTIONS[order[index]]
 
@@ -76,7 +77,7 @@ export function createTrivia(): GameInstance {
       answered.push(event.user.id)
       if (pick === q.answer) {
         const cur = scores.get(event.user.id)
-        scores.set(event.user.id, { name: event.user.nickname, pts: (cur?.pts ?? 0) + 1 })
+        scores.set(event.user.id, { name: event.user.nickname, pts: (cur?.pts ?? 0) + 1, avatar: event.user.avatar ?? cur?.avatar })
       }
     },
     update(dt, _now, settings) {
@@ -132,9 +133,11 @@ export function createTrivia(): GameInstance {
         ctx.fillStyle = '#ffffff'
         ctx.fillText('Top players', 40, 60)
         topPlayers.forEach(([, p], i) => {
+          const y = 96 + i * 32
+          drawAvatar(ctx, p.avatar, 53, y - 7, 13, p.name)
           ctx.font = '20px system-ui'
           ctx.fillStyle = i === 0 ? '#f5b14c' : '#f0f0f2'
-          ctx.fillText(`${i + 1}. ${p.name} — ${p.pts}`, 40, 96 + i * 32)
+          ctx.fillText(`${i + 1}. ${p.name} — ${p.pts}`, 74, y)
         })
       }
     },

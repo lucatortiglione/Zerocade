@@ -98,7 +98,7 @@ export function playSound(play: DjPlay) {
 // Incastro's sounds, also synthesized. A found word climbs a major scale, one note per
 // letter, the way the line crosses the wheel; an extra word is a lighter two-note chime.
 const SCALE = [523.25, 587.33, 659.25, 698.46, 783.99, 880, 987.77, 1046.5]
-export type GameSound = 'found' | 'extra' | 'repeat' | 'hint' | 'shuffle' | 'complete' | 'chapter'
+export type GameSound = 'found' | 'extra' | 'secret' | 'repeat' | 'hint' | 'shuffle' | 'complete' | 'chapter'
 
 export function gameSound(kind: GameSound, letters = 3) {
   try {
@@ -110,6 +110,11 @@ export function gameSound(kind: GameSound, letters = 3) {
       case 'extra':
         tone(783.99, 0.12, 'sine', 0.12)
         tone(1174.66, 0.22, 'sine', 0.1, 0.09)
+        break
+      case 'secret':
+        // A bright run up and a held chord: the secret word is the big find of a level.
+        ;[659.25, 783.99, 987.77, 1318.5].forEach((f, i) => tone(f, 0.18, 'triangle', 0.12, i * 0.07))
+        ;[1318.5, 1567.98, 1975.53].forEach((f) => tone(f, 0.7, 'sine', 0.06, 0.3))
         break
       case 'repeat':
         tone(330, 0.12, 'triangle', 0.08)
@@ -127,6 +132,54 @@ export function gameSound(kind: GameSound, letters = 3) {
       case 'chapter':
         ;[523.25, 659.25, 783.99, 1046.5, 1318.5].forEach((f, i) => tone(f, 0.45, 'triangle', 0.12, i * 0.13))
         tone(261.63, 1.1, 'sine', 0.1, 0.5)
+        break
+    }
+  } catch {
+    // No audio device, or the browser source has not allowed sound yet.
+  }
+}
+
+// Quizzland's sounds: a bright call when a question opens, a wood-block tick in its last
+// seconds, a downward sweep for the 50:50, and the reveal: a rising arpeggio when someone got
+// it right, two falling notes when nobody did.
+export type QuizSound = 'question' | 'tick' | 'fifty' | 'right' | 'none'
+
+export function quizSound(kind: QuizSound) {
+  try {
+    switch (kind) {
+      case 'question':
+        tone(659.25, 0.14, 'triangle', 0.11)
+        tone(987.77, 0.26, 'triangle', 0.11, 0.1)
+        tone(1318.5, 0.3, 'sine', 0.05, 0.2)
+        break
+      case 'tick':
+        tone(1600, 0.04, 'square', 0.05)
+        tone(800, 0.06, 'triangle', 0.07)
+        break
+      case 'fifty': {
+        const a = ac()
+        const o = a.createOscillator()
+        const g = a.createGain()
+        o.type = 'sawtooth'
+        o.frequency.setValueAtTime(1200, a.currentTime)
+        o.frequency.exponentialRampToValueAtTime(220, a.currentTime + 0.35)
+        g.gain.setValueAtTime(0.08, a.currentTime)
+        g.gain.exponentialRampToValueAtTime(0.0001, a.currentTime + 0.4)
+        o.connect(g)
+        g.connect(out())
+        o.start()
+        o.stop(a.currentTime + 0.42)
+        tone(523.25, 0.12, 'triangle', 0.1, 0.36)
+        tone(523.25, 0.18, 'triangle', 0.1, 0.5)
+        break
+      }
+      case 'right':
+        ;[523.25, 659.25, 783.99, 1046.5, 1318.5].forEach((f, i) => tone(f, 0.22, 'triangle', 0.11, i * 0.07))
+        ;[1046.5, 1318.5, 1567.98].forEach((f) => tone(f, 0.8, 'sine', 0.05, 0.36))
+        break
+      case 'none':
+        tone(392, 0.28, 'triangle', 0.11)
+        tone(311.13, 0.5, 'triangle', 0.11, 0.24)
         break
     }
   } catch {

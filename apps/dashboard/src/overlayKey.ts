@@ -24,6 +24,8 @@ export const overlayKey = room.key
 // names it. Otherwise the link is the server's own, the same for every game.
 const OVERLAY_ORIGIN: string | undefined = import.meta.env.VITE_OVERLAY_ORIGIN
 export const overlayUrl = OVERLAY_ORIGIN ? `${OVERLAY_ORIGIN}/?key=${overlayKey}` : room.overlayUrl
+// The hosts file line the server's link still needs, if any.
+export const hostsLine = OVERLAY_ORIGIN ? undefined : room.hostsLine
 
 // The dashboard's own preview of the overlay, which stays silent (no text-to-speech). In dev
 // it is the overlay's Vite server, so changes show up live; a build is hosted by the

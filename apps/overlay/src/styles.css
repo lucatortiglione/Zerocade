@@ -9,6 +9,15 @@
 html, body, #root { width: 100%; height: 100%; }
 body { background: #0b0b0e; overflow: hidden; }
 
+/* The page around the scene (main.tsx): see-through, so a window wider or taller than the
+   scene shows nothing beside it. */
+body.scene-host { background: transparent; }
+body.scene-host #root { display: grid; place-items: center; }
+.scene-frame { display: block; border: 0; width: min(100vw, 100vh * 9 / 16); height: min(100vh, 100vw * 16 / 9); }
+@media (orientation: landscape) {
+  .scene-frame { width: min(100vw, 100vh * 16 / 9); height: min(100vh, 100vw * 9 / 16); }
+}
+
 .overlay { position: relative; width: 100%; height: 100%; }
 .overlay__canvas { display: block; width: 100%; height: 100%; }
 
@@ -41,6 +50,9 @@ body { background: #0b0b0e; overflow: hidden; }
   pointer-events: none;
 }
 .toast {
+  display: flex;
+  align-items: center;
+  gap: 6px;
   padding: 8px 14px;
   border-radius: 999px;
   background: #1b1b21ee;
@@ -49,8 +61,27 @@ body { background: #0b0b0e; overflow: hidden; }
   white-space: nowrap;
   max-width: 80vw;
   overflow: hidden;
-  text-overflow: ellipsis;
 }
+.toast__text { overflow: hidden; text-overflow: ellipsis; }
+
+/* A viewer's picture next to their name (ViewerAvatar): sized on the text around it, with
+   their initial underneath for when there is no picture. */
+.viewer-avatar {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  width: 1.6em;
+  aspect-ratio: 1;
+  vertical-align: middle;
+  border-radius: 50%;
+  overflow: hidden;
+  background: var(--tint, #3a3a44);
+  color: #ffffff;
+  font-weight: 700;
+  line-height: 1;
+}
+.viewer-avatar img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 
 .overlay__guide {
   position: absolute;
@@ -113,7 +144,8 @@ body { background: #0b0b0e; overflow: hidden; }
 .widget-goal__bar { height: 12px; border-radius: 6px; background: #00000055; overflow: hidden; }
 .widget-goal__fill { height: 100%; background: #7c5cff; transition: width 0.3s ease; }
 
-.widget-gifters__row { display: flex; gap: 8px; justify-content: flex-end; }
+.widget-gifters__row { display: flex; align-items: center; gap: 8px; justify-content: flex-end; }
+.widget-gifters__row + .widget-gifters__row { margin-top: 4px; }
 
 @keyframes alert-in {
   from { opacity: 0; transform: translateX(-50%) translateY(-12px); }
@@ -303,12 +335,14 @@ body { background: #0b0b0e; overflow: hidden; }
   font-size: 9cqi;
   font-weight: 800;
 }
+/* As wide as the card, so a word too long for it sticks out and Bivio.tsx (useWholeWords) can
+   shrink the text: words are never broken. */
 .bivio-opt__text {
+  align-self: stretch;
   font-size: 5.4vmin;
   font-size: 13cqi;
   font-weight: 800;
   line-height: 1.15;
-  overflow-wrap: anywhere;
   text-shadow: 0 0.3vmin 1.2vmin #00000066;
 }
 .bivio-opt__text--mid { font-size: 4.8vmin; font-size: 11.5cqi; }
@@ -344,7 +378,10 @@ body { background: #0b0b0e; overflow: hidden; }
 .bivio__status { font-size: 3.4vmin; font-weight: 700; text-align: center; }
 .bivio__voters { display: flex; flex-wrap: wrap; justify-content: center; gap: 1vmin; min-height: 4.6vmin; }
 .bivio__voter {
-  padding: 0.6vmin 1.8vmin;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.8vmin;
+  padding: 0.6vmin 1.8vmin 0.6vmin 0.6vmin;
   border-radius: 999px;
   background: #ffffff14;
   font-size: 2.6vmin;
@@ -450,9 +487,21 @@ body.bivio-see-through { background: transparent; }
 }
 
 /* Incastro: a calm garden, tactile tiles. Sized in vmin/vh like Bivio; portrait first
-   (1080 × 1920), landscape at the end. --inc-accent is the chapter colour, set inline. */
+   (1080 × 1920), landscape at the end. The colours come from the picture behind, set inline:
+   --inc-accent its most vivid colour (or the chapter's), --inc-hue its dominant hue and
+   --inc-tint how much of it the glass, the slots and the wheel take (0 = neutral grey). The
+   defaults are the garden green. */
 .inc {
-  --inc-ink: #24342c;
+  --inc-hue: 155;
+  --inc-tint: 0.04;
+  --inc-ink: oklch(0.3 calc(var(--inc-tint) * 0.7) var(--inc-hue));
+  --inc-muted: oklch(0.48 calc(var(--inc-tint) * 0.5) var(--inc-hue));
+  --inc-glass: oklch(0.3 var(--inc-tint) var(--inc-hue) / 0.62);
+  --inc-glass-deep: oklch(0.19 calc(var(--inc-tint) * 0.8) var(--inc-hue) / 0.74);
+  --inc-soft: oklch(0.9 calc(var(--inc-tint) * 2) var(--inc-hue));
+  --inc-slot: oklch(0.97 calc(var(--inc-tint) * 0.5) var(--inc-hue) / 0.88);
+  --inc-paper: oklch(0.99 calc(var(--inc-tint) * 0.15) var(--inc-hue));
+  --inc-paper-deep: oklch(0.94 calc(var(--inc-tint) * 0.45) var(--inc-hue));
   --inc-gold: #f6c453;
   --inc-display: 'Fredoka Variable', 'Nunito Variable', system-ui, sans-serif;
   --inc-text: 'Nunito Variable', system-ui, sans-serif;
@@ -461,16 +510,17 @@ body.bivio-see-through { background: transparent; }
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1.2vh;
-  /* The bottom is left to the trigger chips of the play guide. */
-  padding: 6vh 4vw 10vh;
+  gap: 0.8vh;
+  /* The top clears the top bar (where the prompt sits), the bottom is left to the trigger
+     chips of the play guide. */
+  padding: 7vmin 2.5vw 7.5vh;
   overflow: hidden;
   color: #ffffff;
   font-family: var(--inc-text);
 }
 body.incastro-see-through { background: transparent; }
-/* The gift alert sits over the chapter title for its few seconds, not over the board. */
-body.incastro-on .widget-alert { top: 5.5vh; z-index: 4; padding: 1.2vmin 3vmin; font-size: 2.8vmin; }
+/* The gift alert sits over the top bar for its few seconds, not over the board. */
+body.incastro-on .widget-alert { top: 0.8vmin; z-index: 4; padding: 1.2vmin 3vmin; font-size: 2.8vmin; }
 /* The app's top bar and play guide, scaled with the scene and dressed like it. */
 body.incastro-on .overlay__top { padding: 1.4vmin 2.4vmin; gap: 1vmin; background: none; }
 body.incastro-on .overlay__brand { font-size: 2.6vmin; }
@@ -479,14 +529,14 @@ body.incastro-on .dot { width: 1.2vmin; height: 1.2vmin; }
 body.incastro-on .overlay__guide {
   gap: 1vmin;
   padding: 1.6vmin 2vmin 2.2vmin;
-  background: linear-gradient(transparent, rgb(8 20 14 / 0.5));
+  background: linear-gradient(transparent, rgb(6 10 14 / 0.45));
   font-family: 'Nunito Variable', system-ui, sans-serif;
 }
 body.incastro-on .guide-chip {
   gap: 0.8vmin;
   padding: 0.7vmin 1.8vmin;
   border: 0.15vmin solid rgb(255 255 255 / 0.16);
-  background: rgb(14 30 22 / 0.62);
+  background: rgb(12 18 24 / 0.62);
   backdrop-filter: blur(0.8vmin);
   font-size: 2vmin;
   font-weight: 700;
@@ -498,11 +548,54 @@ body.incastro-on .guide-chip__arrow { color: rgb(255 255 255 / 0.45); }
 .inc__backdrop { z-index: 0; overflow: hidden; }
 .inc__bg { background-size: cover; background-position: center bottom; }
 .inc__bg--in { animation: inc-fade 1.6s ease-out both; }
+.inc__bg--photo { background-position: center; }
 /* A little darker at the edges and behind the title, where text sits on the garden. */
 .inc__veil {
   background:
     radial-gradient(130% 75% at 50% 48%, transparent 55%, rgb(8 20 14 / 0.38)),
     linear-gradient(rgb(8 20 14 / 0.32), transparent 24%, transparent 72%, rgb(8 20 14 / 0.28));
+}
+/* NASA's pictures stay whole: only the top and bottom edges darken a little, under the
+   top bar and the trigger chips. */
+.inc__veil--photo { background: linear-gradient(rgb(0 0 0 / 0.38), transparent 12%, transparent 86%, rgb(0 0 0 / 0.42)); }
+/* A new level opens on its background alone: the veil comes in with the grid, and so does
+   everything over it. */
+.inc__veil { transition: opacity 1.2s ease-out; }
+.inc--intro .inc__veil { opacity: 0; }
+.inc--intro > .inc__paused { margin: auto; }
+.inc__head, .inc__play { animation: inc-fade 0.8s ease-out both; }
+.inc-board { animation: inc-summary-in 0.5s ease-out both; }
+/* The picture's title, under it while it is shown alone. */
+.inc > p.inc__caption {
+  position: absolute;
+  left: 50%;
+  bottom: 9vh;
+  z-index: 2;
+  width: max-content;
+  max-width: 86vw;
+  transform: translateX(-50%);
+  font-family: var(--inc-display);
+  font-size: 3.2vmin;
+  font-weight: 600;
+  text-align: center;
+  color: rgb(255 255 255 / 0.92);
+  text-shadow: 0 0.3vmin 1.2vmin rgb(0 0 0 / 0.75);
+  animation: inc-fade 1s ease-out 0.6s both;
+}
+/* Whose picture it is, small in the bottom-right corner. */
+.inc > p.inc__credit {
+  position: absolute;
+  right: 1.6vmin;
+  bottom: 0.6vmin;
+  z-index: 2;
+  max-width: 34vw;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-size: 1.5vmin;
+  font-weight: 700;
+  color: rgb(255 255 255 / 0.78);
+  text-shadow: 0 0.2vmin 0.6vmin rgb(0 0 0 / 0.7);
 }
 .inc__pollen span {
   position: absolute;
@@ -517,10 +610,10 @@ body.incastro-on .guide-chip__arrow { color: rgb(255 255 255 / 0.45); }
 .inc > :not(.inc__backdrop, .inc-rain) { position: relative; z-index: 1; }
 .inc__empty { margin: auto; font-family: var(--inc-display); font-size: 4vmin; font-weight: 600; }
 
-/* Dark frosted glass behind the small panels. */
-.inc__prompt, .inc__paused, .inc-feed__item, .inc-bubble__who, .inc-board-list, .inc-stat {
+/* Dark frosted glass behind the small panels, in the picture's hue. */
+.inc__prompt, .inc__paused, .inc-feed__item, .inc-bubble__who, .inc-board-list, .inc-stat, .inc-secret {
   border: 0.15vmin solid rgb(255 255 255 / 0.16);
-  background: linear-gradient(160deg, rgb(30 56 43 / 0.6), rgb(10 22 16 / 0.7));
+  background: linear-gradient(160deg, var(--inc-glass), var(--inc-glass-deep));
   backdrop-filter: blur(1.2vmin) saturate(1.2);
   box-shadow: 0 1vmin 3vmin rgb(0 0 0 / 0.22);
 }
@@ -528,90 +621,50 @@ body.incastro-on .guide-chip__arrow { color: rgb(255 255 255 / 0.45); }
 .inc-icon { display: block; flex: none; fill: currentColor; }
 .inc-icon__line { fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
 
-.inc__head { display: flex; flex-direction: column; align-items: center; gap: 0.8vh; text-align: center; }
-.inc__eyebrow {
-  display: flex;
-  align-items: center;
-  gap: 1.4vmin;
-  font-size: 2.2vmin;
-  font-weight: 800;
-  letter-spacing: 0.35vmin;
-  text-transform: uppercase;
-  text-shadow: 0 0.2vmin 0.8vmin rgb(0 0 0 / 0.55);
-}
-.inc__level {
-  padding: 0.5vmin 1.8vmin;
-  border-radius: 999px;
-  background: linear-gradient(color-mix(in srgb, var(--inc-accent), #ffffff 18%), var(--inc-accent));
-  letter-spacing: 0.15vmin;
-  text-shadow: 0 0.2vmin 0 rgb(0 0 0 / 0.2);
-  box-shadow: inset 0 0.25vmin 0 rgb(255 255 255 / 0.35), 0 0.6vmin 1.6vmin rgb(0 0 0 / 0.25);
-}
-.inc__chapter {
-  font-family: var(--inc-display);
-  font-size: 5.8vmin;
-  font-weight: 600;
-  line-height: 1.05;
-  text-shadow: 0 0.3vmin 0 rgb(0 0 0 / 0.16), 0 0.6vmin 2.6vmin rgb(0 0 0 / 0.5);
-}
-/* One leaf per level of the chapter. */
-.inc__leaves { display: flex; gap: 0.7vmin; padding-top: 0.3vh; }
-.inc__leaf {
-  width: 1.8vmin;
-  height: 1.8vmin;
-  border-radius: 100% 0;
-  background: rgb(255 255 255 / 0.32);
-  box-shadow: 0 0.2vmin 0.6vmin rgb(0 0 0 / 0.25);
-}
-.inc__leaf--done { background: linear-gradient(135deg, #d4f5b4, #5fbf62); }
-.inc__leaf--now {
-  background: var(--inc-accent);
-  box-shadow: 0 0 0 0.3vmin #ffffff, 0 0 1.8vmin var(--inc-accent);
-  animation: inc-pulse 1.4s ease-in-out infinite;
-}
+.inc > .inc__head { position: absolute; top: 1.2vmin; left: 50%; z-index: 2; transform: translateX(-50%); white-space: nowrap; }
 .inc__prompt {
   display: flex;
   align-items: center;
   gap: 1vmin;
-  margin-top: 0.4vh;
-  padding: 0.7vmin 2.4vmin 0.7vmin 1.8vmin;
+  padding: 0.6vmin 2.2vmin 0.6vmin 1.6vmin;
   border-radius: 999px;
-  font-size: 2.2vmin;
+  font-size: 2vmin;
   font-weight: 700;
 }
-.inc__prompt .inc-icon { width: 2.6vmin; color: #c6efb4; }
+.inc__prompt .inc-icon { width: 2.6vmin; color: var(--inc-soft); }
 
 .inc__stage { flex: 1 1 auto; min-height: 0; width: 100%; display: grid; place-items: center; }
 .inc-board {
-  --cell: min(calc(84vw / var(--cols)), calc(26vh / var(--rows)), 12vmin);
+  --cell: min(calc(92vw / var(--cols)), calc(44vh / var(--rows)), 16vmin);
   position: relative;
   display: grid;
   grid-template-columns: repeat(var(--cols), var(--cell));
   grid-template-rows: repeat(var(--rows), var(--cell));
-  padding: 2.2vmin;
-  border: 0.2vmin solid rgb(255 255 255 / 0.55);
-  border-radius: 3.4vmin;
-  background: linear-gradient(160deg, rgb(255 255 255 / 0.34), rgb(255 255 255 / 0.12));
-  backdrop-filter: blur(1.4vmin) saturate(1.2);
-  box-shadow: inset 0 0.2vmin 0 rgb(255 255 255 / 0.45), 0 2vmin 5vmin rgb(0 0 0 / 0.22);
+  /* No panel: the slots stand on the picture. Padding and border keep the room the sizes
+     below count on. */
+  padding: 1.4vmin;
+  border: 0.2vmin solid transparent;
 }
-/* Where container units work the board fills exactly the room the stage has left
-   (the 5vmin are its padding and border); elsewhere the vh guess above stands. */
+/* Where container units work the board fills all the room the stage has left (the 3.4vmin
+   are its padding and border), up to big tiles for small grids; elsewhere the vh guess
+   above stands. */
 @supports (height: 1cqh) {
   .inc__stage { container-type: size; }
   .inc-board {
-    --cell: min(calc((100cqw - 5vmin) / var(--cols)), calc((100cqh - 5vmin) / var(--rows)), 12vmin);
+    --cell: min(calc((100cqw - 3.4vmin) / var(--cols)), calc((100cqh - 3.4vmin) / var(--rows)), 16vmin);
   }
 }
-/* An empty slot, sunk into the glass. */
+/* An empty slot, sunk in, straight on the picture: a dark rim and a shadow keep it apart
+   from a bright one. */
 .inc-cell {
   position: relative;
   margin: calc(var(--cell) * 0.045);
   border-radius: calc(var(--cell) * 0.22);
-  background: rgb(255 255 255 / 0.66);
+  background: var(--inc-slot);
   box-shadow:
-    inset 0 calc(var(--cell) * 0.08) calc(var(--cell) * 0.12) rgb(20 40 30 / 0.24),
-    0 0.15vmin 0 rgb(255 255 255 / 0.6);
+    inset 0 calc(var(--cell) * 0.08) calc(var(--cell) * 0.12) oklch(0.3 0.03 var(--inc-hue) / 0.24),
+    0 0 0 calc(var(--cell) * 0.025) oklch(0.22 calc(var(--inc-tint) * 0.6) var(--inc-hue) / 0.3),
+    0 calc(var(--cell) * 0.06) calc(var(--cell) * 0.16) rgb(0 0 0 / 0.32);
   animation: inc-appear 0.35s ease-out var(--d) both;
 }
 /* The letter tile that drops into it. */
@@ -655,14 +708,14 @@ body.incastro-on .guide-chip__arrow { color: rgb(255 255 255 / 0.45); }
   animation: inc-shine 0.8s ease-out calc(var(--d) + 0.35s) both;
 }
 .inc-cell--hint .inc-cell__tile {
-  background: linear-gradient(180deg, #ffffff, #f2ead9);
+  background: linear-gradient(180deg, var(--inc-paper), var(--inc-paper-deep));
   color: var(--inc-accent);
   box-shadow:
     inset 0 calc(var(--cell) * -0.07) 0 rgb(0 0 0 / 0.08),
     0 calc(var(--cell) * 0.05) calc(var(--cell) * 0.1) rgb(0 0 0 / 0.18);
   animation: inc-pop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) var(--d) both;
 }
-.inc-cell--missed .inc-cell__tile { color: rgb(36 52 44 / 0.42); animation: inc-fade 0.5s ease-out var(--d) both; }
+.inc-cell--missed .inc-cell__tile { color: color-mix(in oklch, var(--inc-ink), transparent 58%); animation: inc-fade 0.5s ease-out var(--d) both; }
 .inc-board__badge {
   align-self: start;
   justify-self: start;
@@ -691,27 +744,28 @@ body.incastro-on .guide-chip__arrow { color: rgb(255 255 255 / 0.45); }
 .inc-avatar img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 
 .inc-feed {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 7vmin;
   list-style: none;
-  height: 7vh;
-  width: 100%;
   display: flex;
-  flex-direction: column;
   align-items: center;
-  justify-content: flex-start;
-  gap: 0.7vh;
+  justify-content: center;
 }
+.inc-feed--hidden { visibility: hidden; }
 .inc-feed__item {
   display: flex;
   align-items: center;
   gap: 1.2vmin;
   max-width: 92%;
-  padding: 0.6vmin 2.2vmin 0.6vmin 0.6vmin;
+  padding: 0.5vmin 2vmin 0.5vmin 0.5vmin;
   border-radius: 999px;
-  font-size: 2.4vmin;
+  font-size: 2.2vmin;
   font-weight: 700;
   animation: inc-slide 0.35s ease-out both;
 }
-.inc-feed__item:nth-child(2) { opacity: 0.72; font-size: 2.1vmin; }
 .inc-feed__item--found { border-color: color-mix(in srgb, var(--inc-accent), transparent 30%); }
 .inc-feed__item--extra { border-color: rgb(246 196 83 / 0.7); }
 .inc-feed__avatar { width: 3.6vmin; font-size: 1.6vmin; }
@@ -723,13 +777,16 @@ body.incastro-on .guide-chip__arrow { color: rgb(255 255 255 / 0.45); }
   flex: none;
   width: 100%;
   display: grid;
-  grid-template-columns: 1fr 44vmin 1fr;
+  position: relative;
+  grid-template-columns: 1fr 40vmin 1fr;
   align-items: center;
   gap: 2vmin;
-  /* Room for the word bubble above the wheel. */
-  padding-top: 12vmin;
+  /* The strip above the wheel: the latest moment, or the bubble of a word just found. */
+  padding-top: 7vmin;
 }
 .inc__wheel-wrap { position: relative; }
+.inc__wheel-wrap--click { cursor: pointer; transition: transform 0.15s ease-out; }
+.inc__wheel-wrap--click:active { transform: scale(0.97); }
 /* The frosted disc: CSS, so it can blur the garden behind it. */
 .inc__wheel-wrap::before {
   content: '';
@@ -737,9 +794,13 @@ body.incastro-on .guide-chip__arrow { color: rgb(255 255 255 / 0.45); }
   inset: 2%;
   border-radius: 50%;
   border: 0.4vmin solid rgb(255 255 255 / 0.85);
-  background: radial-gradient(circle at 50% 30%, rgb(255 255 255 / 0.86), rgb(255 250 238 / 0.66));
+  background: radial-gradient(
+    circle at 50% 30%,
+    oklch(0.99 calc(var(--inc-tint) * 0.15) var(--inc-hue) / 0.88),
+    oklch(0.94 calc(var(--inc-tint) * 0.45) var(--inc-hue) / 0.7)
+  );
   backdrop-filter: blur(1.2vmin);
-  box-shadow: inset 0 -1.2vmin 2.6vmin rgb(20 40 30 / 0.12), 0 1.8vmin 4vmin rgb(0 0 0 / 0.3);
+  box-shadow: inset 0 -1.2vmin 2.6vmin oklch(0.3 0.03 var(--inc-hue) / 0.12), 0 1.8vmin 4vmin rgb(0 0 0 / 0.3);
 }
 .inc__side { display: flex; flex-direction: column; gap: 1.4vmin; min-width: 0; }
 .inc__side--right { align-items: flex-end; }
@@ -772,26 +833,26 @@ body.incastro-on .guide-chip__arrow { color: rgb(255 255 255 / 0.45); }
   bottom: 100%;
   left: 50%;
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 0.9vmin;
-  margin-bottom: 1vmin;
+  gap: 1.4vmin;
+  margin-bottom: 0.8vmin;
   transform: translateX(-50%);
   white-space: nowrap;
   animation: inc-bubble-out 0.3s ease-in 1.2s forwards;
 }
 .inc-bubble--idle { display: none; }
 .inc-bubble--extra { --inc-accent: #e9a400; animation-delay: 0.85s; }
+.inc-bubble--secret { --inc-accent: #e9a400; animation-delay: 2.1s; }
 .inc-bubble--repeat { --inc-accent: #8f9aa5; animation-delay: 0.65s; }
-.inc-bubble__tiles { display: flex; gap: 0.7vmin; }
+.inc-bubble__tiles { display: flex; gap: 0.6vmin; }
 .inc-bubble__tile {
   display: grid;
   place-items: center;
-  width: 6.6vmin;
-  height: 6.6vmin;
-  border-radius: 1.6vmin;
+  width: 5.4vmin;
+  height: 5.4vmin;
+  border-radius: 1.3vmin;
   font-family: var(--inc-display);
-  font-size: 4.3vmin;
+  font-size: 3.6vmin;
   font-weight: 600;
   text-shadow: 0 0.25vmin 0 rgb(0 0 0 / 0.22);
   box-shadow:
@@ -823,6 +884,49 @@ body.incastro-on .guide-chip__arrow { color: rgb(255 255 255 / 0.45); }
 .inc-bubble__note .inc-icon { width: 2.2vmin; color: #fff3c4; }
 
 .inc-board-list { padding: 1.6vmin 1.8vmin; border-radius: 2.6vmin; }
+/* The secret word, top of the right column: gold-edged empty tiles, the letters once found. */
+.inc-secret {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.8vmin;
+  padding: 1.3vmin 1.4vmin;
+  border-color: rgb(246 196 83 / 0.55);
+  border-radius: 2.6vmin;
+}
+.inc-secret__label {
+  display: flex;
+  align-items: center;
+  gap: 0.7vmin;
+  font-size: 1.6vmin;
+  font-weight: 800;
+  letter-spacing: 0.2vmin;
+  text-transform: uppercase;
+  color: var(--inc-gold);
+}
+.inc-secret__label .inc-icon { width: 2vmin; }
+.inc-secret__tiles { display: flex; gap: 0.35vmin; }
+.inc-secret__tile {
+  display: grid;
+  place-items: center;
+  width: 2.4vmin;
+  height: 2.8vmin;
+  border: 0.15vmin solid rgb(246 196 83 / 0.6);
+  border-radius: 0.6vmin;
+  background: rgb(255 255 255 / 0.08);
+  font-family: var(--inc-display);
+  font-size: 1.9vmin;
+  font-weight: 600;
+}
+.inc-secret--open .inc-secret__tile {
+  border-color: transparent;
+  background: linear-gradient(#ffe7a1, #e2a21a);
+  color: #4a3200;
+  animation: inc-pop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) var(--d) both;
+}
+.inc-secret__who { display: flex; align-items: center; gap: 0.8vmin; max-width: 100%; font-size: 1.7vmin; font-weight: 700; opacity: 0.9; }
+.inc-secret__avatar { width: 2.6vmin; font-size: 1.2vmin; }
+.inc-secret__name { min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
 .inc-board-list__title {
   display: flex;
   align-items: center;
@@ -849,9 +953,27 @@ body.incastro-on .guide-chip__arrow { color: rgb(255 255 255 / 0.45); }
 .inc-board-list__row:nth-child(2) .inc-board-list__rank { background: linear-gradient(#f4f7fa, #a9b4c0); color: #26303a; }
 .inc-board-list__row:nth-child(3) .inc-board-list__rank { background: linear-gradient(#f6cfaa, #c27a44); color: #3d220f; }
 .inc-board-list__avatar { width: 3.4vmin; font-size: 1.5vmin; }
-.inc-board-list__name { flex: 1; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.inc-board-list__who { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.inc-board-list__name, .inc-board-list__word { min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+/* The player's longest word of this level, under the name. */
+.inc-board-list__word { font-family: var(--inc-display); font-size: 1.6vmin; font-weight: 600; line-height: 1.1; letter-spacing: 0.15vmin; color: var(--inc-gold); }
 .inc-board-list__pts { font-family: var(--inc-display); font-weight: 600; font-variant-numeric: tabular-nums; }
 .inc-board-list__empty { font-size: 2vmin; opacity: 0.8; }
+/* The live's longest word, under the ranking. */
+.inc-record {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6vmin;
+  margin-top: 1.4vmin;
+  padding-top: 1.2vmin;
+  border-top: 0.15vmin solid rgb(255 255 255 / 0.16);
+  animation: inc-slide 0.3s ease-out both;
+}
+.inc-record__label { font-size: 1.6vmin; font-weight: 800; letter-spacing: 0.2vmin; text-transform: uppercase; color: var(--inc-gold); }
+.inc-record__word { font-family: var(--inc-display); font-size: 2.8vmin; font-weight: 600; line-height: 1.05; letter-spacing: 0.2vmin; overflow-wrap: anywhere; }
+.inc-record__who { display: flex; align-items: center; gap: 0.9vmin; min-width: 0; font-size: 2vmin; font-weight: 700; }
+.inc-record__avatar { width: 3vmin; font-size: 1.4vmin; }
+.inc-record__name { min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
 
 .inc-stat {
   display: grid;
@@ -864,7 +986,7 @@ body.incastro-on .guide-chip__arrow { color: rgb(255 255 255 / 0.45); }
   border-radius: 2.6vmin;
 }
 .inc-stat__icon { grid-area: icon; width: 5vmin; color: var(--inc-gold); filter: drop-shadow(0 0.3vmin 0.5vmin rgb(0 0 0 / 0.3)); }
-.inc-stat__icon--time { color: #c6efb4; }
+.inc-stat__icon--time { color: var(--inc-soft); }
 .inc-stat .inc-ring { grid-area: icon; width: 5.6vmin; }
 .inc-stat__value {
   grid-area: value;
@@ -916,7 +1038,7 @@ body.incastro-on .guide-chip__arrow { color: rgb(255 255 255 / 0.45); }
   padding: 7.5vmin 4vmin 3.6vmin;
   border: 0.4vmin solid #ffffff;
   border-radius: 3.6vmin;
-  background: linear-gradient(180deg, #fffdf8, #f5eedf);
+  background: linear-gradient(180deg, var(--inc-paper), var(--inc-paper-deep));
   color: var(--inc-ink);
   text-align: center;
   box-shadow: 0 2vmin 6vmin rgb(0 0 0 / 0.4);
@@ -943,10 +1065,15 @@ body.incastro-on .guide-chip__arrow { color: rgb(255 255 255 / 0.45); }
 .inc-summary__best { display: flex; align-items: center; gap: 2vmin; text-align: left; }
 .inc-summary__best > div { display: flex; flex-direction: column; }
 .inc-summary__avatar { width: 11vmin; font-size: 5vmin; box-shadow: 0 0 0 0.6vmin var(--inc-accent); }
-.inc-summary__label { font-size: 2.3vmin; font-weight: 700; color: #5b6b63; }
+.inc-summary__label { font-size: 2.3vmin; font-weight: 700; color: var(--inc-muted); }
 .inc-summary__name { font-family: var(--inc-display); font-size: 4.2vmin; font-weight: 600; }
 .inc-summary__pts { font-size: 2.5vmin; font-weight: 800; color: var(--inc-accent); }
-.inc-summary__others { display: flex; gap: 2.4vmin; font-size: 2.3vmin; font-weight: 700; color: #5b6b63; }
+.inc-summary__others { display: flex; gap: 2.4vmin; font-size: 2.3vmin; font-weight: 700; color: var(--inc-muted); }
+.inc-summary__others > span { display: inline-flex; align-items: center; gap: 0.7vmin; }
+.inc-summary__mini { width: 3.6vmin; font-size: 1.6vmin; }
+/* Each player's longest word of the level. */
+.inc-summary__longest { font-size: 2.1vmin; font-weight: 700; color: var(--inc-muted); }
+.inc-summary__word { font-family: var(--inc-display); font-weight: 600; letter-spacing: 0.15vmin; color: var(--inc-accent); }
 .inc-summary__chapter {
   display: flex;
   align-items: center;
@@ -959,7 +1086,7 @@ body.incastro-on .guide-chip__arrow { color: rgb(255 255 255 / 0.45); }
   font-weight: 800;
 }
 .inc-summary__chapter .inc-icon { width: 3vmin; }
-.inc-summary__next { font-size: 2.3vmin; font-weight: 700; color: #5b6b63; }
+.inc-summary__next { font-size: 2.3vmin; font-weight: 700; color: var(--inc-muted); }
 
 .inc-rain { position: absolute; inset: 0; z-index: 2; overflow: hidden; pointer-events: none; }
 .inc-rain span {
@@ -1013,16 +1140,14 @@ body.incastro-on .guide-chip__arrow { color: rgb(255 255 255 / 0.45); }
 @media (orientation: landscape) {
   .inc {
     display: grid;
-    grid-template-columns: 1.25fr 1fr;
-    grid-template-rows: auto 1fr auto;
-    grid-template-areas: 'head head' 'stage play' 'feed play';
-    padding: 5vh 3vw 9vh;
-    column-gap: 3vw;
+    grid-template-columns: 1.3fr 1fr;
+    grid-template-rows: 1fr;
+    grid-template-areas: 'stage play';
+    padding: 7vmin 2.5vw 8.5vh;
+    column-gap: 2.5vw;
   }
-  .inc__head { grid-area: head; }
   /* Stretched: a size container would otherwise be as tall as its content, which is none. */
   .inc__stage { grid-area: stage; align-self: stretch; }
-  .inc-feed { grid-area: feed; height: auto; min-height: 9vh; }
   .inc__play {
     grid-area: play;
     grid-template-columns: minmax(0, 1fr) 40vh;
@@ -1033,6 +1158,6 @@ body.incastro-on .guide-chip__arrow { color: rgb(255 255 255 / 0.45); }
   .inc__side--left { grid-area: left; align-self: end; }
   .inc__side--right { grid-area: right; align-self: start; align-items: stretch; }
   @supports not (height: 1cqh) {
-    .inc-board { --cell: min(calc(48vw / var(--cols)), calc(50vh / var(--rows)), 10vmin); }
+    .inc-board { --cell: min(calc(52vw / var(--cols)), calc(80vh / var(--rows)), 14vmin); }
   }
 }
