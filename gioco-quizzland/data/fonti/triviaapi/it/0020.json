@@ -1,0 +1,2802 @@
+{
+"tta-623741c5cb85f7ce9e949d88": [
+"Qual è la capitale del paese Norvegia?",
+"Oslo",
+"Berna",
+"Lubiana",
+"Nicosia"
+],
+"tta-623741cacb85f7ce9e949d8a": [
+"Qual è la capitale del paese Oman?",
+"Mascate",
+"Niamey",
+"Kabul",
+"Gitega"
+],
+"tta-623741cfcb85f7ce9e949d8c": [
+"Qual è la capitale del paese Pakistan?",
+"Islamabad",
+"Zagabria",
+"Tallinn",
+"Teheran"
+],
+"tta-623741d4cb85f7ce9e949d8e": [
+"Qual è la capitale del paese Palau?",
+"Ngerulmud",
+"Praia",
+"Lusaka",
+"Gitega"
+],
+"tta-623741dccb85f7ce9e949d91": [
+"Port Moresby è la capitale di quale paese?",
+"Papua Nuova Guinea",
+"Isole Salomone",
+"Namibia",
+"São Tomé e Príncipe"
+],
+"tta-623741e3cb85f7ce9e949d94": [
+"Qual è la capitale del paese Paraguay?",
+"Asunción",
+"Praia",
+"Vilnius",
+"Castries"
+],
+"tta-623741e8cb85f7ce9e949d96": [
+"Qual è la capitale del paese Perù?",
+"Lima",
+"Praia",
+"Caracas",
+"Castries"
+],
+"tta-623741f7cb85f7ce9e949d9c": [
+"Qual è la capitale del paese Portogallo?",
+"Lisbona",
+"Santo Domingo",
+"Suva",
+"Oslo"
+],
+"tta-623741fccb85f7ce9e949d9e": [
+"Qual è la capitale del paese Qatar?",
+"Doha",
+"Lima",
+"Juba",
+"Kampala"
+],
+"tta-62374201cb85f7ce9e949da0": [
+"Qual è la capitale del paese Romania?",
+"Bucarest",
+"Sarajevo",
+"Bratislava",
+"Vientiane"
+],
+"tta-62374206cb85f7ce9e949da2": [
+"Qual è la capitale del paese Russia?",
+"Mosca",
+"St Petersburg",
+"Kazan",
+"Vladivostok"
+],
+"tta-6237420bcb85f7ce9e949da4": [
+"Qual è la capitale del paese Ruanda?",
+"Kigali",
+"Kuala Lumpur",
+"Bishkek",
+"Lubiana"
+],
+"tta-62374210cb85f7ce9e949da6": [
+"Qual è la capitale del paese Saint Kitts e Nevis?",
+"Basseterre",
+"Manama",
+"Podgorica",
+"Port-au-Prince"
+],
+"tta-62374215cb85f7ce9e949da8": [
+"Qual è la capitale del paese Saint Lucia?",
+"Castries",
+"Tirana",
+"Kigali",
+"Dili"
+],
+"tta-6237421acb85f7ce9e949daa": [
+"Qual è la capitale del paese Saint Vincent e Grenadine?",
+"Kingstown",
+"Yamoussoukro",
+"Manama",
+"Banjul"
+],
+"tta-6237421fcb85f7ce9e949dac": [
+"Qual è la capitale del paese Samoa?",
+"Apia",
+"Lomé",
+"Maputo",
+"Podgorica"
+],
+"tta-62374233cb85f7ce9e949db4": [
+"Qual è la capitale del paese Senegal?",
+"Dakar",
+"Nuku'alofa",
+"Giacarta",
+"Nouakchott"
+],
+"tta-62374238cb85f7ce9e949db6": [
+"Qual è la capitale del paese Serbia?",
+"Belgrado",
+"Tallinn",
+"Chisinau",
+"Riga"
+],
+"tta-6237423dcb85f7ce9e949db8": [
+"Qual è la capitale del paese Seychelles?",
+"Victoria",
+"Saint George's",
+"Quito",
+"Managua"
+],
+"tta-6237424bcb85f7ce9e949dbe": [
+"Qual è la capitale del paese Slovacchia?",
+"Bratislava",
+"Conakry",
+"Praga",
+"Zagabria"
+],
+"tta-62374250cb85f7ce9e949dc0": [
+"Qual è la capitale del paese Slovenia?",
+"Lubiana",
+"Sarajevo",
+"Yaoundé",
+"Reykjavik"
+],
+"tta-62374253cb85f7ce9e949dc1": [
+"Honiara è la capitale di quale paese?",
+"Isole Salomone",
+"Burkina Faso",
+"Panama",
+"Brunei"
+],
+"tta-6237425acb85f7ce9e949dc4": [
+"Qual è la capitale del paese Somalia?",
+"Mogadiscio",
+"Tashkent",
+"Dušanbe",
+"Majuro"
+],
+"tta-6237425fcb85f7ce9e949dc6": [
+"Qual è la capitale del paese Corea del Sud?",
+"Seul",
+"Busan",
+"Incheon",
+"Daegu"
+],
+"tta-62374262cb85f7ce9e949dc7": [
+"Juba è la capitale di quale paese?",
+"Sudan del Sud",
+"Croazia",
+"Turkmenistan",
+"Laos"
+],
+"tta-6237426ecb85f7ce9e949dcc": [
+"Qual è la capitale del paese Sudan?",
+"Khartum",
+"Nur-Sultan",
+"Bratislava",
+"Rabat"
+],
+"tta-62374273cb85f7ce9e949dce": [
+"Qual è la capitale del paese Suriname?",
+"Paramaribo",
+"L'Avana",
+"Manila",
+"Sarajevo"
+],
+"tta-62374278cb85f7ce9e949dd0": [
+"Qual è la capitale del paese Svezia?",
+"Stoccolma",
+"Monrovia",
+"Helsinki",
+"Oslo"
+],
+"tta-6237427dcb85f7ce9e949dd2": [
+"Qual è la capitale del paese Svizzera?",
+"Berna",
+"Geneva",
+"Zurich",
+"Basilea"
+],
+"tta-62374282cb85f7ce9e949dd4": [
+"Qual è la capitale del paese Siria?",
+"Damasco",
+"Mogadiscio",
+"Islamabad",
+"Bamako"
+],
+"tta-62374287cb85f7ce9e949dd6": [
+"Qual è la capitale del paese Taiwan?",
+"Taipei",
+"Tarawa",
+"Pechino",
+"Apia"
+],
+"tta-6237428ccb85f7ce9e949dd8": [
+"Qual è la capitale del paese Tagikistan?",
+"Dušanbe",
+"Mosca",
+"Vilnius",
+"Antananarivo"
+],
+"tta-62374291cb85f7ce9e949dda": [
+"Qual è la capitale del paese Tanzania?",
+"Dodoma",
+"Dušanbe",
+"N'Djamena",
+"Juba"
+],
+"tta-62374296cb85f7ce9e949ddc": [
+"Qual è la capitale del paese Thailandia?",
+"Bangkok",
+"Windhoek",
+"Phnom Penh",
+"Suva"
+],
+"tta-6237429bcb85f7ce9e949dde": [
+"Qual è la capitale del paese Timor Est?",
+"Dili",
+"Erevan",
+"Nuku'alofa",
+"Kigali"
+],
+"tta-623742a0cb85f7ce9e949de0": [
+"Qual è la capitale del paese Togo?",
+"Lomé",
+"Nouakchott",
+"Dili",
+"Maputo"
+],
+"tta-623742a5cb85f7ce9e949de2": [
+"Qual è la capitale del paese Tonga?",
+"Nuku'alofa",
+"Dacca",
+"Vaduz",
+"Saint George's"
+],
+"tta-623742aacb85f7ce9e949de4": [
+"Qual è la capitale del paese Trinidad e Tobago?",
+"Port of Spain",
+"Mogadiscio",
+"Dili",
+"Maseru"
+],
+"tta-623742afcb85f7ce9e949de6": [
+"Qual è la capitale del paese Tunisia?",
+"Tunisi",
+"Ankara",
+"Algeri",
+"Dakar"
+],
+"tta-623742b4cb85f7ce9e949de8": [
+"Qual è la capitale del paese Turchia?",
+"Ankara",
+"Istanbul",
+"Antalya",
+"Bursa"
+],
+"tta-623742b9cb85f7ce9e949dea": [
+"Qual è la capitale del paese Turkmenistan?",
+"Ashgabat",
+"Lusaka",
+"Antananarivo",
+"Addis Abeba"
+],
+"tta-623742becb85f7ce9e949dec": [
+"Qual è la capitale del paese Tuvalu?",
+"Funafuti",
+"Sana'a",
+"Manama",
+"Kigali"
+],
+"tta-623742c3cb85f7ce9e949dee": [
+"Qual è la capitale del paese Uganda?",
+"Kampala",
+"Nuku'alofa",
+"Yamoussoukro",
+"Lilongwe"
+],
+"tta-623742c8cb85f7ce9e949df0": [
+"Qual è la capitale del paese Ucraina?",
+"Kyiv",
+"Sofia",
+"Belgrado",
+"Charkiv"
+],
+"tta-623742cdcb85f7ce9e949df2": [
+"Qual è la capitale del paese Emirati Arabi Uniti?",
+"Abu Dhabi",
+"Rabat",
+"Meccah",
+"Islamabad"
+],
+"tta-623742dbcb85f7ce9e949df8": [
+"Qual è la capitale del paese Uruguay?",
+"Montevideo",
+"Bogotà",
+"Zagabria",
+"Bandar Seri Begawan"
+],
+"tta-623742e0cb85f7ce9e949dfa": [
+"Qual è la capitale del paese Uzbekistan?",
+"Tashkent",
+"Ulan Bator",
+"Yaren",
+"Tarawa"
+],
+"tta-623742e5cb85f7ce9e949dfc": [
+"Qual è la capitale del paese Vanuatu?",
+"Port Vila",
+"São Tomé",
+"Libreville",
+"Naypyidaw"
+],
+"tta-623742efcb85f7ce9e949e00": [
+"Qual è la capitale del paese Venezuela?",
+"Caracas",
+"Khartum",
+"La Valletta",
+"Moroni"
+],
+"tta-623742f9cb85f7ce9e949e04": [
+"Qual è la capitale del paese Yemen?",
+"Sana'a",
+"Chisinau",
+"Tarawa",
+"Suva"
+],
+"tta-623742fecb85f7ce9e949e06": [
+"Qual è la capitale del paese Zambia?",
+"Lusaka",
+"Niamey",
+"Managua",
+"Ndola"
+],
+"tta-62374303cb85f7ce9e949e08": [
+"Qual è la capitale del paese Zimbabwe?",
+"Harare",
+"Monrovia",
+"Baku",
+"Bulawayo"
+],
+"tta-623b5778fd6c701a9211835d": [
+"In quale paese si trova: il sito UNESCO Angkor Wat?",
+"Cambogia",
+"Guatemala",
+"Belgio",
+"Iraq"
+],
+"tta-623b577afd6c701a9211835e": [
+"In quale paese si trova: Taj Mahal?",
+"India",
+"Egitto",
+"Italia",
+"Cina"
+],
+"tta-623b5780fd6c701a92118360": [
+"L'isola di Pasqua appartiene a quale paese?",
+"Cile",
+"Scozia",
+"Tanzania",
+"Stati Uniti"
+],
+"tta-623b5782fd6c701a92118361": [
+"In quale paese si trova: il sito UNESCO Petra?",
+"Giordania",
+"Malta",
+"Perù",
+"Arabia Saudita"
+],
+"tta-623b578afd6c701a92118364": [
+"In quale paese si trova: Piramidi di Giza?",
+"Egitto",
+"Indonesia",
+"Perù",
+"Messico"
+],
+"tta-623b5792fd6c701a92118367": [
+"In quale paese si trova: Itsukushima Shinto Shrine?",
+"Giappone",
+"Vietnam",
+"Russia",
+"Francia"
+],
+"tta-623b5794fd6c701a92118368": [
+"In quale città si trova l'Acropoli?",
+"Atene",
+"Gerusalemme",
+"Mosca",
+"Venezia"
+],
+"tta-623b5797fd6c701a92118369": [
+"In quale paese si trova: il sito UNESCO Cinque Terre?",
+"Italia",
+"Norvegia",
+"Guatemala",
+"Portogallo"
+],
+"tta-623b5799fd6c701a9211836a": [
+"In quale paese si trova: la città di Salzburg?",
+"Austria",
+"Uzbekistan",
+"Estonia",
+"Francia"
+],
+"tta-623b579ffd6c701a9211836c": [
+"In quale paese si trova: Rila Monastery?",
+"Bulgaria",
+"Guatemala",
+"Cuba",
+"Belgio"
+],
+"tta-623b57a1fd6c701a9211836d": [
+"In quale paese si trova: Giant's Causeway?",
+"Irlanda del Nord",
+"Grecia",
+"Nuova Zelanda",
+"Vietnam"
+],
+"tta-623b57a4fd6c701a9211836e": [
+"In quale paese si trova: Abu Simbel temples?",
+"Egitto",
+"Yemen",
+"Giappone",
+"Vietnam"
+],
+"tta-623b57a6fd6c701a9211836f": [
+"In quale paese si trova: Chichen Itza?",
+"Messico",
+"Israele",
+"Indonesia",
+"Grecia"
+],
+"tta-623b57a9fd6c701a92118370": [
+"In quale paese si trova: l'isola di Bali?",
+"Indonesia",
+"Turchia",
+"Arabia Saudita",
+"Thailandia"
+],
+"tta-623b57abfd6c701a92118371": [
+"In quale paese si trova: Leshan Giant Buddha, the largest and tallest stone Buddha statue in the world?",
+"Cina",
+"Indonesia",
+"Stati Uniti",
+"India"
+],
+"tta-623b57aefd6c701a92118372": [
+"In quale paese si trova: Yellowstone National Park?",
+"Stati Uniti",
+"Nuova Zelanda",
+"Belgio",
+"Francia"
+],
+"tta-623b57b1fd6c701a92118373": [
+"In quale paese si trova: il sito UNESCO Cappadocia?",
+"Turchia",
+"Ungheria",
+"Iran",
+"Vietnam"
+],
+"tta-623b57b5fd6c701a92118375": [
+"In quale paese si trova: Los Glaciares National Park?",
+"Argentina",
+"Messico",
+"Ecuador",
+"Perù"
+],
+"tta-623b57b8fd6c701a92118376": [
+"In quale paese si trova: la città di Venice?",
+"Italia",
+"Russia",
+"Repubblica Ceca",
+"Stati Uniti"
+],
+"tta-623b57bafd6c701a92118377": [
+"In quale paese si trova: Plitvice Lakes National Park?",
+"Croazia",
+"Italia",
+"Australia",
+"Repubblica Ceca"
+],
+"tta-623b57bdfd6c701a92118378": [
+"In quale paese si trova: Ha Long Bay?",
+"Vietnam",
+"Francia",
+"Regno Unito",
+"Guatemala"
+],
+"tta-623b57c0fd6c701a92118379": [
+"In quale paese si trova: gli antichi templi di Hampi?",
+"India",
+"Iraq",
+"Ecuador",
+"Thailandia"
+],
+"tta-623b57c2fd6c701a9211837a": [
+"In quale paese si trova: l'antica città di Bagan?",
+"Myanmar",
+"Egitto",
+"Italia",
+"Tanzania"
+],
+"tta-623b57c4fd6c701a9211837b": [
+"In quale paese si trova: il sito UNESCO Mont Saint Michel?",
+"Francia",
+"Belgio",
+"Argentina",
+"Israele"
+],
+"tta-623b57c7fd6c701a9211837c": [
+"In quale paese si trova: Serengeti National Park?",
+"Tanzania",
+"Cuba",
+"Iran",
+"Nigeria"
+],
+"tta-623b57cafd6c701a9211837d": [
+"In quale paese si trova: il sito UNESCO Al-Hijr Archaeological Site?",
+"Arabia Saudita",
+"Thailandia",
+"Messico",
+"Israele"
+],
+"tta-623b57ccfd6c701a9211837e": [
+"In quale paese si trova: il sito UNESCO Pergamon?",
+"Turchia",
+"Inghilterra",
+"Germania",
+"Ungheria"
+],
+"tta-623b57cffd6c701a9211837f": [
+"In quale paese si trova: il sito UNESCO Rani-ki-Vav?",
+"India",
+"Ungheria",
+"Israele",
+"Russia"
+],
+"tta-623b57d1fd6c701a92118380": [
+"In quale paese si trova: Grand Canyon National Park?",
+"Stati Uniti",
+"Israele",
+"Inghilterra",
+"Australia"
+],
+"tta-623b57d4fd6c701a92118381": [
+"In quale paese si trova: Dolomites?",
+"Italia",
+"Cina",
+"Belgio",
+"Argentina"
+],
+"tta-623b57d7fd6c701a92118382": [
+"In quale paese si trova: Schönbrunn Palace and Gardens?",
+"Austria",
+"Giordania",
+"Bulgaria",
+"Israele"
+],
+"tta-623b57dafd6c701a92118383": [
+"In quale paese si trova: il sito UNESCO Cesky Krumlov?",
+"Repubblica Ceca",
+"Ecuador",
+"Iraq",
+"Egitto"
+],
+"tta-623b57dcfd6c701a92118384": [
+"In quale paese si trova: Forbidden City?",
+"Cina",
+"Arabia Saudita",
+"Argentina",
+"Cuba"
+],
+"tta-623b57e328c24aa8913945da": [
+"In quale paese si trova: Tikal National Park?",
+"Guatemala",
+"Bosnia ed Erzegovina",
+"Irlanda del Nord",
+"Germania"
+],
+"tta-623b57e6fd6c701a92118386": [
+"In quale paese si trova: Statua della Libertà?",
+"Stati Uniti",
+"Brasile",
+"Spagna",
+"Regno Unito"
+],
+"tta-623b57e8fd6c701a92118387": [
+"In quale paese si trova: l'antica città greca di Hierapolis?",
+"Turchia",
+"Bosnia ed Erzegovina",
+"Francia",
+"Italia"
+],
+"tta-623b57ebfd6c701a92118388": [
+"In quale paese si trova: il sito UNESCO The Bam Citadel?",
+"Iran",
+"Turchia",
+"Thailandia",
+"Irlanda del Nord"
+],
+"tta-623b57edfd6c701a92118389": [
+"In quale paese si trova: Ayutthaya Historical Park?",
+"Thailandia",
+"Libia",
+"Guatemala",
+"Iraq"
+],
+"tta-623b57f2fd6c701a9211838b": [
+"In quale paese si trova: il sito UNESCO St. Kilda?",
+"Scozia",
+"Argentina",
+"Irlanda",
+"Stati Uniti"
+],
+"tta-623b57f5fd6c701a9211838c": [
+"In quale paese si trova: il sito UNESCO La Grand-Place?",
+"Belgio",
+"Austria",
+"Francia",
+"Svizzera"
+],
+"tta-623b57f7fd6c701a9211838d": [
+"In quale paese si trova: Tongariro National Park?",
+"Nuova Zelanda",
+"Cambogia",
+"Italia",
+"Tanzania"
+],
+"tta-623b57fafd6c701a9211838e": [
+"In quale paese si trova: Socotra Archipelago?",
+"Yemen",
+"Francia",
+"Australia",
+"Turchia"
+],
+"tta-623b57fcfd6c701a9211838f": [
+"In quale paese si trova: il sito UNESCO Wulingyuan?",
+"Cina",
+"Cambogia",
+"Italia",
+"Perù"
+],
+"tta-623b5804fd6c701a92118391": [
+"In quale paese si trova: la città di Dubrovnik?",
+"Croazia",
+"Libia",
+"Italia",
+"Ecuador"
+],
+"tta-623b5809fd6c701a92118393": [
+"In quale paese si trova: l'oasi berbera di Ghadames?",
+"Libia",
+"Tanzania",
+"Bulgaria",
+"Myanmar"
+],
+"tta-623b580bfd6c701a92118394": [
+"In quale paese si trova: Carlsbad Caverns National Park?",
+"Stati Uniti",
+"Croazia",
+"Spagna",
+"Australia"
+],
+"tta-623b580efd6c701a92118395": [
+"In quale paese si trova: la città vecchia fortificata di Shibam?",
+"Yemen",
+"Estonia",
+"Cile",
+"Guatemala"
+],
+"tta-623b5810fd6c701a92118396": [
+"In quale paese si trova: il sito UNESCO Mostar?",
+"Bosnia ed Erzegovina",
+"Turchia",
+"Argentina",
+"Estonia"
+],
+"tta-623b5813fd6c701a92118397": [
+"In quale paese si trova: il sito UNESCO Meteora?",
+"Grecia",
+"Thailandia",
+"Bulgaria",
+"Libia"
+],
+"tta-623b5815fd6c701a92118398": [
+"In quale paese si trova: il sito UNESCO Dorset and East Devon Coast?",
+"Regno Unito",
+"Norvegia",
+"Nuova Zelanda",
+"Sudafrica"
+],
+"tta-623b5818fd6c701a92118399": [
+"In quale paese si trova: la città di Bukhara?",
+"Uzbekistan",
+"Norvegia",
+"Libia",
+"Croazia"
+],
+"tta-623b581afd6c701a9211839a": [
+"In quale paese si trova: Lut Desert?",
+"Iran",
+"Messico",
+"Cile",
+"Israele"
+],
+"tta-623b581dfd6c701a9211839b": [
+"In quale paese si trova: Mount Etna?",
+"Italia",
+"Iraq",
+"Germania",
+"Russia"
+],
+"tta-623b581ffd6c701a9211839c": [
+"In quale paese si trova: il sito UNESCO Geirangerfjord and Nærøyfjord?",
+"Norvegia",
+"Estonia",
+"Italia",
+"Svezia"
+],
+"tta-623b5822fd6c701a9211839d": [
+"In quale paese si trova: il sito UNESCO Agra Fort?",
+"India",
+"Vietnam",
+"Russia",
+"Germania"
+],
+"tta-623b5824fd6c701a9211839e": [
+"In quale paese si trova: il sito UNESCO Delphi?",
+"Grecia",
+"Giordania",
+"Turchia",
+"Belgio"
+],
+"tta-623b582cfd6c701a921183a1": [
+"In quale paese si trova: Neuschwanstein Castle?",
+"Germania",
+"Ungheria",
+"Israele",
+"Svizzera"
+],
+"tta-623b5834fd6c701a921183a4": [
+"In quale paese si trova: la città di Saint Petersburg?",
+"Russia",
+"Bosnia ed Erzegovina",
+"Grecia",
+"Svezia"
+],
+"tta-623b5839fd6c701a921183a6": [
+"In quale paese si trova: la città di Rio de Janeiro?",
+"Brasile",
+"Spagna",
+"Egitto",
+"Argentina"
+],
+"tta-623b583dfd6c701a921183a8": [
+"In quale paese si trova: il sito UNESCO Stonehenge?",
+"Inghilterra",
+"Italia",
+"Francia",
+"Belgio"
+],
+"tta-623b5843fd6c701a921183aa": [
+"In quale paese si trova: Kyoto?",
+"Giappone",
+"Indonesia",
+"Thailandia",
+"Cina"
+],
+"tta-623b5845fd6c701a921183ab": [
+"In quale paese si trova: il sito UNESCO Bryggen?",
+"Norvegia",
+"Austria",
+"Germania",
+"Irlanda del Nord"
+],
+"tta-623b5848fd6c701a921183ac": [
+"In quale paese si trova: Mount Fuji?",
+"Giappone",
+"Indonesia",
+"Cina",
+"Corea del Sud"
+],
+"tta-623b584afd6c701a921183ad": [
+"In quale paese si trova: la città di Bruges?",
+"Belgio",
+"Italia",
+"Bosnia ed Erzegovina",
+"Brasile"
+],
+"tta-623b584dfd6c701a921183ae": [
+"In quale paese si trova: Kremlin and Red Square?",
+"Russia",
+"Argentina",
+"Ungheria",
+"Spagna"
+],
+"tta-623b584ffd6c701a921183af": [
+"In quale paese si trova: il sito UNESCO The Loire Valley?",
+"Francia",
+"Cile",
+"Nuova Zelanda",
+"Guatemala"
+],
+"tta-623b5852fd6c701a921183b0": [
+"In quale paese si trova: il sito UNESCO The Erbil Citadel?",
+"Iraq",
+"Perù",
+"Austria",
+"Bosnia ed Erzegovina"
+],
+"tta-623b5859fd6c701a921183b3": [
+"In quale paese si trova: Sydney Opera House?",
+"Australia",
+"Cina",
+"Italia",
+"Francia"
+],
+"tta-623b585cfd6c701a921183b4": [
+"In quale paese si trova: il sito UNESCO Prambanan?",
+"Indonesia",
+"Tanzania",
+"Malta",
+"Brasile"
+],
+"tta-623b585ffd6c701a921183b5": [
+"In quale paese si trova: il sito UNESCO The Blue Mountains?",
+"Australia",
+"Repubblica Ceca",
+"Canada",
+"Scozia"
+],
+"tta-623b5861fd6c701a921183b6": [
+"In quale paese si trova: il sito UNESCO Valletta?",
+"Malta",
+"Croazia",
+"Turchia",
+"Tanzania"
+],
+"tta-625e9dba796f721e95543f28": [
+"Quale di questi colori si trova sulla bandiera del paese Azerbaigian?",
+"Rosso",
+"Nero",
+"Arancione",
+"Giallo"
+],
+"tta-625e9dc0796f721e95543f2a": [
+"Che aspetto ha la bandiera del paese Austria?",
+"Tre bande orizzontali uguali di rosso, bianco e rosso.",
+"Tre bande verticali uguali di verde, giallo e rosso.",
+"Campo rosso con un sole giallo al centro.",
+"Verde con un rombo giallo al centro contenente un globo celeste blu."
+],
+"tta-625e9dc4796f721e95543f2b": [
+"Quale di questi colori si trova sulla bandiera del paese Austria?",
+"Rosso",
+"Giallo",
+"Arancione",
+"Nero"
+],
+"tta-625e9dc7796f721e95543f2c": [
+"Che aspetto ha la bandiera del paese Argentina?",
+"Tre bande orizzontali di azzurro, bianco e azzurro, con un sole giallo al centro.",
+"Rosso con una croce bianca che si estende fino ai bordi.",
+"Due bande orizzontali uguali di bianco e rosso.",
+"Rosso con un sole giallo dotato di otto raggi che si allargano fino ai bordi."
+],
+"tta-625e9dcb796f721e95543f2d": [
+"Quale di questi colori si trova sulla bandiera del paese Argentina?",
+"Giallo",
+"Verde",
+"Nero",
+"Arancione"
+],
+"tta-625e9dd2796f721e95543f2f": [
+"Quale bandiera di un paese corrisponde a questa descrizione: «Due bande verticali uguali di verde e bianco, con una mezzaluna e una stella rosse al centro.»?",
+"Algeria",
+"Ghana",
+"Belgio",
+"Spagna"
+],
+"tta-625e9de4796f721e95543f31": [
+"Che aspetto ha la bandiera del paese Belgio?",
+"Tre bande verticali di nero, giallo e rosso.",
+"Due bande orizzontali uguali di rosso e bianco.",
+"Campo rosso con un sole giallo al centro.",
+"Rosso con cinque stelle gialle in alto a sinistra."
+],
+"tta-625e9de7796f721e95543f32": [
+"Quale di questi colori si trova sulla bandiera del paese Belgio?",
+"Rosso",
+"Arancione",
+"Blu",
+"Bianco"
+],
+"tta-625e9df1796f721e95543f35": [
+"Quale di questi colori si trova sulla bandiera del paese Bolivia?",
+"Rosso",
+"Blu",
+"Oro",
+"Bordeaux"
+],
+"tta-625e9df5796f721e95543f36": [
+"Quale di questi colori si trova sulla bandiera del paese Bosnia ed Erzegovina?",
+"Giallo",
+"Nero",
+"Arancione",
+"Oro"
+],
+"tta-625e9dff796f721e95543f38": [
+"Quale bandiera di un paese corrisponde a questa descrizione: «Verde con un rombo giallo al centro contenente un globo celeste blu.»?",
+"Brasile",
+"Giamaica",
+"Isole Fær Øer",
+"Iran"
+],
+"tta-625e9e03796f721e95543f39": [
+"Quale di questi colori si trova sulla bandiera del paese Brasile?",
+"Verde",
+"Bordeaux",
+"Rosso",
+"Nero"
+],
+"tta-625e9e0d796f721e95543f3b": [
+"Quale di questi colori si trova sulla bandiera del paese Cambogia?",
+"Rosso",
+"Verde",
+"Giallo",
+"Oro"
+],
+"tta-625e9e14796f721e95543f3d": [
+"Che aspetto ha la bandiera del paese Canada?",
+"Due bande verticali rosse con un quadrato bianco in mezzo contenente una foglia rossa.",
+"Bordeaux con un'ampia banda bianca dentellata sul lato sinistro.",
+"Verde, con una grande scritta bianca e una spada.",
+"Rosso con una croce bianca che si estende fino ai bordi."
+],
+"tta-625e9e18796f721e95543f3e": [
+"Quale di questi colori si trova sulla bandiera del paese Canada?",
+"Bianco",
+"Bordeaux",
+"Arancione",
+"Oro"
+],
+"tta-625e9e36796f721e95543f47": [
+"Quale di questi colori si trova sulla bandiera del paese Costa Rica?",
+"Rosso",
+"Bordeaux",
+"Nero",
+"Arancione"
+],
+"tta-625e9e47796f721e95543f4c": [
+"Quale di questi colori si trova sulla bandiera del paese Costa d'Avorio?",
+"Arancione",
+"Blu",
+"Oro",
+"Bordeaux"
+],
+"tta-625e9e4b796f721e95543f4d": [
+"Che aspetto ha la bandiera del paese Cuba?",
+"Cinque bande orizzontali uguali alternate di blu e bianco, con un triangolo rosso a sinistra contenente una stella bianca.",
+"Verde con un rombo giallo al centro contenente un globo celeste blu.",
+"Bordeaux con un'ampia banda bianca dentellata sul lato sinistro.",
+"Bianco con una croce blu che si estende fino ai bordi."
+],
+"tta-625e9e4e796f721e95543f4e": [
+"Quale di questi colori si trova sulla bandiera del paese Cuba?",
+"Blu",
+"Nero",
+"Arancione",
+"Bordeaux"
+],
+"tta-625e9e59796f721e95543f51": [
+"Quale bandiera di un paese corrisponde a questa descrizione: «Tre bande orizzontali di giallo, blu e rosso con lo stemma al centro»?",
+"Ecuador",
+"Isole Fær Øer",
+"Austria",
+"Mongolia"
+],
+"tta-625e9e5f796f721e95543f53": [
+"Che aspetto ha la bandiera del paese Estonia?",
+"Tre bande orizzontali uguali di blu, nero e bianco.",
+"Tre bande verticali uguali di verde, bianco e rosso.",
+"Campo rosso con un sole giallo al centro.",
+"Tre bande verticali uguali di blu, bianco e rosso."
+],
+"tta-625e9e66796f721e95543f55": [
+"Che aspetto ha la bandiera del paese Egitto?",
+"Tre bande orizzontali uguali di rosso, bianco e nero, con un'aquila dorata al centro.",
+"Bianco con una stella blu al centro tra due bande orizzontali blu uguali",
+"Rosso con un'aquila nera bicipite al centro.",
+"Tre bande orizzontali di bordeaux, bianco e bordeaux."
+],
+"tta-625e9e74796f721e95543f58": [
+"Che aspetto ha la bandiera del paese Finlandia?",
+"Bianco con una croce blu che si estende fino ai bordi.",
+"Rosso con cinque stelle gialle in alto a sinistra.",
+"Bianco con un simbolo yin e yang rosso e blu al centro.",
+"Tre bande verticali uguali di verde, bianco e verde."
+],
+"tta-625e9e82796f721e95543f5b": [
+"Che aspetto ha la bandiera del paese Francia?",
+"Tre bande verticali uguali di blu, bianco e rosso.",
+"Tre bande orizzontali uguali di rosso, bianco e rosso.",
+"Blu con una croce rossa bordata di bianco che si estende fino ai bordi.",
+"Bianco con un grande disco rosso al centro."
+],
+"tta-625e9e85796f721e95543f5c": [
+"Quale di questi paesi ha il bianco sulla propria bandiera?",
+"Francia",
+"Gabon",
+"Belgio",
+"Lituania"
+],
+"tta-625e9e8c796f721e95543f5d": [
+"Quale di questi colori si trova sulla bandiera del paese Ghana?",
+"Giallo",
+"Bordeaux",
+"Blu",
+"Bianco"
+],
+"tta-625e9e93796f721e95543f5e": [
+"Quale di questi colori si trova sulla bandiera del paese Germania?",
+"Rosso",
+"Bianco",
+"Bordeaux",
+"Verde"
+],
+"tta-625e9e96796f721e95543f5f": [
+"Che aspetto ha la bandiera del paese Grecia?",
+"Nove strisce orizzontali di blu e bianco, con un quadrato blu in alto a sinistra contenente una croce bianca.",
+"Rosso con una mezzaluna e una stella bianche.",
+"Tre bande orizzontali uguali di bianco, blu e rosso",
+"Rosso con cinque stelle gialle in alto a sinistra."
+],
+"tta-625e9e99796f721e95543f60": [
+"Quale di questi colori si trova sulla bandiera del paese Grecia?",
+"Blu",
+"Nero",
+"Verde",
+"Giallo"
+],
+"tta-625e9ea727d267462ff91758": [
+"Quale di questi colori si trova sulla bandiera del paese Indonesia?",
+"Rosso",
+"Giallo",
+"Arancione",
+"Verde"
+],
+"tta-625e9eae796f721e95543f65": [
+"Quale di questi paesi ha il nero sulla propria bandiera?",
+"Iraq",
+"Gabon",
+"Irlanda",
+"Bangladesh"
+],
+"tta-625e9eb1796f721e95543f66": [
+"Quale bandiera di un paese corrisponde a questa descrizione: «Tre bande orizzontali di arancione, bianco e verde, con una ruota blu al centro.»?",
+"India",
+"Nigeria",
+"Afghanistan",
+"Australia"
+],
+"tta-625e9eb5796f721e95543f67": [
+"Quale di questi colori si trova sulla bandiera del paese India?",
+"Arancione",
+"Oro",
+"Nero",
+"Giallo"
+],
+"tta-625e9ebc796f721e95543f69": [
+"Quale di questi colori si trova sulla bandiera del paese Guinea?",
+"Giallo",
+"Bianco",
+"Nero",
+"Arancione"
+],
+"tta-625e9ec6796f721e95543f6b": [
+"Quale bandiera di un paese corrisponde a questa descrizione: «Blu con una croce rossa bordata di bianco che si estende fino ai bordi.»?",
+"Islanda",
+"Francia",
+"Uruguay",
+"Lussemburgo"
+],
+"tta-625e9ec9796f721e95543f6c": [
+"Quale di questi colori si trova sulla bandiera del paese Islanda?",
+"Blu",
+"Giallo",
+"Bordeaux",
+"Oro"
+],
+"tta-625e9ecd796f721e95543f6d": [
+"Quale bandiera di un paese corrisponde a questa descrizione: «Tre bande orizzontali uguali di verde, bianco e rosso.»?",
+"Iran",
+"Costa Rica",
+"Brasile",
+"Azerbaigian"
+],
+"tta-625e9ed0796f721e95543f6e": [
+"Quale di questi colori si trova sulla bandiera del paese Iran?",
+"Rosso",
+"Arancione",
+"Nero",
+"Bordeaux"
+],
+"tta-625e9ed7796f721e95543f70": [
+"Quale di questi colori si trova sulla bandiera del paese Ungheria?",
+"Verde",
+"Arancione",
+"Nero",
+"Oro"
+],
+"tta-625e9ede796f721e95543f72": [
+"Quale di questi colori si trova sulla bandiera del paese Giappone?",
+"Rosso",
+"Oro",
+"Giallo",
+"Blu"
+],
+"tta-625e9ee5796f721e95543f74": [
+"Quale di questi colori si trova sulla bandiera del paese Irlanda?",
+"Bianco",
+"Bordeaux",
+"Rosso",
+"Blu"
+],
+"tta-625e9eeb796f721e95543f76": [
+"Quale di questi colori si trova sulla bandiera del paese Italia?",
+"Bianco",
+"Blu",
+"Oro",
+"Arancione"
+],
+"tta-625e9ef2796f721e95543f78": [
+"Quale di questi colori si trova sulla bandiera del paese Kenya?",
+"Bianco",
+"Blu",
+"Oro",
+"Giallo"
+],
+"tta-625e9ef6796f721e95543f79": [
+"Quale bandiera di un paese corrisponde a questa descrizione: «Bianco con una stella blu al centro tra due bande orizzontali blu uguali»?",
+"Israele",
+"Germania",
+"Portogallo",
+"Cile"
+],
+"tta-625e9efd796f721e95543f7b": [
+"Quale bandiera di un paese corrisponde a questa descrizione: «Triangoli neri e verdi divisi da una croce gialla.»?",
+"Giamaica",
+"Marocco",
+"Gabon",
+"Spagna"
+],
+"tta-625e9f29796f721e95543f88": [
+"Quale di questi paesi ha il rosso sulla propria bandiera?",
+"Lituania",
+"Israele",
+"Arabia Saudita",
+"Svezia"
+],
+"tta-625e9f30796f721e95543f8a": [
+"Quale di questi colori si trova sulla bandiera del paese Lussemburgo?",
+"Rosso",
+"Nero",
+"Giallo",
+"Arancione"
+],
+"tta-625e9f37796f721e95543f8c": [
+"Quale di questi colori si trova sulla bandiera del paese Mali?",
+"Rosso",
+"Bianco",
+"Oro",
+"Bordeaux"
+],
+"tta-625e9f3e796f721e95543f8e": [
+"Quale di questi colori si trova sulla bandiera del paese Mongolia?",
+"Blu",
+"Verde",
+"Nero",
+"Bordeaux"
+],
+"tta-625e9f41796f721e95543f8f": [
+"Quale bandiera di un paese corrisponde a questa descrizione: «Rosso con una stella verde a cinque punte al centro.»?",
+"Marocco",
+"Iraq",
+"Kazakistan",
+"Repubblica Ceca"
+],
+"tta-625e9f45796f721e95543f90": [
+"Quale di questi colori si trova sulla bandiera del paese Marocco?",
+"Verde",
+"Blu",
+"Oro",
+"Giallo"
+],
+"tta-625e9f56796f721e95543f95": [
+"Che aspetto ha la bandiera del paese Malesia?",
+"14 strisce orizzontali di rosso e bianco, con un quadrato blu in alto a sinistra contenente una mezzaluna e una stella gialle.",
+"Tre bande orizzontali uguali di giallo, verde e rosso.",
+"Bianco con un grande disco rosso al centro.",
+"Blu con una croce rossa bordata di bianco che si estende fino ai bordi."
+],
+"tta-625e9f6a796f721e95543f9b": [
+"Quale di questi colori si trova sulla bandiera del paese Paesi Bassi?",
+"Rosso",
+"Arancione",
+"Oro",
+"Giallo"
+],
+"tta-625e9f74796f721e95543f9e": [
+"Quale di questi colori si trova sulla bandiera del paese Nigeria?",
+"Verde",
+"Bordeaux",
+"Giallo",
+"Blu"
+],
+"tta-625e9f7f796f721e95543fa1": [
+"Che aspetto ha la bandiera del paese Norvegia?",
+"Rosso con una croce blu bordata di bianco.",
+"Tre bande verticali uguali di verde, giallo e rosso.",
+"Rosso con un sole giallo dotato di otto raggi che si allargano fino ai bordi.",
+"Bianco con un simbolo yin e yang rosso e blu al centro."
+],
+"tta-625e9f86796f721e95543fa3": [
+"Che aspetto ha la bandiera del paese Polonia?",
+"Due bande orizzontali uguali di bianco e rosso.",
+"Bordeaux con un'ampia banda bianca dentellata sul lato sinistro.",
+"Tre bande verticali uguali di verde, giallo e rosso.",
+"Tre bande orizzontali uguali di verde, bianco e rosso."
+],
+"tta-625e9f89796f721e95543fa4": [
+"Quale di questi colori si trova sulla bandiera del paese Polonia?",
+"Bianco",
+"Oro",
+"Verde",
+"Nero"
+],
+"tta-625e9f90796f721e95543fa6": [
+"Quale di questi colori si trova sulla bandiera del paese Romania?",
+"Giallo",
+"Nero",
+"Bordeaux",
+"Arancione"
+],
+"tta-625e9f93796f721e95543fa7": [
+"Quale bandiera di un paese corrisponde a questa descrizione: «Due bande verticali di verde e rosso con lo stemma nazionale verso sinistra.»?",
+"Portogallo",
+"Indonesia",
+"Repubblica Ceca",
+"Liberia"
+],
+"tta-625e9f9d796f721e95543faa": [
+"Quale di questi colori si trova sulla bandiera del paese Pakistan?",
+"Verde",
+"Arancione",
+"Oro",
+"Rosso"
+],
+"tta-625e9fa1796f721e95543fab": [
+"Che aspetto ha la bandiera del paese Qatar?",
+"Bordeaux con una banda bianca dentellata sul lato sinistro.",
+"Tre bande orizzontali uguali di verde, bianco e rosso.",
+"Tre bande verticali uguali di nero, giallo e rosso.",
+"Tre bande verticali di blu, giallo e rosso."
+],
+"tta-625e9fa4796f721e95543fac": [
+"Quale di questi colori si trova sulla bandiera del paese Qatar?",
+"Bianco",
+"Rosso",
+"Verde",
+"Blu"
+],
+"tta-625e9fa8796f721e95543fad": [
+"Quale bandiera di un paese corrisponde a questa descrizione: «Cinque bande orizzontali uguali di rosso alternate al bianco, con un triangolo blu a sinistra contenente una stella bianca.»?",
+"Porto Rico",
+"Svezia",
+"Sri Lanka",
+"Islanda"
+],
+"tta-625e9fab796f721e95543fae": [
+"Quale di questi colori si trova sulla bandiera del paese Porto Rico?",
+"Rosso",
+"Giallo",
+"Verde",
+"Nero"
+],
+"tta-625e9fb2796f721e95543fb0": [
+"Quale di questi colori si trova sulla bandiera del paese Russia?",
+"Rosso",
+"Oro",
+"Arancione",
+"Verde"
+],
+"tta-625e9fc3796f721e95543fb5": [
+"Quale bandiera di un paese corrisponde a questa descrizione: «Verde, con una grande scritta bianca e una spada.»?",
+"Arabia Saudita",
+"Kazakistan",
+"Liberia",
+"Islanda"
+],
+"tta-625e9fde796f721e95543fbd": [
+"Quale di questi colori si trova sulla bandiera del paese Siria?",
+"Verde",
+"Arancione",
+"Giallo",
+"Blu"
+],
+"tta-625e9fe5796f721e95543fbf": [
+"Che aspetto ha la bandiera del paese Thailandia?",
+"Cinque bande orizzontali di rosso, bianco, blu, bianco e rosso.",
+"Tre bande verticali di verde, bianco e rosso con un simbolo al centro.",
+"Campo rosso con un sole giallo al centro.",
+"Rosso con una mezzaluna e una stella bianche."
+],
+"tta-625e9fec796f721e95543fc1": [
+"Che aspetto ha la bandiera del paese Turchia?",
+"Rosso con una mezzaluna e una stella bianche.",
+"Tre bande orizzontali uguali di rosso, bianco e verde.",
+"Rosso con cinque stelle gialle in alto a sinistra.",
+"Rosso con un sole giallo dotato di otto raggi che si allargano fino ai bordi."
+],
+"tta-625e9fef796f721e95543fc2": [
+"Quale di questi colori si trova sulla bandiera del paese Turchia?",
+"Bianco",
+"Arancione",
+"Blu",
+"Giallo"
+],
+"tta-625e9ff6796f721e95543fc4": [
+"Quale di questi colori si trova sulla bandiera del paese Yemen?",
+"Bianco",
+"Giallo",
+"Blu",
+"Verde"
+],
+"tta-625e9ffa796f721e95543fc5": [
+"Che aspetto ha la bandiera del paese Vietnam?",
+"Rosso con una stella gialla al centro.",
+"Blu con una croce gialla che si estende fino ai bordi.",
+"Bianco con un grande disco rosso al centro.",
+"Tre bande verticali uguali di blu, oro e rosso."
+],
+"tta-625ea001796f721e95543fc7": [
+"Quale bandiera di un paese corrisponde a questa descrizione: «Due bande orizzontali uguali di blu e giallo.»?",
+"Ucraina",
+"Ghana",
+"Danimarca",
+"Porto Rico"
+],
+"tta-625ea004796f721e95543fc8": [
+"Quale di questi colori si trova sulla bandiera del paese Ucraina?",
+"Blu",
+"Nero",
+"Arancione",
+"Bianco"
+],
+"tta-625ea007796f721e95543fc9": [
+"Quale di questi colori si trova sulla bandiera del paese Regno Unito?",
+"Blu",
+"Verde",
+"Oro",
+"Nero"
+],
+"tta-625ea012796f721e95543fcc": [
+"Che aspetto ha la bandiera del paese Stati Uniti?",
+"13 strisce orizzontali di rosso e bianco, con un rettangolo blu in alto a sinistra contenente 50 stelle bianche.",
+"Due bande orizzontali uguali di blu e giallo.",
+"Rosso con una croce bianca che si estende fino ai bordi.",
+"Verde con un rombo giallo al centro contenente un globo celeste blu."
+],
+"tta-625ea019796f721e95543fce": [
+"Quale di questi colori si trova sulla bandiera del paese Uruguay?",
+"Blu",
+"Rosso",
+"Arancione",
+"Oro"
+],
+"tta-62602d0d4b176d54800e3c7b": [
+"Quale di queste città si trova nel paese Australia?",
+"Melbourne",
+"Queenstown",
+"Auckland",
+"Wellington"
+],
+"tta-62602d104b176d54800e3c7c": [
+"In quale paese si trova la città di Berlino?",
+"Germania",
+"Croazia",
+"Albania",
+"Svizzera"
+],
+"tta-62602d174b176d54800e3c7e": [
+"In quale paese si trova la città di Sydney?",
+"Australia",
+"Irlanda",
+"Nuova Zelanda",
+"Canada"
+],
+"tta-62602d1b4b176d54800e3c7f": [
+"Dove si trova la città di Barcellona?",
+"Spagna",
+"Germania",
+"Belgio",
+"Norvegia"
+],
+"tta-62602d254b176d54800e3c82": [
+"In quale paese si trova la città di Pechino?",
+"Cina",
+"Mongolia",
+"India",
+"Australia"
+],
+"tta-62602d284b176d54800e3c83": [
+"Quale di queste città si trova nel paese Germania?",
+"Monaco di Baviera",
+"Valencia",
+"Budapest",
+"Milano"
+],
+"tta-62602d2f4b176d54800e3c85": [
+"In quale paese si trova la città di Milano?",
+"Italia",
+"Lituania",
+"Svezia",
+"Serbia"
+],
+"tta-62602d364b176d54800e3c87": [
+"Quale di queste città si trova nel paese Emirati Arabi Uniti?",
+"Dubai",
+"Mascate",
+"Adana",
+"Tel Aviv"
+],
+"tta-62602d3d4b176d54800e3c89": [
+"Quale di queste città si trova nel paese Cina?",
+"Shanghai",
+"Brisbane",
+"Yokohama",
+"Osaka"
+],
+"tta-62602d444b176d54800e3c8b": [
+"Quale di queste città si trova nel paese Giappone?",
+"Osaka",
+"Adelaide",
+"Incheon",
+"Gold Coast"
+],
+"tta-62602d4b4b176d54800e3c8d": [
+"In quale paese si trova la città di Tel Aviv?",
+"Israele",
+"Libano",
+"Egitto",
+"Qatar"
+],
+"tta-62602d524b176d54800e3c8f": [
+"Quale di queste città si trova nel paese Turchia?",
+"Istanbul",
+"Teheran",
+"Dubai",
+"Manama"
+],
+"tta-62602d694b176d54800e3c96": [
+"In quale paese si trova la città di Shenzhen?",
+"Cina",
+"Filippine",
+"Malesia",
+"Cambogia"
+],
+"tta-62602d704b176d54800e3c98": [
+"In quale paese si trova la città di Hong Kong?",
+"Cina",
+"Sri Lanka",
+"Malesia",
+"Taiwan"
+],
+"tta-62602d854b176d54800e3c9e": [
+"In quale paese si trova la città di Bruxelles?",
+"Belgio",
+"Svezia",
+"Estonia",
+"Islanda"
+],
+"tta-62602d884b176d54800e3c9f": [
+"In quale paese si trova la città di San Paolo?",
+"Brasile",
+"Panama",
+"Messico",
+"Ecuador"
+],
+"tta-62602da8014f58b5fc1a3fc2": [
+"In quale paese si trova la città di Rotterdam?",
+"Paesi Bassi",
+"Croazia",
+"Finlandia",
+"Spagna"
+],
+"tta-62602dab957e77cecfa4ec32": [
+"Quale di queste città si trova nel paese India?",
+"Mumbai",
+"Sydney",
+"Taipei",
+"Yokohama"
+],
+"tta-62602db94b176d54800e3ca9": [
+"In quale paese si trova la città di Edimburgo?",
+"Regno Unito",
+"Stati Uniti",
+"Nuova Zelanda",
+"Irlanda"
+],
+"tta-62602dc44b176d54800e3cac": [
+"Quale di queste città si trova nel paese Regno Unito?",
+"Glasgow",
+"Baltimore",
+"Houston",
+"Minneapolis-St Paul"
+],
+"tta-62602dcb014f58b5fc1a3fc5": [
+"In quale paese si trova la città di Auckland?",
+"Nuova Zelanda",
+"Australia",
+"Irlanda",
+"Canada"
+],
+"tta-62602dd64b176d54800e3cae": [
+"In quale paese si trova la città di Nagoya?",
+"Giappone",
+"Cina",
+"Nuova Zelanda",
+"Corea del Sud"
+],
+"tta-62602de04b176d54800e3cb1": [
+"In quale paese si trova la città di Valencia?",
+"Spagna",
+"Bosnia ed Erzegovina",
+"Albania",
+"Bulgaria"
+],
+"tta-62602de44b176d54800e3cb2": [
+"In quale paese si trova la città di Delhi?",
+"India",
+"Mongolia",
+"Malesia",
+"Giappone"
+],
+"tta-62602de84b176d54800e3cb3": [
+"In quale paese si trova la città di Porto?",
+"Portogallo",
+"Bulgaria",
+"Estonia",
+"Repubblica Ceca"
+],
+"tta-62602dee4b176d54800e3cb5": [
+"In quale paese si trova la città di Basilea?",
+"Svizzera",
+"Danimarca",
+"Finlandia",
+"Portogallo"
+],
+"tta-62602df54b176d54800e3cb7": [
+"In quale paese si trova la città di Eindhoven?",
+"Paesi Bassi",
+"Slovenia",
+"Estonia",
+"Portogallo"
+],
+"tta-62602df94b176d54800e3cb8": [
+"Quale di queste città si trova nel paese Colombia?",
+"Medellin",
+"Buenos Aires",
+"Salvador",
+"Valparaíso"
+],
+"tta-62602dff4b176d54800e3cba": [
+"Quale di queste città si trova nel paese Francia?",
+"Toulouse",
+"Barcelona",
+"Copenaghen",
+"Amsterdam"
+],
+"tta-62602e034b176d54800e3cbb": [
+"Quale di queste città si trova nel paese Spagna?",
+"Bilbao",
+"Dublino",
+"Stuttgart",
+"Colonia"
+],
+"tta-62602e064b176d54800e3cbc": [
+"Quale di queste città si trova nel paese Italia?",
+"Napoli",
+"Dublino",
+"Leipzig",
+"Atene"
+],
+"tta-62602e0a4b176d54800e3cbd": [
+"In quale paese si trova la città di Firenze?",
+"Italia",
+"Portogallo",
+"Svizzera",
+"Ungheria"
+],
+"tta-62602e224b176d54800e3cc4": [
+"Quale di queste città si trova nel paese Corea del Sud?",
+"Daegu",
+"Colombo",
+"Singapore",
+"Petaling Jaya"
+],
+"tta-62602e254b176d54800e3cc5": [
+"Quale di queste città si trova nel paese Svezia?",
+"Malmö",
+"Barcelona",
+"Vienna",
+"Madrid"
+],
+"tta-62602e2c4b176d54800e3cc7": [
+"Quale di queste città si trova nel paese Nuova Zelanda?",
+"Christchurch",
+"Hobart",
+"Ballarat",
+"Bendigo"
+],
+"tta-62602e404b176d54800e3ccd": [
+"In quale paese si trova la città di Graz?",
+"Austria",
+"Estonia",
+"Slovenia",
+"Grecia"
+],
+"tta-62602e474b176d54800e3ccf": [
+"In quale paese si trova la città di Cracovia?",
+"Polonia",
+"Islanda",
+"Macedonia del Nord",
+"Slovenia"
+],
+"tta-62602e4b4b176d54800e3cd0": [
+"Quale di queste città si trova nel paese Grecia?",
+"Thessaloniki",
+"Colonia",
+"Oslo",
+"Barcelona"
+],
+"tta-62602e514b176d54800e3cd2": [
+"Quale di queste città si trova nel paese Austria?",
+"Linz",
+"Stuttgart",
+"Lisbona",
+"Varsavia"
+],
+"tta-62602e554b176d54800e3cd3": [
+"Quale di queste città si trova nel paese Belgio?",
+"Liège",
+"Madrid",
+"Zurigo",
+"Lione"
+],
+"tta-62602e5c4b176d54800e3cd5": [
+"Quale di queste città si trova nel paese Messico?",
+"Monterrey",
+"Recife",
+"Città del Guatemala",
+"Bogotà"
+],
+"tta-62602e6d4b176d54800e3cda": [
+"Quale di queste città si trova nel paese Sudafrica?",
+"Città del Capo",
+"Douala",
+"Port Harcourt",
+"Nairobi"
+],
+"tta-62602e774b176d54800e3cdd": [
+"In quale paese si trova la città di Kaohsiung?",
+"Taiwan",
+"Giappone",
+"Sri Lanka",
+"Myanmar"
+],
+"tta-62602e7a4b176d54800e3cde": [
+"In quale paese si trova la città di Haifa?",
+"Israele",
+"Bahrein",
+"Qatar",
+"Iran"
+],
+"tta-62602e814b176d54800e3ce0": [
+"In quale paese si trova la città di Smirne?",
+"Turchia",
+"Egitto",
+"Giordania",
+"Israele"
+],
+"tta-62602e884b176d54800e3ce2": [
+"Quale di queste città si trova nel paese Danimarca?",
+"Odense",
+"Barcelona",
+"Oslo",
+"Helsinki"
+],
+"tta-62602e924b176d54800e3ce5": [
+"In quale paese si trova la città di Colombo?",
+"Sri Lanka",
+"Indonesia",
+"Vietnam",
+"Cambogia"
+],
+"tta-62602ea04b176d54800e3ce9": [
+"In quale paese si trova la città di Curitiba?",
+"Brasile",
+"Uruguay",
+"Perù",
+"Bahamas"
+],
+"tta-62602ea74b176d54800e3ceb": [
+"Quale di queste città si trova nel paese Vietnam?",
+"Ho Chi Minh City",
+"Yangon",
+"Giacarta",
+"Chittagong"
+],
+"tta-62602eaa4b176d54800e3cec": [
+"In quale paese si trova la città di Belo Horizonte?",
+"Brasile",
+"Bahamas",
+"Trinidad e Tobago",
+"Argentina"
+],
+"tta-62602ead4b176d54800e3ced": [
+"In quale paese si trova la città di Tainan?",
+"Taiwan",
+"Corea del Sud",
+"Malesia",
+"Filippine"
+],
+"tta-62602ebb4b176d54800e3cf1": [
+"In quale paese si trova la città di Gedda?",
+"Arabia Saudita",
+"Qatar",
+"Turchia",
+"Giordania"
+],
+"tta-62602ebe4b176d54800e3cf2": [
+"In quale paese si trova la città di Guadalajara?",
+"Messico",
+"Cuba",
+"Cile",
+"Paraguay"
+],
+"tta-62602ec84b176d54800e3cf5": [
+"In quale paese si trova la città di Antalya?",
+"Turchia",
+"Israele",
+"Giordania",
+"Bahrein"
+],
+"tta-62602ecc4b176d54800e3cf6": [
+"In quale paese si trova la città di Córdoba?",
+"Argentina",
+"Brasile",
+"Giamaica",
+"Venezuela"
+],
+"tta-62602ecf4b176d54800e3cf7": [
+"In quale paese si trova la città di Karachi?",
+"Pakistan",
+"Ucraina",
+"Tagikistan",
+"Bielorussia"
+],
+"tta-62602fd24b176d54800e3cff": [
+"In quale paese si trova la città di Queenstown?",
+"Nuova Zelanda",
+"Irlanda",
+"Regno Unito",
+"Australia"
+],
+"tta-62602fdc014f58b5fc1a3fc9": [
+"Quale di queste città si trova nel paese Romania?",
+"Timisoara",
+"Parigi",
+"Amsterdam",
+"Praga"
+],
+"tta-62602fe34b176d54800e3d01": [
+"In quale paese si trova la città di Alessandria d'Egitto?",
+"Egitto",
+"Qatar",
+"Libano",
+"Arabia Saudita"
+],
+"tta-62602fea4b176d54800e3d03": [
+"In quale paese si trova la città di Košice?",
+"Slovacchia",
+"Lituania",
+"Polonia",
+"Islanda"
+],
+"tta-62602fed4b176d54800e3d04": [
+"In quale paese si trova la città di Novosibirsk?",
+"Russia",
+"Danimarca",
+"Germania",
+"Lettonia"
+],
+"tta-6260300e4b176d54800e3d09": [
+"Quale di queste città si trova nel paese Birmania?",
+"Yangon",
+"Suwon",
+"Seul",
+"Hanoi"
+],
+"tta-626030154b176d54800e3d0b": [
+"Quale di queste città si trova nel paese Kazakistan?",
+"Almaty",
+"Karachi",
+"Zaporižžja",
+"Charkiv"
+],
+"tta-626030274b176d54800e3d10": [
+"In quale paese si trova la città di Durban?",
+"Sudafrica",
+"Senegal",
+"Repubblica Democratica del Congo",
+"Nigeria"
+],
+"tta-626030354b176d54800e3d14": [
+"In quale paese si trova la città di Casablanca?",
+"Marocco",
+"Kenya",
+"Sudan",
+"Nigeria"
+],
+"tta-626030384b176d54800e3d15": [
+"Quale di queste città si trova nel paese Pakistan?",
+"Lahore",
+"Leopoli",
+"Bishkek",
+"Baku"
+],
+"tta-6260303b4b176d54800e3d16": [
+"In quale paese si trova la città di Cali?",
+"Colombia",
+"Guatemala",
+"Honduras",
+"Panama"
+],
+"tta-6260304d4b176d54800e3d1b": [
+"In quale paese si trova la città di Valparaíso?",
+"Cile",
+"Guatemala",
+"Paraguay",
+"Bahamas"
+],
+"tta-626030504b176d54800e3d1c": [
+"In quale paese si trova la città di Ajman?",
+"Emirati Arabi Uniti",
+"Qatar",
+"Kuwait",
+"Libano"
+],
+"tta-626030544b176d54800e3d1d": [
+"In quale paese si trova la città di Pretoria?",
+"Sudafrica",
+"Etiopia",
+"Algeria",
+"Tunisia"
+],
+"tta-6260305e4b176d54800e3d20": [
+"In quale paese si trova la città di Bandung?",
+"Indonesia",
+"Thailandia",
+"Bangladesh",
+"Corea del Sud"
+],
+"tta-626030654b176d54800e3d21": [
+"Quale di queste città si trova nel paese Portogallo?",
+"Guimaraes",
+"L'Aia",
+"Budapest",
+"Milano"
+],
+"tta-626030694b176d54800e3d22": [
+"In quale paese si trova la città di Chittagong?",
+"Bangladesh",
+"Malesia",
+"Thailandia",
+"Singapore"
+],
+"tta-626030704b176d54800e3d24": [
+"In quale paese si trova la città di Odessa?",
+"Ucraina",
+"Kirghizistan",
+"Bielorussia",
+"Georgia"
+],
+"tta-626030734b176d54800e3d25": [
+"In quale paese si trova la città di San Salvador?",
+"El Salvador",
+"Colombia",
+"Cile",
+"Honduras"
+],
+"tta-626030844b176d54800e3d2a": [
+"Quale di queste città si trova nel paese Colombia?",
+"Cartagena",
+"Caracas",
+"Belo Horizonte",
+"Curitiba"
+],
+"tta-626030884b176d54800e3d2b": [
+"In quale paese si trova la città di Guayaquil?",
+"Ecuador",
+"Brasile",
+"Colombia",
+"Cile"
+],
+"tta-6260308f4b176d54800e3d2d": [
+"In quale paese si trova la città di Charkiv?",
+"Ucraina",
+"Kirghizistan",
+"Tagikistan",
+"Bielorussia"
+],
+"tta-626030954b176d54800e3d2f": [
+"In quale paese si trova la città di Leopoli?",
+"Ucraina",
+"Azerbaigian",
+"Pakistan",
+"Kazakistan"
+],
+"tta-626030994b176d54800e3d30": [
+"In quale paese si trova la città di San Juan?",
+"Argentina",
+"Cile",
+"Uruguay",
+"Bahamas"
+],
+"tta-6260309c4b176d54800e3d31": [
+"Quale di queste città si trova nel paese Bolivia?",
+"La Paz",
+"Belo Horizonte",
+"Buenos Aires",
+"Caracas"
+],
+"tta-626030a04b176d54800e3d32": [
+"Quale di queste città si trova nel paese Nigeria?",
+"Lagos",
+"Casablanca",
+"Khartum",
+"Luanda"
+],
+"tta-626030b14b176d54800e3d37": [
+"In quale paese si trova la città di Algeri?",
+"Algeria",
+"Camerun",
+"Repubblica Democratica del Congo",
+"Senegal"
+],
+"tta-626030c94b176d54800e3d3e": [
+"In quale paese si trova la città di Dar es Salaam?",
+"Tanzania",
+"Senegal",
+"Algeria",
+"Sudafrica"
+],
+"tta-626030cc4b176d54800e3d3f": [
+"In quale paese si trova la città di Douala?",
+"Camerun",
+"Algeria",
+"Mauritius",
+"Tunisia"
+],
+"tta-626030d7014f58b5fc1a3fcc": [
+"In quale paese si trova la città di Port Harcourt?",
+"Nigeria",
+"Marocco",
+"Angola",
+"Camerun"
+],
+"tta-62628cd452c39217ab0d70f2": [
+"Quale fiume ha il maggior numero di capitali sulle sue rive?",
+"Il Danubio",
+"Il Nilo",
+"Il Rio delle Amazzoni",
+"Il Congo"
+],
+"tta-639c9d90929b90846f2fc951": [
+"In quale città si trova la Basilica di Santa Sofia, una struttura iconica?",
+"Istanbul",
+"Roma",
+"Mosca",
+"Atene"
+],
+"tta-639c9d95929b90846f2fc95b": [
+"Qual è l'edificio più alto del mondo?",
+"Burj Khalifa",
+"Shanghai Tower",
+"Taipei 101",
+"Empire State Building"
+],
+"tta-639c9d98929b90846f2fc963": [
+"Qual è la più antica struttura in legno a travi e pilastri ancora esistente al mondo?",
+"Tempio Horyuji",
+"Città Proibita",
+"Cattedrale di Notre-Dame",
+"Partenone"
+],
+"tta-639c9d9f929b90846f2fc972": [
+"Il Gherkin è un noto edificio di Londra progettato da Norman Foster. Che tipo di edificio è?",
+"Un grattacielo",
+"Una cattedrale",
+"Un museo",
+"Uno stadio"
+],
+"tta-639c9da2929b90846f2fc977": [
+"Come si chiama l'iconico edificio di Gaudí a Barcellona?",
+"Sagrada Família",
+"Palau de la Música Catalana",
+"Basilica de la Mercè",
+"Hospital de Sant Pau"
+],
+"tta-639c9da4929b90846f2fc97c": [
+"Il Pantheon di Roma è un esempio di quale stile architettonico?",
+"Classico",
+"Gotico",
+"Barocco",
+"Modernista"
+],
+"tta-639c9da7929b90846f2fc981": [
+"Il Louvre è un museo iconico di quale città?",
+"Parigi",
+"Londra",
+"New York",
+"Roma"
+],
+"tta-639c9db0929b90846f2fc995": [
+"Qual è il nome del grattacielo più alto della Cina?",
+"Shanghai Tower",
+"Torri Petronas",
+"Taipei 101",
+"Burj Khalifa"
+],
+"tta-639c9dbf929b90846f2fc9b3": [
+"Le Torri Petronas sono una coppia di grattacieli iconici situati in quale città?",
+"Kuala Lumpur",
+"Singapore",
+"Seul",
+"Tokyo"
+],
+"tta-63b058684799123c67712f1e": [
+"Qual è la capitale della Scozia?",
+"Edimburgo",
+"Aberdeen",
+"Glasgow",
+"Cardiff"
+],
+"tta-63b0586b4799123c67712f23": [
+"Qual è il fiume più lungo dell'India (senza contare la lunghezza negli altri paesi)?",
+"Gange",
+"Godavari",
+"Krishna",
+"Yamuna"
+],
+"tta-63b058704799123c67712f2b": [
+"Qual è il più grande stato dell'India?",
+"Rajasthan",
+"Madhya Pradesh",
+"Maharashtra",
+"Uttar Pradesh"
+],
+"tta-63b058724799123c67712f2e": [
+"Qual è la montagna più alta del Regno Unito?",
+"Ben Nevis",
+"Monte Snowdon",
+"Scafell Pike",
+"Carrauntoohil"
+],
+"tta-63b058724799123c67712f2f": [
+"Qual è la montagna più alta dell'India?",
+"Kangchenjunga",
+"Nanda Devi",
+"Kamet",
+"Monte Everest"
+],
+"tta-63b058754799123c67712f33": [
+"Qual è il più grande deserto dell'India?",
+"Deserto del Thar",
+"Rann di Kutch",
+"Altopiano del Deccan",
+"Deserto del Gobi"
+],
+"tta-63b0587b4799123c67712f3d": [
+"Quale di queste città russe non si trova nella Russia europea?",
+"Vladivostok",
+"Mosca",
+"San Pietroburgo",
+"Nižnij Novgorod"
+],
+"tta-63b0587d4799123c67712f41": [
+"Dove si trovano i monti Altaj?",
+"Asia centrale",
+"Sud America",
+"Europa orientale",
+"Australia occidentale"
+],
+"tta-63b0587e4799123c67712f43": [
+"Qual è la più grande catena montuosa dell'India?",
+"Himalaya",
+"Aravalli",
+"Vindhya",
+"Satpura"
+],
+"tta-63b058824799123c67712f49": [
+"Qual è il nome del fiume più lungo della Russia?",
+"Fiume Lena",
+"Fiume Ob",
+"Fiume Enisej",
+"Volga"
+],
+"tta-63b058844799123c67712f4d": [
+"Quale di queste città russe si trova sul Mar Nero?",
+"Soči",
+"Mosca",
+"San Pietroburgo",
+"Kazan"
+],
+"tta-63f394fe989356ef48370bd8": [
+"Qual è il nome della montagna più alta del Giappone?",
+"Monte Fuji",
+"Monte Yari",
+"Monte Ontake",
+"Monte Hakusan"
+],
+"tta-63f39500989356ef48370bdd": [
+"Quale fiume attraversa Tokyo?",
+"Fiume Sumida",
+"Fiume Giallo",
+"Fiume Kiso",
+"Fiume delle Perle"
+],
+"tta-645aba5e158db1bd1779f1d1": [
+"In quale paese si trovano i due laghi più grandi dell'America Centrale, compreso il lago di Managua?",
+"Nicaragua",
+"Honduras",
+"El Salvador",
+"Costa Rica"
+],
+"tta-645bc75b4638d58091b1b9e1": [
+"Quale fiume riceve come ultimo affluente l'Atbara, nel nord del Sudan?",
+"Il Nilo",
+"Il Rio delle Amazzoni",
+"Il Congo",
+"Lo Zambesi"
+],
+"tta-645bc75b4638d58091b1b9e9": [
+"Quale città è rappresentata dal codice aeroportuale LAS?",
+"Las Vegas",
+"Los Angeles",
+"Lansing",
+"Louisiana"
+],
+"tta-645bc75b4638d58091b1b9ea": [
+"Quale città tedesca prese il nome da un allevamento di cavalli che si trovava un tempo sul sito?",
+"Stoccarda",
+"Amburgo",
+"Monaco di Baviera",
+"Berlino"
+],
+"tta-645bc75b4638d58091b1b9eb": [
+"Quale città californiana fu un porto baleniero a metà dell'Ottocento e si trova a 12 miglia a nord del Messico?",
+"San Diego",
+"San Francisco",
+"Los Angeles",
+"Sacramento"
+],
+"tta-645c9f6b42ea81e2554c5f26": [
+"L'inno nazionale di quale paese africano si chiama \"Wimbo wa Taifa\" in swahili, che significa \"inno della nazione\"?",
+"Kenya",
+"Camerun",
+"Mali",
+"Senegal"
+],
+"tta-645c9fc842ea81e2554c5f8b": [
+"Quale città americana è nota per i riti voodoo e per la tomba della regina del voodoo Marie Laveau?",
+"New Orleans",
+"Miami",
+"Los Angeles",
+"Chicago"
+],
+"tta-645cb0e67d263fd50970438d": [
+"Cambogia, Laos e Vietnam si trovano su quale penisola?",
+"Indocina",
+"Malese",
+"Malacca",
+"Sunda"
+],
+"tta-645cb0ee602ff42ca52fb41c": [
+"Quale paese africano era un tempo noto come Costa d'Oro ed è adiacente alla Costa d'Avorio?",
+"Ghana",
+"Egitto",
+"Kenya",
+"Gabon"
+],
+"tta-645cb1257d263fd50970439f": [
+"Come si chiama la strada che va dalla Casa Bianca al Campidoglio ed è usata per le parate cerimoniali?",
+"Pennsylvania Avenue",
+"Broadway",
+"Fifth Avenue",
+"Star Walk"
+],
+"tta-645cb1257d263fd5097043a0": [
+"Su quale fiume si trova il lago di Saint Francis, al confine tra Ontario e Québec?",
+"San Lorenzo",
+"Colorado",
+"Mississippi",
+"Nilo"
+],
+"tta-645cb1257d263fd5097043ab": [
+"Quale dei Grandi Laghi si trova a circa 55 chilometri a nord del lago Erie ed è alimentato dal fiume Niagara?",
+"Lago Ontario",
+"Lago Erie",
+"Lago Michigan",
+"Lago Superiore"
+],
+"tta-645cb1257d263fd5097043b0": [
+"Flatbush e Flatlands sono quartieri di quale distretto (borough) di New York?",
+"Brooklyn",
+"Queens",
+"Manhattan",
+"Bronx"
+],
+"tta-645cb12a602ff42ca52fb422": [
+"Quale di queste è una remota isola britannica del Pacifico meridionale?",
+"Isola di Pitcairn",
+"Isole Falkland",
+"Isola di Ascensione",
+"Georgia del Sud"
+],
+"tta-645cb12a602ff42ca52fb425": [
+"Quale stato americano ha un Parco Nazionale dei Vulcani che comprende la cima di un vulcano alto 13.677 piedi?",
+"Hawaii",
+"California",
+"Alaska",
+"Washington"
+],
+"tta-645cb12a602ff42ca52fb42f": [
+"Quale fenomeno è responsabile dei 10.000 laghi del Minnesota?",
+"Un ghiacciaio",
+"Un fiume",
+"Un terremoto",
+"Un tornado"
+],
+"tta-645cb162602ff42ca52fb437": [
+"Quale stato americano ospita la Willis Tower, il McDonald's Museum e la tomba di Abraham Lincoln?",
+"Illinois",
+"Ohio",
+"Indiana",
+"Michigan"
+],
+"tta-645cb162602ff42ca52fb438": [
+"Qual è la capitale del paese Alaska?",
+"Juneau",
+"Anchorage",
+"Fairbanks",
+"Ketchikan"
+],
+"tta-645cb16b7d263fd5097043ce": [
+"Quale nazione, con Vilnius come capitale, ottenne l'indipendenza nel 1991 dopo aver fatto parte di Polonia e Russia?",
+"Lituania",
+"Finlandia",
+"Lettonia",
+"Austria"
+],
+"tta-645cb17f7d263fd5097043d8": [
+"Quanti viali si irradiano dall'Arco di Trionfo a Parigi?",
+"12",
+"8",
+"10",
+"4"
+],
+"tta-645f94b7541c4d4fc8cf2e67": [
+"Come si chiama il grande paese a sud dell'Egitto, con cui condivide un confine terrestre?",
+"Il Sudan",
+"Etiopia",
+"Nigeria",
+"Sudafrica"
+],
+"tta-645f9526541c4d4fc8cf2ead": [
+"Quale paese ospita le città di Taranto, Anzio e Padova?",
+"Italia",
+"Spagna",
+"Portogallo",
+"Grecia"
+],
+"tta-645f9526541c4d4fc8cf2eb0": [
+"Quale città giapponese è servita dall'aeroporto di Narita?",
+"Tokyo",
+"Osaka",
+"Kyoto",
+"Sapporo"
+],
+"tta-645f9526541c4d4fc8cf2eb5": [
+"Quale specchio d'acqua circostante è rappresentato dal triangolo blu sulla bandiera delle Isole Salomone?",
+"L'Oceano Pacifico",
+"L'Oceano Atlantico",
+"L'Oceano Indiano",
+"Il Mar dei Caraibi"
+],
+"tta-645f9526541c4d4fc8cf2eb6": [
+"Quale arcipelago portoghese ha Flores e Corvo come isole più settentrionali?",
+"Azzorre",
+"Madeira",
+"Capo Verde",
+"Canarie"
+],
+"tta-6460896ade964ebc39016c4e": [
+"Quale parco nazionale è famoso per il geyser Old Faithful?",
+"Yellowstone",
+"Yosemite",
+"Grand Canyon",
+"Monte Rushmore"
+],
+"tta-646089a2de964ebc39016c59": [
+"Come chiamò Joseph Ives la sezione dell'Arizona, dai colori brillanti, che scoprì?",
+"Il Deserto Dipinto",
+"Il Deserto Rosso",
+"Il Deserto del Miraggio",
+"Il Deserto Technicolor"
+],
+"tta-646089cade964ebc39016c7b": [
+"La popolazione di quale nazione africana comprende quattro gruppi tribali principali: Akan, Kru, Voltaici e Mande?",
+"Costa d'Avorio",
+"Congo",
+"Etiopia",
+"Nigeria"
+],
+"tta-646140774d46e537ca8cd9bb": [
+"Come si chiama la meraviglia naturale che si estende per oltre 2.000 chilometri al largo della costa orientale dell'Australia?",
+"La Grande Barriera Corallina",
+"L'aurora boreale",
+"Le isole Galápagos",
+"La Fossa delle Marianne"
+],
+"tta-6461407e4d46e537ca8cd9e0": [
+"Quale di queste strutture si estende per oltre 6.000 chilometri ed è spesso definita il più grande progetto edilizio mai completato?",
+"La Grande Muraglia cinese",
+"Il Canale di Panama",
+"Il Golden Gate Bridge",
+"La diga di Hoover"
+],
+"tta-646140b54d46e537ca8cda08": [
+"Quale nome, che significa \"costa\", indica oggi la costa sud-orientale della Francia?",
+"La Riviera",
+"La Promenade",
+"Il Mediterraneo",
+"La Linea di costa"
+],
+"tta-646261c8ab138b829b81e993": [
+"Quale minuscolo paese è indipendente dall'Italia dal 1929 ed è la casa del Papa?",
+"Città del Vaticano",
+"Monaco",
+"Liechtenstein",
+"San Marino"
+],
+"tta-64626214ab138b829b81e9ba": [
+"Qual è la città più popolosa della Svizzera?",
+"Zurigo",
+"Berna",
+"Ginevra",
+"Basilea"
+],
+"tta-6462621bab138b829b81e9c4": [
+"Quale baia separa la parte della penisola di Delmarva appartenente alla Virginia dalla terraferma?",
+"Baia di Chesapeake",
+"Baia di Hudson",
+"Puget Sound",
+"Baia di Narragansett"
+],
+"tta-6462621bab138b829b81e9c6": [
+"Quale paese è il più settentrionale tra Lussemburgo, Liechtenstein, Laos e Liberia?",
+"Lussemburgo",
+"Liechtenstein",
+"Liberia",
+"Laos"
+],
+"tta-6462624dab138b829b81e9e5": [
+"Come si chiama la più grande isola del Massachusetts, famosa per i suoi paesaggi lussureggianti, le spiagge e gli avvistamenti di celebrità?",
+"Martha's Vineyard",
+"Long Island",
+"Block Island",
+"Cape Cod"
+],
+"tta-6462628bab138b829b81ea22": [
+"Quale città italiana è servita dall'aeroporto internazionale Leonardo da Vinci?",
+"Roma",
+"Milano",
+"Firenze",
+"Napoli"
+],
+"tta-6462628bab138b829b81ea2c": [
+"Come si chiama il mare che confina con la Romania a ovest, l'Ucraina a nord, la Russia a est e la Turchia a sud?",
+"Il Mar Nero",
+"Il Mar Baltico",
+"Il Mar Mediterraneo",
+"Il Mar Caspio"
+],
+"tta-646262b8ab138b829b81ea57": [
+"Quale paese si inserisce perfettamente tra il Mar Tirreno e il Mare Adriatico?",
+"Italia",
+"Spagna",
+"Grecia",
+"Turchia"
+],
+"tta-646262f6ab138b829b81ea6b": [
+"Nell'Ottocento, l'Isola Insanguinata di quale fiume era un popolare luogo di duelli perché fuori dalla giurisdizione di Missouri e Illinois?",
+"Il Mississippi",
+"Il fiume Colorado",
+"Il Rio Grande",
+"Il Tamigi"
+],
+"tta-646262f6ab138b829b81ea72": [
+"Quale di questi paesi si trova tra la Bolivia e l'Oceano Pacifico?",
+"Cile",
+"Argentina",
+"Messico",
+"Brasile"
+],
+"tta-6463391301d576cfac3aa304": [
+"Quale stato americano ha comunità chiamate Lititz, Ephrata e Strasburg nella sua zona Amish?",
+"Pennsylvania",
+"Ohio",
+"Indiana",
+"Maryland"
+],
+"tta-6463391301d576cfac3aa306": [
+"In quale paese del Regno Unito si trova la residenza reale e castello britannico noto come Balmoral?",
+"Scozia",
+"Inghilterra",
+"Galles",
+"Irlanda del Nord"
+],
+"tta-6463391401d576cfac3aa310": [
+"Come si chiama la città gemella di El Paso sul lato messicano del confine?",
+"Ciudad Juárez",
+"Tijuana",
+"Nogales",
+"Matamoros"
+],
+"tta-6463391401d576cfac3aa317": [
+"Quale baia è segnata da Capo Charles e Capo Henry in Virginia, rispettivamente sui lati nord e sud?",
+"Baia di Chesapeake",
+"Baia di San Francisco",
+"Baia di Hudson",
+"Baia di Tampa"
+],
+"tta-6463394601d576cfac3aa32a": [
+"Qual è la capitale della provincia canadese del Manitoba?",
+"Winnipeg",
+"Toronto",
+"Vancouver",
+"Montréal"
+],
+"tta-6463394f01d576cfac3aa33b": [
+"Quali 2 stati americani non condividono alcun confine terrestre con altri stati?",
+"Alaska e Hawaii",
+"Maine e New Hampshire",
+"Vermont e Massachusetts",
+"Rhode Island e Connecticut"
+],
+"tta-6463395501d576cfac3aa34e": [
+"Quale isola, sede della Borsa coreana, è talvolta chiamata \"la Manhattan coreana\"?",
+"Isola di Yeouido",
+"Isola di Jeju",
+"Isola di Ulleungdo",
+"Isola di Ganghwado"
+],
+"tta-6463398b01d576cfac3aa37d": [
+"Come si chiama la bandiera francese?",
+"Tricolore",
+"Rosso, bianco e blu",
+"Il Vello d'Oro",
+"L'Union Jack"
+],
+"tta-646339a001d576cfac3aa3a0": [
+"Come si chiama il castello nel Kent, in Inghilterra, da cui si può vedere la Francia nelle giornate limpide?",
+"Castello di Dover",
+"Castello di Windsor",
+"Buckingham Palace",
+"Castello di Edimburgo"
+],
+"tta-646339bc01d576cfac3aa3aa": [
+"Quale paese si trova sul confine orientale del Brunei?",
+"Malesia",
+"Thailandia",
+"Vietnam",
+"Indonesia"
+],
+"tta-646339bc01d576cfac3aa3ae": [
+"Qual era il vecchio nome delle Molucche, isole note per chiodi di garofano, macis e noce moscata?",
+"Le Isole delle Spezie",
+"Le Isole dei Coralli",
+"Le Isole Nascoste",
+"Le Isole Sommerse"
+],
+"tta-646b3ec40361c7fb32d6b6cf": [
+"Qual è il paese più piccolo del mondo?",
+"Città del Vaticano",
+"Monaco",
+"Nauru",
+"San Marino"
+],
+"tta-6470d59c32850588056636ee": [
+"Qual è il nome della catena montuosa europea i cui ghiacciai formarono laghi come Como e Costanza?",
+"Le Alpi",
+"I Pirenei",
+"Gli Urali",
+"L'Himalaya"
+],
+"tta-647129af64c916f9c84814b2": [
+"Quale stato americano ha la più grande economia subnazionale del mondo?",
+"California",
+"Texas",
+"New York",
+"Florida"
+],
+"tta-6471bcf37206d7c314606f5d": [
+"In quale paese si trova il lago Taupo?",
+"Nuova Zelanda",
+"Australia",
+"Indonesia",
+"Filippine"
+],
+"tta-647203881068407b3d7e9718": [
+"Quale elemento geografico è chiamato dai francesi \"la Manche\" (la manica)?",
+"Il Canale della Manica",
+"Le Alpi",
+"Il Mar Mediterraneo",
+"Il Reno"
+],
+"tta-6472076e3bbb58c31f411c51": [
+"Quale stato messicano ospita la città di Ciudad Juárez?",
+"Chihuahua",
+"Sonora",
+"Nuevo León",
+"Michoacán"
+],
+"tta-64720cd93bbb58c31f411cd2": [
+"Quale parco nazionale americano subtropicale, istituito nel 1947, è noto per ospitare alligatori?",
+"Everglades",
+"Yellowstone",
+"Yosemite",
+"Grand Canyon"
+],
+"tta-64720cd93bbb58c31f411cd7": [
+"Quale catena montuosa si trova nel nord-est dello stato di New York?",
+"Gli Adirondack",
+"Le Montagne Rocciose",
+"Gli Appalachi",
+"La Sierra"
+],
+"tta-64720cd93bbb58c31f411cd9": [
+"Quale fiume inglese ha sia una località Welford-on- sia una Bidford-on-?",
+"L'Avon",
+"Il Tamigi",
+"Il Severn",
+"Il Mersey"
+],
+"tta-6473075ccf09068746f63767": [
+"Di quale fiume Düsseldorf è un importante porto?",
+"Il Reno",
+"Il Rio delle Amazzoni",
+"La Senna",
+"Il Tevere"
+],
+"tta-64730798cf09068746f6377b": [
+"Quale monumento iconico fu costruito originariamente per l'Esposizione Universale del 1889?",
+"La Torre Eiffel",
+"La Statua della Libertà",
+"Big Ben",
+"Il Colosseo"
+],
+"tta-6474630cbda4b199c327d0bd": [
+"Quale oceano comprende il Mare di Sulu?",
+"Oceano Pacifico",
+"Oceano Atlantico",
+"Oceano Indiano",
+"Oceano Artico"
+],
+"tta-64746ac15a4c31088dd9cfdb": [
+"Accanto a quale continente si trova il Mare di Bellingshausen?",
+"Antartide",
+"Europa",
+"Asia",
+"Sud America"
+],
+"tta-64746af65a4c31088dd9cff7": [
+"Quale città asiatica ospita il tempio Wat Traimit, che custodisce una statua di Buddha d'oro massiccio di 5 tonnellate e mezzo?",
+"Bangkok",
+"Tokyo",
+"Shanghai",
+"Pechino"
+],
+"tta-64746b005a4c31088dd9d002": [
+"Quale paese europeo ospita la Foresta di Soignes e le località di Tervuren e Waterloo?",
+"Belgio",
+"Italia",
+"Finlandia",
+"Spagna"
+],
+"tta-64746b6f5a4c31088dd9d057": [
+"In quale paese si trovano i guerrieri di terracotta?",
+"Cina",
+"Giappone",
+"Thailandia",
+"India"
+],
+"tta-64746b6f5a4c31088dd9d058": [
+"Quale di questi paesi ha la stessa lettera iniziale della sua capitale?",
+"Svezia",
+"Grecia",
+"Perù",
+"Colombia"
+],
+"tta-6476390bf05ea6d6f587a16f": [
+"In quale città si trova il castello di Edo?",
+"Tokyo",
+"Kyoto",
+"Osaka",
+"Nagoya"
+],
+"tta-6476390bf05ea6d6f587a174": [
+"Quale sistema montuoso separa l'Europa centrale dall'Italia?",
+"Le Alpi",
+"Gli Urali",
+"Le Ande",
+"I Carpazi"
+],
+"tta-6476390cf05ea6d6f587a186": [
+"Come si chiama il fiume che attraversa la provincia canadese del Manitoba e sfocia nel lago Winnipeg?",
+"Il Red River (fiume Rosso)",
+"Il fiume Blu",
+"Il fiume Giallo",
+"Il fiume Verde"
+],
+"tta-6477ba9e550bc819ad646af6": [
+"Quali isole ecuadoriane ospitano le sule piedeazzurro?",
+"Le Galápagos",
+"Aruba",
+"Belize",
+"Bora Bora"
+],
+"tta-6477bacc550bc819ad646b0d": [
+"Come si chiama il ponte che attraversa l'East River a New York ed è stato il primo a usare l'acciaio per i cavi?",
+"Il Ponte di Brooklyn",
+"Il Golden Gate Bridge",
+"Il Tower Bridge",
+"Il George Washington Bridge"
+],
+"tta-6477bacc550bc819ad646b11": [
+"Quale cittadina scozzese era un tempo una città ecclesiastica ma oggi è una mecca del golf?",
+"St Andrews",
+"Edimburgo",
+"Glasgow",
+"Inverness"
+],
+"tta-6477bad7550bc819ad646b2b": [
+"Quale paese è separato dalla Spagna dallo Stretto di Gibilterra?",
+"Marocco",
+"Egitto",
+"Tunisia",
+"Libia"
+],
+"tta-6477bad7550bc819ad646b3b": [
+"Nel 2010 il traffico aereo in tutta Europa fu interrotto dal vulcano Eyjafjallajökull, in quale paese?",
+"Islanda",
+"Belgio",
+"Russia",
+"Grecia"
+],
+"tta-6477bada550bc819ad646b49": [
+"Quale stato americano ospita Muir Woods, un monumento nazionale che contiene giganteschi alberi di sequoia?",
+"California",
+"Maine",
+"Washington",
+"Florida"
+],
+"tta-6477bada550bc819ad646b4c": [
+"Quale città più meridionale degli Stati Uniti continentali è raggiungibile tramite un'autostrada completata nel 1938 che permetteva di arrivarci da Miami?",
+"Key West",
+"Miami Beach",
+"Tallahassee",
+"Jacksonville"
+],
+"tta-6477bb12550bc819ad646b64": [
+"Come si chiama l'isola considerata il centro storico di Parigi e circondata dalla Senna?",
+"Île de la Cité",
+"Île de Ré",
+"Île-de-Paris",
+"Île-de-France"
+],
+"tta-6477bb70550bc819ad646b84": [
+"Qual è la capitale dello stato del Michigan?",
+"Lansing",
+"Ann Arbor",
+"Flint",
+"Grand Rapids"
+],
+"tta-6477bb70550bc819ad646b88": [
+"Come si chiama la seconda città più popolosa del Brasile, dopo San Paolo?",
+"Rio de Janeiro",
+"Brasilia",
+"Salvador",
+"Recife"
+],
+"tta-647a125b55463d5ce2994fde": [
+"Quale città americana, con 2 milioni di abitanti, è soprannominata \"Space City\" (la città dello spazio)?",
+"Houston",
+"Chicago",
+"Filadelfia",
+"Miami"
+],
+"tta-647a126555463d5ce2994fe8": [
+"Quale regione amministrativa speciale cinese si trova dall'altra parte dell'estuario del Fiume delle Perle rispetto a Macao?",
+"Hong Kong",
+"Taiwan",
+"Shanghai",
+"Pechino"
+],
+"tta-647c981ff89e0968cfbc1a19": [
+"L'eruzione del 1980 di quale vulcano fece piombare nell'oscurità la città di Spokane a causa della cenere?",
+"Monte Sant'Elena",
+"Monte Fuji",
+"Vesuvio",
+"Kilimangiaro"
+],
+"tta-647edb8d520523194910c34a": [
+"Quale paese celebra la Festa Nazionale di Suez?",
+"Egitto",
+"Tunisia",
+"Marocco",
+"Algeria"
+],
+"tta-647f9dc33a4302a719271639": [
+"Quale gruppo di isole era un tempo noto come Isole Sandwich?",
+"Hawaii",
+"Porto Rico",
+"Bermuda",
+"Indonesia"
+],
+"tta-647f9de83a4302a719271650": [
+"Quale città canadese è soprannominata \"Oil City\" (la città del petrolio)?",
+"Edmonton",
+"Calgary",
+"Toronto",
+"Vancouver"
+],
+"tta-647f9ded3a4302a71927167b": [
+"Qual è la capitale del Kentucky?",
+"Frankfort",
+"Louisville",
+"Lexington",
+"Bowling Green"
+],
+"tta-64824eaa7778562fd76a9663": [
+"Quale baia è collegata all'Oceano Pacifico dallo stretto del Golden Gate, lungo cinque chilometri?",
+"Baia di San Francisco",
+"Baia di Monterey",
+"Baia di Santa Monica",
+"Baia di San Diego"
+],
+"tta-64824eaa7778562fd76a9667": [
+"Il delta dell'Orinoco si trova in quale paese sudamericano?",
+"Venezuela",
+"Colombia",
+"Perù",
+"Cile"
+]
+}
