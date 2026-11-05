@@ -26,6 +26,7 @@ import {
 } from '@zerocade/shared'
 import { BivioRooms, bivioCsv, bivioFlagsCsv, bivioStats } from './bivio.js'
 import { IncastroRooms, zerowordsCsv } from './incastro.js'
+import { QuizzlandRooms, quizzlandCsv, quizzlandStats } from './quizzland.js'
 import {
   dataDir,
   getPad,
@@ -58,6 +59,7 @@ import {
   sanitizeIncastroCommand,
   sanitizeLevel,
   sanitizeMessage,
+  sanitizeQuizzlandCommand,
   sanitizeScene,
   sanitizeSettings,
   sanitizeBridgeConfig,
@@ -135,6 +137,14 @@ app.get('/api/bivio/flagged.csv', async (_req, reply) =>
     .header('content-disposition', 'attachment; filename="bivio-domande-sbagliate.csv"')
     .send(bivioFlagsCsv()),
 )
+app.get('/api/quizzland/stats', async () => quizzlandStats())
+app.get('/api/quizzland/export.csv', async (_req, reply) => {
+  const day = new Date().toISOString().slice(0, 10)
+  return reply
+    .header('content-type', 'text/csv; charset=utf-8')
+    .header('content-disposition', `attachment; filename="zeroquizz-risposte-${day}.csv"`)
+    .send(quizzlandCsv())
+})
 // ZeroWords' plays (one row per level) and the answers and hints within them: the data to
 // calibrate the level generator on.
 for (const which of ['plays', 'answers'] as const) {
@@ -146,7 +156,7 @@ for (const which of ['plays', 'answers'] as const) {
   )
 }
 
-// Background images (Bivio, Incastro): one per game and overlay key, stored in the data
+// Background images (Bivio, Incastro, Quizzland): one per game and overlay key, stored in the data
 // folder next to the databases. No SVG, which could carry scripts.
 const BACKGROUND_TYPES: Record<string, string> = { 'image/png': 'png', 'image/jpeg': 'jpg', 'image/webp': 'webp', 'image/gif': 'gif' }
 const backgroundsDir = join(dataDir, 'backgrounds')
@@ -243,6 +253,17 @@ const dashboardRoom = (key: string) => `${key}#dashboard`
 const incastro = new IncastroRooms(
   (key, state) => io.to(key).emit('incastro:state', state),
   (key, solution) => io.to(dashboardRoom(key)).emit('incastro:solution', solution),
+  // The right answers of the level in this Zerocade's room go to ZeroFollowerBot's voice (see zfb.ts): of the
+  // comments made of a single word it reads only a right answer, the first time.
+  (key, answers, fresh) => {
+    if (key === roomKey) zfb.setWords(answers, fresh)
+  },
+)
+
+// Quizzland's right answer, like Incastro's solution, goes to the dashboards only.
+const quizzland = new QuizzlandRooms(
+  (key, state) => io.to(key).emit('quizzland:state', state),
+  (key, solution) => io.to(dashboardRoom(key)).emit('quizzland:solution', solution),
 )
 
 // The latest live events of each key, for the dashboard's chat box when it opens.
@@ -251,7 +272,7 @@ const feeds = new Map<string, FeedEvent[]>()
 let feedSeq = 0
 
 // Persist + relay every live event (simulated or real), and keep the gifters ranking.
-// Bivio and Incastro run on the server, so their triggers are applied here rather than in
+// Bivio, Incastro and Quizzland run on the server, so their triggers are applied here rather than in
 // the overlay. `origin` is the feed the event came from, `creator` that feed's account
 // ('tiktok:<username>'), '' when simulated.
 function broadcastEvent(key: string, event: LiveEvent, origin: EventOrigin = 'sim', creator = '') {
@@ -262,7 +283,7 @@ function broadcastEvent(key: string, event: LiveEvent, origin: EventOrigin = 'si
   feeds.set(key, [...(feeds.get(key) ?? []).slice(1 - FEED_KEPT), item])
   io.to(dashboardRoom(key)).emit('feed:events', [item])
   if (event.type === 'gift') io.to(key).emit('ranking:update', getRanking(key))
-  const room = bivio.get(key) ?? incastro.get(key)
+  const room = bivio.get(key) ?? incastro.get(key) ?? quizzland.get(key)
   if (room) for (const t of triggersFor(getSession(key).triggers, event)) room.action(t.action, event)
 }
 
@@ -343,11 +364,13 @@ io.on('connection', (socket) => {
   socket.emit('session:state', session)
   if (session.gameId === 'bivio') socket.emit('bivio:state', bivio.open(key, session.settings))
   if (session.gameId === 'incastro') socket.emit('incastro:state', incastro.open(key, session.settings))
+  if (session.gameId === 'quizzland') socket.emit('quizzland:state', quizzland.open(key, session.settings))
 
   socket.on('disconnect', () => {
     if (io.sockets.adapter.rooms.get(key)?.size) return
     bivio.get(key)?.suspend()
     incastro.get(key)?.suspend()
+    quizzland.get(key)?.suspend()
   })
 
   // A click on ZeroWords' wheel shuffles it: in the dashboard's preview, the overlay page in a
@@ -360,6 +383,8 @@ io.on('connection', (socket) => {
   void socket.join(dashboardRoom(key))
   const words = incastro.get(key)
   if (words) socket.emit('incastro:solution', words.solution())
+  const quiz = quizzland.get(key)?.solution()
+  if (quiz) socket.emit('quizzland:solution', quiz)
   socket.emit('ranking:update', getRanking(key))
   socket.emit('pads:state', padBoard(key))
   for (const status of roomSources(key).statuses()) socket.emit('source:status', status)
@@ -399,12 +424,14 @@ io.on('connection', (socket) => {
     const state = selectGame(key, gameId)
     if (!state) return
     io.to(key).emit('session:state', state)
-    // Selecting Bivio again starts a fresh round; Incastro picks up its saved level with
-    // a fresh leaderboard.
+    // Selecting Bivio or Quizzland again starts a fresh round (and Quizzland a fresh
+    // leaderboard); Incastro picks up its saved level with a fresh leaderboard.
     bivio.close(key)
     incastro.close(key)
+    quizzland.close(key)
     if (state.gameId === 'bivio') bivio.open(key, state.settings)
     if (state.gameId === 'incastro') incastro.open(key, state.settings)
+    if (state.gameId === 'quizzland') quizzland.open(key, state.settings)
   })
 
   socket.on('triggers:set', (raw: unknown) => {
@@ -421,6 +448,7 @@ io.on('connection', (socket) => {
     io.to(key).emit('session:state', setSettings(key, settings))
     bivio.get(key)?.applySettings(settings)
     incastro.get(key)?.applySettings(settings)
+    quizzland.get(key)?.applySettings(settings)
   })
 
   socket.on('bivio:control', (raw: unknown) => {
@@ -431,6 +459,11 @@ io.on('connection', (socket) => {
   socket.on('incastro:control', (raw: unknown) => {
     const command = sanitizeIncastroCommand(raw)
     if (command) incastro.get(key)?.control(command)
+  })
+
+  socket.on('quizzland:control', (raw: unknown) => {
+    const command = sanitizeQuizzlandCommand(raw)
+    if (command) quizzland.get(key)?.control(command)
   })
 
   socket.on('incastro:goto', (raw: unknown) => {

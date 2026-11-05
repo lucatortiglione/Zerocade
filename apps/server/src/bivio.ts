@@ -279,13 +279,10 @@ class BivioRoom {
     )
   }
 
-  // Least-played dilemmas first (shuffled among equals), so every question collects
-  // votes before any of them comes back, across restarts too.
+  // A fresh random order every time the deck runs out: never the file/DB order, and not
+  // ranked by how often a dilemma was played either.
   private buildDeck(): void {
-    const rounds = new Map(bivioTotalsByQuestion().map((r) => [r.id, r.rounds]))
-    this.deck = shuffle(DILEMMAS.filter((d) => this.matches(d) && !flagged.has(d.id))).sort(
-      (x, y) => (rounds.get(x.id) ?? 0) - (rounds.get(y.id) ?? 0),
-    )
+    this.deck = shuffle(DILEMMAS.filter((d) => this.matches(d) && !flagged.has(d.id)))
     if (this.deck.length > 1 && this.deck[0].id === this.current?.id) this.deck.push(this.deck.shift()!)
   }
 

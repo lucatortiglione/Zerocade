@@ -225,9 +225,22 @@ class IncastroRoom {
     private settings: GameSettings,
     private emit: (state: IncastroState) => void,
     private emitSolution: (solution: IncastroSolution) => void,
+    // The level's right answers whenever they change (see answers()); `fresh` for a new level.
+    private emitAnswers: (answers: string[], fresh: boolean) => void,
   ) {
     // From where this overlay key stopped last time.
     this.startLevel((incastroLevel(this.key) ?? 1) - 1)
+  }
+
+  // The level's right answers, for ZeroFollowerBot's voice (see zfb.ts): of the comments made of a
+  // single word it reads only a right answer, the first time. The grid words, the secret word and,
+  // when they count, the extra words, in that order (a list cut short keeps the grid). None before
+  // a level comes or while nobody watches: the game ignores chat then, so the voice reads it all.
+  answers(): string[] {
+    const level = this.level
+    if (!level || !this.watched) return []
+    const extras = this.settings.extras !== false ? [...this.extraWords] : []
+    return [...new Set([...level.words.map((w) => w.w), ...(level.secret ? [level.secret] : []), ...extras])]
   }
 
   // Whether a comment only repeats words this level already has (on the board, the secret word
@@ -326,6 +339,7 @@ class IncastroRoom {
     const changed = (id: string) => prev[id] !== settings[id]
     if (this.phase === 'playing' && (changed('autoHints') || changed('hintSeconds'))) this.restartHintTimer()
     if (changed('background')) this.pickPhoto()
+    if (changed('extras')) this.emitAnswers(this.answers(), false)
     if (this.phase === 'playing' && changed('levelSeconds')) {
       this.freeze()
       const ms = num(settings, 'levelSeconds', 0) * 1000
@@ -345,6 +359,7 @@ class IncastroRoom {
     this.freeze()
     this.clockStop()
     this.watched = false
+    this.emitAnswers([], false)
   }
 
   watch(): IncastroState {
@@ -352,6 +367,7 @@ class IncastroRoom {
       this.watched = true
       this.schedule()
       this.clockStart()
+      this.emitAnswers(this.answers(), false)
     }
     return this.snapshot()
   }
@@ -367,6 +383,7 @@ class IncastroRoom {
 
   dispose(): void {
     if (this.phase === 'playing') this.endPlay('left', null)
+    this.emitAnswers([], false)
     this.loading++
     clearTimeout(this.timer)
     clearTimeout(this.hintTimer)
@@ -519,6 +536,7 @@ class IncastroRoom {
     saveIncastroLevel(this.key, level.id)
     this.pickPhoto()
     this.emitSolution(this.solution())
+    this.emitAnswers(this.answers(), true)
     // Made while this one is played.
     levels.prefetch(level.id + 1)
     // The background alone for a few seconds, then the grid; at once on a plain colour or a
@@ -936,6 +954,7 @@ export class IncastroRooms {
   constructor(
     private emit: (key: string, state: IncastroState) => void,
     private emitSolution: (key: string, solution: IncastroSolution) => void,
+    private emitAnswers: (key: string, answers: string[], fresh: boolean) => void,
   ) {}
 
   // Starts the game for a key if needed and wakes it up if it was suspended.
@@ -947,6 +966,7 @@ export class IncastroRooms {
         settings,
         (state) => this.emit(key, state),
         (solution) => this.emitSolution(key, solution),
+        (answers, fresh) => this.emitAnswers(key, answers, fresh),
       )
       this.rooms.set(key, room)
     }

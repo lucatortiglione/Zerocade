@@ -5,11 +5,15 @@ import { giftIdForTiktok, type BridgeConfig, type BridgeStatus, type LiveEvent, 
 // per message. Zerocade listens there instead of opening a second Euler Stream connection (its free plan counts
 // requests). While enabled it keeps trying, so ZeroFollowerBot can be started before or after Zerocade.
 //
-// Protocol 1: {"type":"hello","protocol":1}, {"type":"status","tiktok":"","twitch":""}, then
-// {"type":"comment"|"gift"|"like"|"follow"|"share"|"join"|"bits","platform":"tiktok"|"twitch","user":{"id","name",
-// "nickname","avatar"?},"id", ...}: "text" for a comment, "gift"/"count"/"coins" for a gift, "count" for likes and
-// bits. Zerocade can answer {"type":"skip","id"} for a comment its voice need not read (a word the game already
-// has): ZeroFollowerBot takes it out of the speech queue if it is still waiting. An older one ignores it.
+// Protocol 1: {"type":"hello","protocol":1,"requests":["skip","words"]}, {"type":"status","tiktok":"","twitch":""},
+// then {"type":"comment"|"gift"|"like"|"follow"|"share"|"join"|"bits","platform":"tiktok"|"twitch","user":{"id",
+// "name","nickname","avatar"?},"id", ...}: "text" for a comment, "gift"/"count"/"coins" for a gift, "count" for likes
+// and bits. Zerocade can answer:
+// - {"type":"skip","id"} for a comment its voice need not read (a word the game already has): ZeroFollowerBot takes
+//   it out of the speech queue if it is still waiting. An older one ignores it.
+// - {"type":"words","words":[...]} with the right answers of the ZeroWords level in play ([] = no game): of the
+//   comments made of a single word, ZeroFollowerBot's voice reads only a right answer, the first time. Each list
+//   starts over there; the list ends when this connection closes. Sent only when hello's "requests" has "words".
 
 const PROTOCOL = 1
 // Waits between attempts while ZeroFollowerBot is not there: quick at first, then every few seconds.
@@ -17,6 +21,9 @@ const RETRY_MS = [1000, 2000, 5000]
 const MAX_TEXT = 140
 // As ZeroFollowerBot accepts in a skip (its MAX_SKIP_ID).
 const MAX_ID = 128
+// As ZeroFollowerBot accepts in a words list (its MAX_GAME_WORDS and MAX_GAME_WORD_CHARS).
+const MAX_WORDS = 4096
+const MAX_WORD = 32
 
 // Each event with its feed, the account read there and the message's id ('' when it has none).
 type Emit = (event: LiveEvent, kind: SourceKind, account: string, id: string) => void
@@ -81,6 +88,9 @@ export class ZfbBridge {
   private twitch = ''
   // When each account appeared, for the Creators list.
   private since: Record<SourceKind, number> = { tiktok: 0, twitch: 0 }
+  // The right answers of the ZeroWords level in play ([] = none), and whether this ZeroFollowerBot takes them.
+  private words: string[] = []
+  private takesWords = false
 
   constructor(
     private emit: Emit,
@@ -123,6 +133,21 @@ export class ZfbBridge {
   skip(id: string): void {
     if (!id || this.state !== 'connected' || this.socket?.readyState !== WebSocket.OPEN) return
     this.socket.send(JSON.stringify({ type: 'skip', id }))
+  }
+
+  // The right answers of the ZeroWords level in play ([] = none), for ZeroFollowerBot's voice (see the protocol
+  // above). Kept for the next connection. Each list sent starts over there, so the same one is sent again only
+  // for a new level (`fresh`).
+  setWords(words: string[], fresh = false): void {
+    const list = words.filter((w) => w.length > 0 && w.length <= MAX_WORD).slice(0, MAX_WORDS)
+    if (!fresh && list.length === this.words.length && list.every((w, i) => w === this.words[i])) return
+    this.words = list
+    this.sendWords()
+  }
+
+  private sendWords(): void {
+    if (!this.takesWords || this.state !== 'connected' || this.socket?.readyState !== WebSocket.OPEN) return
+    this.socket.send(JSON.stringify({ type: 'words', words: this.words }))
   }
 
   private stop(): void {
@@ -175,7 +200,11 @@ export class ZfbBridge {
         return
       }
       this.attempt = 0
+      // A ZeroFollowerBot that does not say it takes "words" gets none (an older one would close on a long list).
+      this.takesWords = Array.isArray(m.requests) && m.requests.includes('words')
       this.update('connected')
+      // The level in play, if any: the list ended on ZeroFollowerBot's side with the last connection.
+      if (this.words.length) this.sendWords()
       return
     }
     if (m.type === 'status') return this.setAccounts(str(m.tiktok, 64), str(m.twitch, 64))

@@ -154,6 +154,23 @@ db.exec(`
     shown TEXT
   );
   CREATE INDEX IF NOT EXISTS zerowords_answers_play ON zerowords_answers (play);
+  CREATE TABLE IF NOT EXISTS quizzland_answers (
+    round_id TEXT NOT NULL,
+    key TEXT NOT NULL,
+    question_id TEXT NOT NULL,
+    user_id TEXT NOT NULL,
+    nickname TEXT NOT NULL,
+    choice INTEGER NOT NULL,
+    correct INTEGER NOT NULL CHECK (correct IN (0, 1)),
+    ms INTEGER NOT NULL,
+    answered_at TEXT NOT NULL DEFAULT (datetime('now')),
+    PRIMARY KEY (round_id, user_id)
+  );
+  CREATE INDEX IF NOT EXISTS idx_quizzland_answers_question ON quizzland_answers (question_id);
+  CREATE TABLE IF NOT EXISTS quizzland_flags (
+    question_id TEXT PRIMARY KEY,
+    flagged_at TEXT NOT NULL DEFAULT (datetime('now', 'localtime'))
+  );
   CREATE TABLE IF NOT EXISTS meta (
     name TEXT PRIMARY KEY,
     value TEXT NOT NULL
@@ -361,6 +378,67 @@ const bivioFlagAll = db.prepare(`SELECT question_id, lang, flagged_at FROM bivio
 export const bivioFlags = (): BivioFlag[] => bivioFlagAll.all() as unknown as BivioFlag[]
 export const flagBivio = (questionId: string, lang: string): void => void bivioFlagInsert.run(questionId, lang)
 export const unflagBivio = (questionId: string): void => void bivioFlagDelete.run(questionId)
+
+// --- Quizzland answers ---
+// Each viewer's first answer to each question: `choice` is the option's position in
+// domande.db (0 = the first), whatever order the overlay showed; `ms` how long it took.
+
+export interface QuizzlandAnswer {
+  roundId: string
+  key: string
+  questionId: string
+  userId: string
+  nickname: string
+  choice: number
+  correct: boolean
+  ms: number
+}
+
+export interface QuizzlandTotalsRow {
+  id: string
+  rounds: number
+  answers: number
+  correct: number
+  // How many chose each position of domande.db (c0 = the first answer).
+  c0: number
+  c1: number
+  c2: number
+  c3: number
+  // Average time of the right answers.
+  avgMs: number | null
+}
+
+const quizzlandAnswerInsert = db.prepare(`
+  INSERT OR IGNORE INTO quizzland_answers (round_id, key, question_id, user_id, nickname, choice, correct, ms)
+  VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+`)
+const quizzlandAllTotals = db.prepare(`
+  SELECT question_id AS id, COUNT(DISTINCT round_id) AS rounds, COUNT(*) AS answers, SUM(correct) AS correct,
+    SUM(choice = 0) AS c0, SUM(choice = 1) AS c1, SUM(choice = 2) AS c2, SUM(choice = 3) AS c3,
+    AVG(CASE WHEN correct = 1 THEN ms END) AS avgMs
+  FROM quizzland_answers GROUP BY question_id
+`)
+
+export const recordQuizzlandAnswer = (a: QuizzlandAnswer): void => {
+  quizzlandAnswerInsert.run(a.roundId, a.key, a.questionId, a.userId, a.nickname, a.choice, a.correct ? 1 : 0, Math.round(a.ms))
+}
+
+export const quizzlandTotalsByQuestion = (): QuizzlandTotalsRow[] => quizzlandAllTotals.all() as unknown as QuizzlandTotalsRow[]
+
+// Questions marked as wrong from the dashboard, for every overlay key, until unmarked.
+
+export interface QuizzlandFlag {
+  question_id: string
+  flagged_at: string
+}
+
+const quizzlandFlagInsert = db.prepare('INSERT OR IGNORE INTO quizzland_flags (question_id) VALUES (?)')
+const quizzlandFlagDelete = db.prepare('DELETE FROM quizzland_flags WHERE question_id = ?')
+const quizzlandFlagAll = db.prepare('SELECT question_id, flagged_at FROM quizzland_flags ORDER BY flagged_at, question_id')
+
+export const quizzlandFlags = (): QuizzlandFlag[] => quizzlandFlagAll.all() as unknown as QuizzlandFlag[]
+export const flagQuizzland = (questionId: string): void => void quizzlandFlagInsert.run(questionId)
+export const unflagQuizzland = (questionId: string): void => void quizzlandFlagDelete.run(questionId)
 
 // --- TikTok and Twitch accounts ---
 // The name last entered for each source, per overlay key: the dashboard fills it in again

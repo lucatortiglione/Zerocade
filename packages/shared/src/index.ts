@@ -305,7 +305,7 @@ export type BivioCommand = 'next' | 'reveal' | 'extra-time' | 'pause' | 'resume'
 export const BIVIO_DEFAULT_COLORS = { a: '#2dd4bf', b: '#a78bfa', accent: '#ffffff', text: '#ffffff', background: '#0b0c18' }
 
 // Games whose look can take an uploaded background image (an 'image' setting).
-export const BACKGROUND_GAMES = ['bivio', 'incastro'] as const
+export const BACKGROUND_GAMES = ['bivio', 'incastro', 'quizzland'] as const
 export type BackgroundGame = (typeof BACKGROUND_GAMES)[number]
 
 // Path the server hosts a room's uploaded background at, for one of those games.
@@ -468,6 +468,124 @@ export type IncastroCommand =
   | 'replay'
   | 'restart'
   | 'clear-scores'
+
+// --- Quizzland (intelligence quiz) ---
+// Shown as ZeroQuizz; the code, the saved settings and the database still say quizzland.
+// Server-driven like Bivio: the server deals the question, takes each viewer's first answer
+// (A-D, or 1-4) from chat, scores it at the reveal and stores every answer in SQLite. The
+// questions come from gioco-quizzland/data/domande.db. Italian only.
+
+export interface QuizzlandCategory {
+  id: string
+  label: string
+  colors: [string, string]
+}
+
+// The categories of domande.db; one missing here still plays, with a neutral chip.
+export const QUIZZLAND_CATEGORIES: QuizzlandCategory[] = [
+  { id: 'logica', label: 'Logica', colors: ['#60a5fa', '#4338ca'] },
+  { id: 'numeri', label: 'Numeri', colors: ['#fbbf24', '#ea580c'] },
+  { id: 'trabocchetti', label: 'Trabocchetti', colors: ['#f472b6', '#9333ea'] },
+  // General knowledge from open sources, translated (gioco-quizzland/data/fonti): Open Trivia
+  // Database, The Trivia API (not active: non-commercial licence), OpenBookQA (not active).
+  { id: 'cultura', label: 'Cultura', colors: ['#34d399', '#0f766e'] },
+  { id: 'curiosita', label: 'Curiosità', colors: ['#fb923c', '#be123c'] },
+  { id: 'scienze', label: 'Scienze', colors: ['#22d3ee', '#1d4ed8'] },
+]
+
+export const quizzlandCategoryById = (id: string) => QUIZZLAND_CATEGORIES.find((c) => c.id === id)
+
+// The answers' letters, in the order the overlay shows them.
+export const QUIZZLAND_LETTERS = ['A', 'B', 'C', 'D'] as const
+
+export interface QuizzlandPlayer {
+  id: string
+  nickname: string
+  avatar?: string
+}
+
+export interface QuizzlandScore extends QuizzlandPlayer {
+  points: number
+  // Right answers this live, and in a row (an answer wrong or missed resets it).
+  correct: number
+  streak: number
+  // Points won on the question last revealed.
+  last: number
+}
+
+// One of the first right answers of a question: how long it took and what it was worth.
+export interface QuizzlandFast extends QuizzlandPlayer {
+  ms: number
+  points: number
+}
+
+export interface QuizzlandState {
+  // 'question' takes answers; 'reveal' shows the right one; 'break' the leaderboard before the
+  // next question; 'empty' when no question matches the filters.
+  phase: 'question' | 'reveal' | 'break' | 'empty'
+  paused: boolean
+  roundId: string
+  // Questions asked since the game was picked (or restarted), and how many there are to ask.
+  number: number
+  available: number
+  // `options` in the order shown (shuffled each round unless the question keeps its order);
+  // `flagged`: marked as wrong from the dashboard (it will not come back).
+  question: { id: string; category: string; difficulty: number; text: string; options: string[]; flagged: boolean } | null
+  // From the reveal on: the right option (an index of `options`) and why.
+  correct: number | null
+  explanation: string | null
+  // 50:50: the options taken out, and who did it (null from the dashboard).
+  eliminated: number[]
+  fiftyBy: QuizzlandPlayer | null
+  answered: number
+  // Answers per option, from the reveal on (or live with "liveCounts"); null otherwise.
+  counts: number[] | null
+  // The latest viewers who answered, newest first; nothing about what they answered.
+  answerers: QuizzlandPlayer[]
+  // From the reveal on: how many got it right, and the fastest of them.
+  right: number
+  fastest: QuizzlandFast[]
+  // The live's leaderboard. It changes only at the reveal, so it never gives the answer away.
+  scores: QuizzlandScore[]
+  remainingMs: number
+  durationMs: number
+  // Questions marked as wrong so far.
+  flagged: number
+}
+
+// Sent to the dashboard only, as each question starts: the right option, for the streamer.
+export interface QuizzlandSolution {
+  roundId: string
+  correct: number
+}
+
+export type QuizzlandCommand =
+  | 'next'
+  | 'reveal'
+  | 'extra-time'
+  | 'fifty'
+  | 'pause'
+  | 'resume'
+  | 'restart'
+  | 'clear-scores'
+  | 'flag'
+  | 'unflag'
+
+export interface QuizzlandQuestionStats {
+  id: string
+  category: string
+  text: string
+  answer: string
+  // Rounds with at least one answer, answers, and how many were right.
+  rounds: number
+  answers: number
+  correct: number
+}
+
+export interface QuizzlandStats {
+  totalAnswers: number
+  questions: QuizzlandQuestionStats[]
+}
 
 export const GAMES: GameDef[] = [
   {
@@ -1140,19 +1258,120 @@ export const GAMES: GameDef[] = [
   },
   {
     id: 'quizzland',
-    name: 'Quizzland',
+    name: 'ZeroQuizz',
     category: 'Quiz',
-    description: 'Quiz d’intelligenza: indovinelli e domande di logica.',
+    description:
+      'Quiz d’intelligenza: indovinelli, logica e trabocchetti. La chat risponde A, B, C o D; chi indovina prima prende più punti. Domande e risposte salvate sul PC.',
     emoji: '🧠',
     gradient: ['#8b5cf6', '#1a0a3a'],
-    actions: [{ id: 'answer', label: 'Answer' }],
-    settings: [
-      { id: 'questionSeconds', label: 'Secondi per domanda', kind: 'number', min: 8, max: 60, step: 1, default: 20 },
-      { id: 'revealSeconds', label: 'Secondi rivelazione', kind: 'number', min: 3, max: 20, step: 1, default: 8 },
-      { id: 'breakSeconds', label: 'Pausa', kind: 'number', min: 1, max: 15, step: 1, default: 3 },
-      { id: 'showLeaderboard', label: 'Classifica', kind: 'toggle', default: true },
+    actions: [
+      { id: 'answer', label: 'Rispondi' },
+      { id: 'fifty', label: '50:50' },
+      { id: 'extra_time', label: 'Tempo extra' },
+      { id: 'next', label: 'Prossima domanda' },
     ],
-    defaultTriggers: [{ source: { type: 'comment' }, action: 'answer' }],
+    settings: [
+      {
+        id: 'categories',
+        label: 'Categorie',
+        kind: 'multi',
+        default: '',
+        options: QUIZZLAND_CATEGORIES.map((c) => ({ value: c.id, label: c.label })),
+      },
+      {
+        id: 'difficulty',
+        label: 'Difficoltà',
+        kind: 'select',
+        default: 'all',
+        options: [
+          { value: 'all', label: 'Tutte' },
+          { value: '1', label: 'Facili' },
+          { value: '2', label: 'Medie' },
+          { value: '3', label: 'Difficili' },
+        ],
+      },
+      { id: 'questionSeconds', label: 'Secondi per rispondere', kind: 'number', min: 8, max: 90, step: 1, default: 20 },
+      { id: 'revealSeconds', label: 'Secondi sulla risposta giusta', kind: 'number', min: 3, max: 30, step: 1, default: 8 },
+      {
+        id: 'breakSeconds',
+        label: 'Secondi sulla classifica',
+        hint: 'Tra una domanda e l’altra. 0 = subito la prossima.',
+        kind: 'number',
+        min: 0,
+        max: 30,
+        step: 1,
+        default: 5,
+      },
+      {
+        id: 'inputMode',
+        label: 'Cosa scrivono gli spettatori',
+        hint: 'Automatico accetta A–D e 1–4. Un commento conta solo se contiene solo la risposta; vale la prima.',
+        kind: 'select',
+        default: 'auto',
+        options: [
+          { value: 'auto', label: 'Automatico' },
+          { value: 'letters', label: 'A, B, C o D' },
+          { value: 'numbers', label: '1, 2, 3 o 4' },
+        ],
+      },
+      { id: 'points', label: 'Punti per risposta giusta', kind: 'number', min: 10, max: 1000, step: 10, default: 100 },
+      {
+        id: 'speedBonus',
+        label: 'Bonus velocità',
+        hint: 'Fino al 50% di punti in più a chi risponde subito; scende con il tempo.',
+        kind: 'toggle',
+        default: true,
+      },
+      {
+        id: 'shuffleOptions',
+        label: 'Mescola le risposte',
+        hint: 'A ogni domanda le risposte cambiano posto, tranne nelle domande con ordine fisso.',
+        kind: 'toggle',
+        default: true,
+      },
+      { id: 'autoNext', label: 'Avanza da solo', kind: 'toggle', default: true },
+      { id: 'showLeaderboard', label: 'Classifica', kind: 'toggle', default: true },
+      {
+        id: 'liveCounts',
+        label: 'Percentuali durante la domanda',
+        hint: 'Se spento compaiono solo con la risposta giusta, così la chat non copia.',
+        kind: 'toggle',
+        default: false,
+      },
+      {
+        id: 'sounds',
+        label: 'Suoni del gioco',
+        hint: 'Suoni sintetizzati nell’overlay; l’anteprima della dashboard resta muta.',
+        kind: 'toggle',
+        default: true,
+      },
+      {
+        id: 'tts',
+        label: 'Leggi la domanda ad alta voce (TTS)',
+        hint: 'Usa la sintesi vocale del browser dell’overlay; l’anteprima della dashboard resta muta.',
+        kind: 'toggle',
+        default: false,
+      },
+      {
+        id: 'background',
+        label: 'Sfondo',
+        group: 'Aspetto',
+        kind: 'select',
+        default: 'theme',
+        options: [
+          { value: 'theme', label: 'ZeroQuizz (cielo animato)' },
+          { value: 'color', label: 'Colore' },
+          { value: 'transparent', label: 'Trasparente' },
+          { value: 'image', label: 'Immagine caricata' },
+        ],
+      },
+      { id: 'bgColor', label: 'Colore', group: 'Aspetto', kind: 'color', default: '#1d1147' },
+      { id: 'bgImage', label: 'Immagine', group: 'Aspetto', kind: 'image', default: '' },
+    ],
+    defaultTriggers: [
+      { source: { type: 'comment' }, action: 'answer' },
+      { source: { type: 'gift', giftId: 'rose' }, action: 'fifty' },
+    ],
   },
   {
     id: 'ruzzle',
@@ -1613,6 +1832,9 @@ export interface ServerToClientEvents {
   'incastro:state': (state: IncastroState) => void
   // Dashboards only.
   'incastro:solution': (solution: IncastroSolution) => void
+  'quizzland:state': (state: QuizzlandState) => void
+  // Dashboards only.
+  'quizzland:solution': (solution: QuizzlandSolution) => void
   // A short text the creator shows on the overlay ("Invia messaggio").
   'overlay:message': (text: string) => void
   'pads:state': (board: PadBoard) => void
@@ -1634,6 +1856,7 @@ export interface ClientToServerEvents {
   'bivio:control': (command: BivioCommand) => void
   'incastro:control': (command: IncastroCommand) => void
   'incastro:goto': (level: number) => void
+  'quizzland:control': (command: QuizzlandCommand) => void
   // The only one an overlay may send: a click on the wheel.
   'incastro:shuffle': () => void
   'message:send': (text: string) => void

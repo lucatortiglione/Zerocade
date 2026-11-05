@@ -11,6 +11,7 @@
 //   app/public/{dashboard,overlay}  the built pages
 //   app/content.seed.json
 //   app/domande.db                  Bivio's questions (SQLite, gioco-dilemmi/data/domande.db)
+//   app/quizzland.db                ZeroQuizz's questions (SQLite, gioco-quizzland/data/domande.db)
 //   app/incastro/                   what ZeroWords' generator reads: chapters.json, curve.json,
 //                                   lexicon/words.tsv and blocklist.txt, with the word list's credits
 //   app/node_modules/better-sqlite3 the prebuilt win32-x64 SQLite binding
@@ -74,6 +75,7 @@ cpSync(join(root, 'apps', 'dashboard', 'dist'), join(app, 'public', 'dashboard')
 cpSync(join(root, 'apps', 'overlay', 'dist'), join(app, 'public', 'overlay'), { recursive: true })
 copyFileSync(join(root, 'apps', 'server', 'src', 'content.seed.json'), join(app, 'content.seed.json'))
 copyFileSync(join(root, 'gioco-dilemmi', 'data', 'domande.db'), join(app, 'domande.db'))
+copyFileSync(join(root, 'gioco-quizzland', 'data', 'domande.db'), join(app, 'quizzland.db'))
 // ZeroWords: what the generator reads to make levels on the fly (wordgen/files.ts looks for
 // app/incastro), and the attribution the word list asks for.
 const words = join(app, 'incastro', 'lexicon')
@@ -213,13 +215,34 @@ writeFileSync(
     '  Parole, capitoli e curva di difficoltà: app\\incastro. Licenza della lista di parole:',
     '  app\\incastro\\CREDITI.txt',
     '',
+    'ZEROQUIZZ (quiz d\'intelligenza: indovinelli, logica, trabocchetti)',
+    '  1. Nella dashboard scegli il gioco "ZeroQuizz"; TikTok come per ZeroDubbi.',
+    '  2. Il pubblico risponde scrivendo A, B, C o D (oppure 1, 2, 3 o 4) in chat. Vale la',
+    '     prima risposta di ogni spettatore. Allo scadere del tempo compare la risposta giusta',
+    '     con la spiegazione, le percentuali della chat e i tre più veloci; poi la classifica.',
+    '  3. Una risposta giusta vale 100 punti, fino a 150 con il bonus velocità (regolabili).',
+    '     La classifica cambia solo quando si rivela la risposta, così non la suggerisce; la',
+    '     fiamma accanto al nome conta le risposte giuste di fila.',
+    '  4. Trigger predefinito: Rose = 50:50, toglie due risposte sbagliate (una volta per',
+    '     domanda), con il nome di chi l\'ha regalata.',
+    '  Nella colonna di regia, "Domanda in corso" mostra solo a te la risposta giusta prima del',
+    '  tempo, i comandi Salta / Avanti, Rivela, +10 s, 50:50 e "Domanda sbagliata" (la domanda',
+    '  non torna più finché non premi Annulla). "Risposte raccolte" elenca le domande più',
+    '  sbagliate dalla chat; "Esporta CSV" scarica per ogni domanda risposte, percentuale di',
+    '  giuste, quante volte è stata scelta ogni risposta e se è segnata come sbagliata.',
+    '  Impostazioni: categorie, difficoltà, tempi, punti, risposte mescolate, percentuali',
+    '  durante la domanda, suoni, lettura ad alta voce; sfondo a cielo animato, colore,',
+    '  trasparente o immagine caricata.',
+    '',
     'DATI',
     '  data\\zerocade.db   la stanza dell\'overlay (tabella meta), sessioni, eventi, tutti i',
     '                     voti di ZeroDubbi (bivio_votes), le domande segnate come sbagliate',
     '                     (bivio_flags), il livello di ZeroWords (incastro_progress) e',
     '                     ogni livello giocato con risposte e aiuti (zerowords_plays,',
     '                     zerowords_answers; nessun nome): in Info partita "Partite" e',
-    '                     "Risposte" li scaricano in CSV, per tarare la difficoltà',
+    '                     "Risposte" li scaricano in CSV, per tarare la difficoltà;',
+    '                     le risposte di ZeroQuizz (quizzland_answers) e le sue domande',
+    '                     segnate come sbagliate (quizzland_flags)',
     '  data\\bivio-domande-sbagliate.csv   l\'elenco delle domande segnate come sbagliate',
     '  data\\content.db    contenuti degli altri giochi',
     '  Per spostare Zerocade su un altro PC copia tutta la cartella, data compresa.',
@@ -230,6 +253,14 @@ writeFileSync(
     '  Si modifica con un programma per SQLite, per esempio DB Browser for SQLite (gratuito).',
     '  Dopo una modifica riavvia Zerocade. Non riusare l\'id di una domanda cancellata:',
     '  i voti salvati sono legati all\'id.',
+    '',
+    'DOMANDE DI ZEROQUIZZ',
+    '  app\\quizzland.db, un database SQLite: tabella domande (id, categoria, difficolta 1-3,',
+    '  testo, spiegazione, ordine_fisso, attiva, ordine) e tabella opzioni (domanda, posizione',
+    '  0-3 = A-D, testo, giusta: una sola per domanda). attiva = 0 tiene fuori una domanda;',
+    '  ordine_fisso = 1 non mescola le risposte. Si modifica con DB Browser for SQLite, poi',
+    '  riavvia Zerocade. Non riusare l\'id di una domanda cancellata e non spostare le',
+    '  risposte di una domanda già giocata: le risposte salvate sono legate a id e posizione.',
     '',
     'PROBLEMI',
     '  "La porta 3001 è già in uso": Zerocade è già aperto, usa la finestra che c\'è.',

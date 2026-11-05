@@ -8,6 +8,8 @@ import {
   type IncastroSolution,
   type IncastroState,
   type PadBoard,
+  type QuizzlandSolution,
+  type QuizzlandState,
   type SavedSources,
   type SessionState,
   type SourceKind,
@@ -37,6 +39,9 @@ interface DashboardState {
   bivio: BivioState | null
   incastro: IncastroState | null
   incastroSolution: IncastroSolution | null
+  quizzland: QuizzlandState | null
+  // The right answer of the question in play, sent to dashboards only.
+  quizzlandSolution: QuizzlandSolution | null
   pads: PadBoard | null
   // The live events of this room, oldest first.
   feed: FeedItem[]
@@ -52,6 +57,8 @@ let state: DashboardState = {
   bivio: null,
   incastro: null,
   incastroSolution: null,
+  quizzland: null,
+  quizzlandSolution: null,
   pads: null,
   feed: [],
 }
@@ -110,6 +117,8 @@ socket.on('bridge:status', (bridge) => update({ bridge }))
 socket.on('bivio:state', (bivio) => update({ bivio }))
 socket.on('incastro:state', (incastro) => update({ incastro, feed: marked(state.feed, incastro.moments) }))
 socket.on('incastro:solution', (incastroSolution) => update({ incastroSolution }))
+socket.on('quizzland:state', (quizzland) => update({ quizzland }))
+socket.on('quizzland:solution', (quizzlandSolution) => update({ quizzlandSolution }))
 socket.on('pads:state', (pads) => update({ pads }))
 
 function subscribe(listener: () => void) {

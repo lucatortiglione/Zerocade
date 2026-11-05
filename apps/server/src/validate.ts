@@ -9,6 +9,7 @@ import {
   type GameSettings,
   type IncastroCommand,
   type LiveEvent,
+  type QuizzlandCommand,
   type SourceConfig,
   type Trigger,
   type TriggerSource,
@@ -112,7 +113,7 @@ export function sanitizeSettings(gameId: string, raw: unknown): GameSettings | n
         break
       case 'image':
         // Only images uploaded to this server (POST /api/<game>/background/:key).
-        if (typeof v !== 'string' || (v !== '' && !/^\/api\/(bivio|incastro)\/background\/[A-Za-z0-9-]{8,64}\?v=\d{1,15}$/.test(v))) return null
+        if (typeof v !== 'string' || (v !== '' && !/^\/api\/(bivio|incastro|quizzland)\/background\/[A-Za-z0-9-]{8,64}\?v=\d{1,15}$/.test(v))) return null
         out[s.id] = v
         break
     }
@@ -190,6 +191,22 @@ const INCASTRO_COMMANDS: IncastroCommand[] = [
 
 export const sanitizeIncastroCommand = (raw: unknown): IncastroCommand | null =>
   INCASTRO_COMMANDS.includes(raw as IncastroCommand) ? (raw as IncastroCommand) : null
+
+const QUIZZLAND_COMMANDS: QuizzlandCommand[] = [
+  'next',
+  'reveal',
+  'extra-time',
+  'fifty',
+  'pause',
+  'resume',
+  'restart',
+  'clear-scores',
+  'flag',
+  'unflag',
+]
+
+export const sanitizeQuizzlandCommand = (raw: unknown): QuizzlandCommand | null =>
+  QUIZZLAND_COMMANDS.includes(raw as QuizzlandCommand) ? (raw as QuizzlandCommand) : null
 
 // A level number for "Vai al livello"; the room wraps it into its own range.
 export const sanitizeLevel = (raw: unknown): number | null =>

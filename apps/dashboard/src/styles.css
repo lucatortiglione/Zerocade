@@ -1025,3 +1025,15 @@ input[type='number']:focus { border-color: var(--accent); outline: none; }
 .bridge-line__name { color: var(--text); font-weight: 700; }
 .bridge-line--connected .bridge-line__name::before { content: '● '; color: var(--ok); }
 .bridge-line--connecting .bridge-line__name::before { content: '● '; color: var(--warning); }
+
+/* Quizzland: the question in play, its answers (the right one marked, only here before the
+   reveal) and the share of right answers in the collected answers. */
+.qz-question { color: var(--text); font-size: 14px; font-weight: 600; line-height: 1.35; }
+.qz-option .round-word__word { letter-spacing: 0; font-weight: 600; white-space: normal; }
+.qz-option__letter { display: inline-grid; place-items: center; width: 20px; height: 20px; margin-right: 4px; border-radius: 6px; background: var(--border); font-size: 12px; font-weight: 800; }
+.qz-option--right { border: 1px solid rgba(52, 211, 153, 0.55); }
+.qz-option--right .qz-option__letter { background: #34d399; color: #062e22; }
+.qz-option--right .round-word__who { color: #34d399; }
+.qz-option--out { opacity: 0.45; }
+.qz-option--out .round-word__word { text-decoration: line-through; }
+.qz-split { background: linear-gradient(90deg, #34d399 var(--a), #fb7185 var(--a)); }

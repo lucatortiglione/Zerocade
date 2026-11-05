@@ -6,6 +6,7 @@ import {
   type Gifter,
   type IncastroState,
   type LiveEvent,
+  type QuizzlandState,
   type SessionState,
   type Viewer,
 } from '@zerocade/shared'
@@ -26,6 +27,9 @@ interface OverlayState {
   incastro: IncastroState | null
   // performance.now() when `incastro` arrived, for its timers.
   incastroAt: number
+  quizzland: QuizzlandState | null
+  // performance.now() when `quizzland` arrived, to count its remainingMs down locally.
+  quizzlandAt: number
   // The creator's latest message, shown for a few seconds; messageSeq keys each one.
   message: string | null
   messageSeq: number
@@ -46,6 +50,8 @@ let state: OverlayState = {
   bivioAt: 0,
   incastro: null,
   incastroAt: 0,
+  quizzland: null,
+  quizzlandAt: 0,
   message: null,
   messageSeq: 0,
   gif: null,
@@ -75,6 +81,7 @@ socket.on('dj:stop', () => {
 })
 socket.on('bivio:state', (bivio) => update({ bivio, bivioAt: performance.now() }))
 socket.on('incastro:state', (incastro) => update({ incastro, incastroAt: performance.now() }))
+socket.on('quizzland:state', (quizzland) => update({ quizzland, quizzlandAt: performance.now() }))
 
 const MESSAGE_MS = 8000
 socket.on('overlay:message', (message) => {

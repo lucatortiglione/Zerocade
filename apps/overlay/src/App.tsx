@@ -6,6 +6,7 @@ import { useOverlay } from './store'
 import { Widgets } from './Widgets'
 import { Bivio } from './Bivio'
 import { Incastro } from './Incastro'
+import { Quizzland } from './Quizzland'
 import { isContentReady, loadContent, subscribeContent } from './content'
 import { ViewerAvatar } from './ViewerAvatar'
 
@@ -46,7 +47,7 @@ export function App() {
   }, [])
 
   // Swap the game when the selection changes (only once content is loaded).
-  // Games without a canvas instance (Bivio) leave the canvas blank.
+  // Games without a canvas instance (Bivio, Incastro, Quizzland) leave the canvas blank.
   useEffect(() => {
     if (!session || !contentReady) return
     const game = GAMES.find((g) => g.id === session.gameId)
@@ -69,8 +70,9 @@ export function App() {
     }
     // Bivio has no room for toasts over its title: votes show as bubbles, and gifts,
     // likes and follows can still use the Avvisi widget. In Incastro every comment is a
-    // guess: the words found have their own feed.
-    if (session.gameId === 'bivio' || session.gameId === 'incastro') return
+    // guess: the words found have their own feed. In Quizzland a toast would show everyone
+    // what each viewer answered.
+    if (session.gameId === 'bivio' || session.gameId === 'incastro' || session.gameId === 'quizzland') return
     const id = Date.now() + Math.random()
     setToasts((prev) => [...prev.slice(-4), { id, user: event.user, ...describeEvent(event) }])
     // Not cleared when the next event arrives: every toast removes itself.
@@ -84,6 +86,7 @@ export function App() {
       <canvas ref={canvasRef} className="overlay__canvas" />
       {session?.gameId === 'bivio' && <Bivio />}
       {session?.gameId === 'incastro' && <Incastro />}
+      {session?.gameId === 'quizzland' && <Quizzland />}
       <header className="overlay__top">
         <span className="overlay__brand">{game?.emoji ?? '🎮'}</span>
         <span className="overlay__title">{game?.name ?? 'Zerocade'}</span>
