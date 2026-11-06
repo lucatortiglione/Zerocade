@@ -13,6 +13,7 @@ Una versione precedente della pagina di AI2 aggiungeva "solo ricerca, non commer
 Modifiche rispetto all'originale:
 
 - Domande e risposte sono tradotte dall'inglese all'italiano, con Claude (Anthropic).
+- I file italiani da `0040.json` in poi sono stati completati con Google Translate il 6 novembre 2026; sono traduzioni automatiche da sottoporre a revisione editoriale.
 - ARC-Easy ha difficoltà 1 e ARC-Challenge difficoltà 2.
 - Le poche domande con 5 risposte tengono la giusta e le prime 3 sbagliate.
 

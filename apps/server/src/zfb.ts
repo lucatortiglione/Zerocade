@@ -42,7 +42,9 @@ function viewerOf(raw: unknown, kind: SourceKind): Viewer {
   const shown = kind === 'tiktok' ? name || str(u.nickname, 32) : str(u.nickname, 32) || name
   const avatar = str(u.avatar, 1024)
   return {
-    id: str(u.id, 64) || name || 'anonymous',
+    // TikTok and Twitch have independent user IDs. The same ID on the two
+    // platforms must get separate answers and scores in a shared quiz.
+    id: `${kind}:${str(u.id, 64) || name || 'anonymous'}`,
     nickname: shown.slice(0, 32) || 'anonymous',
     avatar: /^https:\/\/\S+$/.test(avatar) ? avatar : undefined,
   }

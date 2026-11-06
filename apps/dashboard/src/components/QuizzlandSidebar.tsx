@@ -15,12 +15,12 @@ import {
 import { socket } from '../socket'
 import { useDashboard } from '../store'
 import {
+  BridgeControl,
   ConnectionBadge,
   GameSwitch,
   LiveSimulator,
   MessageComposer,
   StreamSettings,
-  TiktokAccount,
   pick,
   simViewer,
 } from './Regia'
@@ -99,7 +99,11 @@ function Connection() {
 
   return (
     <>
-      <TiktokAccount />
+      <p className="text-muted small">
+        ZeroQuizz riceve le risposte dalle chat TikTok e Twitch di ZeroBot. Attiva in ZeroBot
+        &ldquo;Manda chat ed eventi a Zerocade&rdquo; e imposta qui la stessa porta di ascolto.
+      </p>
+      <BridgeControl label="Ricevi risposte TikTok e Twitch da ZeroBot" />
 
       <LiveSimulator makeEvent={() => fakeEvent(live.current.quizzland, live.current.quizzlandSolution)} />
 

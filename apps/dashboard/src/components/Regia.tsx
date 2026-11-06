@@ -101,7 +101,7 @@ export function BridgeSummary() {
 }
 
 // The bridge's switch and port (Sources page): Zerocade listens to ZeroFollowerBot on this PC.
-export function BridgeControl() {
+export function BridgeControl({ label = 'Ricevi chat ed eventi da ZeroFollowerBot' }: { label?: string }) {
   const { bridge } = useDashboard()
   const [port, setPort] = useState('')
   useEffect(() => {
@@ -115,7 +115,7 @@ export function BridgeControl() {
     <>
       <label className="bridge-toggle">
         <input type="checkbox" checked={bridge.enabled} disabled={!validPort} onChange={(e) => set(e.target.checked)} />
-        Ricevi chat ed eventi da ZeroFollowerBot
+        {label}
       </label>
       <div className="source-card__row">
         <label className="bridge-port">
