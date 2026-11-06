@@ -9,6 +9,6 @@ Mihaylov, Clark, Khot, Sabharwal, "Can a Suit of Armor Conduct Electricity? A Ne
 Per questo le domande sono importate con `attiva = 0`, finché la licenza non è chiarita, per esempio scrivendo ad AI2.
 Si accendono cambiando `attiva` di `openbookqa` in `tools/fonti.py` e rigenerando il CSV.
 
-Modifiche rispetto all'originale: domande e risposte tradotte dall'inglese all'italiano con Claude (Anthropic).
+Modifiche rispetto all'originale: domande e risposte tradotte automaticamente dall'inglese all'italiano con Google Translate il 6 novembre 2026, da sottoporre a revisione editoriale.
 La fonte non indica la difficoltà, quindi tutte hanno difficoltà 2.
 Molte domande sono frasi da completare con la risposta ("Il sole è responsabile di…"): la traduzione mantiene questa forma.
