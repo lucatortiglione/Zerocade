@@ -7,7 +7,6 @@ import {
   type GameSettings,
   type QuizzlandFast,
   type QuizzlandPlayer,
-  type QuizzlandScore,
   type QuizzlandState,
 } from '@zerocade/shared'
 import sky from '@quizzland/sfondo.svg'
@@ -291,7 +290,6 @@ function Game({ state, at, settings }: { state: QuizzlandState; at: number; sett
 
           <footer className="qz__foot">
             {reveal ? <Result state={state} /> : <Answered state={state} settings={settings} />}
-            {showBoard && !reveal && state.scores.length > 0 && <MiniBoard scores={state.scores} />}
           </footer>
         </>
       )}
@@ -487,26 +485,6 @@ function Fastest({ fast, rank }: { fast: QuizzlandFast; rank: number }) {
         </span>
       </span>
     </li>
-  )
-}
-
-// The top three while the chat answers, under the answers.
-function MiniBoard({ scores }: { scores: QuizzlandScore[] }) {
-  return (
-    <ol className="qz-mini">
-      <li className="qz-mini__icon" aria-hidden="true">
-        <Icon name="trophy" />
-      </li>
-      {scores.slice(0, 3).map((s, i) => (
-        <li key={s.id} className="qz-mini__row" style={{ '--medal': MEDALS[i] } as CSSProperties}>
-          <span className="qz-mini__rank">{i + 1}</span>
-          <Avatar player={s} className="qz-mini__avatar" />
-          <span className="qz-mini__name">{s.nickname}</span>
-          <span className="qz-mini__pts">{s.points.toLocaleString('it')}</span>
-          {s.streak >= 2 && <Streak n={s.streak} />}
-        </li>
-      ))}
-    </ol>
   )
 }
 

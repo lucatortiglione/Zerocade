@@ -9,6 +9,7 @@ import { Incastro } from './Incastro'
 import { Quizzland } from './Quizzland'
 import { isContentReady, loadContent, subscribeContent } from './content'
 import { ViewerAvatar } from './ViewerAvatar'
+import { ScoreTicker } from './ScoreTicker'
 
 interface Toast {
   id: number
@@ -18,7 +19,7 @@ interface Toast {
 }
 
 export function App() {
-  const { connected, session, event, seq, message, messageSeq, gif, gifSeq } = useOverlay()
+  const { connected, session, event, seq, message, messageSeq, gif, gifSeq, incastro, quizzland } = useOverlay()
   const contentReady = useSyncExternalStore(subscribeContent, isContentReady)
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const engineRef = useRef<Engine | null>(null)
@@ -81,6 +82,9 @@ export function App() {
 
   const game = session ? GAMES.find((g) => g.id === session.gameId) : undefined
 
+  const scores = session?.gameId === 'incastro' ? incastro?.scores
+    : session?.gameId === 'quizzland' ? quizzland?.scores : undefined
+
   return (
     <div className="overlay">
       <canvas ref={canvasRef} className="overlay__canvas" />
@@ -93,6 +97,7 @@ export function App() {
         <span className={`dot${connected ? ' dot--on' : ''}`} />
       </header>
 
+      {session?.settings.showLeaderboard !== false && scores && <ScoreTicker scores={scores} />}
       <Widgets />
 
       {gif && <img key={gifSeq} className="overlay-gif" src={gif.url} alt={gif.label} />}

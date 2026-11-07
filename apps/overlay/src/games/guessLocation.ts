@@ -164,7 +164,7 @@ export function createGuessLocation(): GameInstance {
       }
 
       drawTimerBar(ctx, width, height, Math.max(0, timer / (revealed ? revealSecs : roundSecs)), revealed ? '#3ccf7a' : '#ffc02e')
-      if (showBoard) drawLeaderboard(ctx, scores, 5)
+      if (showBoard) drawLeaderboard(ctx, scores)
     },
   }
 }

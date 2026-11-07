@@ -310,6 +310,9 @@ def to_csv(dst):
             rows.append([q["id"], cfg["categoria"], q["difficolta"], fixed, cfg["attiva"], it[0], *answers, right, ""])
             added += 1
         report.append(f"{source}: {added} ({missing} senza traduzione, {left_out} escluse{f', {len(bad)} scartate: ' + ', '.join(bad[:10]) if bad else ''})")
+    # Keep reviewed wording and exclusions when rebuilding from the original sources.
+    from revisione_risposte import editorial_rows
+    rows = editorial_rows(rows)
     with open(dst, "w", encoding="utf-8", newline="") as fh:
         writer = csv.writer(fh, lineterminator="\n")
         writer.writerow(["id", "categoria", "difficolta", "ordine_fisso", "attiva", "domanda", "a", "b", "c", "d", "giusta", "spiegazione"])
