@@ -6,7 +6,6 @@ import type {
   IncastroMoment,
   IncastroPlayer,
   IncastroRecord,
-  IncastroScore,
   IncastroState,
 } from '@zerocade/shared'
 import { gameSound, type GameSound } from './audio'
@@ -462,7 +461,7 @@ function Game({ state, at, settings }: { state: IncastroState; at: number; setti
       <section className="inc__play">
         <Feed moments={state.moments} playing={playing?.seq} ui={ui} />
         <aside className="inc__side inc__side--left">
-          {showBoard && <Leaderboard scores={state.scores} longest={state.longest} ui={ui} />}
+          {showBoard && state.longest && <LongestWord longest={state.longest} ui={ui} />}
         </aside>
         {/* A click shuffles the wheel (the server takes this one command from an overlay). */}
         <div
@@ -815,49 +814,16 @@ function Secret({ secret, ui }: { secret: NonNullable<IncastroState['secret']>; 
   )
 }
 
-function Leaderboard({
-  scores,
-  longest,
-  ui,
-}: {
-  scores: IncastroScore[]
-  longest: IncastroRecord | null
-  ui: Record<string, string>
-}) {
+// The ranking is in the top ribbon; keep the live's longest word beside the wheel.
+function LongestWord({ longest, ui }: { longest: IncastroRecord; ui: Record<string, string> }) {
   return (
-    <div className="inc-board-list">
-      <h2 className="inc-board-list__title">
-        <Icon name="trophy" />
-        {ui.leaderboard}
-      </h2>
-      {scores.length === 0 ? (
-        <p className="inc-board-list__empty">{ui.noScores}</p>
-      ) : (
-        <ol>
-          {scores.slice(0, 5).map((s, i) => (
-            <li key={s.id} className="inc-board-list__row">
-              <span className="inc-board-list__rank">{i + 1}</span>
-              <Avatar player={s} className="inc-board-list__avatar" />
-              {/* Under the name, their longest word of this level. */}
-              <span className="inc-board-list__who">
-                <span className="inc-board-list__name">{s.nickname}</span>
-                {s.levelLongest && <span className="inc-board-list__word">{s.levelLongest}</span>}
-              </span>
-              <span className="inc-board-list__pts">{s.points}</span>
-            </li>
-          ))}
-        </ol>
-      )}
-      {longest && (
-        <div className="inc-record">
-          <span className="inc-record__label">{ui.longest}</span>
-          <span className="inc-record__word">{longest.word}</span>
-          <span className="inc-record__who">
-            <Avatar player={longest.by} className="inc-record__avatar" />
-            <span className="inc-record__name">{longest.by.nickname}</span>
-          </span>
-        </div>
-      )}
+    <div className="inc-record">
+      <span className="inc-record__label">{ui.longest}</span>
+      <span className="inc-record__word">{longest.word}</span>
+      <span className="inc-record__who">
+        <Avatar player={longest.by} className="inc-record__avatar" />
+        <span className="inc-record__name">{longest.by.nickname}</span>
+      </span>
     </div>
   )
 }

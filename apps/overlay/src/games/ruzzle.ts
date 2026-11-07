@@ -135,7 +135,7 @@ export function createRuzzle(): GameInstance {
       ctx.fillText(`Parole trovate: ${found.size}/${placed.length}`, cx, startY + tile * 4 + 40)
 
       drawTimerBar(ctx, width, height, Math.max(0, timer / (revealed ? breakSecs : roundSecs)), revealed ? '#3ccf7a' : '#ff5c5c')
-      if (showBoard) drawLeaderboard(ctx, scores, 5)
+      if (showBoard) drawLeaderboard(ctx, scores)
     },
   }
 }

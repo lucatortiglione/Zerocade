@@ -127,7 +127,7 @@ export function createMemoryMaestro(): GameInstance {
 
       const total = phase === 'memorize' ? memSecs : phase === 'answer' ? answerSecs : phase === 'reveal' ? revealSecs : breakSecs
       drawTimerBar(ctx, width, height, Math.max(0, timer / total), phase === 'answer' ? '#3ccf7a' : '#f5b14c')
-      if (showBoard) drawLeaderboard(ctx, scores, 6)
+      if (showBoard) drawLeaderboard(ctx, scores)
     },
   }
 }

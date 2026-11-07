@@ -234,7 +234,7 @@ export function createMillionQuiz(): GameInstance {
         drawTimerBar(ctx, width, height, Math.max(0, timer / voteSecs), '#f6c945')
       }
 
-      if (showBoard) drawLeaderboard(ctx, scores, 5)
+      if (showBoard) drawLeaderboard(ctx, scores)
     },
 
   }

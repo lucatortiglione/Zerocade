@@ -159,7 +159,7 @@ export function createContext(): GameInstance {
       }
 
       if (!revealed) drawTimerBar(ctx, width, height, Math.max(0, timer / autoHintSecs), '#f5b14c')
-      if (showBoard) drawLeaderboard(ctx, scores, 5)
+      if (showBoard) drawLeaderboard(ctx, scores)
     },
   }
 }

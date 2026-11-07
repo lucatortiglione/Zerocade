@@ -1,5 +1,6 @@
 import type { GameInstance } from './engine'
 import { drawAvatar } from './avatar'
+import { drawLeaderboard } from './common'
 
 // "Word Swipe" — like Zen Word / Words of Wonder: a wheel of letters, viewers type
 // any word they can build from them in chat. Longer words score more.
@@ -69,7 +70,6 @@ export function createWordSwipe(): GameInstance {
     timer = seconds
   }
 
-  const top = () => [...scores.entries()].sort((a, b) => b[1].pts - a[1].pts).slice(0, 5)
 
   return {
     reset(settings, w, h) {
@@ -180,20 +180,7 @@ export function createWordSwipe(): GameInstance {
       ctx.fillStyle = revealed ? '#3ccf7a' : '#f5b14c'
       ctx.fillRect(40, height - 56, (width - 80) * frac, 14)
 
-      const topPlayers = top()
-      if (topPlayers.length) {
-        ctx.textAlign = 'left'
-        ctx.font = 'bold 20px system-ui'
-        ctx.fillStyle = '#ffffff'
-        ctx.fillText('Top players', 40, 60)
-        topPlayers.forEach(([, p], i) => {
-          const y = 88 + i * 26
-          drawAvatar(ctx, p.avatar, 52, y - 8, 11, p.name)
-          ctx.font = '18px system-ui'
-          ctx.fillStyle = i === 0 ? '#f5b14c' : '#f0f0f2'
-          ctx.fillText(`${i + 1}. ${p.name} — ${p.pts}`, 70, y)
-        })
-      }
+      drawLeaderboard(ctx, scores)
     },
   }
 }

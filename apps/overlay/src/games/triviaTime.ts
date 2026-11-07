@@ -159,7 +159,7 @@ export function createTriviaTime(): GameInstance {
       }
 
       drawTimerBar(ctx, width, height, Math.max(0, timer / (revealed ? revealSecs : qSecs)), revealed ? '#3ccf7a' : '#f5b14c')
-      if (showBoard) drawLeaderboard(ctx, scores, 5)
+      if (showBoard) drawLeaderboard(ctx, scores)
     },
   }
 }

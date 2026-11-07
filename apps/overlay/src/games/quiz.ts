@@ -1,5 +1,5 @@
 import type { GameInstance } from './engine'
-import { drawAvatar } from './avatar'
+import { drawLeaderboard } from './common'
 
 interface Q {
   q: string
@@ -50,7 +50,6 @@ export function createTrivia(): GameInstance {
     else timer = seconds
   }
 
-  const top = () => [...scores.entries()].sort((a, b) => b[1].pts - a[1].pts).slice(0, 5)
 
   return {
     reset(settings, w, h) {
@@ -126,20 +125,7 @@ export function createTrivia(): GameInstance {
       ctx.textAlign = 'center'
       ctx.fillText(revealed ? 'Correct answer highlighted!' : 'Type A, B, C or D in chat', cx, height - 80)
 
-      const topPlayers = top()
-      if (topPlayers.length) {
-        ctx.textAlign = 'left'
-        ctx.font = 'bold 22px system-ui'
-        ctx.fillStyle = '#ffffff'
-        ctx.fillText('Top players', 40, 60)
-        topPlayers.forEach(([, p], i) => {
-          const y = 96 + i * 32
-          drawAvatar(ctx, p.avatar, 53, y - 7, 13, p.name)
-          ctx.font = '20px system-ui'
-          ctx.fillStyle = i === 0 ? '#f5b14c' : '#f0f0f2'
-          ctx.fillText(`${i + 1}. ${p.name} — ${p.pts}`, 74, y)
-        })
-      }
+      drawLeaderboard(ctx, scores)
     },
   }
 }

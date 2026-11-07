@@ -1161,3 +1161,30 @@ body.incastro-on .guide-chip__arrow { color: rgb(255 255 255 / 0.45); }
     .inc-board { --cell: min(calc(52vw / var(--cols)), calc(80vh / var(--rows)), 14vmin); }
   }
 }
+
+/* Score ribbon below the game title; its own row keeps it clear of the board/question. */
+.score-ticker {
+  position: absolute;
+  top: 6vmin;
+  left: 0;
+  right: 0;
+  height: 5.5vmin;
+  z-index: 2;
+  overflow: hidden;
+  pointer-events: none;
+  background: rgb(12 15 29 / 0.78);
+  border-block: 0.12vmin solid rgb(255 255 255 / 0.18);
+  color: white;
+  font: 700 2.3vmin 'Nunito Variable', system-ui, sans-serif;
+}
+.score-ticker__track { display: flex; width: max-content; height: 100%; animation: score-scroll var(--ticker-duration, 20s) linear infinite; }
+.score-ticker__group { display: flex; align-items: center; flex: none; min-width: 100vw; list-style: none; gap: 5vmin; padding: 0 2.5vmin; }
+.score-ticker__entry { display: flex; align-items: center; gap: 1vmin; white-space: nowrap; }
+.score-ticker__rank, .score-ticker__entry strong { color: #ffd166; font-variant-numeric: tabular-nums; }
+.score-ticker__name { max-width: 30vmin; overflow: hidden; text-overflow: ellipsis; }
+.score-ticker__entry small { font-size: 0.75em; }
+.overlay:has(.score-ticker) .inc, .overlay:has(.score-ticker) .qz { padding-top: 13vmin; }
+@keyframes score-scroll { to { transform: translateX(-50%); } }
+@media (prefers-reduced-motion: reduce) {
+  .score-ticker__track { animation: none; }
+}

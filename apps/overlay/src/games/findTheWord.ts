@@ -118,7 +118,7 @@ export function createFindTheWord(): GameInstance {
       ctx.fillText(done ? word : `${revealed}/${word.length} lettere rivelate`, cx, height * 0.55)
 
       drawTimerBar(ctx, width, height, Math.max(0, timer / (done ? breakSecs : roundSecs)), done ? '#3ccf7a' : '#f5b14c')
-      if (showBoard) drawLeaderboard(ctx, scores, 5)
+      if (showBoard) drawLeaderboard(ctx, scores)
     },
   }
 }

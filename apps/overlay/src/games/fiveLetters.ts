@@ -226,7 +226,7 @@ export function createFiveLetters(): GameInstance {
       }
 
       if (timed) drawTimerBar(ctx, width, height, revealed ? 1 : clamp(timer / seconds, 0, 1), solved ? '#3ccf7a' : '#3E8BFF')
-      if (showBoard) drawLeaderboard(ctx, scores, 5)
+      if (showBoard) drawLeaderboard(ctx, scores)
     },
   }
 }

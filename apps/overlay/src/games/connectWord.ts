@@ -138,7 +138,7 @@ export function createConnectWord(): GameInstance {
       ctx.fillText(`${found.size}/${placed.length} trovate${last ? ' — ✓ ' + last : ''}`, cx, startY + boardW + 40)
 
       if (revealed) drawTimerBar(ctx, width, height, Math.max(0, timer / breakSecs), '#3ccf7a')
-      if (showBoard) drawLeaderboard(ctx, scores, 5)
+      if (showBoard) drawLeaderboard(ctx, scores)
     },
   }
 }
