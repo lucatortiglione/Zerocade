@@ -1,4 +1,5 @@
 // Types and catalogs shared by the server, the dashboard and the overlay.
+export { isWordAssociationPuzzle, type WordAssociationPuzzle } from './wordAssociation.js'
 
 export interface Viewer {
   id: string
@@ -904,7 +905,7 @@ export const GAMES: GameDef[] = [
     id: 'word-association',
     name: 'Word Association',
     category: 'Quiz',
-    description: 'Un tema e più parole collegate nascoste: trova le parole associate in chat.',
+    description: 'Sette indizi convergono su una parola: indovina il bersaglio in chat.',
     emoji: '🔗',
     gradient: ['#3258d4', '#0a1a3a'],
     actions: [
@@ -914,9 +915,8 @@ export const GAMES: GameDef[] = [
     settings: [
       { id: 'roundSeconds', label: 'Secondi per round', kind: 'number', min: 30, max: 300, step: 10, default: 60 },
       { id: 'breakSeconds', label: 'Pausa', kind: 'number', min: 2, max: 20, step: 1, default: 5 },
-      { id: 'pointsPerCorrect', label: 'Punti per parola', kind: 'number', min: 1, max: 20, step: 1, default: 1 },
+      { id: 'pointsPerCorrect', label: 'Punti per soluzione', kind: 'number', min: 1, max: 20, step: 1, default: 1 },
       { id: 'speedBonusEnabled', label: 'Bonus velocità', kind: 'toggle', default: true },
-      { id: 'comboEnabled', label: 'Combo', kind: 'toggle', default: true },
       { id: 'dripRevealEnabled', label: 'Rivelazione progressiva', kind: 'toggle', default: true },
       { id: 'showSessionLeaderboard', label: 'Classifica', kind: 'toggle', default: true },
     ],

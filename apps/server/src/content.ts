@@ -2,6 +2,7 @@ import { mkdirSync, readFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import Database from 'better-sqlite3'
+import { loadWordAssociationContent } from './word-association.js'
 
 // Game content (word banks, questions, statements, brands, locations, …) lives in
 // its own SQLite database, separate from the sessions/events DB. The overlay loads
@@ -35,10 +36,12 @@ const existingGames = new Set((selectAll.all() as { game_id: string }[]).map((r)
 const seedAll = db.transaction(() => {
   for (const [gameId, items] of Object.entries(seed)) {
     if (existingGames.has(gameId)) continue
+    if (gameId === 'association-themes' && existingGames.has('word-association')) continue
     for (const item of items) insert.run(gameId, JSON.stringify(item))
   }
 })
 seedAll()
+const wordAssociationContent = loadWordAssociationContent()
 
 export function getContent(): Record<string, unknown[]> {
   const out: Record<string, unknown[]> = {}
@@ -50,6 +53,10 @@ export function getContent(): Record<string, unknown[]> {
       // ignore malformed rows
     }
   }
+  // The two other games still use the historical theme bank. Existing databases
+  // retain its old key; the new target-guessing game only uses the QA export.
+  out['association-themes'] ??= out['word-association'] ?? []
+  out['word-association'] = wordAssociationContent
   return out
 }
 
