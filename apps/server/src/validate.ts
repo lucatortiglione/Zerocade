@@ -4,9 +4,12 @@ import {
   djSoundById,
   giftById,
   type BivioCommand,
+  type BridgeConfig,
   type DjPlay,
   type GameSettings,
+  type IncastroCommand,
   type LiveEvent,
+  type QuizzlandCommand,
   type SourceConfig,
   type Trigger,
   type TriggerSource,
@@ -109,8 +112,8 @@ export function sanitizeSettings(gameId: string, raw: unknown): GameSettings | n
         out[s.id] = v.toLowerCase()
         break
       case 'image':
-        // Only images uploaded to this server (POST /api/bivio/background/:key).
-        if (typeof v !== 'string' || (v !== '' && !/^\/api\/bivio\/background\/[A-Za-z0-9-]{8,64}\?v=\d{1,15}$/.test(v))) return null
+        // Only images uploaded to this server (POST /api/<game>/background/:key).
+        if (typeof v !== 'string' || (v !== '' && !/^\/api\/(bivio|incastro|quizzland)\/background\/[A-Za-z0-9-]{8,64}\?v=\d{1,15}$/.test(v))) return null
         out[s.id] = v
         break
     }
@@ -127,6 +130,15 @@ export function sanitizeDj(raw: unknown): DjPlay | null {
   }
   if (typeof r.soundId === 'string' && djSoundById(r.soundId)) return { soundId: r.soundId }
   return null
+}
+
+// ZeroFollowerBot's bridge: on or off, and a port that can be opened without privileges.
+export function sanitizeBridgeConfig(raw: unknown): BridgeConfig | null {
+  const r = asRecord(raw)
+  if (!r || typeof r.enabled !== 'boolean') return null
+  const port = Number(r.port)
+  if (!Number.isInteger(port) || port < 1024 || port > 65535) return null
+  return { enabled: r.enabled, port }
 }
 
 export function sanitizeSourceConfig(raw: unknown): SourceConfig | null {
@@ -158,10 +170,47 @@ export function sanitizeScene(raw: unknown): Partial<WidgetConfig> | null {
   return out
 }
 
-const BIVIO_COMMANDS: BivioCommand[] = ['next', 'reveal', 'extra-time', 'pause', 'resume', 'restart']
+const BIVIO_COMMANDS: BivioCommand[] = ['next', 'reveal', 'extra-time', 'pause', 'resume', 'restart', 'flag', 'unflag']
 
 export const sanitizeBivioCommand = (raw: unknown): BivioCommand | null =>
   BIVIO_COMMANDS.includes(raw as BivioCommand) ? (raw as BivioCommand) : null
+
+const INCASTRO_COMMANDS: IncastroCommand[] = [
+  'next',
+  'prev',
+  'hint',
+  'reveal-word',
+  'shuffle',
+  'extra-time',
+  'pause',
+  'resume',
+  'replay',
+  'restart',
+  'clear-scores',
+]
+
+export const sanitizeIncastroCommand = (raw: unknown): IncastroCommand | null =>
+  INCASTRO_COMMANDS.includes(raw as IncastroCommand) ? (raw as IncastroCommand) : null
+
+const QUIZZLAND_COMMANDS: QuizzlandCommand[] = [
+  'next',
+  'reveal',
+  'extra-time',
+  'fifty',
+  'pause',
+  'resume',
+  'restart',
+  'clear-scores',
+  'flag',
+  'unflag',
+]
+
+export const sanitizeQuizzlandCommand = (raw: unknown): QuizzlandCommand | null =>
+  QUIZZLAND_COMMANDS.includes(raw as QuizzlandCommand) ? (raw as QuizzlandCommand) : null
+
+// A level number for "Vai al livello"; the room wraps it into its own range.
+export const sanitizeLevel = (raw: unknown): number | null =>
+  typeof raw === 'number' && Number.isInteger(raw) && raw >= 1 && raw <= 1_000_000 ? raw : null
 
 export function sanitizeMessage(raw: unknown): string | null {
   if (typeof raw !== 'string') return null

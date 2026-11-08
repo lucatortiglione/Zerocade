@@ -1,8 +1,23 @@
+import { randomUUID } from 'node:crypto'
 import { mkdirSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import Database from 'better-sqlite3'
-import { giftById, type BivioChoice, type BivioTally, type Gifter, type LiveEvent } from '@zerocade/shared'
+import {
+  BRIDGE_DEFAULT_PORT,
+  giftById,
+  type BivioChoice,
+  type BridgeConfig,
+  type BivioTally,
+  type FeedCreator,
+  type FeedGift,
+  type GiftEvent,
+  type Gifter,
+  type LiveEvent,
+  type Pad,
+  type SavedSources,
+  type SourceKind,
+} from '@zerocade/shared'
 
 // Local persistence via better-sqlite3 (latest stable SQLite engine). The DB file
 // lives in apps/server/data and is gitignored; set ZEROCADE_DB to override the path.
@@ -51,6 +66,115 @@ db.exec(`
     PRIMARY KEY (round_id, user_id)
   );
   CREATE INDEX IF NOT EXISTS idx_bivio_votes_question ON bivio_votes (question_id);
+  CREATE TABLE IF NOT EXISTS bivio_flags (
+    question_id TEXT PRIMARY KEY,
+    lang TEXT NOT NULL,
+    flagged_at TEXT NOT NULL DEFAULT (datetime('now', 'localtime'))
+  );
+  CREATE TABLE IF NOT EXISTS pad_boards (
+    key TEXT PRIMARY KEY,
+    volume REAL NOT NULL DEFAULT 0.8
+  );
+  CREATE TABLE IF NOT EXISTS pads (
+    id TEXT PRIMARY KEY,
+    key TEXT NOT NULL,
+    kind TEXT NOT NULL CHECK (kind IN ('sound', 'gif')),
+    slot INTEGER NOT NULL,
+    label TEXT NOT NULL,
+    color TEXT NOT NULL,
+    sound_id TEXT,
+    file TEXT,
+    UNIQUE (key, kind, slot)
+  );
+  CREATE TABLE IF NOT EXISTS gifts (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    key TEXT NOT NULL,
+    creator TEXT NOT NULL,
+    game_id TEXT NOT NULL,
+    user_id TEXT NOT NULL,
+    nickname TEXT NOT NULL,
+    gift_id TEXT NOT NULL,
+    count INTEGER NOT NULL,
+    coins INTEGER NOT NULL,
+    at INTEGER NOT NULL
+  );
+  CREATE INDEX IF NOT EXISTS idx_gifts_at ON gifts (at);
+  CREATE TABLE IF NOT EXISTS creators (
+    kind TEXT NOT NULL,
+    username TEXT NOT NULL,
+    game_id TEXT NOT NULL,
+    viewers INTEGER,
+    last_live INTEGER NOT NULL,
+    PRIMARY KEY (kind, username)
+  );
+  CREATE TABLE IF NOT EXISTS source_accounts (
+    key TEXT NOT NULL,
+    kind TEXT NOT NULL,
+    username TEXT NOT NULL,
+    updated_at TEXT NOT NULL DEFAULT (datetime('now')),
+    PRIMARY KEY (key, kind)
+  );
+  CREATE TABLE IF NOT EXISTS incastro_progress (
+    key TEXT PRIMARY KEY,
+    level INTEGER NOT NULL,
+    updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+  );
+  CREATE TABLE IF NOT EXISTS zerowords_plays (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    key TEXT NOT NULL,
+    level INTEGER NOT NULL,
+    variant TEXT NOT NULL,
+    generator TEXT NOT NULL,
+    archetype TEXT NOT NULL,
+    seed TEXT NOT NULL,
+    target REAL NOT NULL,
+    dsim REAL NOT NULL,
+    words INTEGER NOT NULL,
+    hint_seconds INTEGER NOT NULL,
+    started_at INTEGER NOT NULL,
+    ended_at INTEGER,
+    active_ms INTEGER,
+    result TEXT,
+    outcome TEXT,
+    players INTEGER,
+    attempts INTEGER,
+    wrong INTEGER,
+    hints_auto INTEGER,
+    hints_streamer INTEGER,
+    hints_trigger INTEGER,
+    first_ms INTEGER,
+    stall_ms INTEGER
+  );
+  CREATE TABLE IF NOT EXISTS zerowords_answers (
+    play INTEGER NOT NULL,
+    at_ms INTEGER NOT NULL,
+    kind TEXT NOT NULL,
+    word TEXT,
+    how TEXT NOT NULL,
+    shown TEXT
+  );
+  CREATE INDEX IF NOT EXISTS zerowords_answers_play ON zerowords_answers (play);
+  CREATE TABLE IF NOT EXISTS quizzland_answers (
+    round_id TEXT NOT NULL,
+    key TEXT NOT NULL,
+    question_id TEXT NOT NULL,
+    user_id TEXT NOT NULL,
+    nickname TEXT NOT NULL,
+    choice INTEGER NOT NULL,
+    correct INTEGER NOT NULL CHECK (correct IN (0, 1)),
+    ms INTEGER NOT NULL,
+    answered_at TEXT NOT NULL DEFAULT (datetime('now')),
+    PRIMARY KEY (round_id, user_id)
+  );
+  CREATE INDEX IF NOT EXISTS idx_quizzland_answers_question ON quizzland_answers (question_id);
+  CREATE TABLE IF NOT EXISTS quizzland_flags (
+    question_id TEXT PRIMARY KEY,
+    flagged_at TEXT NOT NULL DEFAULT (datetime('now', 'localtime'))
+  );
+  CREATE TABLE IF NOT EXISTS meta (
+    name TEXT PRIMARY KEY,
+    value TEXT NOT NULL
+  );
 `)
 
 // Migrate databases created before the widgets/goal columns existed.
@@ -64,6 +188,56 @@ try {
 } catch {
   // column already present on fresh schema
 }
+// The gifter's profile picture, for the Top donatori widget.
+try {
+  db.exec('ALTER TABLE gifters ADD COLUMN avatar TEXT')
+} catch {
+  // column already present
+}
+
+// --- Room ---
+// This Zerocade's one room: the dashboard, the overlay link and every game use its key,
+// whatever browser opens them. A database from before keys were kept here carries on with
+// the room it was used with most (the key with the most events); a new one gets a fresh key.
+
+function loadRoomKey(): string {
+  const saved = db.prepare("SELECT value FROM meta WHERE name = 'room_key'").get() as { value: string } | undefined
+  if (saved) return saved.value
+  const busiest = db
+    .prepare(
+      'SELECT s.key FROM sessions s LEFT JOIN events e ON e.key = s.key GROUP BY s.key ORDER BY count(e.id) DESC, s.updated_at DESC LIMIT 1',
+    )
+    .get() as { key: string } | undefined
+  const key = busiest?.key ?? randomUUID()
+  db.prepare("INSERT INTO meta (name, value) VALUES ('room_key', ?)").run(key)
+  return key
+}
+
+export const roomKey = loadRoomKey()
+
+// --- ZeroFollowerBot's event bridge ---
+// Whether Zerocade listens to ZeroFollowerBot, and on which port: one setting for this Zerocade.
+
+const bridgeGet = db.prepare("SELECT value FROM meta WHERE name = 'zfb_bridge'")
+const bridgeSet = db.prepare(`
+  INSERT INTO meta (name, value) VALUES ('zfb_bridge', ?)
+  ON CONFLICT(name) DO UPDATE SET value = excluded.value
+`)
+
+export function bridgeConfig(): BridgeConfig {
+  const row = bridgeGet.get() as { value: string } | undefined
+  try {
+    const saved = row ? (JSON.parse(row.value) as Partial<BridgeConfig>) : {}
+    return {
+      enabled: saved.enabled === true,
+      port: Number.isInteger(saved.port) ? (saved.port as number) : BRIDGE_DEFAULT_PORT,
+    }
+  } catch {
+    return { enabled: false, port: BRIDGE_DEFAULT_PORT }
+  }
+}
+
+export const saveBridgeConfig = (config: BridgeConfig): void => void bridgeSet.run(JSON.stringify(config))
 
 // --- Sessions ---
 
@@ -103,16 +277,21 @@ export const saveSession = (
 // --- Gifters ---
 
 const gifterUpsert = db.prepare(`
-  INSERT INTO gifters (key, user_id, nickname, coins) VALUES (?, ?, ?, ?)
+  INSERT INTO gifters (key, user_id, nickname, avatar, coins) VALUES (?, ?, ?, ?, ?)
   ON CONFLICT(key, user_id) DO UPDATE SET
     nickname = excluded.nickname,
+    avatar = coalesce(excluded.avatar, gifters.avatar),
     coins = gifters.coins + excluded.coins
 `)
 const gifterSelect = db.prepare(`
-  SELECT user_id AS id, nickname, coins FROM gifters WHERE key = ? ORDER BY coins DESC, nickname ASC LIMIT 50
+  SELECT user_id AS id, nickname, avatar, coins FROM gifters WHERE key = ? ORDER BY coins DESC, nickname ASC LIMIT 50
 `)
 
-export const getRanking = (key: string): Gifter[] => gifterSelect.all(key) as unknown as Gifter[]
+// Gifters without a picture (Twitch, or saved before pictures were) leave the field out.
+export const getRanking = (key: string): Gifter[] =>
+  (gifterSelect.all(key) as unknown as (Omit<Gifter, 'avatar'> & { avatar: string | null })[]).map(({ avatar, ...g }) =>
+    avatar ? { ...g, avatar } : g,
+  )
 
 // --- Events ---
 
@@ -139,7 +318,7 @@ export const recordEvent = (key: string, event: LiveEvent): void => {
   eventPrune.run(key, key)
   if (event.type === 'gift') {
     const coins = (giftById(event.giftId)?.coins ?? 0) * event.count
-    gifterUpsert.run(key, event.user.id, event.user.nickname, coins)
+    gifterUpsert.run(key, event.user.id, event.user.nickname, event.user.avatar ?? null, coins)
   }
 }
 // --- Bivio votes ---
@@ -182,3 +361,317 @@ export const recordBivioVote = (v: BivioVote): void => {
 export const bivioTotals = (questionId: string): BivioTally => bivioQuestionTotals.get(questionId) as BivioTally
 
 export const bivioTotalsByQuestion = (): BivioTotalsRow[] => bivioAllTotals.all() as unknown as BivioTotalsRow[]
+
+// --- Bivio questions marked as wrong from the dashboard ---
+// For every overlay key; they stay out of the game until unmarked.
+
+export interface BivioFlag {
+  question_id: string
+  lang: string
+  flagged_at: string
+}
+
+const bivioFlagInsert = db.prepare(`INSERT OR IGNORE INTO bivio_flags (question_id, lang) VALUES (?, ?)`)
+const bivioFlagDelete = db.prepare(`DELETE FROM bivio_flags WHERE question_id = ?`)
+const bivioFlagAll = db.prepare(`SELECT question_id, lang, flagged_at FROM bivio_flags ORDER BY flagged_at, question_id`)
+
+export const bivioFlags = (): BivioFlag[] => bivioFlagAll.all() as unknown as BivioFlag[]
+export const flagBivio = (questionId: string, lang: string): void => void bivioFlagInsert.run(questionId, lang)
+export const unflagBivio = (questionId: string): void => void bivioFlagDelete.run(questionId)
+
+// --- Quizzland answers ---
+// Each viewer's first answer to each question: `choice` is the option's position in
+// domande.db (0 = the first), whatever order the overlay showed; `ms` how long it took.
+
+export interface QuizzlandAnswer {
+  roundId: string
+  key: string
+  questionId: string
+  userId: string
+  nickname: string
+  choice: number
+  correct: boolean
+  ms: number
+}
+
+export interface QuizzlandTotalsRow {
+  id: string
+  rounds: number
+  answers: number
+  correct: number
+  // How many chose each position of domande.db (c0 = the first answer).
+  c0: number
+  c1: number
+  c2: number
+  c3: number
+  // Average time of the right answers.
+  avgMs: number | null
+}
+
+const quizzlandAnswerInsert = db.prepare(`
+  INSERT OR IGNORE INTO quizzland_answers (round_id, key, question_id, user_id, nickname, choice, correct, ms)
+  VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+`)
+const quizzlandAllTotals = db.prepare(`
+  SELECT question_id AS id, COUNT(DISTINCT round_id) AS rounds, COUNT(*) AS answers, SUM(correct) AS correct,
+    SUM(choice = 0) AS c0, SUM(choice = 1) AS c1, SUM(choice = 2) AS c2, SUM(choice = 3) AS c3,
+    AVG(CASE WHEN correct = 1 THEN ms END) AS avgMs
+  FROM quizzland_answers GROUP BY question_id
+`)
+
+export const recordQuizzlandAnswer = (a: QuizzlandAnswer): void => {
+  quizzlandAnswerInsert.run(a.roundId, a.key, a.questionId, a.userId, a.nickname, a.choice, a.correct ? 1 : 0, Math.round(a.ms))
+}
+
+export const quizzlandTotalsByQuestion = (): QuizzlandTotalsRow[] => quizzlandAllTotals.all() as unknown as QuizzlandTotalsRow[]
+
+// Questions marked as wrong from the dashboard, for every overlay key, until unmarked.
+
+export interface QuizzlandFlag {
+  question_id: string
+  flagged_at: string
+}
+
+const quizzlandFlagInsert = db.prepare('INSERT OR IGNORE INTO quizzland_flags (question_id) VALUES (?)')
+const quizzlandFlagDelete = db.prepare('DELETE FROM quizzland_flags WHERE question_id = ?')
+const quizzlandFlagAll = db.prepare('SELECT question_id, flagged_at FROM quizzland_flags ORDER BY flagged_at, question_id')
+
+export const quizzlandFlags = (): QuizzlandFlag[] => quizzlandFlagAll.all() as unknown as QuizzlandFlag[]
+export const flagQuizzland = (questionId: string): void => void quizzlandFlagInsert.run(questionId)
+export const unflagQuizzland = (questionId: string): void => void quizzlandFlagDelete.run(questionId)
+
+// --- TikTok and Twitch accounts ---
+// The name last entered for each source, per overlay key: the dashboard fills it in again
+// at the next live.
+
+const sourceAccountsGet = db.prepare('SELECT kind, username FROM source_accounts WHERE key = ?')
+const sourceAccountSet = db.prepare(`
+  INSERT INTO source_accounts (key, kind, username) VALUES (?, ?, ?)
+  ON CONFLICT(key, kind) DO UPDATE SET username = excluded.username, updated_at = datetime('now')
+`)
+
+export const savedSources = (key: string): SavedSources =>
+  Object.fromEntries((sourceAccountsGet.all(key) as { kind: SourceKind; username: string }[]).map((r) => [r.kind, r.username]))
+
+export const saveSource = (key: string, kind: SourceKind, username: string): void => {
+  sourceAccountSet.run(key, kind, username)
+}
+
+// --- Incastro progress ---
+// The level each overlay key is on, so the next live starts where this one stopped.
+
+const incastroLevelGet = db.prepare('SELECT level FROM incastro_progress WHERE key = ?')
+const incastroLevelSet = db.prepare(`
+  INSERT INTO incastro_progress (key, level) VALUES (?, ?)
+  ON CONFLICT(key) DO UPDATE SET level = excluded.level, updated_at = datetime('now')
+`)
+
+export const incastroLevel = (key: string): number | undefined =>
+  (incastroLevelGet.get(key) as { level: number } | undefined)?.level
+
+export const saveIncastroLevel = (key: string, level: number): void => {
+  incastroLevelSet.run(key, level)
+}
+
+// --- ZeroWords plays ---
+// Every level played, with the chat's answers and the hints as they came (times in played
+// milliseconds since the level began, pauses left out): the data to calibrate the
+// generator's difficulty on (gioco-parole/ALGORITMO.md). Nothing about who answered.
+
+export interface ZerowordsPlayStart {
+  key: string
+  level: number
+  variant: string
+  generator: string
+  archetype: string
+  // The wheel's full word.
+  seed: string
+  target: number
+  dsim: number
+  words: number
+  hint_seconds: number
+}
+
+export interface ZerowordsPlayEnd {
+  active_ms: number
+  result: 'complete' | 'time-up' | 'left'
+  outcome: string | null
+  players: number
+  attempts: number
+  wrong: number
+  hints_auto: number
+  hints_streamer: number
+  hints_trigger: number
+  first_ms: number | null
+  stall_ms: number
+}
+
+export interface ZerowordsAnswer {
+  play: number
+  at_ms: number
+  // grid | extra | secret | hint
+  kind: string
+  word: string | null
+  // chat | auto | streamer | trigger | missed
+  how: string
+  // A grid word: its letters on the board just before (V_G___).
+  shown: string | null
+}
+
+const ZEROWORDS_DAYS_KEPT = 365
+{
+  const old = Date.now() - ZEROWORDS_DAYS_KEPT * 86_400_000
+  db.prepare('DELETE FROM zerowords_answers WHERE play IN (SELECT id FROM zerowords_plays WHERE started_at < ?)').run(old)
+  db.prepare('DELETE FROM zerowords_plays WHERE started_at < ?').run(old)
+}
+
+const zwPlayInsert = db.prepare(`
+  INSERT INTO zerowords_plays (key, level, variant, generator, archetype, seed, target, dsim, words, hint_seconds, started_at)
+  VALUES (@key, @level, @variant, @generator, @archetype, @seed, @target, @dsim, @words, @hint_seconds, @started_at)
+`)
+const zwPlayEnd = db.prepare(`
+  UPDATE zerowords_plays SET ended_at = @ended_at, active_ms = @active_ms, result = @result, outcome = @outcome,
+    players = @players, attempts = @attempts, wrong = @wrong, hints_auto = @hints_auto,
+    hints_streamer = @hints_streamer, hints_trigger = @hints_trigger, first_ms = @first_ms, stall_ms = @stall_ms
+  WHERE id = @id
+`)
+const zwAnswerInsert = db.prepare(`
+  INSERT INTO zerowords_answers (play, at_ms, kind, word, how, shown) VALUES (@play, @at_ms, @kind, @word, @how, @shown)
+`)
+const zwPlaysAll = db.prepare('SELECT * FROM zerowords_plays ORDER BY id')
+const zwAnswersAll = db.prepare(`
+  SELECT a.play, p.level, p.variant, a.at_ms, a.kind, a.word, a.how, a.shown
+  FROM zerowords_answers a JOIN zerowords_plays p ON p.id = a.play ORDER BY a.rowid
+`)
+
+export const startZerowordsPlay = (play: ZerowordsPlayStart): number =>
+  Number(zwPlayInsert.run({ ...play, started_at: Date.now() }).lastInsertRowid)
+
+export const endZerowordsPlay = (id: number, end: ZerowordsPlayEnd): void => {
+  zwPlayEnd.run({ ...end, id, ended_at: Date.now() })
+}
+
+export const addZerowordsAnswer = (answer: ZerowordsAnswer): void => {
+  zwAnswerInsert.run(answer)
+}
+
+// Column names and rows, for the CSV downloads.
+const table = (stmt: Database.Statement) => ({
+  columns: stmt.columns().map((c) => c.name),
+  rows: stmt.raw().all() as (string | number | null)[][],
+})
+
+export const zerowordsPlays = () => table(zwPlaysAll)
+export const zerowordsAnswers = () => table(zwAnswersAll)
+
+// --- Pads ---
+// A key gets a pad_boards row the first time its board is read, so a board emptied on
+// purpose is not filled with the defaults again.
+
+const padBoardGet = db.prepare('SELECT volume FROM pad_boards WHERE key = ?')
+const padBoardInsert = db.prepare('INSERT INTO pad_boards (key) VALUES (?)')
+const padBoardVolume = db.prepare('UPDATE pad_boards SET volume = ? WHERE key = ?')
+const PAD_COLUMNS = 'SELECT id, kind, slot, label, color, sound_id AS soundId, file FROM pads'
+const padSelect = db.prepare(`${PAD_COLUMNS} WHERE key = ? ORDER BY kind, slot`)
+const padGet = db.prepare(`${PAD_COLUMNS} WHERE key = ? AND id = ?`)
+const padInSlot = db.prepare(`${PAD_COLUMNS} WHERE key = ? AND kind = ? AND slot = ?`)
+const padUpsert = db.prepare(`
+  INSERT INTO pads (id, key, kind, slot, label, color, sound_id, file) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+  ON CONFLICT(id) DO UPDATE SET
+    slot = excluded.slot,
+    label = excluded.label,
+    color = excluded.color,
+    sound_id = excluded.sound_id,
+    file = excluded.file
+`)
+const padDelete = db.prepare('DELETE FROM pads WHERE key = ? AND id = ?')
+
+type PadRow = Omit<Pad, 'soundId' | 'file'> & { soundId: string | null; file: string | null }
+
+const toPad = ({ soundId, file, ...rest }: PadRow): Pad => ({
+  ...rest,
+  ...(soundId ? { soundId } : {}),
+  ...(file ? { file } : {}),
+})
+
+export const padVolume = (key: string): number | undefined =>
+  (padBoardGet.get(key) as { volume: number } | undefined)?.volume
+
+export const setPadVolume = (key: string, volume: number): void => {
+  padBoardVolume.run(volume, key)
+}
+
+export const listPads = (key: string): Pad[] => (padSelect.all(key) as unknown as PadRow[]).map(toPad)
+
+export const getPad = (key: string, id: string): Pad | undefined => {
+  const row = padGet.get(key, id) as PadRow | undefined
+  return row && toPad(row)
+}
+
+export const padAt = (key: string, kind: Pad['kind'], slot: number): Pad | undefined => {
+  const row = padInSlot.get(key, kind, slot) as PadRow | undefined
+  return row && toPad(row)
+}
+
+export const savePad = (key: string, pad: Pad): void => {
+  padUpsert.run(pad.id, key, pad.kind, pad.slot, pad.label, pad.color, pad.soundId ?? null, pad.file ?? null)
+}
+
+export const deletePad = (key: string, id: string): void => {
+  padDelete.run(key, id)
+}
+
+export const createPadBoard = db.transaction((key: string, pads: Pad[]) => {
+  padBoardInsert.run(key)
+  for (const pad of pads) savePad(key, pad)
+})
+
+// --- Feed: gifts and creators across every key on this server ---
+
+const GIFT_DAYS_KEPT = 30
+db.prepare('DELETE FROM gifts WHERE at < ?').run(Date.now() - GIFT_DAYS_KEPT * 86_400_000)
+
+const giftInsert = db.prepare(`
+  INSERT INTO gifts (key, creator, game_id, user_id, nickname, gift_id, count, coins, at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+`)
+const GIFT_COLUMNS = 'SELECT id, creator, game_id AS gameId, nickname, gift_id AS giftId, count, coins, at FROM gifts'
+const giftsLatest = db.prepare(`${GIFT_COLUMNS} WHERE (@creator IS NULL OR creator = @creator) ORDER BY id DESC LIMIT @limit`)
+const giftTop = db.prepare(
+  `${GIFT_COLUMNS} WHERE (@creator IS NULL OR creator = @creator) AND at >= @since ORDER BY coins DESC, id DESC LIMIT 1`,
+)
+const giftCreators = db.prepare('SELECT DISTINCT creator FROM gifts')
+
+export const recordGift = (key: string, creator: string, gameId: string, event: GiftEvent): void => {
+  const coins = (giftById(event.giftId)?.coins ?? 0) * event.count
+  giftInsert.run(key, creator, gameId, event.user.id, event.user.nickname, event.giftId, event.count, coins, Date.now())
+}
+
+// `creator` undefined means every creator; '' the simulator.
+export const latestGifts = (creator: string | undefined, limit: number): FeedGift[] =>
+  giftsLatest.all({ creator: creator ?? null, limit }) as unknown as FeedGift[]
+
+export const topGiftSince = (creator: string | undefined, since: number): FeedGift | null =>
+  (giftTop.get({ creator: creator ?? null, since }) as FeedGift | undefined) ?? null
+
+export const giftedCreators = (): string[] => (giftCreators.all() as { creator: string }[]).map((r) => r.creator)
+
+const creatorUpsert = db.prepare(`
+  INSERT INTO creators (kind, username, game_id, viewers, last_live) VALUES (?, ?, ?, ?, ?)
+  ON CONFLICT(kind, username) DO UPDATE SET
+    game_id = excluded.game_id,
+    viewers = COALESCE(excluded.viewers, creators.viewers),
+    last_live = excluded.last_live
+`)
+const creatorsRecent = db.prepare(
+  'SELECT kind, username, game_id AS gameId, viewers, last_live AS at FROM creators ORDER BY last_live DESC LIMIT ?',
+)
+
+// Called while a creator is live, so last_live ends up close to when the live ended.
+export const touchCreator = (kind: SourceKind, username: string, gameId: string, viewers?: number): void => {
+  creatorUpsert.run(kind, username, gameId, viewers ?? null, Date.now())
+}
+
+export const recentCreators = (limit: number): FeedCreator[] =>
+  (creatorsRecent.all(limit) as (Omit<FeedCreator, 'viewers'> & { viewers: number | null })[]).map(({ viewers, ...c }) =>
+    viewers === null ? c : { ...c, viewers },
+  )

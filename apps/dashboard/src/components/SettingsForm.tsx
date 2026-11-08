@@ -1,5 +1,5 @@
 import { Fragment, useEffect, useRef, useState } from 'react'
-import { GAMES, bivioBackgroundPath, type GameSetting, type SessionState } from '@zerocade/shared'
+import { BACKGROUND_GAMES, GAMES, backgroundPath, type GameSetting, type SessionState } from '@zerocade/shared'
 import { overlayKey } from '../overlayKey'
 import { socket } from '../socket'
 
@@ -19,18 +19,25 @@ function groupsOf(settings: GameSetting[]): Group[] {
   return groups
 }
 
-export function SettingsForm({ session }: { session: SessionState }) {
+// Only the changed field: the server merges it onto the current settings.
+const set = (id: string, value: Value) => socket.emit('settings:set', { [id]: value })
+
+// `omit` leaves out the settings a control column already shows on their own (SettingField).
+export function SettingsForm({ session, omit = [] }: { session: SessionState; omit?: string[] }) {
   const game = GAMES.find((g) => g.id === session.gameId)
   if (!game) return null
 
-  // Only the changed field: the server merges it onto the current settings.
-  const set = (id: string, value: Value) => socket.emit('settings:set', { [id]: value })
-
   return (
     <div className="form">
-      {groupsOf(game.settings).map((group, i) => {
+      {groupsOf(game.settings.filter((s) => !omit.includes(s.id))).map((group, i) => {
         const fields = group.settings.map((s) => (
-          <Field key={s.id} setting={s} value={session.settings[s.id] ?? s.default} onChange={(v) => set(s.id, v)} />
+          <Field
+            key={s.id}
+            gameId={game.id}
+            setting={s}
+            value={session.settings[s.id] ?? s.default}
+            onChange={(v) => set(s.id, v)}
+          />
         ))
         return group.name ? (
           <div key={i} className="form__group">
@@ -43,6 +50,14 @@ export function SettingsForm({ session }: { session: SessionState }) {
       })}
     </div>
   )
+}
+
+// One setting of the current game, outside the form.
+export function SettingField({ session, id }: { session: SessionState; id: string }) {
+  const game = GAMES.find((g) => g.id === session.gameId)
+  const setting = game?.settings.find((s) => s.id === id)
+  if (!game || !setting) return null
+  return <Field gameId={game.id} setting={setting} value={session.settings[id] ?? setting.default} onChange={(v) => set(id, v)} />
 }
 
 function Label({ setting }: { setting: GameSetting }) {
@@ -58,7 +73,17 @@ function Label({ setting }: { setting: GameSetting }) {
   )
 }
 
-function Field({ setting, value, onChange }: { setting: GameSetting; value: Value; onChange: (v: Value) => void }) {
+function Field({
+  gameId,
+  setting,
+  value,
+  onChange,
+}: {
+  gameId: string
+  setting: GameSetting
+  value: Value
+  onChange: (v: Value) => void
+}) {
   switch (setting.kind) {
     case 'toggle':
       return (
@@ -97,7 +122,7 @@ function Field({ setting, value, onChange }: { setting: GameSetting; value: Valu
     case 'multi':
       return <MultiPicker setting={setting} value={String(value)} onChange={onChange} />
     case 'image':
-      return <ImagePicker setting={setting} value={String(value)} onChange={onChange} />
+      return <ImagePicker gameId={gameId} setting={setting} value={String(value)} onChange={onChange} />
   }
 }
 
@@ -205,10 +230,12 @@ function MultiPicker({
 
 // Uploads the picked file to the server, which hosts it for the overlay.
 function ImagePicker({
+  gameId,
   setting,
   value,
   onChange,
 }: {
+  gameId: string
   setting: GameSetting
   value: string
   onChange: (v: string) => void
@@ -216,12 +243,13 @@ function ImagePicker({
   const input = useRef<HTMLInputElement>(null)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
+  const game = BACKGROUND_GAMES.find((g) => g === gameId) ?? 'bivio'
 
   const upload = async (file: File) => {
     setBusy(true)
     setError('')
     try {
-      const res = await fetch(bivioBackgroundPath(overlayKey), {
+      const res = await fetch(backgroundPath(game, overlayKey), {
         method: 'POST',
         headers: { 'content-type': file.type },
         body: file,

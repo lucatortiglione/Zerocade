@@ -9,6 +9,15 @@
 html, body, #root { width: 100%; height: 100%; }
 body { background: #0b0b0e; overflow: hidden; }
 
+/* The page around the scene (main.tsx): see-through, so a window wider or taller than the
+   scene shows nothing beside it. */
+body.scene-host { background: transparent; }
+body.scene-host #root { display: grid; place-items: center; }
+.scene-frame { display: block; border: 0; width: min(100vw, 100vh * 9 / 16); height: min(100vh, 100vw * 16 / 9); }
+@media (orientation: landscape) {
+  .scene-frame { width: min(100vw, 100vh * 16 / 9); height: min(100vh, 100vw * 9 / 16); }
+}
+
 .overlay { position: relative; width: 100%; height: 100%; }
 .overlay__canvas { display: block; width: 100%; height: 100%; }
 
@@ -41,6 +50,9 @@ body { background: #0b0b0e; overflow: hidden; }
   pointer-events: none;
 }
 .toast {
+  display: flex;
+  align-items: center;
+  gap: 6px;
   padding: 8px 14px;
   border-radius: 999px;
   background: #1b1b21ee;
@@ -49,8 +61,27 @@ body { background: #0b0b0e; overflow: hidden; }
   white-space: nowrap;
   max-width: 80vw;
   overflow: hidden;
-  text-overflow: ellipsis;
 }
+.toast__text { overflow: hidden; text-overflow: ellipsis; }
+
+/* A viewer's picture next to their name (ViewerAvatar): sized on the text around it, with
+   their initial underneath for when there is no picture. */
+.viewer-avatar {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  width: 1.6em;
+  aspect-ratio: 1;
+  vertical-align: middle;
+  border-radius: 50%;
+  overflow: hidden;
+  background: var(--tint, #3a3a44);
+  color: #ffffff;
+  font-weight: 700;
+  line-height: 1;
+}
+.viewer-avatar img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 
 .overlay__guide {
   position: absolute;
@@ -105,7 +136,7 @@ body { background: #0b0b0e; overflow: hidden; }
   background: #1b1b21ee;
   border: 1px solid #26262e;
   font-size: 22px;
-  animation: alert-in 0.25s ease-out;
+  animation: alert-in 0.25s ease-out, alert-out 0.4s ease-in 4.6s forwards;
 }
 .widget-alert__icon { font-size: 34px; }
 
@@ -113,11 +144,15 @@ body { background: #0b0b0e; overflow: hidden; }
 .widget-goal__bar { height: 12px; border-radius: 6px; background: #00000055; overflow: hidden; }
 .widget-goal__fill { height: 100%; background: #7c5cff; transition: width 0.3s ease; }
 
-.widget-gifters__row { display: flex; gap: 8px; justify-content: flex-end; }
+.widget-gifters__row { display: flex; align-items: center; gap: 8px; justify-content: flex-end; }
+.widget-gifters__row + .widget-gifters__row { margin-top: 4px; }
 
 @keyframes alert-in {
   from { opacity: 0; transform: translateX(-50%) translateY(-12px); }
   to { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+@keyframes alert-out {
+  to { opacity: 0; transform: translateX(-50%) translateY(-12px); }
 }
 
 /* Bivio: sized in vmin, so it reads the same in the dashboard preview and at 1080 × 1920. */
@@ -171,9 +206,108 @@ body { background: #0b0b0e; overflow: hidden; }
   background: #ffffff2e;
   transition: height 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
+
+/* Voter bubbles, under the option text. Three layers, one transform each: the spot
+   (left/top, centred), a slow float, and the entrance: the bubble rises out of the
+   bottom of the card, overshoots, settles and sends out a ring; its name shows briefly. */
+.bivio-opt__crowd { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
+.bivio-bubble {
+  position: absolute;
+  width: 6.5vmin;
+  width: 15cqi;
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%);
+}
+.bivio-bubble__float {
+  display: block;
+  width: 100%;
+  height: 100%;
+  animation: bubble-float 2.8s ease-in-out var(--float-delay, 0s) infinite alternate;
+}
+.bivio-bubble__pop {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: var(--tint, #6b7280);
+  color: #ffffff;
+  font-size: 2.8vmin;
+  font-size: 6.5cqi;
+  font-weight: 800;
+  box-shadow: 0 0 0 0.25vmin #ffffffd0, 0 0.6vmin 1.6vmin #00000066;
+  box-shadow: 0 0 0 0.6cqi #ffffffd0, 0 1.4cqi 3.6cqi #00000066;
+  animation: bubble-pop 0.8s ease-out both;
+}
+.bivio-bubble__pop img { position: absolute; inset: 0; width: 100%; height: 100%; border-radius: 50%; object-fit: cover; }
+/* Soap-bubble shine on top of the picture. */
+.bivio-bubble__pop::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 32% 26%, #ffffffc0 0 9%, transparent 24%),
+    radial-gradient(circle at 50% 50%, transparent 60%, #ffffff38 74%, transparent 80%);
+}
+.bivio-bubble__pop::after {
+  content: '';
+  position: absolute;
+  inset: -8%;
+  border: 0.35vmin solid #ffffff;
+  border: 0.8cqi solid #ffffff;
+  border-radius: 50%;
+  opacity: 0;
+  animation: bubble-ring 0.9s ease-out 0.4s;
+}
+.bivio-bubble__name {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  max-width: 60cqi;
+  margin-bottom: 1cqi;
+  padding: 0.3vmin 1vmin;
+  padding: 0.6cqi 2.4cqi;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #000000aa;
+  color: #ffffff;
+  font-size: 2.2vmin;
+  font-size: 5.5cqi;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  opacity: 0;
+  transform: translateX(-50%);
+  animation: bubble-name 2.6s ease 0.3s;
+}
+
+@keyframes bubble-pop {
+  0% { opacity: 0; transform: translateY(170%) scale(0.25); }
+  45% { opacity: 1; transform: translateY(-14%) scale(1.18); }
+  65% { transform: translateY(5%) scale(0.94); }
+  82% { transform: translateY(-2%) scale(1.03); }
+  100% { opacity: 1; transform: none; }
+}
+@keyframes bubble-ring {
+  0% { opacity: 0.9; transform: scale(0.9); }
+  100% { opacity: 0; transform: scale(1.9); }
+}
+@keyframes bubble-float {
+  from { transform: translateY(-5%) rotate(-4deg); }
+  to { transform: translateY(5%) rotate(4deg); }
+}
+@keyframes bubble-name {
+  0% { opacity: 0; transform: translate(-50%, 40%); }
+  15%, 75% { opacity: 1; transform: translate(-50%, 0); }
+  100% { opacity: 0; transform: translate(-50%, 0); }
+}
 .bivio-opt__body {
   position: absolute;
   inset: 0;
+  z-index: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -201,12 +335,14 @@ body { background: #0b0b0e; overflow: hidden; }
   font-size: 9cqi;
   font-weight: 800;
 }
+/* As wide as the card, so a word too long for it sticks out and Bivio.tsx (useWholeWords) can
+   shrink the text: words are never broken. */
 .bivio-opt__text {
+  align-self: stretch;
   font-size: 5.4vmin;
   font-size: 13cqi;
   font-weight: 800;
   line-height: 1.15;
-  overflow-wrap: anywhere;
   text-shadow: 0 0.3vmin 1.2vmin #00000066;
 }
 .bivio-opt__text--mid { font-size: 4.8vmin; font-size: 11.5cqi; }
@@ -242,7 +378,10 @@ body { background: #0b0b0e; overflow: hidden; }
 .bivio__status { font-size: 3.4vmin; font-weight: 700; text-align: center; }
 .bivio__voters { display: flex; flex-wrap: wrap; justify-content: center; gap: 1vmin; min-height: 4.6vmin; }
 .bivio__voter {
-  padding: 0.6vmin 1.8vmin;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.8vmin;
+  padding: 0.6vmin 1.8vmin 0.6vmin 0.6vmin;
   border-radius: 999px;
   background: #ffffff14;
   font-size: 2.6vmin;
@@ -284,6 +423,10 @@ body.bivio-see-through { background: transparent; }
 .bivio__options--stacked .bivio-opt__votes { font-size: 3vmin; }
 .bivio__options--stacked .bivio-opt__all { font-size: 2.8vmin; }
 .bivio__options--stacked .bivio__or { margin: -3.4vmin 0; }
+.bivio__options--stacked .bivio-bubble { width: 7vmin; }
+.bivio__options--stacked .bivio-bubble__pop { font-size: 3vmin; box-shadow: 0 0 0 0.25vmin #ffffffd0, 0 0.6vmin 1.6vmin #00000066; }
+.bivio__options--stacked .bivio-bubble__pop::after { border-width: 0.35vmin; }
+.bivio__options--stacked .bivio-bubble__name { max-width: 30vmin; margin-bottom: 0.4vmin; padding: 0.3vmin 1vmin; font-size: 2.2vmin; }
 
 /* A message the creator sends from the dashboard, over any game. */
 .overlay-message {
@@ -319,4 +462,729 @@ body.bivio-see-through { background: transparent; }
 @keyframes bivio-pop {
   from { opacity: 0; transform: translateY(0.8vmin); }
   to { opacity: 1; transform: none; }
+}
+
+/* GIF pads: the GIF pops in mid-screen above the game and fades out after 5 s (GIF_MS). */
+.overlay-gif {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 6;
+  max-width: 62vmin;
+  max-height: 46vh;
+  border-radius: 3vmin;
+  box-shadow: 0 2vmin 6vmin #000000aa;
+  transform: translate(-50%, -50%);
+  animation: gif-in 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), gif-out 0.4s ease-in 4.6s forwards;
+  pointer-events: none;
+}
+@keyframes gif-in {
+  from { opacity: 0; transform: translate(-50%, -50%) scale(0.6); }
+  to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+}
+@keyframes gif-out {
+  to { opacity: 0; transform: translate(-50%, -50%) scale(0.92); }
+}
+
+/* Incastro: a calm garden, tactile tiles. Sized in vmin/vh like Bivio; portrait first
+   (1080 × 1920), landscape at the end. The colours come from the picture behind, set inline:
+   --inc-accent its most vivid colour (or the chapter's), --inc-hue its dominant hue and
+   --inc-tint how much of it the glass, the slots and the wheel take (0 = neutral grey). The
+   defaults are the garden green. */
+.inc {
+  --inc-hue: 155;
+  --inc-tint: 0.04;
+  --inc-ink: oklch(0.3 calc(var(--inc-tint) * 0.7) var(--inc-hue));
+  --inc-muted: oklch(0.48 calc(var(--inc-tint) * 0.5) var(--inc-hue));
+  --inc-glass: oklch(0.3 var(--inc-tint) var(--inc-hue) / 0.62);
+  --inc-glass-deep: oklch(0.19 calc(var(--inc-tint) * 0.8) var(--inc-hue) / 0.74);
+  --inc-soft: oklch(0.9 calc(var(--inc-tint) * 2) var(--inc-hue));
+  --inc-slot: oklch(0.97 calc(var(--inc-tint) * 0.5) var(--inc-hue) / 0.88);
+  --inc-paper: oklch(0.99 calc(var(--inc-tint) * 0.15) var(--inc-hue));
+  --inc-paper-deep: oklch(0.94 calc(var(--inc-tint) * 0.45) var(--inc-hue));
+  --inc-gold: #f6c453;
+  --inc-display: 'Fredoka Variable', 'Nunito Variable', system-ui, sans-serif;
+  --inc-text: 'Nunito Variable', system-ui, sans-serif;
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.8vh;
+  /* The top clears the top bar (where the prompt sits), the bottom is left to the trigger
+     chips of the play guide. */
+  padding: 7vmin 2.5vw 7.5vh;
+  overflow: hidden;
+  color: #ffffff;
+  font-family: var(--inc-text);
+}
+body.incastro-see-through { background: transparent; }
+/* The gift alert sits over the top bar for its few seconds, not over the board. */
+body.incastro-on .widget-alert { top: 0.8vmin; z-index: 4; padding: 1.2vmin 3vmin; font-size: 2.8vmin; }
+/* The app's top bar and play guide, scaled with the scene and dressed like it. */
+body.incastro-on .overlay__top { padding: 1.4vmin 2.4vmin; gap: 1vmin; background: none; }
+body.incastro-on .overlay__brand { font-size: 2.6vmin; }
+body.incastro-on .overlay__title { font: 600 2.4vmin 'Fredoka Variable', system-ui, sans-serif; text-shadow: 0 0.2vmin 0.8vmin rgb(0 0 0 / 0.5); }
+body.incastro-on .dot { width: 1.2vmin; height: 1.2vmin; }
+body.incastro-on .overlay__guide {
+  gap: 1vmin;
+  padding: 1.6vmin 2vmin 2.2vmin;
+  background: linear-gradient(transparent, rgb(6 10 14 / 0.45));
+  font-family: 'Nunito Variable', system-ui, sans-serif;
+}
+body.incastro-on .guide-chip {
+  gap: 0.8vmin;
+  padding: 0.7vmin 1.8vmin;
+  border: 0.15vmin solid rgb(255 255 255 / 0.16);
+  background: rgb(12 18 24 / 0.62);
+  backdrop-filter: blur(0.8vmin);
+  font-size: 2vmin;
+  font-weight: 700;
+}
+body.incastro-on .guide-chip__label { color: rgb(255 255 255 / 0.75); }
+body.incastro-on .guide-chip__arrow { color: rgb(255 255 255 / 0.45); }
+
+.inc__backdrop, .inc__bg, .inc__veil, .inc__pollen { position: absolute; inset: 0; }
+.inc__backdrop { z-index: 0; overflow: hidden; }
+.inc__bg { background-size: cover; background-position: center bottom; }
+.inc__bg--in { animation: inc-fade 1.6s ease-out both; }
+.inc__bg--photo { background-position: center; }
+/* A little darker at the edges and behind the title, where text sits on the garden. */
+.inc__veil {
+  background:
+    radial-gradient(130% 75% at 50% 48%, transparent 55%, rgb(8 20 14 / 0.38)),
+    linear-gradient(rgb(8 20 14 / 0.32), transparent 24%, transparent 72%, rgb(8 20 14 / 0.28));
+}
+/* NASA's pictures stay whole: only the top and bottom edges darken a little, under the
+   top bar and the trigger chips. */
+.inc__veil--photo { background: linear-gradient(rgb(0 0 0 / 0.38), transparent 12%, transparent 86%, rgb(0 0 0 / 0.42)); }
+/* A new level opens on its background alone: the veil comes in with the grid, and so does
+   everything over it. */
+.inc__veil { transition: opacity 1.2s ease-out; }
+.inc--intro .inc__veil { opacity: 0; }
+.inc--intro > .inc__paused { margin: auto; }
+.inc__head, .inc__play { animation: inc-fade 0.8s ease-out both; }
+.inc-board { animation: inc-summary-in 0.5s ease-out both; }
+/* The picture's title, under it while it is shown alone. */
+.inc > p.inc__caption {
+  position: absolute;
+  left: 50%;
+  bottom: 9vh;
+  z-index: 2;
+  width: max-content;
+  max-width: 86vw;
+  transform: translateX(-50%);
+  font-family: var(--inc-display);
+  font-size: 3.2vmin;
+  font-weight: 600;
+  text-align: center;
+  color: rgb(255 255 255 / 0.92);
+  text-shadow: 0 0.3vmin 1.2vmin rgb(0 0 0 / 0.75);
+  animation: inc-fade 1s ease-out 0.6s both;
+}
+/* Whose picture it is, small in the bottom-right corner. */
+.inc > p.inc__credit {
+  position: absolute;
+  right: 1.6vmin;
+  bottom: 0.6vmin;
+  z-index: 2;
+  max-width: 34vw;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-size: 1.5vmin;
+  font-weight: 700;
+  color: rgb(255 255 255 / 0.78);
+  text-shadow: 0 0.2vmin 0.6vmin rgb(0 0 0 / 0.7);
+}
+.inc__pollen span {
+  position: absolute;
+  bottom: -3vmin;
+  left: var(--x);
+  width: var(--s);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: radial-gradient(rgb(255 248 214 / 0.95), rgb(255 248 214 / 0) 70%);
+  animation: inc-drift var(--t) linear var(--d) infinite;
+}
+.inc > :not(.inc__backdrop, .inc-rain) { position: relative; z-index: 1; }
+.inc__empty { margin: auto; font-family: var(--inc-display); font-size: 4vmin; font-weight: 600; }
+
+/* Dark frosted glass behind the small panels, in the picture's hue. */
+.inc__prompt, .inc__paused, .inc-feed__item, .inc-bubble__who, .inc-board-list, .inc-stat, .inc-secret {
+  border: 0.15vmin solid rgb(255 255 255 / 0.16);
+  background: linear-gradient(160deg, var(--inc-glass), var(--inc-glass-deep));
+  backdrop-filter: blur(1.2vmin) saturate(1.2);
+  box-shadow: 0 1vmin 3vmin rgb(0 0 0 / 0.22);
+}
+
+.inc-icon { display: block; flex: none; fill: currentColor; }
+.inc-icon__line { fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+
+.inc > .inc__head { position: absolute; top: 1.2vmin; left: 50%; z-index: 2; transform: translateX(-50%); white-space: nowrap; }
+.inc__prompt {
+  display: flex;
+  align-items: center;
+  gap: 1vmin;
+  padding: 0.6vmin 2.2vmin 0.6vmin 1.6vmin;
+  border-radius: 999px;
+  font-size: 2vmin;
+  font-weight: 700;
+}
+.inc__prompt .inc-icon { width: 2.6vmin; color: var(--inc-soft); }
+
+.inc__stage { flex: 1 1 auto; min-height: 0; width: 100%; display: grid; place-items: center; }
+.inc-board {
+  --cell: min(calc(92vw / var(--cols)), calc(44vh / var(--rows)), 16vmin);
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(var(--cols), var(--cell));
+  grid-template-rows: repeat(var(--rows), var(--cell));
+  /* No panel: the slots stand on the picture. Padding and border keep the room the sizes
+     below count on. */
+  padding: 1.4vmin;
+  border: 0.2vmin solid transparent;
+}
+/* Where container units work the board fills all the room the stage has left (the 3.4vmin
+   are its padding and border), up to big tiles for small grids; elsewhere the vh guess
+   above stands. */
+@supports (height: 1cqh) {
+  .inc__stage { container-type: size; }
+  .inc-board {
+    --cell: min(calc((100cqw - 3.4vmin) / var(--cols)), calc((100cqh - 3.4vmin) / var(--rows)), 16vmin);
+  }
+}
+/* An empty slot, sunk in, straight on the picture: a dark rim and a shadow keep it apart
+   from a bright one. */
+.inc-cell {
+  position: relative;
+  margin: calc(var(--cell) * 0.045);
+  border-radius: calc(var(--cell) * 0.22);
+  background: var(--inc-slot);
+  box-shadow:
+    inset 0 calc(var(--cell) * 0.08) calc(var(--cell) * 0.12) oklch(0.3 0.03 var(--inc-hue) / 0.24),
+    0 0 0 calc(var(--cell) * 0.025) oklch(0.22 calc(var(--inc-tint) * 0.6) var(--inc-hue) / 0.3),
+    0 calc(var(--cell) * 0.06) calc(var(--cell) * 0.16) rgb(0 0 0 / 0.32);
+  animation: inc-appear 0.35s ease-out var(--d) both;
+}
+/* The letter tile that drops into it. */
+.inc-cell__tile {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  border-radius: inherit;
+  font-family: var(--inc-display);
+  font-size: calc(var(--cell) * 0.62);
+  font-weight: 600;
+  line-height: 1;
+}
+/* Raised, glossy tiles in the chapter colour: on the board and above the wheel. */
+.inc-cell--found .inc-cell__tile, .inc-bubble__tile {
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--inc-accent), #ffffff 32%),
+    var(--inc-accent) 55%,
+    color-mix(in srgb, var(--inc-accent), #000000 14%)
+  );
+  color: #ffffff;
+}
+.inc-cell--found .inc-cell__tile {
+  text-shadow: 0 calc(var(--cell) * 0.035) 0 rgb(0 0 0 / 0.22);
+  box-shadow:
+    inset 0 calc(var(--cell) * 0.05) 0 rgb(255 255 255 / 0.45),
+    inset 0 calc(var(--cell) * -0.08) 0 rgb(0 0 0 / 0.16),
+    0 calc(var(--cell) * 0.06) calc(var(--cell) * 0.14) rgb(0 0 0 / 0.25);
+  animation: inc-drop 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) var(--d) both;
+}
+/* A light runs across each new letter once it has landed. */
+.inc-cell--found .inc-cell__tile::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(105deg, transparent 30%, rgb(255 255 255 / 0.6) 50%, transparent 70%);
+  transform: translateX(-120%);
+  animation: inc-shine 0.8s ease-out calc(var(--d) + 0.35s) both;
+}
+.inc-cell--hint .inc-cell__tile {
+  background: linear-gradient(180deg, var(--inc-paper), var(--inc-paper-deep));
+  color: var(--inc-accent);
+  box-shadow:
+    inset 0 calc(var(--cell) * -0.07) 0 rgb(0 0 0 / 0.08),
+    0 calc(var(--cell) * 0.05) calc(var(--cell) * 0.1) rgb(0 0 0 / 0.18);
+  animation: inc-pop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) var(--d) both;
+}
+.inc-cell--missed .inc-cell__tile { color: color-mix(in oklch, var(--inc-ink), transparent 58%); animation: inc-fade 0.5s ease-out var(--d) both; }
+.inc-board__badge {
+  align-self: start;
+  justify-self: start;
+  width: calc(var(--cell) * 0.42);
+  margin: calc(var(--cell) * -0.08) 0 0 calc(var(--cell) * -0.08);
+  font-size: calc(var(--cell) * 0.2);
+  box-shadow: 0 0 0 calc(var(--cell) * 0.04) #ffffff, 0 0.4vmin 1vmin rgb(0 0 0 / 0.3);
+  animation: inc-pop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) 0.5s both;
+  z-index: 2;
+}
+
+.inc-avatar {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  overflow: hidden;
+  background: var(--tint, #3b6b52);
+  color: #ffffff;
+  font-family: var(--inc-display);
+  font-weight: 600;
+  line-height: 1;
+}
+.inc-avatar img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+
+.inc-feed {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 7vmin;
+  list-style: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.inc-feed--hidden { visibility: hidden; }
+.inc-feed__item {
+  display: flex;
+  align-items: center;
+  gap: 1.2vmin;
+  max-width: 92%;
+  padding: 0.5vmin 2vmin 0.5vmin 0.5vmin;
+  border-radius: 999px;
+  font-size: 2.2vmin;
+  font-weight: 700;
+  animation: inc-slide 0.35s ease-out both;
+}
+.inc-feed__item--found { border-color: color-mix(in srgb, var(--inc-accent), transparent 30%); }
+.inc-feed__item--extra { border-color: rgb(246 196 83 / 0.7); }
+.inc-feed__avatar { width: 3.6vmin; font-size: 1.6vmin; }
+.inc-feed__icon { display: grid; place-items: center; width: 3.6vmin; aspect-ratio: 1; border-radius: 50%; background: rgb(246 196 83 / 0.2); color: var(--inc-gold); }
+.inc-feed__icon .inc-icon { width: 2.3vmin; }
+.inc-feed__text { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+
+.inc__play {
+  flex: none;
+  width: 100%;
+  display: grid;
+  position: relative;
+  grid-template-columns: 1fr 40vmin 1fr;
+  align-items: center;
+  gap: 2vmin;
+  /* The strip above the wheel: the latest moment, or the bubble of a word just found. */
+  padding-top: 7vmin;
+}
+.inc__wheel-wrap { position: relative; }
+.inc__wheel-wrap--click { cursor: pointer; transition: transform 0.15s ease-out; }
+.inc__wheel-wrap--click:active { transform: scale(0.97); }
+/* The frosted disc: CSS, so it can blur the garden behind it. */
+.inc__wheel-wrap::before {
+  content: '';
+  position: absolute;
+  inset: 2%;
+  border-radius: 50%;
+  border: 0.4vmin solid rgb(255 255 255 / 0.85);
+  background: radial-gradient(
+    circle at 50% 30%,
+    oklch(0.99 calc(var(--inc-tint) * 0.15) var(--inc-hue) / 0.88),
+    oklch(0.94 calc(var(--inc-tint) * 0.45) var(--inc-hue) / 0.7)
+  );
+  backdrop-filter: blur(1.2vmin);
+  box-shadow: inset 0 -1.2vmin 2.6vmin oklch(0.3 0.03 var(--inc-hue) / 0.12), 0 1.8vmin 4vmin rgb(0 0 0 / 0.3);
+}
+.inc__side { display: flex; flex-direction: column; gap: 1.4vmin; min-width: 0; }
+.inc__side--right { align-items: flex-end; }
+
+.inc-wheel { position: relative; display: block; width: 100%; height: auto; overflow: visible; }
+.inc-wheel__ring { fill: none; stroke: var(--inc-ink); stroke-opacity: 0.18; stroke-width: 0.9; stroke-linecap: round; stroke-dasharray: 0.001 1.5; }
+.inc-wheel__sprout { fill: var(--inc-accent); opacity: 0.4; }
+.inc-wheel__sprout .inc-icon__line { stroke: var(--inc-accent); }
+.inc-wheel__letter { transition: transform 0.7s cubic-bezier(0.34, 1.4, 0.64, 1); }
+.inc-wheel__chip { transform-box: fill-box; transform-origin: center; animation: inc-chip 0.28s cubic-bezier(0.34, 1.56, 0.64, 1) both; }
+.inc-wheel__chip-base { fill: var(--inc-accent); stroke: #ffffff; stroke-width: 0.9; }
+.inc-wheel__chip-shine { fill: rgb(255 255 255 / 0.2); }
+.inc-wheel__text { fill: var(--inc-ink); font-family: var(--inc-display); font-weight: 600; text-anchor: middle; }
+.inc-wheel__text--on { animation: inc-chip-text 0.2s ease-out both; }
+.inc-wheel__halo, .inc-wheel__line {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: inc-draw linear forwards;
+}
+.inc-wheel__halo { stroke: #ffffff; stroke-width: 6.6; opacity: 0.8; }
+.inc-wheel__line { stroke: var(--inc-accent); stroke-width: 3.8; }
+.inc-wheel--extra { --inc-accent: #e9a400; }
+.inc-wheel--repeat { --inc-accent: #8f9aa5; }
+
+.inc-bubble {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  display: flex;
+  align-items: center;
+  gap: 1.4vmin;
+  margin-bottom: 0.8vmin;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  animation: inc-bubble-out 0.3s ease-in 1.2s forwards;
+}
+.inc-bubble--idle { display: none; }
+.inc-bubble--extra { --inc-accent: #e9a400; animation-delay: 0.85s; }
+.inc-bubble--secret { --inc-accent: #e9a400; animation-delay: 2.1s; }
+.inc-bubble--repeat { --inc-accent: #8f9aa5; animation-delay: 0.65s; }
+.inc-bubble__tiles { display: flex; gap: 0.6vmin; }
+.inc-bubble__tile {
+  display: grid;
+  place-items: center;
+  width: 5.4vmin;
+  height: 5.4vmin;
+  border-radius: 1.3vmin;
+  font-family: var(--inc-display);
+  font-size: 3.6vmin;
+  font-weight: 600;
+  text-shadow: 0 0.25vmin 0 rgb(0 0 0 / 0.22);
+  box-shadow:
+    inset 0 0.35vmin 0 rgb(255 255 255 / 0.45),
+    inset 0 -0.5vmin 0 rgb(0 0 0 / 0.16),
+    0 0.8vmin 2vmin rgb(0 0 0 / 0.25);
+  animation: inc-pop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+.inc-bubble__who {
+  display: flex;
+  align-items: center;
+  gap: 1vmin;
+  padding: 0.5vmin;
+  border-radius: 999px;
+  font-size: 2.4vmin;
+  font-weight: 800;
+}
+.inc-bubble__avatar { width: 3.8vmin; font-size: 1.7vmin; }
+.inc-bubble__name { max-width: 30vmin; overflow: hidden; text-overflow: ellipsis; }
+.inc-bubble__note {
+  display: flex;
+  align-items: center;
+  gap: 0.5vmin;
+  padding: 0.35vmin 1.5vmin;
+  border-radius: 999px;
+  background: var(--inc-accent);
+  font-size: 2.1vmin;
+}
+.inc-bubble__note .inc-icon { width: 2.2vmin; color: #fff3c4; }
+
+.inc-board-list { padding: 1.6vmin 1.8vmin; border-radius: 2.6vmin; }
+/* The secret word, top of the right column: gold-edged empty tiles, the letters once found. */
+.inc-secret {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.8vmin;
+  padding: 1.3vmin 1.4vmin;
+  border-color: rgb(246 196 83 / 0.55);
+  border-radius: 2.6vmin;
+}
+.inc-secret__label {
+  display: flex;
+  align-items: center;
+  gap: 0.7vmin;
+  font-size: 1.6vmin;
+  font-weight: 800;
+  letter-spacing: 0.2vmin;
+  text-transform: uppercase;
+  color: var(--inc-gold);
+}
+.inc-secret__label .inc-icon { width: 2vmin; }
+.inc-secret__tiles { display: flex; gap: 0.35vmin; }
+.inc-secret__tile {
+  display: grid;
+  place-items: center;
+  width: 2.4vmin;
+  height: 2.8vmin;
+  border: 0.15vmin solid rgb(246 196 83 / 0.6);
+  border-radius: 0.6vmin;
+  background: rgb(255 255 255 / 0.08);
+  font-family: var(--inc-display);
+  font-size: 1.9vmin;
+  font-weight: 600;
+}
+.inc-secret--open .inc-secret__tile {
+  border-color: transparent;
+  background: linear-gradient(#ffe7a1, #e2a21a);
+  color: #4a3200;
+  animation: inc-pop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) var(--d) both;
+}
+.inc-secret__who { display: flex; align-items: center; gap: 0.8vmin; max-width: 100%; font-size: 1.7vmin; font-weight: 700; opacity: 0.9; }
+.inc-secret__avatar { width: 2.6vmin; font-size: 1.2vmin; }
+.inc-secret__name { min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.inc-board-list__title {
+  display: flex;
+  align-items: center;
+  gap: 0.8vmin;
+  margin-bottom: 1.1vmin;
+  font-family: var(--inc-display);
+  font-size: 2.6vmin;
+  font-weight: 600;
+}
+.inc-board-list__title .inc-icon { width: 3vmin; color: var(--inc-gold); }
+.inc-board-list ol { list-style: none; display: flex; flex-direction: column; gap: 0.8vmin; }
+.inc-board-list__row { display: flex; align-items: center; gap: 0.9vmin; font-size: 2.2vmin; font-weight: 700; animation: inc-slide 0.3s ease-out both; }
+.inc-board-list__rank {
+  display: grid;
+  place-items: center;
+  width: 2.8vmin;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: rgb(255 255 255 / 0.16);
+  font-size: 1.6vmin;
+  font-weight: 900;
+}
+.inc-board-list__row:nth-child(1) .inc-board-list__rank { background: linear-gradient(#ffe7a1, #e2a21a); color: #4a3200; }
+.inc-board-list__row:nth-child(2) .inc-board-list__rank { background: linear-gradient(#f4f7fa, #a9b4c0); color: #26303a; }
+.inc-board-list__row:nth-child(3) .inc-board-list__rank { background: linear-gradient(#f6cfaa, #c27a44); color: #3d220f; }
+.inc-board-list__avatar { width: 3.4vmin; font-size: 1.5vmin; }
+.inc-board-list__who { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.inc-board-list__name, .inc-board-list__word { min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+/* The player's longest word of this level, under the name. */
+.inc-board-list__word { font-family: var(--inc-display); font-size: 1.6vmin; font-weight: 600; line-height: 1.1; letter-spacing: 0.15vmin; color: var(--inc-gold); }
+.inc-board-list__pts { font-family: var(--inc-display); font-weight: 600; font-variant-numeric: tabular-nums; }
+.inc-board-list__empty { font-size: 2vmin; opacity: 0.8; }
+/* The live's longest word, under the ranking. */
+.inc-record {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6vmin;
+  margin-top: 1.4vmin;
+  padding-top: 1.2vmin;
+  border-top: 0.15vmin solid rgb(255 255 255 / 0.16);
+  animation: inc-slide 0.3s ease-out both;
+}
+.inc-record__label { font-size: 1.6vmin; font-weight: 800; letter-spacing: 0.2vmin; text-transform: uppercase; color: var(--inc-gold); }
+.inc-record__word { font-family: var(--inc-display); font-size: 2.8vmin; font-weight: 600; line-height: 1.05; letter-spacing: 0.2vmin; overflow-wrap: anywhere; }
+.inc-record__who { display: flex; align-items: center; gap: 0.9vmin; min-width: 0; font-size: 2vmin; font-weight: 700; }
+.inc-record__avatar { width: 3vmin; font-size: 1.4vmin; }
+.inc-record__name { min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+
+.inc-stat {
+  display: grid;
+  grid-template-columns: auto auto;
+  grid-template-areas: 'icon value' 'icon label';
+  align-items: center;
+  column-gap: 1.2vmin;
+  min-width: 18vmin;
+  padding: 1.1vmin 2vmin 1.1vmin 1.4vmin;
+  border-radius: 2.6vmin;
+}
+.inc-stat__icon { grid-area: icon; width: 5vmin; color: var(--inc-gold); filter: drop-shadow(0 0.3vmin 0.5vmin rgb(0 0 0 / 0.3)); }
+.inc-stat__icon--time { color: var(--inc-soft); }
+.inc-stat .inc-ring { grid-area: icon; width: 5.6vmin; }
+.inc-stat__value {
+  grid-area: value;
+  font-family: var(--inc-display);
+  font-size: 3.8vmin;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.1;
+}
+.inc-stat__value small { font-size: 2.2vmin; opacity: 0.7; }
+.inc-stat__label { grid-area: label; font-size: 1.9vmin; font-weight: 700; opacity: 0.8; }
+.inc-stat--hurry { border-color: #ff7b7b; animation: inc-pulse 1s ease-in-out infinite; }
+.inc-stat--hurry .inc-stat__icon { color: #ff9b9b; }
+.inc-ring { overflow: visible; }
+.inc-ring__track { fill: none; stroke: rgb(255 255 255 / 0.2); stroke-width: 3.5; }
+.inc-ring__fill {
+  fill: none;
+  stroke: var(--inc-gold);
+  stroke-width: 3.5;
+  stroke-linecap: round;
+  stroke-dasharray: 1;
+  transform: rotate(-90deg);
+  transform-origin: 18px 18px;
+  transition: stroke-dashoffset 0.1s linear;
+}
+.inc-ring__icon { color: var(--inc-gold); }
+
+.inc__paused {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  gap: 1.4vmin;
+  padding: 1.4vmin 4vmin 1.4vmin 3vmin;
+  border-radius: 999px;
+  font-family: var(--inc-display);
+  font-size: 4vmin;
+  font-weight: 600;
+}
+.inc__paused .inc-icon { width: 4vmin; }
+
+.inc-summary {
+  position: absolute;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.6vmin;
+  width: min(80vw, 70vmin);
+  padding: 7.5vmin 4vmin 3.6vmin;
+  border: 0.4vmin solid #ffffff;
+  border-radius: 3.6vmin;
+  background: linear-gradient(180deg, var(--inc-paper), var(--inc-paper-deep));
+  color: var(--inc-ink);
+  text-align: center;
+  box-shadow: 0 2vmin 6vmin rgb(0 0 0 / 0.4);
+  animation: inc-summary-in 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) 0.9s both;
+}
+.inc-summary--chapter { box-shadow: 0 0 0 0.8vmin var(--inc-accent), 0 2vmin 6vmin rgb(0 0 0 / 0.4); }
+.inc-summary__medal {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  display: grid;
+  place-items: center;
+  width: 12vmin;
+  aspect-ratio: 1;
+  border: 0.6vmin solid #ffffff;
+  border-radius: 50%;
+  background: radial-gradient(circle at 50% 30%, color-mix(in srgb, var(--inc-accent), #ffffff 28%), var(--inc-accent) 72%);
+  color: #ffffff;
+  box-shadow: 0 1vmin 2.4vmin rgb(0 0 0 / 0.3);
+  transform: translate(-50%, -50%);
+}
+.inc-summary__medal .inc-icon { width: 6.4vmin; }
+.inc-summary__title { font-family: var(--inc-display); font-size: 5vmin; font-weight: 600; }
+.inc-summary__best { display: flex; align-items: center; gap: 2vmin; text-align: left; }
+.inc-summary__best > div { display: flex; flex-direction: column; }
+.inc-summary__avatar { width: 11vmin; font-size: 5vmin; box-shadow: 0 0 0 0.6vmin var(--inc-accent); }
+.inc-summary__label { font-size: 2.3vmin; font-weight: 700; color: var(--inc-muted); }
+.inc-summary__name { font-family: var(--inc-display); font-size: 4.2vmin; font-weight: 600; }
+.inc-summary__pts { font-size: 2.5vmin; font-weight: 800; color: var(--inc-accent); }
+.inc-summary__others { display: flex; gap: 2.4vmin; font-size: 2.3vmin; font-weight: 700; color: var(--inc-muted); }
+.inc-summary__others > span { display: inline-flex; align-items: center; gap: 0.7vmin; }
+.inc-summary__mini { width: 3.6vmin; font-size: 1.6vmin; }
+/* Each player's longest word of the level. */
+.inc-summary__longest { font-size: 2.1vmin; font-weight: 700; color: var(--inc-muted); }
+.inc-summary__word { font-family: var(--inc-display); font-weight: 600; letter-spacing: 0.15vmin; color: var(--inc-accent); }
+.inc-summary__chapter {
+  display: flex;
+  align-items: center;
+  gap: 1vmin;
+  padding: 1vmin 2.6vmin 1vmin 2vmin;
+  border-radius: 999px;
+  background: var(--inc-accent);
+  color: #ffffff;
+  font-size: 2.6vmin;
+  font-weight: 800;
+}
+.inc-summary__chapter .inc-icon { width: 3vmin; }
+.inc-summary__next { font-size: 2.3vmin; font-weight: 700; color: var(--inc-muted); }
+
+.inc-rain { position: absolute; inset: 0; z-index: 2; overflow: hidden; pointer-events: none; }
+.inc-rain span {
+  position: absolute;
+  top: -5vmin;
+  left: var(--x);
+  width: 2.8vmin;
+  height: 2.8vmin;
+  border-radius: 100% 0;
+  background: linear-gradient(135deg, #d4f5b4, #4fae5a);
+  animation: inc-fall var(--t) ease-in var(--d) both;
+}
+.inc-rain span:nth-child(3n) { background: linear-gradient(135deg, #ffffff, var(--inc-accent)); }
+
+@keyframes inc-fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes inc-appear { from { opacity: 0; transform: scale(0.6); } to { opacity: 1; transform: none; } }
+@keyframes inc-pop {
+  0% { opacity: 0; transform: scale(0.4); }
+  70% { opacity: 1; transform: scale(1.14); }
+  100% { opacity: 1; transform: none; }
+}
+/* A found letter waits its turn, then falls into its slot with a small bounce. */
+@keyframes inc-drop {
+  0% { opacity: 0; transform: translateY(-60%) scale(1.25); }
+  60% { opacity: 1; transform: translateY(4%) scale(0.94); }
+  100% { opacity: 1; transform: none; }
+}
+@keyframes inc-shine { to { transform: translateX(120%); } }
+@keyframes inc-pulse { 50% { transform: scale(1.12); } }
+@keyframes inc-slide { from { opacity: 0; transform: translateY(-1vmin); } }
+@keyframes inc-draw { to { stroke-dashoffset: 0; } }
+@keyframes inc-chip { from { opacity: 0; transform: scale(0.3); } to { opacity: 1; transform: none; } }
+@keyframes inc-chip-text { from { fill: var(--inc-ink); } to { fill: #ffffff; } }
+@keyframes inc-bubble-out { to { opacity: 0; transform: translateX(-50%) translateY(-1.5vmin); } }
+@keyframes inc-summary-in { from { opacity: 0; transform: scale(0.85); } to { opacity: 1; transform: none; } }
+@keyframes inc-drift {
+  0% { opacity: 0; transform: translate(0, 0); }
+  12% { opacity: 0.85; }
+  50% { transform: translate(3vmin, -55vh); }
+  88% { opacity: 0.6; }
+  100% { opacity: 0; transform: translate(-2vmin, -110vh); }
+}
+@keyframes inc-fall {
+  0% { opacity: 0; transform: translate(0, 0) rotate(var(--r)); }
+  10% { opacity: 1; }
+  100% { opacity: 0.85; transform: translate(6vmin, 112vh) rotate(calc(var(--r) + 540deg)); }
+}
+
+/* A 16:9 scene: the board on the left; on the right the wheel, with the leaderboard and
+   the stats in a column beside it. */
+@media (orientation: landscape) {
+  .inc {
+    display: grid;
+    grid-template-columns: 1.3fr 1fr;
+    grid-template-rows: 1fr;
+    grid-template-areas: 'stage play';
+    padding: 7vmin 2.5vw 8.5vh;
+    column-gap: 2.5vw;
+  }
+  /* Stretched: a size container would otherwise be as tall as its content, which is none. */
+  .inc__stage { grid-area: stage; align-self: stretch; }
+  .inc__play {
+    grid-area: play;
+    grid-template-columns: minmax(0, 1fr) 40vh;
+    grid-template-areas: 'left wheel' 'right wheel';
+    align-content: center;
+  }
+  .inc__wheel-wrap { grid-area: wheel; }
+  .inc__side--left { grid-area: left; align-self: end; }
+  .inc__side--right { grid-area: right; align-self: start; align-items: stretch; }
+  @supports not (height: 1cqh) {
+    .inc-board { --cell: min(calc(52vw / var(--cols)), calc(80vh / var(--rows)), 14vmin); }
+  }
+}
+
+/* Score ribbon below the game title; its own row keeps it clear of the board/question. */
+.score-ticker {
+  position: absolute;
+  top: 6vmin;
+  left: 0;
+  right: 0;
+  height: 5.5vmin;
+  z-index: 2;
+  overflow: hidden;
+  pointer-events: none;
+  background: rgb(12 15 29 / 0.78);
+  border-block: 0.12vmin solid rgb(255 255 255 / 0.18);
+  color: white;
+  font: 700 2.3vmin 'Nunito Variable', system-ui, sans-serif;
+}
+.score-ticker__track { display: flex; width: max-content; height: 100%; animation: score-scroll var(--ticker-duration, 20s) linear infinite; }
+.score-ticker__group { display: flex; align-items: center; flex: none; min-width: 100vw; list-style: none; gap: 5vmin; padding: 0 2.5vmin; }
+.score-ticker__entry { display: flex; align-items: center; gap: 1vmin; white-space: nowrap; }
+.score-ticker__rank, .score-ticker__entry strong { color: #ffd166; font-variant-numeric: tabular-nums; }
+.score-ticker__name { max-width: 30vmin; overflow: hidden; text-overflow: ellipsis; }
+.score-ticker__entry small { font-size: 0.75em; }
+.overlay:has(.score-ticker) .inc, .overlay:has(.score-ticker) .qz { padding-top: 13vmin; }
+@keyframes score-scroll { to { transform: translateX(-50%); } }
+@media (prefers-reduced-motion: reduce) {
+  .score-ticker__track { animation: none; }
 }

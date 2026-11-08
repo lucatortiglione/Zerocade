@@ -1,11 +1,14 @@
-import { giftById } from '@zerocade/shared'
+import { giftById, type Viewer } from '@zerocade/shared'
 import type { GameInstance } from './engine'
+import { fillTextWithAvatar } from './avatar'
 
 type Side = 'red' | 'blue'
 
 interface Fighter {
   side: Side
   name: string
+  // The viewer who joined this side, once one has.
+  viewer?: Viewer
   hp: number
   hit: number
 }
@@ -59,7 +62,10 @@ export function createMmaClash(): GameInstance {
         const s: Side = action === 'join-red' ? 'red' : 'blue'
         sides.set(event.user.id, s)
         const f = s === 'red' ? red : blue
-        if (f.name === 'RED' || f.name === 'BLUE') f.name = event.user.nickname
+        if (!f.viewer) {
+          f.viewer = event.user
+          f.name = event.user.nickname
+        }
         return
       }
       if (action === 'punch') {
@@ -124,7 +130,8 @@ export function createMmaClash(): GameInstance {
           ctx.fillStyle = '#f0f0f2'
           ctx.font = '22px system-ui'
           ctx.textAlign = 'center'
-          ctx.fillText(f.name, x, cy() + 96)
+          if (f.viewer) fillTextWithAvatar(ctx, f.name, x, cy() + 96, f.viewer)
+          else ctx.fillText(f.name, x, cy() + 96)
         }
 
         const bw = width * 0.3

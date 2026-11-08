@@ -15,12 +15,19 @@
     "start": "npm run build && npm run start -w @zerocade/server",
     "package:win": "node scripts/package-win.mjs",
     "typecheck": "npm run typecheck --workspaces --if-present",
+    "test:associations": "python -m unittest discover -s gioco-zeroassociations -p test_*.py && node --import tsx --test tests/word-association.test.ts",
+    "associations:audit": "python gioco-zeroassociations/audit_legacy.py",
     "sqlite:upgrade": "node scripts/upgrade-sqlite.mjs"
   },
   "devDependencies": {
     "concurrently": "^10.0.6",
     "esbuild": "0.28.2",
     "typescript": "7.0.2"
+  },
+  "overrides": {
+    "@fastify/static": {
+      "glob": "^14.0.3"
+    }
   },
   "allowScripts": {
     "better-sqlite3@13.0.3": true,

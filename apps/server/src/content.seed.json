@@ -17,7 +17,7 @@
     "VINO", "PANE", "LATTE", "MUSICA", "LIBRO", "PORTA", "TRENO", "SERA",
     "NOTTE", "VERDE", "ACQUA"
   ],
-  "word-association": [
+  "association-themes": [
     { "prompt": "COLORI", "words": ["ROSSO", "BLU", "VERDE", "GIALLO", "VIOLA", "ARANCIONE"] },
     { "prompt": "ANIMALI", "words": ["CANE", "GATTO", "CAVALLO", "LEONE", "TIGRE", "ELEFANTE"] },
     { "prompt": "SPORT", "words": ["CALCIO", "TENNIS", "NUOTO", "PALLAVOLO", "CICLISMO", "PALLA"] },
@@ -286,16 +286,6 @@
       { "clue": "Capitale d'Italia", "word": "ROMA" },
       { "clue": "Il monte più alto del mondo", "word": "EVEREST" }
     ] }
-  ],
-  "quizzland": [
-    { "q": "Quale numero segue: 2, 4, 8, 16, ...?", "options": ["24", "32", "30", "28"], "answer": 1 },
-    { "q": "Se 5 gatti prendono 5 topi in 5 minuti, quanto impiega 1 gatto a prendere 1 topo?", "options": ["1 minuto", "5 minuti", "25 minuti", "10 minuti"], "answer": 1 },
-    { "q": "Quanti mesi hanno 28 giorni?", "options": ["1", "12", "2", "6"], "answer": 1 },
-    { "q": "Quanto fa la metà di 2 + 2?", "options": ["2", "3", "4", "1"], "answer": 1 },
-    { "q": "Un padre ha 4 figlie e ogni figlia ha 1 fratello. Quanti figli ha?", "options": ["4", "5", "8", "6"], "answer": 1 },
-    { "q": "Quale parola è scritta scorrettamente in tutti i dizionari?", "options": ["Male", "Scorrettamente", "Dizionario", "Parola"], "answer": 1 },
-    { "q": "Cosa pesa di più: 1 kg di ferro o 1 kg di piume?", "options": ["Ferro", "Piume", "Pesano uguale", "Dipende"], "answer": 2 },
-    { "q": "Se superi il secondo in una gara, in che posizione sei?", "options": ["Primo", "Secondo", "Terzo", "Ultimo"], "answer": 1 }
   ]
 }
 

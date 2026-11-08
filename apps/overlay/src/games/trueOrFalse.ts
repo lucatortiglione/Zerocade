@@ -139,7 +139,7 @@ export function createTrueOrFalse(): GameInstance {
       }
 
       drawTimerBar(ctx, width, height, Math.max(0, timer / (revealed ? revealSecs : stmtSecs)), revealed ? '#3ccf7a' : '#ffc83d')
-      if (showBoard) drawLeaderboard(ctx, scores, 5)
+      if (showBoard) drawLeaderboard(ctx, scores)
     },
   }
 }

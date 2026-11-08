@@ -1,0 +1,173 @@
+category_id,cluster_id,cluster_name,category_name,example_prompts,quota_status
+001,A,Alimentazione e cucina,"Ingredienti, dispensa e prodotti di base","farina, zucchero, spezia",da_calibrare_su_pilota
+002,A,Alimentazione e cucina,"Carni, tagli, salumi e norcineria","guanciale, prosciutto, brasato",da_calibrare_su_pilota
+003,A,Alimentazione e cucina,Pesce e prodotti ittici alimentari,"baccalà, alici, mollusco",da_calibrare_su_pilota
+004,A,Alimentazione e cucina,"Latte, latticini e formaggi","cagliata, ricotta, stagionatura",da_calibrare_su_pilota
+005,A,Alimentazione e cucina,"Frutta, ortaggi e aromi culinari","basilico, carciofo, albicocca",da_calibrare_su_pilota
+006,A,Alimentazione e cucina,Tecniche di cottura e preparazione,"soffritto, rosolare, lessare",da_calibrare_su_pilota
+007,A,Alimentazione e cucina,"Utensili, pentole e attrezzatura da cucina","colino, setaccio, mestolo",da_calibrare_su_pilota
+008,A,Alimentazione e cucina,"Panificazione, farine e lievitazioni","lievito, impastare, crosta",da_calibrare_su_pilota
+009,A,Alimentazione e cucina,"Pasticceria, dolci e gelateria","meringa, glassare, sorbetto",da_calibrare_su_pilota
+010,A,Alimentazione e cucina,"Conservazione, fermentazione e trasformazioni alimentari","salamoia, sottolio, affumicare",da_calibrare_su_pilota
+011,B,"Bevande, locali e ospitalità",Viticoltura e vendemmia,"vigneto, vendemmia, grappolo",da_calibrare_su_pilota
+012,B,"Bevande, locali e ospitalità","Enologia, vini e degustazione","tannino, mosto, decantare",da_calibrare_su_pilota
+013,B,"Bevande, locali e ospitalità",Birra e birrificazione,"luppolo, malto, schiuma",da_calibrare_su_pilota
+014,B,"Bevande, locali e ospitalità","Distillati, liquori e amari","alambicco, grappa, infusione",da_calibrare_su_pilota
+015,B,"Bevande, locali e ospitalità","Cocktail, miscelazione e aperitivi","shaker, guarnizione, aperitivo",da_calibrare_su_pilota
+016,B,"Bevande, locali e ospitalità","Caffè, torrefazione ed estrazione","torrefazione, macinare, espresso",da_calibrare_su_pilota
+017,B,"Bevande, locali e ospitalità","Tè, tisane e bevande analcoliche","infuso, decotto, dissetare",da_calibrare_su_pilota
+018,B,"Bevande, locali e ospitalità",Servizio di sala e ristorazione,"cameriere, comanda, vassoio",da_calibrare_su_pilota
+019,B,"Bevande, locali e ospitalità","Bar, tavole calde e cultura del bancone","bancone, consumazione, scontrino",da_calibrare_su_pilota
+020,B,"Bevande, locali e ospitalità",Ospitalità professionale e ricevimento,"reception, accoglienza, prenotazione",da_calibrare_su_pilota
+021,C,"Casa, abitare e manutenzione",Strutture domestiche e tipologie abitative,"mansarda, soppalco, abbaino",da_calibrare_su_pilota
+022,C,"Casa, abitare e manutenzione","Edilizia, materiali e isolamento","intonaco, massetto, intercapedine",da_calibrare_su_pilota
+023,C,"Casa, abitare e manutenzione",Impianti idraulici e sanitari,"rubinetto, scarico, sifone",da_calibrare_su_pilota
+024,C,"Casa, abitare e manutenzione",Impianti elettrici e illuminazione domestica,"presa, interruttore, lampadario",da_calibrare_su_pilota
+025,C,"Casa, abitare e manutenzione","Riscaldamento, climatizzazione ed efficienza","caldaia, radiatore, termostato",da_calibrare_su_pilota
+026,C,"Casa, abitare e manutenzione","Arredamento, complementi e design interno","credenza, mensola, abatjour",da_calibrare_su_pilota
+027,C,"Casa, abitare e manutenzione",Elettrodomestici e apparecchi domestici,"frigorifero, lavatrice, aspirapolvere",da_calibrare_su_pilota
+028,C,"Casa, abitare e manutenzione","Bucato, stiro e trattamento dei tessuti","candeggina, smacchiare, strizzare",da_calibrare_su_pilota
+029,C,"Casa, abitare e manutenzione","Condominio, vicinato e locazioni","portineria, inquilino, millesimo",da_calibrare_su_pilota
+030,C,"Casa, abitare e manutenzione","Orto domestico, siepi e attrezzi da giardino","cesoia, potare, scartavetrare",da_calibrare_su_pilota
+031,D,"Geografia, territorio e ambiente","Geografia fisica, rilievi e forme del paesaggio","promontorio, altopiano, vallata",da_calibrare_su_pilota
+032,D,"Geografia, territorio e ambiente","Fiumi, laghi, sorgenti e idrografia","affluente, bacino, foce",da_calibrare_su_pilota
+033,D,"Geografia, territorio e ambiente","Mari, coste, isole e litorali","battigia, laguna, scogliera",da_calibrare_su_pilota
+034,D,"Geografia, territorio e ambiente",Geografia amministrativa e territorio italiano,"provincia, capoluogo, frazione",da_calibrare_su_pilota
+035,D,"Geografia, territorio e ambiente",Meteorologia e fenomeni atmosferici,"scirocco, grandine, nebbia",da_calibrare_su_pilota
+036,D,"Geografia, territorio e ambiente","Clima, stagioni e cicli naturali","siccità, afoso, equinozio",da_calibrare_su_pilota
+037,D,"Geografia, territorio e ambiente","Geologia, rocce e minerali","faglia, calcare, quarzo",da_calibrare_su_pilota
+038,D,"Geografia, territorio e ambiente","Vulcani, terremoti e rischi naturali","cratere, eruzione, sisma",da_calibrare_su_pilota
+039,D,"Geografia, territorio e ambiente","Ecologia, rifiuti, riciclo e bonifiche","discarica, riciclare, bonifica",da_calibrare_su_pilota
+040,D,"Geografia, territorio e ambiente","Energia, risorse e sostenibilità ambientale","turbina, rinnovabile, biomassa",da_calibrare_su_pilota
+041,E,"Piante, animali e agricoltura",Botanica e anatomia vegetale,"radice, linfa, germoglio",da_calibrare_su_pilota
+042,E,"Piante, animali e agricoltura","Alberi, boschi, foreste e legname","corteccia, quercia, tronco",da_calibrare_su_pilota
+043,E,"Piante, animali e agricoltura","Fiori, impollinazione e riproduzione vegetale","polline, pistillo, impollinare",da_calibrare_su_pilota
+044,E,"Piante, animali e agricoltura","Coltivazioni, semina e lavorazioni agricole","semina, mietere, maggese",da_calibrare_su_pilota
+045,E,"Piante, animali e agricoltura","Zootecnia, stalle e allevamento animale","stalla, pascolo, mungere",da_calibrare_su_pilota
+046,E,"Piante, animali e agricoltura",Animali domestici e cura degli animali,"guinzaglio, cuccia, veterinario",da_calibrare_su_pilota
+047,E,"Piante, animali e agricoltura",Fauna selvatica terrestre,"volpe, cinghiale, cervo",da_calibrare_su_pilota
+048,E,"Piante, animali e agricoltura","Fauna acquatica, anfibi e ambienti umidi","lontra, rana, medusa",da_calibrare_su_pilota
+049,E,"Piante, animali e agricoltura","Insetti, ragni e piccoli invertebrati","formica, ragnatela, coleottero",da_calibrare_su_pilota
+050,E,"Piante, animali e agricoltura","Etologia, migrazioni e adattamenti","letargo, mimetismo, migrare",da_calibrare_su_pilota
+051,F,"Corpo, medicina e benessere",Anatomia ossea e muscolare,"tendine, vertebra, cartilagine",da_calibrare_su_pilota
+052,F,"Corpo, medicina e benessere","Organi, apparati e sistemi corporei","polmone, fegato, arteria",da_calibrare_su_pilota
+053,F,"Corpo, medicina e benessere","Fisiologia, sensi e riflessi","pupilla, deglutire, starnuto",da_calibrare_su_pilota
+054,F,"Corpo, medicina e benessere","Sintomi, patologie comuni e disturbi","vertigine, febbre, emicrania",da_calibrare_su_pilota
+055,F,"Corpo, medicina e benessere","Diagnostica, analisi ed esami medici","radiografia, tampone, referto",da_calibrare_su_pilota
+056,F,"Corpo, medicina e benessere","Farmaci, terapie e farmacologia quotidiana","collirio, pomata, placebo",da_calibrare_su_pilota
+057,F,"Corpo, medicina e benessere",Igiene personale e prevenzione,"disinfettare, lavarsi, igienico",da_calibrare_su_pilota
+058,F,"Corpo, medicina e benessere","Nutrizione, metabolismo e alimentazione","digestione, sazietà, nutriente",da_calibrare_su_pilota
+059,F,"Corpo, medicina e benessere","Sonno, riposo e recupero","insonnia, russare, sonnolenza",da_calibrare_su_pilota
+060,F,"Corpo, medicina e benessere","Assistenza, riabilitazione e convalescenza","fisioterapia, cicatrice, deambulare",da_calibrare_su_pilota
+061,G,"Psicologia, comportamento e relazioni",Emozioni e stati d'animo,"nostalgia, rimorso, malinconia",da_calibrare_su_pilota
+062,G,"Psicologia, comportamento e relazioni","Memoria, attenzione e apprendimento mentale","ricordare, dimenticare, distrazione",da_calibrare_su_pilota
+063,G,"Psicologia, comportamento e relazioni","Personalità, carattere e temperamento","ostinato, timido, carisma",da_calibrare_su_pilota
+064,G,"Psicologia, comportamento e relazioni","Percezione, giudizio e decisioni","intuizione, pregiudizio, esitazione",da_calibrare_su_pilota
+065,G,"Psicologia, comportamento e relazioni","Etica quotidiana, valori e virtù","lealtà, onestà, coraggio",da_calibrare_su_pilota
+066,G,"Psicologia, comportamento e relazioni","Vizi, atteggiamenti e difetti caratteriali","ipocrisia, invidia, rancore",da_calibrare_su_pilota
+067,G,"Psicologia, comportamento e relazioni",Comunicazione interpersonale e linguaggio del corpo,"gesticolare, sguardo, ascolto",da_calibrare_su_pilota
+068,G,"Psicologia, comportamento e relazioni","Amicizia, socialità e rapporti fra pari","complicità, fiducia, solidarietà",da_calibrare_su_pilota
+069,G,"Psicologia, comportamento e relazioni","Amore, corteggiamento e vita di coppia","corteggiamento, gelosia, intesa",da_calibrare_su_pilota
+070,G,"Psicologia, comportamento e relazioni","Famiglia, parentele e fasi della vita","parentela, nonno, accudire",da_calibrare_su_pilota
+071,H,"Lavoro, commercio ed economia","Mestieri artigiani, botteghe e officine","incudine, tornio, forgiare",da_calibrare_su_pilota
+072,H,"Lavoro, commercio ed economia","Industria manifatturiera, fabbriche e produzione","catena, assemblare, collaudo",da_calibrare_su_pilota
+073,H,"Lavoro, commercio ed economia","Ufficio, organizzazione aziendale e gestione","delegare, riunione, scadenza",da_calibrare_su_pilota
+074,H,"Lavoro, commercio ed economia","Carriera, contratti, sindacati e occupazione","tirocinio, sciopero, licenziare",da_calibrare_su_pilota
+075,H,"Lavoro, commercio ed economia","Commercio, negozi, vendita e clienti","saldo, vetrina, commerciante",da_calibrare_su_pilota
+076,H,"Lavoro, commercio ed economia","Banche, credito, mutui e risparmio","ipoteca, mutuo, interessi",da_calibrare_su_pilota
+077,H,"Lavoro, commercio ed economia","Assicurazioni, previdenza e pensioni","polizza, indennizzo, pensione",da_calibrare_su_pilota
+078,H,"Lavoro, commercio ed economia","Fisco, imposte, contabilità e bilanci","imposta, fattura, conguaglio",da_calibrare_su_pilota
+079,H,"Lavoro, commercio ed economia","Economia, mercati, prezzi e inflazione","rincaro, inflazione, domanda",da_calibrare_su_pilota
+080,H,"Lavoro, commercio ed economia","Burocrazia, anagrafe e servizi pubblici","certificato, protocollo, delega",da_calibrare_su_pilota
+081,I,"Diritto, istituzioni e storia","Diritto civile, proprietà e contratti","caparra, eredità, usufrutto",da_calibrare_su_pilota
+082,I,"Diritto, istituzioni e storia","Diritto penale, reati e indagini","alibi, movente, sequestro",da_calibrare_su_pilota
+083,I,"Diritto, istituzioni e storia","Giustizia, tribunali e procedure","imputato, udienza, testimonianza",da_calibrare_su_pilota
+084,I,"Diritto, istituzioni e storia","Diritti, doveri e cittadinanza","cittadino, cittadinanza, tutela",da_calibrare_su_pilota
+085,I,"Diritto, istituzioni e storia","Elezioni, costituzione e istituzioni nazionali","referendum, parlamento, elettore",da_calibrare_su_pilota
+086,I,"Diritto, istituzioni e storia","Diplomazia, confini e cooperazione internazionale","ambasciata, trattato, frontiera",da_calibrare_su_pilota
+087,I,"Diritto, istituzioni e storia","Civiltà antiche, imperi e storia politica","dinastia, impero, conquista",da_calibrare_su_pilota
+088,I,"Diritto, istituzioni e storia","Medioevo, feudi e società medievale","feudo, castello, vassallo",da_calibrare_su_pilota
+089,I,"Diritto, istituzioni e storia","Età moderna, esplorazioni e rivoluzioni","navigatore, rivolta, monarchia",da_calibrare_su_pilota
+090,I,"Diritto, istituzioni e storia",Storia contemporanea e trasformazioni sociali,"armistizio, emigrazione, ricostruzione",da_calibrare_su_pilota
+091,J,"Istruzione, lingua e tradizioni","Scuola, insegnamento e didattica","cattedra, verifica, bocciatura",da_calibrare_su_pilota
+092,J,"Istruzione, lingua e tradizioni","Università, esami e titoli di studio","matricola, laurea, fuoricorso",da_calibrare_su_pilota
+093,J,"Istruzione, lingua e tradizioni","Biblioteche, studio e ricerca documentale","archivio, catalogo, consultare",da_calibrare_su_pilota
+094,J,"Istruzione, lingua e tradizioni","Grammatica, ortografia e punteggiatura","sintassi, virgola, congiuntivo",da_calibrare_su_pilota
+095,J,"Istruzione, lingua e tradizioni","Retorica, stile e figure linguistiche","metafora, ironia, iperbole",da_calibrare_su_pilota
+096,J,"Istruzione, lingua e tradizioni","Lessico, etimologia e variazione linguistica","sinonimo, dialetto, neologismo",da_calibrare_su_pilota
+097,J,"Istruzione, lingua e tradizioni","Proverbi, modi di dire e linguaggio figurato","proverbio, allusione, malinteso",da_calibrare_su_pilota
+098,J,"Istruzione, lingua e tradizioni","Feste civili, calendario e ricorrenze","ferragosto, carnevale, anniversario",da_calibrare_su_pilota
+099,J,"Istruzione, lingua e tradizioni","Storia delle religioni, culto e riti","pellegrinaggio, eremo, processione",da_calibrare_su_pilota
+100,J,"Istruzione, lingua e tradizioni","Mitologia, fiabe e leggende popolari","oracolo, leggenda, sortilegio",da_calibrare_su_pilota
+101,K,"Musica, spettacoli e informazione","Teoria musicale, ritmo e armonia","melodia, battuta, accordo",da_calibrare_su_pilota
+102,K,"Musica, spettacoli e informazione",Strumenti musicali e orchestre,"violino, timpano, spartito",da_calibrare_su_pilota
+103,K,"Musica, spettacoli e informazione","Canto, vocalità e opera lirica","falsetto, soprano, intonare",da_calibrare_su_pilota
+104,K,"Musica, spettacoli e informazione","Teatro, recitazione e palcoscenico","sipario, copione, suggeritore",da_calibrare_su_pilota
+105,K,"Musica, spettacoli e informazione","Danza, balletto e coreografia","passo, coreografia, piroetta",da_calibrare_su_pilota
+106,K,"Musica, spettacoli e informazione","Cinema, regia e montaggio","sceneggiatura, doppiaggio, inquadratura",da_calibrare_su_pilota
+107,K,"Musica, spettacoli e informazione","Televisione, programmi e format","palinsesto, telecomando, puntata",da_calibrare_su_pilota
+108,K,"Musica, spettacoli e informazione","Radio, podcast e comunicazione audio","frequenza, microfono, radiocronaca",da_calibrare_su_pilota
+109,K,"Musica, spettacoli e informazione","Giornalismo, cronaca e informazione","redazione, notizia, esclusiva",da_calibrare_su_pilota
+110,K,"Musica, spettacoli e informazione","Letteratura, narrativa e generi letterari","epilogo, romanzo, narratore",da_calibrare_su_pilota
+111,L,"Arti visive, design e moda","Pittura, disegno e tecniche pittoriche","affresco, pennello, chiaroscuro",da_calibrare_su_pilota
+112,L,"Arti visive, design e moda","Scultura, ceramica e lavorazione artistica","bassorilievo, argilla, scolpire",da_calibrare_su_pilota
+113,L,"Arti visive, design e moda",Architettura monumentale e storia dell'arte,"facciata, capitello, colonna",da_calibrare_su_pilota
+114,L,"Arti visive, design e moda","Fotografia tecnica, ottiche ed esposizione","diaframma, controluce, obiettivo",da_calibrare_su_pilota
+115,L,"Arti visive, design e moda","Musei, restauro e conservazione","patina, restaurare, reperto",da_calibrare_su_pilota
+116,L,"Arti visive, design e moda","Grafica, tipografia e comunicazione visiva","carattere, impaginare, manifesto",da_calibrare_su_pilota
+117,L,"Arti visive, design e moda","Moda, abbigliamento e tendenze","passerella, cappotto, elegante",da_calibrare_su_pilota
+118,L,"Arti visive, design e moda","Sartoria, tessuti e lavorazioni","imbastitura, velluto, cucire",da_calibrare_su_pilota
+119,L,"Arti visive, design e moda","Calzature, borse e accessori","suola, fibbia, tracolla",da_calibrare_su_pilota
+120,L,"Arti visive, design e moda","Gioielleria, oreficeria e gemme","carato, filigrana, diamante",da_calibrare_su_pilota
+121,M,"Mobilità, trasporti e turismo","Automobili, motori e meccanica di guida","frizione, marmitta, sterzare",da_calibrare_su_pilota
+122,M,"Mobilità, trasporti e turismo","Moto, biciclette e micromobilità","pedale, manubrio, monopattino",da_calibrare_su_pilota
+123,M,"Mobilità, trasporti e turismo","Strade, segnaletica e regole di circolazione","carreggiata, casello, precedenza",da_calibrare_su_pilota
+124,M,"Mobilità, trasporti e turismo","Autobus, metropolitane e mobilità urbana","fermata, convalida, capolinea",da_calibrare_su_pilota
+125,M,"Mobilità, trasporti e turismo","Ferrovie, treni e stazioni","binario, convoglio, deragliare",da_calibrare_su_pilota
+126,M,"Mobilità, trasporti e turismo","Logistica, spedizioni e trasporto merci","magazzino, consegna, imballaggio",da_calibrare_su_pilota
+127,M,"Mobilità, trasporti e turismo","Nautica, navigazione e vita portuale","zavorra, chiglia, ormeggio",da_calibrare_su_pilota
+128,M,"Mobilità, trasporti e turismo","Aviazione, aeromobili e aeroporti","fusoliera, decollo, scalo",da_calibrare_su_pilota
+129,M,"Mobilità, trasporti e turismo","Turismo, itinerari e visita dei luoghi","escursione, turista, itinerario",da_calibrare_su_pilota
+130,M,"Mobilità, trasporti e turismo","Viaggi, alloggi e vacanze dal lato del viaggiatore","valigia, ostello, pernottamento",da_calibrare_su_pilota
+131,N,Sport e competizioni,"Calcio, tattica e regolamenti","fuorigioco, rigore, portiere",da_calibrare_su_pilota
+132,N,Sport e competizioni,"Pallavolo, pallacanestro e sport collettivi","schiacciata, canestro, palleggiare",da_calibrare_su_pilota
+133,N,Sport e competizioni,"Atletica leggera, gare e corsa","staffetta, ostacolo, traguardo",da_calibrare_su_pilota
+134,N,Sport e competizioni,Ginnastica sportiva e tecnica di allenamento,"flessione, addominale, allenarsi",da_calibrare_su_pilota
+135,N,Sport e competizioni,Ciclismo sportivo e competizioni su strada,"gregario, volata, tappa",da_calibrare_su_pilota
+136,N,Sport e competizioni,"Tennis, badminton e sport di racchetta","rovescio, servizio, racchetta",da_calibrare_su_pilota
+137,N,Sport e competizioni,"Nuoto, pallanuoto e sport acquatici","virata, nuotare, corsia",da_calibrare_su_pilota
+138,N,Sport e competizioni,"Sci, sport invernali e competizioni sulla neve","slalom, pista, discesa",da_calibrare_su_pilota
+139,N,Sport e competizioni,"Scherma, arti marziali e sport da combattimento","stoccata, fioretto, schivare",da_calibrare_su_pilota
+140,N,Sport e competizioni,"Automobilismo, motociclismo e competizioni motoristiche","sorpasso, circuito, podio",da_calibrare_su_pilota
+141,O,"Giochi, hobby e vita ricreativa",Scacchi e giochi strategici astratti,"arrocco, scacco, pedone",da_calibrare_su_pilota
+142,O,"Giochi, hobby e vita ricreativa","Carte tradizionali, prese e combinazioni","briscola, mazzo, scartare",da_calibrare_su_pilota
+143,O,"Giochi, hobby e vita ricreativa","Giochi da tavolo, dadi e società","pedina, tabellone, dado",da_calibrare_su_pilota
+144,O,"Giochi, hobby e vita ricreativa","Cruciverba, enigmistica e indovinelli","rebus, anagramma, definizione",da_calibrare_su_pilota
+145,O,"Giochi, hobby e vita ricreativa","Logica ricreativa, rompicapi e problemi","deduzione, paradosso, enigma",da_calibrare_su_pilota
+146,O,"Giochi, hobby e vita ricreativa","E-sport, streaming e competizioni videoludiche","joystick, avatar, livello",da_calibrare_su_pilota
+147,O,"Giochi, hobby e vita ricreativa","Collezionismo, modellismo e hobby creativi","francobollo, miniatura, raccolta",da_calibrare_su_pilota
+148,O,"Giochi, hobby e vita ricreativa","Campeggio, escursionismo e outdoor","tenda, sentiero, bivacco",da_calibrare_su_pilota
+149,O,"Giochi, hobby e vita ricreativa","Circo, illusionismo e spettacoli di abilità","prestigiatore, giocoliere, trapezio",da_calibrare_su_pilota
+150,O,"Giochi, hobby e vita ricreativa","Feste private, eventi e intrattenimento","invito, brindisi, festeggiare",da_calibrare_su_pilota
+151,P,"Scienze, matematica e digitale","Matematica, calcolo e geometria","frazione, teorema, triangolo",da_calibrare_su_pilota
+152,P,"Scienze, matematica e digitale","Fisica, meccanica e forze","inerzia, attrito, accelerazione",da_calibrare_su_pilota
+153,P,"Scienze, matematica e digitale","Chimica, elementi e trasformazioni","reagente, miscela, molecola",da_calibrare_su_pilota
+154,P,"Scienze, matematica e digitale","Astronomia, cielo e corpi celesti","eclissi, orbita, costellazione",da_calibrare_su_pilota
+155,P,"Scienze, matematica e digitale","Astronautica, satelliti ed esplorazione spaziale","razzo, astronauta, satellite",da_calibrare_su_pilota
+156,P,"Scienze, matematica e digitale","Software, sistemi operativi e programmazione","algoritmo, applicazione, programma",da_calibrare_su_pilota
+157,P,"Scienze, matematica e digitale","Web, protocolli e servizi internet","browser, router, connessione",da_calibrare_su_pilota
+158,P,"Scienze, matematica e digitale",Sicurezza informatica tecnica e protezione dati,"password, cifratura, autenticare",da_calibrare_su_pilota
+159,P,"Scienze, matematica e digitale","Elettronica, sensori e automazione","circuito, sensore, microchip",da_calibrare_su_pilota
+160,P,"Scienze, matematica e digitale","Intelligenza artificiale, modelli e dati","neurale, apprendimento, classificare",da_calibrare_su_pilota
+161,C,"Casa, abitare e manutenzione",Giardinaggio e piante da interno,"ficus, rinvasare, terriccio",da_calibrare_su_pilota
+162,C,"Casa, abitare e manutenzione",Bricolage e fai-da-te,"trapano, tassello, avvitare",da_calibrare_su_pilota
+163,C,"Casa, abitare e manutenzione",Pulizia e organizzazione domestica,"spolverare, riordinare, scaffale",da_calibrare_su_pilota
+164,E,"Piante, animali e agricoltura","Agricoltura, allevamento e pesca","filiera, pescatore, raccolto",da_calibrare_su_pilota
+165,L,"Arti visive, design e moda","Fotografia, fumetto e illustrazione","vignetta, storyboard, illustrare",da_calibrare_su_pilota
+166,I,"Diritto, istituzioni e storia",Archeologia,"scavo, reperto, restauro",da_calibrare_su_pilota
+167,I,"Diritto, istituzioni e storia",Filosofia,"dubbio, ragionare, paradosso",da_calibrare_su_pilota
+168,I,"Diritto, istituzioni e storia","Sociologia, antropologia e politica","comunità, consenso, consuetudine",da_calibrare_su_pilota
+169,P,"Scienze, matematica e digitale",Informatica e tecnologia digitale,"interfaccia, dispositivo, touchscreen",da_calibrare_su_pilota
+170,P,"Scienze, matematica e digitale","Internet, social e cybersecurity","profilo, condivisione, phishing",da_calibrare_su_pilota
+171,F,"Corpo, medicina e benessere","Benessere, fitness e stile di vita","abitudine, postura, allenarsi",da_calibrare_su_pilota
+172,O,"Giochi, hobby e vita ricreativa",Videogiochi,"videogioco, avatar, salvataggio",da_calibrare_su_pilota

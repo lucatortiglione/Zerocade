@@ -1,0 +1,561 @@
+/* Quizzland: a candy-bright quiz under a violet night sky. Sized in vmin/vh like Bivio and
+   Incastro; portrait first (1080 × 1920), landscape at the end. A, B, C and D keep one colour
+   each (--c on the answer, set inline); the right answer glows mint. */
+.qz {
+  --qz-ink: #1d1340;
+  --qz-glass: rgb(30 18 80 / 0.72);
+  --qz-glass-deep: rgb(18 11 52 / 0.84);
+  --qz-line: rgb(255 255 255 / 0.15);
+  --qz-right: #34e3a4;
+  --qz-gold: #ffd166;
+  --qz-display: 'Fredoka Variable', 'Nunito Variable', system-ui, sans-serif;
+  --qz-text: 'Nunito Variable', system-ui, sans-serif;
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1.6vh;
+  /* The top clears the app's top bar, the bottom the trigger chips of the play guide. */
+  padding: 7vmin 4.5vw 8vh;
+  overflow: hidden;
+  color: #ffffff;
+  font-family: var(--qz-text);
+}
+body.quizzland-see-through { background: transparent; }
+/* The gift alert sits over the top bar for its few seconds, not over the question. */
+body.quizzland-on .widget-alert { top: 0.8vmin; z-index: 4; padding: 1.2vmin 3vmin; font-size: 2.8vmin; }
+/* The app's top bar and play guide, scaled with the scene and dressed like it. */
+body.quizzland-on .overlay__top { padding: 1.4vmin 2.4vmin; gap: 1vmin; background: none; }
+body.quizzland-on .overlay__brand { font-size: 2.6vmin; }
+body.quizzland-on .overlay__title { font: 600 2.4vmin 'Fredoka Variable', system-ui, sans-serif; text-shadow: 0 0.2vmin 0.8vmin rgb(0 0 0 / 0.5); }
+body.quizzland-on .dot { width: 1.2vmin; height: 1.2vmin; }
+body.quizzland-on .overlay__guide {
+  gap: 1vmin;
+  padding: 1.6vmin 2vmin 2.2vmin;
+  background: linear-gradient(transparent, rgb(10 6 30 / 0.5));
+  font-family: 'Nunito Variable', system-ui, sans-serif;
+}
+body.quizzland-on .guide-chip {
+  gap: 0.8vmin;
+  padding: 0.7vmin 1.8vmin;
+  border: 0.15vmin solid rgb(255 255 255 / 0.18);
+  background: rgb(30 18 80 / 0.7);
+  backdrop-filter: blur(0.8vmin);
+  font-size: 2vmin;
+  font-weight: 700;
+}
+body.quizzland-on .guide-chip__label { color: rgb(255 255 255 / 0.75); }
+body.quizzland-on .guide-chip__arrow { color: rgb(255 255 255 / 0.45); }
+
+.qz-icon { display: inline-block; flex: none; width: 1em; height: 1em; fill: currentColor; }
+.qz-icon__line { fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+
+.qz-avatar {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  flex: none;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  overflow: hidden;
+  background: var(--tint, #5b4b9a);
+  color: #ffffff;
+  font-weight: 800;
+  line-height: 1;
+}
+.qz-avatar img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+
+/* Text that shrinks to fit its box (Quizzland.tsx, Fit): words are never broken. */
+.qz-fit { display: flex; align-items: center; justify-content: center; min-width: 0; min-height: 0; overflow: hidden; }
+.qz-fit__text { display: block; max-width: 100%; overflow-wrap: normal; word-break: normal; }
+
+/* --- Backdrop --- */
+.qz__backdrop, .qz__sky, .qz__aurora, .qz__photo, .qz__glyphs, .qz__veil { position: absolute; inset: 0; }
+.qz__backdrop { z-index: 0; overflow: hidden; pointer-events: none; }
+.qz__sky, .qz__photo { background-size: cover; background-position: center; }
+/* The sky's glows breathe slowly. */
+.qz__aurora {
+  background:
+    radial-gradient(60% 40% at 20% 15%, rgb(255 79 216 / 0.22), transparent 70%),
+    radial-gradient(55% 45% at 85% 48%, rgb(41 211 255 / 0.18), transparent 70%);
+  mix-blend-mode: screen;
+  animation: qz-aurora 18s ease-in-out infinite alternate;
+}
+.qz__veil { background: radial-gradient(120% 80% at 50% 45%, transparent 55%, rgb(8 5 28 / 0.45)); }
+.qz__veil--photo { background: linear-gradient(rgb(8 5 28 / 0.55), rgb(8 5 28 / 0.32) 28%, rgb(8 5 28 / 0.32) 70%, rgb(8 5 28 / 0.62)); }
+.qz-glyph {
+  position: absolute;
+  bottom: -12vmin;
+  left: var(--x);
+  width: var(--s);
+  height: var(--s);
+  fill: #ffffff;
+  stroke: #ffffff;
+  opacity: var(--o);
+  animation: qz-drift var(--t) linear var(--d) infinite;
+}
+.qz-glyph--spark { fill: #ffd6f6; }
+.qz-glyph--ring { stroke: #9fe8ff; }
+
+/* --- Head: category, question number, difficulty --- */
+.qz__head { z-index: 1; display: flex; align-items: center; gap: 1.6vmin; }
+.qz-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 1vmin;
+  padding: 0.8vmin 2.4vmin 0.8vmin 1.4vmin;
+  border-radius: 999px;
+  font: 600 2.8vmin var(--qz-display);
+  text-shadow: 0 0.2vmin 0.6vmin rgb(0 0 0 / 0.3);
+  box-shadow: 0 0.6vmin 2vmin rgb(0 0 0 / 0.35), inset 0 0.25vmin 0 rgb(255 255 255 / 0.35);
+  animation: qz-pop 0.4s ease-out backwards;
+}
+.qz-chip .qz-icon { width: 3.4vmin; height: 3.4vmin; }
+.qz__number, .qz-level {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.7vmin 2vmin;
+  border: 0.15vmin solid var(--qz-line);
+  border-radius: 999px;
+  background: var(--qz-glass);
+  backdrop-filter: blur(0.8vmin);
+}
+.qz__number { margin-left: auto; gap: 0.8vmin; font: 500 2.6vmin var(--qz-display); }
+.qz__number strong { font-weight: 700; }
+.qz-level { gap: 0.6vmin; font-size: 2.2vmin; font-weight: 800; }
+.qz-level__pip { width: 1.3vmin; height: 1.3vmin; border-radius: 50%; background: rgb(255 255 255 / 0.22); }
+.qz-level__pip--on { background: var(--qz-gold); box-shadow: 0 0 1vmin rgb(255 209 102 / 0.7); }
+.qz-level__label { margin-left: 0.4vmin; }
+
+/* --- Stage: the question card and the answers --- */
+.qz__stage { z-index: 1; flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 2vh; padding-top: 5vmin; }
+.qz-card {
+  position: relative;
+  flex: 1 1 0;
+  min-height: 16vh;
+  max-height: 34vh;
+  display: flex;
+  flex-direction: column;
+  gap: 1.2vh;
+  padding: 8.5vmin 5vmin 3.6vmin;
+  border-radius: 4vmin;
+  background: linear-gradient(165deg, #ffffff 30%, #efe8ff);
+  color: var(--qz-ink);
+  box-shadow: 0 2vmin 6vmin rgb(5 2 25 / 0.55), inset 0 -0.8vmin 0 rgb(91 64 196 / 0.14);
+  animation: qz-card-in 0.55s cubic-bezier(0.2, 0.9, 0.25, 1.2) backwards;
+}
+.qz-card__text { flex: 1; text-align: center; font: 600 5.8vmin/1.22 var(--qz-display); letter-spacing: -0.01em; }
+.qz-card__text--long { font-size: 5vmin; }
+
+/* The timer hangs on the card's top edge like a medal; at the reveal the right letter takes
+   its place. */
+.qz-timer, .qz-card__answer {
+  position: absolute;
+  top: -6.5vmin;
+  left: calc(50% - 6.5vmin);
+  display: grid;
+  place-items: center;
+  width: 13vmin;
+  height: 13vmin;
+  border-radius: 50%;
+  box-shadow: 0 0 0 1vmin #ffffff, 0 1.2vmin 4vmin rgb(0 0 0 / 0.45);
+}
+.qz-timer { --ring: var(--qz-right); background: var(--qz-ink); }
+.qz-timer svg { position: absolute; inset: 0.9vmin; width: calc(100% - 1.8vmin); height: calc(100% - 1.8vmin); transform: rotate(-90deg); }
+.qz-timer__track, .qz-timer__fill { fill: none; stroke-width: 3.4; }
+.qz-timer__track { stroke: rgb(255 255 255 / 0.14); }
+.qz-timer__fill { stroke: var(--ring); stroke-linecap: round; stroke-dasharray: 1; transition: stroke-dashoffset 0.1s linear, stroke 0.3s; }
+.qz-timer--warn { --ring: #ffc23d; }
+.qz-timer--hurry { --ring: #ff5d73; }
+.qz-timer--paused { opacity: 0.75; }
+.qz-timer__secs { position: relative; color: #ffffff; font: 700 5.2vmin var(--qz-display); font-variant-numeric: tabular-nums; }
+.qz-timer--hurry .qz-timer__secs { color: #ffd2d9; animation: qz-beat 0.5s ease-out; }
+.qz-card__answer {
+  background: var(--c);
+  background-image: linear-gradient(rgb(255 255 255 / 0.4), transparent 60%);
+  color: var(--qz-ink);
+  font: 700 6.4vmin var(--qz-display);
+  box-shadow: 0 0 0 1vmin #ffffff, 0 0 0 1.6vmin var(--qz-right), 0 0 6vmin rgb(52 227 164 / 0.6);
+  animation: qz-stamp 0.6s cubic-bezier(0.2, 1.4, 0.4, 1) backwards;
+}
+.qz-card__answer .qz-icon {
+  position: absolute;
+  right: -1.2vmin;
+  bottom: -1vmin;
+  width: 5.2vmin;
+  height: 5.2vmin;
+  padding: 0.9vmin;
+  border-radius: 50%;
+  background: var(--qz-right);
+  color: #07382a;
+  box-shadow: 0 0 0 0.6vmin #ffffff;
+}
+.qz-card__fifty {
+  align-self: center;
+  display: inline-flex;
+  align-items: center;
+  gap: 1vmin;
+  max-width: 100%;
+  padding: 0.6vmin 2.2vmin 0.6vmin 0.6vmin;
+  border-radius: 999px;
+  background: var(--qz-ink);
+  color: #ffffff;
+  font-size: 2.4vmin;
+  font-weight: 700;
+  white-space: nowrap;
+  animation: qz-pop 0.4s cubic-bezier(0.2, 1.4, 0.4, 1) backwards;
+}
+.qz-card__fifty-tag { padding: 0.3vmin 1.3vmin; border-radius: 999px; background: linear-gradient(135deg, #ff5d73, #ffc23d); color: var(--qz-ink); font: 700 2.2vmin var(--qz-display); }
+.qz-card__fifty-avatar { width: 3.6vmin; font-size: 1.6vmin; }
+.qz-card__fifty-name { overflow: hidden; text-overflow: ellipsis; color: var(--qz-gold); }
+
+/* The answers: a coloured gem with the letter, the text, and from the reveal (or with live
+   counts) the share of the chat behind them. */
+.qz-options { list-style: none; display: flex; flex-direction: column; gap: 1.3vh; }
+.qz-opt {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 2.4vmin;
+  height: 8.6vh;
+  padding: 0 3vmin 0 1.2vh;
+  border: 0.35vmin solid var(--c-line);
+  border-radius: 3vmin;
+  overflow: hidden;
+  background: var(--qz-glass-deep);
+  box-shadow: 0 1vmin 3vmin rgb(4 2 20 / 0.4), inset 0 0.25vmin 0 rgb(255 255 255 / 0.08);
+  backdrop-filter: blur(1vmin);
+  animation: qz-opt-in 0.5s cubic-bezier(0.2, 0.9, 0.3, 1.15) var(--d) backwards;
+  transition: height 0.45s cubic-bezier(0.2, 0.8, 0.2, 1), flex-grow 0.45s, opacity 0.4s, transform 0.4s, filter 0.4s, border-color 0.3s;
+}
+.qz-opt__fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: var(--share);
+  background: linear-gradient(90deg, var(--c-soft), var(--c-soft) calc(100% - 0.6vmin), var(--c-line));
+  transition: width 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) 0.2s;
+}
+.qz-opt__gem {
+  position: relative;
+  flex: none;
+  display: grid;
+  place-items: center;
+  height: 76%;
+  aspect-ratio: 1;
+  border-radius: 2.2vmin;
+  background: var(--c);
+  background-image: linear-gradient(rgb(255 255 255 / 0.4), transparent 60%);
+  color: var(--qz-ink);
+  font: 700 4.4vmin var(--qz-display);
+  box-shadow: inset 0 -0.6vmin 0 rgb(0 0 0 / 0.18), 0 0.6vmin 1.6vmin rgb(0 0 0 / 0.3);
+  transition: font-size 0.45s;
+}
+.qz-opt__text { position: relative; flex: 1; align-self: stretch; justify-content: flex-start; font: 800 4.2vmin/1.15 var(--qz-text); text-align: left; text-shadow: 0 0.2vmin 0.8vmin rgb(0 0 0 / 0.35); }
+.qz-opt__share { position: relative; flex: none; font: 700 4vmin var(--qz-display); font-variant-numeric: tabular-nums; animation: qz-pop 0.4s 0.3s backwards; }
+.qz-opt__share small { font-size: 0.6em; opacity: 0.8; }
+.qz-opt__check {
+  position: relative;
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 5.4vmin;
+  height: 5.4vmin;
+  border-radius: 50%;
+  background: var(--qz-right);
+  color: #07382a;
+  animation: qz-pop 0.5s cubic-bezier(0.2, 1.5, 0.4, 1) 0.15s backwards;
+}
+.qz-opt__check .qz-icon { width: 3.6vmin; height: 3.6vmin; }
+.qz-opt--right {
+  border-color: var(--qz-right);
+  transform: scale(1.025);
+  animation: qz-glow 1.4s ease-in-out 0.3s infinite alternate;
+}
+/* Wrong answers, and those taken out by the 50:50, step back and get shorter. */
+.qz-opt--wrong, .qz-opt--cut { height: 6.4vh; opacity: 0.4; filter: saturate(0.35); transform: scale(0.97); }
+.qz-opt--wrong .qz-opt__gem, .qz-opt--cut .qz-opt__gem { font-size: 3.4vmin; }
+.qz-opt--cut:not(.qz-opt--wrong) { opacity: 0.32; filter: grayscale(1); }
+.qz-opt--cut .qz-fit__text { text-decoration: line-through 0.45vmin rgb(255 255 255 / 0.8); }
+
+/* --- Foot: who has answered, then the result; the top three --- */
+.qz__foot { z-index: 1; display: flex; flex-direction: column; align-items: center; gap: 1.4vh; }
+.qz-answered { display: flex; flex-direction: column; align-items: center; gap: 1vh; }
+.qz-answered__hint {
+  display: inline-flex;
+  align-items: center;
+  gap: 1.2vmin;
+  padding: 1vmin 2.8vmin;
+  border: 0.15vmin solid var(--qz-line);
+  border-radius: 999px;
+  background: var(--qz-glass);
+  backdrop-filter: blur(0.8vmin);
+  font: 600 3.2vmin var(--qz-display);
+}
+.qz-answered__hint .qz-icon { width: 3.6vmin; height: 3.6vmin; color: #7fe0ff; }
+.qz-answered__row { display: flex; align-items: center; gap: 2vmin; min-height: 6vmin; }
+.qz-answered__crowd { display: flex; }
+.qz-answered__avatar {
+  width: 5.6vmin;
+  margin-left: -1.6vmin;
+  font-size: 2.4vmin;
+  box-shadow: 0 0 0 0.35vmin #ffffff;
+  animation: qz-pop 0.45s cubic-bezier(0.2, 1.5, 0.4, 1) backwards;
+}
+.qz-answered__avatar:first-child { margin-left: 0; }
+.qz-answered__count { display: inline-block; font: 600 2.8vmin var(--qz-display); text-shadow: 0 0.2vmin 0.8vmin rgb(0 0 0 / 0.45); }
+.qz-answered__count--bump { animation: qz-bump 0.3s ease-out; }
+
+.qz-result { display: flex; flex-direction: column; align-items: center; gap: 1vh; width: 100%; }
+.qz-result__line {
+  padding: 0.8vmin 2.8vmin;
+  border: 0.2vmin solid rgb(52 227 164 / 0.55);
+  border-radius: 999px;
+  background: rgb(18 80 62 / 0.75);
+  font: 600 3vmin var(--qz-display);
+  animation: qz-rise 0.4s backwards;
+}
+.qz-result__line--none { border-color: rgb(255 93 115 / 0.5); background: rgb(90 20 44 / 0.75); }
+.qz-why {
+  display: flex;
+  align-items: flex-start;
+  gap: 1.4vmin;
+  max-width: 100%;
+  padding: 1.6vmin 2.6vmin;
+  border-radius: 2.6vmin;
+  background: #f4efff;
+  color: #34246e;
+  font-size: 2.9vmin;
+  font-weight: 700;
+  line-height: 1.3;
+  box-shadow: 0 1vmin 3vmin rgb(4 2 20 / 0.35);
+  animation: qz-rise 0.45s 0.2s backwards;
+}
+.qz-why .qz-icon { width: 3.8vmin; height: 3.8vmin; margin-top: -0.2vmin; color: #f5a524; }
+.qz-podium { list-style: none; display: flex; justify-content: center; gap: 1.6vmin; max-width: 100%; }
+.qz-podium__spot {
+  display: flex;
+  align-items: center;
+  gap: 1.4vmin;
+  min-width: 0;
+  padding: 1vmin 2vmin 1vmin 1vmin;
+  border: 0.2vmin solid var(--qz-line);
+  border-radius: 999px;
+  background: var(--qz-glass);
+  backdrop-filter: blur(0.8vmin);
+  animation: qz-rise 0.45s cubic-bezier(0.2, 1.3, 0.4, 1) var(--d) backwards;
+}
+.qz-podium__pic { position: relative; flex: none; display: grid; }
+.qz-podium__avatar { width: 7vmin; font-size: 3vmin; box-shadow: 0 0 0 0.45vmin var(--medal); }
+.qz-podium__rank {
+  position: absolute;
+  right: -0.8vmin;
+  bottom: -0.6vmin;
+  display: grid;
+  place-items: center;
+  width: 3.2vmin;
+  height: 3.2vmin;
+  border-radius: 50%;
+  background: var(--medal);
+  color: var(--qz-ink);
+  font: 700 2vmin var(--qz-display);
+  box-shadow: 0 0.3vmin 1vmin rgb(0 0 0 / 0.4);
+}
+.qz-podium__who { display: flex; flex-direction: column; min-width: 0; }
+.qz-podium__name { max-width: 18vmin; overflow: hidden; font-size: 2.5vmin; font-weight: 800; text-overflow: ellipsis; white-space: nowrap; }
+.qz-podium__meta { display: inline-flex; align-items: center; gap: 0.5vmin; font-size: 2.1vmin; font-weight: 700; opacity: 0.9; white-space: nowrap; }
+.qz-podium__meta .qz-icon { width: 2.2vmin; height: 2.2vmin; margin-left: 0.6vmin; color: var(--qz-gold); }
+.qz-podium__pts { color: var(--qz-right); font: 700 2.6vmin var(--qz-display); }
+
+.qz-mini {
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 1.8vmin;
+  max-width: 100%;
+  padding: 0.9vmin 2.2vmin 0.9vmin 1.4vmin;
+  border: 0.15vmin solid var(--qz-line);
+  border-radius: 999px;
+  background: var(--qz-glass);
+  backdrop-filter: blur(0.8vmin);
+}
+.qz-mini__icon { display: grid; }
+.qz-mini__icon .qz-icon { width: 3.6vmin; height: 3.6vmin; color: var(--qz-gold); }
+.qz-mini__row { display: flex; align-items: center; gap: 0.8vmin; min-width: 0; font-size: 2.4vmin; font-weight: 800; }
+.qz-mini__rank { display: grid; place-items: center; flex: none; width: 2.8vmin; height: 2.8vmin; border-radius: 50%; background: var(--medal); color: var(--qz-ink); font: 700 1.8vmin var(--qz-display); }
+.qz-mini__avatar { width: 4vmin; font-size: 1.8vmin; }
+.qz-mini__name { max-width: 14vmin; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.qz-mini__pts { color: var(--qz-gold); font-family: var(--qz-display); font-weight: 600; font-variant-numeric: tabular-nums; }
+.qz-streak { display: inline-flex; align-items: center; gap: 0.2vmin; color: #ff9b4d; font: 700 2vmin var(--qz-display); }
+.qz-streak .qz-icon { width: 2.6vmin; height: 2.6vmin; }
+
+/* --- Between questions: the leaderboard --- */
+/* As tall as its rows, in the middle of the scene. */
+.qz-board {
+  z-index: 1;
+  flex: 0 1 auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2.4vh;
+  margin-block: auto;
+  padding: 4vmin 4vmin 3.4vmin;
+  border: 0.25vmin solid rgb(255 255 255 / 0.16);
+  border-radius: 4.5vmin;
+  background: linear-gradient(170deg, rgb(48 28 120 / 0.9), rgb(18 11 54 / 0.92));
+  box-shadow: 0 2vmin 6vmin rgb(4 2 20 / 0.55);
+  animation: qz-card-in 0.5s cubic-bezier(0.2, 0.9, 0.25, 1.15) backwards;
+}
+.qz-board__title { display: flex; align-items: center; justify-content: center; gap: 1.4vmin; font: 700 6vmin var(--qz-display); }
+.qz-board__title .qz-icon { width: 6.4vmin; height: 6.4vmin; color: var(--qz-gold); }
+.qz-board__list { list-style: none; min-height: 0; display: flex; flex-direction: column; gap: 1.2vh; }
+.qz-board__empty { padding: 4vh 0; text-align: center; font: 600 3.8vmin var(--qz-display); opacity: 0.85; }
+.qz-row {
+  display: flex;
+  align-items: center;
+  gap: 2vmin;
+  padding: 1.4vmin 2.6vmin 1.4vmin 1.6vmin;
+  border: 0.2vmin solid rgb(255 255 255 / 0.08);
+  border-radius: 3vmin;
+  background: rgb(255 255 255 / 0.07);
+  animation: qz-row-in 0.45s cubic-bezier(0.2, 1.1, 0.4, 1) var(--d) backwards;
+}
+.qz-row--medal { box-shadow: inset 0.9vmin 0 0 var(--medal); }
+.qz-row__rank { display: grid; place-items: center; flex: none; width: 5.4vmin; height: 5.4vmin; border-radius: 50%; background: rgb(255 255 255 / 0.12); font: 700 3vmin var(--qz-display); }
+.qz-row--medal .qz-row__rank { background: var(--medal); color: var(--qz-ink); }
+.qz-row__avatar { width: 8vmin; font-size: 3.4vmin; }
+.qz-row__who { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 0.3vh; }
+.qz-row__name { overflow: hidden; font-size: 3.4vmin; font-weight: 800; text-overflow: ellipsis; white-space: nowrap; }
+.qz-row__sub { display: inline-flex; align-items: center; gap: 1.4vmin; font-size: 2.2vmin; font-weight: 700; color: rgb(255 255 255 / 0.72); }
+.qz-row__gain {
+  flex: none;
+  padding: 0.4vmin 1.4vmin;
+  border-radius: 999px;
+  background: rgb(52 227 164 / 0.2);
+  color: var(--qz-right);
+  font: 700 2.4vmin var(--qz-display);
+  animation: qz-pop 0.4s calc(var(--d) + 0.35s) backwards;
+}
+.qz-row__pts { flex: none; min-width: 14vmin; color: var(--qz-gold); font: 700 4vmin var(--qz-display); font-variant-numeric: tabular-nums; text-align: right; }
+.qz-board__next { display: flex; flex-direction: column; align-items: center; gap: 1vh; font: 600 2.8vmin var(--qz-display); }
+.qz-board__bar { width: 60%; height: 1vmin; border-radius: 999px; background: rgb(255 255 255 / 0.14); overflow: hidden; }
+.qz-board__bar > span {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, #ff5d73, #ffc23d, #2ed3a0, #3fa9ff);
+  transform-origin: left;
+  transition: transform 0.1s linear;
+}
+.qz-board--plain { justify-content: center; }
+.qz-board__soon { text-align: center; font: 700 6vmin var(--qz-display); }
+
+.qz__paused {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  gap: 1.4vmin;
+  width: max-content;
+  height: max-content;
+  margin: auto;
+  padding: 2vmin 4.4vmin;
+  border: 0.25vmin solid rgb(255 255 255 / 0.2);
+  border-radius: 999px;
+  background: rgb(16 10 46 / 0.9);
+  box-shadow: 0 1.6vmin 5vmin rgb(0 0 0 / 0.5);
+  font: 700 4.4vmin var(--qz-display);
+  animation: qz-pop 0.3s backwards;
+}
+.qz__paused .qz-icon { width: 4.6vmin; height: 4.6vmin; }
+.qz__empty {
+  z-index: 1;
+  margin: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2vh;
+  padding: 5vmin 6vmin;
+  border: 0.2vmin solid var(--qz-line);
+  border-radius: 4vmin;
+  background: var(--qz-glass);
+  font: 600 4vmin var(--qz-display);
+  text-align: center;
+}
+.qz__empty .qz-icon { width: 10vmin; height: 10vmin; color: var(--qz-gold); }
+
+/* Confetti over the scene when someone got it right. */
+.qz-confetti { position: absolute; inset: 0; z-index: 2; overflow: hidden; pointer-events: none; }
+.qz-confetti span {
+  position: absolute;
+  top: -4vmin;
+  left: var(--x);
+  width: 1.5vmin;
+  height: 2.6vmin;
+  border-radius: 0.4vmin;
+  background: var(--c);
+  animation: qz-confetti var(--t) cubic-bezier(0.25, 0.6, 0.45, 1) var(--d) both;
+}
+.qz-confetti span.qz-confetti__round { width: 1.8vmin; height: 1.8vmin; border-radius: 50%; }
+
+@keyframes qz-aurora {
+  from { opacity: 0.7; transform: translate3d(-3%, -2%, 0) scale(1.05); }
+  to { opacity: 1; transform: translate3d(3%, 2%, 0) scale(1.12); }
+}
+@keyframes qz-drift {
+  from { transform: translateY(0) rotate(0deg); }
+  to { transform: translateY(-125vh) rotate(var(--r)); }
+}
+@keyframes qz-card-in {
+  from { opacity: 0; transform: translateY(3vh) scale(0.94); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes qz-opt-in {
+  from { opacity: 0; transform: translateX(10vw); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes qz-row-in {
+  from { opacity: 0; transform: translateX(-6vw); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes qz-pop {
+  from { opacity: 0; transform: scale(0.6); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes qz-rise {
+  from { opacity: 0; transform: translateY(2vh); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes qz-stamp {
+  0% { opacity: 0; transform: scale(0.3) rotate(-30deg); }
+  60% { opacity: 1; transform: scale(1.15) rotate(6deg); }
+  100% { transform: none; }
+}
+@keyframes qz-beat {
+  from { transform: scale(1.4); }
+  to { transform: none; }
+}
+@keyframes qz-bump {
+  from { transform: scale(1.2); }
+  to { transform: none; }
+}
+@keyframes qz-glow {
+  from { box-shadow: 0 0 0 0.5vmin rgb(52 227 164 / 0.3), 0 0 3vmin rgb(52 227 164 / 0.35), 0 1vmin 3vmin rgb(4 2 20 / 0.4); }
+  to { box-shadow: 0 0 0 0.9vmin rgb(52 227 164 / 0.45), 0 0 7vmin rgb(52 227 164 / 0.6), 0 1vmin 3vmin rgb(4 2 20 / 0.4); }
+}
+@keyframes qz-confetti {
+  0% { opacity: 1; transform: translate3d(0, 0, 0) rotate(0deg); }
+  50% { transform: translate3d(var(--sway), 55vh, 0) rotate(calc(var(--r) * 2)); }
+  100% { opacity: 0.9; transform: translate3d(calc(var(--sway) * -0.5), 112vh, 0) rotate(calc(var(--r) * 4)); }
+}
+
+/* A 16:9 scene: the question beside the answers, the result and the top three below. */
+@media (orientation: landscape) {
+  .qz { padding: 7vmin 3vw 9vh; gap: 1.4vh; }
+  .qz__stage { flex-direction: row; align-items: stretch; gap: 3vw; padding-top: 6.5vmin; }
+  .qz-card { flex: 1 1 0; min-height: 0; max-height: none; }
+  .qz-options { flex: 1.2 1 0; justify-content: center; }
+  .qz-opt { flex: 1 1 0; height: auto; max-height: 13vh; }
+  .qz-opt--wrong, .qz-opt--cut { flex-grow: 0.7; height: auto; }
+  .qz-result { flex-direction: row; flex-wrap: wrap; justify-content: center; }
+  .qz-board { width: min(72vw, 120vmin); align-self: center; }
+}

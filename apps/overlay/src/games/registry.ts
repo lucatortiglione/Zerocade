@@ -31,7 +31,6 @@ import { createParolePopolari } from './parolePopolari'
 import { createParoleSolitario } from './paroleSolitario'
 import { createPerleParole } from './perleParole'
 import { createQuizBlitz } from './quizBlitz'
-import { createQuizzland } from './quizzland'
 import { createRuzzle } from './ruzzle'
 import { createTop7 } from './top7'
 import { createWildWords } from './wildWords'
@@ -70,7 +69,6 @@ const registry: Record<string, () => GameInstance> = {
   'parole-solitario': createParoleSolitario,
   'perle-parole': createPerleParole,
   'quiz-blitz': createQuizBlitz,
-  quizzland: createQuizzland,
   ruzzle: createRuzzle,
   'top-7': createTop7,
   'wild-words': createWildWords,

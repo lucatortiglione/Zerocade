@@ -25,7 +25,7 @@ export function createAssociations(): GameInstance {
   const scores = newScores()
 
   const pick = () => {
-    theme = shuffled(itemsFor<Theme>('word-association'))[0] ?? { prompt: '', words: [] }
+    theme = shuffled(itemsFor<Theme>('association-themes'))[0] ?? { prompt: '', words: [] }
     found = new Set()
     revealed = false
     timer = roundSecs
@@ -103,7 +103,7 @@ export function createAssociations(): GameInstance {
       ctx.fillText(`${found.size}/${theme.words.length} trovate`, cx, height * 0.72)
 
       drawTimerBar(ctx, width, height, Math.max(0, timer / (revealed ? breakSecs : roundSecs)), revealed ? '#3ccf7a' : '#3258d4')
-      if (showBoard) drawLeaderboard(ctx, scores, 5)
+      if (showBoard) drawLeaderboard(ctx, scores)
     },
   }
 }

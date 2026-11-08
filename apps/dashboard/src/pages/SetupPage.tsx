@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { overlayUrl } from '../overlayKey'
+import { hostsLine, overlayUrl } from '../overlayKey'
 
 export function SetupPage() {
   const [copied, setCopied] = useState(false)
@@ -18,7 +18,8 @@ export function SetupPage() {
     <div className="setup">
       <h1>Overlay setup</h1>
       <p className="text-muted">
-        Add this link as a browser source in TikTok LIVE Studio or OBS, sized 1080 × 1920.
+        One link for every game. Add it once as a browser source in OBS or TikTok LIVE Studio, sized 1080 × 1920
+        (1920 × 1080 for a landscape scene): when you pick another game here, the overlay switches by itself.
       </p>
       <div className="url-box">
         <input type="text" readOnly value={overlayUrl} aria-label="Overlay link" onFocus={(e) => e.currentTarget.select()} />
@@ -26,7 +27,16 @@ export function SetupPage() {
           {copied ? 'Copied' : 'Copy'}
         </button>
       </div>
-      <p className="setup__warning">Keep this link private: for now, anyone who has it can control your overlay.</p>
+      {hostsLine && (
+        <p className="setup-warning small">
+          This link won't open yet: the Windows hosts file needs the line <code>{hostsLine}</code>. Restart Zerocade
+          and accept the administrator prompt, or add the line by hand to C:\Windows\System32\drivers\etc\hosts.
+        </p>
+      )}
+      <p className="text-muted small">
+        The link stays the same whatever browser opens this dashboard. It works on this PC only, while Zerocade is
+        running.
+      </p>
     </div>
   )
 }

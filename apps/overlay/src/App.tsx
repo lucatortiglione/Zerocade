@@ -1,19 +1,25 @@
 import { useEffect, useRef, useState, useSyncExternalStore } from 'react'
-import { GAMES, describeSource, triggersFor, type LiveEvent } from '@zerocade/shared'
+import { GAMES, describeSource, triggersFor, type LiveEvent, type Viewer } from '@zerocade/shared'
 import { Engine } from './games/engine'
 import { createGame } from './games/registry'
 import { useOverlay } from './store'
 import { Widgets } from './Widgets'
 import { Bivio } from './Bivio'
+import { Incastro } from './Incastro'
+import { Quizzland } from './Quizzland'
 import { isContentReady, loadContent, subscribeContent } from './content'
+import { ViewerAvatar } from './ViewerAvatar'
+import { ScoreTicker } from './ScoreTicker'
 
 interface Toast {
   id: number
+  icon: string
+  user: Viewer
   text: string
 }
 
 export function App() {
-  const { connected, session, event, seq, message, messageSeq } = useOverlay()
+  const { connected, session, event, seq, message, messageSeq, gif, gifSeq, incastro, quizzland } = useOverlay()
   const contentReady = useSyncExternalStore(subscribeContent, isContentReady)
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const engineRef = useRef<Engine | null>(null)
@@ -42,7 +48,7 @@ export function App() {
   }, [])
 
   // Swap the game when the selection changes (only once content is loaded).
-  // Games without a canvas instance (Bivio) leave the canvas blank.
+  // Games without a canvas instance (Bivio, Incastro, Quizzland) leave the canvas blank.
   useEffect(() => {
     if (!session || !contentReady) return
     const game = GAMES.find((g) => g.id === session.gameId)
@@ -63,27 +69,38 @@ export function App() {
     if (game) {
       for (const t of triggersFor(session.triggers, event)) engineRef.current?.pushAction(t.action, event)
     }
-    // In Bivio comments are the votes, already listed under the options.
-    if (session.gameId === 'bivio' && event.type === 'comment') return
+    // Bivio has no room for toasts over its title: votes show as bubbles, and gifts,
+    // likes and follows can still use the Avvisi widget. In Incastro every comment is a
+    // guess: the words found have their own feed. In Quizzland a toast would show everyone
+    // what each viewer answered.
+    if (session.gameId === 'bivio' || session.gameId === 'incastro' || session.gameId === 'quizzland') return
     const id = Date.now() + Math.random()
-    setToasts((prev) => [...prev.slice(-4), { id, text: describeEvent(event) }])
-    const timer = setTimeout(() => setToasts((prev) => prev.filter((t) => t.id !== id)), 3200)
-    return () => clearTimeout(timer)
+    setToasts((prev) => [...prev.slice(-4), { id, user: event.user, ...describeEvent(event) }])
+    // Not cleared when the next event arrives: every toast removes itself.
+    setTimeout(() => setToasts((prev) => prev.filter((t) => t.id !== id)), 3200)
   }, [seq])
 
   const game = session ? GAMES.find((g) => g.id === session.gameId) : undefined
+
+  const scores = session?.gameId === 'incastro' ? incastro?.scores
+    : session?.gameId === 'quizzland' ? quizzland?.scores : undefined
 
   return (
     <div className="overlay">
       <canvas ref={canvasRef} className="overlay__canvas" />
       {session?.gameId === 'bivio' && <Bivio />}
+      {session?.gameId === 'incastro' && <Incastro />}
+      {session?.gameId === 'quizzland' && <Quizzland />}
       <header className="overlay__top">
         <span className="overlay__brand">{game?.emoji ?? '🎮'}</span>
         <span className="overlay__title">{game?.name ?? 'Zerocade'}</span>
         <span className={`dot${connected ? ' dot--on' : ''}`} />
       </header>
 
+      {session?.settings.showLeaderboard !== false && scores && <ScoreTicker scores={scores} />}
       <Widgets />
+
+      {gif && <img key={gifSeq} className="overlay-gif" src={gif.url} alt={gif.label} />}
 
       {message && (
         <div key={messageSeq} className="overlay-message" role="status">
@@ -94,7 +111,9 @@ export function App() {
       <div className="overlay__toasts">
         {toasts.map((t) => (
           <div key={t.id} className="toast">
-            {t.text}
+            <span>{t.icon}</span>
+            <ViewerAvatar viewer={t.user} />
+            <span className="toast__text">{t.text}</span>
           </div>
         ))}
       </div>
@@ -119,19 +138,20 @@ export function App() {
   )
 }
 
-function describeEvent(event: LiveEvent): string {
+// The toast's icon, and its text after the viewer's picture.
+function describeEvent(event: LiveEvent): { icon: string; text: string } {
   switch (event.type) {
     case 'gift':
-      return `🎁 ${event.user.nickname} ×${event.count}`
+      return { icon: '🎁', text: `${event.user.nickname} ×${event.count}` }
     case 'like':
-      return `👍 ${event.user.nickname} ×${event.count}`
+      return { icon: '👍', text: `${event.user.nickname} ×${event.count}` }
     case 'follow':
-      return `➕ ${event.user.nickname} followed`
+      return { icon: '➕', text: `${event.user.nickname} followed` }
     case 'share':
-      return `🔁 ${event.user.nickname} shared`
+      return { icon: '🔁', text: `${event.user.nickname} shared` }
     case 'comment':
-      return `💬 ${event.user.nickname}: ${event.text}`
+      return { icon: '💬', text: `${event.user.nickname}: ${event.text}` }
     case 'join':
-      return `👋 ${event.user.nickname} joined`
+      return { icon: '👋', text: `${event.user.nickname} joined` }
   }
 }

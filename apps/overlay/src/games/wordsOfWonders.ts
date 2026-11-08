@@ -1,5 +1,6 @@
 import type { GameInstance } from './engine'
 import { drawAvatar } from './avatar'
+import { drawLeaderboard } from './common'
 
 // "Words of Wonders: Guru" — a crossword board of hidden words: viewers find every
 // word that can be built from the letters. Longer words score more.
@@ -139,7 +140,6 @@ export function createWordsOfWonders(): GameInstance {
     timer = seconds
   }
 
-  const top = () => [...scores.entries()].sort((a, b) => b[1].pts - a[1].pts).slice(0, 5)
 
   return {
     reset(settings, w, h) {
@@ -261,7 +261,7 @@ export function createWordsOfWonders(): GameInstance {
         ctx.beginPath()
         ctx.roundRect(px, py - 24, pw, 48, 24)
         ctx.fill()
-        drawAvatar(ctx, last.avatar, px + 36, py, 20)
+        drawAvatar(ctx, last.avatar, px + 36, py, 20, last.name)
         ctx.fillStyle = '#3ccf7a'
         ctx.textAlign = 'left'
         ctx.fillText(text, px + 66, py + 8)
@@ -275,20 +275,7 @@ export function createWordsOfWonders(): GameInstance {
       ctx.fillStyle = revealed ? '#ff5c5c' : allFound() ? '#3ccf7a' : '#f5b14c'
       ctx.fillRect(40, height - 56, (width - 80) * frac, 14)
 
-      const topPlayers = top()
-      if (topPlayers.length) {
-        ctx.textAlign = 'left'
-        ctx.font = 'bold 20px system-ui'
-        ctx.fillStyle = '#ffffff'
-        ctx.fillText('Top players', 40, 60)
-        topPlayers.forEach(([, p], i) => {
-          const y = 88 + i * 26
-          drawAvatar(ctx, p.avatar, 52, y - 8, 11)
-          ctx.font = '18px system-ui'
-          ctx.fillStyle = i === 0 ? '#f5b14c' : '#f0f0f2'
-          ctx.fillText(`${i + 1}. ${p.name} — ${p.pts}`, 70, y)
-        })
-      }
+      drawLeaderboard(ctx, scores)
     },
   }
 }

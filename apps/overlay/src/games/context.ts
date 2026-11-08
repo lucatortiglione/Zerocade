@@ -1,4 +1,6 @@
+import type { Viewer } from '@zerocade/shared'
 import type { GameInstance } from './engine'
+import { fillTextWithAvatar } from './avatar'
 import { addPoints, drawLeaderboard, drawTimerBar, newScores, normalize, shuffled } from './common'
 import { itemsFor } from '../content'
 
@@ -26,7 +28,7 @@ export function createContext(): GameInstance {
   let target: Target = { word: '', hint: '', close: [], medium: [] }
   let timer = 45
   let revealed = false
-  let solver = ''
+  let solver: Viewer | null = null
   let hintCount = 0
   let hintClock = 0
   let bestRank = Infinity
@@ -37,7 +39,7 @@ export function createContext(): GameInstance {
     target = shuffled(itemsFor<Target>('context'))[0] ?? { word: '', hint: '', close: [], medium: [] }
     timer = autoHintSecs
     revealed = false
-    solver = ''
+    solver = null
     hintCount = 0
     hintClock = 0
     bestRank = Infinity
@@ -88,7 +90,7 @@ export function createContext(): GameInstance {
       if (!guesses.some((g) => g.text === text)) guesses.unshift({ text, rank: r })
       if (r === 0) {
         revealed = true
-        solver = event.user.nickname
+        solver = event.user
         timer = breakSecs
         addPoints(scores, event.user.id, event.user.nickname, event.user.avatar, finderPts)
       } else if (r < bestRank) {
@@ -153,11 +155,11 @@ export function createContext(): GameInstance {
         ctx.fillStyle = '#3ccf7a'
         ctx.font = 'bold 30px system-ui'
         ctx.textAlign = 'center'
-        ctx.fillText(`${solver} ha trovato: ${target.word}`, cx, height * 0.86)
+        if (solver) fillTextWithAvatar(ctx, `${solver.nickname} ha trovato: ${target.word}`, cx, height * 0.86, solver)
       }
 
       if (!revealed) drawTimerBar(ctx, width, height, Math.max(0, timer / autoHintSecs), '#f5b14c')
-      if (showBoard) drawLeaderboard(ctx, scores, 5)
+      if (showBoard) drawLeaderboard(ctx, scores)
     },
   }
 }

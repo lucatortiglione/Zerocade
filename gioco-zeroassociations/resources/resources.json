@@ -1,0 +1,50 @@
+{
+  "created_at": "2026-11-08T09:12:01.625493+00:00",
+  "corpus_id": "kaikki-itwiktionary-Italiano",
+  "corpus_source": "https://kaikki.org/itwiktionary/Italiano/kaikki.org-dictionary-Italiano.jsonl",
+  "corpus_dump_date": "2026-11-01",
+  "extraction_date": "2026-11-03",
+  "license": "CC-BY-SA-4.0; contributori Wikizionario",
+  "corpus_sha256": "095df1665fde8e41bdf07250887d0cdacf570b543118aa09505f8628c9cf46e9",
+  "domain": "definizioni lessicografiche italiane",
+  "document_unit": "testo completo della definizione di una accezione ammessa dal filtro corpus",
+  "deduplication": "uguaglianza esatta del testo UTF-8 della definizione; esempi esclusi dal denominatore DF",
+  "total_documents": 69598,
+  "analyzed_texts": 80874,
+  "frequency_entries": 302260,
+  "frequency_source": "wordfreq top_n_list(it,1000000); rango della forma canonica, nessuna conversione in rango di lemma",
+  "frequency_version": "3.1.1",
+  "frequency_license": "Dati wordfreq CC BY-SA 4.0; vedere NOTICE delle dipendenze",
+  "spacy_version": "3.8.18",
+  "model": "it_core_news_md",
+  "model_version": "3.8.0",
+  "model_license": "CC BY-NC-SA 3.0",
+  "model_components": [
+    "tok2vec",
+    "morphologizer",
+    "tagger",
+    "lemmatizer",
+    "attribute_ruler"
+  ],
+  "files": {
+    "frequency": {
+      "path": "C:\\Users\\lucat\\AppData\\Local\\Zerocade\\word-association\\resources-v3_5_5\\frequency_ranks_it.csv",
+      "sha256": "e4e4fc0d8af8f4e6d853670a9bf5f5ef43d315d29e1a65765d476f1f44bf7aa1"
+    },
+    "df": {
+      "path": "C:\\Users\\lucat\\AppData\\Local\\Zerocade\\word-association\\resources-v3_5_5\\definition_document_counts_it.csv",
+      "sha256": "0ebb55d7a3a8a03e68541c15c9299dd5178510208674611c70386212115fe015"
+    },
+    "cache": {
+      "path": "C:\\Users\\lucat\\AppData\\Local\\Zerocade\\word-association\\resources-v3_5_5\\analysis_cache.jsonl",
+      "sha256": "00dcab4c5894d1776a894adb7f0a8f363d9c4db38d948125d86b15d2427b2cc3"
+    }
+  },
+  "model_source": "https://api.github.com/repos/explosion/spacy-models/releases/assets/195735543",
+  "repository_tables": {
+    "definition_document_counts_it.csv": "0ebb55d7a3a8a03e68541c15c9299dd5178510208674611c70386212115fe015",
+    "frequency_ranks_it.csv": "e4e4fc0d8af8f4e6d853670a9bf5f5ef43d315d29e1a65765d476f1f44bf7aa1",
+    "morphology_5000.csv": "af324daa14746e234a44a6edc8a5708f8bb9b0c0a1793ea4b4331c81bf4865c8",
+    "morphology_selection.csv": "66680eafc93b9eedd834a2d0ee2333b5519ec28f8d2f40d857f28d4df45c9422"
+  }
+}

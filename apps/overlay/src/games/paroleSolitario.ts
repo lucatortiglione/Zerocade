@@ -1,4 +1,6 @@
+import type { Viewer } from '@zerocade/shared'
 import type { GameInstance } from './engine'
+import { fillTextWithAvatar } from './avatar'
 import { addPoints, drawLeaderboard, drawTimerBar, newScores, normalize, shuffled } from './common'
 import { itemsFor } from '../content'
 
@@ -22,15 +24,15 @@ export function createParoleSolitario(): GameInstance {
   let step = 0
   let timer = 60
   let revealed = false
-  let solver = ''
+  let solver: Viewer | null = null
   const scores = newScores()
 
   const pick = () => {
-    theme = shuffled(itemsFor<Theme>('word-association'))[0] ?? { prompt: '', words: [] }
+    theme = shuffled(itemsFor<Theme>('association-themes'))[0] ?? { prompt: '', words: [] }
     step = 0
     revealed = false
     timer = roundSecs
-    solver = ''
+    solver = null
   }
 
   return {
@@ -50,7 +52,7 @@ export function createParoleSolitario(): GameInstance {
       const target = theme.words[step]
       if (!target || normalize(target) !== w) return
       addPoints(scores, event.user.id, event.user.nickname, event.user.avatar, pts)
-      solver = event.user.nickname
+      solver = event.user
       step++
       if (step >= theme.words.length) {
         revealed = true
@@ -107,11 +109,11 @@ export function createParoleSolitario(): GameInstance {
       if (revealed) {
         ctx.fillStyle = '#3ccf7a'
         ctx.font = 'bold 26px system-ui'
-        ctx.fillText(`${solver} ha completato la catena!`, cx, height * 0.78)
+        if (solver) fillTextWithAvatar(ctx, `${solver.nickname} ha completato la catena!`, cx, height * 0.78, solver)
       }
 
       drawTimerBar(ctx, width, height, Math.max(0, timer / (revealed ? breakSecs : roundSecs)), revealed ? '#3ccf7a' : '#f5b14c')
-      if (showBoard) drawLeaderboard(ctx, scores, 5)
+      if (showBoard) drawLeaderboard(ctx, scores)
     },
   }
 }

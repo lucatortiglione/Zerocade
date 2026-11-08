@@ -1,4 +1,6 @@
+import type { Viewer } from '@zerocade/shared'
 import type { GameInstance } from './engine'
+import { fillTextWithAvatar } from './avatar'
 
 const WORDS = ['TIKTOK', 'STREAM', 'LEGEND', 'ROCKET', 'CROWN', 'GALAXY', 'VIEWER', 'GAMING']
 const MAX_WRONG = 6
@@ -11,7 +13,7 @@ export function createWordGuess(): GameInstance {
   let word = WORDS[0]
   let guessed = new Set<string>()
   let wrong = 0
-  let winners: string[] = []
+  let winners: Viewer[] = []
   let revealed = false
 
   const isWon = () => word.split('').every((c) => guessed.has(c))
@@ -36,7 +38,7 @@ export function createWordGuess(): GameInstance {
       if (event.type !== 'comment' || revealed) return
       const text = event.text.trim().toUpperCase()
       if (text === word) {
-        if (!winners.includes(event.user.nickname)) winners.push(event.user.nickname)
+        if (!winners.some((w) => w.id === event.user.id)) winners.push(event.user)
         revealed = true
         timer = 4
         return
@@ -95,7 +97,7 @@ export function createWordGuess(): GameInstance {
       if (winners.length) {
         ctx.fillStyle = '#f5b14c'
         ctx.font = 'bold 28px system-ui'
-        ctx.fillText(`🏆 ${winners[0]} guessed it!`, cx, height * 0.58)
+        fillTextWithAvatar(ctx, `🏆 ${winners[0].nickname} guessed it!`, cx, height * 0.58, winners[0])
       }
 
       const frac = Math.max(0, timer / (revealed ? 4 : seconds))

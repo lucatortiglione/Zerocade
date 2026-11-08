@@ -200,7 +200,7 @@ export function createPicQuiz(rounds: (wordsPerRound: number) => PicPuzzle, titl
         ctx.beginPath()
         ctx.roundRect(px, py - 24, pw, 48, 24)
         ctx.fill()
-        drawAvatar(ctx, solver.avatar, px + 36, py, 20)
+        drawAvatar(ctx, solver.avatar, px + 36, py, 20, solver.name)
         ctx.fillStyle = '#3ccf7a'
         ctx.textAlign = 'left'
         ctx.fillText(text, px + 66, py + 8)
@@ -222,7 +222,7 @@ export function createPicQuiz(rounds: (wordsPerRound: number) => PicPuzzle, titl
         ctx.fillText('Top players', 40, 60)
         topPlayers.forEach(([, pl], i) => {
           const y = 88 + i * 26
-          drawAvatar(ctx, pl.avatar, 52, y - 8, 11)
+          drawAvatar(ctx, pl.avatar, 52, y - 8, 11, pl.name)
           ctx.font = '18px system-ui'
           ctx.fillStyle = i === 0 ? '#f5b14c' : '#f0f0f2'
           ctx.fillText(`${i + 1}. ${pl.name} — ${pl.pts}`, 70, y)
