@@ -1,15 +1,10 @@
+import { isWordAssociationPuzzle, type WordAssociationPuzzle } from '@zerocade/shared'
 import type { GameInstance } from './engine'
 import { fillTextWithAvatar } from './avatar'
-import { addPoints, drawLeaderboard, drawTimerBar, newScores, normalize, shuffled } from './common'
+import { addPoints, drawLeaderboard, drawTimerBar, newScores, shuffled } from './common'
 import { itemsFor } from '../content'
 
-// "Word Association" — a prompt is shown and several connected words are hidden.
-// Viewers type any connected word in chat; the first solver of each slot scores.
-
-interface Theme {
-  prompt: string
-  words: string[]
-}
+// v3.5.5: guess one hidden target from seven clues, revealed 3 → 5 → 7.
 export function createWordAssociation(): GameInstance {
   let width = 0
   let height = 0
@@ -17,77 +12,67 @@ export function createWordAssociation(): GameInstance {
   let breakSecs = 5
   let pts = 1
   let speedBonus = true
-  let comboEnabled = true
-  let drip = true
+  let progressive = true
   let showBoard = true
-
-  let theme: Theme = { prompt: '', words: [] }
-  let found = new Set<string>()
+  let deck: WordAssociationPuzzle[] = []
+  let puzzle: WordAssociationPuzzle | null = null
   let revealed = false
   let timer = 60
   let flash = 0
-  let last = { name: '', pts: 0, avatar: undefined as string | undefined, word: '' }
+  let hintLetters = 0
+  let last = { name: '', pts: 0, avatar: undefined as string | undefined }
   const scores = newScores()
-  const combos = new Map<string, number>()
-
-  const allFound = () => theme.words.every((w) => found.has(w))
-
+  const answerKey = (text: string) => text.normalize('NFD').replace(/\p{M}/gu, '').trim().toLocaleLowerCase('it')
+  const positive = (value: unknown, fallback: number) =>
+    typeof value === 'number' && Number.isFinite(value) && value > 0 ? value : fallback
+  const clueCount = () => revealed || !progressive ? 7 : timer <= roundSecs / 3 ? 7 : timer <= roundSecs * 2 / 3 ? 5 : 3
   const pick = () => {
-    theme = shuffled(itemsFor<Theme>('word-association'))[0] ?? { prompt: '', words: [] }
-    found = new Set()
+    if (!deck.length) deck = shuffled(itemsFor<unknown>('word-association').filter(isWordAssociationPuzzle))
+    puzzle = deck.pop() ?? null
     revealed = false
     timer = roundSecs
     flash = 0
-    combos.clear()
+    hintLetters = 0
   }
-
   return {
     reset(settings, w, h) {
       width = w
       height = h
-      roundSecs = typeof settings.roundSeconds === 'number' ? settings.roundSeconds : 60
-      breakSecs = typeof settings.breakSeconds === 'number' ? settings.breakSeconds : 5
-      pts = typeof settings.pointsPerCorrect === 'number' ? settings.pointsPerCorrect : 1
+      roundSecs = positive(settings.roundSeconds, 60)
+      breakSecs = positive(settings.breakSeconds, 5)
+      pts = positive(settings.pointsPerCorrect, 1)
       speedBonus = settings.speedBonusEnabled !== false
-      comboEnabled = settings.comboEnabled !== false
-      drip = settings.dripRevealEnabled !== false
+      progressive = settings.dripRevealEnabled !== false
       showBoard = settings.showSessionLeaderboard !== false
+      deck = []
       scores.clear()
       pick()
     },
     onAction(action, event) {
-      if (action === 'reveal_letter') return
-      if (event.type !== 'comment' || revealed) return
-      const w = normalize(event.text)
-      const match = theme.words.find((word) => !found.has(word) && normalize(word) === w)
-      if (!match) return
-      found.add(match)
-      let gain = pts
-      if (speedBonus) gain += Math.round((timer / roundSecs) * 2)
-      if (comboEnabled) {
-        combos.set(event.user.id, (combos.get(event.user.id) ?? 0) + 1)
-        gain += combos.get(event.user.id)! - 1
-      }
-      addPoints(scores, event.user.id, event.user.nickname, event.user.avatar, gain)
-      flash = 2
-      last = { name: event.user.nickname, pts: gain, avatar: event.user.avatar, word: match }
-      if (allFound()) {
-        revealed = true
-        timer = breakSecs
-      }
-    },
-    update(dt, _now, settings) {
-      roundSecs = typeof settings.roundSeconds === 'number' ? settings.roundSeconds : roundSecs
-      breakSecs = typeof settings.breakSeconds === 'number' ? settings.breakSeconds : breakSecs
-      pts = typeof settings.pointsPerCorrect === 'number' ? settings.pointsPerCorrect : pts
-      if (flash > 0) flash -= dt
-      if (revealed) {
-        timer -= dt
-        if (timer <= 0) pick()
+      if (!puzzle || revealed) return
+      if (action === 'reveal_letter') {
+        hintLetters = Math.min(hintLetters + 1, puzzle.prompt.length - 1)
         return
       }
+      if (action !== 'guess' || event.type !== 'comment' || answerKey(event.text) !== answerKey(puzzle.prompt)) return
+      const gain = pts + (speedBonus ? Math.round(Math.max(0, timer / roundSecs) * 2) : 0)
+      addPoints(scores, event.user.id, event.user.nickname, event.user.avatar, gain)
+      last = { name: event.user.nickname, pts: gain, avatar: event.user.avatar }
+      flash = breakSecs
+      revealed = true
+      timer = breakSecs
+    },
+    update(dt, _now, settings) {
+      if (!puzzle) return
+      progressive = settings.dripRevealEnabled !== false
+      showBoard = settings.showSessionLeaderboard !== false
+      speedBonus = settings.speedBonusEnabled !== false
+      pts = positive(settings.pointsPerCorrect, pts)
+      if (flash > 0) flash -= dt
       timer -= dt
-      if (timer <= 0) {
+      if (timer > 0) return
+      if (revealed) pick()
+      else {
         revealed = true
         timer = breakSecs
       }
@@ -95,51 +80,43 @@ export function createWordAssociation(): GameInstance {
     draw(ctx) {
       ctx.clearRect(0, 0, width, height)
       const cx = width / 2
-      ctx.fillStyle = '#ffffff'
-      ctx.font = 'bold 44px system-ui'
       ctx.textAlign = 'center'
-      ctx.fillText(theme.prompt, cx, 90)
-      ctx.fillStyle = '#8a8a96'
-      ctx.font = '22px system-ui'
-      ctx.fillText('Scrivi una parola collegata in chat', cx, 128)
-
-      const cols = 2
-      const cellW = Math.min(340, (width - 200) / cols)
-      const cellH = 54
-      const startY = height * 0.3
-      theme.words.forEach((word, i) => {
-        const gx = i % cols
-        const gy = Math.floor(i / cols)
-        const x = cx - (cols * cellW + (cols - 1) * 20) / 2 + gx * (cellW + 20) + cellW / 2
-        const y = startY + gy * (cellH + 14)
-        const isFound = found.has(word)
-        const letterCount = isFound || revealed ? word.length : drip ? Math.min(1 + Math.floor((roundSecs - timer) / 10), word.length) : 0
-        ctx.fillStyle = isFound ? '#22c55e' : '#1b1b21'
-        ctx.beginPath()
-        ctx.roundRect(x - cellW / 2, y - cellH / 2, cellW, cellH, 12)
-        ctx.fill()
-        if (isFound) {
-          ctx.fillStyle = '#ffffff'
-          ctx.font = 'bold 22px system-ui'
-          ctx.fillText(word, x, y + 8)
-        } else {
-          const shown = revealed ? word : word.slice(0, letterCount)
-          const hidden = word.length - (revealed ? 0 : letterCount)
-          ctx.fillStyle = '#f0f0f2'
-          ctx.font = 'bold 22px system-ui'
-          ctx.fillText(shown + '_'.repeat(hidden), x, y + 8)
-        }
-      })
-
-      if (flash > 0 && last.name) {
-        ctx.fillStyle = '#f5b14c'
-        ctx.font = 'bold 26px system-ui'
-        fillTextWithAvatar(ctx, `${last.name} +${last.pts} — ${last.word}`, cx, height * 0.7, { nickname: last.name, avatar: last.avatar })
+      ctx.fillStyle = '#ffffff'
+      ctx.font = `bold ${Math.min(44, width / 18)}px system-ui`
+      ctx.fillText('Word Association', cx, height * 0.07)
+      if (!puzzle) {
+        ctx.font = `${Math.min(24, width / 28)}px system-ui`
+        ctx.fillText('Nessun enigma approvato disponibile', cx, height * 0.4)
+        return
       }
-
+      const visible = clueCount()
+      ctx.fillStyle = '#b3bacb'
+      ctx.font = `${Math.min(24, width / 28)}px system-ui`
+      const pos = { NOUN: 'nome', VERB: 'verbo', ADJ: 'aggettivo' }[puzzle.pos]
+      ctx.fillText(`Indovina la parola in chat${puzzle.pos_hint_mode === 'visible' ? ` · ${pos}` : ''}`, cx, height * 0.11)
+      ctx.fillText(`${visible} di 7 indizi`, cx, height * 0.15)
+      const cellW = Math.min(width * 0.76, 680)
+      const cellH = Math.min(58, height * 0.055)
+      const gap = Math.min(14, height * 0.012)
+      puzzle.words.forEach((clue, i) => {
+        const y = height * 0.2 + i * (cellH + gap)
+        ctx.fillStyle = i < visible ? '#23304d' : '#151925'
+        ctx.beginPath()
+        ctx.roundRect(cx - cellW / 2, y, cellW, cellH, 12)
+        ctx.fill()
+        ctx.fillStyle = i < visible ? '#ffffff' : '#8991a3'
+        ctx.font = `bold ${Math.min(26, cellH * 0.48)}px system-ui`
+        ctx.fillText(i < visible ? clue : `Indizio ${i + 1}`, cx, y + cellH * 0.66)
+      })
+      ctx.fillStyle = revealed ? '#5be09b' : '#f5b14c'
+      ctx.font = `bold ${Math.min(40, width / 20)}px system-ui`
+      ctx.fillText(revealed ? puzzle.prompt : hintLetters ? puzzle.prompt.slice(0, hintLetters) + '…' : 'Qual è la parola?', cx, height * 0.77)
+      if (flash > 0) {
+        ctx.font = `bold ${Math.min(26, width / 28)}px system-ui`
+        fillTextWithAvatar(ctx, `${last.name} +${last.pts}`, cx, height * 0.82, { nickname: last.name, avatar: last.avatar })
+      }
       drawTimerBar(ctx, width, height, Math.max(0, timer / (revealed ? breakSecs : roundSecs)), revealed ? '#3ccf7a' : '#f5b14c')
       if (showBoard) drawLeaderboard(ctx, scores)
     },
   }
 }
-

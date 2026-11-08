@@ -28,7 +28,7 @@ export function createParoleSolitario(): GameInstance {
   const scores = newScores()
 
   const pick = () => {
-    theme = shuffled(itemsFor<Theme>('word-association'))[0] ?? { prompt: '', words: [] }
+    theme = shuffled(itemsFor<Theme>('association-themes'))[0] ?? { prompt: '', words: [] }
     step = 0
     revealed = false
     timer = roundSecs

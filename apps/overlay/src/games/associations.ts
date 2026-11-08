@@ -25,7 +25,7 @@ export function createAssociations(): GameInstance {
   const scores = newScores()
 
   const pick = () => {
-    theme = shuffled(itemsFor<Theme>('word-association'))[0] ?? { prompt: '', words: [] }
+    theme = shuffled(itemsFor<Theme>('association-themes'))[0] ?? { prompt: '', words: [] }
     found = new Set()
     revealed = false
     timer = roundSecs

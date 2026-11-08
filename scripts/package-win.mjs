@@ -74,6 +74,10 @@ step('Copying pages, content and the SQLite binding')
 cpSync(join(root, 'apps', 'dashboard', 'dist'), join(app, 'public', 'dashboard'), { recursive: true })
 cpSync(join(root, 'apps', 'overlay', 'dist'), join(app, 'public', 'overlay'), { recursive: true })
 copyFileSync(join(root, 'apps', 'server', 'src', 'content.seed.json'), join(app, 'content.seed.json'))
+// Only the release-gated export is eligible; generated candidate CSVs stay out.
+const associationsContent = process.env.ZEROCADE_ASSOCIATIONS_CONTENT
+  ?? join(root, 'gioco-zeroassociations', 'approved', 'content.json')
+if (existsSync(associationsContent)) copyFileSync(associationsContent, join(app, 'word-association.content.json'))
 copyFileSync(join(root, 'gioco-dilemmi', 'data', 'domande.db'), join(app, 'domande.db'))
 copyFileSync(join(root, 'gioco-quizzland', 'data', 'domande.db'), join(app, 'quizzland.db'))
 // ZeroWords: what the generator reads to make levels on the fly (wordgen/files.ts looks for

@@ -17,7 +17,7 @@
     "VINO", "PANE", "LATTE", "MUSICA", "LIBRO", "PORTA", "TRENO", "SERA",
     "NOTTE", "VERDE", "ACQUA"
   ],
-  "word-association": [
+  "association-themes": [
     { "prompt": "COLORI", "words": ["ROSSO", "BLU", "VERDE", "GIALLO", "VIOLA", "ARANCIONE"] },
     { "prompt": "ANIMALI", "words": ["CANE", "GATTO", "CAVALLO", "LEONE", "TIGRE", "ELEFANTE"] },
     { "prompt": "SPORT", "words": ["CALCIO", "TENNIS", "NUOTO", "PALLAVOLO", "CICLISMO", "PALLA"] },
