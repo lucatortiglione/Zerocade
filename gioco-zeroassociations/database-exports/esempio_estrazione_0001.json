@@ -1,0 +1,956 @@
+{
+  "schema": "sampled-pools-1",
+  "seed": "verifica-db-20261109",
+  "mode": "random",
+  "difficulty_filter": "all",
+  "rows": [
+    {
+      "prompt": "affresco",
+      "words": [
+        "cappella",
+        "pennello",
+        "restauro",
+        "pittore",
+        "pigmento",
+        "intonaco",
+        "parete",
+        "volta"
+      ],
+      "answer_count": 8,
+      "pool_sha256": "abdd117b2d3874519598ce8f4d04674467595df81446901dca819edd27db91dc",
+      "sense_description": "Dipinto eseguito su intonaco ancora umido",
+      "category_id": "111",
+      "approval": false,
+      "independent_gameplay_qa": false
+    },
+    {
+      "prompt": "agitato",
+      "words": [
+        "nervoso",
+        "tremare",
+        "attesa",
+        "ansia",
+        "battito",
+        "tranquillo",
+        "sudore",
+        "calmarsi"
+      ],
+      "answer_count": 8,
+      "pool_sha256": "3d14fe5322fa7718e7ab31b37c29a2d62f460c6d0a571829032d6a45912bbd81",
+      "sense_description": "Persona in uno stato emotivo di forte irrequietezza",
+      "category_id": "061",
+      "approval": false,
+      "independent_gameplay_qa": false
+    },
+    {
+      "prompt": "agonia",
+      "words": [
+        "sofferenza",
+        "rantolo",
+        "morire",
+        "vegliare",
+        "familiare",
+        "letto",
+        "respiro",
+        "capezzale"
+      ],
+      "answer_count": 8,
+      "pool_sha256": "fb59ead4a1a10d2016d7c50219c9b9063a828dee9c43d0d4290fd7c074da15f2",
+      "sense_description": "Sofferenza e progressivo venir meno delle funzioni vitali prima della morte",
+      "category_id": "054",
+      "approval": false,
+      "independent_gameplay_qa": false
+    },
+    {
+      "prompt": "agonistico",
+      "words": [
+        "record",
+        "sportivo",
+        "competizione",
+        "allenamento",
+        "avversario",
+        "gara",
+        "campionato",
+        "atleta"
+      ],
+      "answer_count": 8,
+      "pool_sha256": "47fd4e33ccb0abeb3a38bc265703179356a72544dabbdb2835c7f3ccd02800b8",
+      "sense_description": "Attività sportiva finalizzata alla competizione",
+      "category_id": null,
+      "approval": false,
+      "independent_gameplay_qa": false
+    },
+    {
+      "prompt": "agosto",
+      "words": [
+        "caldo",
+        "anguria",
+        "vacanza",
+        "mare",
+        "estate",
+        "spiaggia",
+        "ferragosto",
+        "ombrellone"
+      ],
+      "answer_count": 8,
+      "pool_sha256": "87ad2b8bfb1184c5e037f5a187020ed5288c2e8661897a414c39ec1ae7440063",
+      "sense_description": "Mese estivo nel calendario e nella vita quotidiana italiana",
+      "category_id": "098",
+      "approval": false,
+      "independent_gameplay_qa": false
+    },
+    {
+      "prompt": "alternativo",
+      "words": [
+        "soluzione",
+        "proposta",
+        "opzione",
+        "diverso",
+        "sostituire",
+        "piano",
+        "confronto",
+        "percorso"
+      ],
+      "answer_count": 8,
+      "pool_sha256": "fd22b0225968dfd49534074787818b8add4f58a8feb88759291a83e6b6716085",
+      "sense_description": "Che offre una possibilità diversa da quella prevista o abituale",
+      "category_id": "064",
+      "approval": false,
+      "independent_gameplay_qa": false
+    },
+    {
+      "prompt": "anima",
+      "words": [
+        "corpo",
+        "immortale",
+        "fede",
+        "peccato",
+        "aldilà",
+        "salvezza",
+        "spirito",
+        "paradiso"
+      ],
+      "answer_count": 8,
+      "pool_sha256": "8da8c32660f248e9423a59ac14cc62b6069f0223f78285cf90bfe30ff66ad56a",
+      "sense_description": "Principio spirituale e interiore della persona nelle credenze religiose",
+      "category_id": "099",
+      "approval": false,
+      "independent_gameplay_qa": false
+    },
+    {
+      "prompt": "aria",
+      "words": [
+        "gas",
+        "atmosfera",
+        "ossigeno",
+        "ventilazione",
+        "vento",
+        "respiro",
+        "azoto",
+        "inquinamento"
+      ],
+      "answer_count": 8,
+      "pool_sha256": "92906a0bd30b4b036a7df03977f6230bd2fb87875ac8dd06556fff97d8370ff7",
+      "sense_description": "Miscuglio gassoso dell'atmosfera",
+      "category_id": "153",
+      "approval": false,
+      "independent_gameplay_qa": false
+    },
+    {
+      "prompt": "bistecca",
+      "words": [
+        "fuoco",
+        "manzo",
+        "sangue",
+        "vitello",
+        "griglia",
+        "carne",
+        "padella",
+        "filetto"
+      ],
+      "answer_count": 8,
+      "pool_sha256": "8fdc330a11b97dd437e8ba0f7646ea39092aed53ca33ad7b1d2b6e1f72247538",
+      "sense_description": "Taglio di carne da cuocere",
+      "category_id": "002",
+      "approval": false,
+      "independent_gameplay_qa": false
+    },
+    {
+      "prompt": "bollito",
+      "words": [
+        "carne",
+        "brodo",
+        "cottura",
+        "acqua",
+        "manzo",
+        "lessare",
+        "pentola"
+      ],
+      "answer_count": 7,
+      "pool_sha256": "3de94359b7432a7de7381000e96cbb98db9a3b867ca6963cf1a2dab09f2eb5d1",
+      "sense_description": "Pietanza di carne lessata",
+      "category_id": "002",
+      "approval": false,
+      "independent_gameplay_qa": false
+    },
+    {
+      "prompt": "camerata",
+      "words": [
+        "sveglia",
+        "branda",
+        "caserma",
+        "armadietto",
+        "letto",
+        "commilitone",
+        "dormitorio",
+        "russare"
+      ],
+      "answer_count": 8,
+      "pool_sha256": "55cb979b6f80b2a56d3c317b08c9f09d50df607c2f32ab22777895140401067f",
+      "sense_description": "Grande dormitorio condiviso, tipico della caserma",
+      "category_id": "021",
+      "approval": false,
+      "independent_gameplay_qa": false
+    },
+    {
+      "prompt": "caramella",
+      "words": [
+        "limone",
+        "zucchero",
+        "succhiare",
+        "menta",
+        "dolce",
+        "liquirizia",
+        "incarto"
+      ],
+      "answer_count": 7,
+      "pool_sha256": "0327a122f22ef980a1071ca21c915ccd9b58bb206d9a77916e34a25d92f51b99",
+      "sense_description": "Dolciume da mangiare o succhiare",
+      "category_id": "009",
+      "approval": false,
+      "independent_gameplay_qa": false
+    },
+    {
+      "prompt": "caramello",
+      "words": [
+        "cottura",
+        "budino",
+        "ambrato",
+        "croccante",
+        "salsa",
+        "dolce",
+        "zucchero",
+        "pentolino"
+      ],
+      "answer_count": 8,
+      "pool_sha256": "173d63bd9a975b7be22c4a0cb07defccfbd46d38092483c8534199c5e40ace09",
+      "sense_description": "Preparazione ottenuta riscaldando lo zucchero",
+      "category_id": "009",
+      "approval": false,
+      "independent_gameplay_qa": false
+    },
+    {
+      "prompt": "cassa",
+      "words": [
+        "supermercato",
+        "contante",
+        "cassiere",
+        "pagamento",
+        "carta",
+        "resto",
+        "scontrino"
+      ],
+      "answer_count": 7,
+      "pool_sha256": "b1904eba15ed01c5110870e3e4d4a1cd8f71367a68f07fe522c7de320b217b00",
+      "sense_description": "Punto del negozio in cui si registra e si paga l'acquisto",
+      "category_id": "075",
+      "approval": false,
+      "independent_gameplay_qa": false
+    },
+    {
+      "prompt": "coagulazione",
+      "words": [
+        "sangue",
+        "ferita",
+        "sanguinamento",
+        "crosta",
+        "fibrinogeno",
+        "coagulo",
+        "fibrina",
+        "emorragia"
+      ],
+      "answer_count": 8,
+      "pool_sha256": "b909df94cf1c6624628d1312e69ca9766fff530748e6d64934aeaa849d83665c",
+      "sense_description": "Coagulazione del sangue",
+      "category_id": "053",
+      "approval": false,
+      "independent_gameplay_qa": false
+    },
+    {
+      "prompt": "cosplay",
+      "words": [
+        "travestimento",
+        "costume",
+        "convegno",
+        "manga",
+        "fiera",
+        "accessorio",
+        "personaggio"
+      ],
+      "answer_count": 7,
+      "pool_sha256": "08d2f68d32158a1288d694168a338255fc0d3791f768df60a49aaf5e67b8e69e",
+      "sense_description": "Travestimento e interpretazione di un personaggio di finzione",
+      "category_id": "150",
+      "approval": false,
+      "independent_gameplay_qa": false
+    },
+    {
+      "prompt": "difendere",
+      "words": [
+        "riparo",
+        "attacco",
+        "sicurezza",
+        "pericolo",
+        "aggressore",
+        "proteggere",
+        "scudo"
+      ],
+      "answer_count": 7,
+      "pool_sha256": "8515e0e6e57fbc0adf333c40eae318ad4e584a4cc4bc4bf22014480d841335dc",
+      "sense_description": "Proteggere da un pericolo o da un attacco",
+      "category_id": null,
+      "approval": false,
+      "independent_gameplay_qa": false
+    },
+    {
+      "prompt": "esperto",
+      "words": [
+        "conoscenza",
+        "consulenza",
+        "parere",
+        "preparato",
+        "principiante",
+        "abilità",
+        "esperienza"
+      ],
+      "answer_count": 7,
+      "pool_sha256": "23005f9e2a4d92953d4ba6fa0153ba4fc8e1a7a5249edef3b44806428391326a",
+      "sense_description": "Che possiede conoscenze e competenze in una materia",
+      "category_id": null,
+      "approval": false,
+      "independent_gameplay_qa": false
+    },
+    {
+      "prompt": "farina",
+      "words": [
+        "mulino",
+        "polvere",
+        "pasta",
+        "cereale",
+        "macinare",
+        "setaccio",
+        "impasto",
+        "pane"
+      ],
+      "answer_count": 8,
+      "pool_sha256": "0c3aa23bfb87a2f93547c5b47928aeb42af7895b86ddccff9bcedf30f9d48034",
+      "sense_description": "Polvere alimentare ottenuta dalla macinazione dei cereali",
+      "category_id": "008",
+      "approval": false,
+      "independent_gameplay_qa": false
+    },
+    {
+      "prompt": "glutine",
+      "words": [
+        "grano",
+        "pasta",
+        "elasticità",
+        "farina",
+        "orzo",
+        "celiachia",
+        "pane"
+      ],
+      "answer_count": 7,
+      "pool_sha256": "2c0c67463471d1e0266e55f5764fcbc5513924a72215391facd5d1347c6beafe",
+      "sense_description": "Componente proteica presente in alcuni cereali",
+      "category_id": "001",
+      "approval": false,
+      "independent_gameplay_qa": false
+    },
+    {
+      "prompt": "gufo",
+      "words": [
+        "volo",
+        "topo",
+        "becco",
+        "notturno",
+        "caccia",
+        "ala",
+        "artiglio",
+        "piuma"
+      ],
+      "answer_count": 8,
+      "pool_sha256": "c99fa11062a3a75284dd31022cf0b530dd66004cc6c1c7907d5db2a0ae60f173",
+      "sense_description": "Uccello rapace notturno",
+      "category_id": "047",
+      "approval": false,
+      "independent_gameplay_qa": false
+    },
+    {
+      "prompt": "impoverire",
+      "words": [
+        "risparmio",
+        "spesa",
+        "arricchire",
+        "reddito",
+        "denaro",
+        "perdita",
+        "miseria",
+        "debito"
+      ],
+      "answer_count": 8,
+      "pool_sha256": "187cfea79b435bfdecf489610b318e5a6252851eeeaf219a2c7f5ae3fc082461",
+      "sense_description": "Ridurre le risorse economiche o rendere economicamente povero",
+      "category_id": "079",
+      "approval": false,
+      "independent_gameplay_qa": false
+    },
+    {
+      "prompt": "improvviso",
+      "words": [
+        "preavviso",
+        "fulmine",
+        "sorpresa",
+        "sussulto",
+        "rumore",
+        "imprevisto",
+        "istante"
+      ],
+      "answer_count": 7,
+      "pool_sha256": "9326ec2287211ca2b8529a060cb29b6b68c0b643d1139ce25d28eda62df6fe62",
+      "sense_description": "Che avviene in modo inatteso e rapido",
+      "category_id": null,
+      "approval": false,
+      "independent_gameplay_qa": false
+    },
+    {
+      "prompt": "ketchup",
+      "words": [
+        "condimento",
+        "hamburger",
+        "bottiglia",
+        "aceto",
+        "pomodoro",
+        "patatina",
+        "salsa"
+      ],
+      "answer_count": 7,
+      "pool_sha256": "f8d190e74efdf78625eeaea33baf813442f5871e9d1d65d95ed469c2ceb19759",
+      "sense_description": "Salsa di pomodoro per condire",
+      "category_id": "001",
+      "approval": false,
+      "independent_gameplay_qa": false
+    },
+    {
+      "prompt": "light",
+      "words": [
+        "grasso",
+        "formaggio",
+        "zucchero",
+        "bevanda",
+        "dieta",
+        "leggero",
+        "etichetta",
+        "yogurt"
+      ],
+      "answer_count": 8,
+      "pool_sha256": "1375168b9405f77c804c37356e3f29006fa14ef70fec28fed534d6f759b36cb5",
+      "sense_description": "Prodotti alimentari a contenuto ridotto di grassi, zuccheri o calorie",
+      "category_id": "058",
+      "approval": false,
+      "independent_gameplay_qa": false
+    },
+    {
+      "prompt": "macinato",
+      "words": [
+        "tritacarne",
+        "carne",
+        "polpetta",
+        "polpettone",
+        "hamburger",
+        "ragù",
+        "tritare",
+        "maiale"
+      ],
+      "answer_count": 8,
+      "pool_sha256": "2354e80820f189fd49ac94f2b3303415d2534c0563b9cbd4253aaa113602baee",
+      "sense_description": "Carne tritata per preparazioni alimentari",
+      "category_id": "002",
+      "approval": false,
+      "independent_gameplay_qa": false
+    },
+    {
+      "prompt": "marshmallow",
+      "words": [
+        "stecco",
+        "arrostire",
+        "gelatina",
+        "caramella",
+        "falò",
+        "spugnoso",
+        "dolce"
+      ],
+      "answer_count": 7,
+      "pool_sha256": "21b79d44421764f26f90c7593c3938ba7111fa30cb32d60e41ef3ddbbe4ff867",
+      "sense_description": "Dolciume zuccherino morbido",
+      "category_id": "009",
+      "approval": false,
+      "independent_gameplay_qa": false
+    },
+    {
+      "prompt": "masso",
+      "words": [
+        "roccia",
+        "rotolare",
+        "peso",
+        "sasso",
+        "pesante",
+        "pendio",
+        "frana"
+      ],
+      "answer_count": 7,
+      "pool_sha256": "80dc252b49512ab52349f2d045c244642334f1a26d2a3f8600747c0b6f94745b",
+      "sense_description": "Grande blocco naturale di pietra",
+      "category_id": "037",
+      "approval": false,
+      "independent_gameplay_qa": false
+    },
+    {
+      "prompt": "merenda",
+      "words": [
+        "spuntino",
+        "fame",
+        "panino",
+        "cioccolato",
+        "frutta",
+        "pausa",
+        "biscotto"
+      ],
+      "answer_count": 7,
+      "pool_sha256": "3c2cf3e985fb78b9b3bd742a2d9f2a828a241474337ca1f4618e6e2727a9812d",
+      "sense_description": "Spuntino tra i pasti principali",
+      "category_id": null,
+      "approval": false,
+      "independent_gameplay_qa": false
+    },
+    {
+      "prompt": "morte",
+      "words": [
+        "cimitero",
+        "funerale",
+        "vita",
+        "decesso",
+        "sepoltura",
+        "cordoglio",
+        "bara",
+        "defunto"
+      ],
+      "answer_count": 8,
+      "pool_sha256": "bae831b8e07a3988f3a3c4d16737a9e7a21e86955e6bb2e4bb5c817319fb1b56",
+      "sense_description": "Cessazione della vita e conseguenti riti e lutto",
+      "category_id": "099",
+      "approval": false,
+      "independent_gameplay_qa": false
+    },
+    {
+      "prompt": "palato",
+      "words": [
+        "deglutire",
+        "mucosa",
+        "osso",
+        "molle",
+        "bocca",
+        "cavità",
+        "duro"
+      ],
+      "answer_count": 7,
+      "pool_sha256": "2e186901af9442aa735c7bb41bc405114ffc985de50549b390996c93d3cf2f20",
+      "sense_description": "Parte superiore della cavità della bocca",
+      "category_id": "051",
+      "approval": false,
+      "independent_gameplay_qa": false
+    },
+    {
+      "prompt": "parmigiana",
+      "words": [
+        "teglia",
+        "basilico",
+        "melanzana",
+        "strato",
+        "forno",
+        "parmigiano",
+        "mozzarella",
+        "formaggio"
+      ],
+      "answer_count": 8,
+      "pool_sha256": "2a4ae4e415c342db41ad751cbe12efa6cd4d955ff2e2314d05ba13d91ceb9a18",
+      "sense_description": "Pietanza di melanzane, pomodoro e formaggio",
+      "category_id": "006",
+      "approval": false,
+      "independent_gameplay_qa": false
+    },
+    {
+      "prompt": "pizza",
+      "words": [
+        "cornicione",
+        "pizzaiolo",
+        "impasto",
+        "mozzarella",
+        "pomodoro",
+        "farina",
+        "teglia",
+        "olio"
+      ],
+      "answer_count": 8,
+      "pool_sha256": "a32846cdab5534159a49a60536c81d3f457d30624131a1a3c6ceaca026139c08",
+      "sense_description": "Preparazione di impasto cotto e condito",
+      "category_id": "008",
+      "approval": false,
+      "independent_gameplay_qa": false
+    },
+    {
+      "prompt": "pollame",
+      "words": [
+        "oca",
+        "allevamento",
+        "anatra",
+        "volatile",
+        "cortile",
+        "gallina",
+        "pollo"
+      ],
+      "answer_count": 7,
+      "pool_sha256": "1852d910a159b209e278bbb593797b7a318138f0a6d88eeb5e86554b4b501c0c",
+      "sense_description": "Volatili domestici allevati",
+      "category_id": "045",
+      "approval": false,
+      "independent_gameplay_qa": false
+    },
+    {
+      "prompt": "pongo",
+      "words": [
+        "schiacciare",
+        "formina",
+        "plastilina",
+        "mano",
+        "pallina",
+        "giocattolo",
+        "figura"
+      ],
+      "answer_count": 7,
+      "pool_sha256": "c610b416c51e4e6ec9302adc7769c61d3997821d59fa53722673a5caefd3b0c3",
+      "sense_description": "Materiale plastico da modellare e per giochi creativi",
+      "category_id": "147",
+      "approval": false,
+      "independent_gameplay_qa": false
+    },
+    {
+      "prompt": "prosciutto",
+      "words": [
+        "affettare",
+        "sale",
+        "coscia",
+        "crudo",
+        "cotto",
+        "maiale",
+        "salume"
+      ],
+      "answer_count": 7,
+      "pool_sha256": "f61a1e315cb9922e1f2d27ed6f7593ecc29706feec0608aaed9a9043f1d24f63",
+      "sense_description": "Salume ricavato dalla coscia del maiale",
+      "category_id": "002",
+      "approval": false,
+      "independent_gameplay_qa": false
+    },
+    {
+      "prompt": "ragù",
+      "words": [
+        "pomodoro",
+        "sugo",
+        "tagliatella",
+        "cottura",
+        "pasta",
+        "sedano",
+        "carota"
+      ],
+      "answer_count": 7,
+      "pool_sha256": "3710661a57f1ba4a8763be4a6d6e502bbc531740a7ce8d3c429cd059f4194754",
+      "sense_description": "Sugo di carne per condire la pasta",
+      "category_id": "002",
+      "approval": false,
+      "independent_gameplay_qa": false
+    },
+    {
+      "prompt": "ripieno",
+      "words": [
+        "carne",
+        "farcitura",
+        "spinacio",
+        "farcire",
+        "ricotta",
+        "raviolo",
+        "pasta"
+      ],
+      "answer_count": 7,
+      "pool_sha256": "20b1a2c481ed185479ea03be5389a8af1605b0c1debeb8eb34a367eb91582e65",
+      "sense_description": "Farcitura alimentare",
+      "category_id": "006",
+      "approval": false,
+      "independent_gameplay_qa": false
+    },
+    {
+      "prompt": "rugby",
+      "words": [
+        "campo",
+        "squadra",
+        "passaggio",
+        "meta",
+        "placcaggio",
+        "ovale",
+        "arbitro"
+      ],
+      "answer_count": 7,
+      "pool_sha256": "3a815f09edeeeba0bbf4f16fb05d187eca170c8b2d76d97844ad8ba558762599",
+      "sense_description": "Sport di squadra con palla ovale",
+      "category_id": "132",
+      "approval": false,
+      "independent_gameplay_qa": false
+    },
+    {
+      "prompt": "salame",
+      "words": [
+        "spezie",
+        "macinare",
+        "fetta",
+        "insaccato",
+        "budello",
+        "stagionatura",
+        "coltello"
+      ],
+      "answer_count": 7,
+      "pool_sha256": "975470a28d2a43923e890b2fd486e776167eac950861d8dd14da53cd36a20fa9",
+      "sense_description": "Insaccato di carne stagionata",
+      "category_id": "002",
+      "approval": false,
+      "independent_gameplay_qa": false
+    },
+    {
+      "prompt": "scarpetta",
+      "words": [
+        "sugo",
+        "forchetta",
+        "assorbire",
+        "mollica",
+        "pane",
+        "intingere",
+        "piatto",
+        "fetta"
+      ],
+      "answer_count": 8,
+      "pool_sha256": "e34da26a757d57a63ea902103374169e72a902a8b8e15f251db1d3a3a97c0a65",
+      "sense_description": "Gesto di raccogliere il sugo con il pane",
+      "category_id": "006",
+      "approval": false,
+      "independent_gameplay_qa": false
+    },
+    {
+      "prompt": "skateboard",
+      "words": [
+        "acrobazia",
+        "caduta",
+        "equilibrio",
+        "tavola",
+        "ruota",
+        "pista",
+        "casco"
+      ],
+      "answer_count": 7,
+      "pool_sha256": "12cfd493003c09acbcea9b73bed408a46d2e96c72a83150e871119f077183999",
+      "sense_description": "Tavola a ruote per spostarsi e compiere acrobazie",
+      "category_id": "122",
+      "approval": false,
+      "independent_gameplay_qa": false
+    },
+    {
+      "prompt": "sottomarino",
+      "words": [
+        "immersione",
+        "acqua",
+        "periscopio",
+        "navale",
+        "subacqueo",
+        "profondità",
+        "sonar",
+        "equipaggio"
+      ],
+      "answer_count": 8,
+      "pool_sha256": "e5da4994164ceee04f27cb1a80240ef011fe30209d158592330fd6f3ab7ee9af",
+      "sense_description": "Mezzo navale capace di navigare sott'acqua",
+      "category_id": "127",
+      "approval": false,
+      "independent_gameplay_qa": false
+    },
+    {
+      "prompt": "spandere",
+      "words": [
+        "olio",
+        "superficie",
+        "pavimento",
+        "spargere",
+        "macchia",
+        "liquido",
+        "sabbia"
+      ],
+      "answer_count": 7,
+      "pool_sha256": "ecac9c3bd83583b7e7c9e80fc105f09ef335fceee945392394c25c6219218663",
+      "sense_description": "Distribuire una sostanza o un materiale su una superficie",
+      "category_id": null,
+      "approval": false,
+      "independent_gameplay_qa": false
+    },
+    {
+      "prompt": "speck",
+      "words": [
+        "salato",
+        "prosciutto",
+        "stagionatura",
+        "affumicatura",
+        "crudo",
+        "fetta",
+        "maiale",
+        "coscia"
+      ],
+      "answer_count": 8,
+      "pool_sha256": "d9f57dbc9e84dc2faad13faf74acb24248a1cda996076df36fabfabda896c0fe",
+      "sense_description": "Salume di maiale affumicato",
+      "category_id": "002",
+      "approval": false,
+      "independent_gameplay_qa": false
+    },
+    {
+      "prompt": "terna",
+      "words": [
+        "lotto",
+        "elemento",
+        "gruppo",
+        "numero",
+        "tombola",
+        "vincita",
+        "tre",
+        "candidato"
+      ],
+      "answer_count": 8,
+      "pool_sha256": "f4eb02548fd49d1d5e24747c38f67ee1d5f718677392adef011d617a07146611",
+      "sense_description": "Insieme di tre elementi, anche combinazione di tre numeri",
+      "category_id": "151",
+      "approval": false,
+      "independent_gameplay_qa": false
+    },
+    {
+      "prompt": "tigre",
+      "words": [
+        "felino",
+        "ruggito",
+        "striscia",
+        "coda",
+        "carnivoro",
+        "pelliccia",
+        "caccia"
+      ],
+      "answer_count": 7,
+      "pool_sha256": "c2a35cbeb0de9d4ffddfe948e59e24de06cf781b2ca2c73980db9cdb7a4208e1",
+      "sense_description": "Grande felino predatore dal mantello striato",
+      "category_id": "047",
+      "approval": false,
+      "independent_gameplay_qa": false
+    },
+    {
+      "prompt": "travestimento",
+      "words": [
+        "personaggio",
+        "attore",
+        "carnevale",
+        "parrucca",
+        "trucco",
+        "costume",
+        "maschera"
+      ],
+      "answer_count": 7,
+      "pool_sha256": "a20d2e3a45f2580b327e07a1eba145d85a6ff574250f8daeee42284fa00df302",
+      "sense_description": "Cambio di aspetto con abiti e trucco, anche per interpretare un personaggio",
+      "category_id": "150",
+      "approval": false,
+      "independent_gameplay_qa": false
+    },
+    {
+      "prompt": "tribuna",
+      "words": [
+        "tifoso",
+        "biglietto",
+        "stadio",
+        "applauso",
+        "spettatore",
+        "gradinata",
+        "sedere",
+        "pubblico"
+      ],
+      "answer_count": 8,
+      "pool_sha256": "63281d488330960dd7af2084b138c9bf0be5d1f55deff0276d1ff9208ac8f21a",
+      "sense_description": "Settore rialzato destinato agli spettatori di un impianto sportivo",
+      "category_id": "132",
+      "approval": false,
+      "independent_gameplay_qa": false
+    },
+    {
+      "prompt": "zucchero",
+      "words": [
+        "dolcificare",
+        "canna",
+        "saccarosio",
+        "granello",
+        "bustina",
+        "barbabietola",
+        "cucchiaino",
+        "caffè"
+      ],
+      "answer_count": 8,
+      "pool_sha256": "e34a676cf3dd2eda93abd082f52d12b9b993a6ca74993ee7fc381de71202753b",
+      "sense_description": "Sostanza dolce usata come alimento e dolcificante",
+      "category_id": "001",
+      "approval": false,
+      "independent_gameplay_qa": false
+    },
+    {
+      "prompt": "zuppa",
+      "words": [
+        "ciotola",
+        "caldo",
+        "minestra",
+        "pane",
+        "verdura",
+        "legume",
+        "cucchiaio",
+        "crostino"
+      ],
+      "answer_count": 8,
+      "pool_sha256": "2d8971f2e52c11dadd13af14fbdf62e8e6b5945ac1e67a78fb23a96d889fc029",
+      "sense_description": "Pietanza liquida o semiliquida servita calda",
+      "category_id": "006",
+      "approval": false,
+      "independent_gameplay_qa": false
+    }
+  ],
+  "pending": [],
+  "csv_exported": false,
+  "release_approved": false
+}

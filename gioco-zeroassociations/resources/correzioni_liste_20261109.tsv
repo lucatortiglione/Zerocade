@@ -1,0 +1,40 @@
+index	old	new	relation	rationale
+22	spezie	spezia	contesto	Una spezia può conferire un aroma riconoscibile a una pietanza.
+29	candela	pasticcere	ruolo	Il pasticcere prepara dolci per la vendita.
+87	rifiuti	rifiuto	contesto	Un accumulo di rifiuti richiede raccolta e smaltimento.
+102	tortellini	tortellino	contesto	Il tortellino viene tradizionalmente servito anche in brodo.
+103	semi	seme	parte	Il cacao alimentare si ricava dalla lavorazione dei semi della pianta.
+106	tipica	tipico	proprietà	Una caratteristica tipica aiuta a riconoscere un oggetto o una persona.
+107	mezzo	mille	proprietà	Un chilo corrisponde a mille grammi.
+115	fraintesa	frainteso	contrasto	Frainteso indica un significato interpretato male anziché compreso.
+142	terra	agricolo	contesto	La proprietà fondiaria può comprendere terreni a uso agricolo.
+194	ore	ora	contesto	Quarantotto ore costituiscono una durata comunemente espressa anche in due giorni.
+198	dura	duro	proprietà	La roccia è comunemente percepita come un materiale duro.
+199	rossastra	rossastro	proprietà	Il colore rossastro è caratteristico della ruggine sul ferro.
+293	detonazione	tritolo	categoria	Il tritolo è una sostanza esplosiva.
+323	novarese	vino	contesto	Il vino piemontese comprende produzioni note come il Barolo e il Barbaresco.
+331	velocità	corsa	contesto	Una corsa rapida copre una distanza in poco tempo.
+331	fulmineo	reazione	contesto	Una reazione rapida segue lo stimolo senza una lunga attesa.
+331	istante	intervento	contesto	Un intervento rapido permette di affrontare presto un'emergenza.
+333	dimenticare	negozio	luogo	Si può riportare al negozio un oggetto acquistato per restituirlo.
+338	più	aritmetica	contesto	Sommare è una delle operazioni fondamentali dell'aritmetica.
+440	fuoritema	digressione	contrasto	Una digressione può allontanare il discorso dal tema e ridurne la pertinenza.
+539	retto	diritto	sinonimia	Un percorso lineare procede diritto senza deviazioni.
+539	retta	segmento	contesto	Un segmento segue un andamento lineare.
+547	superiorità	numero	contesto	La prevalenza numerica indica un numero maggiore rispetto al gruppo di confronto.
+547	dominio	peso	contesto	La prevalenza può indicare un maggior peso relativo nella valutazione di elementi diversi.
+127	india	piccante	proprietà	Il curry può conferire un sapore piccante alle pietanze.
+172	italia	spiaggia	contesto	Le coste di una penisola possono comprendere spiagge.
+451	caserta	trono	contesto	La reggia di un sovrano può ospitare una sala del trono.
+466	pisa	orologio	contesto	Una torre civica può ospitare un orologio visibile dalla piazza.
+527	milano	rosone	parte	Un duomo può avere un rosone sulla facciata.
+622	zuppa	gelato	contesto	Il cucchiaio permette di raccogliere e mangiare il gelato.
+622	brodo	acciaio	materiale	Molti cucchiai sono fabbricati in acciaio.
+634	brillante	argento	contesto	Una superficie d'argento ben pulita e lucidata può apparire lustra.
+634	lucidare	scarpa	contesto	Una scarpa lucidata può essere descritta come lustra.
+637	egitto	piramide	contesto	Le piramidi egizie sono comunemente associate alle mummie dei faraoni.
+643	zip	cerniera	parte	La cerniera può chiudere l'apertura anteriore del pantalone.
+657	sedersi	riposo	contesto	Sedere permette di riposare le gambe dopo essere rimasti in piedi.
+658	convinzione	risposta	contesto	Una persona sicura del proprio giudizio può dare una risposta senza esitazione.
+678	abitazione	corriere	ruolo	Il corriere effettua consegne al domicilio del destinatario.
+678	soggiorno	trasloco	contesto	Un trasloco può comportare il cambiamento del domicilio.

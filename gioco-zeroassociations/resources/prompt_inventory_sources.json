@@ -1,0 +1,419 @@
+[
+  {
+    "id": "kaikki-itwiktionary",
+    "name": "Wikizionario italiano completo, tramite Kaikki",
+    "kind": "wiktextract",
+    "url": "https://kaikki.org/itwiktionary/Italiano/kaikki.org-dictionary-Italiano.jsonl",
+    "cache_file": "kaikki.org-dictionary-Italiano.jsonl",
+    "license": "CC BY-SA / GFDL secondo Wikizionario",
+    "attribution": "Contributori Wikizionario; estrazione Kaikki/Wiktextract",
+    "definition_language": "it"
+  },
+  {
+    "id": "kaikki-enwiktionary-it",
+    "name": "Lessico italiano di Wiktionary inglese, tramite Kaikki",
+    "kind": "wiktextract",
+    "url": "https://kaikki.org/dictionary/Italian/kaikki.org-dictionary-Italian.jsonl",
+    "cache_file": "kaikki.org-dictionary-Italian-enwiktionary.jsonl",
+    "license": "CC BY-SA / GFDL secondo Wiktionary",
+    "attribution": "Contributori Wiktionary; estrazione Kaikki/Wiktextract",
+    "definition_language": "en"
+  },
+  {
+    "id": "wikipedia-it",
+    "name": "Titoli Wikipedia italiana",
+    "kind": "wiki_titles",
+    "url": "https://dumps.wikimedia.org/itwiki/20261101/itwiki-20261101-all-titles-in-ns0.gz",
+    "cache_file": "itwiki-20261101-all-titles-in-ns0.gz",
+    "license": "Titoli e URL di voci; nessun testo degli articoli importato",
+    "attribution": "Contributori Wikipedia; Wikimedia dumps",
+    "wiki_base": "https://it.wikipedia.org/wiki/"
+  },
+  {
+    "id": "wiktionary-it-titles",
+    "name": "Titoli Wikizionario, tutte le lingue presenti nell'edizione italiana",
+    "kind": "wiki_titles",
+    "url": "https://dumps.wikimedia.org/itwiktionary/20261101/itwiktionary-20261101-all-titles-in-ns0.gz",
+    "license": "Titoli e URL di voci; nessun testo importato",
+    "attribution": "Contributori Wikizionario; Wikimedia dumps",
+    "wiki_base": "https://it.wiktionary.org/wiki/"
+  },
+  {
+    "id": "wikisource-it",
+    "name": "Titoli Wikisource italiana",
+    "kind": "wiki_titles",
+    "url": "https://dumps.wikimedia.org/itwikisource/20261101/itwikisource-20261101-all-titles-in-ns0.gz",
+    "license": "Titoli e URL di voci; nessun testo importato",
+    "attribution": "Contributori Wikisource; Wikimedia dumps",
+    "wiki_base": "https://it.wikisource.org/wiki/"
+  },
+  {
+    "id": "wikiquote-it",
+    "name": "Titoli Wikiquote italiana",
+    "kind": "wiki_titles",
+    "url": "https://dumps.wikimedia.org/itwikiquote/20261101/itwikiquote-20261101-all-titles-in-ns0.gz",
+    "license": "Titoli e URL di voci; nessun testo importato",
+    "attribution": "Contributori Wikiquote; Wikimedia dumps",
+    "wiki_base": "https://it.wikiquote.org/wiki/"
+  },
+  {
+    "id": "wikivoyage-it",
+    "name": "Titoli Wikivoyage italiana",
+    "kind": "wiki_titles",
+    "url": "https://dumps.wikimedia.org/itwikivoyage/20261101/itwikivoyage-20261101-all-titles-in-ns0.gz",
+    "license": "Titoli e URL di voci; nessun testo importato",
+    "attribution": "Contributori Wikivoyage; Wikimedia dumps",
+    "wiki_base": "https://it.wikivoyage.org/wiki/"
+  },
+  {
+    "id": "wikiversity-it",
+    "name": "Titoli Wikiversità italiana",
+    "kind": "wiki_titles",
+    "url": "https://dumps.wikimedia.org/itwikiversity/20261101/itwikiversity-20261101-all-titles-in-ns0.gz",
+    "license": "Titoli e URL di voci; nessun testo importato",
+    "attribution": "Contributori Wikiversità; Wikimedia dumps",
+    "wiki_base": "https://it.wikiversity.org/wiki/"
+  },
+  {
+    "id": "wikinews-it",
+    "name": "Titoli Wikinotizie italiana",
+    "kind": "wiki_titles",
+    "url": "https://dumps.wikimedia.org/itwikinews/20261101/itwikinews-20261101-all-titles-in-ns0.gz",
+    "license": "Titoli e URL di voci; nessun testo importato",
+    "attribution": "Contributori Wikinotizie; Wikimedia dumps",
+    "wiki_base": "https://it.wikinews.org/wiki/"
+  },
+  {
+    "id": "libreoffice-it-dictionary",
+    "name": "Dizionario ortografico italiano LibreOffice",
+    "kind": "hunspell",
+    "url": "https://raw.githubusercontent.com/LibreOffice/dictionaries/c0865a85eb67dc377f2cf8e8fe2c4fa9e53f0dcb/it_IT/it_IT.dic",
+    "license": "GPL-3.0; vedere README_it_IT.txt della medesima revisione",
+    "license_url": "https://raw.githubusercontent.com/LibreOffice/dictionaries/c0865a85eb67dc377f2cf8e8fe2c4fa9e53f0dcb/it_IT/README_it_IT.txt",
+    "attribution": "LibreItalia, Marina Latini e autori precedenti elencati nel README",
+    "revision": "c0865a85eb67dc377f2cf8e8fe2c4fa9e53f0dcb"
+  },
+  {
+    "id": "libreoffice-it-thesaurus",
+    "name": "Thesaurus italiano LibreOffice",
+    "kind": "mythes",
+    "url": "https://raw.githubusercontent.com/LibreOffice/dictionaries/c0865a85eb67dc377f2cf8e8fe2c4fa9e53f0dcb/it_IT/th_it_IT_v2.dat",
+    "license": "GPL-3.0; vedere README_th_it_IT.txt della medesima revisione",
+    "license_url": "https://raw.githubusercontent.com/LibreOffice/dictionaries/c0865a85eb67dc377f2cf8e8fe2c4fa9e53f0dcb/it_IT/README_th_it_IT.txt",
+    "attribution": "Daniela Volta, Giovanni Zuliani, Davide Prina, Andrea Pescetti, LibreItalia e Marina Latini",
+    "revision": "c0865a85eb67dc377f2cf8e8fe2c4fa9e53f0dcb"
+  },
+  {
+    "id": "omw-multiwordnet-it",
+    "name": "MultiWordNet italiano, distribuzione Open Multilingual Wordnet",
+    "kind": "wordnet_tab",
+    "url": "https://raw.githubusercontent.com/omwn/omw-data/406bf83b3c507a3d1f26e88252d5d66893fd36bf/wns/ita/wn-data-ita.tab",
+    "license": "CC BY 3.0 secondo LICENSE della distribuzione OMW",
+    "license_url": "https://raw.githubusercontent.com/omwn/omw-data/406bf83b3c507a3d1f26e88252d5d66893fd36bf/wns/ita/LICENSE",
+    "attribution": "Emanuele Pianta, Luisa Bentivogli, Christian Girardi, FBK; distribuzione OMW",
+    "revision": "406bf83b3c507a3d1f26e88252d5d66893fd36bf"
+  },
+  {
+    "id": "napolux-paroleitaliane",
+    "name": "Parole italiane, unione delle liste napolux",
+    "kind": "wordlist",
+    "url": "https://raw.githubusercontent.com/napolux/paroleitaliane/2951524b6d5b67986f542937cef16a54af63ff84/paroleitaliane/parole_uniche.txt",
+    "license": "Repository MIT; provenienze dei dati eterogenee, consultare README",
+    "license_url": "https://raw.githubusercontent.com/napolux/paroleitaliane/2951524b6d5b67986f542937cef16a54af63ff84/LICENSE",
+    "attribution": "Francesco Napoletano e contributori; fonti delle singole liste nel README",
+    "revision": "2951524b6d5b67986f542937cef16a54af63ff84"
+  },
+  {
+    "id": "wordfreq-it-local",
+    "name": "Frequenze italiane wordfreq 3.1.1 già presenti nel progetto",
+    "kind": "frequency_csv",
+    "local_path": "resources/frequency_ranks_it.csv",
+    "url": "https://github.com/rspeer/wordfreq",
+    "license": "Dati CC BY-SA 4.0 e condizioni delle fonti riportate in wordfreq",
+    "attribution": "Robyn Speer e contributori wordfreq",
+    "revision": "3.1.1"
+  },
+  {
+    "id": "de-mauro-sitemaps",
+    "name": "Indici pubblici del dizionario Nuovo De Mauro, Internazionale",
+    "kind": "sitemap_index",
+    "url": "https://dizionario.internazionale.it/sitemaps/dizionario/sitemap_dizionario-index.xml",
+    "entry_prefix": "/parola/",
+    "license": "Slug e URL degli indici pubblici; definizioni e altri testi del dizionario non importati",
+    "attribution": "Nuovo De Mauro, Internazionale; URL dei lemmi dalle sitemap pubbliche"
+  },
+  {
+    "id": "ud-isdt-train",
+    "name": "UD Italian ISDT, lemmi e forme del corpus train",
+    "kind": "conllu",
+    "url": "https://raw.githubusercontent.com/UniversalDependencies/UD_Italian-ISDT/ff2447f6b21e03adbbbed5eff306f79b8857286b/it_isdt-ud-train.conllu",
+    "license": "CC BY-NC-SA 3.0; nessuna approvazione automatica per la banca di gioco",
+    "license_url": "https://raw.githubusercontent.com/UniversalDependencies/UD_Italian-ISDT/ff2447f6b21e03adbbbed5eff306f79b8857286b/README.md",
+    "attribution": "Autori di Italian Stanford Dependency Treebank e Universal Dependencies, come da README",
+    "revision": "ff2447f6b21e03adbbbed5eff306f79b8857286b"
+  },
+  {
+    "id": "ud-isdt-dev",
+    "name": "UD Italian ISDT, lemmi e forme del corpus dev",
+    "kind": "conllu",
+    "url": "https://raw.githubusercontent.com/UniversalDependencies/UD_Italian-ISDT/ff2447f6b21e03adbbbed5eff306f79b8857286b/it_isdt-ud-dev.conllu",
+    "license": "CC BY-NC-SA 3.0; nessuna approvazione automatica per la banca di gioco",
+    "license_url": "https://raw.githubusercontent.com/UniversalDependencies/UD_Italian-ISDT/ff2447f6b21e03adbbbed5eff306f79b8857286b/README.md",
+    "attribution": "Autori di Italian Stanford Dependency Treebank e Universal Dependencies, come da README",
+    "revision": "ff2447f6b21e03adbbbed5eff306f79b8857286b"
+  },
+  {
+    "id": "ud-isdt-test",
+    "name": "UD Italian ISDT, lemmi e forme del corpus test",
+    "kind": "conllu",
+    "url": "https://raw.githubusercontent.com/UniversalDependencies/UD_Italian-ISDT/ff2447f6b21e03adbbbed5eff306f79b8857286b/it_isdt-ud-test.conllu",
+    "license": "CC BY-NC-SA 3.0; nessuna approvazione automatica per la banca di gioco",
+    "license_url": "https://raw.githubusercontent.com/UniversalDependencies/UD_Italian-ISDT/ff2447f6b21e03adbbbed5eff306f79b8857286b/README.md",
+    "attribution": "Autori di Italian Stanford Dependency Treebank e Universal Dependencies, come da README",
+    "revision": "ff2447f6b21e03adbbbed5eff306f79b8857286b"
+  },
+  {
+    "id": "kaikki-frwiktionary-it",
+    "name": "Lessico italiano di Wiktionary, edizione fr, tramite Kaikki",
+    "kind": "wiktextract",
+    "url": "https://kaikki.org/frwiktionary/Italien/kaikki.org-dictionary-Italien.jsonl",
+    "license": "CC BY-SA / GFDL secondo Wiktionary",
+    "attribution": "Contributori Wiktionary, edizione fr; estrazione Kaikki/Wiktextract",
+    "definition_language": "fr",
+    "source_group": "wiktionary-fr-italian"
+  },
+  {
+    "id": "kaikki-dewiktionary-it",
+    "name": "Lessico italiano di Wiktionary, edizione de, tramite Kaikki",
+    "kind": "wiktextract",
+    "url": "https://kaikki.org/dewiktionary/Italienisch/kaikki.org-dictionary-Italienisch.jsonl",
+    "license": "CC BY-SA / GFDL secondo Wiktionary",
+    "attribution": "Contributori Wiktionary, edizione de; estrazione Kaikki/Wiktextract",
+    "definition_language": "de",
+    "source_group": "wiktionary-de-italian"
+  },
+  {
+    "id": "kaikki-eswiktionary-it",
+    "name": "Lessico italiano di Wiktionary, edizione es, tramite Kaikki",
+    "kind": "wiktextract",
+    "url": "https://kaikki.org/eswiktionary/Italiano/kaikki.org-dictionary-Italiano.jsonl",
+    "license": "CC BY-SA / GFDL secondo Wiktionary",
+    "attribution": "Contributori Wiktionary, edizione es; estrazione Kaikki/Wiktextract",
+    "definition_language": "es",
+    "source_group": "wiktionary-es-italian"
+  },
+  {
+    "id": "morphit-048-mirror",
+    "name": "Morph-it! 0.4.8, copia pubblica con README originale",
+    "kind": "morphit",
+    "encoding": "utf-8",
+    "url": "https://raw.githubusercontent.com/giodegas/morphit-lemmatizer/b99d75d774367e4bedc5c5f339dec384777488ff/master/morph-it_048_utf8.txt",
+    "license": "CC BY-SA 2.0 / licenze GNU indicate nel README originale di Morph-it!",
+    "license_url": "https://raw.githubusercontent.com/giodegas/morphit-lemmatizer/b99d75d774367e4bedc5c5f339dec384777488ff/master/README.md",
+    "attribution": "Marco Baroni ed Eros Zanchetta, 2004–2009; copia pubblica nel repository giodegas/morphit-lemmatizer",
+    "revision": "b99d75d774367e4bedc5c5f339dec384777488ff",
+    "source_group": "morphit",
+    "primary_reference": "https://docs.sslmit.unibo.it/doku.php?id=resources:morph-it",
+    "distribution_note": "Il vecchio indirizzo ufficiale non era raggiungibile; il download proviene dal mirror dichiarato, non dal server originale."
+  },
+  {
+    "id": "frequencywords-it-2018",
+    "name": "Frequenze italiane OpenSubtitles 2018, FrequencyWords, lista completa",
+    "kind": "frequency_text",
+    "url": "https://raw.githubusercontent.com/hermitdave/FrequencyWords/525f9b560de45753a5ea01069454e72e9aa541c6/content/2018/it/it_full.txt",
+    "license": "CC BY-SA 4.0 per i dati; MIT soltanto per il codice, come da README",
+    "license_url": "https://raw.githubusercontent.com/hermitdave/FrequencyWords/525f9b560de45753a5ea01069454e72e9aa541c6/README.md",
+    "attribution": "Hermit Dave; corpus OpenSubtitles 2018 distribuito tramite OPUS",
+    "revision": "525f9b560de45753a5ea01069454e72e9aa541c6",
+    "source_group": "opensubtitles-frequencywords"
+  },
+  {
+    "id": "freedict-ita-deu",
+    "name": "FreeDict italiano–tedesco: sole forme di entrata italiane",
+    "kind": "tei_headwords",
+    "dictionary_source_language": "it",
+    "url": "https://raw.githubusercontent.com/freedict/fd-dictionaries/5bdceeac8d0dba3298c1bebe734f60d54dad30f7/ita-deu/ita-deu.tei",
+    "license": "GPL-2.0-or-later, secondo availability del TEI e COPYING",
+    "license_url": "https://raw.githubusercontent.com/freedict/fd-dictionaries/5bdceeac8d0dba3298c1bebe734f60d54dad30f7/ita-deu/COPYING",
+    "attribution": "Autori e contributori FreeDict ita-deu, elencati nel file TEI",
+    "revision": "5bdceeac8d0dba3298c1bebe734f60d54dad30f7",
+    "source_group": "freedict-ita-deu",
+    "translations_imported": false
+  },
+  {
+    "id": "ud-vit-dev",
+    "name": "UD Italian vit, lemmi e forme, dev",
+    "kind": "conllu",
+    "url": "https://raw.githubusercontent.com/UniversalDependencies/UD_Italian-VIT/12fc5f682a677e87dac1923903ae954d8441f7b7/it_vit-ud-dev.conllu",
+    "license": "CC BY-NC-SA 3.0",
+    "license_url": "https://raw.githubusercontent.com/UniversalDependencies/UD_Italian-VIT/12fc5f682a677e87dac1923903ae954d8441f7b7/README.md",
+    "attribution": "Autori di UniversalDependencies/UD_Italian-VIT, come da README e LICENSE del repository",
+    "revision": "12fc5f682a677e87dac1923903ae954d8441f7b7",
+    "source_group": "ud-italian-vit"
+  },
+  {
+    "id": "ud-vit-test",
+    "name": "UD Italian vit, lemmi e forme, test",
+    "kind": "conllu",
+    "url": "https://raw.githubusercontent.com/UniversalDependencies/UD_Italian-VIT/12fc5f682a677e87dac1923903ae954d8441f7b7/it_vit-ud-test.conllu",
+    "license": "CC BY-NC-SA 3.0",
+    "license_url": "https://raw.githubusercontent.com/UniversalDependencies/UD_Italian-VIT/12fc5f682a677e87dac1923903ae954d8441f7b7/README.md",
+    "attribution": "Autori di UniversalDependencies/UD_Italian-VIT, come da README e LICENSE del repository",
+    "revision": "12fc5f682a677e87dac1923903ae954d8441f7b7",
+    "source_group": "ud-italian-vit"
+  },
+  {
+    "id": "ud-vit-train",
+    "name": "UD Italian vit, lemmi e forme, train",
+    "kind": "conllu",
+    "url": "https://raw.githubusercontent.com/UniversalDependencies/UD_Italian-VIT/12fc5f682a677e87dac1923903ae954d8441f7b7/it_vit-ud-train.conllu",
+    "license": "CC BY-NC-SA 3.0",
+    "license_url": "https://raw.githubusercontent.com/UniversalDependencies/UD_Italian-VIT/12fc5f682a677e87dac1923903ae954d8441f7b7/README.md",
+    "attribution": "Autori di UniversalDependencies/UD_Italian-VIT, come da README e LICENSE del repository",
+    "revision": "12fc5f682a677e87dac1923903ae954d8441f7b7",
+    "source_group": "ud-italian-vit"
+  },
+  {
+    "id": "ud-partut-dev",
+    "name": "UD Italian partut, lemmi e forme, dev",
+    "kind": "conllu",
+    "url": "https://raw.githubusercontent.com/UniversalDependencies/UD_Italian-ParTUT/6ae975aeb16378d9aaf102ecccaf1a083e636b44/it_partut-ud-dev.conllu",
+    "license": "CC BY-NC-SA 4.0",
+    "license_url": "https://raw.githubusercontent.com/UniversalDependencies/UD_Italian-ParTUT/6ae975aeb16378d9aaf102ecccaf1a083e636b44/README.md",
+    "attribution": "Autori di UniversalDependencies/UD_Italian-ParTUT, come da README e LICENSE del repository",
+    "revision": "6ae975aeb16378d9aaf102ecccaf1a083e636b44",
+    "source_group": "ud-italian-partut"
+  },
+  {
+    "id": "ud-partut-test",
+    "name": "UD Italian partut, lemmi e forme, test",
+    "kind": "conllu",
+    "url": "https://raw.githubusercontent.com/UniversalDependencies/UD_Italian-ParTUT/6ae975aeb16378d9aaf102ecccaf1a083e636b44/it_partut-ud-test.conllu",
+    "license": "CC BY-NC-SA 4.0",
+    "license_url": "https://raw.githubusercontent.com/UniversalDependencies/UD_Italian-ParTUT/6ae975aeb16378d9aaf102ecccaf1a083e636b44/README.md",
+    "attribution": "Autori di UniversalDependencies/UD_Italian-ParTUT, come da README e LICENSE del repository",
+    "revision": "6ae975aeb16378d9aaf102ecccaf1a083e636b44",
+    "source_group": "ud-italian-partut"
+  },
+  {
+    "id": "ud-partut-train",
+    "name": "UD Italian partut, lemmi e forme, train",
+    "kind": "conllu",
+    "url": "https://raw.githubusercontent.com/UniversalDependencies/UD_Italian-ParTUT/6ae975aeb16378d9aaf102ecccaf1a083e636b44/it_partut-ud-train.conllu",
+    "license": "CC BY-NC-SA 4.0",
+    "license_url": "https://raw.githubusercontent.com/UniversalDependencies/UD_Italian-ParTUT/6ae975aeb16378d9aaf102ecccaf1a083e636b44/README.md",
+    "attribution": "Autori di UniversalDependencies/UD_Italian-ParTUT, come da README e LICENSE del repository",
+    "revision": "6ae975aeb16378d9aaf102ecccaf1a083e636b44",
+    "source_group": "ud-italian-partut"
+  },
+  {
+    "id": "ud-postwita-dev",
+    "name": "UD Italian postwita, lemmi e forme, dev",
+    "kind": "conllu",
+    "url": "https://raw.githubusercontent.com/UniversalDependencies/UD_Italian-PoSTWITA/b8237631e55060de297000ab65b05b91eec17e67/it_postwita-ud-dev.conllu",
+    "license": "CC BY-NC-SA 4.0",
+    "license_url": "https://raw.githubusercontent.com/UniversalDependencies/UD_Italian-PoSTWITA/b8237631e55060de297000ab65b05b91eec17e67/README.md",
+    "attribution": "Autori di UniversalDependencies/UD_Italian-PoSTWITA, come da README e LICENSE del repository",
+    "revision": "b8237631e55060de297000ab65b05b91eec17e67",
+    "source_group": "ud-italian-postwita"
+  },
+  {
+    "id": "ud-postwita-test",
+    "name": "UD Italian postwita, lemmi e forme, test",
+    "kind": "conllu",
+    "url": "https://raw.githubusercontent.com/UniversalDependencies/UD_Italian-PoSTWITA/b8237631e55060de297000ab65b05b91eec17e67/it_postwita-ud-test.conllu",
+    "license": "CC BY-NC-SA 4.0",
+    "license_url": "https://raw.githubusercontent.com/UniversalDependencies/UD_Italian-PoSTWITA/b8237631e55060de297000ab65b05b91eec17e67/README.md",
+    "attribution": "Autori di UniversalDependencies/UD_Italian-PoSTWITA, come da README e LICENSE del repository",
+    "revision": "b8237631e55060de297000ab65b05b91eec17e67",
+    "source_group": "ud-italian-postwita"
+  },
+  {
+    "id": "ud-postwita-train",
+    "name": "UD Italian postwita, lemmi e forme, train",
+    "kind": "conllu",
+    "url": "https://raw.githubusercontent.com/UniversalDependencies/UD_Italian-PoSTWITA/b8237631e55060de297000ab65b05b91eec17e67/it_postwita-ud-train.conllu",
+    "license": "CC BY-NC-SA 4.0",
+    "license_url": "https://raw.githubusercontent.com/UniversalDependencies/UD_Italian-PoSTWITA/b8237631e55060de297000ab65b05b91eec17e67/README.md",
+    "attribution": "Autori di UniversalDependencies/UD_Italian-PoSTWITA, come da README e LICENSE del repository",
+    "revision": "b8237631e55060de297000ab65b05b91eec17e67",
+    "source_group": "ud-italian-postwita"
+  },
+  {
+    "id": "ud-twittiro-dev",
+    "name": "UD Italian twittiro, lemmi e forme, dev",
+    "kind": "conllu",
+    "url": "https://raw.githubusercontent.com/UniversalDependencies/UD_Italian-TWITTIRO/ff4c607327db615e219e1613b6e804ec55a4cffc/it_twittiro-ud-dev.conllu",
+    "license": "CC BY-SA 4.0",
+    "license_url": "https://raw.githubusercontent.com/UniversalDependencies/UD_Italian-TWITTIRO/ff4c607327db615e219e1613b6e804ec55a4cffc/README.md",
+    "attribution": "Autori di UniversalDependencies/UD_Italian-TWITTIRO, come da README e LICENSE del repository",
+    "revision": "ff4c607327db615e219e1613b6e804ec55a4cffc",
+    "source_group": "ud-italian-twittiro"
+  },
+  {
+    "id": "ud-twittiro-test",
+    "name": "UD Italian twittiro, lemmi e forme, test",
+    "kind": "conllu",
+    "url": "https://raw.githubusercontent.com/UniversalDependencies/UD_Italian-TWITTIRO/ff4c607327db615e219e1613b6e804ec55a4cffc/it_twittiro-ud-test.conllu",
+    "license": "CC BY-SA 4.0",
+    "license_url": "https://raw.githubusercontent.com/UniversalDependencies/UD_Italian-TWITTIRO/ff4c607327db615e219e1613b6e804ec55a4cffc/README.md",
+    "attribution": "Autori di UniversalDependencies/UD_Italian-TWITTIRO, come da README e LICENSE del repository",
+    "revision": "ff4c607327db615e219e1613b6e804ec55a4cffc",
+    "source_group": "ud-italian-twittiro"
+  },
+  {
+    "id": "ud-twittiro-train",
+    "name": "UD Italian twittiro, lemmi e forme, train",
+    "kind": "conllu",
+    "url": "https://raw.githubusercontent.com/UniversalDependencies/UD_Italian-TWITTIRO/ff4c607327db615e219e1613b6e804ec55a4cffc/it_twittiro-ud-train.conllu",
+    "license": "CC BY-SA 4.0",
+    "license_url": "https://raw.githubusercontent.com/UniversalDependencies/UD_Italian-TWITTIRO/ff4c607327db615e219e1613b6e804ec55a4cffc/README.md",
+    "attribution": "Autori di UniversalDependencies/UD_Italian-TWITTIRO, come da README e LICENSE del repository",
+    "revision": "ff4c607327db615e219e1613b6e804ec55a4cffc",
+    "source_group": "ud-italian-twittiro"
+  },
+  {
+    "id": "ud-valico-test",
+    "name": "UD Italian valico, lemmi e forme, test",
+    "kind": "conllu",
+    "url": "https://raw.githubusercontent.com/UniversalDependencies/UD_Italian-Valico/8d60b2c84b8a877d900b2a75bb7644dfd84eb185/it_valico-ud-test.conllu",
+    "license": "CC BY-SA 4.0",
+    "license_url": "https://raw.githubusercontent.com/UniversalDependencies/UD_Italian-Valico/8d60b2c84b8a877d900b2a75bb7644dfd84eb185/README.md",
+    "attribution": "Autori di UniversalDependencies/UD_Italian-Valico, come da README e LICENSE del repository",
+    "revision": "8d60b2c84b8a877d900b2a75bb7644dfd84eb185",
+    "source_group": "ud-italian-valico"
+  },
+  {
+    "id": "ud-markit-dev",
+    "name": "UD Italian markit, lemmi e forme, dev",
+    "kind": "conllu",
+    "url": "https://raw.githubusercontent.com/UniversalDependencies/UD_Italian-MarkIT/e210079df0aea331ec1dcaa90648d815ce94c3ce/it_markit-ud-dev.conllu",
+    "license": "CC BY 4.0",
+    "license_url": "https://raw.githubusercontent.com/UniversalDependencies/UD_Italian-MarkIT/e210079df0aea331ec1dcaa90648d815ce94c3ce/README.md",
+    "attribution": "Autori di UniversalDependencies/UD_Italian-MarkIT, come da README e LICENSE del repository",
+    "revision": "e210079df0aea331ec1dcaa90648d815ce94c3ce",
+    "source_group": "ud-italian-markit"
+  },
+  {
+    "id": "ud-markit-test",
+    "name": "UD Italian markit, lemmi e forme, test",
+    "kind": "conllu",
+    "url": "https://raw.githubusercontent.com/UniversalDependencies/UD_Italian-MarkIT/e210079df0aea331ec1dcaa90648d815ce94c3ce/it_markit-ud-test.conllu",
+    "license": "CC BY 4.0",
+    "license_url": "https://raw.githubusercontent.com/UniversalDependencies/UD_Italian-MarkIT/e210079df0aea331ec1dcaa90648d815ce94c3ce/README.md",
+    "attribution": "Autori di UniversalDependencies/UD_Italian-MarkIT, come da README e LICENSE del repository",
+    "revision": "e210079df0aea331ec1dcaa90648d815ce94c3ce",
+    "source_group": "ud-italian-markit"
+  },
+  {
+    "id": "ud-markit-train",
+    "name": "UD Italian markit, lemmi e forme, train",
+    "kind": "conllu",
+    "url": "https://raw.githubusercontent.com/UniversalDependencies/UD_Italian-MarkIT/e210079df0aea331ec1dcaa90648d815ce94c3ce/it_markit-ud-train.conllu",
+    "license": "CC BY 4.0",
+    "license_url": "https://raw.githubusercontent.com/UniversalDependencies/UD_Italian-MarkIT/e210079df0aea331ec1dcaa90648d815ce94c3ce/README.md",
+    "attribution": "Autori di UniversalDependencies/UD_Italian-MarkIT, come da README e LICENSE del repository",
+    "revision": "e210079df0aea331ec1dcaa90648d815ce94c3ce",
+    "source_group": "ud-italian-markit"
+  }
+]

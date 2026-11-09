@@ -1,5 +1,6 @@
 import { useSyncExternalStore } from 'react'
 import {
+  EMPTY_LIVE_STATS,
   type BivioState,
   type BridgeStatus,
   type FeedEvent,
@@ -7,6 +8,7 @@ import {
   type IncastroMoment,
   type IncastroSolution,
   type IncastroState,
+  type LiveStats,
   type PadBoard,
   type QuizzlandSolution,
   type QuizzlandState,
@@ -45,6 +47,8 @@ interface DashboardState {
   pads: PadBoard | null
   // The live events of this room, oldest first.
   feed: FeedItem[]
+  // The live's counters since this Zerocade started.
+  stats: LiveStats
 }
 
 let state: DashboardState = {
@@ -61,6 +65,7 @@ let state: DashboardState = {
   quizzlandSolution: null,
   pads: null,
   feed: [],
+  stats: EMPTY_LIVE_STATS,
 }
 const listeners = new Set<() => void>()
 
@@ -109,6 +114,7 @@ socket.on('disconnect', () => update({ connected: false }))
 socket.on('feed:events', (items) => update({ feed: [...state.feed, ...items].slice(-FEED_KEPT) }))
 socket.on('session:state', (session) => update({ session }))
 socket.on('ranking:update', (ranking) => update({ gifters: ranking }))
+socket.on('stats:update', (stats) => update({ stats }))
 socket.on('source:status', (status) => {
   update({ sources: { ...state.sources, [status.kind]: status } })
 })

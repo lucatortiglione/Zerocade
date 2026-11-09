@@ -5,7 +5,75 @@
 **Revisione semantica:** 8 novembre 2026 — controllo obbligatorio di accezione e associazioni per singola risposta.  
 **Rottura di compatibilità semantica rispetto alla v3.5.5.**
 
-> **REGOLA FONDAMENTALE — DIREZIONE DEL GIOCO:** `prompt` è la **parola di contesto mostrata al giocatore**; `words` contiene **esattamente sette risposte nascoste che il giocatore deve indovinare**. NON si devono usare le sette risposte per indovinare il `prompt`. Questa regola prevale su tutte le istruzioni precedenti.
+> **REGOLA FONDAMENTALE — DIREZIONE DEL GIOCO:** `prompt` è la **parola di contesto mostrata al giocatore**; per Livecade `words` contiene **esattamente 7 risposte nascoste che il giocatore deve indovinare**, estratte casualmente da un bacino revisionato. NON si devono usare le risposte per indovinare il `prompt`. Questa regola prevale su tutte le istruzioni precedenti.
+
+## Aggiornamento prioritario del 9 novembre 2026: database e bacini
+
+Questa sezione prevale sui precedenti riferimenti a esattamente sette risposte,
+sulla distribuzione rigida delle difficoltà e sui workflow che inseriscono bozze
+nel database prima della revisione. Gli esempi storici con sette parole restano esempi.
+
+- `prompt.sqlite3` è il database operativo SQLite **3.54.1**; `prompt.sql` è
+  l'esportazione SQL UTF-8 ripristinabile dello stesso archivio. Il runtime
+  dedicato deve controllare la versione effettiva senza cambiare quello del server.
+- Si cerca una copertura italiana progressivamente più ampia. Non si dichiara
+  esaustivo un elenco finito: neologismi, accezioni, tecnicismi e usi cambiano.
+- **La verifica semantica avviene PRIMA di inserire prompt e associazioni nel DB.**
+  Dump, titoli, proposte LLM e relazioni lessicografiche da esaminare restano
+  esclusivamente in JSONL esterni (`prompt-staging/`). Nessuna tabella di parole
+  non revisionate nel database operativo; nessuna promozione automatica dal corpus.
+- Per ogni prompt si seleziona un significato familiare e si costruisce un
+  bacino estendibile di tutte le associazioni che il revisore riesce a giustificare.
+  Il bacino non ha il limite di sette elementi e non coincide con i token della definizione.
+  Si inseriscono prima tutte le associazioni coerenti effettivamente revisionate;
+  soltanto quando si genera la lista Livecade se ne estraggono sette. Non si
+  memorizza esclusivamente la combinazione casuale dell'ultima esportazione.
+- Ogni prompt e ogni accezione nel DB hanno una **categoria obbligatoria**,
+  collegata al catalogo con ID, nome e cluster. La tassonomia di base mantiene
+  invariati gli ID 001–172; il catalogo DB aggiunge 173–178 per pasti/spuntini,
+  eventi/circostanze, protezione/difesa, competenze/consulenza, sport generale
+  e distribuzione di materiali. L'assegnazione deve seguire il significato scelto.
+- Ogni associazione ammessa ha accezione, relazione, motivazione individuale,
+  provenienza e controlli espliciti su autonomia, naturalezza, pertinenza,
+  negazioni e conservazione del significato del lemma. Il prompt italiano resta
+  filtrato per familiarità; un prestito straniero deve essere in `common_loanwords`.
+  Non si reintroducono esclusioni globali di singoli prompt.
+- Le risposte possono avere **qualsiasi difficoltà**, inclusi termini specialistici
+  quando direttamente coerenti. La difficoltà non sana un legame debole. Una stima
+  basata sulla frequenza è indicata come tale, senza inventare risultati di gioco.
+- Un revisore umano o LLM può effettuare la revisione editoriale documentata.
+  I filtri tecnici controllano il verbale: non dimostrano da soli la correttezza
+  semantica. I test umani e il QA indipendente rimangono distinti e non simulati.
+- Un bacino revisionato conserva un hash del contenuto e delle direttive. Una
+  modifica al bacino o alle direttive richiede una nuova revisione prima dell'importazione.
+  Gli ampliamenti non trascinano l'approvazione delle parole nuove dalle vecchie.
+- Sinonimi equivalenti, famiglie ridondanti e incompatibilità tra risposte sono
+  documentati con gruppi, limiti e conflitti. Il limite predefinito di un gruppo
+  equivalente è **uno**, estendibile a due soltanto con scelta editoriale esplicita.
+  Se una parola è errata si cerca un'alternativa, preservando il prompt.
+- Per **Livecade l'estrazione è sempre di sette risposte**, senza ripetizione e
+  rispettando i vincoli del bacino. Si estraggono casualmente anche i prompt,
+  senza duplicarli nella stessa lista. Si registra il seed per riprodurre la scelta.
+  Nessun verbo o schema POS è obbligatorio. Se il bacino è insufficiente si
+  segnala la necessità di ampliarlo: niente riempitivi. Una richiesta di più prompt
+  di quelli disponibili non viene soddisfatta ripetendo i contesti esistenti.
+  Le precedenti modalità sperimentali da otto parole non sono il formato Livecade.
+- La casualità vale fra risposte già verificate. Non è necessario chiamare
+  Qwen, usare la GPU o accedere alla rete per ciascuna estrazione. La verifica
+  semantica serve quando si ammettono o si modificano parole e accezioni.
+- La selezione casuale di parole individualmente corrette non certifica la
+  recuperabilità dell'intero set. I CSV estratti restano candidati fino al QA di gioco.
+- L'esportazione mantiene `ref,source,language,prompt,words`, con risposte unite
+  da `|` e suffisso progressivo `0001`, `0002`, ecc. Il nuovo percorso è il task
+  VS Code **Livecade: genera lista (7 risposte per prompt)**. I vecchi generatori e
+  validatori del lotto storico restano riferiti ai loro set da sette parole;
+  non sono il gate della nuova banca dati e non ne certificano i set da otto.
+
+Fonti iniziali: Wikizionario tramite Kaikki/Wiktextract e inventario dei titoli
+di Wikipedia italiana. Le relazioni a livello di voce possono mescolare sensi:
+sono materiale di preparazione, mai associazioni già validate. Altri dizionari
+e siti possono essere aggiunti con URL, versione/hash, attribuzione e condizioni
+di riuso; una fonte elencata non va descritta come già importata.
 
 ## Indice
 
@@ -179,6 +247,12 @@ una segnatura». «Compare nella definizione», «è un nome», «è frequente»
 semantiche sufficienti. `clue_evidence.kind=definizione` e gli audit POS restano
 prove di provenienza e analisi linguistica, mai approvazioni del legame.
 
+La produzione ordinaria richiede una selezione editoriale documentata. La
+modalità che estrae proposte da fonti lessicali è separata ed esplicita: non
+deve consegnare automaticamente i primi sette token come set pronto da usare.
+Un rapporto deve distinguere numero di prompt esaminati, set effettivamente
+riscritti, selezioni mancanti e QA indipendente ancora da eseguire.
+
 ### 3.6 Dettagli accidentali, riferimenti e parole di servizio
 
 Respingere la proposta quando il collegamento dipende soltanto da una data,
@@ -212,6 +286,142 @@ o figurato del contesto. Conservare accenti, forma canonica e significato:
 `meta` e `metà` sono parole distinte. Una correzione semantica non si ottiene
 eliminando automaticamente accenti o cambiando lemma per far coincidere le forme.
 
+#### 3.7.1 Scelta preventiva del senso e controllo dei referenti
+
+Prima di proporre le sette risposte, fissare per iscritto l'accezione scelta,
+il significato quotidiano eventualmente concorrente, la categoria pertinente
+e gli aiuti tematici che il giocatore vede realmente. Selezionare il senso
+prima di raccogliere parole dalla fonte; non dedurlo dal numero di token
+disponibili, dall'ordine delle voci del dizionario o dalla facilità di riempire il set.
+
+**In assenza di un tema specialistico esplicitamente mostrato, usare un senso
+comune e familiare al pubblico.** Una parola quotidiana non autorizza a scegliere
+una sua accezione specialistica meno riconoscibile. La categoria interna nei
+metadati non è un aiuto visibile e non disambigua il prompt per il giocatore.
+Se non è chiaro quale senso sia riconoscibile, lasciare la scelta in revisione.
+
+**La coerenza tecnica non prova la riconoscibilità del senso.** Una categoria
+corretta, sette parole appartenenti allo stesso settore e una definizione
+dizionariale valida non bastano a scegliere un'accezione specialistica di un
+prompt familiare. Prima del set, confrontare esplicitamente il senso quotidiano
+con quello tecnico e motivare la scelta rispetto a ciò che il giocatore vede.
+Non usare le sette risposte nascoste per disambiguare a posteriori il prompt:
+il giocatore non le conosce. La frequenza del lemma non misura la familiarità
+dell'accezione; la precisione dei termini tecnici non sostituisce tale verifica.
+
+Per esempio, `alternativo` senza un tema meccanico visibile non va interpretato
+automaticamente come macchina o motore a moto alternativo. La categoria
+«Automobili, motori e meccanica di guida» può essere coerente con quel senso,
+ma non lo rende quello atteso dal solo prompt. Ripartire da un uso quotidiano
+riconoscibile, per esempio diverso, non convenzionale o sostitutivo, scegliendone
+uno senza mescolarli. Un senso specialistico intenzionale richiede sia un tema
+visibile sufficiente a orientare il giocatore sia la verifica indipendente;
+senza queste condizioni il set resta `DA_RIVEDERE` e non entra nella consegna.
+
+Controllare insieme `prompt`, accezione, categoria e sette risposte. La categoria
+deve descrivere il senso effettivamente usato: non assegnarla per somiglianza
+generica o per distribuire le quantità tra categorie. Non cambiare la categoria
+per giustificare a posteriori un senso poco familiare. Un uso specialistico
+intenzionale richiede il tema visibile previsto dal gioco e le verifiche indipendenti.
+
+Per ogni parola distinguere il contenuto associato al prompt dalla funzione
+che quella parola svolge nella frase della definizione:
+
+- Un verbo che descrive cosa una didascalia, una voce o un autore «prescrive»,
+  «esprime» o «indica» non diventa automaticamente un'azione associata al prompt.
+- Un aggettivo deve qualificare direttamente il concetto del prompt. Se modifica
+  un materiale, una componente o un altro nome citato, respingere quella proposta.
+  Se il referente non è verificabile, non ammetterla automaticamente.
+- Un nome pertinente può essere conservato, ma la sua presenza non convalida
+  gli attributi o i verbi che lo accompagnano. Non sostituire meccanicamente
+  una parola respinta con il suo referente, specie se è già presente nel set.
+
+**Casi vincolanti di regressione:**
+
+| Prompt e fonte | Errore da impedire | Comportamento richiesto |
+|---|---|---|
+| `agitato`, nel normale contesto quotidiano | Scegliere l'indicazione musicale e produrre `partitura`, `didascalia`, `esecuzione` | Ripartire dallo stato di agitazione e valutare associazioni coerenti; il senso musicale è ammissibile soltanto nel contesto specialistico esplicito e verificato |
+| `alternativo → motore, albero, trasformare, macchina, moto, rotatorio, stantuffo` | Accezione meccanica non disambiguata dal prompt, anche con categoria tecnica coerente; `rotatorio` qualifica il moto dell'albero e `trasformare` proviene dalla spiegazione del meccanismo | Bloccare la consegna, scegliere un senso quotidiano riconoscibile e rigenerare sullo stesso prompt; ammettere il senso tecnico solo con tema visibile e verifica indipendente |
+| `agitato`: «didascalia nelle partiture musicali che prescrive… esprimendo…» | Estrarre `prescrivere` e `esprimere` dalla costruzione della definizione; estrarre `musicale` da `partiture musicali` | Respingere queste giustificazioni: verbi della frase e attributi di altri referenti non sono selezioni semantiche |
+| `agitato` musicale classificato come «Percezione, giudizio e decisioni» | Categoria e accezione incoerenti | Bloccare la consegna e riesaminare la scelta del senso prima delle risposte |
+| `anima → metallo, compito, piano, centrale, disporre, taglio, sforzo` | Scelto il senso strutturale di un profilato metallico invece di un senso familiare al prompt; frammenti da «piano di sollecitazione» e «sforzi di taglio»; categoria «Caffè, torrefazione ed estrazione» incoerente | Bloccare il set; mantenere il prompt, scegliere esplicitamente un senso familiare e rigenerare associazioni autonome con categoria pertinente; non salvare i frammenti richiamando altri significati di anima |
+| `affresco`: «dipinto realizzato su intonaco fresco» | Attribuire `fresco` all'affresco quando qualifica l'intonaco | Respingere `fresco` da questa fonte; valutare `intonaco` separatamente e senza duplicarlo |
+
+Questi casi non sono blacklist: `partitura` può essere pertinente in un gioco
+esplicitamente musicale e `fresco` può descrivere direttamente `intonaco`.
+Le eventuali alternative devono avere motivazioni proprie; non sono gold standard
+né set approvati. Anche un solo senso, referente o legame irrisolto impedisce
+di dichiarare il set pronto per il gioco.
+
+#### 3.7.2 Espressioni complete, specificità e associazioni spontanee
+
+**Non trasformare una definizione in una lista di sette parole.** Prima proporre
+associazioni naturali al senso familiare del prompt; poi usare la fonte per
+controllarle. Una frase tecnicamente corretta può produrre sette risposte
+inutili se viene scomposta in nomi, verbi e aggettivi isolati.
+
+Prima di selezionare una parola identificare l'espressione sorgente completa
+e il suo ruolo: entità, proprietà, modificatore, negazione, variazione o
+relazione. Verificare che la parola isolata conservi un legame proprio con
+il prompt, senza ricostruire mentalmente i termini rimossi.
+
+- `Mancanza di coscienza` non autorizza automaticamente né `mancanza` né
+  `coscienza`; `diminuzione della temperatura` non giustifica da sola
+  `temperatura`; `funzioni vitali` non rende specifico il solo `funzione`.
+  Conservare assenza, variazione e qualificatori nella motivazione; se la
+  parola isolata non funziona, cercare una risposta diversa.
+- In `calendario giuliano`, `giuliano` identifica il calendario e non
+  caratterizza agosto. La locuzione documenta un fatto, non due risposte
+  automaticamente valide. Non concatenare o troncare locuzioni per aggirare
+  il vincolo della parola singola.
+- `Momento`, `funzione`, `mancanza`, `anno` e `giorno` possono servire alla
+  descrizione senza essere associazioni caratteristiche del prompt. Per ogni
+  proposta chiedere se la motivazione rimarrebbe identica per numerosi altri
+  contesti. Se sì, richiedere un contributo specifico e naturale; la sola
+  appartenenza a una categoria o struttura temporale non basta.
+- Esaminare anche il set: sette parole corrette non devono ridursi ai
+  metadati della definizione, a una tassonomia o a un elenco di vicinanze.
+  Preferire contenuti distinti e spontaneamente recuperabili dal prompt.
+  Le relazioni di categoria o vicinanza non sono vietate, ma ciascuna deve
+  meritare il posto nel set oltre alla mera verità fattuale.
+
+**Nomi di supporto alla descrizione.** Essere un sostantivo di contenuto non
+rende una parola una risposta valida. Termini come `forma`, `aspetto`,
+`dimensione`, `caratteristica`, `funzione` o `struttura` possono introdurre
+un attributo nella fonte senza identificare un contenuto caratteristico del
+prompt. Controllare il ruolo concreto nella frase, non soltanto la POS.
+
+In «camerata: camera di forma rettangolare utilizzata come dormitorio»,
+`forma` è il nome generico dell'attributo geometrico: l'informazione descrittiva
+è nel qualificatore `rettangolare`. Estrarre soltanto `forma` perde quella
+specificazione e produce una parola applicabile a innumerevoli ambienti e
+oggetti, senza un'associazione autonoma caratteristica con `camerata`.
+La motivazione «la camerata ha una forma» non supera il controllo semantico.
+Respingere questa proposta anche se supera i filtri lessicali.
+
+Non sostituirla automaticamente con `rettangolare`: la precisione geometrica
+non dimostra che la proprietà sia essenziale, caratteristica o spontaneamente
+recuperabile dal prompt. Cercare un'associazione con evidenza propria;
+`dormitorio` è una proposta diretta da valutare, ma non va duplicata se già
+presente. Non vietare globalmente `forma`: in un contesto dove sia essa stessa
+un concetto pertinente può essere valutata con una motivazione specifica.
+Un avviso lessicale `review` non equivale ad accettazione editoriale e non
+autorizza l'inserimento della parola per completare le sette risposte.
+
+| Caso | Diagnosi obbligatoria | Azione |
+|---|---|---|
+| `CAMERATA → forma`, da «di forma rettangolare» | Nome di supporto a un attributo geometrico; isolandolo si perde la specificazione e rimane un legame generico | Respingere questa proposta, cercare una relazione autonoma e specifica; non promuovere automaticamente il qualificatore né duplicare dormitorio |
+| `AGONIA → funzione, mancanza, temperatura, momento` | Frammenti generici e relazioni cliniche scomposte | Respingere la sola giustificazione lessicale e cercare associazioni autonome; valutare `morte`, `respiro` e `coscienza` individualmente, senza approvazione automatica |
+| `AGONIA` in «Etologia, migrazioni e adattamenti» | Categoria non coerente col senso scelto | Riesaminare categoria e intero set prima della consegna |
+| `AGOSTO → anno, giorno, mese, calendario, settembre, luglio, giuliano` | Concentrazione sulla struttura del calendario e modificatore riferito a un altro nome | Escludere `giuliano` da questa fonte; valutare singolarmente le altre risposte e cercare associazioni quotidiane più caratteristiche |
+
+Per agosto si possono proporre, da verificare, `estate`, `ferie`, `ferragosto`
+o `caldo`: sono esempi di ricerca editoriale, non una lista obbligatoria o
+un set approvato. Non accumulare sinonimi per completare le sette risposte.
+Se una parola fallisce, mantenerne la diagnosi, cercare alternative sullo
+stesso prompt e riesaminare il set. Una risposta irrisolta blocca la consegna;
+le sole modifiche alle direttive non approvano né correggono gli export esistenti.
+
 ### 3.8 Casi di regressione semantica
 
 I casi seguenti illustrano decisioni editoriali, non set già approvati.
@@ -242,6 +452,15 @@ I casi seguenti illustrano decisioni editoriali, non set già approvati.
 | `COAGULAZIONE → gel` | Estratto da «gel di fibrina» | Il rapporto tecnico esiste, ma va valutato per naturalezza e pubblico: non trattare automaticamente la parola isolata come una buona risposta |
 | `COAGULAZIONE → formazione, impedire` | Nome generico del processo e verbo che introduce lo scopo | Cercare risposte più specifiche e recuperabili |
 | `COAGULAZIONE → ferito`, dalla forma `ferita` | Lemmatizzazione della lesione come aggettivo/persona ferita | Correggere l'analisi secondo la frase: il nome `ferita` conserva il senso della lesione |
+| `IMPROVVISO → inaspettato, imprevisto, inatteso, improvvisare, improvvisato` | Accumulo di quasi sinonimi e derivati; alcuni richiamano l'improvvisazione | Cercare associazioni distinte nello stesso senso temporale; non riempire il set con varianti |
+| `TRAVESTIMENTO → operazione, compiere, speciale, fine` | Frammenti della frase sulle operazioni segrete e i fini ludici | Generare risposte dal significato del travestirsi, non dalla sintassi della definizione |
+| `SKATEBOARD → manubrio` | La fonte dice «senza manubrio» | Conservare la polarità: una componente assente non diventa una parte del mezzo |
+| `DIFENDERE → individuo, posizione, idea, conservare, aiutare, abbandonare` | Oggetti plausibili, relazioni ampie e contrario importati senza un contesto preciso | Non dichiararli tutti falsi; precisare il senso e sostituire i legami troppo ampi o poco naturali |
+| `MASSO → granello, massone, massetto` | Contrasto dimensionale e termini correlati non verificati per naturalezza e senso dominante | Non usare contrari, somiglianze e correlazioni come riempitivi |
+| `TRIBUNA → altare, clero` | Accezione di architettura sacra, reale ma poco riconoscibile dal prompt isolato | Scegliere un senso familiare oppure documentare e verificare l'aiuto UI che disambigua |
+| `TIGRE → scientifico, classificazione` | Metadescrizione della voce zoologica | Separare proprietà dell'animale e informazioni sul modo in cui è classificato |
+| `TIGRE → arancione, nero, bianco` | Colori corretti, tutti dello stesso aspetto | Non dichiararli falsi; valutare se conservarne solo alcuni per dare più contenuto al set |
+| `IMPOVERIRE → ragionamento, capacità, dissanguare, rovinare` | Senso cognitivo della definizione e sensi economici/figurati delle relazioni | Unificare il senso; verificare anche adeguatezza della fonte e dei contrari |
 
 `secolo` può essere pertinente in un contesto storico o temporale adeguato;
 `misura` può esserlo in un contesto di misurazione. Questi esempi non autorizzano
@@ -375,6 +594,141 @@ forma sorgente, analisi automatica, correzione motivata e autore; non applicare
 la stessa correzione indiscriminatamente ad altre occorrenze. Restano vietate
 le normalizzazioni che cancellano differenze come `meta`/`metà`.
 
+### 3.11 Negazioni, complementi, esempi e paragoni
+
+Conservare il rapporto logico della fonte: presenza, assenza, prevenzione,
+contrasto, possibilità, tipicità e semplice esempio non sono intercambiabili.
+In SKATEBOARD, «senza manubrio» non documenta un manubrio come parte del mezzo.
+Conservare nei materiali di verifica il passaggio e l'ambito della negazione.
+Non attribuire a un oggetto le componenti di un altro oggetto citato in un paragone.
+Le parole di una locuzione come «in grado di» non sono caratteristiche del mezzo.
+
+Il rilevamento di `senza`, `privo di`, `non` o simili produce un controllo dei
+ruoli, non una blacklist automatica. Una relazione di prevenzione o contrasto
+può essere naturale: il sanguinamento resta pertinente alla coagulazione che
+lo arresta. Va però spiegata con il ruolo corretto. Non promuovere un'assenza
+o un contrario a risposta soltanto per completare il numero delle parole.
+
+### 3.12 Diversità del contenuto e ridondanza interna
+
+Il limite massimo di due equivalenti non autorizza automaticamente una coppia
+ridondante. Nome e aggettivo della stessa famiglia, come `competizione` e
+`competitivo` per AGONISTICO, richiedono contributi diversi: il solo cambio di
+POS non aggiunge contenuto. Senza una distinzione utile, conservarne uno e
+cercare un'alternativa. Lo stesso vale per forme derivate con grafie diverse.
+Le formule iniziali «inerente a», «relativo a» e simili descrivono un rapporto
+nella definizione: non estrarle come risposte autonome solo perché sono aggettivi.
+Il giudizio riguarda la funzione nella frase, non un divieto universale dei lemmi.
+
+Sette grafie diverse devono portare contenuti associativi distinguibili.
+Per impostazione editoriale, non usare più di **due risposte sostanzialmente
+equivalenti** nello stesso set. Non aggirare la regola cambiando POS, genere,
+numero o gruppo dichiarato a parole che esprimono lo stesso contenuto.
+IMPROVVISO non deve accumulare `inaspettato`, `imprevisto`, `inatteso` e poi
+aggiungere `improvvisare`/`improvvisato` per raggiungere sette risposte.
+
+Non accumulare derivati del prompt o più flessioni dello stesso lemma.
+La parentela di forma è un segnale: per mantenerne due occorre spiegare il
+diverso contributo, senza assumerne l'equivalenza o l'etimologia dalla grafia.
+Non confondere l'improvviso temporale con l'esecuzione improvvisata, né MASSO
+con il significato dominante di `massone`. Sinonimi e contrari richiedono
+gli stessi controlli di senso e naturalezza delle altre risposte.
+
+Verificare anche la concentrazione su un solo aspetto: tre colori della tigre
+possono essere corretti ma togliere spazio ad altre caratteristiche riconoscibili.
+Si possono sostituire risposte vere per migliorare la varietà, dichiarando
+questa ragione e conservando quelle che contribuiscono meglio. Non introdurre
+quote di tipi di relazione: sono ammessi set interamente contestuali o sensoriali.
+La diversità riguarda i contenuti, non una percentuale di nomi, verbi o aggettivi.
+
+### 3.13 Qualità della fonte, evidenze individuali e casi osservati
+
+Una fonte può essere ampia, specialistica, ambigua o inadatta al pubblico.
+Non scegliere l'accezione che offre più token; non trattare ogni etichetta
+di una voce come proprietà del referente. `Classificazione scientifica` e
+`tassonomia` in TIGRE descrivono la voce, non due associazioni all'animale.
+Una definizione di IMPOVERIRE centrata sull'attenuazione del ragionamento
+non autorizza ad aggiungere automaticamente sinonimi economici e figurati.
+
+Conservare per ogni parola il senso, la relazione, una motivazione concreta
+individuale e l'esito dei controlli di autonomia, naturalezza, ruolo/polarità,
+incidentalità e lemmatizzazione. Una frase generica copiata sette volte non
+costituisce sette evidenze. Nel QA registrare anche la verifica del set per
+coerenza di senso, ridondanza e assenza di vincoli POS forzati. Non compilare
+automaticamente questi giudizi come superati: il software controlla il contratto,
+non l'autenticità o la verità dei giudizi dichiarati.
+
+La revisione dei [22 casi degli screenshot](analisi_screenshot_word_association_20261108.md)
+è conservata con accezioni e fonti originali nel catalogo
+`resources/semantic_regressions_it.jsonl`. Il catalogo serve per regressioni
+contestuali e spiegazioni, non per escludere globalmente prompt o parole.
+Il riferimento iniziale CARAMELLA riguarda il formato CSV; DIFENDERE e MASSO
+sono i contesti degli screenshot privi di titolo. SPANDERE proviene dal lotto 0002.
+
+Versione del contratto semantico: `word-association-semantic-2026-11-08.2`.
+I vecchi verbali privi delle verifiche individuali e di diversità richiedono
+integrazione; il solo superamento delle vecchie verifiche tecniche non basta.
+
+### 3.14 Vincoli preventivi prima della consegna
+
+**Regola vincolante: prima sette associazioni individualmente valide, poi
+un set coerente e non ridondante. La presenza nella fonte non sostituisce
+nessuna delle due verifiche.** Questi vincoli si applicano a tutti i prompt,
+non soltanto a quelli degli screenshot e non soltanto alle parole già note.
+
+| Controllo | Criterio richiesto | Se il criterio fallisce |
+|---|---|---|
+| Senso visibile | Un'accezione familiare, riconoscibile dal prompt e dai soli aiuti UI reali | Cercare risposte nello stesso prompt con un senso familiare e dichiarato; mantenere il prompt in revisione se manca una soluzione |
+| Scelta tra senso quotidiano e tecnico | Il confronto tra accezioni precede il set; categoria interna e risposte nascoste non sono usate per orientare il giocatore | Bloccare il senso specialistico non disambiguato anche se categoria e sette termini sono tecnicamente coerenti; applicare §3.7.1 |
+| Coerenza della categoria | La categoria descrive l'accezione scelta; una categoria interna non sostituisce un tema visibile al giocatore | Bloccare la consegna e riesaminare senso, categoria e risposte insieme, secondo §3.7.1 |
+| Legame autonomo | La risposta singola ha un rapporto concreto e naturale, spiegabile senza ricostruire la definizione | Sostituire la parola, senza estrarre un altro frammento della stessa frase |
+| Ruolo e polarità | Il rapporto rispetta presenza, assenza, scopo, prevenzione, esempio e contrasto della fonte | Correggere il ruolo; non presentare come componente qualcosa indicato come assente |
+| Referente degli aggettivi | L'aggettivo qualifica direttamente il concetto del prompt nell'accezione scelta, non un altro nome citato nella fonte | Escluderlo dalla selezione automatica se modifica un componente, materiale o altro referente; in caso di dubbio richiedere revisione |
+| Specificità | La parola contribuisce al contesto oltre a essere un descrittore valido per innumerevoli oggetti o processi | Cercare una parte, proprietà, azione o associazione più caratteristica |
+| Locuzioni | La parola isolata conserva il senso pertinente, senza un qualificatore o complemento nascosto | Scegliere un'altra risposta; non accorciare meccanicamente l'espressione |
+| Espressione sorgente e contributo specifico | La parola conserva una relazione autonoma senza perdere assenze, variazioni o qualificatori; il set offre contenuti oltre alla struttura della definizione | Applicare §3.7.2, sostituire i frammenti e gli elementi generici privi di un contributo proprio; nessun riempimento fino a sette |
+| Relazioni lessicali | Sinonimo, contrario, correlato, iperonimo o iponimo appartiene al senso scelto ed è naturale da solo | Verificare la relazione e cercare un'alternativa; non importarla soltanto perché presente nel dizionario |
+| Forma e lemma | L'analisi conserva il significato della forma nella frase e gli accenti pertinenti | Correggere con motivazione contestuale; non normalizzare in massa forme semanticamente diverse |
+| Diversità | Le sette risposte aggiungono contenuti distinguibili, senza accumulare equivalenti, flessioni o derivati | Conservare le risposte migliori e sostituire quelle ridondanti; massimo due equivalenti, senza quote di tipi di relazione |
+| Familiarità | Il senso è adatto al pubblico; i prestiti del prompt rispettano la lista chiusa e l'italiano il filtro distinto | Applicare la politica linguistica e cercare risposte accessibili; nessuna lista di eccezioni ad hoc |
+| Evidenza e QA | Sette motivazioni concrete individuali, controlli di set e prove previste realmente eseguite | Lasciare i giudizi mancanti da compilare e il set in revisione; niente approvazioni simulate |
+
+Esempio: in «affresco: dipinto realizzato su intonaco fresco», `fresco`
+qualifica `intonaco`, non `affresco`, e va escluso come risposta estratta.
+`intonaco` può essere valutato come associazione distinta; se è già nel set,
+non va duplicato. L'analisi delle dipendenze registra il referente e blocca
+i casi non verificabili: un legame sintattico diretto non sostituisce la
+valutazione semantica della coppia.
+
+Le parole dei casi osservati illustrano categorie di errore: `operare` non è
+proibito in assoluto, `scientifico` può essere pertinente in un altro contesto,
+un contrario può essere naturale e una relazione tecnica può essere vera.
+Il controllo deve spiegare perché **quella coppia, in quel senso**, funziona
+o va sostituita. Un giudizio tecnico positivo non risolve automaticamente
+la naturalezza, la recuperabilità o la ridondanza.
+
+**Procedura di sostituzione obbligatoria:** conservare il prompt; mantenere
+le risposte valide; proporre alternative per le sole risposte fallite;
+valutare ogni alternativa con gli stessi controlli; riesaminare il set completo.
+Se il problema è esteso, rigenerare il set sullo stesso prompt con genealogia
+documentata. Il volume richiesto e le quote POS non autorizzano a inserire
+una parola debole, a cambiare senso senza dichiararlo o a eliminare il prompt
+per evitare il lavoro di sostituzione.
+
+Nella produzione ordinaria non usare sette token estratti come scorciatoia
+verso la consegna. I suggerimenti lessicali e i CSV di candidati sono materiale
+di lavoro esplicitamente non approvato. Un set è pronto soltanto dopo il QA
+previsto: anche una sola risposta respinta o irrisolta impedisce questo stato.
+L'assenza di avvisi automatici non sostituisce il giudizio sulle sette coppie.
+Le regole riducono il rischio degli errori osservati; la loro semplice presenza
+nel documento non prova che un lotto le abbia già superate.
+
+Per una segnalazione contestuale motivatamente risolta conservare nel materiale
+editoriale `signal_resolutions`: codice, parola, `decision=resolved` e spiegazione
+concreta della risoluzione. Non usare la risoluzione per trasformare un'assenza
+in presenza o per rinominare una risposta debole come valida. È un'annotazione
+editoriale da verificare nel QA indipendente, non un'approvazione automatica.
+
 ---
 
 ## 4. Difficoltà e alternative ammissibili
@@ -505,6 +859,7 @@ nel campo non prova che la revisione sia stata realmente eseguita.
 ```json
 {
   "schema_version":"word-association-qa-3.6.0",
+  "semantic_policy_version":"word-association-semantic-2026-11-08.2",
   "candidate_id":"cand-pizza-001",
   "category_id":"008",
   "prompt":"pizza",
@@ -519,11 +874,16 @@ nel campo non prova che la revisione sia stata realmente eseguita.
     "trials":[]
   },
   "word_reviews":[
-    {"word":"forno","relevance":5,"discoverability":5,"difficulty":"facile","rationale":"Associazione concreta con la cottura."}
+    {"word":"forno","relevance":null,"discoverability":null,"difficulty":null,
+     "answer_sense":"forno per cuocere la pizza","meaning_group":"cottura_in_forno","decision":null,
+     "checks":{"same_sense":null,"standalone":null,"natural":null,"not_incidental":null,
+               "source_polarity":null,"lemma_meaning_preserved":null},
+     "rationale":"Il forno viene utilizzato per cuocere la pizza."}
   ],
   "semantic_review":{
     "ratings":{"Individuabilità":0,"Pertinenza":0,"Difficoltà":0,"Originalità":0,"Familiarità":0},
     "total_100":0,"alternative_answer_pressure":"unknown",
+    "set_checks":{"single_sense":null,"non_redundant":null,"no_forced_pos":null},
     "rationale":"Esempio di schema, NON un verbale QA completo o approvato."
   },
   "safety_review":{"status":"NOT_RUN","classification":null},
@@ -709,6 +1069,39 @@ Se una risposta è debole, cerca un'alternativa mantenendo il prompt. Se necessa
 rigenera il set sullo stesso prompt; senza sette risposte valide lascia il prompt
 in revisione e documenta le alternative tentate: nessun riempitivo o esclusione automatica.
 Il materiale rimane candidato fino alle revisioni indipendenti del protocollo.
+Applica anche §§3.11–3.13: conserva negazioni e complementi, non attribuire
+componenti assenti (skateboard senza manubrio), non accumulare quasi sinonimi
+e derivati (improvviso), non usare metadescrizioni della voce (tigre) e non
+scegliere accezioni specialistiche per raccogliere sette parole (tribuna).
+Per la produzione ordinaria aggiungi editorial_revision.sense_description e
+editorial_revision.word_reviews: sette oggetti con word, relation, rationale
+individuale e meaning_group. Non riempire le verifiche indipendenti come superate.
+Usa il §3.14 come controllo obbligatorio prima della consegna: valuta prima
+ogni risposta e poi il set completo. Per una parola fallita cerca un'alternativa
+sullo stesso prompt, conserva le risposte valide e ripeti i controlli. Senza
+sette risposte valide mantieni il prompt in revisione; non forzare il volume.
+Applica il §3.7.1 prima della raccolta delle risposte: fissa un senso familiare,
+la categoria coerente e i soli aiuti UI reali. Senza tema musicale esplicito,
+non trasformare agitato nell'indicazione di partitura. Non estrarre prescrivere
+o esprimere dalla frase della definizione. Verifica il referente degli aggettivi:
+musicale in "partiture musicali" e fresco in "intonaco fresco" non qualificano
+rispettivamente agitato e affresco. Un caso irrisolto blocca la consegna del set.
+Confronta il senso quotidiano con quello tecnico prima di proporre risposte:
+alternativo non diventa un motore a stantuffo perché esistono sette termini
+meccanici o una categoria coerente. Senza tema visibile e verifica indipendente,
+rigenera sullo stesso prompt in un senso familiare e lascia irrisolti i dubbi.
+Le risposte nascoste non possono disambiguare il prompt per il giocatore.
+Controlla anche i nomi di supporto della descrizione: camerata->forma da
+"di forma rettangolare" perde il qualificatore e resta generico. Essere un
+sostantivo o avere soltanto un avviso review non basta. Respingi la proposta
+e cerca una relazione autonoma; non sostituirla automaticamente con rettangolare.
+Applica anche il §3.7.2: conserva nella valutazione l'espressione sorgente
+completa e il ruolo di ogni termine. Non ricavare automaticamente funzione,
+mancanza o temperatura dalle espressioni cliniche dell'agonia, né giuliano
+da calendario giuliano per agosto. Chiedi se ogni risposta funziona da sola
+ed è caratteristica del prompt; non limitare il set ai descrittori della fonte,
+alla categoria o ai vicini di una sequenza. Proponi alternative naturali e
+distinte; le sette risposte richiedono sette selezioni semantiche motivate.
 
 Strategie: balanced_322 = 3 risposte relativamente accessibili, 2 medie,
 2 più impegnative (stima da verificare); convergent_free = distribuzione
@@ -754,12 +1147,36 @@ Esamina il contesto, l'accezione scelta, ciascuna risposta e le fonti effettive.
 Per ogni coppia descrivi brevemente il legame concreto, valuta pertinenza e
 recuperabilità e registra accettata/da_riscrivere/respinta con motivo.
 Una parola nella definizione non è automaticamente un'associazione valida.
+Verifica prima il §3.7.1: senso familiare, tema realmente visibile e categoria
+coerente. Respingi un salto specialistico non disambiguato; controlla a quale
+nome si riferisce ogni aggettivo e se ogni verbo descrive il prompt oppure
+soltanto la frase della fonte. Segnala anche gli errori di categoria.
+Una categoria corretta non sana un'accezione tecnica inattesa: verifica anche
+il confronto documentato con il senso quotidiano. Per alternativo, un set
+meccanico coerente resta da respingere dalla consegna se il giocatore non ha
+un tema visibile sufficiente e manca la verifica indipendente dell'accezione.
+Applica il §3.7.2: ricostruisci l'espressione completa da cui proviene ogni
+proposta; controlla perdite di negazione, variazione e qualificatori. La sola
+verità fattuale non rende una parola isolata una buona associazione. Verifica
+il contributo specifico di ogni risposta e che il set non sia una lista di
+frammenti descrittivi, classificatori o temporali. Usa AGONIA e AGOSTO come
+regressioni contestuali; niente blacklist globali o alternative autoapprovate.
+Applica lo stesso controllo a CAMERATA->forma: verifica se il sostantivo
+introduce soltanto un attributo e se la motivazione, privata del qualificatore,
+vale per innumerevoli altri contesti. In quel caso respingi la proposta;
+un avviso lessicale review non costituisce selezione editoriale.
 Respingi dettagli storici accidentali e parole di servizio della frase quando
 il legame non è naturale dal solo contesto mostrato. Controlla accenti e sensi.
 Applica il §3.10 anche a esempi tra parentesi, qualificatori perduti, locuzioni
 scomposte, verbi di supporto e relazioni di pagina non disambiguate.
 Richiedi una motivazione specifica per ciascuna coppia e una sostituzione sullo
 stesso prompt per le risposte deboli. Nessuna blacklist dei termini degli esempi.
+Registra semantic_policy_version=word-association-semantic-2026-11-08.2.
+Per ogni word_review specifica answer_sense, meaning_group, decision e checks:
+same_sense, standalone, natural, not_incidental, source_polarity,
+lemma_meaning_preserved. I sei checks devono riflettere verifiche eseguite.
+Valuta il set con single_sense, non_redundant e no_forced_pos. Una spiegazione
+generica copiata sette volte o tre risposte equivalenti non superano il contratto.
 Non giustificare risposte di un'accezione con un altro significato del prompt.
 Verifica poi coerenza delle sette risposte, ridondanze e pressione di alternative.
 Una risposta respinta o irrisolta mantiene l'intero set DA_RIVEDERE.

@@ -27,8 +27,10 @@ export function Widgets() {
   if (!session) return null
   const w = session.widgets
   // In Bivio comments are the votes: they are listed under the options, and an alert
-  // would sit on top of option A. In Incastro they are the words played.
-  const alert = (session.gameId === 'bivio' || session.gameId === 'incastro') && event?.type === 'comment' ? null : event
+  // would sit on top of option A. In Incastro they are the words played; in ZeroAssociazioni
+  // the guesses, which an alert would hand to everyone.
+  const guessing = session.gameId === 'bivio' || session.gameId === 'incastro' || session.gameId === 'word-association'
+  const alert = guessing && event?.type === 'comment' ? null : event
 
   return (
     <>

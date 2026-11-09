@@ -1,5 +1,5 @@
 import { Fragment, useEffect, useRef, useState } from 'react'
-import { BACKGROUND_GAMES, GAMES, backgroundPath, type GameSetting, type SessionState } from '@zerocade/shared'
+import { BACKGROUND_GAMES, GAMES, backgroundPath, settingVisible, type GameSetting, type SessionState } from '@zerocade/shared'
 import { overlayKey } from '../overlayKey'
 import { socket } from '../socket'
 
@@ -29,16 +29,25 @@ export function SettingsForm({ session, omit = [] }: { session: SessionState; om
 
   return (
     <div className="form">
-      {groupsOf(game.settings.filter((s) => !omit.includes(s.id))).map((group, i) => {
-        const fields = group.settings.map((s) => (
-          <Field
-            key={s.id}
-            gameId={game.id}
-            setting={s}
-            value={session.settings[s.id] ?? s.default}
-            onChange={(v) => set(s.id, v)}
-          />
-        ))
+      {groupsOf(game.settings.filter((s) => !omit.includes(s.id) && settingVisible(s, game.settings, session.settings))).map((group, i) => {
+        const fields = group.settings.map((s) => {
+          const field = (
+            <Field
+              key={s.id}
+              gameId={game.id}
+              setting={s}
+              value={session.settings[s.id] ?? s.default}
+              onChange={(v) => set(s.id, v)}
+            />
+          )
+          return s.when ? (
+            <div key={s.id} className="form__sub">
+              {field}
+            </div>
+          ) : (
+            field
+          )
+        })
         return group.name ? (
           <div key={i} className="form__group">
             <h3 className="form__group-title">{group.name}</h3>

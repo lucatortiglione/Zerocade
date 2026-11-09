@@ -16,7 +16,7 @@
     "package:win": "node scripts/package-win.mjs",
     "typecheck": "npm run typecheck --workspaces --if-present",
     "test:associations": "python -m unittest discover -s gioco-zeroassociations -p test_*.py && node --import tsx --test tests/word-association.test.ts",
-    "associations:audit": "python gioco-zeroassociations/audit_legacy.py",
+    "associations:telemetry": "python gioco-zeroassociations/analyze_telemetry.py",
     "sqlite:upgrade": "node scripts/upgrade-sqlite.mjs"
   },
   "devDependencies": {

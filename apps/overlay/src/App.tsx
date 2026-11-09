@@ -74,6 +74,8 @@ export function App() {
     // guess: the words found have their own feed. In Quizzland a toast would show everyone
     // what each viewer answered.
     if (session.gameId === 'bivio' || session.gameId === 'incastro' || session.gameId === 'quizzland') return
+    // In ZeroAssociazioni every comment is a guess: a toast would hand the answers to everyone.
+    if (session.gameId === 'word-association' && event.type === 'comment') return
     const id = Date.now() + Math.random()
     setToasts((prev) => [...prev.slice(-4), { id, user: event.user, ...describeEvent(event) }])
     // Not cleared when the next event arrives: every toast removes itself.

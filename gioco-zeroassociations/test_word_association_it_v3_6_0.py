@@ -6,6 +6,7 @@ import json
 import csv
 import tempfile
 import unittest
+from semantic_rules import SEMANTIC_POLICY, WORD_CHECKS, SET_CHECKS
 
 from validate_word_association_it_v3_6_0 import (
     load_taxonomy,check_csv,check_candidates_jsonl,check_qa_register,
@@ -29,9 +30,14 @@ def candidate(prompt='pizza', cid='c0', cat='008'):
 
 
 def approved_qa():
+    facts=['Il forno cuoce la pizza.', 'La mozzarella condisce la pizza.',
+           'Il pomodoro viene usato come condimento della pizza.',
+           "L'impasto forma la base della pizza.", 'Il lievito fa lievitare la pizza.',
+           'Il basilico aromatizza la pizza.', 'La margherita è una varietà di pizza.']
     reviews=[{'word':word,'relevance':5,'discoverability':4,
-              'difficulty':'media','rationale':'Associazione recuperabile dalla pizza in italiano.'}
-             for word in ANSWERS]
+              'difficulty':'media','rationale':fact,'answer_sense':word,
+              'meaning_group':word,'decision':'accettata','checks':{k:True for k in WORD_CHECKS}}
+             for word,fact in zip(ANSWERS,facts)]
     trials=[{'reviewer_id':'human1','reviewer_type':'human','prompt_shown':'pizza',
              'answers_shown':False,'guesses':['forno','pomodoro','impasto'],
              'ui_cues':{'answer_lengths_visible':False}},
@@ -39,6 +45,7 @@ def approved_qa():
              'answers_shown':False,'guesses':['mozzarella','basilico','salame'],
              'ui_cues':{'answer_lengths_visible':False}}]
     return {'schema_version':'word-association-qa-3.6.0','candidate_id':'c0',
+            'semantic_policy_version':SEMANTIC_POLICY,
             'category_id':'008','prompt':'pizza','words':ANSWERS[:],
             'technical':{'passed':True,'errors':[],'warnings_reviewed':True},
             'retrieval_test':{'protocol':'prompt_to_words_independent','prompt_visible':True,
@@ -49,6 +56,7 @@ def approved_qa():
             'semantic_review':{'ratings':{'Individuabilità':5,'Pertinenza':5,
                                           'Difficoltà':4,'Originalità':5,'Familiarità':5},
                                'total_100':96,'alternative_answer_pressure':'acceptable',
+                               'set_checks':{k:True for k in SET_CHECKS},
                                'rationale':'Due prove esterne distinte, giudizi individuali sulle sette risposte.'},
             'safety_review':{'status':'CLEAR','classification':None},
             'decision':'IDONEO_REVISIONE_FINALE'}

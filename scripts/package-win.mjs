@@ -12,6 +12,7 @@
 //   app/content.seed.json
 //   app/domande.db                  Bivio's questions (SQLite, gioco-dilemmi/data/domande.db)
 //   app/quizzland.db                ZeroQuizz's questions (SQLite, gioco-quizzland/data/domande.db)
+//   app/zeroassociations.db         ZeroAssociazioni's verified pools (gioco-zeroassociations/prompt.sqlite3)
 //   app/incastro/                   what ZeroWords' generator reads: chapters.json, curve.json,
 //                                   lexicon/words.tsv and blocklist.txt, with the word list's credits
 //   app/node_modules/better-sqlite3 the prebuilt win32-x64 SQLite binding
@@ -21,7 +22,7 @@
 // data/ is never deleted by a rebuild, and is left out of the zip.
 
 import { execFileSync, execSync } from 'node:child_process'
-import { copyFileSync, cpSync, existsSync, mkdirSync, rmSync, statSync, writeFileSync } from 'node:fs'
+import { copyFileSync, cpSync, existsSync, mkdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs'
 import { createRequire } from 'node:module'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -74,10 +75,38 @@ step('Copying pages, content and the SQLite binding')
 cpSync(join(root, 'apps', 'dashboard', 'dist'), join(app, 'public', 'dashboard'), { recursive: true })
 cpSync(join(root, 'apps', 'overlay', 'dist'), join(app, 'public', 'overlay'), { recursive: true })
 copyFileSync(join(root, 'apps', 'server', 'src', 'content.seed.json'), join(app, 'content.seed.json'))
-// Only the release-gated export is eligible; generated candidate CSVs stay out.
-const associationsContent = process.env.ZEROCADE_ASSOCIATIONS_CONTENT
-  ?? join(root, 'gioco-zeroassociations', 'approved', 'content.json')
-if (existsSync(associationsContent)) copyFileSync(associationsContent, join(app, 'word-association.content.json'))
+// ZeroAssociazioni: only the verified pools, from the first source that has any (the same order
+// as the server: the validated copy, the collection database, its dump). The collection's prompt
+// inventory weighs gigabytes and is not the game's; its decisions come along, so a discarded
+// prompt stays out.
+const POOL_TABLES = ['reviews', 'prompts', 'senses', 'associations', 'group_limits', 'conflicts', 'inventory_term_decisions']
+const gameData = join(root, 'gioco-zeroassociations')
+const poolsDb = join(app, 'zeroassociations.db')
+const poolSources = [
+  process.env.ZEROCADE_ASSOCIATIONS_DB,
+  join(gameData, 'prompt_validi.sqlite3'),
+  join(gameData, 'prompt.sqlite3'),
+  join(gameData, 'prompt.sql'),
+].filter((p) => p && existsSync(p))
+const Database = createRequire(join(root, 'apps', 'server', 'package.json'))('better-sqlite3')
+for (const source of poolSources) {
+  rmSync(poolsDb, { force: true })
+  const pools = new Database(poolsDb)
+  if (source.endsWith('.sql')) pools.exec(readFileSync(source, 'utf-8'))
+  else {
+    pools.prepare('ATTACH DATABASE ? AS src').run(source)
+    const present = new Set(pools.prepare("SELECT name FROM src.sqlite_schema WHERE type = 'table'").pluck().all())
+    for (const table of POOL_TABLES.filter((t) => present.has(t))) pools.exec(`CREATE TABLE ${table} AS SELECT * FROM src.${table}`)
+    pools.exec('DETACH DATABASE src')
+  }
+  const count = pools
+    .prepare('SELECT count(*) FROM prompts p JOIN senses s ON s.prompt = p.lemma AND s.description = p.familiar_sense')
+    .pluck()
+    .get()
+  pools.close()
+  if (count) break
+  rmSync(poolsDb, { force: true })
+}
 copyFileSync(join(root, 'gioco-dilemmi', 'data', 'domande.db'), join(app, 'domande.db'))
 copyFileSync(join(root, 'gioco-quizzland', 'data', 'domande.db'), join(app, 'quizzland.db'))
 // ZeroWords: what the generator reads to make levels on the fly (wordgen/files.ts looks for

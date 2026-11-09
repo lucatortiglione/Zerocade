@@ -1,3 +1,4 @@
+import type { WordAssociationRoundReport } from '@zerocade/shared'
 import type { GameInstance } from './engine'
 import { createGiftDrop } from './giftDrop'
 import { createMmaClash } from './mmaClash'
@@ -36,6 +37,14 @@ import { createTop7 } from './top7'
 import { createWildWords } from './wildWords'
 import { createWordMerge } from './wordMerge'
 
+// Word Association's rounds go to the server, for the content's telemetry; the dashboard's
+// preview (?preview) plays along but does not report.
+const PREVIEW = typeof window !== 'undefined' && new URLSearchParams(window.location.search).has('preview')
+function reportWordAssociationRound(report: WordAssociationRoundReport) {
+  if (PREVIEW) return
+  void import('../socket').then(({ socket }) => socket.emit('wordassoc:round', report))
+}
+
 const registry: Record<string, () => GameInstance> = {
   'gift-drop': createGiftDrop,
   'mma-clash': createMmaClash,
@@ -51,7 +60,7 @@ const registry: Record<string, () => GameInstance> = {
   'true-or-false': createTrueOrFalse,
   'trivia-time': createTriviaTime,
   'memory-maestro': createMemoryMaestro,
-  'word-association': createWordAssociation,
+  'word-association': () => createWordAssociation(reportWordAssociationRound),
   'word-hunt': createWordHunt,
   'word-cross': createWordCross,
   'guess-logo': createGuessLogo,

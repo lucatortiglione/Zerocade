@@ -10,6 +10,7 @@ import {
   BACKGROUND_GAMES,
   GAMES,
   backgroundPath,
+  giftById,
   isValidKey,
   padFilePath,
   triggersFor,
@@ -21,6 +22,7 @@ import {
   type FeedEvent,
   type HandshakeAuth,
   type LiveEvent,
+  type LiveStats,
   type RoomInfo,
   type ServerToClientEvents,
 } from '@zerocade/shared'
@@ -38,6 +40,7 @@ import {
   recentCreators,
   recordEvent,
   recordGift,
+  recordWordAssociationRound,
   roomKey,
   saveBridgeConfig,
   saveSource,
@@ -45,8 +48,12 @@ import {
   setPadVolume,
   topGiftSince,
   touchCreator,
+  wordAssociationGuesses,
+  wordAssociationRounds,
 } from './db.js'
-import { getContent } from './content.js'
+import { getContent, wordAssociation } from './content.js'
+import { toCsv } from './csv.js'
+import { sanitizeRoundReport } from './word-association.js'
 import { HOSTS_LINE, LOCAL_DOMAIN, domainRegistered, ensureDomain } from './hosts.js'
 import { PAD_FILE_MAX, padBoard, padFile, removePad, savePadInput } from './pads.js'
 import { getSession, selectGame, setScene, setSettings, setTriggers } from './sessions.js'
@@ -154,6 +161,18 @@ for (const which of ['plays', 'answers'] as const) {
       .header('content-disposition', `attachment; filename="zerowords-${which === 'plays' ? 'partite' : 'risposte'}.csv"`)
       .send(zerowordsCsv(which)),
   )
+}
+
+// Word Association's rounds and, within them, the hidden words found or missed and the chat's
+// frequent wrong guesses: what gioco-zeroassociations/analyze_telemetry.py reads.
+for (const which of ['rounds', 'guesses'] as const) {
+  app.get(`/api/word-association/${which}.csv`, async (_req, reply) => {
+    const { columns, rows } = which === 'rounds' ? wordAssociationRounds() : wordAssociationGuesses()
+    return reply
+      .header('content-type', 'text/csv; charset=utf-8')
+      .header('content-disposition', `attachment; filename="word-association-${which === 'rounds' ? 'round' : 'tentativi'}.csv"`)
+      .send(toCsv([columns, ...rows]))
+  })
 }
 
 // Background images (Bivio, Incastro, Quizzland): one per game and overlay key, stored in the data
@@ -271,6 +290,48 @@ const FEED_KEPT = 100
 const feeds = new Map<string, FeedEvent[]>()
 let feedSeq = 0
 
+// The live's counters of each key since this Zerocade started, for the dashboard's right column.
+// The viewers are read from the connected lives each time they are sent.
+type Counters = Omit<LiveStats, 'viewers'>
+const counters = new Map<string, Counters>()
+const NO_COUNTS: Counters = { comments: 0, likes: 0, gifts: 0, coins: 0, follows: 0 }
+const STATS_EVERY_MS = 500
+const statsTimers = new Map<string, NodeJS.Timeout>()
+
+function liveStats(key: string): LiveStats {
+  const watching = (sources.get(key)?.live() ?? []).flatMap((s) => (s.viewers === undefined ? [] : [s.viewers]))
+  return {
+    ...(counters.get(key) ?? NO_COUNTS),
+    viewers: watching.length ? watching.reduce((a, b) => a + b, 0) : null,
+  }
+}
+
+// At most one update every STATS_EVERY_MS per key, however busy the chat.
+function pushStats(key: string) {
+  if (statsTimers.has(key)) return
+  statsTimers.set(key, setTimeout(() => {
+    statsTimers.delete(key)
+    io.to(dashboardRoom(key)).emit('stats:update', liveStats(key))
+  }, STATS_EVERY_MS))
+}
+
+function countEvent(key: string, event: LiveEvent, origin: EventOrigin) {
+  const c = { ...(counters.get(key) ?? NO_COUNTS) }
+  if (event.type === 'comment') c.comments++
+  else if (event.type === 'like' && origin !== 'twitch') c.likes += event.count
+  else if (event.type === 'gift') {
+    c.gifts += event.count
+    c.coins += (giftById(event.giftId)?.coins ?? 0) * event.count
+  } else if (event.type === 'follow') c.follows++
+  counters.set(key, c)
+  pushStats(key)
+}
+
+// The viewer count changes without any event: refresh it every few seconds for lives connected.
+setInterval(() => {
+  for (const [key, room] of sources) if (room.live().length) pushStats(key)
+}, 5000).unref()
+
 // Persist + relay every live event (simulated or real), and keep the gifters ranking.
 // Bivio, Incastro and Quizzland run on the server, so their triggers are applied here rather than in
 // the overlay. `origin` is the feed the event came from, `creator` that feed's account
@@ -283,6 +344,7 @@ function broadcastEvent(key: string, event: LiveEvent, origin: EventOrigin = 'si
   feeds.set(key, [...(feeds.get(key) ?? []).slice(1 - FEED_KEPT), item])
   io.to(dashboardRoom(key)).emit('feed:events', [item])
   if (event.type === 'gift') io.to(key).emit('ranking:update', getRanking(key))
+  countEvent(key, event, origin)
   const room = bivio.get(key) ?? incastro.get(key) ?? quizzland.get(key)
   if (room) for (const t of triggersFor(getSession(key).triggers, event)) room.action(t.action, event)
 }
@@ -377,6 +439,27 @@ io.on('connection', (socket) => {
   // browser, or OBS's Interact window.
   socket.on('incastro:shuffle', () => incastro.get(key)?.control('shuffle'))
 
+  // The end of a ZeroAssociazioni round, from an overlay (never the dashboard's preview): kept
+  // only while the game is selected and when it matches the content this server loaded.
+  socket.on('wordassoc:round', (raw: unknown) => {
+    if (getSession(key).gameId !== 'word-association') return
+    const report = sanitizeRoundReport(raw, wordAssociation)
+    if (!report) return
+    recordWordAssociationRound({
+      key,
+      content_id: report.content_id,
+      ref: report.ref,
+      prompt: report.prompt,
+      words: report.words,
+      duration_ms: report.durationMs,
+      players: report.players,
+      guesses: report.guesses,
+      hints: report.hints,
+      found: report.found,
+      wrong: report.wrong,
+    })
+  })
+
   // Otherwise overlays only listen; everything that changes state comes from the dashboard.
   if (clientType !== 'dashboard') return
 
@@ -391,6 +474,7 @@ io.on('connection', (socket) => {
   socket.emit('source:saved', savedSources(key))
   socket.emit('feed:events', feeds.get(key) ?? [])
   socket.emit('bridge:status', zfb.status())
+  socket.emit('stats:update', liveStats(key))
 
   socket.on('bridge:set', (raw: unknown) => {
     const config = sanitizeBridgeConfig(raw)

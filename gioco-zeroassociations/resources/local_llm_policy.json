@@ -1,0 +1,19 @@
+{
+  "purpose": "Bozze e diagnosi editoriali delle associazioni, senza approvazione QA automatica",
+  "required_for_csv_export": false,
+  "required_for_validation": false,
+  "gpu_required": false,
+  "preferred_family": "Qwen",
+  "version_policy": "Verificare l'ultima versione ufficiale generalista adatta alla macchina prima di ogni nuovo lotto; mantenere fissa la revisione durante il lotto",
+  "official_publisher": "Qwen",
+  "selection_verified_on": "2026-11-09",
+  "selected_base_model": "Qwen/Qwen3.8-27B",
+  "selected_base_revision": "37561816e66b5b9153b1b64c10968c18c1e6f4a0",
+  "quantization_repository": "unsloth/Qwen3.8-27B-GGUF",
+  "quantization_revision": "4ca720788d1e01f1bff70c033e0d0028fd02e502",
+  "model_file": "Qwen3.8-27B-UD-Q5_K_M.gguf",
+  "model_sha256": "2de73110cb254cbf09b54b717578dadff12ef1194e7271527e68202f39ba4bfd",
+  "pilot_status": "NOT_EVALUATED_AT_THIS_QUANTIZATION",
+  "external_weights": true,
+  "notes": "Le prove con Qwen precedente e con la quantizzazione IQ2 non autorizzano l'export. Le bozze del modello restano in revisione fino al controllo editoriale. Non cambiare automaticamente modello durante la ripresa di un lotto."
+}

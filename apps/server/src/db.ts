@@ -175,6 +175,30 @@ db.exec(`
     name TEXT PRIMARY KEY,
     value TEXT NOT NULL
   );
+  CREATE TABLE IF NOT EXISTS word_association_rounds (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    key TEXT NOT NULL,
+    content_id TEXT NOT NULL,
+    ref TEXT NOT NULL,
+    prompt TEXT NOT NULL,
+    words TEXT NOT NULL,
+    ended_at INTEGER NOT NULL,
+    duration_ms INTEGER NOT NULL,
+    found INTEGER NOT NULL,
+    total INTEGER NOT NULL,
+    players INTEGER NOT NULL,
+    guesses INTEGER NOT NULL,
+    hints INTEGER NOT NULL
+  );
+  CREATE TABLE IF NOT EXISTS word_association_guesses (
+    round INTEGER NOT NULL,
+    kind TEXT NOT NULL CHECK (kind IN ('found', 'missed', 'wrong')),
+    word TEXT NOT NULL,
+    at_ms INTEGER,
+    hinted INTEGER NOT NULL DEFAULT 0,
+    count INTEGER NOT NULL DEFAULT 1
+  );
+  CREATE INDEX IF NOT EXISTS word_association_guesses_round ON word_association_guesses (round);
 `)
 
 // Migrate databases created before the widgets/goal columns existed.
@@ -182,6 +206,11 @@ try {
   db.exec("ALTER TABLE sessions ADD COLUMN widgets TEXT NOT NULL DEFAULT '{}'")
 } catch {
   // column already present on fresh schema
+}
+try {
+  db.exec('ALTER TABLE gifts ADD COLUMN avatar TEXT')
+} catch {
+  // column already present
 }
 try {
   db.exec('ALTER TABLE sessions ADD COLUMN goal INTEGER NOT NULL DEFAULT 1000')
@@ -564,6 +593,76 @@ const table = (stmt: Database.Statement) => ({
 export const zerowordsPlays = () => table(zwPlaysAll)
 export const zerowordsAnswers = () => table(zwAnswersAll)
 
+// --- Word Association telemetry ---
+// One row per round an overlay played to the end, and per hidden word (found or missed) and
+// frequent wrong guess in it: what gioco-zeroassociations/analyze_telemetry.py reads to
+// measure difficulty and find the associations the chat expects. No viewer is stored.
+
+const WORD_ASSOCIATION_DAYS_KEPT = 365
+{
+  const old = Date.now() - WORD_ASSOCIATION_DAYS_KEPT * 86_400_000
+  db.prepare('DELETE FROM word_association_guesses WHERE round IN (SELECT id FROM word_association_rounds WHERE ended_at < ?)').run(old)
+  db.prepare('DELETE FROM word_association_rounds WHERE ended_at < ?').run(old)
+}
+
+export interface WordAssociationRoundRow {
+  key: string
+  content_id: string
+  ref: string
+  prompt: string
+  words: string[]
+  duration_ms: number
+  players: number
+  guesses: number
+  hints: number
+  found: { word: string; ms: number; hinted: boolean }[]
+  wrong: { guess: string; count: number }[]
+}
+
+const waRoundInsert = db.prepare(`
+  INSERT INTO word_association_rounds (key, content_id, ref, prompt, words, ended_at, duration_ms, found, total, players, guesses, hints)
+  VALUES (@key, @content_id, @ref, @prompt, @words, @ended_at, @duration_ms, @found, @total, @players, @guesses, @hints)
+`)
+const waGuessInsert = db.prepare(`
+  INSERT INTO word_association_guesses (round, kind, word, at_ms, hinted, count) VALUES (@round, @kind, @word, @at_ms, @hinted, @count)
+`)
+const waRoundsAll = db.prepare(`
+  SELECT id AS round, content_id, ref, prompt, words, ended_at, duration_ms, found, total, players, guesses, hints
+  FROM word_association_rounds ORDER BY id
+`)
+const waGuessesAll = db.prepare(`
+  SELECT g.round, r.content_id, r.ref, r.prompt, g.kind, g.word, g.at_ms, g.hinted, g.count, r.duration_ms
+  FROM word_association_guesses g JOIN word_association_rounds r ON r.id = g.round ORDER BY g.rowid
+`)
+
+export const recordWordAssociationRound = db.transaction((row: WordAssociationRoundRow): number => {
+  const round = Number(
+    waRoundInsert.run({
+      key: row.key,
+      content_id: row.content_id,
+      ref: row.ref,
+      prompt: row.prompt,
+      words: row.words.join('|'),
+      ended_at: Date.now(),
+      duration_ms: row.duration_ms,
+      found: row.found.length,
+      total: row.words.length,
+      players: row.players,
+      guesses: row.guesses,
+      hints: row.hints,
+    }).lastInsertRowid,
+  )
+  for (const f of row.found) waGuessInsert.run({ round, kind: 'found', word: f.word, at_ms: f.ms, hinted: f.hinted ? 1 : 0, count: 1 })
+  const found = new Set(row.found.map((f) => f.word))
+  for (const word of row.words)
+    if (!found.has(word)) waGuessInsert.run({ round, kind: 'missed', word, at_ms: null, hinted: 0, count: 1 })
+  for (const w of row.wrong) waGuessInsert.run({ round, kind: 'wrong', word: w.guess, at_ms: null, hinted: 0, count: w.count })
+  return round
+})
+
+export const wordAssociationRounds = () => table(waRoundsAll)
+export const wordAssociationGuesses = () => table(waGuessesAll)
+
 // --- Pads ---
 // A key gets a pad_boards row the first time its board is read, so a board emptied on
 // purpose is not filled with the defaults again.
@@ -632,9 +731,9 @@ const GIFT_DAYS_KEPT = 30
 db.prepare('DELETE FROM gifts WHERE at < ?').run(Date.now() - GIFT_DAYS_KEPT * 86_400_000)
 
 const giftInsert = db.prepare(`
-  INSERT INTO gifts (key, creator, game_id, user_id, nickname, gift_id, count, coins, at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+  INSERT INTO gifts (key, creator, game_id, user_id, nickname, avatar, gift_id, count, coins, at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 `)
-const GIFT_COLUMNS = 'SELECT id, creator, game_id AS gameId, nickname, gift_id AS giftId, count, coins, at FROM gifts'
+const GIFT_COLUMNS = 'SELECT id, creator, game_id AS gameId, nickname, avatar, gift_id AS giftId, count, coins, at FROM gifts'
 const giftsLatest = db.prepare(`${GIFT_COLUMNS} WHERE (@creator IS NULL OR creator = @creator) ORDER BY id DESC LIMIT @limit`)
 const giftTop = db.prepare(
   `${GIFT_COLUMNS} WHERE (@creator IS NULL OR creator = @creator) AND at >= @since ORDER BY coins DESC, id DESC LIMIT 1`,
@@ -643,15 +742,23 @@ const giftCreators = db.prepare('SELECT DISTINCT creator FROM gifts')
 
 export const recordGift = (key: string, creator: string, gameId: string, event: GiftEvent): void => {
   const coins = (giftById(event.giftId)?.coins ?? 0) * event.count
-  giftInsert.run(key, creator, gameId, event.user.id, event.user.nickname, event.giftId, event.count, coins, Date.now())
+  giftInsert.run(key, creator, gameId, event.user.id, event.user.nickname, event.user.avatar ?? null, event.giftId, event.count, coins, Date.now())
 }
 
 // `creator` undefined means every creator; '' the simulator.
-export const latestGifts = (creator: string | undefined, limit: number): FeedGift[] =>
-  giftsLatest.all({ creator: creator ?? null, limit }) as unknown as FeedGift[]
+// A gift row without a picture leaves `avatar` out rather than null.
+const giftRow = (row: unknown): FeedGift => {
+  const { avatar, ...gift } = row as FeedGift & { avatar: string | null }
+  return avatar ? { ...gift, avatar } : gift
+}
 
-export const topGiftSince = (creator: string | undefined, since: number): FeedGift | null =>
-  (giftTop.get({ creator: creator ?? null, since }) as FeedGift | undefined) ?? null
+export const latestGifts = (creator: string | undefined, limit: number): FeedGift[] =>
+  giftsLatest.all({ creator: creator ?? null, limit }).map(giftRow)
+
+export const topGiftSince = (creator: string | undefined, since: number): FeedGift | null => {
+  const row = giftTop.get({ creator: creator ?? null, since })
+  return row ? giftRow(row) : null
+}
 
 export const giftedCreators = (): string[] => (giftCreators.all() as { creator: string }[]).map((r) => r.creator)
 

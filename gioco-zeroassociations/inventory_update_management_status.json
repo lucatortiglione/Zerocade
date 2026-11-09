@@ -1,0 +1,32 @@
+{
+  "before": {
+    "inventory_terms": 2740415,
+    "inventory_attestations": 7731331,
+    "inventory_sources": 40,
+    "prompts": 102,
+    "associations": 1010
+  },
+  "after": {
+    "inventory_terms": 2740415,
+    "inventory_attestations": 7731331,
+    "inventory_sources": 40,
+    "prompts": 102,
+    "associations": 1010
+  },
+  "verified_pools_unchanged": true,
+  "registered_sources": 40,
+  "active_source_versions": 40,
+  "word_decisions_created": 0,
+  "source_update_decisions_created": 0,
+  "database": "C:\\Progetti\\Zerocade\\gioco-zeroassociations\\prompt.sqlite3",
+  "migration": "additive_preserves_existing_data",
+  "tests_passed": 92,
+  "source_check": {
+    "source": "freedict-ita-deu",
+    "status": "UNCHANGED"
+  },
+  "new_table_foreign_key_errors": [],
+  "verified_pool_dump_restored": true,
+  "catalog_lookup_verified": true,
+  "pending_updates": 0
+}

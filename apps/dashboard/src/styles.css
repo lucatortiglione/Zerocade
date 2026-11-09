@@ -648,6 +648,8 @@ input[type='number']:focus { border-color: var(--accent); outline: none; }
 .form__field select, .form__field input[type='number'] { width: 100%; }
 .form__row { display: flex; align-items: center; gap: 10px; font-size: 14px; }
 .form__row > :last-child { margin-left: auto; }
+.form__sub { padding-left: 12px; }
+.setting-sub { display: flex; flex-direction: column; gap: inherit; margin-left: 2px; padding-left: 12px; border-left: 1px solid var(--border-strong); }
 .form__label { display: inline-flex; align-items: center; gap: 6px; font-size: 14px; }
 .form__hint {
   display: inline-grid;
@@ -727,6 +729,74 @@ input[type='number']:focus { border-color: var(--accent); outline: none; }
 /* ============ Right column: pads, creators, latest gifts (every game) ============ */
 
 .live-col { background: #0b0b10; }
+
+/* The column fits the screen: counters, pads and folded sections keep their size; the chat and
+   the gifters share what is left, and their lists scroll inside. */
+.live-col { overflow: hidden; }
+.live-col > * { flex: none; }
+.live-col > .side-section--grow[open] { display: flex; flex-direction: column; flex: 1 1 0; min-height: 150px; overflow: hidden; }
+/* The chat gets more of the room than the gifters. */
+.live-col > .side-section--chat[open] { flex-grow: 3; }
+.live-col > .side-section--grow[open]:not(.side-section--chat) { flex-grow: 2; }
+/* A <details>' content sits in its ::details-content box: that box is the flex item to shrink. */
+.live-col > .side-section--grow[open]::details-content { display: flex; flex-direction: column; flex: 1; min-height: 0; }
+.live-col > .side-section--grow[open] .side-section__body { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+.live-col .scroll-area { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; }
+.live-col .scroll-area > .empty-state { min-height: 100%; justify-content: center; padding: 10px 24px; }
+.live-col .empty-state__icon { width: 38px; height: 38px; margin-bottom: 6px; }
+.live-col .comment-box { flex: none; margin-top: 8px; }
+
+/* The live's counters, on top of the column */
+.live-stats { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); padding: 14px 4px; border-bottom: 1px solid var(--border); }
+.live-stats__cell { display: inline-flex; align-items: center; justify-content: center; gap: 7px; min-width: 0; color: var(--text-muted); font-size: 14px; }
+.live-stats__cell + .live-stats__cell { border-left: 1px solid var(--border); }
+.live-stats__cell svg, .live-stats__cell .coin { flex: none; }
+.live-stats__value { overflow: hidden; color: var(--text); font-weight: 700; font-variant-numeric: tabular-nums; text-overflow: ellipsis; }
+.live-stats__value--coin { color: var(--warning); }
+.sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+/* Empty sections: an icon tile, a title and a line */
+.empty-state { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 22px 28px 26px; color: var(--text-muted); font-size: 13px; line-height: 1.45; text-align: center; }
+.empty-state__icon { display: grid; place-items: center; width: 46px; height: 46px; margin-bottom: 10px; border-radius: 12px; background: var(--bg-elevated); }
+.empty-state strong { color: #d6d6e0; font-size: 14px; font-weight: 700; }
+
+/* Chat: filter menu and the box to comment as a simulated viewer */
+.icon-btn { display: grid; place-items: center; width: 26px; height: 26px; border: 0; border-radius: 7px; background: transparent; color: var(--text-muted); cursor: pointer; }
+.icon-btn:hover, .icon-btn[aria-expanded='true'] { background: var(--bg-hover); color: var(--text); }
+.icon-btn--on { color: var(--accent-hover); }
+.filter-menu { position: relative; display: inline-flex; }
+.filter-menu__list {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  min-width: 160px;
+  padding: 4px;
+  border: 1px solid var(--border-strong);
+  border-radius: 10px;
+  background: var(--bg-elevated);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.55);
+}
+.filter-menu__item { padding: 7px 10px; border: 0; border-radius: 7px; background: transparent; color: var(--text-muted); font-size: 13px; text-align: left; cursor: pointer; }
+.filter-menu__item:hover { background: var(--bg-hover); color: var(--text); }
+.filter-menu__item[aria-checked='true'] { color: var(--text); font-weight: 600; }
+.comment-box { display: flex; align-items: center; gap: 6px; margin: 10px 12px 0; padding: 0 5px 0 14px; border: 1px solid var(--border); border-radius: 10px; background: #15151c; }
+.comment-box:focus-within { border-color: var(--border-strong); }
+.comment-box input { flex: 1; min-width: 0; padding: 11px 0; border: 0; outline: none; background: transparent; font-size: 14px; }
+.comment-box input::placeholder { color: #6e6e80; }
+.comment-box button { display: grid; place-items: center; width: 30px; height: 30px; border: 0; border-radius: 8px; background: transparent; color: var(--text-muted); cursor: pointer; }
+.comment-box button:hover:not(:disabled) { background: var(--bg-hover); color: var(--text); }
+.comment-box button:disabled { opacity: 0.45; cursor: default; }
+
+/* Gifters: latest gifts and the top of the live */
+.gifters__filter { align-self: flex-end; margin: 0 10px 6px; }
+.gifters__rank { width: 18px; flex: none; color: var(--text-muted); font-size: 13px; font-weight: 800; text-align: center; font-variant-numeric: tabular-nums; }
+.gifters__rank--1 { color: #fbbf24; }
+.gifters__rank--2 { color: #d1d5db; }
+.gifters__rank--3 { color: #f59e6b; }
+.chat-row__avatar.chat-row__avatar--small { display: inline-grid; width: 16px; height: 16px; font-size: 8px; vertical-align: -3px; }
 
 .pads { display: flex; flex-direction: column; gap: 10px; padding: 12px 12px 16px; border-bottom: 1px solid var(--border); }
 .pads__bar { display: flex; align-items: center; gap: 4px; }
@@ -898,7 +968,8 @@ input[type='number']:focus { border-color: var(--accent); outline: none; }
   vertical-align: 1px;
 }
 /* Chat and events: newest on top, scrolling within its own box. */
-.chat-feed { max-height: 380px; overflow-y: auto; overscroll-behavior: contain; }
+.chat-feed { min-height: 240px; max-height: 380px; overflow-y: auto; overscroll-behavior: contain; }
+.empty-state.chat-feed { justify-content: center; }
 .chat-row { display: flex; align-items: flex-start; gap: 10px; padding: 7px 14px; }
 .chat-row:nth-child(odd) { background: #101016; }
 .chat-row__avatar {

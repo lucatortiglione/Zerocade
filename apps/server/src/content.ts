@@ -2,7 +2,7 @@ import { mkdirSync, readFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import Database from 'better-sqlite3'
-import { loadWordAssociationContent } from './word-association.js'
+import { loadWordAssociation } from './word-association.js'
 
 // Game content (word banks, questions, statements, brands, locations, …) lives in
 // its own SQLite database, separate from the sessions/events DB. The overlay loads
@@ -41,7 +41,8 @@ const seedAll = db.transaction(() => {
   }
 })
 seedAll()
-const wordAssociationContent = loadWordAssociationContent()
+// Word Association reads the verified pools of gioco-zeroassociations/prompt.sqlite3.
+export const wordAssociation = loadWordAssociation()
 
 export function getContent(): Record<string, unknown[]> {
   const out: Record<string, unknown[]> = {}
@@ -54,9 +55,9 @@ export function getContent(): Record<string, unknown[]> {
     }
   }
   // The two other games still use the historical theme bank. Existing databases
-  // retain its old key; the new target-guessing game only uses the QA export.
+  // retain its old key; ZeroAssociazioni only uses the verified pools of prompt.sqlite3.
   out['association-themes'] ??= out['word-association'] ?? []
-  out['word-association'] = wordAssociationContent
+  out['word-association'] = wordAssociation.pools
   return out
 }
 

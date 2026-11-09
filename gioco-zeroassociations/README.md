@@ -1,156 +1,79 @@
-# Word Association IT v3.6.0
+# ZeroAssociazioni: prompt e associazioni verificate
 
-Le [direttive correnti](direttive_word_association_it_v3_6_0.md) definiscono
-**contesto visibile → sette risposte nascoste**. Il catalogo contiene 172
-categorie in 16 cluster, senza rinumerazione degli ID precedenti.
+Il gioco mostra una parola (il **prompt**) e la chat indovina **7 o 8 parole
+collegate nascoste**. Questa cartella produce e verifica quei dati; il gioco è in
+`apps/overlay/src/games/wordAssociation.ts` e li legge dal server.
 
-## Lotto di 5.000 esempi
+## Il ciclo
 
-I file sono in [generated-v3_6_0](generated-v3_6_0/LEGGIMI.md):
+1. **Inventario**: raccogliere i prompt dalle fonti (`prompt_inventory.py collect`,
+   [PROMPT_INVENTORY.md](PROMPT_INVENTORY.md)) e integrare, scartare o rimandare
+   gli aggiornamenti e le singole voci (`inventory_updates.py`,
+   [AGGIORNAMENTI_FONTI.md](AGGIORNAMENTI_FONTI.md)). Nessuna associazione.
+2. **Bacini**: per un prompt scelto, fissare il senso familiare e proporre le
+   associazioni partendo dal concetto, non dalle definizioni (bozze:
+   `free_association_llm.py propose`). Ogni parola si verifica con le [regole](REGOLE.md).
+3. **Importazione**: `prompt_database.py import-reviewed` accetta solo bacini con
+   verbale completo ([PROMPT_DATABASE.md](PROMPT_DATABASE.md)). Poi `dump`.
+   `validated_prompt_database.py sync` ne ricava `prompt_validi.sqlite3`, la copia
+   con i soli prompt validati e i loro bacini.
+4. **Gioco**: a ogni round il server estrae 7 o 8 parole dal bacino, rispettando
+   gruppi di equivalenti e coppie incompatibili. Per Livecade: `livecade` (7 parole).
+5. **Telemetria**: la dashboard scarica i CSV «Round» e «Tentativi» del gioco.
+6. **Analisi**: `analyze_telemetry.py` misura la difficoltà di ogni parola, segnala
+   quelle mai trovate e propone le parole che la chat scrive spesso. Le proposte
+   tornano al punto 2: nessuna entra nel DB senza revisione.
 
-- `word_association_it_5000_candidati_0003.csv`: lotto corrente, con prima riga
-  `ref,source,language,prompt,words`, un campo per cella; `ref` vuoto,
-  `source=ChatGPT`, `language=it`, prompt maiuscolo e risposte minuscole con `|`.
-- La consegna ripristina le virgole e UTF-8 senza BOM: un record completo
-  per riga, con prima riga `ref,source,language,prompt,words`.
-- La copia `_candidati_con_ordine_0003.csv` appartiene alle esecuzioni precedenti;
-  non viene più creata automaticamente. Per richiederla usare `--with-order`.
-- `word_association_it_5000_gioco_0003.csv`: copia di gioco a cinque colonne.
-- `word_association_it_5000_metadati_0003.jsonl`: categoria proposta, accezione,
-  evidenze, POS, difficoltà stimate e stato di revisione.
-- `rapporto_0003.json`, `validazione_0003.json` e `audit_familiarita_0003.json`:
-  generazione, controlli strutturali e verifica indipendente sulla fonte dei prompt.
+`free_association_llm.py recall` simula i giocatori sui bacini già importati
+(K giocatori indipendenti vedono solo il prompt): utile prima di avere dati veri,
+ma resta una diagnosi.
 
-I file senza suffisso e i lotti precedenti sono storici: non applicavano tutti
-i filtri correnti di familiarità. L'intestazione del precedente CSV principale
-è stata corretta a cinque celle, conservando la copia originale con `ordine`.
+## Comandi
 
-Sono **candidati non approvati**. Le associazioni e la classificazione richiedono
-revisione editoriale e prove indipendenti con il contesto visibile. Non vengono
-inventati voti, test umani, recuperabilità o esiti safety.
+Dalla cartella `gioco-zeroassociations`, con `.venv/Scripts/python.exe -B`:
 
-## Nomi dei file progressivi
+| Comando | Cosa fa |
+|---|---|
+| `prompt_inventory.py collect` | Raccoglie l'inventario dei prompt (task «1. Prompt: raccogli…») |
+| `prompt_database.py import-reviewed FILE.jsonl` | Importa bacini già revisionati, tutto o niente |
+| `prompt_database.py status` | Conteggi e integrità del DB |
+| `prompt_database.py dump` | Aggiorna `prompt.sql` (solo bacini, senza inventario) |
+| `prompt_database.py livecade --count N` | CSV per Livecade: N prompt, 7 risposte ciascuno |
+| `prompt_database.py register-directives` | Dopo un ritocco al testo delle direttive che non cambia le regole |
+| `inventory_updates.py …` | Aggiornamenti delle fonti e decisioni sulle voci (task «Fonti: …» e «Voci: …») |
+| `validated_prompt_database.py sync` | Rigenera `prompt_validi.sqlite3` dai verbali correnti |
+| `analyze_telemetry.py --guesses T.csv --rounds R.csv --output rapporto.json --proposals proposte.jsonl` | Analisi della chat |
+| `free_association_llm.py --output r.json recall` | Giocatori simulati sui bacini (LLM locale) |
+| `free_association_llm.py --output b.jsonl propose mare sole` | Bozze di bacino per prompt nuovi |
 
-Ogni nuova esecuzione aggiunge al nome un suffisso prima dell'estensione:
-`word_association_it_5000_candidati_0001.csv`, poi `_0002.csv`, `_0003.csv`, ecc.
-CSV di gioco, metadati e rapporto dello stesso lotto condividono il numero
-(`word_association_it_5000_gioco_0001.csv`,
-`word_association_it_5000_metadati_0001.jsonl`, `rapporto_0001.json`).
-La sequenza parte da 0001 in ogni cartella di output e prosegue dal numero
-massimo già presente, anche se cambia il numero di esempi richiesto.
-I file preesistenti senza suffisso restano consultabili con i nomi originari.
-La colonna `ordine` è disponibile soltanto nella copia facoltativa
-`_candidati_con_ordine_NNNN.csv`, richiesta con `--with-order`.
+`npm run test:associations`, dalla radice del progetto, esegue i test Python e quelli del gioco.
 
-## Familiarità dei prompt e prestiti ammessi
+## Dove legge il gioco
 
-[resources/prompt_policy.json](resources/prompt_policy.json) contiene la lista
-chiusa di 462 `common_loanwords`. Si applica soltanto ai prestiti stranieri:
-se un prestito non è elencato, il generatore lo esclude, anche se frequente.
-Non esiste un dizionario di eccezioni `excluded_prompts`.
+Il server usa, in sola lettura, la prima fonte che contiene bacini:
+`prompt_validi.sqlite3`, poi `prompt.sqlite3`, poi `prompt.sql` caricato in
+memoria (un clone appena scaricato ha solo questo). Solo i prompt con revisione
+`verified`, nel senso indicato da `prompts.familiar_sense`; mai quelli che la
+raccolta segna `DISCARDED` o `DEFERRED`. I bacini nuovi compaiono al riavvio di
+Zerocade. Il pacchetto Windows include un database ridotto ai soli bacini
+(`zeroassociations.db`, circa 2 MB).
 
-I normali termini italiani non devono appartenere alla lista: seguono una soglia
-di familiarità Zipf italiano 3,0. Per i verbi il riferimento può essere una forma
-flessa attestata nella voce; ausiliari e intestazioni di tabella sono esclusi.
-La forma effettivamente usata è registrata in `prompt_familiarity.frequency_reference`.
-È uno screening automatico, non una prova di familiarità o giocabilità umana.
+## File
 
-Il filtro usa etichette lessicografiche ed etimologia diretta della stessa forma;
-non tratta le traduzioni in inglese come prova di forestierismo. Le derivazioni
-italiane come `filmare` restano nel percorso dei termini italiani. Le liste
-non vengono estese automaticamente. L'inventario dei prestiti nel corpus è
-conservato in `resources/loanword_inventory.jsonl`; non è una lista di approvazioni.
+- `prompt.sqlite3`: database operativo unico, escluso da Git (con l'inventario pesa gigabyte).
+- `prompt.sql`: dump dei bacini verificati e delle decisioni sulle voci, versionato.
+- `prompt_validi.sqlite3`: copia dei prompt validati, esclusa da Git (si rigenera con `sync`).
+- `prompt_schema.sql`, `prompt_inventory_schema.sql`: schemi.
+- `resources/policy_versions.json`: per ogni testo delle direttive, la versione
+  delle regole (`SEMANTIC_POLICY`) con cui i bacini sono stati revisionati.
+- `resources/prompt_policy.json`: prestiti comuni ammessi (lista chiusa) e soglia
+  di familiarità Zipf 3,0 per i termini italiani.
+- `verified_pools.py`: lettura dei bacini e confronto delle parole, con le stesse
+  regole del gioco (accenti, forme flesse).
+- `validate_word_association_it_v3_6_0.py`: validatore tecnico dei CSV.
+- [Direttive complete](direttive_word_association_it_v3_6_0.md) e
+  [direttiva di pertinenza](DIRETTIVA_INDIZI.md): il riferimento normativo.
+- [archivio](archivio/LEGGIMI.md): la vecchia estrazione dalle definizioni.
 
-`audit_prompt_familiarity.py --csv FILE.csv --metadata METADATI.jsonl --corpus CORPUS.jsonl --output AUDIT.json`
-ricontrolla le accezioni sorgente e le frequenze del lotto. Per il lotto 0003
-ha verificato 5.000 contesti: tutti i 190 prestiti rilevati sono elencati,
-zero contesti respinti dallo screening corrente.
-
-## Verbi facoltativi
-
-Il piano POS 70/20/10 è orientativo: se mancano verbi adatti, si compensano
-con nomi o aggettivi, anche fino a zero verbi. Il generatore lo fa per default,
-registrando piano richiesto, piano adattato e distribuzione reale.
-`--strict-pos-quotas` è un'opzione aggiuntiva per pianificazioni specifiche.
-Il validatore registra gli scostamenti come note, senza farli diventare gate
-nemmeno con `--strict-warnings`. Qualità e sette risposte restano obbligatorie.
-
-## Risorse e riproduzione
-
-L'ambiente dedicato è `.venv/` (Python 3.13, escluso da Git); pacchetti e versioni
-sono elencati in [resources/environment.txt](resources/environment.txt).
-spaCy `it_core_news_md` 3.8.0 è stato eseguito su 69.598 definizioni distinte.
-Frequenze e DF reali, manifest con hash e metodi, lessico morfologico del lotto
-e crediti sono in [resources](resources/LEGGIMI.md).
-
-Corpus originale e cache NLP rimangono fuori dal repository:
-`%LOCALAPPDATA%/Zerocade/word-association/`.
-Gli estratti sorgente effettivamente usati sono conservati nei metadati.
-
-```powershell
-py -3.13 -m venv gioco-zeroassociations/.venv
-uv pip install --python gioco-zeroassociations/.venv/Scripts/python.exe -r gioco-zeroassociations/requirements-generation.txt
-gioco-zeroassociations/.venv/Scripts/python.exe -m spacy download it_core_news_md
-gioco-zeroassociations/.venv/Scripts/python.exe gioco-zeroassociations/prepare_resources.py --corpus CORPUS.jsonl --output RISORSE --processes 4
-gioco-zeroassociations/.venv/Scripts/python.exe gioco-zeroassociations/generate_candidates.py --corpus CORPUS.jsonl --frequency-csv gioco-zeroassociations/resources/frequency_ranks_it.csv --definition-df-csv gioco-zeroassociations/resources/definition_document_counts_it.csv --morphology-csv gioco-zeroassociations/resources/morphology_selection.csv --analysis-cache RISORSE/analysis_cache.jsonl --count 5000 --batch-id NUOVO-LOTTO --output NUOVA_CARTELLA
-```
-
-La cache è facoltativa: il generatore può rieseguire l'analisi sulle frasi.
-Corpus, modello e hash della cache devono coincidere con il manifest. La
-classificazione usa vettori semantici del modello e gli esempi del catalogo:
-rimane proposta, non un'etichetta verificata. I nomi propri non vengono
-estratti automaticamente come risposte; gli esempi d'uso non vengono utilizzati
-come serbatoio di associazioni accidentali. Le relazioni lessicali e i contesti
-inversi conservano fonte, accezione e contesto condiviso.
-
-## Controlli e QA
-
-```powershell
-npm run test:associations
-gioco-zeroassociations/.venv/Scripts/python.exe gioco-zeroassociations/validate_word_association_it_v3_6_0.py gioco-zeroassociations/generated-v3_6_0/word_association_it_5000_gioco_0003.csv --candidates-jsonl gioco-zeroassociations/generated-v3_6_0/word_association_it_5000_metadati_0003.jsonl --min-rows 5000 --require-lexical --morphology-csv gioco-zeroassociations/resources/morphology_5000.csv --frequency-csv gioco-zeroassociations/resources/frequency_ranks_it.csv --definition-df-csv gioco-zeroassociations/resources/definition_document_counts_it.csv --report-json gioco-zeroassociations/generated-v3_6_0/validazione_0003.json
-```
-
-`PASS_TECHNICAL_ONLY` non è approvazione semantica. I flag di frequenza,
-omonimia, forme sconosciute e parentela morfologica richiedono esame contestuale.
-I §§3.5–3.10 delle [direttive](direttive_word_association_it_v3_6_0.md) e la
-[direttiva di pertinenza](DIRETTIVA_INDIZI.md) impongono anche il controllo
-semantico di ogni coppia: provenienza e frequenza non sostituiscono una
-relazione concreta, naturale e recuperabile nell'accezione scelta. Per ogni
-risposta debole cercare un'alternativa mantenendo il prompt. Il §3.10 include
-MORTE, LIGHT, COSPLAY e PALATO e richiede la disambiguazione delle relazioni
-lessicali; include GUFO e SPANDERE per frequenza impropria, locuzioni spezzate
-e descrittori del modo dell'azione. Niente frammenti di definizione o sinonimi
-di altri sensi. I lotti
-già generati richiedono questo riesame; l'aggiornamento dei documenti non
-esegue una revisione né corregge automaticamente le risposte nei CSV.
-`prepare_qa.py CANDIDATI.jsonl --output CARTELLA_NUOVA` crea moduli
-`DA_RIVEDERE` e richieste indipendenti che mostrano il contesto e nascondono
-le sette risposte. Gli aiuti UI effettivi possono essere passati con
-`--ui-cues-json`; la prova deve riprodurre quelli realmente usati dal gioco.
-
-Il lotto storico `generated/` e `candidati_curati.csv` restano conservati
-separatamente. Non sono stati convertiti aggiungendo uno zero agli ID.
-Le prove legacy 3→5→7 non sono valide per il nuovo protocollo v3.6.0.
-Questo lotto di 5.000 esempi non viene caricato come dataset approvato nel gioco.
-
-## Riparazioni sul lotto corrente
-
-La [revisione del lotto 0003](generated-v3_6_0/LEGGIMI.md) ha sostituito 150
-risposte in 33 set, mantenendo i 5.000 prompt. Le altre 4.967 righe richiedono
-ancora selezione editoriale e tutte richiedono QA indipendente.
-
-`repair_candidates.py --directory CARTELLA --batch 0003 --revisions-jsonl
-REVISIONI.jsonl --plan-json PIANO_NUOVO.json` prepara un piano controllato
-senza modificare i CSV. Ogni revisione contiene `prompt`, `revision_id`,
-`expected_words`, `sense_description` e sette `answers` con `word`, `relation`
-e `rationale`. Un cambio di senso usa `sense_changed=true`; l'eventuale nuova
-categoria è esplicita. Il piano conserva le celle manuali, verifica la
-corrispondenza CSV/JSONL e contiene hash, versioni precedenti e coda di revisione.
-La sua applicazione richiede di scrivere insieme le copie CSV e i metadati,
-controllando gli hash prima della sostituzione; non è un'approvazione semantica.
-
-Il generatore importa automaticamente relazioni lessicali soltanto quando
-esplicitamente annidate nell'accezione selezionata. Non eredita sinonimi,
-contrari, iperonimi, iponimi e correlati di pagina per il solo fatto che
-rimanga un'accezione estratta. Anche le relazioni annidate richiedono selezione
-semantica: gli export nuovi dichiarano `LEXICAL_PROPOSALS_ONLY` e QA da eseguire.
+Nessun controllo automatico approva un'associazione: le revisioni dichiarano chi
+le ha fatte (`human_review`) e i dati di gioco non sostituiscono la revisione.

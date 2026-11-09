@@ -7,15 +7,17 @@ export function Section({
   title,
   extra,
   open = true,
+  className = '',
   children,
 }: {
   title: string
   extra?: ReactNode
   open?: boolean
+  className?: string
   children: ReactNode
 }) {
   return (
-    <details className="side-section" open={open}>
+    <details className={`side-section ${className}`} open={open}>
       <summary className="side-section__head">
         <span>{title}</span>
         {/* Clicks on the control must not fold the section. */}

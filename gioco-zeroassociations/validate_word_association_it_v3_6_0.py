@@ -19,6 +19,8 @@ import re
 import secrets
 import unicodedata
 from typing import Any, Mapping
+from semantic_rules import (SEMANTIC_POLICY, WORD_CHECKS, SET_CHECKS,
+                            qa_word_checks_valid, screen_set, SOURCE_ONLY_REASON, adjective_attachment)
 
 TOKEN_PATTERN = re.compile(r"[a-zàèéìòù]+\Z")
 FUNCTION_POS = frozenset({"DET", "PRON", "ADP", "CCONJ", "SCONJ", "AUX", "PART", "INTJ", "SYM", "PUNCT", "X", "NUM"})
@@ -68,7 +70,7 @@ def load_italian_nlp(model: str = "it_core_news_md"):
     except ImportError as e:
         raise RuntimeError("spaCy non installato: pip install spacy") from e
     try:
-        nlp = spacy.load(model, disable=["parser", "ner", "textcat"])
+        nlp = spacy.load(model, disable=["ner", "textcat"])
     except OSError as e:
         raise RuntimeError(f"Modello {model!r} non installato: python -m spacy download {model}") from e
     if "tagger" not in nlp.pipe_names and "morphologizer" not in nlp.pipe_names:
@@ -209,6 +211,13 @@ def filter_definition(prompt: str, definition: str, nlp,
     seen = set()
     for tok in nlp(definition):
         item = check_token(prompt, tok, resources, definition_id=definition_id)
+        attachment = adjective_attachment(prompt, tok)
+        if attachment is not None:
+            item['adjective_attachment'] = attachment
+            item['provenance']['filters_applied'].append('direct_adjective_reference')
+            if attachment['status'] != 'direct':
+                item['status'] = 'excluded'
+                item['exclusion_reasons'].append('adjective_' + attachment['status'])
         if item["lemma"] in seen and item["status"] != "excluded":
             item["status"] = "excluded"
             item["exclusion_reasons"].append("duplicate_lemma_in_definition")
@@ -437,6 +446,9 @@ def check_csv(path: Path, min_rows: int = 0, max_answer_frequency: float = 0.01,
                         flags=morphological_overlap_candidates(a,b)
                         if flags:
                             add('warning','morphology',f'Riga {lineno}: parentela {a}/{b} {sorted(flags)} (non prova di errore)')
+                for signal in screen_set(prompt, answers)['signals']:
+                    add('warning', 'semantic:'+signal['code'],
+                        f'Riga {lineno}: {signal["code"]}: {signal["words"]}; revisione contestuale, mantenere il prompt')
                 aset=frozenset(answers)
                 if len(answers)==7 and len(aset)==7 and all(_valid_word(x) for x in aset):
                     signature=tuple(sorted(aset))
@@ -505,6 +517,7 @@ def check_candidates_jsonl(path:Path, taxonomy:dict[str,dict]|None=None, samples
     planning_notes=[]
     counts=Counter(); relations=Counter(); cats=Counter(); batches=Counter()
     seen_ids={}; seen_prompts=defaultdict(list); lineage=[]; items=0
+    semantic_counts=Counter();semantic_examples=[];semantic_sets=0;editorial_missing=0
     for ln,d,err in read_jsonl(path):
         if err:errors.append(f'Riga {ln}: {err}');continue
         items+=1
@@ -521,6 +534,13 @@ def check_candidates_jsonl(path:Path, taxonomy:dict[str,dict]|None=None, samples
             errors.append(f'Riga {ln}: words richiede sette risposte canoniche')
         elif len(set(w))!=7 or p in w:
             errors.append(f'Riga {ln}: risposte duplicate o uguali al prompt')
+        if _valid_word(p) and isinstance(w,list) and len(w)==7 and all(_valid_word(a) for a in w):
+            screen=screen_set(p,w,d)
+            if screen['signals']:
+                semantic_sets+=1
+                semantic_counts.update(s['code'] for s in screen['signals'])
+                if len(semantic_examples)<samples:semantic_examples.append(screen)
+        editorial_missing+=not bool(d.get('editorial_revision'))
         if not isinstance(d.get('pos'),str) or d.get('pos') not in POS:errors.append(f'Riga {ln}: POS del contesto non valido')
         if not isinstance(d.get('difficulty_estimate'),str) or d.get('difficulty_estimate') not in {'media','alta'}:
             errors.append(f'Riga {ln}: difficoltà complessiva stimata non valida')
@@ -590,6 +610,10 @@ def check_candidates_jsonl(path:Path, taxonomy:dict[str,dict]|None=None, samples
             'covered_categories':len(cats),'batches':dict(batches),
             'planning_notes':planning_notes,'pos_quotas_are_mandatory':False,
             'distribution':dict(counts),'relations':dict(relations),
+            'semantic_screen':{'policy':SEMANTIC_POLICY,'sets_with_signals':semantic_sets,
+                'signals':dict(semantic_counts),'examples':semantic_examples,
+                'without_editorial_selection':editorial_missing,'semantic_approval':False,
+                'action':'Cercare sostituzioni mantenendo il prompt; QA indipendente da eseguire'},
             'limits':['Metadati autodeclarati dal generatore: non certificano associazioni, difficoltà o POS.',
                       'Il test reale va nella direzione prompt visibile -> risposte nascoste.']}
 
@@ -747,7 +771,11 @@ def _word_reviews_valid(reviews,answers):
         if type(item.get('relevance')) not in (int,float) or item['relevance']<4 or item['relevance']>5:return False
         if type(item.get('discoverability')) not in (int,float) or not 3<=item['discoverability']<=5:return False
         if item.get('difficulty') not in DIFFICULTIES:return False
-        if not isinstance(item.get('rationale'),str) or len(item['rationale'].strip())<10:return False
+        if not isinstance(item.get('rationale'),str) or len(item['rationale'].strip())<15:return False
+        if SOURCE_ONLY_REASON.fullmatch(item['rationale'].strip()):return False
+        if not qa_word_checks_valid(item):return False
+    if len({item['rationale'].strip().casefold() for item in reviews}) != 7:return False
+    if any(n>2 for n in Counter(item['meaning_group'] for item in reviews).values()):return False
     return set(entries)==set(answers)
 
 
@@ -786,7 +814,10 @@ def check_qa_register(csv_path:Path,qa_dir:Path, require_qa:bool=False, samples:
                 safe.get('status')=='FLAGGED' and safe.get('classification') in {'false_positive','acceptable_with_note'}
                 and isinstance(safe.get('reason'),str) and len(safe['reason'].strip())>=20)
         ratings=sem.get('ratings') or {}
-        allowed=(technical.get('passed') is True and technical.get('errors')==[] and
+        allowed=(d.get('semantic_policy_version')==SEMANTIC_POLICY and
+                 isinstance(sem.get('set_checks'),dict) and
+                 all(sem.get('set_checks',{}).get(k) is True for k in SET_CHECKS) and
+                 technical.get('passed') is True and technical.get('errors')==[] and
                  technical.get('warnings_reviewed') is True and
                  _retrieval_valid(d.get('retrieval_test'),p) and
                  _word_reviews_valid(d.get('word_reviews'),dataset[key]) and

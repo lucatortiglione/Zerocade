@@ -47,7 +47,8 @@ export function fillTextWithAvatar(
   y: number,
   who: { nickname: string; avatar?: string },
 ) {
-  const size = Number(/(\d+)px/.exec(ctx.font)?.[1] ?? 20)
+  // The font size may have decimals ("bold 20.77px …"): read all of it, not just its last digits.
+  const size = Number(/(\d+(?:\.\d+)?)px/.exec(ctx.font)?.[1] ?? 20)
   const r = size * 0.6
   const gap = size * 0.3
   const at = Math.max(0, text.indexOf(who.nickname))

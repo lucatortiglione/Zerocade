@@ -64,6 +64,7 @@ export function GamesPage() {
         <Simulator />
         {session && <TriggerEditor session={session} />}
         {session && <SettingsPanel session={session} />}
+        {session?.gameId === 'word-association' && <WordAssociationData />}
         {session && <WidgetsPanel session={session} />}
         <TopGifters />
       </aside>
@@ -72,6 +73,28 @@ export function GamesPage() {
 
       <LiveColumn />
     </div>
+  )
+}
+
+// Word Association's telemetry, for gioco-zeroassociations/analyze_telemetry.py: which hidden
+// words the chat finds, how fast, and what it writes instead.
+function WordAssociationData() {
+  return (
+    <section>
+      <h2 className="section-label">Dati di gioco</h2>
+      <p className="text-muted small">
+        Round giocati e tentativi della chat: servono a misurare la difficoltà delle parole e a trovare le associazioni che la
+        chat si aspetta.
+      </p>
+      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+        <a className="btn btn--small" href="/api/word-association/rounds.csv" download>
+          Round (CSV)
+        </a>
+        <a className="btn btn--small" href="/api/word-association/guesses.csv" download>
+          Tentativi (CSV)
+        </a>
+      </div>
+    </section>
   )
 }
 

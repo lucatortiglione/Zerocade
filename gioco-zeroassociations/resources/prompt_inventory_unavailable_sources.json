@@ -1,0 +1,37 @@
+[
+  {
+    "name":"Vocabolario Treccani, sitemap pubblica",
+    "url":"https://www.treccani.it/sitemap-vocabolario.xml",
+    "checked_at":"2026-11-09",
+    "status":"NOT_IMPORTED",
+    "reason":"La sitemapindex pubblica restituita non conteneva URL loc; nessun lemma ricavato e nessun conteggio attribuito alla fonte."
+  },
+  {
+    "name":"Morph-it!, indirizzo storico ufficiale",
+    "url":"https://sslmitdev-online.sslmit.unibo.it/linguistics/morph-it.php",
+    "checked_at":"2026-11-09",
+    "status":"NOT_IMPORTED",
+    "reason":"Il dominio dell'indirizzo storico non era risolvibile; la pagina di documentazione consultata separatamente restituiva HTTP 402. Il corpus è stato successivamente importato da una copia pubblica dichiarata, sotto l'ID morphit-048-mirror; questo record riguarda soltanto l'endpoint ufficiale indisponibile."
+  },
+  {
+    "name":"Dizionario italiano Olivetti, sitemap pubblica",
+    "url":"https://www.dizionario-italiano.it/sitemap.xml",
+    "checked_at":"2026-11-09",
+    "status":"NOT_IMPORTED",
+    "reason":"Gli URL campionati contenevano identificatori come lemma=A100; questi codici non sono stati trasformati arbitrariamente in parole. Serve un estrattore dei lemmi effettivi prima dell'importazione."
+  },
+  {
+    "name":"CoLFIS, download ufficiale SNS",
+    "url":"https://linguistica.sns.it/CoLFIS/Download.htm",
+    "checked_at":"2026-11-09",
+    "status":"NOT_IMPORTED",
+    "reason":"Gli endpoint ufficiali tentati restituivano timeout o reset della connessione; nessun file lessicale acquisito."
+  },
+  {
+    "name":"PAISÀ, repository Eurac CLARIN",
+    "url":"https://clarin.eurac.edu/repository/xmlui/handle/20.500.12124/3",
+    "checked_at":"2026-11-09",
+    "status":"NOT_IMPORTED",
+    "reason":"Il repository indicato dalla pagina ufficiale del corpus ha restituito Access Denied. Nessuna protezione aggirata e nessun dato contato come importato."
+  }
+]

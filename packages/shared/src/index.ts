@@ -1,5 +1,23 @@
 // Types and catalogs shared by the server, the dashboard and the overlay.
-export { isWordAssociationPuzzle, type WordAssociationPuzzle } from './wordAssociation.js'
+import type { WordAssociationRoundReport } from './wordAssociation.js'
+
+export {
+  WORD_ASSOCIATION_MAX_WORDS,
+  WORD_ASSOCIATION_MIN_WORDS,
+  WORD_ASSOCIATION_WRONG_SENT,
+  answerKey,
+  drawAnswers,
+  drawPuzzle,
+  guessKey,
+  inflections,
+  isWordAssociationPool,
+  isWordAssociationPuzzle,
+  type WordAssociationAnswer,
+  type WordAssociationPool,
+  type WordAssociationPos,
+  type WordAssociationPuzzle,
+  type WordAssociationRoundReport,
+} from './wordAssociation.js'
 
 export interface Viewer {
   id: string
@@ -188,10 +206,17 @@ export const MAX_TRIGGERS = 16
 
 // --- Live-tunable settings ---
 
-// `group` puts a setting under a sub-heading in the dashboard, `hint` explains it.
+// `group` puts a setting under a sub-heading in the dashboard, `hint` explains it, `when`
+// shows it (indented) only while another setting has the given value.
 // A 'multi' value is a comma-separated list of option values, '' meaning all of them;
 // an 'image' value is the URL of an image uploaded to the server, '' meaning none.
-type SettingBase = { id: string; label: string; group?: string; hint?: string }
+type SettingBase = {
+  id: string
+  label: string
+  group?: string
+  hint?: string
+  when?: { id: string; value: number | boolean | string }
+}
 
 export type GameSetting = SettingBase &
   (
@@ -204,6 +229,14 @@ export type GameSetting = SettingBase &
   )
 
 export type GameSettings = Record<string, number | boolean | string>
+
+// A setting with `when` shows only while the setting it depends on has that value (its saved
+// value, or its default).
+export function settingVisible(setting: GameSetting, all: GameSetting[], values: GameSettings): boolean {
+  if (!setting.when) return true
+  const parent = all.find((s) => s.id === setting.when?.id)
+  return (values[setting.when.id] ?? parent?.default) === setting.when.value
+}
 
 export const defaultSettings = (settings: GameSetting[]): GameSettings => {
   const out: GameSettings = {}
@@ -903,21 +936,48 @@ export const GAMES: GameDef[] = [
   },
   {
     id: 'word-association',
-    name: 'Word Association',
+    name: 'ZeroAssociazioni',
     category: 'Quiz',
-    description: 'Sette indizi convergono su una parola: indovina il bersaglio in chat.',
+    description: 'Una parola in vista e 7 o 8 parole collegate nascoste: la chat le indovina una a una. Ogni tanto un round speciale al contrario.',
     emoji: '🔗',
     gradient: ['#3258d4', '#0a1a3a'],
     actions: [
       { id: 'guess', label: 'Guess' },
-      { id: 'reveal_letter', label: 'Rivela lettera' },
+      { id: 'reveal_letter', label: 'Rivela lettere' },
+      { id: 'next_round', label: 'Round successivo' },
     ],
     settings: [
-      { id: 'roundSeconds', label: 'Secondi per round', kind: 'number', min: 30, max: 300, step: 10, default: 60 },
-      { id: 'breakSeconds', label: 'Pausa', kind: 'number', min: 2, max: 20, step: 1, default: 5 },
-      { id: 'pointsPerCorrect', label: 'Punti per soluzione', kind: 'number', min: 1, max: 20, step: 1, default: 1 },
-      { id: 'speedBonusEnabled', label: 'Bonus velocità', kind: 'toggle', default: true },
-      { id: 'dripRevealEnabled', label: 'Rivelazione progressiva', kind: 'toggle', default: true },
+      { id: 'answerCount', label: 'Parole da indovinare', kind: 'select', default: 'random', options: [
+        { value: 'random', label: '7 o 8 a caso' },
+        { value: '7', label: '7' },
+        { value: '8', label: '8 (solo i prompt che ne hanno abbastanza)' },
+      ] },
+      { id: 'roundMode', label: 'Modalità del round', kind: 'select', default: 'timed', options: [
+        { value: 'timed', label: 'A tempo (finisce prima se le trovano tutte)' },
+        { value: 'untilSolved', label: 'Finché non le trovano tutte' },
+      ] },
+      { id: 'roundSeconds', label: 'Durata del round (secondi)', kind: 'number', min: 30, max: 300, step: 10, default: 60, when: { id: 'roundMode', value: 'timed' } },
+      { id: 'breakSeconds', label: 'Secondi tra un round e l’altro', kind: 'number', min: 2, max: 20, step: 1, default: 5 },
+      { id: 'matchEnd', label: 'Fine della partita', kind: 'select', default: 'endless', options: [
+        { value: 'endless', label: 'Mai (una classifica per tutta la live)' },
+        { value: 'rounds', label: 'Dopo un numero di round' },
+        { value: 'points', label: 'Quando qualcuno raggiunge i punti' },
+      ] },
+      { id: 'matchRounds', label: 'Round per partita', kind: 'number', min: 3, max: 50, step: 1, default: 10, when: { id: 'matchEnd', value: 'rounds' } },
+      { id: 'matchPoints', label: 'Punti per vincere', kind: 'number', min: 10, max: 5000, step: 10, default: 100, when: { id: 'matchEnd', value: 'points' } },
+      { id: 'pointsPerCorrect', label: 'Punti per parola', kind: 'number', min: 1, max: 20, step: 1, default: 1 },
+      { id: 'speedBonusEnabled', label: 'Le risposte più veloci valgono di più', kind: 'toggle', default: true },
+      { id: 'comboEnabled', label: 'Bonus combo per parole trovate di fila', kind: 'toggle', default: true },
+      { id: 'longWordHeadStart', label: 'Lettere iniziali in più sulle parole lunghe', kind: 'toggle', default: true },
+      { id: 'dripRevealEnabled', label: 'Scopri un’altra lettera mentre il round avanza', kind: 'toggle', default: true },
+      { id: 'giftRevealLetters', label: 'Lettere scoperte per regalo', kind: 'number', min: 1, max: 3, step: 1, default: 2 },
+      { id: 'guessCapEnabled', label: 'Limita i tentativi per spettatore per round', kind: 'toggle', default: false },
+      { id: 'guessesPerUser', label: 'Tentativi massimi per spettatore per round', kind: 'number', min: 1, max: 50, step: 1, default: 10, when: { id: 'guessCapEnabled', value: true } },
+      { id: 'specialRoundEnabled', label: 'Round speciale: indovina la parola dagli indizi', kind: 'toggle', default: true,
+        hint: 'Gli indizi compaiono uno alla volta: chi indovina per primo la parola di partenza vince punti, tanti più quanti meno indizi sono usciti.' },
+      { id: 'specialRoundEvery', label: 'Un round speciale ogni (round)', kind: 'number', min: 3, max: 50, step: 1, default: 10, when: { id: 'specialRoundEnabled', value: true } },
+      { id: 'specialRevealSeconds', label: 'Secondi tra un indizio e l’altro', kind: 'number', min: 3, max: 20, step: 1, default: 6, when: { id: 'specialRoundEnabled', value: true } },
+      { id: 'showSenseHint', label: 'Mostra l’accezione', kind: 'toggle', default: false },
       { id: 'showSessionLeaderboard', label: 'Classifica', kind: 'toggle', default: true },
     ],
     defaultTriggers: [
@@ -1795,6 +1855,8 @@ export interface FeedGift {
   count: number
   coins: number
   at: number
+  // The gifter's picture, when the live sent one.
+  avatar?: string
 }
 
 export interface Feed {
@@ -1816,7 +1878,23 @@ export interface SessionState {
   goal: number
 }
 
+// The live's counters since this Zerocade started (dashboards only): who is watching now and
+// what came in. Likes are TikTok's (and the simulator's); Twitch sends bits, not counted here.
+export interface LiveStats {
+  // Watching now, summed over the connected lives; null when none of them says.
+  viewers: number | null
+  comments: number
+  likes: number
+  gifts: number
+  coins: number
+  follows: number
+}
+
+export const EMPTY_LIVE_STATS: LiveStats = { viewers: null, comments: 0, likes: 0, gifts: 0, coins: 0, follows: 0 }
+
 export interface ServerToClientEvents {
+  // Dashboards only: the live's counters, on connecting and as they change.
+  'stats:update': (stats: LiveStats) => void
   'session:state': (state: SessionState) => void
   'live:event': (event: LiveEvent) => void
   'dj:play': (play: DjPlay) => void
@@ -1857,8 +1935,10 @@ export interface ClientToServerEvents {
   'incastro:control': (command: IncastroCommand) => void
   'incastro:goto': (level: number) => void
   'quizzland:control': (command: QuizzlandCommand) => void
-  // The only one an overlay may send: a click on the wheel.
+  // The only ones an overlay may send: a click on the wheel, and the end of a Word
+  // Association round (its telemetry).
   'incastro:shuffle': () => void
+  'wordassoc:round': (report: WordAssociationRoundReport) => void
   'message:send': (text: string) => void
   'pad:play': (id: string) => void
   'pad:stop': () => void

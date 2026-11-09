@@ -1,0 +1,801 @@
+index	prompt	category_id	sense_description	words
+700	settimo	151	Che occupa la posizione numero sette	sette|sesto|ottavo|posto|fila|classifica|ordine
+701	speculazione	079	Investimento finanziario volto a guadagnare dalle variazioni dei prezzi	borsa|profitto|rischio|investimento|azione|rialzo|ribasso
+702	tariffa	075	Prezzo stabilito per un servizio	prezzo|pagamento|bolletta|abbonamento|scatto|telefonia|trasporto
+703	ventesimo	151	Che occupa la posizione numero venti	venti|diciannovesimo|ventunesimo|posto|fila|classifica|ordine
+704	vintage	117	Di un'epoca passata e apprezzato nello stile	retrò|epoca|moda|usato|collezionismo|arredamento|vinile
+705	barbiere	071	Professionista che cura barba e capelli	barba|rasoio|capello|forbice|schiuma|poltrona|rasatura
+706	casale	021	Grande abitazione rurale	campagna|rustico|casolare|cortile|fienile|pietra|ristrutturazione
+707	costruzione	022	Realizzazione di un edificio	cantiere|muratore|mattone|cemento|gru|progetto|fondamenta
+708	dare	068	Trasferire o offrire qualcosa a qualcuno	donare|ricevere|regalo|offerta|aiuto|generosità|consegna
+709	giullare	088	Intrattenitore delle corti medievali	corte|re|buffone|sonaglio|spettacolo|scherzo|medievale
+710	legno	042	Materiale ricavato dagli alberi	albero|tronco|tavola|mobile|falegname|segatura|bruciare
+711	ombrellone	130	Grande ombrello usato per ripararsi dal sole	spiaggia|ombra|sole|telo|asta|sdraio|sabbia
+712	piazza	034	Spazio pubblico aperto del centro abitato	fontana|monumento|mercato|panchina|pedone|municipio|lastricato
+713	picnic	148	Pasto consumato all'aperto	prato|cestino|coperta|panino|formica|parco|tovaglia
+714	scuderia	045	Luogo attrezzato per ospitare e curare cavalli	cavallo|box|stalliere|fieno|sella|maneggio|zoccolo
+715	siepe	030	Fila di arbusti che delimita un terreno	cespuglio|recinzione|potare|giardino|foglia|sempreverde|confine
+716	spiraglio	021	Piccola apertura che lascia filtrare aria o luce	fessura|luce|porta|apertura|socchiuso|filtrare|spiffero
+717	veranda	021	Spazio coperto annesso alla casa e spesso chiuso da vetrate	vetrata|terrazza|tetto|giardino|tavolo|sedia|portico
+718	altitudine	031	Altezza di un luogo rispetto al livello del mare	quota|montagna|metro|altimetro|vetta|ossigeno|salire
+719	altopiano	031	Superficie pianeggiante situata a una quota elevata	pianoro|quota|montagna|pascolo|pianura|escursione|pendio
+720	asteroide	154	Piccolo corpo roccioso che orbita nello spazio	roccia|spazio|orbita|cratere|impatto|meteorite|telescopio
+721	cerchio	151	Figura piana delimitata da una circonferenza	raggio|diametro|circonferenza|centro|compasso|ruota|rotondo
+722	crinale	031	Linea alta che separa due versanti montuosi	cresta|montagna|versante|sentiero|spartiacque|vetta|panorama
+723	cristallino	053	Molto limpido e trasparente	trasparente|limpido|acqua|vetro|purezza|luce|sorgente
+724	discontinuità	064	Interruzione della continuità o della regolarità	interruzione|continuità|ritmo|servizio|cambiamento|salto|irregolare
+725	distesa	031	Ampia superficie che si estende allo sguardo	pianura|orizzonte|mare|campo|prato|vastità|spazio
+726	geometria	151	Disciplina che studia figure e proprietà dello spazio	figura|angolo|triangolo|cerchio|area|perimetro|compasso
+727	globo	031	Rappresentazione sferica del pianeta terrestre	sfera|pianeta|mappamondo|equatore|meridiano|polo|continente
+728	lato	151	Segmento che delimita una figura geometrica	triangolo|quadrato|vertice|segmento|angolo|perimetro|lunghezza
+729	motivo	116	Disegno ornamentale che può ripetersi su una superficie	disegno|decorazione|trama|floreale|geometrico|ricamo|tessuto
+730	oca	047	Uccello acquatico dal collo allungato	piuma|becco|starnazzare|palmato|stagno|anatra|uovo
+731	ovale	151	Di forma arrotondata e allungata simile a un uovo	uovo|ellisse|rugby|allungato|contorno|viso|tavolo
+732	piramide	166	Monumento funerario di forma piramidale dell'antico Egitto	faraone|tomba|triangolo|base|vertice|pietra|deserto
+733	quadro	111	Opera pittorica destinata a essere esposta	tela|pittura|cornice|pennello|pittore|museo|appendere
+734	regione	034	Divisione amministrativa del territorio italiano	territorio|capoluogo|confine|provincia|governatore|statuto|consiglio
+735	rilievo	031	Forma del terreno che si eleva rispetto all'area circostante	montagna|collina|altitudine|pendio|cima|catena|mappa
+736	strofa	110	Gruppo di versi di una poesia o di una canzone	verso|rima|poesia|canzone|ritornello|metrica|quartina
+737	valico	031	Passaggio attraverso una catena montuosa	passo|montagna|confine|strada|attraversare|salita|galleria
+738	vallata	031	Ampia valle fra rilievi montuosi	valle|fiume|montagna|versante|paese|prato|paesaggio
+739	vetta	031	Punto più alto di una montagna	cima|montagna|alpinista|scalare|panorama|croce|altitudine
+740	voluta	064	Desiderata e compiuta intenzionalmente	intenzione|scelta|desiderio|consapevole|accidentale|progetto|programmare
+741	bacino	032	Depressione naturale o artificiale che raccoglie acqua	acqua|lago|diga|invaso|serbatoio|profondità|affluente
+742	barca	127	Piccola imbarcazione per navigare	vela|remo|scafo|timone|porto|ormeggio|navigare
+743	battello	127	Imbarcazione usata anche per trasportare passeggeri	nave|passeggero|lago|fiume|molo|imbarco|navigazione
+744	burrone	031	Profonda e ripida incisione del terreno	precipizio|ripido|profondità|caduta|montagna|vertigine|ponte
+745	cardinale	099	Alto dignitario della Chiesa cattolica	chiesa|papa|conclave|vescovo|porpora|elezione|berretta
+746	delta	032	Foce fluviale ramificata formata dall'accumulo di sedimenti	fiume|foce|sedimento|ramo|alluvionale|triangolo|mare
+747	deriva	127	Spostamento di un'imbarcazione trascinata da vento o corrente	corrente|vento|barca|timone|navigazione|rotta|ancora
+748	diga	032	Sbarramento che trattiene e regola l'acqua	acqua|sbarramento|bacino|cemento|energia|turbina|chiusa
+749	foce	032	Punto in cui un fiume termina in un altro corpo d'acqua	fiume|mare|delta|estuario|sedimento|salmastro|sbocco
+750	nord	031	Punto cardinale opposto al sud	bussola|polo|settentrione|freddo|ago|orientamento|sud
+751	riva	032	Margine di un fiume o di un lago	fiume|lago|acqua|sponda|spiaggia|approdo|pescare
+752	sponda	032	Margine di un corso o specchio d'acqua	riva|fiume|lago|argine|attracco|ponte|vegetazione
+753	sud	031	Punto cardinale opposto al nord	meridione|bussola|sole|caldo|nord|orientamento|australe
+754	traversata	127	Viaggio via acqua fra due sponde	viaggio|mare|nave|traghetto|passeggero|rotta|approdo
+755	valle	031	Depressione allungata fra rilievi montuosi	montagna|fiume|versante|fondovalle|paese|ghiacciaio|pendio
+756	vortice	152	Movimento rotatorio di un fluido attorno a un asse	rotazione|spirale|acqua|risucchio|corrente|imbuto|mulinello
+757	borgo	034	Piccolo centro abitato spesso di origine antica	paese|castello|vicolo|piazza|medievale|abitante|pietra
+758	collina	031	Rilievo di altezza moderata	rilievo|pendio|vigneto|salita|sommità|bosco|paesaggio
+759	costa	033	Fascia di terra a contatto con il mare	mare|litorale|spiaggia|scogliera|onda|promontorio|porto
+760	golfo	033	Ampia insenatura del mare nella costa	mare|insenatura|costa|baia|porto|promontorio|navigazione
+761	laguna	033	Bacino costiero poco profondo comunicante con il mare	salmastro|mare|isola|canale|marea|palude|pesca
+762	lungomare	130	Strada o passeggiata lungo la costa	passeggiata|mare|panchina|pedone|costa|gelato|panorama
+763	mare	033	Grande distesa di acqua salata	onda|salato|spiaggia|barca|pesce|marea|orizzonte
+764	merluzzo	003	Pesce marino comunemente utilizzato in cucina	pesce|pinna|filetto|baccalà|stoccafisso|rete|panare
+765	molo	127	Opera portuale a cui possono attraccare le imbarcazioni	porto|ormeggio|barca|bitta|banchina|pescatore|attraccare
+766	polesine	032	Isolotto fluviale piatto separato dalla riva dalla corrente	isolotto|fiume|corrente|riva|terra|piatto|alluvionale
+767	rada	127	Tratto di mare riparato usato per l'ancoraggio	nave|ancora|ormeggio|costa|riparo|baia|approdo
+768	spiaggia	033	Tratto costiero di sabbia o ciottoli	sabbia|mare|ombrellone|bagnino|asciugamano|conchiglia|sdraio
+769	zattera	127	Piattaforma galleggiante usata come imbarcazione	legno|tronco|fune|galleggiare|fiume|remo|naufrago
+770	abitante	034	Persona che vive in un determinato luogo	residente|casa|paese|città|popolazione|domicilio|quartiere
+771	abitato	034	Insieme di edifici in cui vive una popolazione	paese|casa|popolazione|strada|centro|edificio|disabitato
+772	avamposto	086	Posizione militare avanzata per osservazione e difesa	sentinella|soldato|confine|pattuglia|difesa|fortificazione|ricognizione
+773	bresciano	034	Originario o caratteristico del territorio di Brescia	dialetto|provincia|cittadino|spiedo|polenta|industria|lombardo
+774	canonica	099	Abitazione del parroco presso la chiesa	parroco|chiesa|abitazione|parrocchia|prete|studio|sacrestia
+775	capoluogo	034	Città sede principale di un'amministrazione territoriale	provincia|regione|città|amministrazione|municipio|sede|comune
+776	centrocampo	131	Zona centrale del campo di calcio	calcio|centrocampista|passaggio|regista|mediano|palla|attacco
+777	circonvallazione	123	Strada che gira attorno al nucleo centrale di una città	strada|traffico|città|periferia|svincolo|veicolo|tangenziale
+778	confinante	034	Che ha un confine in comune con un altro territorio	vicino|confine|territorio|frontiera|adiacente|muro|proprietà
+779	contea	034	Divisione territoriale storica o amministrativa	conte|territorio|feudo|provincia|amministrazione|sceriffo|inglese
+780	corte	083	Organo giudiziario collegiale	giudice|sentenza|legge|aula|processo|avvocato|pena
+781	dipartimento	073	Settore organizzativo di un ente o di un'università	università|ministero|ufficio|direttore|sezione|organizzazione|ricerca
+782	fattoria	164	Azienda agricola con terreni e animali	stalla|campo|contadino|trattore|animale|fienile|raccolto
+783	laziale	034	Originario o caratteristico del Lazio	romano|dialetto|regione|tirrenico|lago|collina|capoluogo
+784	locale	018	Esercizio pubblico di ristorazione o intrattenimento	bar|ristorante|tavolo|bancone|cliente|cameriere|apertura
+785	metropoli	034	Grande città densamente popolata	grattacielo|traffico|metropolitana|quartiere|abitante|periferia|urbanizzazione
+786	nazione	084	Comunità nazionale con territorio e identità condivisa	popolo|territorio|confine|stato|bandiera|inno|cittadinanza
+787	nomade	050	Che si sposta senza una dimora stabile	itinerante|tenda|spostarsi|viaggio|accampamento|pascolo|sedentario
+788	paese	034	Piccolo centro abitato	piazza|casa|abitante|campanile|municipio|negozio|vicolo
+789	palazzo	021	Edificio di grandi dimensioni articolato su più piani	edificio|piano|scala|portone|facciata|appartamento|ascensore
+790	pandemia	054	Diffusione molto estesa di una malattia infettiva	virus|contagio|epidemia|vaccino|mascherina|quarantena|diffusione
+791	periferia	034	Parte esterna di una città rispetto al centro	centro|quartiere|città|sobborgo|autobus|pendolare|espansione
+792	pieve	099	Antica chiesa con funzioni parrocchiali e battesimali	chiesa|parrocchia|battesimo|navata|campanile|sacerdote|romanico
+793	platea	104	Settore del teatro davanti al palcoscenico	teatro|pubblico|poltrona|palcoscenico|spettatore|fila|biglietto
+794	provincia	034	Circoscrizione amministrativa che comprende più comuni	capoluogo|comune|territorio|confine|prefettura|targa|amministrazione
+795	pugliese	034	Originario o caratteristico della Puglia	dialetto|meridionale|tarallo|orecchietta|ulivo|trullo|costa
+796	riviera	130	Fascia costiera associata anche alla villeggiatura	costa|mare|spiaggia|turismo|albergo|passeggiata|stabilimento
+797	settentrione	031	Direzione o parte settentrionale di un territorio	nord|bussola|polo|freddo|meridione|orientamento|boreale
+798	sobborgo	034	Nucleo abitato alla periferia di una città	periferia|città|quartiere|abitazione|pendolare|autobus|centro
+799	tedesco	034	Originario o caratteristico della Germania	birra|bretzel|salsiccia|autostrada|lingua|germanico|berlinese
+800	ungherese	034	Originario o caratteristico dell'Ungheria	paprica|gulasch|lingua|magiaro|ciarda|terme|pianura
+801	urbanizzazione	034	Sviluppo ed espansione delle aree urbane	città|edificio|strada|cemento|periferia|espansione|infrastruttura
+802	vallone	031	Valle stretta e profondamente incisa	valle|burrone|torrente|versante|pendio|bosco|erosione
+803	veneto	034	Originario o caratteristico del Veneto	dialetto|gondola|laguna|prosecco|villa|polenta|vigneto
+804	afa	035	Caldo soffocante associato ad alta umidità	caldo|umidità|sudore|soffocante|ventilatore|estate|sete
+805	arcobaleno	035	Arco di colori visibile quando la luce attraversa gocce d'acqua	pioggia|sole|colore|arco|prisma|rifrazione|goccia
+806	ardore	061	Partecipazione intensa e appassionata	passione|entusiasmo|amore|impegno|desiderio|indifferenza|slancio
+807	battere	101	Produrre un ritmo con colpi ripetuti	ritmo|tamburo|mano|bacchetta|colpo|tempo|percussione
+808	erosione	037	Consumo progressivo del terreno o delle rocce	roccia|acqua|vento|sedimento|consumare|costa|solco
+809	folgore	035	Scarica elettrica atmosferica	fulmine|tuono|elettricità|temporale|scossa|parafulmine|cielo
+810	gelo	035	Freddo molto intenso che può congelare l'acqua	ghiaccio|freddo|brina|inverno|brivido|termometro|sottozero
+811	grandine	035	Precipitazione di chicchi di ghiaccio	chicco|ghiaccio|temporale|ammaccatura|tetto|parabrezza|raccolto
+812	nebbia	035	Sospensione di goccioline che riduce la visibilità	visibilità|foschia|umidità|goccia|faro|strada|diradarsi
+813	neve	035	Precipitazione di cristalli di ghiaccio in fiocchi	fiocco|bianco|inverno|pupazzo|sci|slitta|sciogliere
+814	nuvola	035	Massa visibile di gocce o cristalli sospesi nell'atmosfera	cielo|vapore|pioggia|vento|bianco|temporale|ombra
+815	parabrezza	121	Vetro anteriore di un'automobile	vetro|tergicristallo|automobile|scheggia|pioggia|visibilità|sbrinare
+816	persiana	021	Chiusura a stecche che scherma una finestra	finestra|stecca|legno|oscurare|anta|luce|aprire
+817	piena	032	Aumento della portata e del livello di un fiume	fiume|pioggia|alluvione|argine|straripare|portata|livello
+818	ponente	031	Ovest, anche come direzione da cui soffia un vento	ovest|tramonto|bussola|vento|levante|sole|orizzonte
+819	scirocco	035	Vento caldo proveniente da sudest	vento|caldo|sudest|sabbia|deserto|afa|umidità
+820	sereno	035	Cielo privo di nuvole	cielo|azzurro|sole|nuvola|stellato|schiarita|limpido
+821	smog	039	Inquinamento atmosferico tipico delle aree urbane	inquinamento|traffico|scarico|polmone|città|polvere|mascherina
+822	tempesta	035	Violenta perturbazione atmosferica	vento|pioggia|fulmine|mare|onda|rifugio|danno
+823	temporale	035	Perturbazione con pioggia, tuoni e fulmini	tuono|fulmine|pioggia|nuvola|scroscio|ombrello|grandine
+824	tormenta	035	Bufera di neve accompagnata da forte vento	neve|vento|bufera|visibilità|gelo|rifugio|montagna
+825	uragano	035	Ciclone tropicale con venti molto violenti	ciclone|vento|occhio|tempesta|distruzione|evacuazione|mare
+826	zona	034	Porzione delimitata di territorio	area|confine|quartiere|territorio|mappa|delimitare|periferia
+827	almanacco	098	Pubblicazione annuale con calendario e informazioni ricorrenti	calendario|anno|mese|ricorrenza|previsione|proverbio|luna
+828	estate	036	Stagione calda dell'anno	caldo|vacanza|spiaggia|sole|gelato|cicala|piscina
+829	inverno	036	Stagione fredda dell'anno	freddo|neve|ghiaccio|sciarpa|camino|cappotto|sci
+830	lunghezza	151	Estensione misurata lungo una direzione	metro|centimetro|righello|distanza|misurare|segmento|estensione
+831	prematuro	060	Nato prima del termine della gestazione	nascita|neonato|incubatrice|gestazione|parto|ospedale|assistenza
+832	primavera	036	Stagione del risveglio vegetativo dopo l'inverno	fiore|germoglio|rondine|polline|ape|tiepido|rinascita
+833	siccità	036	Prolungata mancanza di piogge e disponibilità d'acqua	pioggia|sete|aridità|raccolto|crepa|deserto|irrigazione
+834	solstizio	036	Momento annuale di massima o minima durata del giorno	estate|inverno|sole|giorno|notte|equinozio|inclinazione
+835	ultimo	151	Che si trova alla fine di una successione	fine|primo|penultimo|coda|classifica|chiusura|traguardo
+836	abisso	033	Profondità marine estreme	profondità|buio|oceano|sottomarino|pressione|immersione|inesplorato
+837	arenaria	037	Roccia sedimentaria formata da granuli di sabbia	roccia|sabbia|sedimento|granulo|strato|erosione|costruzione
+838	ariete	045	Maschio adulto della pecora	montone|corno|pecora|gregge|maschio|lana|carica
+839	balena	048	Grande cetaceo marino	mammifero|oceano|sfiatatoio|pinna|cetaceo|fanone|plancton
+840	bara	099	Contenitore che accoglie una salma per il funerale e la sepoltura	salma|legno|funerale|coperchio|cimitero|becchino|sepoltura
+841	bolla	152	Sottile involucro sferico pieno d'aria	sapone|aria|sfera|trasparente|scoppiare|pellicola|soffiare
+842	brocca	007	Recipiente con manico e beccuccio per versare liquidi	manico|beccuccio|acqua|versare|ceramica|recipiente|tavola
+843	calcare	163	Deposito minerale lasciato dall'acqua dura	incrostazione|acqua|rubinetto|bollitore|anticalcare|aceto|doccia
+844	calcio	131	Sport di squadra in cui si cerca di segnare nella porta avversaria	pallone|porta|gol|arbitro|stadio|squadra|calciare
+845	carbone	040	Combustibile fossile solido di colore nero	miniera|nero|combustibile|bruciare|cenere|fornace|fuliggine
+846	cascata	032	Salto d'acqua lungo il corso di un fiume	acqua|fiume|salto|roccia|spruzzo|fragore|dislivello
+847	catrame	022	Sostanza scura e viscosa impiegata anche come impermeabilizzante	nero|viscoso|asfalto|carbone|impermeabilizzare|odore|strada
+848	cava	037	Luogo di estrazione a cielo aperto di materiali minerali	pietra|escavatore|estrazione|ghiaia|marmo|roccia|camion
+849	cavità	031	Spazio vuoto all'interno di un corpo o del terreno	vuoto|grotta|buco|parete|profondità|interno|apertura
+850	cemento	022	Legante in polvere usato per produrre malte e calcestruzzo	polvere|acqua|calcestruzzo|cantiere|sacco|betoniera|indurire
+851	fosforo	153	Elemento chimico presente anche in ossa, denti e fertilizzanti	elemento|osso|dente|fiammifero|fertilizzante|chimica|nutriente
+852	frana	038	Movimento di terra o rocce lungo un pendio	roccia|pendio|pioggia|smottamento|detrito|evacuazione|geologo
+853	ghiaia	037	Aggregato di piccoli ciottoli	ciottolo|strada|fiume|drenaggio|calcestruzzo|granulo|cava
+854	giada	120	Pietra ornamentale apprezzata soprattutto nelle varietà verdi	gemma|verde|minerale|intaglio|ciondolo|bracciale|levigare
+855	granito	037	Roccia dura e cristallina usata anche in edilizia	roccia|duro|quarzo|mica|lastra|pavimento|monumento
+856	grotta	031	Cavità naturale nel terreno o nella roccia	stalattite|stalagmite|speleologo|buio|roccia|eco|pipistrello
+857	malta	022	Impasto legante usato per unire mattoni e pietre	calce|sabbia|acqua|mattone|muratore|cazzuola|legante
+858	mattone	022	Blocco da costruzione ottenuto comunemente da argilla cotta	argilla|rosso|muro|muratore|malta|forno|costruzione
+859	montano	031	Relativo alla montagna	montagna|quota|sentiero|bosco|alpeggio|neve|alpino
+860	oceano	033	Grandissima distesa di acqua salata fra continenti	mare|continente|onda|abisso|corrente|nave|salato
+861	ombrello	119	Oggetto portatile che ripara dalla pioggia	pioggia|manico|telo|stecca|aprire|riparare|goccia
+862	petrolio	040	Miscela naturale da cui si ottengono combustibili e altri prodotti	greggio|raffineria|benzina|pozzo|trivella|oleodotto|plastica
+863	quarzo	037	Minerale cristallino composto da silice	cristallo|minerale|silicio|sabbia|orologio|vetro|trasparente
+864	sci	138	Sport di scivolamento sulla neve	neve|pista|scarpone|bastoncino|seggiovia|discesa|slalom
+865	sima	113	Modanatura sporgente a profilo curvo nell'architettura antica	modanatura|cornice|sporgente|curvo|edificio|decorazione|facciata
+866	tavola	018	Superficie apparecchiata per consumare un pasto	piatto|posata|tovaglia|bicchiere|apparecchiare|commensale|pranzo
+867	torrente	032	Corso d'acqua spesso rapido e variabile nella portata	acqua|montagna|alveo|ciottolo|rapido|ponte|piena
+868	uncino	162	Gancio ricurvo con una punta	gancio|curvo|metallo|agganciare|punta|pirata|amo
+869	vaglio	162	Attrezzo a maglie per separare materiali di diversa dimensione	setaccio|maglia|rete|separare|granulo|ghiaia|filtrare
+870	voragine	038	Apertura molto profonda nel terreno	buco|profondità|sprofondare|strada|terreno|crollo|precipizio
+871	vulcano	038	Rilievo o apertura da cui possono fuoriuscire magma e gas	lava|cratere|magma|eruzione|cenere|lapillo|fumarola
+872	allerta	038	Stato di attenzione per un pericolo previsto	pericolo|avviso|emergenza|sirena|evacuazione|vigilanza|meteo
+873	cratere	038	Apertura sommitale o depressione di un vulcano	vulcano|lava|eruzione|caldera|bocca|cenere|lapillo
+874	eruzione	038	Fuoriuscita di materiali da un vulcano	vulcano|lava|magma|cenere|lapillo|cratere|fumo
+875	sciagura	061	Evento disastroso che provoca danni e sofferenza	disgrazia|incidente|vittima|lutto|danno|soccorso|pianto
+876	tsunami	038	Serie di grandi onde provocate da un improvviso spostamento d'acqua	onda|mare|terremoto|costa|inondazione|ritiro|evacuazione
+877	discarica	039	Luogo destinato al deposito e allo smaltimento dei rifiuti	rifiuto|camion|cumulo|inquinamento|puzza|smaltimento|abusivo
+878	efficienza	073	Capacità di ottenere risultati contenendo l'uso delle risorse	rendimento|risparmio|produttività|spreco|ottimizzare|energia|tempo
+879	elettricità	024	Fenomeni e impieghi legati alle cariche elettriche	corrente|fulmine|lampadina|voltaggio|cavo|scintilla|energia
+880	energetica	040	Relativa alla produzione e all'impiego dell'energia	elettricità|consumo|risparmio|centrale|solare|rinnovabile|efficienza
+881	rinnovabile	040	Riferito a una fonte energetica che si rigenera naturalmente	sole|vento|acqua|energia|sostenibile|pannello|turbina
+882	riserva	163	Scorta conservata per un uso futuro	scorta|emergenza|magazzino|carburante|serbatoio|esaurire|accantonare
+883	turbina	040	Macchina a pale che ricava energia da un fluido	rotore|pala|rotazione|energia|acqua|vapore|generatore
+884	linfa	041	Liquido che trasporta acqua e sostanze nelle piante	pianta|radice|acqua|nutriente|foglia|zucchero|scorrere
+885	nocciolo	005	Parte dura centrale di alcuni frutti che contiene il seme	pesca|albicocca|duro|seme|polpa|snocciolare|frutto
+886	radice	041	Parte della pianta che assorbe acqua e la ancora al terreno	pianta|terreno|acqua|assorbire|ramificazione|ancoraggio|carota
+887	seme	043	Struttura vegetale da cui può svilupparsi una nuova pianta	germoglio|seminare|pianta|terra|acqua|crescere|bustina
+888	albero	042	Pianta legnosa con tronco e rami	tronco|ramo|foglia|radice|corteccia|chioma|bosco
+889	antenna	159	Dispositivo per trasmettere o ricevere segnali radioelettrici	segnale|radio|televisore|frequenza|trasmettere|ricevere|ripetitore
+890	cesta	026	Contenitore intrecciato usato per trasportare o riporre oggetti	vimini|intreccio|manico|contenitore|frutta|bucato|coperchio
+891	legna	025	Legno tagliato destinato a essere bruciato	camino|fuoco|ceppo|accetta|catasta|scaldare|ardere
+892	acacia	042	Nome comune di alberi spinosi, spesso riferito alla robinia	albero|fiore|miele|spina|legno|bianco|grappolo
+893	agro	053	Di sapore aspro e acido	aspro|acido|limone|aceto|gusto|dolce|lingua
+894	arancio	043	Albero che produce arance	albero|agrume|fiore|foglia|frutto|profumo|spremuta
+895	avena	001	Cereale consumato anche in fiocchi	cereale|fiocco|colazione|porridge|latte|fibra|cavallo
+896	bacca	043	Frutto carnoso che può contenere più semi	frutto|mirtillo|uva|polpa|seme|bosco|cespuglio
+897	camomilla	017	Pianta i cui fiori vengono usati per una bevanda rilassante	fiore|tisana|sonno|rilassamento|tazza|bustina|acqua
+898	cannabis	043	Pianta nota anche come canapa	pianta|canapa|foglia|resina|stupefacente|coltivazione|fibra
+899	castagna	005	Frutto del castagno raccolto in autunno	riccio|autunno|bosco|caldarrosta|guscio|farina|marrone
+900	cedro	005	Agrume dalla scorza spessa e profumata	agrume|scorza|candito|profumo|giallo|polpa|marmellata
+901	ciliegia	005	Piccolo frutto del ciliegio con nocciolo	rosso|dolce|picciolo|nocciolo|coppia|ciliegio|marmellata
+902	ciliegio	043	Albero che produce ciliegie	albero|ciliegia|fiore|primavera|frutteto|ramo|legno
+903	concordia	068	Accordo pacifico nei rapporti fra persone	accordo|pace|dialogo|litigio|collaborazione|riconciliazione|famiglia
+904	fagiolo	005	Legume coltivato e consumato come alimento	legume|baccello|seme|zuppa|proteina|orto|borlotto
+905	frutto	043	Prodotto vegetale che racchiude i semi	seme|polpa|buccia|albero|maturo|succo|raccogliere
+906	girasole	043	Pianta dal grande capolino giallo	fiore|giallo|sole|seme|olio|petalo|campo
+907	lilla	111	Colore viola molto chiaro	viola|chiaro|colore|fiore|tinta|abito|parete
+908	liquirizia	009	Prodotto dal caratteristico sapore dolce ricavato da una radice	radice|nero|caramella|bastoncino|dolciume|aroma|rotella
+909	loto	043	Pianta acquatica dai grandi fiori	fiore|acqua|stagno|foglia|petalo|buddismo|purezza
+910	magnolia	043	Pianta ornamentale apprezzata per i grandi fiori	albero|fiore|petalo|profumo|primavera|giardino|foglia
+911	mandarino	005	Piccolo agrume facilmente divisibile in spicchi	agrume|spicchio|buccia|arancione|seme|inverno|sbucciare
+912	marijuana	054	Preparazione stupefacente ricavata dalla cannabis	cannabis|canapa|stupefacente|fumo|resina|spinello|pianta
+913	marrone	111	Colore comune della terra, del legno e del cioccolato	terra|castagna|cioccolato|caffè|legno|colore|scuro
+914	melo	043	Albero che produce mele	mela|albero|frutteto|fiore|ramo|potare|innesto
+915	menta	005	Pianta aromatica dal profumo rinfrescante	foglia|aroma|fresco|tisana|dentifricio|gelato|sciroppo
+916	mora	005	Frutto scuro e succoso del rovo	rovo|frutto|nero|spina|bosco|marmellata|succoso
+917	morfina	056	Farmaco oppioide impiegato contro il dolore	dolore|analgesico|oppio|ospedale|farmaco|dose|sollievo
+918	nettare	043	Liquido zuccherino prodotto dai fiori	fiore|ape|dolce|polline|impollinazione|miele|succhiare
+919	noce	005	Frutto con guscio duro e gheriglio commestibile	guscio|gheriglio|schiaccianoci|olio|seme|secco|albero
+920	olivo	042	Albero che produce olive	oliva|olio|albero|foglia|ramo|frantoio|potatura
+921	oppio	056	Sostanza ricavata dal lattice del papavero	papavero|lattice|morfina|stupefacente|dipendenza|analgesico|estrazione
+922	polpa	005	Parte carnosa interna di un frutto	frutto|buccia|seme|succo|fibra|schiacciare|carnoso
+923	soia	001	Legume usato per diversi alimenti e condimenti	legume|tofu|salsa|proteina|germoglio|olio|vegetale
+924	stigma	168	Marchio sociale negativo che favorisce l'esclusione	pregiudizio|vergogna|discriminazione|marchio|esclusione|malattia|accettazione
+925	uva	005	Frutto della vite raccolto in grappoli	acino|grappolo|vite|vendemmia|vino|mosto|buccia
+926	verde	111	Colore caratteristico dell'erba e di molte foglie	erba|foglia|prato|semaforo|speranza|smeraldo|colore
+927	zafferano	001	Spezia gialla ricavata dagli stimmi di un fiore	spezia|risotto|giallo|pistillo|fiore|aroma|prezioso
+928	agraria	044	Relativa all'agricoltura	agricoltura|campo|coltivazione|terreno|contadino|semina|trattore
+929	semina	044	Distribuzione dei semi nel terreno per ottenere piante	seme|terra|solco|seminatrice|campo|germoglio|primavera
+930	alpe	031	Zona montana di pascoli e alpeggi	montagna|pascolo|malga|mucca|formaggio|alpeggio|quota
+931	annegare	060	Affogare per immersione nelle acque	acqua|affogare|soccorso|salvagente|nuotare|corrente|respirazione
+932	asino	045	Equide domestico tradizionalmente usato come animale da soma	raglio|orecchio|zoccolo|soma|basto|mulo|carota
+933	barbone	070	Persona senza una dimora stabile nel senso comune della parola	senzatetto|strada|riparo|dormitorio|assistenza|freddo|elemosina
+934	cammello	047	Grande mammifero con due gobbe adattato ad ambienti aridi	gobba|deserto|sabbia|carovana|oasi|sete|dromedario
+935	capra	045	Ruminante domestico allevato anche per il latte	corno|barba|latte|formaggio|montagna|zoccolo|belare
+936	cascina	164	Complesso rurale destinato all'attività agricola	fattoria|stalla|cortile|campo|contadino|fienile|latte
+937	cattività	050	Condizione di un animale tenuto in uno spazio delimitato	gabbia|zoo|animale|prigionia|libertà|recinto|riproduzione
+938	cavallo	045	Equide domestico usato anche per cavalcare	sella|galoppo|zoccolo|nitrire|redine|maneggio|criniera
+939	colonia	130	Soggiorno estivo collettivo per ragazzi	bambino|estate|mare|educatore|dormitorio|gruppo|vacanza
+940	criceto	046	Piccolo roditore comunemente allevato come animale domestico	roditore|gabbia|ruota|guancia|seme|lettiera|notturno
+941	foraggio	045	Alimento vegetale destinato al bestiame	fieno|erba|bestiame|mangime|stalla|pascolo|falciare
+942	fossile	037	Resto o traccia di un organismo conservato nelle rocce	dinosauro|roccia|impronta|scheletro|paleontologo|scavo|sedimento
+943	gregge	045	Gruppo di pecore condotto al pascolo	pecora|pastore|cane|lana|pascolo|transumanza|belato
+944	iena	047	Mammifero carnivoro noto anche per il verso simile a una risata	savana|risata|zanna|carogna|branco|predatore|notturno
+945	importare	079	Introdurre merci provenienti dall'estero	estero|dogana|merce|dazio|spedizione|esportare|confine
+946	letame	044	Materiale organico di stalla usato per concimare	concime|stalla|mucca|paglia|odore|terreno|fertilizzare
+947	macello	072	Impianto destinato all'abbattimento del bestiame per uso alimentare	bestiame|carne|macellaio|veterinario|igiene|abbattimento|allevamento
+948	neolitico	087	Periodo della preistoria segnato da agricoltura e allevamento	agricoltura|allevamento|ceramica|sedentario|pietra|villaggio|preistoria
+949	pascolo	045	Terreno erboso dove si alimenta il bestiame	erba|prato|mucca|pecora|pastore|brucare|montagna
+950	pecora	045	Ruminante domestico allevato per lana e latte	lana|gregge|pastore|belato|tosare|latte|agnello
+951	picchio	047	Uccello che batte il tronco con il becco	becco|tronco|albero|insetto|battere|nido|bosco
+952	prato	030	Superficie coperta d'erba	erba|fiore|tagliaerba|rugiada|picnic|verde|calpestare
+953	procione	047	Mammifero dal muso mascherato e dalla coda ad anelli	mascherina|coda|anello|notturno|onnivoro|bosco|zampa
+954	punta	162	Estremità assottigliata e spesso acuminata	ago|spillo|acuminato|estremità|forare|matita|temperino
+955	sella	045	Sedile fissato sul dorso del cavallo	cavallo|cuoio|staffa|sottopancia|equitazione|cavaliere|sedile
+956	vagabondo	070	Persona che si sposta senza una dimora stabile	viandante|strada|viaggio|zaino|senzatetto|camminare|dimora
+957	boxer	117	Indumento intimo a pantaloncino	mutanda|intimo|cotone|elastico|aderente|taglia|bucato
+958	dentista	056	Professionista che cura i denti e la bocca	dente|carie|trapano|otturazione|gengiva|poltrona|anestesia
+959	guinzaglio	046	Cinghia o corda usata per condurre un cane	cane|collare|passeggiata|moschettone|manico|trattenere|allungabile
+960	cervo	047	Ruminante selvatico i cui maschi portano palchi ramificati	palco|bosco|cerbiatto|bramito|branco|manto|erbivoro
+961	cinghiale	047	Suide selvatico con zanne e setole	zanna|setola|grugno|bosco|onnivoro|fango|caccia
+962	costata	002	Taglio di carne comprendente una parte della costola	carne|osso|griglia|manzo|cottura|bistecca|succoso
+963	coyote	047	Canide selvatico diffuso in America	canide|ululato|deserto|predatore|notturno|branco|onnivoro
+964	gallina	045	Femmina del pollo domestico	uovo|pollaio|chioccia|becco|piuma|cova|razzolare
+965	lana	118	Fibra tessile ricavata dal vello della pecora	pecora|gomitolo|maglione|filo|fibra|caldo|tosatura
+966	scoiattolo	047	Roditore arboricolo dalla lunga coda	coda|albero|noce|ghianda|roditore|saltare|bosco
+967	selvatico	050	Animale che vive libero in natura	natura|bosco|animale|libero|domestico|caccia|tana
+968	volpe	047	Canide selvatico dalla coda folta	coda|rossiccio|tana|astuzia|notturno|muso|preda
+969	asciugare	028	Togliere acqua o umidità da una superficie	asciugamano|panno|sole|calore|stendere|bagnato|phon
+970	deserto	031	Ambiente naturale caratterizzato da estrema aridità	sabbia|duna|oasi|sete|cammello|arido|miraggio
+971	trota	048	Pesce d'acqua dolce comune in torrenti e allevamenti	pesce|torrente|acqua|pinna|pesca|lenza|allevamento
+972	anatra	048	Uccello acquatico con becco largo e piedi palmati	palmato|becco|stagno|nuotare|piuma|starnazzare|germano
+973	baffo	051	Pelo o insieme di peli sopra il labbro superiore	pelo|labbro|barba|rasoio|viso|pettine|arricciare
+974	bava	053	Saliva che cola dalla bocca	saliva|bocca|colare|sbavare|cuscino|neonato|bavaglino
+975	bruco	049	Larva di una farfalla	larva|farfalla|foglia|metamorfosi|bozzolo|strisciare|insetto
+976	cigno	048	Grande uccello acquatico dal collo lungo	collo|bianco|lago|becco|piuma|elegante|nuotare
+977	colossale	064	Di dimensioni o entità eccezionalmente grandi	enorme|dimensione|statua|impresa|sforzo|errore|minuscolo
+978	corvo	047	Uccello dal piumaggio scuro che gracchia	nero|becco|cornacchia|gracchiare|piuma|onnivoro|nido
+979	delfino	048	Cetaceo marino capace di ecolocalizzazione	mammifero|mare|pinna|salto|sfiatatoio|ecolocalizzazione|branco
+980	diavolo	099	Figura religiosa che personifica il male	inferno|corno|coda|forcone|tentazione|demonio|angelo
+981	dito	051	Parte articolata terminale della mano	mano|unghia|falange|impronta|polpastrello|anello|toccare
+982	drago	100	Creatura leggendaria spesso rappresentata con ali e fuoco	fuoco|ala|squama|tesoro|cavaliere|grotta|leggenda
+983	elefante	047	Grande mammifero dotato di proboscide	proboscide|zanna|orecchio|savana|mammifero|branco|pesante
+984	falco	047	Uccello rapace noto per vista e abilità di caccia	rapace|becco|artiglio|volo|vista|caccia|preda
+985	farfalla	049	Insetto adulto con ali spesso colorate	ala|bruco|metamorfosi|nettare|fiore|colorato|insetto
+986	felino	047	Mammifero della famiglia del gatto e dei grandi predatori affini	gatto|tigre|artiglio|preda|caccia|pelo|zampa
+987	fenice	100	Uccello mitico che rinasce dalle proprie ceneri	rinascita|cenere|fuoco|uccello|mito|immortale|leggenda
+988	formica	049	Insetto sociale che vive in colonie	formicaio|colonia|antenna|zampa|operaia|regina|zucchero
+989	fucile	082	Arma da fuoco lunga	canna|calcio|grilletto|proiettile|mirino|sparo|caccia
+990	gabbiano	048	Uccello marino comune sulle coste	mare|spiaggia|becco|ala|pesce|porto|planare
+991	gambero	003	Crostaceo con corpo allungato e addome sviluppato	crostaceo|antenna|coda|carapace|zampa|mare|lessare
+992	gatto	046	Piccolo felino domestico	miagolare|fusa|baffo|artiglio|lettiera|topo|felino
+993	giraffa	047	Mammifero africano dal collo molto lungo	collo|alto|savana|macchia|erbivoro|zampa|acacia
+994	gnu	047	Antilope africana che vive in grandi branchi	antilope|savana|branco|migrazione|erba|corno|pascolo
+995	gorilla	047	Grande primate delle foreste africane	scimmia|primate|foresta|braccio|forza|erbivoro|petto
+996	granchio	048	Crostaceo con carapace largo e chele	chela|crostaceo|carapace|zampa|mare|scoglio|sabbia
+997	immergere	152	Mettere qualcosa completamente dentro un liquido	acqua|sommergere|profondità|subacqueo|liquido|riemergere|recipiente
+998	kayak	137	Piccola imbarcazione condotta con una pagaia	pagaia|scafo|fiume|rapida|equilibrio|casco|remare
+999	leone	047	Grande felino africano noto per la criniera del maschio	criniera|ruggito|zanna|savana|felino|preda|branco
+1000	leopardo	047	Felino dal mantello maculato abile nell'arrampicata	felino|macchia|artiglio|albero|predatore|agile|savana
+1001	lumaca	049	Mollusco terrestre comunemente rappresentato con un guscio	lento|bava|guscio|chiocciola|foglia|giardino|tentacolo
+1002	lupo	047	Canide selvatico che può cacciare in branco	ululato|branco|zanna|bosco|preda|canide|notturno
+1003	merlo	047	Uccello canoro comune anche nei giardini	uccello|canto|nero|becco|nido|verme|giardino
+1004	montone	045	Maschio adulto della pecora	pecora|maschio|corno|lana|gregge|carica|pascolo
+1005	mulo	045	Equide nato dall'incrocio di asino e cavalla	asino|cavallo|soma|basto|zoccolo|orecchio|montagna
+1006	naso	052	Organo dell'olfatto e via della respirazione	odore|olfatto|narice|respirare|raffreddore|starnuto|fazzoletto
+1007	orco	100	Mostro delle fiabe spesso rappresentato come un gigante	mostro|fiaba|gigante|bosco|caverna|paura|cattivo
+1008	orso	047	Grande mammifero dal corpo robusto e dalla folta pelliccia	letargo|miele|zampa|artiglio|tana|pelliccia|bruno
+1009	panda	047	Orso dal caratteristico mantello bianco e nero	bambù|orso|bianco|nero|foresta|cucciolo|conservazione
+1010	penna	094	Strumento che scrive mediante inchiostro	inchiostro|scrivere|carta|punta|cappuccio|biro|impugnatura
+1011	pesce	048	Animale acquatico dotato di pinne e branchie	acqua|pinna|branchia|squama|nuotare|mare|pescatore
+1012	pesci	048	Animali acquatici con pinne e branchie	acquario|banco|rete|branchia|pinna|nuotare|mangime
+1013	piccione	047	Uccello comune nelle città	colombo|piazza|becco|grano|piuma|nido|viaggiatore
+1014	pinguino	048	Uccello marino che nuota ma non vola	uccello|ghiaccio|nuotare|pesce|ala|bianco|nero
+1015	predatore	050	Animale che caccia altri animali per nutrirsi	preda|caccia|agguato|artiglio|zanna|carnivoro|inseguire
+1016	puffo	100	Piccolo personaggio blu di fumetti e cartoni animati	blu|piccolo|fungo|villaggio|cappello|cartone|personaggio
+1017	pupazzo	147	Figura di stoffa o altro materiale usata come giocattolo	giocattolo|peluche|imbottitura|bambino|stoffa|abbracciare|orsacchiotto
+1018	ragno	049	Aracnide noto per la ragnatela	ragnatela|zampa|seta|insetto|veleno|aracnide|mosca
+1019	serpente	047	Rettile dal corpo allungato privo di zampe	squama|strisciare|lingua|rettile|muta|veleno|coda
+1020	sgombro	003	Pesce azzurro marino comune nelle conserve	pesce|azzurro|mare|pinna|filetto|olio|conserva
+1021	soffiare	053	Spingere fuori aria con la bocca	fiato|aria|candela|vento|spegnere|bolla|gonfiare
+1022	sparo	082	Esplosione che espelle un proiettile da un'arma	arma|proiettile|grilletto|botto|bersaglio|bossolo|poligono
+1023	sputo	053	Saliva espulsa dalla bocca	saliva|bocca|disprezzo|espellere|tosse|fazzoletto|getto
+1024	tacchino	045	Grande uccello domestico allevato per la carne	uccello|piuma|becco|allevamento|arrosto|forno|ripieno
+1025	talpa	047	Piccolo mammifero che scava gallerie nel terreno	galleria|terreno|scavare|sotterraneo|unghia|insetto|vista
+1026	tasso	047	Mammifero dal muso a strisce che vive anche nei boschi	mammifero|tana|bosco|notturno|onnivoro|muso|striscia
+1027	tomba	099	Luogo di sepoltura di una persona	lapide|cimitero|sepoltura|defunto|fiore|epitaffio|loculo
+1028	tonno	003	Grande pesce marino venduto anche in conserva	pesce|scatoletta|olio|pesca|pinna|filetto|mare
+1029	tortora	047	Uccello simile al colombo dal caratteristico tubare	uccello|colombo|tubare|nido|piumaggio|seme|migrazione
+1030	uccello	047	Animale vertebrato dotato di piume e ali	piuma|ala|becco|nido|uovo|volare|canto
+1031	unicorno	100	Cavallo leggendario con un corno sulla fronte	cavallo|corno|magia|bianco|leggenda|fiaba|purezza
+1032	vedova	070	Donna il cui coniuge è morto	marito|lutto|matrimonio|solitudine|pensione|funerale|ricordo
+1033	vespa	049	Insetto con pungiglione che costruisce un nido	insetto|pungiglione|nido|ronzio|striscia|estate|puntura
+1034	vipera	047	Serpente velenoso presente anche in Italia	serpente|veleno|morso|zanna|rettile|squama|bosco
+1035	zebra	047	Equide africano dal mantello a strisce	striscia|bianco|nero|savana|criniera|erbivoro|branco
+1036	accenno	067	Breve riferimento a un argomento senza approfondirlo	allusione|indizio|breve|discorso|argomento|anticipare|approfondire
+1037	agire	064	Passare all'azione compiendo una scelta o un intervento	azione|decisione|intervenire|inerzia|responsabilità|conseguenza|esitare
+1038	agonia	054	Sofferenza e progressivo venir meno delle funzioni vitali prima della morte	morte|sofferenza|respiro|rantolo|letto|capezzale|vegliare
+1039	airbag	121	Dispositivo di sicurezza che si gonfia in caso di urto	automobile|urto|cuscino|gonfiarsi|volante|sicurezza|sensore
+1040	ala	047	Organo che consente il volo agli uccelli	uccello|piuma|volare|battito|apertura|planare|penna
+1041	alieno	100	Creatura immaginata come proveniente da un altro pianeta	extraterrestre|spazio|astronave|pianeta|marziano|umano|ufo
+1042	amante	069	Persona legata a un'altra da una relazione amorosa	amore|passione|bacio|relazione|desiderio|segreto|incontro
+1043	arare	044	Lavorare il terreno con l'aratro	aratro|solco|terra|campo|trattore|contadino|zolla
+1044	arrendere	086	Cedere cessando la resistenza contro un avversario	resa|sconfitta|combattere|resistenza|bandiera|nemico|cedere
+1045	articolare	067	Pronunciare ed esprimere chiaramente parole	parola|pronuncia|voce|sillaba|discorso|lingua|chiarezza
+1046	assalire	082	Attaccare qualcuno con impeto	attaccare|nemico|sorpresa|vittima|difesa|irrompere|fuggire
+1047	astuto	063	Abile a trovare espedienti e a evitare inganni	furbo|inganno|piano|trappola|intelligenza|ingenuo|espediente
+1048	auspicio	061	Augurio o speranza che qualcosa si realizzi	augurio|speranza|futuro|realizzare|successo|attesa|ottimismo
+1049	autocritica	064	Valutazione dei propri errori e limiti	errore|riflessione|limite|migliorare|giudizio|ammettere|consapevolezza
+1050	bandito	082	Fuorilegge ricercato per attività criminali	fuorilegge|rapina|arma|ricercato|polizia|fuga|covo
+1051	barricata	086	Ostacolo improvvisato per bloccare una strada o difendere una posizione	ostacolo|strada|protesta|difesa|blocco|assedio|sgomberare
+1052	battesimo	099	Sacramento cristiano celebrato con l'acqua	acqua|fonte|padrino|madrina|sacerdote|sacramento|neonato
+1053	blitz	082	Operazione improvvisa e rapida delle forze dell'ordine	polizia|sorpresa|irruzione|perquisizione|arresto|rapidità|agente
+1054	branco	050	Gruppo di animali della stessa specie	lupo|gruppo|caccia|capobranco|territorio|cucciolo|cooperazione
+1055	campagna	044	Territorio rurale coltivato e abitato da agricoltori	campo|contadino|trattore|fattoria|aratro|raccolto|prato
+1056	campione	133	Atleta o squadra che ottiene una vittoria importante	vittoria|medaglia|podio|gara|trofeo|atleta|allenamento
+1057	cedere	064	Smettere di opporsi a una pressione o resistenza	arrendersi|resistenza|sconfitta|rinunciare|pressione|insistere|compromesso
+1058	chiasso	067	Rumore forte e disordinato	rumore|voce|gridare|silenzio|disturbo|bambino|cortile
+1059	cicogna	047	Grande uccello migratore che costruisce nidi sopraelevati	becco|zampa|nido|migrazione|tetto|neonato|bianco
+1060	clan	070	Gruppo familiare esteso e unito da legami di appartenenza	famiglia|parentela|capo|gruppo|appartenenza|tradizione|lealtà
+1061	cliché	095	Espressione o schema ripetuto fino a diventare banale	stereotipo|banalità|ripetizione|frase|originalità|prevedibile|cinema
+1062	coccodrillo	048	Grande rettile predatore acquatico	rettile|squama|coda|dente|palude|predatore|uovo
+1063	concludere	067	Portare a termine un'attività o un discorso	finire|accordo|discorso|risultato|iniziare|riassumere|riunione
+1064	congiura	087	Complotto segreto contro chi detiene il potere	complotto|segreto|cospiratore|potere|tradimento|assassinio|scoprire
+1065	conseguire	091	Ottenere un risultato o un titolo attraverso un percorso	ottenere|risultato|diploma|laurea|successo|impegno|obiettivo
+1066	contadino	044	Persona che lavora la terra	campo|trattore|aratro|semina|raccolto|terra|zappa
+1067	continuità	064	Proseguimento senza interruzioni nel tempo o nello svolgimento	interruzione|durata|costanza|servizio|tempo|successione|collegamento
+1068	continuo	064	Che prosegue senza interruzioni	ininterrotto|pausa|costante|rumore|flusso|durata|lavoro
+1069	corazza	088	Protezione rigida indossata sul corpo	armatura|metallo|torace|protezione|cavaliere|pesante|elmo
+1070	corrosione	153	Deterioramento di un materiale per reazione chimica	metallo|ruggine|ossidazione|acido|umidità|antiruggine|deterioramento
+1071	creare	112	Dare origine a un'opera o a qualcosa di nuovo	inventare|idea|opera|artista|immaginazione|novità|realizzare
+1072	cronico	054	Che persiste a lungo o si ripresenta nel tempo	persistente|malattia|durata|terapia|dolore|ricorrente|acuto
+1073	cuneo	162	Attrezzo a forma di prisma triangolare che separa o blocca	triangolo|punta|legno|spaccare|fermaporta|martello|incastrare
+1074	decomposizione	039	Trasformazione della materia organica per azione di organismi	batterio|fungo|marcio|odore|organico|humus|trasformazione
+1075	decrescita	079	Riduzione della produzione e dei consumi economici	diminuzione|crescita|consumo|economia|risorsa|sostenibilità|produzione
+1076	dedalo	097	Insieme intricato di percorsi simile a un labirinto	labirinto|vicolo|perdersi|uscita|intricato|orientamento|percorso
+1077	delirare	054	Parlare senza coerenza in uno stato mentale alterato	vaneggiare|febbre|confusione|allucinazione|discorso|medico|coscienza
+1078	diametro	151	Segmento che attraversa il centro di un cerchio	cerchio|raggio|centro|circonferenza|corda|sfera|misurare
+1079	distinzione	064	Riconoscimento di differenze fra elementi	differenza|confronto|criterio|categoria|riconoscere|confondere|separare
+1080	distorsione	054	Trauma di un'articolazione comunemente associato alla caviglia	caviglia|legamento|gonfiore|dolore|ghiaccio|fasciatura|slogatura
+1081	divenire	167	Passare nel tempo da una condizione a un'altra	diventare|tempo|cambiamento|futuro|sviluppo|processo|essere
+1082	divergenza	067	Contrasto fra opinioni o punti di vista	disaccordo|opinione|contrasto|convergenza|dibattito|mediazione|prospettiva
+1083	eccitazione	061	Stato di intensa attivazione emotiva	euforia|emozione|stimolo|attesa|adrenalina|agitazione|calma
+1084	elaborare	062	Sviluppare o trasformare informazioni attraverso un lavoro mentale	analisi|dato|progetto|calcolo|idea|computer|sviluppare
+1085	elfo	100	Creatura fantastica spesso legata a boschi e magia	magia|bosco|orecchio|arco|longevo|fiaba|incantesimo
+1086	emulazione	063	Imitazione di un modello con il desiderio di eguagliarlo	imitazione|modello|rivale|confronto|competizione|superare|esempio
+1087	epicentro	038	Punto della superficie terrestre sopra l'origine di un terremoto	terremoto|ipocentro|superficie|scossa|sismografo|mappa|localizzare
+1088	esaltante	061	Che suscita grande entusiasmo	entusiasmo|gioia|avventura|successo|vittoria|applauso|noioso
+1089	esplorare	129	Visitare un territorio per scoprirlo e conoscerlo	territorio|mappa|spedizione|scoprire|curiosità|grotta|viaggio
+1090	estro	112	Slancio creativo e capacità inventiva	creatività|ispirazione|artista|idea|improvvisare|originalità|talento
+1091	falange	051	Piccolo osso delle dita della mano o del piede	dito|osso|mano|piede|articolazione|frattura|unghia
+1092	falò	150	Fuoco acceso all'aperto con una catasta di legna	fuoco|legna|spiaggia|notte|scintilla|calore|accendere
+1093	fantasticare	062	Immaginare situazioni e avventure non reali	immaginare|sogno|avventura|desiderio|realtà|progetto|viaggio
+1094	fantomatico	100	Misterioso o di esistenza dubbia e sfuggente	fantasma|mistero|scomparsa|inafferrabile|apparizione|leggenda|inesistente
+1095	fauna	050	Insieme delle specie animali di un ambiente	animale|specie|habitat|selvatico|ecosistema|flora|biodiversità
+1096	fautore	068	Persona che sostiene e promuove una proposta	sostenitore|proposta|appoggio|oppositore|progetto|promuovere|consenso
+1097	favola	110	Breve racconto con personaggi spesso animali e un insegnamento	racconto|morale|animale|insegnamento|personaggio|leggere|breve
+1098	figlio	070	Persona rispetto ai propri genitori	padre|madre|famiglia|nascita|educare|erede|crescere
+1099	focus	062	Centro dell'attenzione su un tema o un obiettivo	attenzione|concentrazione|obiettivo|analisi|priorità|tema|approfondimento
+1100	fucilare	086	Eseguire una condanna a morte mediante un plotone armato	fucile|esecuzione|plotone|condanna|soldato|pena|ordine
+1101	fuga	082	Allontanamento rapido da un pericolo o da chi insegue	scappare|inseguimento|rifugio|pericolo|evasione|nascondiglio|uscita
+1102	fulmine	035	Scarica elettrica atmosferica	lampo|tuono|elettricità|temporale|parafulmine|scarica|cielo
+1103	fusa	046	Suono vibrante prodotto dal gatto	gatto|vibrazione|ronzio|coccola|rilassamento|accarezzare|sonno
+1104	gancio	162	Pezzo ricurvo usato per agganciare o appendere	uncino|appendere|metallo|curvo|attaccapanni|traino|moschettone
+1105	germano	048	Anatra selvatica comunemente associata al germano reale	anatra|stagno|becco|nuotare|piumaggio|palmato|seme
+1106	gianna	035	Voce dialettale per un vento o una corrente fredda invernale	vento|freddo|inverno|corrente|sciarpa|brivido|spiffero
+1107	gigante	100	Essere umano o fantastico di statura eccezionale	statura|alto|forza|colosso|minuscolo|fiaba|orco
+1108	giornata	098	Arco di un giorno nelle attività quotidiane	mattina|pomeriggio|sera|calendario|lavoro|sole|quotidiano
+1109	giorno	098	Intervallo quotidiano o parte illuminata del ciclo quotidiano	notte|alba|tramonto|sole|ora|calendario|luce
+1110	gravità	152	Forza di attrazione fra corpi dotati di massa	attrazione|peso|massa|caduta|pianeta|orbita|forza
+1111	gru	022	Macchina da cantiere usata per sollevare carichi	cantiere|braccio|gancio|carico|sollevare|contrappeso|operatore
+1112	guardia	082	Persona incaricata della sorveglianza	sorvegliare|sentinella|turno|divisa|sicurezza|ingresso|pattuglia
+1113	hardcore	101	Genere musicale derivato dal punk e caratterizzato da grande intensità	punk|chitarra|batteria|concerto|urlo|distorsione|ritmo
+1114	imboscata	086	Attacco preparato da una posizione nascosta	agguato|trappola|nascondiglio|sorpresa|attacco|soldato|nemico
+1115	immettere	169	Inserire dati o codici in un sistema	dato|tastiera|codice|modulo|digitare|casella|inserire
+1116	immigrato	168	Persona trasferitasi a vivere in un altro paese	migrazione|paese|arrivo|residenza|permesso|integrazione|lingua
+1117	immobilismo	168	Mancanza di iniziativa e cambiamento nella vita pubblica	inerzia|stagnazione|cambiamento|riforma|decisione|politica|progresso
+1118	imperialismo	090	Politica di espansione e dominio su altri territori	impero|conquista|colonia|espansione|dominio|esercito|sfruttamento
+1119	imponente	064	Che colpisce per dimensioni e maestosità	maestoso|grande|altezza|edificio|monumento|statura|impressione
+1120	incalzare	067	Sollecitare qualcuno con insistenza e rapidità	domanda|pressione|insistere|risposta|interrogatorio|fretta|sollecitare
+1121	incombere	061	Avvicinarsi come minaccia o impegno urgente	minaccia|pericolo|scadenza|urgenza|ansia|gravare|attesa
+1122	incubo	059	Sogno spaventoso che può provocare un risveglio	sogno|paura|notte|sonno|risveglio|mostro|sudore
+1123	indigeno	168	Originario del territorio in cui vive	autoctono|origine|territorio|popolo|lingua|cultura|tradizione
+1124	infinità	151	Assenza di un limite nel numero, nello spazio o nel tempo	limite|numero|universo|eternità|tempo|orizzonte|illimitato
+1125	ingombrante	026	Che occupa molto spazio e ostacola il passaggio	voluminoso|spazio|mobile|trasloco|trasporto|ostacolo|manovrare
+1126	iniziazione	099	Rito o percorso di ammissione a un gruppo	rito|cerimonia|novizio|gruppo|ammissione|passaggio|segreto
+1127	intatto	064	Che non ha subito danni o alterazioni	integro|rotto|danno|conservazione|sigillo|originale|alterare
+1128	intorno	031	Spazio circostante un luogo	vicinanza|perimetro|ambiente|cerchio|circondare|centro|esterno
+1129	intrappolare	050	Catturare o bloccare mediante una trappola	trappola|catturare|rete|esca|gabbia|preda|fuggire
+1130	inverso	151	Che procede nell'ordine o nella direzione contrari	contrario|ordine|rovesciare|direzione|sequenza|percorso|ritorno
+1131	irrompere	067	Entrare improvvisamente e con impeto	entrare|porta|forza|folla|sorpresa|rumore|interruzione
+1132	iscrizione	091	Registrazione per partecipare a un corso o servizio	modulo|corso|scuola|quota|registro|scadenza|studente
+1133	isolamento	068	Distacco dai contatti e dalle relazioni sociali	solitudine|contatto|comunicazione|compagnia|distanza|esclusione|ritiro
+1134	jogging	171	Corsa leggera praticata per allenamento	corsa|scarpa|parco|fiato|allenamento|ritmo|sudore
+1135	judo	139	Arte marziale basata anche su prese e proiezioni	tatami|judoka|cintura|kimono|proiezione|presa|equilibrio
+1136	ladro	082	Persona che si appropria dei beni altrui	furto|rubare|refurtiva|polizia|scasso|impronta|fuga
+1137	lampo	035	Bagliore rapido prodotto da un fulmine	luce|fulmine|tuono|cielo|temporale|bagliore|istante
+1138	lasso	098	Intervallo di tempo considerato nella sua durata	intervallo|durata|tempo|minuto|attesa|inizio|fine
+1139	letargo	050	Stato stagionale di attività e metabolismo ridotti in alcuni animali	inverno|orso|ghiro|sonno|tana|metabolismo|risveglio
+1140	limitare	064	Contenere qualcosa entro una quantità o un confine	ridurre|confine|divieto|quantità|accesso|contenere|soglia
+1141	limitato	064	Circoscritto nello spazio, nel tempo o nella quantità	ristretto|illimitato|quantità|tempo|spazio|disponibilità|confine
+1142	limite	064	Soglia o confine oltre il quale non si può o non si deve andare	confine|soglia|superare|divieto|velocità|possibilità|restrizione
+1143	localizzare	031	Individuare la posizione di qualcosa	mappa|coordinata|posizione|indirizzo|satellite|segnale|individuare
+1144	maltempo	035	Condizioni atmosferiche sfavorevoli	pioggia|vento|nuvola|temporale|ombrello|allerta|freddo
+1145	manichino	117	Figura usata per esporre o provare abiti	vetrina|abito|moda|negozio|sarto|busto|posa
+1146	manovra	123	Operazione di guida per spostare o posizionare un veicolo	parcheggio|volante|sterzo|retromarcia|veicolo|spazio|conducente
+1147	masturbazione	069	Stimolazione sessuale del proprio corpo	sessualità|piacere|intimità|stimolazione|orgasmo|corpo|autoerotismo
+1148	mediana	151	Segmento che unisce un vertice al punto medio del lato opposto	triangolo|vertice|lato|punto|segmento|baricentro|metà
+1149	menopausa	053	Cessazione delle mestruazioni legata alla fine dell'attività ovarica	mestruazione|donna|ormone|vampata|età|fertilità|estrogeno
+1150	metafisica	167	Parte della filosofia che indaga essere e realtà	filosofia|essere|esistenza|realtà|anima|materia|ontologia
+1151	meteorologia	035	Studio dei fenomeni atmosferici	meteo|previsione|atmosfera|temperatura|pressione|vento|barometro
+1152	migrare	050	Spostarsi stagionalmente da una zona a un'altra, detto di animali	spostarsi|stagione|uccello|stormo|rotta|nido|svernare
+1153	miopia	054	Difetto visivo che rende difficoltosa la visione a distanza	occhiale|lente|occhio|diottria|oculista|distanza|correzione
+1154	misurare	151	Determinare una grandezza confrontandola con un'unità	metro|righello|bilancia|lunghezza|peso|unità|precisione
+1155	moto	122	Motocicletta nel linguaggio comune	ruota|motore|casco|manubrio|sella|centauro|accelerare
+1156	naufragare	127	Affondare o andare perduti durante la navigazione	nave|mare|tempesta|relitto|soccorso|scialuppa|affondare
+1157	normalizzazione	073	Adeguamento di forme o procedure a uno standard comune	standard|uniformare|dato|procedura|conformità|formato|controllo
+1158	obsoleto	169	Superato dalle innovazioni e non più attuale	superato|vecchio|tecnologia|aggiornamento|sostituire|ricambio|innovazione
+1159	opportunista	066	Persona che sfrutta le occasioni per il proprio vantaggio	vantaggio|interesse|occasione|sfruttare|principio|ipocrisia|egoismo
+1160	orientale	031	Situato verso est	est|alba|sole|occidentale|bussola|orizzonte|levante
+1161	oscillazione	152	Movimento periodico attorno a una posizione di equilibrio	pendolo|altalena|ampiezza|periodo|frequenza|vibrazione|equilibrio
+1162	palestinese	034	Originario o caratteristico della Palestina	arabo|lingua|territorio|tradizione|ricamo|ulivo|cittadinanza
+1163	palude	032	Terreno coperto da acque poco profonde e stagnanti	acqua|fango|canneto|zanzara|stagno|limo|rana
+1164	partigiano	090	Combattente della Resistenza nel contesto storico italiano	resistenza|liberazione|montagna|clandestino|sabotaggio|occupazione|ribelle
+1165	parto	060	Processo della nascita di un bambino	nascita|neonato|madre|ostetrica|ospedale|travaglio|cordone
+1166	passera	047	Femmina del passero nel senso ornitologico comune	uccello|passero|nido|becco|seme|piuma|cinguettare
+1167	pedofilia	054	Disturbo relativo all'attrazione sessuale verso bambini	minore|tutela|abuso|prevenzione|denuncia|psichiatria|vittima
+1168	penombra	053	Illuminazione parziale e debole	luce|ombra|crepuscolo|stanza|lampada|vedere|oscurità
+1169	perseveranza	065	Impegno mantenuto nel tempo nonostante gli ostacoli	tenacia|impegno|ostacolo|obiettivo|rinunciare|pazienza|allenamento
+1170	piega	028	Ripiegatura o grinza di un tessuto	tessuto|stirare|ferro|vestito|gonna|grinza|orlo
+1171	pluralismo	168	Coesistenza e riconoscimento di più opinioni e culture	opinione|diversità|democrazia|tolleranza|confronto|libertà|inclusione
+1172	precoce	070	Che mostra uno sviluppo o un'abilità prima dell'età abituale	bambino|talento|sviluppo|anticipato|maturo|apprendimento|età
+1173	presagio	100	Segno interpretato come annuncio di un evento futuro	segno|presentimento|futuro|auspicio|sventura|interpretare|avvertimento
+1174	prestito	076	Somma concessa con obbligo di restituzione	denaro|banca|interesse|rimborso|debito|scadenza|garanzia
+1175	privilegiato	168	Che gode di vantaggi o favori rispetto ad altri	vantaggio|favore|fortuna|accesso|esclusivo|disparità|beneficio
+1176	profondo	031	Che si estende molto sotto la superficie	abisso|pozzo|mare|fondale|superficiale|scavare|immersione
+1177	proletariato	168	Classe sociale dei lavoratori salariati	operaio|classe|lavoro|salario|sindacato|capitalismo|fabbrica
+1178	prologo	110	Parte introduttiva di un'opera narrativa o teatrale	introduzione|inizio|romanzo|teatro|antefatto|epilogo|narratore
+1179	prossimità	031	Vicinanza fisica fra luoghi o persone	vicinanza|distanza|contatto|adiacente|confine|raggiungere|quartiere
+1180	pubertà	070	Fase di sviluppo fisico verso la maturità sessuale	adolescenza|ormone|crescita|sviluppo|mestruazione|barba|voce
+1181	punk	101	Movimento musicale e culturale legato a ribellione e musica energica	musica|chitarra|cresta|ribellione|spilla|giubbotto|concerto
+1182	purgatorio	099	Condizione di purificazione delle anime nella dottrina cattolica	anima|espiazione|preghiera|peccato|paradiso|purificazione|attesa
+1183	quarantena	057	Separazione precauzionale per contenere un possibile contagio	isolamento|contagio|esposizione|precauzione|domicilio|sanitario|durata
+1184	realtà	167	Ciò che esiste o avviene effettivamente	mondo|esistenza|fatto|concreto|percezione|illusione|fantasia
+1185	rima	095	Corrispondenza di suoni finali fra parole	poesia|verso|suono|parola|baciato|alternato|sillaba
+1186	ripensare	064	Riconsiderare una decisione o una scelta	decisione|dubbio|riflettere|scelta|cambiare|rivalutare|conseguenza
+1187	risalire	031	Tornare verso una posizione più alta	salire|discesa|pendio|vetta|sentiero|quota|tornare
+1188	riscossa	061	Reazione con cui ci si riprende dopo una sconfitta	rivincita|reazione|sconfitta|coraggio|recupero|vittoria|ribellione
+1189	ritorno	130	Rientro nel luogo da cui si era partiti	rientro|casa|viaggio|partenza|abbraccio|nostalgia|attesa
+1190	rivale	133	Avversario in una competizione	avversario|competizione|sfida|gara|sconfitta|vittoria|confronto
+1191	rivoluzionare	160	Trasformare profondamente metodi o condizioni esistenti	trasformare|innovazione|tradizione|riforma|progresso|metodo|tecnologia
+1192	rombo	151	Quadrilatero con quattro lati uguali	lato|diagonale|quadrilatero|angolo|losanga|area|perimetro
+1193	ronzio	053	Suono continuo e vibrante come quello di alcuni insetti	ape|zanzara|orecchio|vibrazione|continuo|motore|fastidio
+1194	rossore	053	Arrossamento visibile della pelle	pelle|viso|imbarazzo|caldo|sole|eritema|timidezza
+1195	salita	031	Percorso o tratto che porta verso l'alto	discesa|pendenza|sentiero|gradino|fiato|vetta|sforzo
+1196	scalzare	074	Rimuovere qualcuno dalla posizione che occupa	destituire|posto|rivale|sostituire|competizione|potere|successore
+1197	scorgere	053	Riuscire a distinguere qualcosa con la vista	intravedere|binocolo|distanza|nebbia|orizzonte|occhio|figura
+1198	scossa	038	Breve movimento sismico del terreno	terremoto|faglia|epicentro|tremore|magnitudo|sismografo|paura
+1199	selvaggio	050	Che vive libero nell'ambiente naturale	selvatico|natura|bosco|domestico|animale|libertà|addomesticare
+1200	sessismo	084	Discriminazione o pregiudizio fondato sul genere	discriminazione|genere|pregiudizio|stereotipo|uguaglianza|donna|diritto
+1201	sfidare	133	Invitare un avversario a misurarsi in una gara	avversario|gara|competizione|vincere|perdere|coraggio|duello
+1202	sfumatura	111	Gradazione lieve e progressiva di un colore	colore|tono|gradazione|pennello|chiaro|scuro|passaggio
+1203	soccombere	086	Essere sopraffatto da una forza avversaria	lotta|sconfitta|avversario|resistere|forza|inferiorità|cedere
+1204	sopravvivere	060	Rimanere in vita nonostante un pericolo	cibo|acqua|riparo|soccorso|pericolo|resistenza|salvezza
+1205	sosia	053	Persona che somiglia molto a un'altra	somiglianza|viso|identico|confondere|gemello|imitazione|aspetto
+1206	spensierato	061	Libero da preoccupazioni e pensieri gravosi	allegria|gioco|vacanza|serenità|preoccupazione|leggerezza|divertimento
+1207	sperone	045	Accessorio dello stivale usato dal cavaliere	cavaliere|stivale|cavallo|tallone|punta|metallo|equitazione
+1208	spettacolo	104	Rappresentazione destinata a un pubblico	palco|pubblico|artista|applauso|sipario|biglietto|rappresentazione
+1209	spira	152	Singolo avvolgimento di un filo o percorso elicoidale	avvolgimento|bobina|filo|anello|elica|rotazione|circonferenza
+1210	spirale	151	Curva che si avvolge progressivamente attorno a un centro	curva|chiocciola|cavatappi|taccuino|avvolgere|centro|galassia
+1211	storcere	053	Torcere o deformare rispetto alla posizione normale	torcere|naso|caviglia|collo|smorfia|forza|filo
+1212	stordire	053	Provocare confusione e perdita temporanea di lucidità	capogiro|confusione|rumore|colpo|equilibrio|malessere|riprendersi
+1213	strappo	118	Lacerazione di un tessuto prodotta da una trazione	tessuto|lacerazione|buco|ricucire|toppa|lembo|forza
+1214	stregoneria	100	Pratiche magiche attribuite alle streghe	strega|magia|incantesimo|pozione|scopa|rituale|calderone
+1215	stretto	064	Che offre poco spazio in larghezza	largo|angusto|corridoio|passaggio|spazio|scarpa|cintura
+1216	struzzo	047	Grande uccello corridore incapace di volare	uccello|piuma|uovo|correre|collo|zampa|savana
+1217	suono	053	Fenomeno acustico percepito dall'orecchio	orecchio|vibrazione|onda|volume|frequenza|musica|silenzio
+1218	sussurrare	067	Parlare a voce molto bassa	voce|segreto|orecchio|silenzio|confidenza|ascoltare|bisbigliare
+1219	terremoto	038	Scuotimento del terreno prodotto da un evento sismico	scossa|epicentro|faglia|magnitudo|sismografo|crollo|evacuazione
+1220	tesa	119	Bordo sporgente di un cappello	cappello|visiera|ombra|sole|bordo|ala|feltro
+1221	testardo	063	Che insiste nelle proprie idee resistendo alle obiezioni	ostinato|insistere|convinzione|contraddire|idea|compromesso|mulo
+1222	thriller	106	Genere narrativo o cinematografico basato sulla suspense	suspense|tensione|mistero|indagine|film|romanzo|assassino
+1223	tormentone	101	Canzone ripetuta spesso e rimasta in mente	canzone|ritornello|estate|radio|ripetizione|orecchio|successo
+1224	tragedia	104	Genere teatrale caratterizzato da conflitti ed esiti dolorosi	teatro|dramma|eroe|destino|morte|coro|catarsi
+1225	tranquillo	061	Calmo e privo di agitazione	calmo|silenzio|riposo|agitato|sonno|rilassarsi|sicurezza
+1226	tumulto	168	Agitazione rumorosa e disordinata di una folla	folla|urlo|disordine|protesta|rumore|agitazione|calma
+1227	turbamento	061	Stato di inquietudine emotiva	inquietudine|emozione|notizia|sorpresa|paura|calma|rassicurare
+1228	turbine	035	Vortice d'aria che trascina ciò che incontra	vortice|vento|polvere|rotazione|spirale|trascinare|aria
+1229	uccidere	082	Provocare la morte di qualcuno	morte|omicidio|vittima|assassino|delitto|arma|sopravvivere
+1230	umorismo	095	Capacità di suscitare divertimento cogliendo aspetti comici	risata|battuta|ironia|comico|parodia|divertire|serietà
+1231	urtare	123	Entrare in contatto con un ostacolo o un altro corpo	ostacolo|contatto|automobile|livido|scontrarsi|paraurti|spigolo
+1232	valanga	038	Massa di neve che scende rapidamente lungo un pendio	neve|montagna|slavina|pendio|soccorso|travolgere|distacco
+1233	valletta	107	Assistente del presentatore in uno spettacolo televisivo	televisione|presentatore|palco|spettacolo|microfono|programma|ospite
+1234	vandalismo	082	Danneggiamento volontario di beni pubblici o privati	danneggiare|imbrattare|vetro|muro|rottura|inciviltà|denuncia
+1235	varco	123	Apertura che consente il passaggio	passaggio|apertura|cancello|confine|controllo|pedone|attraversare
+1236	vecchiaia	070	Fase avanzata della vita	anziano|pensione|età|esperienza|nonno|memoria|riposo
+1237	vela	127	Superficie di tessuto che sfrutta il vento per muovere una barca	vento|albero|barca|tela|issare|boma|regata
+1238	vendicare	066	Reagire a un torto infliggendo una ritorsione	torto|rancore|punizione|offesa|perdono|ritorsione|giustizia
+1239	vento	035	Movimento dell'aria nell'atmosfera	aria|soffiare|raffica|brezza|bandiera|mulino|anemometro
+1240	verbo	094	Parte del discorso che esprime azioni, stati o eventi	azione|infinito|coniugare|tempo|persona|ausiliare|predicato
+1241	vibrare	152	Compiere rapide oscillazioni	oscillare|suono|telefono|corda|motore|tremore|frequenza
+1242	vincolare	081	Imporre o assumere un obbligo che limita la libertà	obbligo|contratto|legame|condizione|impegno|libertà|garanzia
+1243	vittoria	133	Successo ottenuto in una competizione	successo|sconfitta|trofeo|podio|esultanza|campione|medaglia
+1244	zoo	047	Struttura visitabile che ospita animali in cattività	animale|recinto|gabbia|visitatore|veterinario|custode|conservazione
+1245	braccio	051	Arto superiore fra spalla e mano	spalla|gomito|avambraccio|mano|muscolo|omero|abbracciare
+1246	busto	051	Parte centrale del corpo umano senza testa e arti	torace|petto|schiena|spalla|addome|collo|tronco
+1247	capo	074	Persona che dirige altri lavoratori	dirigente|dipendente|ufficio|ordine|responsabilità|riunione|comandare
+1248	carie	054	Danneggiamento del dente legato all'attività batterica	dente|batterio|zucchero|dentista|dolore|otturazione|spazzolino
+1249	carne	002	Alimento ricavato dai tessuti muscolari degli animali	bistecca|macellaio|griglia|manzo|pollo|proteina|cottura
+1250	cute	052	Rivestimento esterno del corpo	pelle|epidermide|derma|poro|protezione|sudore|lesione
+1251	fianco	051	Parte laterale del busto	lato|busto|costola|anca|schiena|dolore|cintura
+1252	gamba	051	Arto inferiore usato per stare in piedi e camminare	coscia|ginocchio|polpaccio|tibia|piede|camminare|muscolo
+1253	ginocchio	051	Articolazione fra coscia e gamba	rotula|articolazione|gamba|menisco|piegare|legamento|cartilagine
+1254	lingua	052	Organo muscolare della bocca che partecipa a gusto e parola	bocca|gusto|papilla|saliva|parlare|deglutire|muscolo
+1255	mascella	051	Struttura ossea del viso che sostiene i denti	mandibola|dente|osso|masticare|bocca|morso|articolazione
+1256	mento	051	Parte inferiore e sporgente del viso	viso|barba|mandibola|profilo|fossetta|rasoio|sporgente
+1257	nuca	051	Parte posteriore del collo e della base della testa	collo|testa|capello|cervicale|massaggio|tensione|occipite
+1258	ombelico	052	Cicatrice del collegamento con il cordone ombelicale	pancia|cordone|cicatrice|nascita|neonato|rientranza|piercing
+1259	osso	051	Struttura rigida che costituisce lo scheletro	scheletro|calcio|frattura|midollo|articolazione|radiografia|cartilagine
+1260	polmonite	054	Infezione o infiammazione del tessuto polmonare	polmone|tosse|febbre|infezione|respiro|torace|radiografia
+1261	retina	052	Strato sensibile alla luce nella parte posteriore dell'occhio	occhio|luce|immagine|pupilla|visione|distacco|oculista
+1262	scheletro	051	Insieme delle ossa che sostiene il corpo	osso|cranio|costola|colonna|bacino|articolazione|sostegno
+1263	spalla	051	Regione e articolazione che unisce il braccio al tronco	braccio|scapola|clavicola|omero|articolazione|muscolo|lussazione
+1264	tendine	051	Struttura che collega un muscolo a un osso	muscolo|osso|trazione|collagene|tendinite|rottura|movimento
+1265	tenue	053	Di scarsa intensità o delicatamente percepibile	debole|delicato|luce|colore|profumo|intenso|sfumatura
+1266	tibia	051	Osso della gamba accanto al perone	osso|gamba|ginocchio|caviglia|perone|frattura|stinco
+1267	torace	052	Parte del tronco che contiene cuore e polmoni	petto|costola|sterno|cuore|polmone|respiro|muscolo
+1268	unghia	051	Lamina di cheratina che riveste l'estremità delle dita	dito|cheratina|lima|smalto|tagliare|crescere|cuticola
+1269	vago	064	Impreciso e non chiaramente definito	impreciso|incerto|ricordo|idea|definire|chiarezza|contorno
+1270	vescica	052	Organo che raccoglie l'urina prima della minzione	urina|minzione|cistite|catetere|riempire|svuotare|uretra
+1271	vomito	054	Espulsione del contenuto gastrico attraverso la bocca	nausea|stomaco|espellere|bile|cibo|conato|disidratazione
+1272	amputazione	056	Asportazione di un arto o di una sua parte	arto|chirurgia|protesi|trauma|riabilitazione|moncone|disabilità
+1273	ano	052	Apertura terminale dell'apparato digerente	retto|intestino|sfintere|defecazione|igiene|emorroidi|evacuare
+1274	appendice	052	Piccolo organo intestinale noto per l'appendicite	intestino|appendicite|addome|infiammazione|chirurgo|operazione|dolore
+1275	arteria	052	Vaso che conduce il sangue dal cuore verso il corpo	sangue|cuore|pressione|vena|pulsazione|aorta|circolazione
+1276	bocca	052	Cavità del viso usata per alimentarsi e parlare	labbro|dente|lingua|saliva|parlare|masticare|deglutire
+1277	capillare	052	Vaso sanguigno molto sottile sede di scambi con i tessuti	sangue|vaso|circolazione|ossigeno|pelle|scambio|sottile
+1278	cervello	052	Organo del sistema nervoso legato a pensiero e memoria	neurone|pensiero|memoria|cranio|mente|sinapsi|apprendere
+1279	clitoride	052	Organo genitale femminile sensibile alla stimolazione	organo|sensibilità|piacere|vulva|anatomia|sessualità|stimolazione
+1280	colon	052	Tratto dell'intestino crasso che assorbe acqua e contiene flora batterica	intestino|acqua|assorbire|batterio|feci|digestione|addome
+1281	cuore	052	Organo muscolare che pompa il sangue	battito|sangue|arteria|ventricolo|atrio|valvola|cardiologo
+1282	fegato	052	Organo che produce bile e svolge funzioni metaboliche	bile|epatite|alcol|organo|digestione|metabolismo|cirrosi
+1283	fiato	053	Aria inspirata o espirata durante la respirazione	aria|respiro|polmone|soffiare|affanno|ossigeno|apnea
+1284	milza	052	Organo addominale coinvolto nel sangue e nella difesa immunitaria	sangue|immunità|organo|addome|globulo|infezione|trauma
+1285	mucosa	052	Rivestimento interno umido di diverse cavità corporee	bocca|naso|intestino|secrezione|muco|infiammazione|rivestimento
+1286	nervo	052	Struttura che trasmette impulsi fra sistema nervoso e corpo	impulso|neurone|cervello|dolore|muscolo|sensibilità|riflesso
+1287	organismo	053	Essere vivente organizzato in strutture e funzioni	vita|cellula|tessuto|organo|metabolismo|nutrizione|crescita
+1288	organo	052	Parte del corpo specializzata in funzioni biologiche	cuore|rene|polmone|tessuto|corpo|trapianto|chirurgia
+1289	ormone	053	Sostanza che regola funzioni corporee attraverso segnali chimici	ghiandola|insulina|crescita|tiroide|estrogeno|secrezione|sangue
+1290	pene	052	Organo genitale maschile attraversato dall'uretra	organo|genitale|uretra|urina|erezione|anatomia|sessualità
+1291	placenta	052	Organo della gravidanza che permette scambi fra madre e feto	gravidanza|feto|utero|cordone|nutriente|ossigeno|parto
+1292	polmone	052	Organo della respirazione	respiro|aria|ossigeno|alveolo|bronco|diaframma|torace
+1293	porta	021	Chiusura mobile che regola il passaggio in un'apertura	maniglia|chiave|serratura|anta|cardine|stipite|aprire
+1294	rene	052	Organo che filtra il sangue e produce urina	urina|filtro|sangue|uretere|dialisi|calcolo|vescica
+1295	seno	052	Mammella nel senso anatomico comune	mammella|latte|capezzolo|allattare|reggiseno|ghiandola|torace
+1296	sifilide	054	Infezione batterica trasmissibile e diagnosticabile con esami	infezione|batterio|penicillina|contagio|diagnosi|prevenzione|esame
+1297	singhiozzo	053	Contrazioni involontarie del diaframma accompagnate da un suono caratteristico	diaframma|contrazione|respiro|glottide|spasmo|acqua|involontario
+1298	urina	053	Liquido prodotto dai reni ed espulso durante la minzione	rene|vescica|uretra|minzione|analisi|giallo|liquido
+1299	utero	052	Organo in cui si sviluppa la gravidanza	gravidanza|feto|placenta|parto|endometrio|contrazione|grembo
+1300	valvola	023	Dispositivo che regola il passaggio di un fluido	tubo|pressione|aprire|chiudere|flusso|rubinetto|guarnizione
+1301	vena	052	Vaso sanguigno che riporta il sangue verso il cuore	sangue|cuore|arteria|circolazione|prelievo|valvola|varice
+1302	ventre	052	Parte del tronco comunemente chiamata pancia	pancia|addome|stomaco|intestino|ombelico|digestione|grembo
+1303	anatomia	052	Studio della struttura del corpo	scheletro|muscolo|organo|tessuto|corpo|medicina|dissezione
+1304	angelica	099	Simile a un angelo per purezza o dolcezza	angelo|celestiale|purezza|innocenza|voce|dolcezza|divino
+1305	angelo	099	Essere spirituale messaggero divino nella tradizione religiosa	ala|cielo|paradiso|messaggero|custode|aureola|divino
+1306	annusare	053	Percepire odori con il naso	naso|olfatto|odore|profumo|aroma|cane|fiutare
+1307	apparizione	100	Manifestazione improvvisa percepita come soprannaturale	fantasma|visione|miracolo|spettro|paura|leggenda|scomparsa
+1308	arancione	111	Colore intermedio fra rosso e giallo	arancia|zucca|carota|tramonto|mandarino|albicocca|colore
+1309	ascendente	098	Segno astrologico calcolato rispetto all'ora di nascita	oroscopo|segno|zodiaco|nascita|ora|astrologia|orizzonte
+1310	astro	154	Corpo celeste osservabile nel cielo	stella|pianeta|cielo|luce|telescopio|orbita|notte
+1311	astronomia	154	Scienza che studia i corpi celesti e l'universo	telescopio|stella|pianeta|universo|osservatorio|orbita|galassia
+1312	bagliore	053	Luce intensa che si manifesta rapidamente	luce|lampo|riflesso|fuoco|scintilla|buio|abbagliare
+1313	bianco	111	Colore comune della neve e del latte	neve|latte|panna|perla|gesso|nuvola|colomba
+1314	castoro	047	Roditore acquatico noto per costruire dighe	diga|roditore|coda|legno|fiume|incisivo|rosicchiare
+1315	celeste	111	Colore azzurro chiaro simile a quello del cielo	cielo|azzurro|chiaro|occhio|camicia|colore|fiocco
+1316	colore	111	Qualità visiva distinta mediante diverse tinte	tinta|pennello|arcobaleno|tela|pigmento|sfumatura|prisma
+1317	cometa	154	Corpo celeste ghiacciato che può sviluppare chioma e coda	coda|ghiaccio|nucleo|orbita|sole|chioma|spazio
+1318	cornea	052	Parte anteriore trasparente dell'occhio	occhio|trasparente|luce|curvatura|lente|oculista|trapianto
+1319	croce	099	Simbolo cristiano della crocifissione	chiesa|crocifisso|fede|altare|preghiera|cristiano|sacrificio
+1320	gemma	120	Pietra preziosa utilizzata in gioielleria	anello|collana|minerale|gioiello|taglio|incastonare|prezioso
+1321	giallo	111	Colore comune del limone e dello zafferano	limone|sole|zafferano|canarino|oro|girasole|colore
+1322	illuminare	024	Rendere visibile un ambiente mediante la luce	luce|lampada|sole|vedere|buio|lampadina|faro
+1323	insetto	049	Piccolo animale con sei zampe	zampa|antenna|esoscheletro|formica|zanzara|larva|metamorfosi
+1324	margherita	043	Fiore comune nei prati con ligule chiare e centro giallo	petalo|prato|bianco|giallo|stelo|fiore|sfogliare
+1325	narciso	043	Fiore primaverile di una pianta bulbosa	fiore|bulbo|giallo|primavera|petalo|giardino|profumo
+1326	nebulosa	154	Nube di gas e polveri nello spazio	gas|polvere|stella|telescopio|spazio|luce|galassia
+1327	nero	111	Colore del carbone e di molti inchiostri	carbone|notte|inchiostro|lutto|corvo|buio|colore
+1328	olfatto	053	Senso che permette di percepire gli odori	naso|odore|profumo|annusare|aroma|fiuto|recettore
+1329	ombra	053	Zona meno illuminata per la presenza di un ostacolo	luce|sole|buio|sagoma|albero|riparo|proiettare
+1330	parrucca	057	Capigliatura artificiale da indossare	capello|finto|pettine|teatro|travestimento|calvizie|acconciatura
+1331	pavone	047	Uccello noto per la grande coda ornamentale	coda|ruota|penna|colorato|corteggiamento|maschio|uccello
+1332	pellicola	010	Sottile rivestimento trasparente usato per conservare alimenti	trasparente|avvolgere|alimento|rotolo|conservare|frigorifero|aderire
+1333	perla	120	Formazione preziosa prodotta da alcuni molluschi	ostrica|conchiglia|collana|madreperla|bianco|lucente|gioiello
+1334	pietà	065	Compassione verso chi soffre	compassione|sofferenza|aiuto|misericordia|perdono|crudeltà|commuovere
+1335	piuma	047	Struttura leggera che ricopre gli uccelli	uccello|leggero|soffice|piumaggio|cuscino|nido|volo
+1336	portavoce	109	Persona incaricata di rappresentare pubblicamente un'organizzazione	dichiarazione|comunicato|stampa|intervista|rappresentare|microfono|ufficiale
+1337	pulce	049	Piccolo insetto parassita che si nutre di sangue	parassita|cane|gatto|prurito|sangue|saltare|antiparassitario
+1338	puma	047	Grande felino americano	felino|predatore|artiglio|coda|agguato|montagna|caccia
+1339	renna	047	Cervide adattato agli ambienti freddi del nord	slitta|neve|palco|lichene|freddo|branco|migrazione
+1340	rosa	043	Fiore profumato comunemente coltivato e regalato	petalo|profumo|spina|bouquet|rosso|giardino|vaso
+1341	scaglia	048	Piccola lamina che riveste il corpo di alcuni animali	pesce|squama|pelle|protezione|ricoprire|rettile|lucente
+1342	sirena	082	Dispositivo sonoro di allarme o emergenza	allarme|suono|ambulanza|polizia|emergenza|avvertire|pompiere
+1343	spettro	100	Fantasma o apparizione soprannaturale	fantasma|apparizione|paura|castello|notte|leggenda|invisibile
+1344	stella	154	Corpo celeste che emette luce	cielo|luce|notte|costellazione|brillare|universo|galassia
+1345	succhiare	053	Aspirare con la bocca un liquido o sciogliere lentamente un alimento	cannuccia|caramella|latte|bocca|aspirare|neonato|leccalecca
+1346	vampiro	100	Creatura leggendaria che si nutre di sangue	sangue|zanna|notte|pipistrello|bara|immortale|aglio
+1347	vari	064	Diversi fra loro o presenti in più tipi	diverso|molteplice|varietà|assortimento|uniforme|scelta|eterogeneo
+1348	zodiaco	098	Fascia celeste e insieme dei segni usati in astrologia	astrologia|segno|oroscopo|costellazione|nascita|ascendente|eclittica
+1349	zoologia	050	Disciplina biologica che studia gli animali	animale|specie|biologia|comportamento|habitat|classificazione|evoluzione
+1350	aggravare	054	Peggiorare una condizione o un problema	peggiorare|complicazione|sintomo|dolore|malattia|prognosi|alleviare
+1351	anoressia	054	Disturbo alimentare associato a restrizione e forte dimagrimento	alimentazione|appetito|restrizione|peso|dimagrimento|terapia|nutrizionista
+1352	carestia	058	Grave scarsità di cibo che colpisce una popolazione	fame|cibo|raccolto|siccità|scarsità|denutrizione|soccorso
+1353	colera	054	Infezione batterica associata ad acqua contaminata e grave diarrea	batterio|acqua|diarrea|disidratazione|contagio|epidemia|igiene
+1354	disagio	061	Sensazione di malessere o difficoltà in una situazione	malessere|imbarazzo|ansia|inadeguatezza|sollievo|difficoltà|aiuto
+1355	dissenteria	054	Disturbo intestinale caratterizzato da diarrea	diarrea|intestino|crampo|batterio|igiene|disidratazione|bagno
+1356	ebola	054	Malattia virale trasmissibile che può causare gravi epidemie	virus|febbre|contagio|isolamento|epidemia|protezione|ospedale
+1357	epidemia	054	Diffusione di una malattia in una popolazione	contagio|infezione|diffusione|prevenzione|vaccino|quarantena|popolazione
+1358	epilessia	054	Condizione neurologica caratterizzata da crisi ricorrenti	crisi|convulsione|cervello|neurone|neurologo|farmaco|coscienza
+1359	ferita	054	Lesione del corpo che può richiedere medicazione	lesione|sangue|cerotto|garza|disinfettare|cicatrice|suturare
+1360	insorgenza	054	Comparsa di una malattia o dei suoi sintomi	comparsa|sintomo|malattia|prevenzione|dolore|febbre|improvviso
+1361	morbillo	054	Malattia virale nota per febbre ed esantema	virus|febbre|macchia|esantema|vaccino|contagio|bambino
+1362	morbo	054	Malattia nel significato medico comune	malattia|sintomo|diagnosi|terapia|medico|paziente|prevenzione
+1363	morso	053	Azione dei denti che stringono o incidono	dente|mandibola|ferita|cane|addentare|bocca|masticare
+1364	peste	054	Malattia batterica storicamente associata a ratti e pulci	batterio|pulce|ratto|epidemia|contagio|quarantena|malattia
+1365	portatore	057	Persona che può trasmettere un agente patogeno anche senza sintomi	sano|contagio|infezione|batterio|virus|sintomo|trasmettere
+1366	preoccupato	061	In ansia per un problema o un possibile evento	ansia|pensiero|problema|incertezza|rassicurare|sereno|notizia
+1367	quintana	088	Giostra cavalleresca con un bersaglio da colpire	cavaliere|cavallo|giostra|bersaglio|lancia|torneo|medioevo
+1368	raffreddore	054	Comune infezione virale delle vie respiratorie	naso|starnuto|muco|fazzoletto|virus|tosse|congestione
+1369	rogna	054	Malattia parassitaria della pelle causata da acari	acaro|prurito|pelle|crosta|grattare|contagio|veterinario
+1370	schizofrenia	054	Disturbo psichiatrico che può comprendere deliri e allucinazioni	psicosi|delirio|allucinazione|psichiatra|terapia|farmaco|diagnosi
+1371	sindrome	055	Insieme riconoscibile di manifestazioni cliniche	sintomo|diagnosi|malattia|medico|esame|terapia|paziente
+1372	sintomatologia	055	Insieme dei sintomi che caratterizza una condizione	sintomo|febbre|tosse|dolore|diagnosi|medico|manifestazione
+1373	sofferenza	061	Condizione di dolore fisico o emotivo	dolore|malattia|lutto|solitudine|sollievo|consolare|aiuto
+1374	tubercolosi	054	Infezione batterica che colpisce spesso i polmoni	batterio|polmone|tosse|contagio|radiografia|antibiotico|diagnosi
+1375	vaiolo	054	Malattia virale eradicata mediante la vaccinazione	virus|vaccino|pustola|cicatrice|contagio|eradicazione|febbre
+1376	chirurgo	056	Medico che esegue operazioni	bisturi|operazione|anestesia|sutura|ospedale|paziente|guanto
+1377	farmacologia	056	Disciplina che studia i farmaci e i loro effetti	farmaco|dose|effetto|interazione|tossicità|laboratorio|ricerca
+1378	presidio	060	Struttura che garantisce assistenza sanitaria	ospedale|ambulatorio|assistenza|medico|infermiere|emergenza|servizio
+1379	prognosi	055	Previsione del decorso e dell'esito di una malattia	medico|guarigione|decorso|previsione|malattia|riservato|durata
+1380	radiografia	055	Esame diagnostico che produce immagini tramite raggi X	esame|osso|frattura|immagine|radiologo|torace|lastra
+1381	radiologia	055	Specialità medica della diagnostica per immagini	radiografia|diagnosi|immagine|radiologo|ecografia|tomografia|ospedale
+1382	referto	055	Documento che riporta l'esito di un esame medico	esito|esame|medico|documento|diagnosi|laboratorio|consegna
+1383	ricetta	056	Prescrizione medica di farmaci	medico|farmaco|farmacia|prescrizione|dose|tessera|esenzione
+1384	specialista	055	Medico esperto in uno specifico settore	medico|visita|diagnosi|competenza|ambulatorio|consulenza|patologia
+1385	tampone	055	Prelievo di un campione da analizzare	prelievo|naso|gola|campione|analisi|laboratorio|contagio
+1386	terapeuta	060	Professionista che conduce un percorso di cura	cura|paziente|seduta|terapia|ascolto|percorso|benessere
+1387	visita	055	Incontro con un medico per la valutazione della salute	medico|paziente|ambulatorio|appuntamento|esame|diagnosi|stetoscopio
+1388	chemioterapia	056	Trattamento farmacologico usato contro i tumori	tumore|farmaco|oncologo|infusione|ciclo|terapia|nausea
+1389	chirurgia	056	Specialità medica che interviene mediante operazioni	operazione|bisturi|chirurgo|anestesia|sutura|ospedale|incisione
+1390	overdose	054	Assunzione di una dose eccessiva con effetti tossici	dose|eccesso|stupefacente|intossicazione|coma|soccorso|emergenza
+1391	patologia	054	Malattia o condizione clinica nel linguaggio comune	malattia|diagnosi|sintomo|medico|terapia|esame|ricerca
+1392	paziente	060	Persona che riceve assistenza sanitaria	medico|visita|cura|ospedale|diagnosi|cartella|attesa
+1393	pomata	056	Preparazione medicinale da applicare sulla pelle	unguento|pelle|tubetto|spalmare|farmacia|prurito|irritazione
+1394	prescrizione	056	Indicazione del medico relativa a farmaci o trattamenti	ricetta|medico|farmaco|dose|terapia|farmacia|indicazione
+1395	radioterapia	056	Trattamento oncologico mediante radiazioni	tumore|radiazione|oncologo|seduta|trattamento|paziente|ospedale
+1396	vaccinazione	057	Somministrazione di un vaccino per la prevenzione	vaccino|siringa|iniezione|immunità|prevenzione|richiamo|ambulatorio
+1397	adrenalina	053	Ormone legato alla risposta di allarme e all'attivazione del corpo	ormone|paura|emozione|surrene|battito|allarme|fuga
+1398	allattamento	058	Nutrimento del neonato mediante latte materno	latte|madre|neonato|seno|capezzolo|suzione|lattazione
+1399	assimilare	062	Comprendere e integrare nuove conoscenze	apprendere|concetto|conoscenza|studio|comprendere|memoria|lezione
+1400	assimilazione	058	Assorbimento e utilizzo dei nutrienti da parte dell'organismo	nutriente|digestione|intestino|assorbimento|metabolismo|energia|alimento
+1401	avvelenamento	054	Intossicazione provocata da sostanze velenose	veleno|intossicazione|tossina|ingestione|soccorso|antidoto|malessere
+1402	batterio	053	Microrganismo unicellulare presente in molti ambienti	microrganismo|cellula|microscopio|colonia|antibiotico|infezione|fermentazione
+1403	caffeina	058	Sostanza stimolante presente soprattutto nel caffè e nel tè	caffè|tè|stimolante|sonno|insonnia|vigilanza|espresso
+1404	calore	152	Energia termica percepita o trasferita fra corpi	temperatura|energia|sole|fuoco|termometro|scaldare|freddo
+1405	circolare	151	Di forma simile a un cerchio	cerchio|rotondo|diametro|raggio|centro|ruota|anello
+1406	colesterolo	058	Lipide presente nel sangue e nei tessuti	lipide|sangue|analisi|arteria|dieta|fegato|statina
+1407	complemento	094	Elemento della frase che completa il significato	frase|analisi|soggetto|predicato|diretto|indiretto|preposizione
+1408	compressa	056	Preparazione medicinale solida da ingerire	farmaco|pillola|acqua|dose|blister|deglutire|farmacia
+1409	congestione	054	Ostruzione nasale associata a gonfiore e muco	naso|muco|respiro|raffreddore|ostruzione|spray|mucosa
+1410	crescere	070	Aumentare nello sviluppo fisico durante la vita	bambino|altezza|sviluppo|alimentazione|età|adulto|peso
+1411	deodorante	057	Prodotto per contrastare gli odori corporei	sudore|ascella|odore|profumo|spray|igiene|flacone
+1412	diabete	054	Malattia legata alla regolazione del glucosio nel sangue	glicemia|insulina|glucosio|sangue|dieta|controllo|diabetologo
+1413	dieta	058	Regime di alimentazione	alimentazione|caloria|peso|nutrizionista|menù|pasto|equilibrio
+1414	digerente	052	Relativo all'apparato che trasforma e assorbe gli alimenti	stomaco|intestino|esofago|fegato|pancreas|enzima|assorbimento
+1415	digestione	058	Trasformazione degli alimenti per ricavarne nutrienti	stomaco|enzima|cibo|saliva|intestino|assorbimento|nutriente
+1416	ebbrezza	053	Stato di alterazione dovuto all'alcol	alcol|vino|ubriachezza|euforia|equilibrio|bicchiere|sobrietà
+1417	eccitante	061	Che suscita una forte attivazione emotiva	stimolo|emozione|adrenalina|curiosità|desiderio|novità|noioso
+1418	ecosistema	039	Insieme di organismi e ambiente nelle loro relazioni	ambiente|organismo|habitat|biodiversità|equilibrio|flora|fauna
+1419	edema	054	Accumulo di liquido nei tessuti	gonfiore|liquido|tessuto|caviglia|ritenzione|pelle|infiammazione
+1420	erezione	053	Risposta fisiologica dei tessuti erettili	pene|sangue|eccitazione|tessuto|sessualità|stimolazione|rigidità
+1421	eroina	054	Sostanza oppioide che può provocare dipendenza	oppioide|dipendenza|stupefacente|overdose|astinenza|disintossicazione|morfina
+1422	fermento	010	Microrganismo o preparazione che promuove fermentazioni	lievito|batterio|latte|yogurt|zucchero|fermentazione|probiotico
+1423	foglia	041	Parte della pianta in cui avviene comunemente la fotosintesi	albero|ramo|verde|nervatura|fotosintesi|autunno|clorofilla
+1424	galla	152	Superficie dell'acqua nell'espressione stare a galla	acqua|galleggiare|superficie|sughero|legno|affondare|boa
+1425	ghiandola	052	Organo che produce e secerne sostanze	ormone|secrezione|sudore|saliva|tiroide|pancreas|endocrino
+1426	grasso	058	Sostanza lipidica presente negli alimenti e nel corpo	lipide|olio|burro|caloria|energia|tessuto|dieta
+1427	guarigione	060	Recupero della salute dopo una malattia o ferita	salute|malattia|cura|terapia|recupero|convalescenza|cicatrice
+1428	infezione	054	Presenza e moltiplicazione di agenti patogeni nell'organismo	batterio|virus|contagio|immunità|febbre|igiene|diagnosi
+1429	infiammazione	054	Risposta dei tessuti a una lesione o irritazione	rossore|calore|dolore|gonfiore|tessuto|irritazione|antinfiammatorio
+1430	insulina	056	Ormone che contribuisce alla regolazione della glicemia	ormone|pancreas|glucosio|glicemia|diabete|iniezione|siringa
+1431	intestino	052	Parte dell'apparato digerente coinvolta in digestione e assorbimento	digestione|assorbimento|colon|tenue|villo|batterio|peristalsi
+1432	lacrima	053	Goccia prodotta dall'occhio per protezione o emozione	occhio|pianto|commozione|tristezza|gioia|salato|fazzoletto
+1433	latte	004	Alimento liquido prodotto dalle ghiandole mammarie	mucca|bianco|lattosio|calcio|bottiglia|colazione|formaggio
+1434	lupus	054	Malattia autoimmune che può interessare vari organi	autoimmune|immunità|infiammazione|pelle|articolazione|reumatologo|diagnosi
+1435	muscolo	051	Tessuto capace di contrarsi per produrre movimento	forza|contrazione|tendine|allenamento|fibra|movimento|palestra
+1436	mutilazione	056	Perdita o asportazione di una parte del corpo	arto|perdita|trauma|chirurgia|protesi|disabilità|riabilitazione
+1437	nicotina	058	Sostanza del tabacco associata alla dipendenza	tabacco|sigaretta|dipendenza|fumo|astinenza|cerotto|smettere
+1438	nutrizione	058	Assunzione e impiego di sostanze necessarie alla vita	alimento|nutriente|proteina|vitamina|energia|dieta|metabolismo
+1439	obesità	054	Condizione clinica caratterizzata da eccesso di grasso corporeo	peso|grasso|metabolismo|bilancia|alimentazione|salute|diagnosi
+1440	obeso	054	Persona che presenta obesità	peso|grasso|bilancia|metabolismo|alimentazione|medico|salute
+1441	pancreas	052	Ghiandola che produce enzimi digestivi e ormoni	insulina|enzima|digestione|glucagone|diabete|addome|ghiandola
+1442	patogeno	054	Capace di provocare una malattia	malattia|virus|batterio|infezione|contagio|immunità|agente
+1443	pinna	048	Struttura usata per il nuoto e l'equilibrio nell'acqua	pesce|nuotare|acqua|coda|dorsale|equilibrio|subacqueo
+1444	prostata	052	Ghiandola dell'apparato genitale maschile	ghiandola|uomo|uretra|urologo|minzione|ingrossamento|esame
+1445	quoziente	151	Risultato di una divisione	divisione|dividendo|divisore|risultato|resto|calcolo|rapporto
+1446	respiro	053	Ciclo di inspirazione ed espirazione	aria|polmone|inspirare|espirare|ossigeno|diaframma|ritmo
+1447	retto	052	Tratto terminale dell'intestino crasso	intestino|ano|feci|defecazione|colon|proctologo|sfintere
+1448	sacca	119	Borsa morbida usata per trasportare oggetti	borsa|tessuto|tracolla|chiusura|trasportare|bagaglio|sport
+1449	salato	053	Che presenta il sapore del sale	sale|sapore|mare|prosciutto|patatina|dolce|sapido
+1450	saliva	053	Liquido prodotto nella bocca dalle ghiandole salivari	bocca|ghiandola|lingua|amilasi|digestione|deglutire|sputo
+1451	sangue	052	Tessuto liquido che circola nei vasi	cuore|arteria|vena|globulo|ossigeno|emoglobina|rosso
+1452	sensibilizzazione	067	Azione che aumenta la consapevolezza di un problema	consapevolezza|informazione|campagna|prevenzione|problema|educazione|attenzione
+1453	shock	061	Forte turbamento emotivo provocato da un evento	trauma|sorpresa|paura|notizia|reazione|sconvolgimento|riprendersi
+1454	sperma	053	Liquido biologico contenente spermatozoi	spermatozoo|liquido|fecondazione|testicolo|riproduzione|eiaculazione|fertilità
+1455	stimolante	058	Sostanza che aumenta l'attivazione e la vigilanza	caffeina|caffè|energia|vigilanza|attenzione|sonno|attività
+1456	stomaco	052	Organo dell'apparato digerente che riceve il cibo	digestione|cibo|acido|nausea|digiuno|gastrite|intestino
+1457	stress	061	Stato di tensione dovuto a pressioni e richieste	tensione|lavoro|pressione|insonnia|stanchezza|riposo|rilassamento
+1458	stretching	171	Esercizi di allungamento muscolare	muscolo|allungamento|flessibilità|esercizio|postura|riscaldamento|tendine
+1459	sudore	053	Liquido secreto dalla pelle che contribuisce al raffreddamento	pelle|caldo|ascella|sport|ghiandola|salato|raffreddamento
+1460	terapia	056	Percorso o trattamento per curare una condizione	cura|medico|paziente|farmaco|seduta|guarigione|trattamento
+1461	testicolo	052	Ghiandola genitale che produce spermatozoi e ormoni	ghiandola|spermatozoo|testosterone|scroto|uomo|riproduzione|fertilità
+1462	testosterone	053	Ormone coinvolto nello sviluppo sessuale e in altre funzioni corporee	ormone|testicolo|muscolo|pelo|pubertà|libido|sangue
+1463	tiroide	052	Ghiandola del collo che produce ormoni metabolici	ghiandola|collo|ormone|iodio|metabolismo|ecografia|endocrinologo
+1464	tosse	054	Riflesso che espelle aria e materiale dalle vie respiratorie	catarro|gola|respiro|raffreddore|bronco|sciroppo|espellere
+1465	tossina	054	Sostanza nociva prodotta da un organismo	veleno|batterio|intossicazione|danno|organismo|neutralizzare|antidoto
+1466	trombosi	054	Formazione di un coagulo che può ostruire un vaso	sangue|coagulo|vena|arteria|ostruzione|circolazione|anticoagulante
+1467	ubriaco	053	Alterato dall'assunzione di alcol	alcol|vino|ebbrezza|equilibrio|sobrio|bicchiere|barcollare
+1468	vaccino	057	Preparazione usata per indurre una risposta immunitaria preventiva	immunità|prevenzione|iniezione|richiamo|anticorpo|siringa|contagio
+1469	velenoso	054	Che può provocare danni mediante sostanze tossiche	tossico|serpente|fungo|tossina|morso|pericolo|antidoto
+1470	zecca	049	Acaro parassita che si nutre di sangue	acaro|parassita|sangue|pelle|morso|cane|prato
+1471	alleviare	060	Ridurre l'intensità di un dolore o di un peso	sollievo|dolore|lenire|peso|sofferenza|aiuto|rimedio
+1472	dormire	059	Trovarsi nello stato di sonno	sonno|letto|cuscino|coperta|sogno|russare|risveglio
+1473	evacuare	038	Allontanare le persone da un luogo pericoloso	emergenza|uscita|allarme|edificio|pericolo|soccorritore|raduno
+1474	insonnia	059	Difficoltà a iniziare o mantenere il sonno	sonno|notte|letto|veglia|ansia|stanchezza|addormentarsi
+1475	patire	061	Soffrire una condizione dolorosa o una privazione	soffrire|dolore|fame|freddo|malattia|privazione|sopportare
+1476	riposino	059	Breve periodo di sonno o riposo	sonno|breve|pomeriggio|divano|siesta|stanchezza|sveglia
+1477	riscuotere	076	Incassare una somma dovuta	incassare|denaro|credito|pagamento|fattura|stipendio|ricevuta
+1478	tachicardia	054	Frequenza cardiaca accelerata	cuore|battito|polso|palpitazione|frequenza|ansia|cardiologo
+1479	temere	061	Provare paura per un possibile pericolo	paura|pericolo|minaccia|coraggio|evitare|conseguenza|incertezza
+1480	ambulatorio	060	Locale o struttura destinata a visite e prestazioni sanitarie	medico|visita|paziente|appuntamento|lettino|diagnosi|attesa
+1481	anestesia	056	Riduzione o soppressione della sensibilità per un intervento	dolore|anestesista|intervento|incoscienza|locale|farmaco|sensibilità
+1482	assistenza	060	Aiuto e cura rivolti a chi ne ha bisogno	aiuto|cura|anziano|infermiere|soccorso|domicilio|bisogno
+1483	badante	060	Persona che assiste qualcuno nella vita quotidiana	anziano|assistenza|casa|igiene|pasto|compagnia|cura
+1484	cane	046	Animale domestico della famiglia dei canidi	abbaiare|guinzaglio|collare|zampa|cucciolo|osso|scodinzolare
+1485	circoncisione	056	Intervento di asportazione del prepuzio	prepuzio|intervento|urologo|igiene|rito|anestesia|cicatrizzazione
+1486	consolazione	068	Conforto dato a chi soffre	conforto|abbraccio|dolore|parola|amicizia|ascolto|sollievo
+1487	convalescenza	060	Periodo di recupero successivo a una malattia	guarigione|riposo|letto|malattia|forza|dimissione|riabilitazione
+1488	curare	056	Trattare una malattia o una ferita	medico|malattia|paziente|farmaco|terapia|guarire|medicare
+1489	custode	074	Persona incaricata di sorvegliare un luogo	chiave|edificio|sorvegliare|portineria|cancello|sicurezza|turno
+1490	eutanasia	065	Pratica medica che pone fine alla vita nel contesto del dibattito sulla sofferenza	morte|sofferenza|consenso|medico|dignità|decisione|etica
+1491	fisioterapia	060	Trattamento riabilitativo basato su esercizi e tecniche fisiche	riabilitazione|esercizio|movimento|muscolo|articolazione|massaggio|recupero
+1492	impiccare	086	Eseguire una condanna mediante impiccagione	corda|forca|cappio|esecuzione|condanna|morte|patibolo
+1493	incolumità	060	Condizione di chi è rimasto al sicuro da danni fisici	sicurezza|pericolo|salute|protezione|ferita|soccorso|incidente
+1494	infermiere	060	Professionista dell'assistenza sanitaria	paziente|medicazione|ospedale|siringa|reparto|turno|cura
+1495	internare	082	Rinchiudere qualcuno in una struttura di detenzione o confinamento	rinchiudere|istituto|campo|libertà|autorità|prigioniero|reclusione
+1496	invalido	060	Persona con una condizione di invalidità fisica	disabilità|ausilio|protesi|mobilità|assistenza|riabilitazione|certificato
+1497	medico	055	Professionista che valuta e cura la salute	stetoscopio|diagnosi|visita|paziente|ricetta|malattia|ambulatorio
+1498	noncuranza	066	Atteggiamento di indifferenza e trascuratezza	indifferenza|trascurare|errore|danno|attenzione|dovere|responsabilità
+1499	ospedale	060	Struttura sanitaria per ricoveri e cure	medico|infermiere|reparto|letto|ambulanza|ricovero|visita

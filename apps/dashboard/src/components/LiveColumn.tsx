@@ -1,4 +1,4 @@
-import { useEffect, useState, type CSSProperties } from 'react'
+import { useEffect, useRef, useState, type CSSProperties, type FormEvent, type ReactNode } from 'react'
 import {
   GAMES,
   TIER_COLORS,
@@ -7,16 +7,21 @@ import {
   type Feed,
   type FeedCreator,
   type FeedGift,
+  type Gifter,
   type GiftTier,
   type Viewer,
 } from '@zerocade/shared'
+import { socket } from '../socket'
 import { useDashboard, type FeedItem, type FeedMark } from '../store'
 import { Pads } from './Pads'
+import { simViewer } from './Regia'
 import { Section } from './Section'
 
-// The right column of the Games page, the same for every game: the chat and events of the
-// live, the Sounds/GIFs pads, the creators live on this Zerocade and the latest gifts they
-// received.
+// The right column of the Games page, the same for every game: the live's counters (viewers
+// now, comments, likes, gifts, coins, new followers), the Sounds/GIFs pads, the chat and events
+// with a box to comment as a simulated viewer, and the gifters (latest gifts, or the top of the
+// live). It fits the screen: the pads keep their size, the chat and the gifters share the rest
+// and scroll inside. The creators live on this Zerocade stay folded at the bottom.
 
 const FEED_MS = 3000
 
@@ -75,11 +80,53 @@ export function LiveColumn() {
   const now = useNow()
   return (
     <aside className="panel right-panel side live-col">
-      <ChatFeed now={now} />
+      <LiveStatsBar />
       <Pads />
+      <ChatFeed now={now} />
+      <Gifters feed={feed} now={now} creator={creator} onCreator={setCreator} />
       <Creators feed={feed} now={now} />
-      <LatestGifts feed={feed} now={now} creator={creator} onCreator={setCreator} />
     </aside>
+  )
+}
+
+// --- Counters ---
+
+function LiveStatsBar() {
+  const { stats } = useDashboard()
+  const cells: { icon: ReactNode; value: number; label: string; coin?: boolean }[] = [
+    {
+      icon: <EyeIcon />,
+      value: stats.viewers ?? 0,
+      label: stats.viewers === null ? 'Spettatori (nessuna diretta collegata)' : 'Spettatori presenti ora',
+    },
+    { icon: <CommentIcon />, value: stats.comments, label: 'Commenti della sessione' },
+    { icon: <HeartIcon />, value: stats.likes, label: 'Like della sessione' },
+    { icon: <GiftIcon />, value: stats.gifts, label: 'Regali della sessione' },
+    { icon: <Coin />, value: stats.coins, label: 'Monete ricevute nella sessione', coin: true },
+    { icon: <FollowIcon />, value: stats.follows, label: 'Nuovi follower della sessione' },
+  ]
+  return (
+    <ul className="live-stats" aria-label="Statistiche della diretta">
+      {cells.map((c) => (
+        <li key={c.label} className="live-stats__cell" title={`${c.label}: ${c.value.toLocaleString()}`}>
+          {c.icon}
+          <span className={`live-stats__value${c.coin ? ' live-stats__value--coin' : ''}`}>{compact.format(c.value)}</span>
+          <span className="sr-only">{c.label}</span>
+        </li>
+      ))}
+    </ul>
+  )
+}
+
+function Empty({ icon, title, text, className = '' }: { icon: ReactNode; title: string; text: string; className?: string }) {
+  return (
+    <div className={`empty-state ${className}`}>
+      <span className="empty-state__icon" aria-hidden="true">
+        {icon}
+      </span>
+      <strong>{title}</strong>
+      <span>{text}</span>
+    </div>
   )
 }
 
@@ -115,40 +162,107 @@ function chatRows(feed: FeedItem[], filter: ChatFilter): FeedItem[] {
   return rows.reverse()
 }
 
+const FILTERS: { id: ChatFilter; label: string }[] = [
+  { id: 'all', label: 'Chat ed eventi' },
+  { id: 'chat', label: 'Solo commenti' },
+  { id: 'events', label: 'Solo eventi' },
+]
+
 function ChatFeed({ now }: { now: number }) {
   const { feed } = useDashboard()
   const [filter, setFilter] = useState<ChatFilter>('all')
   const rows = chatRows(feed, filter)
-  const tab = (id: ChatFilter, label: string) => (
-    <button type="button" role="tab" aria-selected={filter === id} className="mini-tabs__btn" onClick={() => setFilter(id)}>
-      {label}
-    </button>
-  )
   return (
-    <Section
-      title="Chat ed eventi"
-      extra={
-        <span className="mini-tabs" role="tablist" aria-label="Chat ed eventi">
-          {tab('all', 'Tutto')}
-          {tab('chat', 'Chat')}
-          {tab('events', 'Eventi')}
-        </span>
-      }
-    >
-      {rows.length ? (
-        <ul className="feed-list chat-feed">
-          {rows.map((item) => (
-            <ChatRow key={item.seq} item={item} now={now} />
-          ))}
-        </ul>
-      ) : (
-        <p className="text-muted small">
-          {filter === 'events'
-            ? 'Nessun evento ancora.'
-            : 'I messaggi della chat TikTok e Twitch compaiono qui appena colleghi la diretta (o dal simulatore).'}
-        </p>
-      )}
+    <Section title="Chat" className="side-section--grow side-section--chat" extra={<FilterMenu value={filter} onChange={setFilter} />}>
+      <div className="scroll-area">
+        {rows.length ? (
+          <ul className="feed-list">
+            {rows.map((item) => (
+              <ChatRow key={item.seq} item={item} now={now} />
+            ))}
+          </ul>
+        ) : filter === 'events' ? (
+          <Empty icon={<HeartIcon size={20} />} title="Nessun evento" text="Like, follow, condivisioni e regali compaiono qui." />
+        ) : (
+          <Empty icon={<CommentIcon size={20} />} title="In attesa di commenti" text="I messaggi dei tuoi spettatori compariranno qui." />
+        )}
+      </div>
+      <CommentBox />
     </Section>
+  )
+}
+
+function FilterMenu({ value, onChange }: { value: ChatFilter; onChange: (filter: ChatFilter) => void }) {
+  const [open, setOpen] = useState(false)
+  const box = useRef<HTMLSpanElement>(null)
+  useEffect(() => {
+    if (!open) return
+    const close = (e: MouseEvent) => {
+      if (!box.current?.contains(e.target as Node)) setOpen(false)
+    }
+    document.addEventListener('mousedown', close)
+    return () => document.removeEventListener('mousedown', close)
+  }, [open])
+  return (
+    <span className="filter-menu" ref={box}>
+      <button
+        type="button"
+        className={`icon-btn${value !== 'all' ? ' icon-btn--on' : ''}`}
+        aria-label="Filtra la chat"
+        aria-haspopup="menu"
+        aria-expanded={open}
+        title="Filtra la chat"
+        onClick={() => setOpen(!open)}
+      >
+        <FilterIcon />
+      </button>
+      {open && (
+        <span className="filter-menu__list" role="menu">
+          {FILTERS.map((f) => (
+            <button
+              key={f.id}
+              type="button"
+              role="menuitemradio"
+              aria-checked={value === f.id}
+              className="filter-menu__item"
+              onClick={() => {
+                onChange(f.id)
+                setOpen(false)
+              }}
+            >
+              {f.label}
+            </button>
+          ))}
+        </span>
+      )}
+    </span>
+  )
+}
+
+// A comment from a simulated viewer, the same for the whole visit: to try a game without a live.
+function CommentBox() {
+  const [viewer] = useState(simViewer)
+  const [text, setText] = useState('')
+  const send = (e: FormEvent) => {
+    e.preventDefault()
+    const comment = text.trim()
+    if (!comment) return
+    socket.emit('sim:event', { type: 'comment', text: comment.slice(0, 140), user: viewer })
+    setText('')
+  }
+  return (
+    <form className="comment-box" onSubmit={send}>
+      <input
+        value={text}
+        maxLength={140}
+        placeholder={`Commenta come @${viewer.nickname}`}
+        aria-label={`Commenta come @${viewer.nickname}`}
+        onChange={(e) => setText(e.target.value)}
+      />
+      <button type="submit" disabled={!text.trim()} aria-label="Invia commento" title="Invia">
+        <SendIcon />
+      </button>
+    </form>
   )
 }
 
@@ -210,10 +324,10 @@ function ChatRow({ item, now }: { item: FeedItem; now: number }) {
   )
 }
 
-function ChatAvatar({ user }: { user: Viewer }) {
+function ChatAvatar({ user, small = false }: { user: Pick<Viewer, 'nickname' | 'avatar'>; small?: boolean }) {
   const [broken, setBroken] = useState(false)
   return (
-    <span className="chat-row__avatar" aria-hidden="true">
+    <span className={`chat-row__avatar${small ? ' chat-row__avatar--small' : ''}`} aria-hidden="true">
       {user.nickname.charAt(0).toUpperCase()}
       {user.avatar && !broken && <img src={user.avatar} alt="" referrerPolicy="no-referrer" onError={() => setBroken(true)} />}
     </span>
@@ -226,6 +340,7 @@ function Creators({ feed, now }: { feed: Feed | null; now: number }) {
   return (
     <Section
       title="Creator"
+      open={false}
       extra={
         <span className="mini-tabs" role="tablist" aria-label="Creator">
           <button type="button" role="tab" aria-selected={tab === 'live'} className="mini-tabs__btn" onClick={() => setTab('live')}>
@@ -288,7 +403,7 @@ function CreatorRow({ creator, live, now }: { creator: FeedCreator; live: boolea
   )
 }
 
-function LatestGifts({
+function Gifters({
   feed,
   now,
   creator,
@@ -299,35 +414,87 @@ function LatestGifts({
   creator: string
   onCreator: (creator: string) => void
 }) {
+  const { gifters } = useDashboard()
+  const [tab, setTab] = useState<'live' | 'top'>('live')
   const creators = feed?.creators ?? []
+  const tabButton = (id: 'live' | 'top', icon: ReactNode, label: string) => (
+    <button type="button" role="tab" aria-selected={tab === id} className="mini-tabs__btn" onClick={() => setTab(id)}>
+      {icon}
+      {label}
+    </button>
+  )
   return (
     <Section
-      title="Ultimi regali"
+      title="Donatori"
+      className="side-section--grow"
       extra={
-        <select className="mini-select" value={creator} aria-label="Filtra per creator" onChange={(e) => onCreator(e.target.value)}>
-          <option value="all">Tutti i creator</option>
-          {creators
-            .filter(Boolean)
-            .map((c) => (
-              <option key={c} value={c}>
-                {creatorName(c)}
-              </option>
-            ))}
-          {(creators.includes('') || creator === 'sim') && <option value="sim">Simulatore</option>}
-        </select>
+        <span className="mini-tabs" role="tablist" aria-label="Donatori">
+          {tabButton('live', <PulseIcon />, 'Live')}
+          {tabButton('top', <TrophyIcon />, 'Top')}
+        </span>
       }
     >
-      {feed?.top && <TopGift gift={feed.top} now={now} />}
-      {feed?.gifts.length ? (
-        <ul className="feed-list">
-          {feed.gifts.map((g) => (
-            <GiftRow key={g.id} gift={g} now={now} />
-          ))}
-        </ul>
-      ) : (
-        <p className="text-muted small">Nessun regalo ancora: arrivano qui appena li ricevi in diretta (o dal simulatore).</p>
-      )}
+      <div className="scroll-area">
+        {tab === 'top' ? (
+          gifters.length ? (
+            <ol className="feed-list">
+              {gifters.slice(0, 10).map((g, i) => (
+                <GifterRow key={g.id} gifter={g} rank={i + 1} />
+              ))}
+            </ol>
+          ) : (
+            <Empty icon={<TrophyIcon size={20} />} title="Classifica vuota" text="Chi dona di più in questa diretta comparirà qui." />
+          )
+        ) : (
+          <>
+            {creators.filter(Boolean).length > 1 && (
+              <select
+                className="mini-select gifters__filter"
+                value={creator}
+                aria-label="Filtra per creator"
+                onChange={(e) => onCreator(e.target.value)}
+              >
+                <option value="all">Tutti i creator</option>
+                {creators
+                  .filter(Boolean)
+                  .map((c) => (
+                    <option key={c} value={c}>
+                      {creatorName(c)}
+                    </option>
+                  ))}
+                {(creators.includes('') || creator === 'sim') && <option value="sim">Simulatore</option>}
+              </select>
+            )}
+            {feed?.top && <TopGift gift={feed.top} now={now} />}
+            {feed?.gifts.length ? (
+              <ul className="feed-list">
+                {feed.gifts.map((g) => (
+                  <GiftRow key={g.id} gift={g} now={now} />
+                ))}
+              </ul>
+            ) : (
+              <Empty icon={<GiftIcon size={20} />} title="Ancora nessun regalo" text="I regali compaiono qui appena uno spettatore ne invia uno." />
+            )}
+          </>
+        )}
+      </div>
     </Section>
+  )
+}
+
+function GifterRow({ gifter, rank }: { gifter: Gifter; rank: number }) {
+  return (
+    <li className="feed-row feed-row--gift">
+      <span className={`gifters__rank gifters__rank--${rank}`}>{rank}</span>
+      <ChatAvatar user={gifter} />
+      <span className="feed-row__body">
+        <span className="feed-row__name">{gifter.nickname}</span>
+      </span>
+      <span className="feed-row__end feed-row__coins">
+        <Coin />
+        {gifter.coins.toLocaleString()}
+      </span>
+    </li>
   )
 }
 
@@ -348,7 +515,7 @@ function TopGift({ gift, now }: { gift: FeedGift; now: number }) {
           {gift.count > 1 && <span className="feed-row__count"> ×{gift.count}</span>}
         </span>
         <span className="feed-row__sub">
-          {gameOf(gift.gameId)?.name ?? gift.gameId} · {gift.nickname} · {ago(now - gift.at)} fa
+          {gameOf(gift.gameId)?.name ?? gift.gameId} · <ChatAvatar user={gift} small /> {gift.nickname} · {ago(now - gift.at)} fa
         </span>
       </span>
       <span className="feed-row__coins feed-row__coins--big">
@@ -363,17 +530,15 @@ function GiftRow({ gift, now }: { gift: FeedGift; now: number }) {
   const info = giftById(gift.giftId)
   return (
     <li className="feed-row feed-row--gift" title={`${gift.nickname} → ${creatorName(gift.creator)}`}>
-      <span className="feed-row__emoji" aria-hidden="true">
-        {info?.emoji ?? '🎁'}
-      </span>
+      <ChatAvatar user={gift} />
       <span className="feed-row__body">
-        <span className="feed-row__name feed-row__name--gift">
-          {info?.name ?? gift.giftId}
-          {gift.count > 1 && <span className="feed-row__count">×{gift.count}</span>}
+        <span className="feed-row__name">
+          {gift.nickname}
           {!gift.creator && <span className="feed-row__sim">SIM</span>}
         </span>
         <span className="feed-row__sub">
-          {gameOf(gift.gameId)?.name ?? gift.gameId} · {gift.nickname}
+          <span aria-hidden="true">{info?.emoji ?? '🎁'}</span> {info?.name ?? gift.giftId}
+          {gift.count > 1 && <span className="feed-row__count">×{gift.count}</span>} · {gameOf(gift.gameId)?.name ?? gift.gameId}
         </span>
       </span>
       <span className="feed-row__end">
@@ -389,11 +554,100 @@ function GiftRow({ gift, now }: { gift: FeedGift; now: number }) {
 
 const Coin = () => <span className="coin" role="img" aria-label="monete" />
 
-function EyeIcon() {
+// Line icons, in the text colour.
+function Icon({ size = 16, children }: { size?: number; children: ReactNode }) {
   return (
-    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+    <svg
+      viewBox="0 0 24 24"
+      width={size}
+      height={size}
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      {children}
+    </svg>
+  )
+}
+
+function EyeIcon({ size = 16 }: { size?: number }) {
+  return (
+    <Icon size={size}>
       <path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z" />
       <circle cx="12" cy="12" r="3" />
-    </svg>
+    </Icon>
+  )
+}
+
+function CommentIcon({ size = 16 }: { size?: number }) {
+  return (
+    <Icon size={size}>
+      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+      <path d="M8 9h8M8 13h5" />
+    </Icon>
+  )
+}
+
+function HeartIcon({ size = 16 }: { size?: number }) {
+  return (
+    <Icon size={size}>
+      <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8l1 1.1L12 21l7.8-7.5 1-1.1a5.5 5.5 0 0 0 0-7.8z" />
+    </Icon>
+  )
+}
+
+function GiftIcon({ size = 16 }: { size?: number }) {
+  return (
+    <Icon size={size}>
+      <rect x="3" y="8" width="18" height="4" rx="1" />
+      <path d="M12 8v13M19 12v7a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2v-7" />
+      <path d="M7.5 8a2.5 2.5 0 0 1 0-5C10 3 12 8 12 8s2-5 4.5-5a2.5 2.5 0 0 1 0 5" />
+    </Icon>
+  )
+}
+
+function FollowIcon() {
+  return (
+    <Icon>
+      <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
+      <circle cx="9" cy="7" r="4" />
+      <path d="M19 8v6M22 11h-6" />
+    </Icon>
+  )
+}
+
+function FilterIcon() {
+  return (
+    <Icon>
+      <path d="M3 6h18M7 12h10M10 18h4" />
+    </Icon>
+  )
+}
+
+function SendIcon() {
+  return (
+    <Icon>
+      <path d="M5 12h14M13 6l6 6-6 6" />
+    </Icon>
+  )
+}
+
+function PulseIcon() {
+  return (
+    <Icon size={13}>
+      <path d="M22 12h-4l-3 8-6-16-3 8H2" />
+    </Icon>
+  )
+}
+
+function TrophyIcon({ size = 13 }: { size?: number }) {
+  return (
+    <Icon size={size}>
+      <path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0z" />
+      <path d="M17 5h3v2a3 3 0 0 1-3 3M7 5H4v2a3 3 0 0 0 3 3" />
+    </Icon>
   )
 }
