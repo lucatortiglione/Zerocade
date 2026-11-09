@@ -10,18 +10,23 @@ import csv
 from collections import Counter
 import hashlib
 import json
+import os
 from pathlib import Path
 import random
 import re
 import secrets
 import sys
+import tempfile
 
 from prompt_policy import load_prompt_policy
 from semantic_rules import SEMANTIC_POLICY, SOURCE_ONLY_REASON, WORD_CHECKS
 from sqlite_prompt_runtime import SQLite, VERSION, literal
 
 ROOT = Path(__file__).resolve().parent
-DEFAULT_DB = ROOT/'prompt.sqlite3'
+# La raccolta: inventario, fonti, aggiornamenti, decisioni e bacini (gigabyte, fuori da Git).
+DEFAULT_DB = ROOT/'prompt_raw.sqlite3'
+# Il database dei soli bacini verificati, quello che legge il gioco (versionato in Git).
+GAME_DB = ROOT/'prompt.sqlite3'
 DIRECTIVES = ROOT/'direttive_word_association_it_v3_6_0.md'
 # Hash delle direttive -> versione delle regole (semantic_rules.SEMANTIC_POLICY) che contenevano.
 POLICY_VERSIONS = ROOT/'resources/policy_versions.json'
@@ -286,6 +291,32 @@ def pool_objects(db):
     return [r['name'] for r in rows]
 
 
+def export_game_db(db, output=GAME_DB):
+    """Ricostruisce `output` (prompt.sqlite3) con le sole tabelle di pool_objects della raccolta:
+    bacini verificati, verbali, categorie e decisioni sulle voci, con schema, vincoli e viste.
+    Sostituzione atomica: un errore lascia il file precedente com'era."""
+    output = Path(output).resolve()
+    if output == db.path: raise ValueError('Il database dei bacini deve essere distinto dalla raccolta')
+    output.parent.mkdir(parents=True, exist_ok=True)
+    handle, name = tempfile.mkstemp(prefix=output.stem+'.', suffix='.part', dir=output.parent)
+    os.close(handle)
+    temporary = Path(name); sql = temporary.with_name(temporary.name+'.sql')
+    try:
+        db.dump(sql, pool_objects(db))
+        game = SQLite(temporary, db.executable)
+        game.run(sql.read_text(encoding='utf-8'))
+        if game.run('PRAGMA integrity_check;', rows=True) != [{'integrity_check': 'ok'}]:
+            raise ValueError('Errore di integrità nel database dei bacini')
+        if game.run('PRAGMA foreign_key_check;', rows=True):
+            raise ValueError('Errore di integrità referenziale nel database dei bacini')
+        pools = len(load_pools(game))
+        temporary.replace(output)
+        return {'output': str(output), 'source': str(db.path), 'pools': pools}
+    finally:
+        temporary.unlink(missing_ok=True)
+        sql.unlink(missing_ok=True)
+
+
 def load_pools(db):
     decisions=db.run("SELECT name FROM sqlite_schema WHERE type='table' AND name='inventory_term_decisions';",rows=True)
     exclusion=(" WHERE NOT EXISTS(SELECT 1 FROM inventory_term_decisions d WHERE d.prompt=s.prompt "
@@ -369,8 +400,8 @@ def main(argv=None):
     sub.add_parser('init')
     imp=sub.add_parser('import-reviewed'); imp.add_argument('file',type=Path)
     sub.add_parser('status')
-    dump=sub.add_parser('dump',help="Dump SQL dei bacini verificati (senza l'inventario)")
-    dump.add_argument('--output',type=Path,default=ROOT/'prompt.sql')
+    dump=sub.add_parser('dump',help="prompt.sqlite3: database dei soli bacini verificati, dalla raccolta")
+    dump.add_argument('--output',type=Path,default=GAME_DB,help='Un .sql scrive invece il dump SQL in testo')
     sub.add_parser('register-directives',help='Dopo un ritocco al testo delle direttive che non cambia le regole')
     sample=sub.add_parser('sample'); sample.add_argument('--answers',choices=['7','8','random'],default='7')
     sample.add_argument('--seed',default=None); sample.add_argument('--difficulty',nargs='+',choices=['easy','medium','hard','unrated'])
@@ -389,10 +420,16 @@ def main(argv=None):
         print(json.dumps(register_directives(),ensure_ascii=False)); return 0
     db=SQLite(args.db,args.sqlite)
     if args.command=='init': initialize(db); print(db.path)
-    elif args.command=='import-reviewed': print(json.dumps({'reviewed_pools_processed':import_reviewed(db,args.file)}))
+    elif args.command=='import-reviewed':
+        result={'reviewed_pools_processed':import_reviewed(db,args.file)}
+        # Il gioco legge prompt.sqlite3: dopo un'importazione nella raccolta si aggiorna subito.
+        if db.path==DEFAULT_DB.resolve(): result['game_db']=export_game_db(db)
+        print(json.dumps(result,ensure_ascii=False))
     else:
         if not db.path.exists(): raise ValueError('Database assente: eseguire init e import-reviewed')
-        if args.command=='dump': db.dump(args.output,pool_objects(db)); print(args.output)
+        if args.command=='dump':
+            if args.output.suffix=='.sql': db.dump(args.output,pool_objects(db)); print(args.output)
+            else: print(json.dumps(export_game_db(db,args.output),ensure_ascii=False))
         elif args.command=='status':
             counts={name:db.run('SELECT count(*) AS n FROM '+name+';',rows=True)[0]['n']
                 for name in ('prompts','senses','associations','sources','reviews','categories')}

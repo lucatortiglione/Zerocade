@@ -21,9 +21,11 @@ import {
 // - ZEROCADE_ASSOCIATIONS_DB (a .sqlite3/.db database or a .sql dump);
 // - zeroassociations.db next to the server: the Windows package's copy;
 // - prompt_validi.sqlite3, the copy of the validated prompts (validated_prompt_database.py sync);
-// - prompt.sqlite3, the collection database (not in git: with the inventory it weighs gigabytes);
-// - prompt.sql, its dump of the verified pools (in git), loaded in memory on a fresh clone.
+// - prompt.sqlite3, the verified pools alone (in git), exported from the collection;
+// - prompt_raw.sqlite3, the collection itself (not in git: with the inventory it weighs gigabytes).
 // A prompt the collection marks DISCARDED or DEFERRED (inventory_term_decisions) never plays.
+// When prompt.sqlite3 is behind the collection (an import or a decision not exported yet), the
+// server says so: `prompt_database.py dump` brings it up to date.
 
 const here = dirname(fileURLToPath(import.meta.url))
 const gameData = join(here, '..', '..', '..', 'gioco-zeroassociations')
@@ -33,7 +35,7 @@ export const wordAssociationSources = (): string[] =>
     join(here, 'zeroassociations.db'),
     join(gameData, 'prompt_validi.sqlite3'),
     join(gameData, 'prompt.sqlite3'),
-    join(gameData, 'prompt.sql'),
+    join(gameData, 'prompt_raw.sqlite3'),
   ].filter((p): p is string => p !== undefined && existsSync(p))
 
 export interface LoadedWordAssociation {
@@ -65,10 +67,13 @@ export function loadWordAssociation(path?: string | null): LoadedWordAssociation
       const loaded = loadWordAssociation(source)
       if (loaded.pools.length) {
         console.log(`[word-association] ${loaded.pools.length} prompts from ${source}`)
+        const raw = join(gameData, 'prompt_raw.sqlite3')
+        if (source === join(gameData, 'prompt.sqlite3') && existsSync(raw) && loadWordAssociation(raw).contentId !== loaded.contentId)
+          console.warn('[word-association] prompt.sqlite3 is behind prompt_raw.sqlite3: run `prompt_database.py dump` to update it')
         return loaded
       }
     }
-    console.warn('[word-association] no verified pools found (prompt.sqlite3, prompt.sql): the game has no prompts')
+    console.warn('[word-association] no verified pools found (prompt.sqlite3): the game has no prompts')
     return none
   }
   if (path === null) return none

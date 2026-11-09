@@ -13,8 +13,8 @@ Questa sezione prevale sui precedenti riferimenti a esattamente sette risposte,
 sulla distribuzione rigida delle difficoltà e sui workflow che inseriscono bozze
 nel database prima della revisione. Gli esempi storici con sette parole restano esempi.
 
-- `prompt.sqlite3` è il database operativo SQLite **3.54.1**; `prompt.sql` è
-  l'esportazione SQL UTF-8 ripristinabile dello stesso archivio. Il runtime
+- `prompt_raw.sqlite3` è il database operativo SQLite **3.54.1** (la raccolta);
+  `prompt.sqlite3` è l'esportazione dei soli bacini verificati che legge il gioco. Il runtime
   dedicato deve controllare la versione effettiva senza cambiare quello del server.
 - Si cerca una copertura italiana progressivamente più ampia. Non si dichiara
   esaustivo un elenco finito: neologismi, accezioni, tecnicismi e usi cambiano.

@@ -7,7 +7,7 @@ import tempfile
 import unittest
 
 from collect_prompt_sources import dictionary_proposals
-from prompt_database import ROOT,digest,validate_pool,sample_pool,import_reviewed,load_pools,export_csv,sample_database,sample_livecade,load_categories,pool_objects,review_policy
+from prompt_database import export_game_db,ROOT,digest,validate_pool,sample_pool,import_reviewed,load_pools,export_csv,sample_database,sample_livecade,load_categories,pool_objects,review_policy
 from semantic_rules import SEMANTIC_POLICY
 from sqlite_prompt_runtime import SQLite,CACHE,literal
 
@@ -161,6 +161,21 @@ class DatabaseTests(unittest.TestCase):
         self.assertEqual(load_pools(self.db),load_pools(restored))
         self.assertEqual(self.db.run('SELECT * FROM prompt_catalog;',rows=True),restored.run('SELECT * FROM prompt_catalog;',rows=True))
         with self.assertRaises(ValueError):self.db.dump(dump,['prompts; .shell echo'])
+
+    def test_game_database_holds_only_verified_pools(self):
+        import_reviewed(self.db,self.pack)
+        self.db.run("CREATE TABLE inventory_terms(prompt TEXT PRIMARY KEY);INSERT INTO inventory_terms VALUES ('grezzo');")
+        game=self.directory/'prompt.sqlite3'
+        result=export_game_db(self.db,game)
+        self.assertEqual(result['pools'],1)
+        exported=SQLite(game)
+        self.assertEqual(load_pools(exported),load_pools(self.db))
+        self.assertEqual(exported.run("SELECT count(*) AS n FROM sqlite_schema WHERE name LIKE 'inventory_terms';",rows=True),[{'n':0}])
+        self.assertEqual(exported.run('SELECT count(*) AS n FROM prompt_catalog;',rows=True),[{'n':1}])
+        before=game.read_bytes()
+        with self.assertRaisesRegex(ValueError,'distinto'):export_game_db(self.db,self.db.path)
+        self.assertEqual(game.read_bytes(),before)
+        self.assertEqual([p.name for p in self.directory.glob('*.part*')],[])
 
     def test_database_requires_categories_and_exposes_names(self):
         import_reviewed(self.db,self.pack)

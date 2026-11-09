@@ -41,7 +41,7 @@ const seedAll = db.transaction(() => {
   }
 })
 seedAll()
-// Word Association reads the verified pools of gioco-zeroassociations/prompt.sqlite3.
+// ZeroAssociazioni reads the verified pools of gioco-zeroassociations/prompt.sqlite3.
 export const wordAssociation = loadWordAssociation()
 
 export function getContent(): Record<string, unknown[]> {

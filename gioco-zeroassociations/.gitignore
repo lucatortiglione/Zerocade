@@ -1,9 +1,12 @@
 __pycache__/
 .venv/
-# Generati in locale e rigenerabili. prompt.sqlite3 contiene anche l'inventario multi-fonte
-# (gigabyte, ricostruibile con prompt_inventory.py collect); prompt.sql, versionato, contiene
-# i soli bacini verificati: il gioco lo carica quando prompt.sqlite3 manca.
-prompt.sqlite3
+# La raccolta prompt_raw.sqlite3 contiene anche l'inventario multi-fonte (gigabyte, ricostruibile
+# con prompt_inventory.py collect). prompt.sqlite3, versionato, ha i soli bacini verificati: è
+# quello che legge il gioco, e prompt_database.py dump lo rigenera dalla raccolta.
+prompt_raw.sqlite3
+prompt*.part
+prompt*.part.sql
+*.sqlite3-journal
 # Copia dei prompt validati: si rigenera con validated_prompt_database.py sync.
 prompt_validi*.sqlite3
 prompt_validi*.jsonl

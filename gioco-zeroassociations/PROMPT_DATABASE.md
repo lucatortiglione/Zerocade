@@ -1,19 +1,26 @@
 # Database dei prompt italiani
 
-Fonti, inventario, aggiornamenti e decisioni convivono in `prompt.sqlite3`:
-vedere [la gestione del database unico](AGGIORNAMENTI_FONTI.md).
+Fonti, inventario, aggiornamenti e decisioni convivono nella raccolta
+`prompt_raw.sqlite3`: vedere [la gestione del database unico](AGGIORNAMENTI_FONTI.md).
 
 **Primo step corrente:** [raccogliere e inserire l'inventario dei prompt](PROMPT_INVENTORY.md).
 La richiesta più recente consente di inserire i prompt raccolti nelle tabelle
 `inventory_*`, prima di cercare le associazioni. La verifica preinserimento
 descritta qui sotto riguarda la banca di gioco e le sue associazioni.
 
-`prompt.sqlite3` è il database operativo (escluso da Git: con l'inventario pesa
-gigabyte); `prompt.sql`, versionato, è il dump SQL UTF-8 dei **soli bacini
-verificati**, con schema, verbali e attribuzioni, e permette di ricostruirli.
-L'inventario `inventory_*` resta fuori dal dump e si ricostruisce dalle fonti
-con `prompt_inventory.py collect`. Il gioco ZeroAssociazioni legge i bacini da
-`prompt.sqlite3` in sola lettura, oppure da `prompt.sql` quando il database manca. Si usa un runtime
+Ci sono due database SQLite:
+
+- `prompt_raw.sqlite3`, la **raccolta**: il database operativo in cui scrivono
+  tutti gli script. Escluso da Git: con l'inventario pesa gigabyte.
+- `prompt.sqlite3`, i **bacini del gioco**: i soli bacini verificati, con schema,
+  verbali, attribuzioni e decisioni sulle voci. Versionato (circa 2 MB). Lo
+  rigenera `prompt_database.py dump` (task «Prompt: aggiorna prompt.sqlite3…»),
+  e si aggiorna da solo dopo `import-reviewed`. Il gioco ZeroAssociazioni lo legge
+  in sola lettura; se è indietro rispetto alla raccolta il server lo segnala.
+
+L'inventario `inventory_*` non entra in `prompt.sqlite3` e si ricostruisce dalle
+fonti con `prompt_inventory.py collect`. Con `dump --output FILE.sql` si ottiene
+invece il dump SQL in testo degli stessi dati. Si usa un runtime
 ufficiale SQLite **3.54.1**, verificato con SHA3-256 e installato nella cache
 utente. Python e il motore SQLite del server non vengono modificati.
 
@@ -82,8 +89,9 @@ Aprire **Terminale → Esegui attività** e scegliere:
 - **Livecade: genera lista (7 risposte per prompt)**: chiede quanti prompt
   distinti estrarre e un seed facoltativo, sceglie i prompt casualmente e per
   ognuno estrae sette risposte rispettando gruppi e conflitti.
-- **Prompt: aggiorna prompt.sql dal database**: aggiorna il dump dei bacini
-  verificati (senza inventario), da versionare dopo ogni importazione.
+- **Prompt: aggiorna prompt.sqlite3 (bacini del gioco) da prompt_raw.sqlite3**:
+  rigenera il database dei bacini verificati, da versionare dopo ogni modifica
+  (dopo `import-reviewed` avviene già da sé; serve dopo le decisioni sulle voci).
 - **Prompt: stato e integrità del DB**: riporta conteggi e controlli SQLite.
 
 I task usano l'ambiente `.venv` già presente. Le nuove utility richiedono solo
@@ -151,15 +159,16 @@ Le copie prima della migrazione sono in `database-backups/`.
 
 ## Ripristino
 
-Da PowerShell, con un **nuovo** percorso di destinazione:
+`prompt.sqlite3` è già un database completo dei bacini: per ripartire da quello
+(per esempio su un PC appena clonato) basta copiarlo come nuova raccolta:
 
 ```powershell
-$sqlitePrompt = Join-Path $env:LOCALAPPDATA 'Zerocade/sqlite-3.54.1/sqlite3.exe'
-& $sqlitePrompt nuovo_prompt.sqlite3 '.read prompt.sql'
-& $sqlitePrompt nuovo_prompt.sqlite3 'PRAGMA integrity_check;'
+Copy-Item prompt.sqlite3 prompt_raw.sqlite3
+python -B prompt_database.py status
 ```
 
-Il dump contiene anche i verbali editoriali e le attribuzioni, non l'inventario. I precedenti
+Contiene anche i verbali editoriali, le attribuzioni e le decisioni sulle voci,
+non l'inventario: si raccoglie di nuovo con `prompt_inventory.py collect`. I precedenti
 CSV da 5.000 prompt, le bozze locali in quarantena e i generatori storici non
 vengono importati o promossi automaticamente. La revisione di quei dati resta
 un lavoro distinto; il nuovo database non significa che tutti i 5.000 siano corretti.

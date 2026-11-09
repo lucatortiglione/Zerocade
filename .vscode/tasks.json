@@ -90,7 +90,7 @@
       "problemMatcher": []
     },
     {
-      "label": "Prompt: aggiorna prompt.sql dal database",
+      "label": "Prompt: aggiorna prompt.sqlite3 (bacini del gioco) da prompt_raw.sqlite3",
       "type": "process",
       "command": "${workspaceFolder}/gioco-zeroassociations/.venv/Scripts/python.exe",
       "args": ["-B", "prompt_database.py", "dump"],

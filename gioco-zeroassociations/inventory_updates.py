@@ -1,4 +1,4 @@
-"""Aggiornamenti e decisioni persistenti nel database unico prompt.sqlite3."""
+"""Aggiornamenti e decisioni persistenti nella raccolta prompt_raw.sqlite3."""
 from __future__ import annotations
 
 import argparse

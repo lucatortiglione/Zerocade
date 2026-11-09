@@ -14,7 +14,8 @@ collegate nascoste**. Questa cartella produce e verifica quei dati; il gioco è 
    associazioni partendo dal concetto, non dalle definizioni (bozze:
    `free_association_llm.py propose`). Ogni parola si verifica con le [regole](REGOLE.md).
 3. **Importazione**: `prompt_database.py import-reviewed` accetta solo bacini con
-   verbale completo ([PROMPT_DATABASE.md](PROMPT_DATABASE.md)). Poi `dump`.
+   verbale completo ([PROMPT_DATABASE.md](PROMPT_DATABASE.md)) nella raccolta
+   `prompt_raw.sqlite3`, e aggiorna subito `prompt.sqlite3`, il database del gioco.
    `validated_prompt_database.py sync` ne ricava `prompt_validi.sqlite3`, la copia
    con i soli prompt validati e i loro bacini.
 4. **Gioco**: a ogni round il server estrae 7 o 8 parole dal bacino, rispettando
@@ -37,7 +38,7 @@ Dalla cartella `gioco-zeroassociations`, con `.venv/Scripts/python.exe -B`:
 | `prompt_inventory.py collect` | Raccoglie l'inventario dei prompt (task «1. Prompt: raccogli…») |
 | `prompt_database.py import-reviewed FILE.jsonl` | Importa bacini già revisionati, tutto o niente |
 | `prompt_database.py status` | Conteggi e integrità del DB |
-| `prompt_database.py dump` | Aggiorna `prompt.sql` (solo bacini, senza inventario) |
+| `prompt_database.py dump` | Rigenera `prompt.sqlite3` dalla raccolta (solo bacini, senza inventario) |
 | `prompt_database.py livecade --count N` | CSV per Livecade: N prompt, 7 risposte ciascuno |
 | `prompt_database.py register-directives` | Dopo un ritocco al testo delle direttive che non cambia le regole |
 | `inventory_updates.py …` | Aggiornamenti delle fonti e decisioni sulle voci (task «Fonti: …» e «Voci: …») |
@@ -51,17 +52,20 @@ Dalla cartella `gioco-zeroassociations`, con `.venv/Scripts/python.exe -B`:
 ## Dove legge il gioco
 
 Il server usa, in sola lettura, la prima fonte che contiene bacini:
-`prompt_validi.sqlite3`, poi `prompt.sqlite3`, poi `prompt.sql` caricato in
-memoria (un clone appena scaricato ha solo questo). Solo i prompt con revisione
-`verified`, nel senso indicato da `prompts.familiar_sense`; mai quelli che la
-raccolta segna `DISCARDED` o `DEFERRED`. I bacini nuovi compaiono al riavvio di
-Zerocade. Il pacchetto Windows include un database ridotto ai soli bacini
+`prompt_validi.sqlite3`, poi `prompt.sqlite3` (in Git: un clone appena scaricato
+ha già i prompt), poi la raccolta `prompt_raw.sqlite3`. Solo i prompt con
+revisione `verified`, nel senso indicato da `prompts.familiar_sense`; mai quelli
+che la raccolta segna `DISCARDED` o `DEFERRED`. Se `prompt.sqlite3` è indietro
+rispetto alla raccolta, il log del server lo dice. I bacini nuovi compaiono al
+riavvio di Zerocade. Il pacchetto Windows include un database ridotto ai soli bacini
 (`zeroassociations.db`, circa 2 MB).
 
 ## File
 
-- `prompt.sqlite3`: database operativo unico, escluso da Git (con l'inventario pesa gigabyte).
-- `prompt.sql`: dump dei bacini verificati e delle decisioni sulle voci, versionato.
+- `prompt_raw.sqlite3`: la raccolta, database operativo unico, esclusa da Git (con
+  l'inventario pesa gigabyte).
+- `prompt.sqlite3`: i bacini verificati e le decisioni sulle voci, versionato: è il
+  database del gioco.
 - `prompt_validi.sqlite3`: copia dei prompt validati, esclusa da Git (si rigenera con `sync`).
 - `prompt_schema.sql`, `prompt_inventory_schema.sql`: schemi.
 - `resources/policy_versions.json`: per ogni testo delle direttive, la versione

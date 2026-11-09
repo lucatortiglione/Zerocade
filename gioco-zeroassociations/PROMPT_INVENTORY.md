@@ -52,7 +52,7 @@ python -B prompt_inventory.py collect --only de-mauro-sitemaps
 
 ## Cosa viene conservato
 
-Il file operativo rimane `prompt.sqlite3` con SQLite 3.54.1.
+Il file operativo è la raccolta `prompt_raw.sqlite3`, con SQLite 3.54.1.
 
 - `inventory_terms`: una riga per testo normalizzato del prompt, con stato
   `COLLECTED`, indicazione di parola singola, presenza di prove di lemma,

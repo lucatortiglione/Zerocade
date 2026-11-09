@@ -76,9 +76,9 @@ cpSync(join(root, 'apps', 'dashboard', 'dist'), join(app, 'public', 'dashboard')
 cpSync(join(root, 'apps', 'overlay', 'dist'), join(app, 'public', 'overlay'), { recursive: true })
 copyFileSync(join(root, 'apps', 'server', 'src', 'content.seed.json'), join(app, 'content.seed.json'))
 // ZeroAssociazioni: only the verified pools, from the first source that has any (the same order
-// as the server: the validated copy, the collection database, its dump). The collection's prompt
-// inventory weighs gigabytes and is not the game's; its decisions come along, so a discarded
-// prompt stays out.
+// as the server: the validated copy, prompt.sqlite3, the collection prompt_raw.sqlite3). The
+// collection's prompt inventory weighs gigabytes and is not the game's; the decisions on its
+// entries come along, so a discarded prompt stays out.
 const POOL_TABLES = ['reviews', 'prompts', 'senses', 'associations', 'group_limits', 'conflicts', 'inventory_term_decisions']
 const gameData = join(root, 'gioco-zeroassociations')
 const poolsDb = join(app, 'zeroassociations.db')
@@ -86,7 +86,7 @@ const poolSources = [
   process.env.ZEROCADE_ASSOCIATIONS_DB,
   join(gameData, 'prompt_validi.sqlite3'),
   join(gameData, 'prompt.sqlite3'),
-  join(gameData, 'prompt.sql'),
+  join(gameData, 'prompt_raw.sqlite3'),
 ].filter((p) => p && existsSync(p))
 const Database = createRequire(join(root, 'apps', 'server', 'package.json'))('better-sqlite3')
 for (const source of poolSources) {
