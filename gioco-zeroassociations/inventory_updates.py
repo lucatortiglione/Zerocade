@@ -1,6 +1,7 @@
 """Aggiornamenti e decisioni persistenti nella raccolta prompt_raw.sqlite3."""
 from __future__ import annotations
 
+import unified_db
 import argparse
 from datetime import datetime,timezone
 import hashlib
@@ -291,7 +292,8 @@ def main(argv=None):
         output=(args.output or ROOT/'database-backups'/('prompt_full_'+datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%S_%f')+'.sqlite3')).resolve()
         if output.exists():raise FileExistsError('Backup già presente: non viene sovrascritto')
         output.parent.mkdir(parents=True,exist_ok=True)
-        db.run('.backup '+json.dumps(output.as_posix())+'\n')
+        if db.schema:unified_db.export_schema(db.schema,output)  # nel DB unico: la sola raccolta, come DB a sé
+        else:db.run('.backup '+json.dumps(output.as_posix())+'\n')
         result={'backup':str(output),'scope':'complete_database_including_inventory_sources_updates_and_decisions'}
     elif args.command=='register-sources':
         sources=json.loads(args.registry.read_text(encoding='utf-8'));register_sources(db,sources);result={'registered_sources':len(sources)}

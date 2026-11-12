@@ -17,3 +17,6 @@ prompt-staging/
 database-backups/
 # Lotti storici dell'estrazione da definizioni (archivio/LEGGIMI.md).
 archivio/lotti/
+# Il DB unico (unified_db.py): pesa gigabyte, si ricostruisce dai sei DB.
+zeroassociazioni.sqlite3
+zeroassociazioni.sqlite3.*

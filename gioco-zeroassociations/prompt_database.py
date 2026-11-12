@@ -5,6 +5,7 @@ controlla il contratto di una revisione già effettuata, non approva nuove parol
 """
 from __future__ import annotations
 
+import unified_db
 import argparse
 import csv
 from collections import Counter
@@ -458,7 +459,7 @@ def main(argv=None):
         if db.path==DEFAULT_DB.resolve(): result['game_db']=export_game_db(db)
         print(json.dumps(result,ensure_ascii=False))
     else:
-        if not db.path.exists(): raise ValueError('Database assente: eseguire init e import-reviewed')
+        if not unified_db.exists(db.path): raise ValueError('Database assente: eseguire init e import-reviewed')
         if args.command=='dump':
             if args.output.suffix=='.sql': db.dump(args.output,pool_objects(db)); print(args.output)
             else: print(json.dumps(export_game_db(db,args.output),ensure_ascii=False))

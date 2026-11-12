@@ -363,7 +363,8 @@ def build(source=VALID_DB, output=FINAL_DB):
     finally:
         out.close()
         src.close()
-    temporary.replace(output)
+    from sqlite_prompt_runtime import publish_database  # in the one database the copy replaces its schema
+    publish_database(temporary, output)
     return {'output': str(output), **counts}
 
 

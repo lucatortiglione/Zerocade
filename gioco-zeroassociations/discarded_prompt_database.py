@@ -5,6 +5,7 @@ come risposta. I rinvii DEFERRED restano in attesa, non sono scarti definitivi.
 """
 from __future__ import annotations
 
+import unified_db
 import argparse
 from datetime import datetime, timezone
 import json
@@ -45,11 +46,11 @@ def sync_discarded(raw_path=DEFAULT_DB, filtered_path=FILTERED_DB, output=DISCAR
     raw_path,filtered_path,output = (Path(p).resolve() for p in (raw_path,filtered_path,output))
     if output in {raw_path,filtered_path,ROOT/'prompt_validi.sqlite3',ROOT/'prompt.sqlite3'}:
         raise ValueError('Il database degli scarti deve essere un file distinto')
-    if not raw_path.exists() or not filtered_path.exists():
+    if not unified_db.exists(raw_path) or not unified_db.exists(filtered_path):
         raise ValueError('Servono la raccolta e il database dei candidati filtrati')
     source = SQLite(raw_path)
     filtered = SQLite(filtered_path,source.executable)
-    if output.exists():
+    if unified_db.exists(output):
         old = SQLite(output,source.executable)
         if not has_table(old,'metadata') or not old.run(
                 "SELECT value FROM metadata WHERE key='database_role' AND value="+literal(ROLE)+';',rows=True):
@@ -147,7 +148,7 @@ def main(argv=None):
     parser.add_argument('--output',type=Path,default=DISCARDED_DB)
     parser.add_argument('command',choices=['sync','status'])
     args = parser.parse_args(argv)
-    if args.command=='status' and not args.output.exists():
+    if args.command=='status' and not unified_db.exists(args.output):
         raise ValueError('DB degli scarti assente: eseguire sync')
     result = (sync_discarded(args.source,args.filtered,args.output) if args.command=='sync'
               else status(SQLite(args.output)))

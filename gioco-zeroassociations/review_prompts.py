@@ -27,6 +27,7 @@ from datetime import datetime, timezone
 import json
 from pathlib import Path
 import sqlite3
+import unified_db
 import sys
 import urllib.request
 
@@ -47,7 +48,7 @@ def today():
 
 
 def read_only(path: Path) -> sqlite3.Connection:
-    db = sqlite3.connect(f'file:{Path(path).resolve().as_posix()}?mode=ro', uri=True)
+    db = unified_db.connect(f'file:{Path(path).resolve().as_posix()}?mode=ro', uri=True)
     db.row_factory = sqlite3.Row
     return db
 
@@ -271,7 +272,7 @@ def refresh(endpoint: str = DEFAULT_ENDPOINT, limit: int = 500, raw: Path = DEFA
     """Dopo nuove parole dalle fonti: filtri, revisione LLM delle sole parole nuove, prompt_validi."""
     from filter_prompts import build
     before = set()
-    if Path(filtered).exists():
+    if unified_db.exists(Path(filtered)):
         db = read_only(filtered)
         try: before = {r[0] for r in db.execute('SELECT prompt FROM filtered_prompts')}
         finally: db.close()
@@ -284,7 +285,7 @@ def refresh(endpoint: str = DEFAULT_ENDPOINT, limit: int = 500, raw: Path = DEFA
         result['llm_review'] = llm_review(limit, endpoint, only=new, raw=raw, filtered=filtered, destination=destination)
     elif new:
         result['llm_review'] = 'LLM locale non attivo: le parole nuove restano in attesa (review_prompts.py pending)'
-    if Path(raw).exists():
+    if unified_db.exists(Path(raw)):
         result['valid_prompts'] = sync_validated(SQLite(raw), destination)['valid_prompts']
         keep_game_db_current(raw)
     return result

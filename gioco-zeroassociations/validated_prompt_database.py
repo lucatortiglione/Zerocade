@@ -9,6 +9,7 @@ associazioni restano nella raccolta e sono copiati in prompt_filtrati.sqlite3
 """
 from __future__ import annotations
 
+import unified_db
 import argparse
 from datetime import datetime, timezone
 import json
@@ -110,7 +111,7 @@ def has_table(db, name):
 
 def register_reviews(db, records):
     """Archivia i verbali prima della copia. Nessuna selezione INTEGRATED equivale a revisione."""
-    if not db.path.exists():
+    if not unified_db.exists(db.path):
         raise ValueError('Database di raccolta assente')
     for record in records:
         validate_record(record)
@@ -164,9 +165,9 @@ def sync_validated(source, destination=VALIDATED_DB):
     destination = Path(destination).resolve()
     if destination == source.path.resolve():
         raise ValueError('Il DB delle voci valide deve essere distinto dalla raccolta')
-    if not source.path.exists() or not has_table(source, 'prompt_validation_heads'):
+    if not unified_db.exists(source.path) or not has_table(source, 'prompt_validation_heads'):
         raise ValueError('Nessun registro di revisioni: importare prima i verbali')
-    if destination.exists():
+    if unified_db.exists(destination):
         owner = SQLite(destination, source.executable)
         if (not has_table(owner, 'metadata') or not owner.run(
                 "SELECT value FROM metadata WHERE key='database_role' AND value='validated-prompts-1';", rows=True)):
@@ -265,7 +266,7 @@ def main(argv=None):
     if args.source.resolve() == args.destination.resolve():
         raise ValueError('Sorgente e destinazione devono essere distinte')
     if args.command == 'status':
-        if not args.destination.exists():
+        if not unified_db.exists(args.destination):
             raise ValueError('DB delle voci valide assente: eseguire sync dopo la revisione')
         db = SQLite(args.destination)
         result = {'destination':str(args.destination), 'sqlite_version':db.run('SELECT sqlite_version() AS v;',rows=True)[0]['v']}

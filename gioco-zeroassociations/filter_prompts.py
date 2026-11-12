@@ -44,6 +44,7 @@ import os
 from pathlib import Path
 import re
 import sqlite3
+import unified_db
 import sys
 import tempfile
 from typing import Callable
@@ -218,7 +219,7 @@ def build(raw_path: Path = RAW_DB, output: Path = FILTERED_DB, game_path: Path |
         raise ValueError('prompt_filtrati.sqlite3 deve essere un file distinto')
     policy = policy or load_prompt_policy()
     zipf = zipf or wordfreq_zipf()
-    raw = sqlite3.connect(f'file:{raw_path.as_posix()}?mode=ro', uri=True)
+    raw = unified_db.connect(f'file:{raw_path.as_posix()}?mode=ro', uri=True)
     try:
         sources = dict(raw.execute('SELECT id, source_key FROM inventory_snapshots'))
         has_decisions = raw.execute(
@@ -269,8 +270,8 @@ def build(raw_path: Path = RAW_DB, output: Path = FILTERED_DB, game_path: Path |
     finally:
         raw.close()
     in_game = set()
-    if game_path and Path(game_path).exists():
-        game = sqlite3.connect(f'file:{Path(game_path).resolve().as_posix()}?mode=ro', uri=True)
+    if game_path and unified_db.exists(Path(game_path)):
+        game = unified_db.connect(f'file:{Path(game_path).resolve().as_posix()}?mode=ro', uri=True)
         try: in_game = {p for (p,) in game.execute('SELECT lemma FROM prompts')}
         finally: game.close()
 
@@ -345,7 +346,7 @@ def main(argv=None):
     if args.command == 'build':
         print(json.dumps(build(args.source, args.output, args.game_db), ensure_ascii=False, indent=2))
     elif args.command == 'status':
-        db = sqlite3.connect(f'file:{args.output.resolve().as_posix()}?mode=ro', uri=True)
+        db = unified_db.connect(f'file:{args.output.resolve().as_posix()}?mode=ro', uri=True)
         try:
             print(json.dumps({
                 'metadata': dict(db.execute('SELECT key, value FROM metadata')),

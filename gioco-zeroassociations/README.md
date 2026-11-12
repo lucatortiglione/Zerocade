@@ -70,6 +70,24 @@ rispetto alla raccolta, il log del server lo dice. I bacini nuovi compaiono al
 riavvio di Zerocade. Il pacchetto Windows include un database ridotto ai soli bacini
 (`zeroassociations.db`, circa 2 MB).
 
+## Il DB unico
+
+`zeroassociazioni.sqlite3` riunisce i sei DB qui sotto in un solo file, uno **schema** ciascuno. In SQLite
+lo schema è il prefisso `<schema>__` di tabelle, indici, viste e trigger: `raw` (prompt_raw.sqlite3),
+`game` (prompt.sqlite3), `validi`, `filtrati`, `finale`, `scartati`. Non è in Git (pesa gigabyte).
+
+- `unified_db.py build` lo crea copiando i sei DB, che restano dove sono; `verify` confronta ogni
+  tabella con il file d'origine (righe e contenuto) e solo allora il DB unico viene usato;
+  `status` mostra schemi, oggetti e righe; `export SCHEMA FILE` riscrive uno schema come DB a sé.
+- Gli script non cambiano: continuano a indicare `prompt_raw.sqlite3`, `prompt_validi.sqlite3`, …, e
+  quel percorso significa lo schema corrispondente del DB unico. L'SQL resta scritto coi nomi senza
+  prefisso e viene riscritto al volo (`SQLite` in `sqlite_prompt_runtime.py`, `unified_db.connect`). Un
+  file con un altro nome (le copie temporanee, i test) è un DB normale. Le copie ricostruite
+  (`publish_database`) sostituiscono lo schema in una transazione.
+- Il server e il pacchetto Windows leggono `zeroassociazioni.sqlite3#validi`, poi `#game`, poi `#raw`.
+- `ZEROASSOC_DB=legacy` fa tornare gli script ai vecchi file. I vecchi file non vengono più aggiornati
+  quando il DB unico è in uso: si possono cancellare dopo `verify`, ma conviene conservarne una copia.
+
 ## File
 
 - `prompt_raw.sqlite3`: la raccolta, database operativo unico, esclusa da Git (con

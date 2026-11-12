@@ -13,6 +13,7 @@ import hashlib
 import json
 from pathlib import Path
 import sqlite3
+import unified_db
 import sys
 from urllib.parse import urlparse
 from urllib.request import url2pathname
@@ -33,7 +34,7 @@ def now():
 
 
 def read_only(path):
-    db = sqlite3.connect(Path(path).resolve().as_uri()+'?mode=ro', uri=True)
+    db = unified_db.connect(Path(path).resolve().as_uri()+'?mode=ro', uri=True)
     db.row_factory = sqlite3.Row
     return db
 
