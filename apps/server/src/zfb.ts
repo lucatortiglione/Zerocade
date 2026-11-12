@@ -35,6 +35,10 @@ const count = (x: unknown) => {
   return Number.isFinite(n) && n > 0 ? Math.min(n, 100_000) : 1
 }
 
+// A boolean the bridge sends under one of these names, or undefined.
+const flag = (u: Record<string, unknown>, ...names: string[]): boolean | undefined =>
+  names.map((n) => u[n]).find((v): v is boolean => typeof v === 'boolean')
+
 // TikTok viewers go by their @name (as the direct TikTok feed does), Twitch ones by their display name.
 function viewerOf(raw: unknown, kind: SourceKind): Viewer {
   const u = rec(raw)
@@ -47,6 +51,10 @@ function viewerOf(raw: unknown, kind: SourceKind): Viewer {
     id: `${kind}:${str(u.id, 64) || name || 'anonymous'}`,
     nickname: shown.slice(0, 32) || 'anonymous',
     avatar: /^https:\/\/\S+$/.test(avatar) ? avatar : undefined,
+    // When the bridge says so ("follower" and "fan" flags, or the names Euler Stream uses): true or false;
+    // absent, a viewer stays unknown.
+    ...(flag(u, 'follower', 'isFollower', 'is_follower') !== undefined && { follower: flag(u, 'follower', 'isFollower', 'is_follower') }),
+    ...(flag(u, 'fan', 'isSubscriber', 'is_subscriber') !== undefined && { fan: flag(u, 'fan', 'isSubscriber', 'is_subscriber') }),
   }
 }
 

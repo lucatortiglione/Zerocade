@@ -1,6 +1,6 @@
 import type { GameInstance } from './engine'
 import { drawAvatar } from './avatar'
-import { drawLeaderboard } from './common'
+import { addPoints, drawLeaderboard } from './common'
 
 // "Word Swipe" — like Zen Word / Words of Wonder: a wheel of letters, viewers type
 // any word they can build from them in chat. Longer words score more.
@@ -85,8 +85,7 @@ export function createWordSwipe(): GameInstance {
       if (word.length < 3 || found.has(word) || !DICT.has(word) || !canForm(word, letters)) return
       found.add(word)
       const pts = pointsFor(word.length)
-      const cur = scores.get(event.user.id)
-      scores.set(event.user.id, { name: event.user.nickname, pts: (cur?.pts ?? 0) + pts, avatar: event.user.avatar })
+      addPoints(scores, event.user.id, event.user.nickname, event.user.avatar, pts)
       lastFound = { word, name: event.user.nickname, pts, avatar: event.user.avatar }
       flash = 2.5
     },

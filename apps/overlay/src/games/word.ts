@@ -1,6 +1,7 @@
 import type { Viewer } from '@zerocade/shared'
 import type { GameInstance } from './engine'
 import { fillTextWithAvatar } from './avatar'
+import { addPoints, newScores } from './common'
 
 const WORDS = ['TIKTOK', 'STREAM', 'LEGEND', 'ROCKET', 'CROWN', 'GALAXY', 'VIEWER', 'GAMING']
 const MAX_WRONG = 6
@@ -15,6 +16,8 @@ export function createWordGuess(): GameInstance {
   let wrong = 0
   let winners: Viewer[] = []
   let revealed = false
+  // Points for the leaderboards (the page /classifica/word-guess): the word 20, a right letter 2.
+  const scores = newScores()
 
   const isWon = () => word.split('').every((c) => guessed.has(c))
 
@@ -39,6 +42,7 @@ export function createWordGuess(): GameInstance {
       const text = event.text.trim().toUpperCase()
       if (text === word) {
         if (!winners.some((w) => w.id === event.user.id)) winners.push(event.user)
+        addPoints(scores, event.user.id, event.user.nickname, event.user.avatar, 20)
         revealed = true
         timer = 4
         return
@@ -47,6 +51,7 @@ export function createWordGuess(): GameInstance {
         if (!guessed.has(text)) {
           guessed.add(text)
           if (!word.includes(text)) wrong++
+          else addPoints(scores, event.user.id, event.user.nickname, event.user.avatar, 2)
         }
       }
     },

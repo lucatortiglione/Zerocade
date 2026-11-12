@@ -1,4 +1,5 @@
 import { drawAvatar } from './avatar'
+import { reportScore } from './scoreReport'
 
 // Small helpers shared by the quiz/word games: normalisation, scoreboards,
 // leaderboard rendering and the timer bar.
@@ -18,6 +19,7 @@ export const newScores = (): Scores => new Map()
 export function addPoints(map: Scores, id: string, name: string, avatar: string | undefined, pts: number) {
   const cur = map.get(id)
   map.set(id, { name, pts: (cur?.pts ?? 0) + pts, avatar: avatar ?? cur?.avatar })
+  reportScore(id, name, avatar ?? cur?.avatar, pts)
 }
 
 export const topOf = (map: Scores, n: number) =>

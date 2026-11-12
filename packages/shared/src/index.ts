@@ -23,6 +23,10 @@ export interface Viewer {
   id: string
   nickname: string
   avatar?: string
+  // Only when the source says so (TikTok's follow status and subscription badge): a game can be
+  // restricted to followers or to the fan club.
+  follower?: boolean
+  fan?: boolean
 }
 
 export type LiveEvent =
@@ -175,7 +179,7 @@ export function giftIdForTiktok(name: string, coins: number): string {
 
 // --- Overlay widgets ---
 
-export type WidgetId = 'alerts' | 'follower' | 'goal' | 'gifters'
+export type WidgetId = 'alerts' | 'joins' | 'follower' | 'goal' | 'gifters'
 
 export interface WidgetConfig {
   widgets: Record<WidgetId, boolean>
@@ -183,7 +187,9 @@ export interface WidgetConfig {
 }
 
 export const DEFAULT_WIDGETS: WidgetConfig = {
-  widgets: { alerts: true, follower: false, goal: false, gifters: false },
+  // Every widget starts off. `alerts`: gifts, follows, likes and shares over the game (never the viewers' messages);
+  // `joins` adds the "X joined" ones (a busy live fills the screen with them).
+  widgets: { alerts: false, joins: false, follower: false, goal: false, gifters: false },
   goal: 1000,
 }
 
@@ -339,12 +345,12 @@ export type BivioCommand = 'next' | 'reveal' | 'extra-time' | 'pause' | 'resume'
 export const BIVIO_DEFAULT_COLORS = { a: '#2dd4bf', b: '#a78bfa', accent: '#ffffff', text: '#ffffff', background: '#0b0c18' }
 
 // Games whose look can take an uploaded background image (an 'image' setting).
-export const BACKGROUND_GAMES = ['bivio', 'incastro', 'quizzland'] as const
+export const BACKGROUND_GAMES = ['zerodubbi', 'incastro', 'quizzland'] as const
 export type BackgroundGame = (typeof BACKGROUND_GAMES)[number]
 
 // Path the server hosts a room's uploaded background at, for one of those games.
 export const backgroundPath = (game: BackgroundGame, key: string) => `/api/${game}/background/${key}`
-export const bivioBackgroundPath = (key: string) => backgroundPath('bivio', key)
+export const bivioBackgroundPath = (key: string) => backgroundPath('zerodubbi', key)
 
 export interface BivioQuestionStats {
   id: string
@@ -621,7 +627,28 @@ export interface QuizzlandStats {
   questions: QuizzlandQuestionStats[]
 }
 
-export const GAMES: GameDef[] = [
+// Settings of every game: who may play, and whose words ZeroFollowerBot's voice reads. They come from the
+// TikTok connection (or the bridge), which says whether a viewer follows or is in the fan club; a game that
+// defines the same id keeps its own.
+const VOICE_HINT = 'La voce di ZeroFollowerBot salta i commenti di chi il ponte dice che non segue il profilo (e non è del fan club). Chi non è noto viene letto.'
+export const COMMON_SETTINGS: GameSetting[] = [
+  {
+    id: 'audience',
+    label: 'Chi può giocare',
+    kind: 'select',
+    default: 'all',
+    group: 'Chat',
+    options: [
+      { value: 'all', label: 'Tutti' },
+      { value: 'followers', label: 'Solo i follower' },
+      { value: 'fans', label: 'Solo il fan club' },
+    ],
+    hint: 'I commenti di chi non rientra vengono ignorati dal gioco. Conta chi scrive dopo il collegamento TikTok, che dice se segue il profilo o ha il badge del fan club (abbonamento): se non lo sa, il commento non vale.',
+  },
+  { id: 'voiceFollowersOnly', label: 'Voce solo ai follower', kind: 'toggle', default: false, group: 'Chat', hint: VOICE_HINT },
+]
+
+const GAME_DEFS: GameDef[] = [
   {
     id: 'gift-drop',
     name: 'Gift Drop',
@@ -806,10 +833,10 @@ export const GAMES: GameDef[] = [
     defaultTriggers: [{ source: { type: 'comment' }, action: 'guess' }],
   },
   {
-    id: 'five-letters',
-    name: 'Five Letters',
+    id: 'zerowordle',
+    name: 'ZeroWordle',
     category: 'Quiz',
-    description: 'Indovina la parola di 5 lettere: ogni tentativo mostra lettere verdi, oro e grigie (stile Wordle).',
+    description: 'La chat indovina insieme una parola di 5 lettere: ogni parola scritta è una riga di tessere verdi, oro e grigie.',
     emoji: '🟩',
     gradient: ['#3e8bff', '#0a1a3a'],
     actions: [
@@ -819,14 +846,106 @@ export const GAMES: GameDef[] = [
       { id: 'rule_out', label: 'Escludi lettera' },
     ],
     settings: [
+      {
+        id: 'wordLength',
+        label: 'Lunghezza della parola',
+        kind: 'select',
+        default: '5',
+        options: [
+          { value: '5', label: '5 lettere' },
+          { value: '6', label: '6 lettere' },
+          { value: '7', label: '7 lettere' },
+          { value: '8', label: '8 lettere' },
+          { value: 'mix', label: 'A caso (da 5 a 8)' },
+        ],
+        hint: 'Cambia dalla parola successiva. Con "A caso" ogni round sceglie una lunghezza.',
+      },
+      { id: 'maxGuesses', label: 'Tentativi per parola (0 = senza limite)', kind: 'number', min: 0, max: 12, step: 1, default: 6, hint: 'Finiti i tentativi senza trovarla, il round si chiude e la parola viene svelata.' },
       { id: 'roundMode', label: 'Modalità', kind: 'select', default: 'untimed', options: [{ value: 'untimed', label: 'Senza tempo' }, { value: 'timed', label: 'A tempo' }] },
-      { id: 'roundSeconds', label: 'Secondi per parola', kind: 'number', min: 60, max: 1800, step: 30, default: 180 },
-      { id: 'breakSeconds', label: 'Pausa', kind: 'number', min: 3, max: 20, step: 1, default: 6 },
+      { id: 'roundSeconds', label: 'Secondi per parola', kind: 'number', min: 60, max: 1800, step: 30, default: 180, when: { id: 'roundMode', value: 'timed' } },
+      { id: 'breakSeconds', label: 'Secondi prima della prossima parola', kind: 'number', min: 3, max: 20, step: 1, default: 6 },
       { id: 'autoHints', label: 'Suggerimenti automatici', kind: 'toggle', default: true },
+      { id: 'autoHintSeconds', label: 'Secondi tra aiuti', kind: 'number', min: 20, max: 300, step: 10, default: 60, when: { id: 'autoHints', value: true } },
       { id: 'maxRevealed', label: 'Lettere rivelate max', kind: 'number', min: 1, max: 4, step: 1, default: 3 },
-      { id: 'pointsPerGreen', label: 'Punti verde', kind: 'number', min: 0, max: 10, step: 1, default: 2 },
-      { id: 'pointsPerGold', label: 'Punti oro', kind: 'number', min: 0, max: 10, step: 1, default: 1 },
-      { id: 'solveBonus', label: 'Bonus soluzione', kind: 'number', min: 0, max: 100, step: 5, default: 15 },
+      { id: 'pointsPerGreen', label: 'Punti per una nuova lettera verde', kind: 'number', min: 0, max: 10, step: 1, default: 2, hint: 'Si guadagna solo ciò che il tentativo scopre di nuovo: ripetere lettere già note non dà punti.' },
+      { id: 'pointsPerGold', label: 'Punti per una nuova lettera oro', kind: 'number', min: 0, max: 10, step: 1, default: 1 },
+      { id: 'solveBonus', label: 'Bonus parola trovata', kind: 'number', min: 0, max: 100, step: 5, default: 15 },
+      { id: 'showLeaderboard', label: 'Classifica', kind: 'toggle', default: true },
+    ],
+    defaultTriggers: [
+      { source: { type: 'comment' }, action: 'guess' },
+      { source: { type: 'gift' }, action: 'reveal_letter' },
+    ],
+  },
+  {
+    id: 'zeroreazioniacatena',
+    name: 'ZeroReazioniACatena',
+    category: 'Quiz',
+    description: 'Una catena di parole, ognuna associata alla successiva: partenza e arrivo sono dati, la chat trova quelle nascoste.',
+    emoji: '⛓️',
+    gradient: ['#ff9a3c', '#3a0a2a'],
+    actions: [
+      { id: 'guess', label: 'Guess' },
+      { id: 'reveal_letter', label: 'Rivela lettera' },
+      { id: 'reveal_word', label: 'Rivela parola' },
+    ],
+    settings: [
+      { id: 'chainLength', label: 'Parole nella catena', kind: 'number', min: 4, max: 9, step: 1, default: 6, hint: 'Partenza e arrivo comprese. Cambia dalla catena successiva.' },
+      {
+        id: 'givenWords',
+        label: 'Parole date',
+        kind: 'select',
+        default: 'ends',
+        options: [
+          { value: 'ends', label: 'Partenza e arrivo' },
+          { value: 'first', label: 'Solo la partenza' },
+        ],
+      },
+      { id: 'roundSeconds', label: 'Secondi per catena (0 = senza limite)', kind: 'number', min: 0, max: 600, step: 10, default: 120 },
+      { id: 'breakSeconds', label: 'Secondi prima della prossima catena', kind: 'number', min: 3, max: 30, step: 1, default: 8 },
+      { id: 'autoHints', label: 'Lettere automatiche', kind: 'toggle', default: true, hint: 'Ogni tanto compare una lettera in più nella parola che ne ha meno.' },
+      { id: 'autoHintSeconds', label: 'Secondi tra una lettera e l\'altra', kind: 'number', min: 5, max: 120, step: 5, default: 20, when: { id: 'autoHints', value: true } },
+      { id: 'wordPoints', label: 'Punti per una parola trovata', kind: 'number', min: 0, max: 200, step: 5, default: 20 },
+      { id: 'letterPenalty', label: 'Punti persi per ogni lettera mostrata', kind: 'number', min: 0, max: 20, step: 1, default: 2, hint: 'Più lettere sono già visibili, meno vale la parola (mai meno di 1).' },
+      { id: 'chainBonus', label: 'Bonus catena completata', kind: 'number', min: 0, max: 500, step: 5, default: 30 },
+      { id: 'showLeaderboard', label: 'Classifica', kind: 'toggle', default: true },
+    ],
+    defaultTriggers: [
+      { source: { type: 'comment' }, action: 'guess' },
+      { source: { type: 'gift' }, action: 'reveal_letter' },
+    ],
+  },
+  {
+    id: 'zeroreazioniacatena',
+    name: 'ZeroReazioniACatena',
+    category: 'Quiz',
+    description: 'Una catena di parole, ognuna associata alla successiva: partenza e arrivo sono dati, la chat trova quelle nascoste.',
+    emoji: '⛓️',
+    gradient: ['#ff9a3c', '#3a0a2a'],
+    actions: [
+      { id: 'guess', label: 'Guess' },
+      { id: 'reveal_letter', label: 'Rivela lettera' },
+      { id: 'reveal_word', label: 'Rivela parola' },
+    ],
+    settings: [
+      { id: 'chainLength', label: 'Parole nella catena', kind: 'number', min: 4, max: 9, step: 1, default: 6, hint: 'Partenza e arrivo comprese. Cambia dalla catena successiva.' },
+      {
+        id: 'givenWords',
+        label: 'Parole date',
+        kind: 'select',
+        default: 'ends',
+        options: [
+          { value: 'ends', label: 'Partenza e arrivo' },
+          { value: 'first', label: 'Solo la partenza' },
+        ],
+      },
+      { id: 'roundSeconds', label: 'Secondi per catena (0 = senza limite)', kind: 'number', min: 0, max: 600, step: 10, default: 120 },
+      { id: 'breakSeconds', label: 'Secondi prima della prossima catena', kind: 'number', min: 3, max: 30, step: 1, default: 8 },
+      { id: 'autoHints', label: 'Lettere automatiche', kind: 'toggle', default: true, hint: 'Ogni tanto compare una lettera in più nella parola che ne ha meno.' },
+      { id: 'autoHintSeconds', label: 'Secondi tra una lettera e l\'altra', kind: 'number', min: 5, max: 120, step: 5, default: 20, when: { id: 'autoHints', value: true } },
+      { id: 'wordPoints', label: 'Punti per una parola trovata', kind: 'number', min: 0, max: 200, step: 5, default: 20 },
+      { id: 'letterPenalty', label: 'Punti persi per ogni lettera mostrata', kind: 'number', min: 0, max: 20, step: 1, default: 2, hint: 'Più lettere sono già visibili, meno vale la parola (mai meno di 1).' },
+      { id: 'chainBonus', label: 'Bonus catena completata', kind: 'number', min: 0, max: 500, step: 5, default: 30 },
       { id: 'showLeaderboard', label: 'Classifica', kind: 'toggle', default: true },
     ],
     defaultTriggers: [
@@ -1113,9 +1232,9 @@ export const GAMES: GameDef[] = [
   },
   {
     id: 'context',
-    name: 'Context',
+    name: 'ZeroContext',
     category: 'Quiz',
-    description: 'Trova la parola segreta per vicinanza semantica: i tentativi si ordinano dal più vicino.',
+    description: 'Trova la parola segreta: ogni parola in chat riceve una posizione per vicinanza di significato (1 = la più vicina).',
     emoji: '🎯',
     gradient: ['#ffffff', '#2d3642'],
     actions: [
@@ -1124,12 +1243,42 @@ export const GAMES: GameDef[] = [
       { id: 'small_hint', label: 'Piccolo aiuto' },
     ],
     settings: [
-      { id: 'breakSeconds', label: 'Pausa', kind: 'number', min: 3, max: 30, step: 1, default: 8 },
-      { id: 'finderPoints', label: 'Punti vincitore', kind: 'number', min: 0, max: 10000, step: 10, default: 100 },
-      { id: 'autoHints', label: 'Suggerimenti automatici', kind: 'toggle', default: true },
-      { id: 'autoHintSeconds', label: 'Secondi tra aiuti', kind: 'number', min: 15, max: 180, step: 5, default: 45 },
-      { id: 'maxHintsPerRound', label: 'Aiuti max per round', kind: 'number', min: 1, max: 30, step: 1, default: 5 },
+      { id: 'starterWords', label: 'Parole iniziali', kind: 'toggle', default: false, hint: 'A inizio round mostra tre parole lontane, per dare alla chat un punto di partenza.' },
+      { id: 'autoHints', label: 'Suggerimenti automatici', kind: 'toggle', default: false },
+      { id: 'autoHintSeconds', label: 'Secondi tra aiuti', kind: 'number', min: 15, max: 180, step: 5, default: 45, when: { id: 'autoHints', value: true } },
+      { id: 'hintClosest', label: 'Posizione più vicina di un aiuto', kind: 'number', min: 1, max: 100, step: 1, default: 3, hint: 'Un aiuto non rivela mai una parola più vicina di questa posizione (1 = la più vicina di tutte).' },
+      { id: 'maxHintsPerRound', label: 'Aiuti massimi per parola', kind: 'number', min: 1, max: 30, step: 1, default: 5 },
+      { id: 'greenRank', label: 'Verde fino alla posizione', kind: 'number', min: 2, max: 1000, step: 1, default: 100 },
+      { id: 'orangeRank', label: 'Arancione fino alla posizione', kind: 'number', min: 10, max: 20000, step: 10, default: 1000, hint: 'Oltre questa posizione il tentativo è rosso.' },
+      { id: 'roundSeconds', label: 'Secondi per round (0 = senza limite)', kind: 'number', min: 0, max: 1800, step: 30, default: 300 },
+      { id: 'breakSeconds', label: 'Secondi prima della prossima parola', kind: 'number', min: 3, max: 30, step: 1, default: 8 },
+      { id: 'finderPoints', label: 'Punti per la parola trovata', kind: 'number', min: 0, max: 10000, step: 10, default: 100 },
+      {
+        id: 'closestPoints',
+        label: 'Punti per un nuovo miglior tentativo',
+        kind: 'select',
+        default: 'normal',
+        options: [
+          { value: 'none', label: 'Nessuno' },
+          { value: 'low', label: 'Pochi' },
+          { value: 'normal', label: 'Normale' },
+          { value: 'high', label: 'Tanti' },
+        ],
+        hint: 'Chi batte il miglior tentativo del round prende punti, tanti più quanto è vicino alla parola.',
+      },
+      {
+        id: 'matchEnds',
+        label: 'Fine partita',
+        kind: 'select',
+        default: 'never',
+        options: [
+          { value: 'never', label: 'Mai (una classifica per tutta la diretta)' },
+          { value: 'words', label: 'Dopo un numero di parole' },
+        ],
+      },
+      { id: 'matchWords', label: 'Parole per partita', kind: 'number', min: 2, max: 100, step: 1, default: 10, when: { id: 'matchEnds', value: 'words' } },
       { id: 'showLeaderboard', label: 'Classifica', kind: 'toggle', default: true },
+      { id: 'voiceFollowersOnly', label: 'Voce solo ai follower', kind: 'toggle', default: true, group: 'Chat', hint: VOICE_HINT },
     ],
     defaultTriggers: [
       { source: { type: 'comment' }, action: 'guess' },
@@ -1494,7 +1643,7 @@ export const GAMES: GameDef[] = [
     defaultTriggers: [{ source: { type: 'comment' }, action: 'guess' }],
   },
   {
-    id: 'bivio',
+    id: 'zerodubbi',
     name: 'ZeroDubbi',
     category: 'Party',
     description: 'Preferiresti…? Il pubblico vota A o B in chat; ogni risposta resta salvata sul PC.',
@@ -1713,6 +1862,18 @@ export const GAMES: GameDef[] = [
   },
 ]
 
+export const GAMES: GameDef[] = GAME_DEFS.map((g) => ({
+  ...g,
+  settings: [...g.settings, ...COMMON_SETTINGS.filter((c) => !g.settings.some((x) => x.id === c.id))],
+}))
+
+// Whether a viewer's comment reaches the game, by the game's "Chi può giocare" setting.
+export function allowedToPlay(settings: GameSettings, user: Viewer): boolean {
+  if (settings.audience === 'followers') return user.follower === true || user.fan === true
+  if (settings.audience === 'fans') return user.fan === true
+  return true
+}
+
 
 export function describeSource(source: TriggerSource): { icon: string; label: string } {
   switch (source.type) {
@@ -1870,12 +2031,20 @@ export interface Feed {
 
 // --- Socket.IO contract ---
 
+// What the creator can do to the game in play, from the dashboard.
+export type GameControl = 'pause' | 'resume' | 'restart' | 'end' | 'start'
+
 export interface SessionState {
   gameId: string
   triggers: Trigger[]
   settings: GameSettings
   widgets: Record<WidgetId, boolean>
   goal: number
+  // Not saved: the game's run state. `run` goes up at each restart; a paused game stops, an ended session
+  // shows nothing until it is started again.
+  paused?: boolean
+  ended?: boolean
+  run?: number
 }
 
 // The live's counters since this Zerocade started (dashboards only): who is watching now and
@@ -1913,6 +2082,9 @@ export interface ServerToClientEvents {
   'quizzland:state': (state: QuizzlandState) => void
   // Dashboards only.
   'quizzland:solution': (solution: QuizzlandSolution) => void
+  // ZeroContext's secret word of the room: dashboards show it to the creator, and every overlay
+  // (the preview too) plays the same one.
+  'secret:word': (secret: { word: string }) => void
   // A short text the creator shows on the overlay ("Invia messaggio").
   'overlay:message': (text: string) => void
   'pads:state': (board: PadBoard) => void
@@ -1939,6 +2111,13 @@ export interface ClientToServerEvents {
   // Association round (its telemetry).
   'incastro:shuffle': () => void
   'wordassoc:round': (report: WordAssociationRoundReport) => void
+  // ZeroContext: an overlay starts a round with this secret word; `prev` is the word of the round
+  // it replaces (null at the start). The server keeps one secret per room.
+  'secret:round': (round: { word: string; prev: string | null }) => void
+  // Pause, restart or end (and start again) the game in play.
+  'game:control': (command: GameControl) => void
+  // An overlay: points a viewer has just earned in the game in play, for the leaderboards.
+  'score:add': (score: { game: string; user: Viewer; points: number }) => void
   'message:send': (text: string) => void
   'pad:play': (id: string) => void
   'pad:stop': () => void
@@ -1963,4 +2142,6 @@ export interface RoomInfo {
   overlayUrl: string
   // Set while this PC's hosts file lacks the overlay link's domain: the line it needs.
   hostsLine?: string
+  // The address other devices can use for the leaderboards (the public mini server), when it runs.
+  publicUrl?: string
 }

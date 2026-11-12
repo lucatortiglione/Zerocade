@@ -224,6 +224,57 @@ try {
   // column already present
 }
 
+// Games that changed id: the saved sessions, gifts and creators follow them.
+for (const [from, to] of [
+  ['five-letters', 'zerowordle'],
+  ['bivio', 'zerodubbi'],
+]) {
+  for (const table of ['sessions', 'gifts', 'creators']) db.prepare(`UPDATE ${table} SET game_id = ? WHERE game_id = ?`).run(to, from)
+}
+
+// Points viewers earn in the games, one row each, for the leaderboards of the session, the day, the week, the
+// month and all time (scores.ts).
+db.exec(`
+  CREATE TABLE IF NOT EXISTS game_scores (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    key TEXT NOT NULL,
+    game_id TEXT NOT NULL,
+    user_id TEXT NOT NULL,
+    nickname TEXT NOT NULL,
+    avatar TEXT,
+    points INTEGER NOT NULL,
+    at INTEGER NOT NULL
+  );
+  CREATE INDEX IF NOT EXISTS game_scores_by_game ON game_scores (key, game_id, at);
+`)
+const scoreInsert = db.prepare('INSERT INTO game_scores (key, game_id, user_id, nickname, avatar, points, at) VALUES (?, ?, ?, ?, ?, ?, ?)')
+export const insertGameScore = (key: string, gameId: string, user: { id: string; nickname: string; avatar?: string }, points: number, at: number): void => {
+  scoreInsert.run(key, gameId, user.id, user.nickname, user.avatar ?? null, points, at)
+}
+// Per viewer, the sum since `since`; the name and picture are the latest. Ties go to who got there first.
+const boardSelect = db.prepare(
+  `WITH tot AS (
+     SELECT user_id, SUM(points) AS points, MIN(at) AS first, MAX(id) AS last_id
+     FROM game_scores WHERE key = @key AND game_id = @game AND at >= @since
+     GROUP BY user_id ORDER BY points DESC, first ASC LIMIT @limit
+   )
+   SELECT tot.user_id AS id, s.nickname AS nickname,
+          COALESCE(s.avatar, (SELECT avatar FROM game_scores
+                              WHERE key = @key AND game_id = @game AND user_id = tot.user_id AND avatar IS NOT NULL
+                              ORDER BY id DESC LIMIT 1)) AS avatar,
+          tot.points AS points
+   FROM tot JOIN game_scores s ON s.id = tot.last_id
+   ORDER BY tot.points DESC, tot.first ASC`,
+)
+export interface BoardRow {
+  id: string
+  nickname: string
+  avatar: string | null
+  points: number
+}
+export const gameBoard = (key: string, gameId: string, since: number, limit: number): BoardRow[] =>
+  boardSelect.all({ key, game: gameId, since, limit }) as BoardRow[]
+
 // --- Room ---
 // This Zerocade's one room: the dashboard, the overlay link and every game use its key,
 // whatever browser opens them. A database from before keys were kept here carries on with

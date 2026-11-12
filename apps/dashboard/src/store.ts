@@ -44,6 +44,8 @@ interface DashboardState {
   quizzland: QuizzlandState | null
   // The right answer of the question in play, sent to dashboards only.
   quizzlandSolution: QuizzlandSolution | null
+  // ZeroContext's secret word of the round in play.
+  gameSecret: string | null
   pads: PadBoard | null
   // The live events of this room, oldest first.
   feed: FeedItem[]
@@ -63,6 +65,7 @@ let state: DashboardState = {
   incastroSolution: null,
   quizzland: null,
   quizzlandSolution: null,
+  gameSecret: null,
   pads: null,
   feed: [],
   stats: EMPTY_LIVE_STATS,
@@ -112,7 +115,10 @@ function marked(feed: FeedItem[], moments: IncastroMoment[]): FeedItem[] {
 socket.on('connect', () => update({ connected: true, feed: [] }))
 socket.on('disconnect', () => update({ connected: false }))
 socket.on('feed:events', (items) => update({ feed: [...state.feed, ...items].slice(-FEED_KEPT) }))
-socket.on('session:state', (session) => update({ session }))
+socket.on('session:state', (session) =>
+  update({ session, gameSecret: session.gameId === state.session?.gameId ? state.gameSecret : null }),
+)
+socket.on('secret:word', ({ word }) => update({ gameSecret: word }))
 socket.on('ranking:update', (ranking) => update({ gifters: ranking }))
 socket.on('stats:update', (stats) => update({ stats }))
 socket.on('source:status', (status) => {

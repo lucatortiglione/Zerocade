@@ -1,233 +1,443 @@
 import type { Viewer } from '@zerocade/shared'
 import type { GameInstance } from './engine'
-import { fillTextWithAvatar } from './avatar'
-import { addPoints, clamp, drawLeaderboard, drawTimerBar, newScores, normalize, shuffled } from './common'
-import { wordsFor } from '../content'
+import { drawAvatar, fillTextWithAvatar } from './avatar'
+import { addPoints, clamp, drawTimerBar, newScores, shuffled, topOf } from './common'
+import { followSecret, reportSecret } from './roomSecret'
+import { feedback, keyStates, newInfo, parseWordleData, readGuess, type Row, type Tile, type WordleData } from './wordleLogic'
 
-// "Five Letters" — Wordle-style: viewers guess a 5-letter word in chat and get
-// green / gold / grey feedback per letter, with correct handling of repeats.
-// The word bank is loaded from the server's SQLite-backed content store.
+// ZeroWordle: the chat plays one word together, of 5 to 8 letters (the creator's choice, or random). Every valid word written in chat is a row
+// of green (right place), gold (elsewhere) and grey (not in the word) tiles. The words come from the
+// server (/api/wordle/*, a list per length built from prompt_raw.sqlite3 by gioco-zerowordle); the secret is shared by
+// the room's overlays (roomSecret.ts) and shown to the creator in the dashboard.
 
-type Tile = 'green' | 'gold' | 'grey'
+const LENGTHS = [5, 6, 7, 8]
+const lists = new Map<number, WordleData>()
+const loading = new Map<number, Promise<WordleData>>()
+let failed = false
 
-interface Guess {
-  word: string
-  tiles: Tile[]
-  user: string
+// The lists of one length, downloaded once.
+function loadData(length: number): Promise<WordleData> {
+  let promise = loading.get(length)
+  if (!promise) {
+    promise = Promise.all([
+      fetch(`/api/wordle/solutions-${length}.txt`).then((r) => (r.ok ? r.text() : Promise.reject(new Error('solutions')))),
+      fetch(`/api/wordle/words-${length}.txt`).then((r) => (r.ok ? r.text() : Promise.reject(new Error('words')))),
+    ])
+      .then(([solutions, words]) => {
+        const data = parseWordleData(solutions, words)
+        lists.set(length, data)
+        return data
+      })
+      .catch((err) => {
+        failed = true
+        loading.delete(length)
+        throw err
+      })
+    loading.set(length, promise)
+  }
+  return promise
 }
 
-const feedback = (guess: string, target: string): Tile[] => {
-  const tiles: Tile[] = Array(5).fill('grey')
-  const remaining: (string | null)[] = target.split('')
-  for (let i = 0; i < 5; i++) {
-    if (guess[i] === target[i]) {
-      tiles[i] = 'green'
-      remaining[i] = null
-    }
-  }
-  for (let i = 0; i < 5; i++) {
-    if (tiles[i] !== 'green') {
-      const idx = remaining.indexOf(guess[i])
-      if (idx >= 0) {
-        tiles[i] = 'gold'
-        remaining[idx] = null
-      }
-    }
-  }
-  return tiles
+interface Guess extends Row {
+  by: Viewer
+  at: number // when it appeared (performance.now), for the tiles' flip
 }
 
+const COLORS: Record<Tile, string> = { green: '#2f9e5b', gold: '#d6a62f', grey: '#3a3d55' }
+const KEYS = ['qwertyuiop', 'asdfghjkl', 'zxcvbnm']
+const FLIP_MS = 380
+const STAGGER_MS = 150
 
 export function createFiveLetters(): GameInstance {
   let width = 0
   let height = 0
-  let seconds = 180
   let timed = false
-  let timer = 180
+  let seconds = 180
   let breakSecs = 6
   let autoHints = true
+  let autoHintSecs = 60
   let maxRevealed = 3
+  let maxGuesses = 6
+  let lengthSetting = '5'
   let ptsGreen = 2
   let ptsGold = 1
   let solveBonus = 15
   let showBoard = true
 
+  let data: WordleData | null = null // the lists of the word in play
   let target = ''
+  let waiting = false // a round is waiting for its lists
+  const bags = new Map<number, string[]>()
   let guesses: Guess[] = []
   let revealedIdx: number[] = []
   let ruledOut: string[] = []
   let solved = false
   let revealed = false
   let solver: Viewer | null = null
+  let timer = 0
+  let roundClock = 0
   let hintClock = 0
   const scores = newScores()
 
-  const pick = () => {
-    target = shuffled(wordsFor('five-letters'))[0] ?? ''
+  // The dashboard's settings, read again every frame so a change applies at once.
+  const read = (settings: Record<string, number | boolean | string>) => {
+    const num = (key: string, fallback: number) => (typeof settings[key] === 'number' ? (settings[key] as number) : fallback)
+    timed = settings.roundMode === 'timed'
+    seconds = num('roundSeconds', 180)
+    breakSecs = num('breakSeconds', 6)
+    autoHints = settings.autoHints !== false
+    autoHintSecs = num('autoHintSeconds', 60)
+    maxRevealed = num('maxRevealed', 3)
+    maxGuesses = num('maxGuesses', 6)
+    lengthSetting = String(settings.wordLength ?? '5')
+    ptsGreen = num('pointsPerGreen', 2)
+    ptsGold = num('pointsPerGold', 1)
+    solveBonus = num('solveBonus', 15)
+    showBoard = settings.showLeaderboard !== false
+  }
+
+  const roundLength = () => {
+    const n = Number(lengthSetting)
+    return LENGTHS.includes(n) ? n : LENGTHS[Math.floor(Math.random() * LENGTHS.length)]
+  }
+
+  // A new round: with the word the room is playing (`forced`) or a random one of the chosen length,
+  // reported to the server. The lists of that length are downloaded first, the first time.
+  const startRound = (forced?: string) => {
+    if (waiting) return
+    const length = forced ? forced.length : roundLength()
+    const lists_ = lists.get(length)
+    if (!lists_) {
+      if (failed) return
+      waiting = true
+      void loadData(length)
+        .then(() => {
+          waiting = false
+          startRound(forced)
+        })
+        .catch(() => {
+          waiting = false
+        })
+      return
+    }
+    if (forced !== undefined && !lists_.words.has(forced)) forced = undefined
+    if (forced === undefined && lists_.solutions.length === 0) return
+    const prev = target || null
+    let bag = bags.get(length) ?? []
+    if (forced === undefined && bag.length === 0) bag = shuffled(lists_.solutions)
+    if (forced === undefined) bags.set(length, bag)
+    data = lists_
+    target = forced ?? bag.pop()!
     guesses = []
     revealedIdx = []
     ruledOut = []
     solved = false
     revealed = false
     solver = null
-    hintClock = 0
     timer = seconds
+    roundClock = 0
+    hintClock = 0
+    if (forced === undefined) reportSecret(target, prev)
+  }
+
+  const finish = (by: Viewer | null) => {
+    revealed = true
+    solved = by !== null
+    solver = by
+    timer = breakSecs
   }
 
   const revealLetter = (positional: boolean) => {
-    if (solved || revealed) return
-    const hidden = target.split('').map((_, i) => i).filter((i) => !revealedIdx.includes(i))
-    if (!hidden.length) return
-    const i = positional ? hidden[0] : hidden[Math.floor(Math.random() * hidden.length)]
-    if (!revealedIdx.includes(i)) revealedIdx.push(i)
-    if (revealedIdx.length >= target.length) {
-      solved = true
-      revealed = true
-      timer = breakSecs
-    }
+    if (!target || revealed) return
+    const hidden = [...target].map((_, i) => i).filter((i) => !revealedIdx.includes(i))
+    if (hidden.length <= 1) return // never give the whole word away
+    revealedIdx.push(positional ? hidden[0] : hidden[Math.floor(Math.random() * hidden.length)])
   }
 
   const ruleOut = () => {
-    if (solved || revealed) return
-    const alphabet = 'ABCDEFGHILMNOPQRSTUVZ'
-    const candidates = alphabet.split('').filter((c) => !target.includes(c) && !ruledOut.includes(c))
-    if (candidates.length) ruledOut.push(candidates[Math.floor(Math.random() * candidates.length)])
-  }
-
-  const finish = () => {
-    revealed = true
-    timer = breakSecs
+    if (!target || revealed) return
+    const known = keyStates(guesses)
+    const absent = 'abcdefghijklmnopqrstuvwxyz'.split('').filter((c) => !target.includes(c) && !ruledOut.includes(c) && !known.has(c))
+    if (absent.length) ruledOut.push(absent[Math.floor(Math.random() * absent.length)])
   }
 
   return {
     reset(settings, w, h) {
       width = w
       height = h
-      seconds = typeof settings.roundSeconds === 'number' ? settings.roundSeconds : 180
-      timed = settings.roundMode === 'timed'
-      breakSecs = typeof settings.breakSeconds === 'number' ? settings.breakSeconds : 6
-      autoHints = settings.autoHints !== false
-      maxRevealed = typeof settings.maxRevealed === 'number' ? settings.maxRevealed : 3
-      ptsGreen = typeof settings.pointsPerGreen === 'number' ? settings.pointsPerGreen : 2
-      ptsGold = typeof settings.pointsPerGold === 'number' ? settings.pointsPerGold : 1
-      solveBonus = typeof settings.solveBonus === 'number' ? settings.solveBonus : 15
-      showBoard = settings.showLeaderboard !== false
+      read(settings)
       scores.clear()
-      pick()
+      bags.clear()
+      target = ''
+      data = null
+      waiting = false
+      followSecret({
+        adopt(word) {
+          if (word !== target) startRound(word)
+        },
+      })
+      startRound()
     },
     onAction(action, event) {
-      if (action === 'reveal_letter') {
-        revealLetter(true)
-        return
-      }
-      if (action === 'find_letter') {
-        revealLetter(false)
-        return
-      }
-      if (action === 'rule_out') {
-        ruleOut()
-        return
-      }
+      if (!data || !target || revealed) return
+      if (action === 'reveal_letter') return revealLetter(true)
+      if (action === 'find_letter') return revealLetter(false)
+      if (action === 'rule_out') return ruleOut()
       if (event.type !== 'comment') return
-      if (solved || revealed) return
-      const w = normalize(event.text)
-      if (w.length !== 5) return
-      const tiles = feedback(w, target)
-      guesses.push({ word: w, tiles, user: event.user.id })
-      if (guesses.length > 9) guesses.shift()
-      if (w === target) {
-        solved = true
-        revealed = true
-        solver = event.user
-        timer = breakSecs
-        let pts = solveBonus
-        for (const t of tiles) pts += t === 'green' ? ptsGreen : t === 'gold' ? ptsGold : 0
-        addPoints(scores, event.user.id, event.user.nickname, event.user.avatar, pts)
-      } else {
-        let pts = 0
-        for (const t of tiles) pts += t === 'green' ? ptsGreen : t === 'gold' ? ptsGold : 0
-        if (pts > 0) addPoints(scores, event.user.id, event.user.nickname, event.user.avatar, pts)
-      }
+      const word = readGuess(event.text, target.length)
+      if (!word || !data.words.has(word) || guesses.some((g) => g.word === word)) return
+      const tiles = feedback(word, target)
+      const row: Guess = { word, tiles, by: event.user, at: performance.now() }
+      const gain = newInfo(guesses, row)
+      guesses.push(row)
+      const user = event.user
+      const pts = gain.greens * ptsGreen + gain.golds * ptsGold + (word === target ? solveBonus : 0)
+      if (pts > 0) addPoints(scores, user.id, user.nickname, user.avatar, pts)
+      if (word === target) finish(user)
+      else if (maxGuesses > 0 && guesses.length >= maxGuesses) finish(null)
     },
     update(dt, _now, settings) {
-      seconds = typeof settings.roundSeconds === 'number' ? settings.roundSeconds : seconds
-      timed = settings.roundMode === 'timed'
-      breakSecs = typeof settings.breakSeconds === 'number' ? settings.breakSeconds : breakSecs
-      autoHints = settings.autoHints !== false
+      read(settings)
+      if (!target) return startRound()
       if (revealed) {
         timer -= dt
-        if (timer <= 0) pick()
+        if (timer <= 0) startRound()
         return
       }
-      if (timed) {
-        timer -= dt
-        if (timer <= 0) finish()
-      }
+      roundClock += dt
+      if (timed && roundClock >= seconds) return finish(null)
       if (autoHints && revealedIdx.length < maxRevealed) {
         hintClock += dt
-        if (hintClock >= 60) {
+        if (hintClock >= autoHintSecs) {
           hintClock = 0
           revealLetter(true)
         }
       }
     },
-    draw(ctx) {
+    // Laid out for a canvas 840 wide, and scaled down on a narrower one (the dashboard's preview).
+    draw(ctx, now) {
       ctx.clearRect(0, 0, width, height)
-      const cx = width / 2
-      ctx.fillStyle = '#ffffff'
-      ctx.font = 'bold 40px system-ui'
-      ctx.textAlign = 'center'
-      ctx.fillText(revealed ? (solved ? 'SOLVED!' : 'La parola era:') : 'FIVE LETTERS', cx, 84)
-      ctx.fillStyle = '#8a8a96'
-      ctx.font = '22px system-ui'
-      ctx.fillText('Scrivi una parola di 5 lettere in chat', cx, 122)
-
-      const tile = 56
-      const gap = 8
-      const rowH = tile + gap
-      const startY = height * 0.26
-      guesses.forEach((g, r) => {
-        const total = 5 * tile + 4 * gap
-        let x = cx - total / 2 + tile / 2
-        const y = startY + r * rowH + tile / 2
-        for (let i = 0; i < 5; i++) {
-          ctx.fillStyle = g.tiles[i] === 'green' ? '#4FA05A' : g.tiles[i] === 'gold' ? '#D1A93A' : '#3B3D42'
-          ctx.beginPath()
-          ctx.roundRect(x - tile / 2, y - tile / 2, tile, tile, 8)
-          ctx.fill()
-          ctx.fillStyle = '#ffffff'
-          ctx.font = `bold ${Math.round(tile * 0.55)}px system-ui`
-          ctx.textAlign = 'center'
-          ctx.textBaseline = 'middle'
-          ctx.fillText(g.word[i], x, y + 1)
-          ctx.textBaseline = 'alphabetic'
-          x += tile + gap
-        }
-      })
-
-      if (revealed) {
-        ctx.fillStyle = '#3ccf7a'
-        ctx.font = 'bold 34px system-ui'
-        ctx.textAlign = 'center'
-        if (solved && solver) fillTextWithAvatar(ctx, `${solver.nickname} ha indovinato!`, cx, height * 0.68, solver)
-        else ctx.fillText(target, cx, height * 0.68)
-      }
-      if (revealedIdx.length) {
-        ctx.fillStyle = '#f0f0f2'
-        ctx.font = '20px system-ui'
-        ctx.textAlign = 'center'
-        ctx.fillText('Lettere rivelate: ' + revealedIdx.map((i) => target[i]).join(' '), cx, height * 0.6)
-      }
-      if (ruledOut.length) {
-        ctx.fillStyle = '#8a8a96'
-        ctx.font = '20px system-ui'
-        ctx.textAlign = 'center'
-        ctx.fillText('Escluse: ' + ruledOut.join(' '), cx, height * 0.64)
-      }
-
-      if (timed) drawTimerBar(ctx, width, height, revealed ? 1 : clamp(timer / seconds, 0, 1), solved ? '#3ccf7a' : '#3E8BFF')
-      if (showBoard) drawLeaderboard(ctx, scores)
+      const k = clamp((width - 16) / 840, 0.3, 1)
+      ctx.save()
+      ctx.scale(k, k)
+      paint(ctx, now, width / k, height / k, k)
+      ctx.restore()
+      if (timed && !revealed && data && target) drawTimerBar(ctx, width, height, 1 - roundClock / seconds, '#2f9e5b')
     },
   }
-}
 
+  function paint(ctx: CanvasRenderingContext2D, now: number, width: number, height: number, k: number) {
+    ctx.textBaseline = 'alphabetic'
+    const cx = width / 2
+    const panelW = Math.min(width - 48, 800)
+    const left = cx - panelW / 2
+    const top = Math.round(56 / k)
+    const bottom = height - Math.round(72 / k)
+    if (bottom - top < 420) return
+
+    // One glass panel behind everything, so the game reads over any stream background.
+    const bg = ctx.createLinearGradient(0, top, 0, bottom)
+    bg.addColorStop(0, 'rgba(16,30,28,0.88)')
+    bg.addColorStop(1, 'rgba(10,14,22,0.88)')
+    ctx.fillStyle = bg
+    ctx.beginPath()
+    ctx.roundRect(left - 18, top, panelW + 36, bottom - top, 28)
+    ctx.fill()
+    ctx.strokeStyle = 'rgba(255,255,255,0.10)'
+    ctx.lineWidth = 2
+    ctx.stroke()
+
+    // Title: ZERO in white, WORDLE in the green-to-gold gradient.
+    ctx.font = '800 40px system-ui'
+    const zeroW = ctx.measureText('ZERO').width
+    const wordleW = ctx.measureText('WORDLE').width
+    const tx = cx - (zeroW + wordleW) / 2
+    ctx.textAlign = 'left'
+    ctx.fillStyle = '#ffffff'
+    ctx.fillText('ZERO', tx, top + 58)
+    const title = ctx.createLinearGradient(tx + zeroW, 0, tx + zeroW + wordleW, 0)
+    title.addColorStop(0, '#34d17a')
+    title.addColorStop(1, '#f2c14e')
+    ctx.fillStyle = title
+    ctx.fillText('WORDLE', tx + zeroW, top + 58)
+
+    if (!data || !target) {
+      ctx.textAlign = 'center'
+      ctx.fillStyle = '#9aa0b8'
+      ctx.font = '24px system-ui'
+      const dots = '.'.repeat(1 + (Math.floor(now / 400) % 3))
+      ctx.fillText(failed ? 'Dati di ZeroWordle non trovati (gioco-zerowordle/data)' : `Carico le parole${dots}`, cx, top + 130)
+      return
+    }
+
+    const chips = [
+      maxGuesses > 0 ? `${guesses.length}/${maxGuesses} tentativi` : `${guesses.length} tentativi`,
+      `${target.length} lettere`,
+    ]
+    ctx.font = '600 16px system-ui'
+    const cw = chips.map((c) => ctx.measureText(c).width + 28)
+    let chipX = cx - (cw.reduce((a, b) => a + b, 0) + (chips.length - 1) * 10) / 2
+    const chipY = top + 76
+    chips.forEach((c, i) => {
+      ctx.fillStyle = 'rgba(255,255,255,0.08)'
+      ctx.beginPath()
+      ctx.roundRect(chipX, chipY, cw[i], 30, 15)
+      ctx.fill()
+      ctx.fillStyle = '#c4c9e0'
+      ctx.textAlign = 'center'
+      ctx.fillText(c, chipX + cw[i] / 2, chipY + 20)
+      chipX += cw[i] + 10
+    })
+
+    // Space: the board, the keyboard and the ranking share what is left under the chips.
+    const boardH = showBoard ? 84 : 0
+    const keyH = 40
+    const keyGap = 8
+    const keysH = 3 * keyH + 2 * keyGap
+    const boardTop = bottom - boardH - 12
+    const keysTop = (showBoard ? boardTop - 30 : bottom - 14) - keysH
+    const gridTop = chipY + 46
+    const rows = maxGuesses > 0 ? maxGuesses : 8
+    const gap = 8
+    const messageRoom = revealed ? 44 : 0
+    const n = target.length
+    // Tall enough for every row, and narrow enough for the longest word with the names beside it.
+    const fitH = Math.floor((keysTop - messageRoom - 32 - gridTop - (rows - 1) * gap) / rows)
+    const fitW = Math.floor((panelW - 200 - (n - 1) * gap) / n)
+    const tile = clamp(Math.min(fitH, fitW), 18, 64)
+
+    // The hints: letters shown to the chat, above the board.
+    let y = gridTop
+    if (revealedIdx.length) {
+      ctx.textAlign = 'center'
+      ctx.fillStyle = '#9aa0b8'
+      ctx.font = '600 15px system-ui'
+      ctx.fillText(`Lettere rivelate: ${revealedIdx.map((i) => `${target[i].toUpperCase()}${i + 1}`).join('  ')}`, cx, y + 4)
+    }
+
+    // The board: one row per guess; empty rows show the room left. Tiles flip in one after the other.
+    const rowW = n * tile + (n - 1) * gap
+    const shownRows = guesses.slice(-rows)
+    for (let r = 0; r < rows; r++) {
+      const g = shownRows[r]
+      const ry = y + 14 + r * (tile + gap)
+      for (let i = 0; i < n; i++) {
+        const x = cx - rowW / 2 + i * (tile + gap)
+        const t = g ? clamp((now - g.at - i * STAGGER_MS) / FLIP_MS, 0, 1) : 0
+        const flip = g ? Math.abs(Math.cos(t * Math.PI)) : 1
+        const showColor = g && t >= 0.5
+        ctx.save()
+        ctx.translate(x + tile / 2, ry + tile / 2)
+        ctx.scale(1, Math.max(0.04, flip))
+        ctx.fillStyle = showColor ? COLORS[g.tiles[i]] : g ? '#2a2d46' : 'rgba(255,255,255,0.05)'
+        ctx.beginPath()
+        ctx.roundRect(-tile / 2, -tile / 2, tile, tile, 10)
+        ctx.fill()
+        if (!g) {
+          ctx.strokeStyle = 'rgba(255,255,255,0.10)'
+          ctx.lineWidth = 2
+          ctx.stroke()
+        } else {
+          ctx.fillStyle = '#ffffff'
+          ctx.font = `800 ${Math.round(tile * 0.56)}px system-ui`
+          ctx.textAlign = 'center'
+          ctx.textBaseline = 'middle'
+          ctx.fillText(g.word[i].toUpperCase(), 0, 2)
+        }
+        ctx.restore()
+      }
+      // Who wrote it: the picture beside the name.
+      if (g && now - g.at > n * STAGGER_MS) {
+        ctx.font = '600 15px system-ui'
+        ctx.textAlign = 'left'
+        ctx.textBaseline = 'middle'
+        ctx.fillStyle = '#d6daf0'
+        const nx = cx + rowW / 2 + 26
+        if (nx + 120 < left + panelW + 18) {
+          drawAvatar(ctx, g.by.avatar, nx, ry + tile / 2, 11, g.by.nickname)
+          ctx.fillText(g.by.nickname, nx + 18, ry + tile / 2)
+        }
+        ctx.textBaseline = 'alphabetic'
+      }
+    }
+
+    // The end of the round, under the board.
+    if (revealed) {
+      ctx.textAlign = 'center'
+      const my = keysTop - 16
+      if (solved && solver) {
+        ctx.fillStyle = '#3ccf7a'
+        ctx.font = '800 26px system-ui'
+        fillTextWithAvatar(ctx, `${solver.nickname} ha indovinato: ${target.toUpperCase()}`, cx, my, solver)
+      } else {
+        ctx.fillStyle = '#E0A022'
+        ctx.font = '800 26px system-ui'
+        ctx.fillText(`Era ${target.toUpperCase()}`, cx, my)
+      }
+    }
+
+    // The keyboard: each key shows the best thing its letter has revealed.
+    const states = keyStates(guesses)
+    KEYS.forEach((row, r) => {
+      const kw = Math.min(54, (panelW - 9 * 6) / 10)
+      const total = row.length * kw + (row.length - 1) * 6
+      row.split('').forEach((letter, i) => {
+        const state = states.get(letter)
+        const out = !state && ruledOut.includes(letter)
+        const x = cx - total / 2 + i * (kw + 6)
+        const ky = keysTop + r * (keyH + keyGap)
+        ctx.fillStyle = state ? COLORS[state] : out ? 'rgba(255,255,255,0.03)' : 'rgba(255,255,255,0.12)'
+        ctx.beginPath()
+        ctx.roundRect(x, ky, kw, keyH, 8)
+        ctx.fill()
+        ctx.fillStyle = out ? 'rgba(255,255,255,0.25)' : '#ffffff'
+        ctx.font = '700 18px system-ui'
+        ctx.textAlign = 'center'
+        ctx.textBaseline = 'middle'
+        ctx.fillText(letter.toUpperCase(), x + kw / 2, ky + keyH / 2 + 1)
+        ctx.textBaseline = 'alphabetic'
+      })
+    })
+
+    // The ranking of the five best scorers, in the bottom of the panel.
+    if (showBoard) {
+      const best5 = topOf(scores, 5)
+      ctx.textAlign = 'left'
+      ctx.fillStyle = '#7f86a8'
+      ctx.font = '700 14px system-ui'
+      ctx.fillText('CLASSIFICA', left + 6, boardTop - 6)
+      const slot = (panelW - 4 * 8) / 5
+      const medals = ['#f5c542', '#c0c6d4', '#d08a4e', '#6f78a8', '#6f78a8']
+      for (let i = 0; i < 5; i++) {
+        const x = left + i * (slot + 8)
+        const mid = boardTop + (boardH - 12) / 2
+        ctx.fillStyle = 'rgba(255,255,255,0.06)'
+        ctx.beginPath()
+        ctx.roundRect(x, boardTop, slot, boardH - 12, 14)
+        ctx.fill()
+        const entry = best5[i]?.[1]
+        ctx.textBaseline = 'middle'
+        ctx.textAlign = 'left'
+        ctx.fillStyle = medals[i]
+        ctx.font = '800 20px system-ui'
+        ctx.fillText(String(i + 1), x + 12, mid)
+        if (!entry) {
+          ctx.fillStyle = 'rgba(255,255,255,0.18)'
+          ctx.font = '600 16px system-ui'
+          ctx.fillText('—', x + 34, mid)
+          continue
+        }
+        drawAvatar(ctx, entry.avatar, x + 52, mid, 15, entry.name)
+        ctx.fillStyle = '#ffffff'
+        ctx.font = '700 15px system-ui'
+        let name = entry.name
+        while (name.length > 3 && ctx.measureText(name).width > slot - 84) name = name.slice(0, -2) + '…'
+        ctx.fillText(name, x + 74, mid - 9)
+        ctx.fillStyle = medals[i]
+        ctx.font = '800 15px system-ui'
+        ctx.fillText(`${entry.pts} pt`, x + 74, mid + 11)
+      }
+      ctx.textBaseline = 'alphabetic'
+    }
+  }
+}

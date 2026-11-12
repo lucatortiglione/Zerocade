@@ -14,6 +14,7 @@ import type {
   LiveEvent,
 } from '@zerocade/shared'
 import { toCsv } from './csv.js'
+import { recordScore } from './scores.js'
 import {
   addZerowordsAnswer,
   endZerowordsPlay,
@@ -853,6 +854,7 @@ class IncastroRoom {
   }
 
   private addPoints(by: IncastroPlayer, points: number, words: number): void {
+    recordScore(this.key, 'incastro', by, points)
     for (const map of [this.scores, this.levelScores]) {
       const cur = map.get(by.id)
       map.set(by.id, {

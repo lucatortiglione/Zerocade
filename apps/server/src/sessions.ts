@@ -1,5 +1,8 @@
-import { DEFAULT_WIDGETS, GAMES, defaultSettings, type GameSettings, type SessionState, type Trigger, type WidgetConfig } from '@zerocade/shared'
+import { DEFAULT_WIDGETS, GAMES, defaultSettings, type GameControl, type GameSettings, type SessionState, type Trigger, type WidgetConfig } from '@zerocade/shared'
 import { loadSession, saveSession } from './db.js'
+
+// Games that changed id: a session saved under the old one continues under the new one.
+const RENAMED: Record<string, string> = { 'five-letters': 'zerowordle', bivio: 'zerodubbi' }
 
 function defaultState(gameId: string): SessionState {
   const game = GAMES.find((g) => g.id === gameId) ?? GAMES[0]
@@ -22,11 +25,38 @@ const save = (key: string, state: SessionState) =>
     state.goal,
   )
 
+// Run state of each room's game: not saved, a restart of Zerocade starts it afresh.
+const runtime = new Map<string, { paused: boolean; ended: boolean; run: number }>()
+const live = (key: string) => runtime.get(key) ?? { paused: false, ended: false, run: 0 }
+
+// When each game's session began in each room (it was chosen, restarted or started again): the start of its
+// "Sessione" leaderboard. Before anything, the start of the server.
+const BOOT = Date.now()
+const began = new Map<string, Record<string, number>>()
+const markSession = (key: string, gameId: string) => began.set(key, { ...began.get(key), [gameId]: Date.now() })
+export const sessionSince = (key: string, gameId: string): number => began.get(key)?.[gameId] ?? BOOT
+
 export function getSession(key: string): SessionState {
+  return { ...loadState(key), ...live(key) }
+}
+
+export function controlGame(key: string, command: GameControl): SessionState {
+  const cur = live(key)
+  if (command === 'pause') runtime.set(key, { ...cur, paused: true })
+  else if (command === 'resume') runtime.set(key, { ...cur, paused: false })
+  else if (command === 'end') runtime.set(key, { ...cur, paused: false, ended: true })
+  else {
+    runtime.set(key, { paused: false, ended: false, run: cur.run + 1 }) // restart, start
+    markSession(key, loadState(key).gameId)
+  }
+  return getSession(key)
+}
+
+function loadState(key: string): SessionState {
   const row = loadSession(key)
   if (row) {
     try {
-      const game = GAMES.find((g) => g.id === row.game_id) ?? GAMES[0]
+      const game = GAMES.find((g) => g.id === (RENAMED[row.game_id] ?? row.game_id)) ?? GAMES[0]
       return {
         gameId: game.id,
         triggers: JSON.parse(row.triggers) as Trigger[],
@@ -47,7 +77,9 @@ export function getSession(key: string): SessionState {
 export function selectGame(key: string, gameId: unknown) {
   const game = typeof gameId === 'string' ? GAMES.find((g) => g.id === gameId) : undefined
   if (!game) return null
-  const prev = getSession(key)
+  const prev = loadState(key)
+  runtime.set(key, { paused: false, ended: false, run: live(key).run + 1 })
+  markSession(key, game.id)
   const state: SessionState = {
     gameId: game.id,
     triggers: game.defaultTriggers,
@@ -56,7 +88,7 @@ export function selectGame(key: string, gameId: unknown) {
     goal: prev.goal,
   }
   save(key, state)
-  return state
+  return getSession(key)
 }
 
 export function setTriggers(key: string, triggers: Trigger[]) {

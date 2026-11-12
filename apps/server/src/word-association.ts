@@ -1,4 +1,5 @@
 import { createHash } from 'node:crypto'
+import { hasTable, openSchema } from './schema-db.js'
 import { existsSync, readFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -20,23 +21,31 @@ import {
 // pools only need an import and a restart. The first of these with pools is used:
 // - ZEROCADE_ASSOCIATIONS_DB (a .sqlite3/.db database or a .sql dump);
 // - zeroassociations.db next to the server: the Windows package's copy;
-// - prompt_validi.sqlite3, the copy of the validated prompts (validated_prompt_database.py sync);
-// - prompt.sqlite3, the verified pools alone (in git), exported from the collection;
-// - prompt_raw.sqlite3, the collection itself (not in git: with the inventory it weighs gigabytes).
+// - zeroassociazioni.sqlite3, the one database of gioco-zeroassociations (unified_db.py), whose schemas
+//   are written `file#schema`: validi (the validated prompts), game (the verified pools alone), raw (the
+//   collection itself, with the lexical inventory);
+// - the old files of the same names, while they are kept: prompt_validi.sqlite3, prompt.sqlite3,
+//   prompt_raw.sqlite3 (the last one is not in git: with the inventory it weighs gigabytes).
 // A prompt the collection marks DISCARDED or DEFERRED (inventory_term_decisions) never plays.
 // When prompt.sqlite3 is behind the collection (an import or a decision not exported yet), the
 // server says so: `prompt_database.py dump` brings it up to date.
 
 const here = dirname(fileURLToPath(import.meta.url))
 const gameData = join(here, '..', '..', '..', 'gioco-zeroassociations')
+const unifiedDb = join(gameData, 'zeroassociazioni.sqlite3')
 export const wordAssociationSources = (): string[] =>
   [
     process.env.ZEROCADE_ASSOCIATIONS_DB,
     join(here, 'zeroassociations.db'),
+    `${unifiedDb}#validi`,
+    `${unifiedDb}#game`,
+    `${unifiedDb}#raw`,
     join(gameData, 'prompt_validi.sqlite3'),
     join(gameData, 'prompt.sqlite3'),
     join(gameData, 'prompt_raw.sqlite3'),
-  ].filter((p): p is string => p !== undefined && existsSync(p))
+  ].filter((p): p is string => p !== undefined && existsSync(p.split('#')[0]))
+
+// A schema of the one database opens as the old file it replaces (schema-db.ts).
 
 export interface LoadedWordAssociation {
   // Identifies what was loaded in the telemetry: a hash of the pools' review ids.
@@ -67,9 +76,10 @@ export function loadWordAssociation(path?: string | null): LoadedWordAssociation
       const loaded = loadWordAssociation(source)
       if (loaded.pools.length) {
         console.log(`[word-association] ${loaded.pools.length} prompts from ${source}`)
-        const raw = join(gameData, 'prompt_raw.sqlite3')
-        if (source === join(gameData, 'prompt.sqlite3') && existsSync(raw) && loadWordAssociation(raw).contentId !== loaded.contentId)
-          console.warn('[word-association] prompt.sqlite3 is behind prompt_raw.sqlite3: run `prompt_database.py dump` to update it')
+        const raw = existsSync(unifiedDb) && source.startsWith(unifiedDb) ? `${unifiedDb}#raw` : join(gameData, 'prompt_raw.sqlite3')
+        const isGame = source === join(gameData, 'prompt.sqlite3') || source === `${unifiedDb}#game`
+        if (isGame && existsSync(raw.split('#')[0]) && loadWordAssociation(raw).contentId !== loaded.contentId)
+          console.warn('[word-association] the game pools (prompt.sqlite3) are behind the collection: run `prompt_database.py dump` to update them')
         return loaded
       }
     }
@@ -82,13 +92,14 @@ export function loadWordAssociation(path?: string | null): LoadedWordAssociation
     if (path.endsWith('.sql')) {
       db = new Database(':memory:')
       db.exec(readFileSync(path, 'utf-8'))
+    } else if (path.includes('#')) {
+      const [file, schema] = path.split('#')
+      db = openSchema(file, schema)
     } else {
       db = new Database(path, { readonly: true, fileMustExist: true })
       db.pragma('busy_timeout = 5000')
     }
-    const decisions = db
-      .prepare("SELECT 1 FROM sqlite_schema WHERE type = 'table' AND name = 'inventory_term_decisions'")
-      .get()
+    const decisions = hasTable(db, 'inventory_term_decisions')
     const senses = db
       .prepare(
         `SELECT s.id, s.prompt, s.description, s.pos, s.category_id, s.review_id

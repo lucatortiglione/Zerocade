@@ -9,6 +9,7 @@ import { Server } from 'socket.io'
 import {
   BACKGROUND_GAMES,
   GAMES,
+  allowedToPlay,
   backgroundPath,
   giftById,
   isValidKey,
@@ -17,6 +18,7 @@ import {
   type BackgroundGame,
   type ClientToServerEvents,
   type EventOrigin,
+  type GameControl,
   type Feed,
   type FeedCreator,
   type FeedEvent,
@@ -52,11 +54,17 @@ import {
   wordAssociationRounds,
 } from './db.js'
 import { getContent, wordAssociation } from './content.js'
+import { contextFile, isContextFile } from './context.js'
+import { isWordleFile, wordleFile } from './wordle.js'
+import { chains } from './chains.js'
+import { publicBaseUrl, startPublicServer } from './public-server.js'
+import { leaderboardCss, leaderboardHtml, leaderboardIndexHtml, leaderboardJs } from './leaderboard-page.js'
+import { PERIODS, leaderboards, recordScore } from './scores.js'
 import { toCsv } from './csv.js'
 import { sanitizeRoundReport } from './word-association.js'
 import { HOSTS_LINE, LOCAL_DOMAIN, domainRegistered, ensureDomain } from './hosts.js'
 import { PAD_FILE_MAX, padBoard, padFile, removePad, savePadInput } from './pads.js'
-import { getSession, selectGame, setScene, setSettings, setTriggers } from './sessions.js'
+import { controlGame, getSession, selectGame, setScene, setSettings, setTriggers } from './sessions.js'
 import { RoomSources, sourceUsername } from './sources.js'
 import { ZfbBridge } from './zfb.js'
 import {
@@ -117,9 +125,46 @@ app.get('/api/room', async (): Promise<RoomInfo> => ({
   key: roomKey,
   overlayUrl: OVERLAY_URL,
   hostsLine: domainRegistered() ? undefined : HOSTS_LINE,
+  publicUrl: publicBaseUrl() ?? undefined,
 }))
 app.get('/api/games', async () => GAMES)
 app.get('/api/content', async () => getContent())
+// ZeroContext's words and vectors: static files, cached by the browser until the next build.
+app.get('/api/context/:file', async (req, reply) => {
+  const name = (req.params as { file: string }).file
+  const body = isContextFile(name) ? contextFile(name) : null
+  if (!body) return reply.code(404).send({ error: 'not found' })
+  const type = name.endsWith('.bin') ? 'application/octet-stream' : name.endsWith('.json') ? 'application/json' : 'text/plain; charset=utf-8'
+  return reply.header('content-type', type).header('cache-control', 'no-cache').send(body)
+})
+// The leaderboards (session, day, week, month, all time) of each game, and the page that shows them: a link to
+// share or a browser source for the stream (leaderboard-page.ts).
+app.get('/api/leaderboard/:game', async (req, reply) => {
+  const game = GAMES.find((g) => g.id === (req.params as { game: string }).game)
+  if (!game) return reply.code(404).send({ error: 'not found' })
+  const limit = Math.min(50, Math.max(1, Math.floor(Number((req.query as { limit?: string }).limit)) || 10))
+  return reply
+    .header('cache-control', 'no-store')
+    .send({ game: { id: game.id, name: game.name, emoji: game.emoji }, periods: PERIODS, boards: leaderboards(roomKey, game.id, limit) })
+})
+app.get('/classifica', async (_req, reply) => reply.type('text/html; charset=utf-8').send(leaderboardIndexHtml()))
+app.get('/classifica/classifica.css', async (_req, reply) => reply.type('text/css; charset=utf-8').send(leaderboardCss))
+app.get('/classifica/classifica.js', async (_req, reply) => reply.type('text/javascript; charset=utf-8').send(leaderboardJs))
+app.get('/classifica/:game', async (req, reply) => {
+  const game = GAMES.find((g) => g.id === (req.params as { game: string }).game)
+  if (!game) return reply.code(404).send({ error: 'not found' })
+  return reply.type('text/html; charset=utf-8').header('cache-control', 'no-store').send(leaderboardHtml(game))
+})
+// ZeroReazioniACatena's chains (walks through ZeroAssociazioni's verified pools).
+app.get('/api/chains', async () => chains())
+// ZeroWordle's word lists.
+app.get('/api/wordle/:file', async (req, reply) => {
+  const name = (req.params as { file: string }).file
+  const body = isWordleFile(name) ? wordleFile(name) : null
+  if (!body) return reply.code(404).send({ error: 'not found' })
+  const type = name.endsWith('.json') ? 'application/json' : 'text/plain; charset=utf-8'
+  return reply.header('content-type', type).header('cache-control', 'no-cache').send(body)
+})
 app.get('/api/events', async (req) => {
   const q = (req.query ?? {}) as { key?: string; limit?: number }
   const key = q.key ?? ''
@@ -181,7 +226,7 @@ const BACKGROUND_TYPES: Record<string, string> = { 'image/png': 'png', 'image/jp
 const backgroundsDir = join(dataDir, 'backgrounds')
 // Bivio's files keep the name they had before other games could have one.
 const backgroundFile = (game: BackgroundGame, key: string, ext: string) =>
-  join(backgroundsDir, game === 'bivio' ? `${key}.${ext}` : `${game}-${key}.${ext}`)
+  join(backgroundsDir, game === 'zerodubbi' ? `${key}.${ext}` : `${game}-${key}.${ext}`)
 const backgroundGame = (raw: string) => BACKGROUND_GAMES.find((g) => g === raw)
 app.addContentTypeParser(Object.keys(BACKGROUND_TYPES), { parseAs: 'buffer', bodyLimit: 8 * 1024 * 1024 }, (_req, body, done) =>
   done(null, body),
@@ -338,15 +383,18 @@ setInterval(() => {
 // ('tiktok:<username>'), '' when simulated.
 function broadcastEvent(key: string, event: LiveEvent, origin: EventOrigin = 'sim', creator = '') {
   recordEvent(key, event)
-  if (event.type === 'gift') recordGift(key, creator, getSession(key).gameId, event)
-  io.to(key).emit('live:event', event)
+  const session = getSession(key)
+  if (event.type === 'gift') recordGift(key, creator, session.gameId, event)
+  // A comment of someone the game's "Chi può giocare" leaves out stays in the dashboard's chat, but the game never sees it.
+  const plays = event.type !== 'comment' || allowedToPlay(session.settings, event.user)
+  if (plays) io.to(key).emit('live:event', event)
   const item: FeedEvent = { seq: ++feedSeq, at: Date.now(), origin, event }
   feeds.set(key, [...(feeds.get(key) ?? []).slice(1 - FEED_KEPT), item])
   io.to(dashboardRoom(key)).emit('feed:events', [item])
   if (event.type === 'gift') io.to(key).emit('ranking:update', getRanking(key))
   countEvent(key, event, origin)
   const room = bivio.get(key) ?? incastro.get(key) ?? quizzland.get(key)
-  if (room) for (const t of triggersFor(getSession(key).triggers, event)) room.action(t.action, event)
+  if (room && plays && !session.ended) for (const t of triggersFor(session.triggers, event)) room.action(t.action, event)
 }
 
 // One RoomSources per overlay key: real TikTok/Twitch feeds are relayed as live events.
@@ -379,8 +427,18 @@ const zfb = new ZfbBridge(
       event.type === 'comment' &&
       triggersFor(getSession(roomKey).triggers, event).some((t) => t.action === 'guess') &&
       incastro.get(roomKey)?.alreadyGuessed(event.text) === true
+    // ZeroFollowerBot's voice does not read the comments the game ignores ("Chi può giocare"), nor, with "Voce solo
+    // ai follower", the ones of viewers the bridge says do not follow (a viewer it says nothing about is read), and
+    // never ZeroWordle's guesses.
+    const session = getSession(roomKey)
+    const silent =
+      id !== '' &&
+      event.type === 'comment' &&
+      (session.gameId === 'zerowordle' ||
+        !allowedToPlay(session.settings, event.user) ||
+        (session.settings.voiceFollowersOnly === true && event.user.follower === false && event.user.fan !== true))
     broadcastEvent(roomKey, event, kind, account ? `${kind}:${account}` : '')
-    if (repeat) zfb.skip(id)
+    if (repeat || silent) zfb.skip(id)
   },
   (status) => {
     io.to(dashboardRoom(roomKey)).emit('bridge:status', status)
@@ -418,13 +476,20 @@ io.use((socket, next) => {
   next()
 })
 
+// ZeroContext's secret word of each room.
+// The games that play one secret per room (ZeroContext's and ZeroWordle's word, ZeroReazioniACatena's chain).
+const SECRET_GAMES = ['context', 'zerowordle', 'zeroreazioniacatena']
+const roomSecrets = new Map<string, string>()
+
 // Each overlay key is a room: the dashboard and every overlay opened with that key share it.
 io.on('connection', (socket) => {
   const { clientType, key } = socket.handshake.auth as HandshakeAuth
   void socket.join(key)
   const session = getSession(key)
   socket.emit('session:state', session)
-  if (session.gameId === 'bivio') socket.emit('bivio:state', bivio.open(key, session.settings))
+  const secret = roomSecrets.get(key)
+  if (SECRET_GAMES.includes(session.gameId) && secret) socket.emit('secret:word', { word: secret })
+  if (session.gameId === 'zerodubbi') socket.emit('bivio:state', bivio.open(key, session.settings))
   if (session.gameId === 'incastro') socket.emit('incastro:state', incastro.open(key, session.settings))
   if (session.gameId === 'quizzland') socket.emit('quizzland:state', quizzland.open(key, session.settings))
 
@@ -433,6 +498,38 @@ io.on('connection', (socket) => {
     bivio.get(key)?.suspend()
     incastro.get(key)?.suspend()
     quizzland.get(key)?.suspend()
+  })
+
+  // ZeroContext and ZeroWordle: the first overlay to start a round sets the room's secret; one that starts it
+  // from another word than the current one (two overlays racing) is told the current one.
+  // Pause, restart or end the game in play (the dashboard's buttons). A restart draws a new secret.
+  socket.on('game:control', (command: unknown) => {
+    if (clientType !== 'dashboard' || typeof command !== 'string' || !['pause', 'resume', 'restart', 'end', 'start'].includes(command)) return
+    if (command === 'restart' || command === 'start') roomSecrets.delete(key)
+    io.to(key).emit('session:state', controlGame(key, command as GameControl))
+  })
+
+  // Points a viewer has just earned, from the overlay of the game in play (never the dashboard's preview).
+  socket.on('score:add', (raw: unknown) => {
+    const r = raw && typeof raw === 'object' ? (raw as Record<string, unknown>) : null
+    const u = r?.user && typeof r.user === 'object' ? (r.user as Record<string, unknown>) : null
+    const session = getSession(key)
+    if (!r || !u || r.game !== session.gameId || session.paused || session.ended) return
+    if (typeof u.id !== 'string' || typeof u.nickname !== 'string' || typeof r.points !== 'number') return
+    const avatar = typeof u.avatar === 'string' && /^https?:\/\//.test(u.avatar) ? u.avatar.slice(0, 512) : undefined
+    recordScore(key, session.gameId, { id: u.id, nickname: u.nickname, avatar }, r.points)
+  })
+
+  socket.on('secret:round', (raw: unknown) => {
+    if (!SECRET_GAMES.includes(getSession(key).gameId) || !raw || typeof raw !== 'object') return
+    const { word, prev } = raw as { word?: unknown; prev?: unknown }
+    // One word, or a chain of them joined by "-".
+    if (typeof word !== 'string' || word.length > 160 || !/^[a-zàèéìòù]{2,20}(?:-[a-zàèéìòù]{2,20})*$/.test(word)) return
+    const current = roomSecrets.get(key)
+    if (current === undefined || current === (typeof prev === 'string' ? prev : null)) {
+      roomSecrets.set(key, word)
+      io.to(key).emit('secret:word', { word })
+    } else socket.emit('secret:word', { word: current })
   })
 
   // A click on ZeroWords' wheel shuffles it: in the dashboard's preview, the overlay page in a
@@ -507,13 +604,14 @@ io.on('connection', (socket) => {
   socket.on('game:select', (gameId: unknown) => {
     const state = selectGame(key, gameId)
     if (!state) return
+    roomSecrets.delete(key)
     io.to(key).emit('session:state', state)
     // Selecting Bivio or Quizzland again starts a fresh round (and Quizzland a fresh
     // leaderboard); Incastro picks up its saved level with a fresh leaderboard.
     bivio.close(key)
     incastro.close(key)
     quizzland.close(key)
-    if (state.gameId === 'bivio') bivio.open(key, state.settings)
+    if (state.gameId === 'zerodubbi') bivio.open(key, state.settings)
     if (state.gameId === 'incastro') incastro.open(key, state.settings)
     if (state.gameId === 'quizzland') quizzland.open(key, state.settings)
   })
@@ -613,6 +711,9 @@ try {
 
 // Before the dashboard opens, so the link it shows already works.
 await ensureDomain(OVERLAY_URL)
+
+// The leaderboards for anyone who can reach this PC, on a port of their own (public-server.ts).
+await startPublicServer(roomKey)
 
 if (dashboardDir) {
   console.log(`\nZerocade è avviato: apri ${LOCAL_URL} (chiudi questa finestra per fermarlo)\n`)

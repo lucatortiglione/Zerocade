@@ -10,9 +10,10 @@
 //   app/wordgen-worker.mjs          ZeroWords' level generator, run in a worker thread
 //   app/public/{dashboard,overlay}  the built pages
 //   app/content.seed.json
-//   app/domande.db                  Bivio's questions (SQLite, gioco-dilemmi/data/domande.db)
-//   app/quizzland.db                ZeroQuizz's questions (SQLite, gioco-quizzland/data/domande.db)
+//   app/giochi.sqlite3              the games' database (database/giochi.sqlite3): ZeroDubbi's and ZeroQuizz's
+//                                   questions, ZeroWordle's and ZeroContext's words, one schema each
 //   app/zeroassociations.db         ZeroAssociazioni's verified pools (gioco-zeroassociations/prompt.sqlite3)
+//   app/zerocontext/vectors.bin     ZeroContext's vectors (gioco-zerocontext/data)
 //   app/incastro/                   what ZeroWords' generator reads: chapters.json, curve.json,
 //                                   lexicon/words.tsv and blocklist.txt, with the word list's credits
 //   app/node_modules/better-sqlite3 the prebuilt win32-x64 SQLite binding
@@ -82,21 +83,35 @@ copyFileSync(join(root, 'apps', 'server', 'src', 'content.seed.json'), join(app,
 const POOL_TABLES = ['reviews', 'prompts', 'senses', 'associations', 'group_limits', 'conflicts', 'inventory_term_decisions']
 const gameData = join(root, 'gioco-zeroassociations')
 const poolsDb = join(app, 'zeroassociations.db')
+// The one database (gioco-zeroassociations/unified_db.py) comes first, schema by schema (`file#schema`:
+// its tables are named `<schema>__<table>`), then the old files while they are kept.
+const unified = join(gameData, 'zeroassociazioni.sqlite3')
 const poolSources = [
   process.env.ZEROCADE_ASSOCIATIONS_DB,
+  `${unified}#validi`,
+  `${unified}#game`,
+  `${unified}#raw`,
   join(gameData, 'prompt_validi.sqlite3'),
   join(gameData, 'prompt.sqlite3'),
   join(gameData, 'prompt_raw.sqlite3'),
-].filter((p) => p && existsSync(p))
+].filter((p) => p && existsSync(p.split('#')[0]))
 const Database = createRequire(join(root, 'apps', 'server', 'package.json'))('better-sqlite3')
 for (const source of poolSources) {
   rmSync(poolsDb, { force: true })
   const pools = new Database(poolsDb)
   if (source.endsWith('.sql')) pools.exec(readFileSync(source, 'utf-8'))
   else {
-    pools.prepare('ATTACH DATABASE ? AS src').run(source)
+    const [file, schema] = source.split('#')
+    // In the one database a table is `<schema>__<table>`; in an old file it has its own name.
+    const prefix = schema ? `${schema}__` : ''
+    pools.prepare('ATTACH DATABASE ? AS src').run(file)
+    if (schema && pools.prepare("SELECT value FROM src.zerodb_meta WHERE name = 'verified'").pluck().get() !== '1') {
+      pools.exec('DETACH DATABASE src')
+      continue
+    }
     const present = new Set(pools.prepare("SELECT name FROM src.sqlite_schema WHERE type = 'table'").pluck().all())
-    for (const table of POOL_TABLES.filter((t) => present.has(t))) pools.exec(`CREATE TABLE ${table} AS SELECT * FROM src.${table}`)
+    for (const table of POOL_TABLES.filter((t) => present.has(prefix + t)))
+      pools.exec(`CREATE TABLE ${table} AS SELECT * FROM src.${prefix}${table}`)
     pools.exec('DETACH DATABASE src')
   }
   const count = pools
@@ -107,8 +122,11 @@ for (const source of poolSources) {
   if (count) break
   rmSync(poolsDb, { force: true })
 }
-copyFileSync(join(root, 'gioco-dilemmi', 'data', 'domande.db'), join(app, 'domande.db'))
-copyFileSync(join(root, 'gioco-quizzland', 'data', 'domande.db'), join(app, 'quizzland.db'))
+// ZeroContext: the playable words, their vectors and the secret words (apps/server/src/context.ts).
+mkdirSync(join(app, 'zerocontext'), { recursive: true })
+copyFileSync(join(root, 'gioco-zerocontext', 'data', 'vectors.bin'), join(app, 'zerocontext', 'vectors.bin'))
+// The games' database: questions and word lists, one schema per game (apps/server/src/schema-db.ts).
+copyFileSync(join(root, 'database', 'giochi.sqlite3'), join(app, 'giochi.sqlite3'))
 // ZeroWords: what the generator reads to make levels on the fly (wordgen/files.ts looks for
 // app/incastro), and the attribution the word list asks for.
 const words = join(app, 'incastro', 'lexicon')
@@ -202,7 +220,7 @@ writeFileSync(
     '  segreta o già trovata.',
     '  Una domanda scritta male o tradotta male: "Domanda sbagliata" (Info partita). Non',
     '  viene più proposta e finisce in data\\bivio-domande-sbagliate.csv, con i testi in tutte',
-    '  le lingue, da correggere in app\\domande.db. "Annulla" la rimette in gioco.',
+    '  le lingue, da correggere in app\\giochi.sqlite3 (tabelle dubbi__). "Annulla" la rimette in gioco.',
     '',
     'ZEROWORDS (ruota di lettere e schema a incastro)',
     '  1. Nella dashboard scegli il gioco "ZeroWords"; TikTok come per ZeroDubbi.',
@@ -280,16 +298,21 @@ writeFileSync(
     '  data\\content.db    contenuti degli altri giochi',
     '  Per spostare Zerocade su un altro PC copia tutta la cartella, data compresa.',
     '',
+    'IL DATABASE DEI GIOCHI',
+    '  app\\giochi.sqlite3, un database SQLite con uno "schema" per gioco: il prefisso delle',
+    '  tabelle. dubbi__ (ZeroDubbi), quizz__ (ZeroQuizz), wordle__ (ZeroWordle), context__',
+    '  (ZeroContext). Le parole di ZeroWordle e ZeroContext si rigenerano dai loro script.',
+    '',
     'DOMANDE DI BIVIO',
-    '  app\\domande.db, un database SQLite: tabella dilemmi (id, categoria, difficolta,',
-    '  esplicita, ordine) e tabella testi (una riga per dilemma e lingua: dilemma, lingua, a, b).',
+    '  app\\giochi.sqlite3, tabella dubbi__dilemmi (id, categoria, difficolta, esplicita,',
+    '  ordine) e tabella dubbi__testi (una riga per dilemma e lingua: dilemma, lingua, a, b).',
     '  Si modifica con un programma per SQLite, per esempio DB Browser for SQLite (gratuito).',
     '  Dopo una modifica riavvia Zerocade. Non riusare l\'id di una domanda cancellata:',
     '  i voti salvati sono legati all\'id.',
     '',
     'DOMANDE DI ZEROQUIZZ',
-    '  app\\quizzland.db, un database SQLite: tabella domande (id, categoria, difficolta 1-3,',
-    '  testo, spiegazione, ordine_fisso, attiva, ordine) e tabella opzioni (domanda, posizione',
+    '  app\\giochi.sqlite3, tabella quizz__domande (id, categoria, difficolta 1-3, testo,',
+    '  spiegazione, ordine_fisso, attiva, ordine) e tabella quizz__opzioni (domanda, posizione',
     '  0-3 = A-D, testo, giusta: una sola per domanda). attiva = 0 tiene fuori una domanda;',
     '  ordine_fisso = 1 non mescola le risposte. Si modifica con DB Browser for SQLite, poi',
     '  riavvia Zerocade. Non riusare l\'id di una domanda cancellata e non spostare le',

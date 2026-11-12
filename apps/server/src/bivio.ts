@@ -1,8 +1,8 @@
 import { randomUUID } from 'node:crypto'
-import { existsSync, writeFileSync } from 'node:fs'
+import { giochiDb, openSource, sourceReady } from './schema-db.js'
+import { writeFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import Database from 'better-sqlite3'
 import {
   BIVIO_CROWD_SIZE,
   type BivioChoice,
@@ -33,11 +33,14 @@ interface Dilemma {
 }
 
 const here = dirname(fileURLToPath(import.meta.url))
+// The first of these: ZEROCADE_BIVIO_DB, the games' database (schema dubbi, database/giochi.sqlite3), then the old
+// files (domande.db next to the server, gioco-dilemmi/data/domande.db).
 const dbPath = [
   process.env.ZEROCADE_BIVIO_DB,
+  giochiDb && `${giochiDb}#dubbi`,
   join(here, 'domande.db'),
   join(here, '..', '..', '..', 'gioco-dilemmi', 'data', 'domande.db'),
-].find((p): p is string => p !== undefined && existsSync(p))
+].find((p): p is string => typeof p === 'string' && sourceReady(p))
 
 interface TextRow {
   id: string
@@ -55,7 +58,7 @@ function loadDilemmas(): Dilemma[] {
     console.warn('[bivio] domande.db not found: the game has no questions')
     return []
   }
-  const db = new Database(dbPath, { readonly: true, fileMustExist: true })
+  const db = openSource(dbPath)
   try {
     const rows = db
       .prepare(

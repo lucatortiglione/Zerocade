@@ -154,6 +154,10 @@ ul, ol { list-style: none; }
   text-transform: uppercase;
 }
 
+.game-picker select { width: 100%; }
+.context-solution { font-size: 28px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; text-align: center;
+  padding: 14px 12px; border-radius: 12px; background: var(--bg-hover); border: 1px solid var(--border-strong); }
+.game-picker p { margin: 8px 2px 0; }
 .game-list { display: flex; flex-direction: column; gap: 8px; }
 .game-card {
   display: flex;

@@ -193,6 +193,91 @@
       "problemMatcher": []
     },
     {
+      "label": "DB dei giochi: verifica giochi.sqlite3",
+      "type": "process",
+      "command": "python",
+      "args": [
+        "-B",
+        "database/giochi.py",
+        "verify"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "DB dei giochi: schemi, tabelle e righe",
+      "type": "process",
+      "command": "python",
+      "args": [
+        "-B",
+        "database/giochi.py",
+        "status"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "DB unico: costruisci zeroassociazioni.sqlite3 dai sei DB (i vecchi restano)",
+      "type": "process",
+      "command": "${workspaceFolder}/gioco-zeroassociations/.venv/Scripts/python.exe",
+      "args": [
+        "-B",
+        "unified_db.py",
+        "build"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}/gioco-zeroassociations"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "DB unico: ricostruisci (sostituisce zeroassociazioni.sqlite3)",
+      "type": "process",
+      "command": "${workspaceFolder}/gioco-zeroassociations/.venv/Scripts/python.exe",
+      "args": [
+        "-B",
+        "unified_db.py",
+        "build",
+        "--replace"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}/gioco-zeroassociations"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "DB unico: verifica contro i vecchi file",
+      "type": "process",
+      "command": "${workspaceFolder}/gioco-zeroassociations/.venv/Scripts/python.exe",
+      "args": [
+        "-B",
+        "unified_db.py",
+        "verify"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}/gioco-zeroassociations"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "DB unico: schemi, tabelle e righe",
+      "type": "process",
+      "command": "${workspaceFolder}/gioco-zeroassociations/.venv/Scripts/python.exe",
+      "args": [
+        "-B",
+        "unified_db.py",
+        "status"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}/gioco-zeroassociations"
+      },
+      "problemMatcher": []
+    },
+    {
       "label": "Prompt: stato e integrità del DB",
       "type": "process",
       "command": "${workspaceFolder}/gioco-zeroassociations/.venv/Scripts/python.exe",

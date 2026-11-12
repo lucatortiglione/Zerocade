@@ -18,12 +18,14 @@ import {
   ConnectionBadge,
   GameSwitch,
   LiveSimulator,
+  BridgeControl,
   MessageComposer,
   StreamSettings,
   TiktokAccount,
   pick,
   simViewer,
 } from './Regia'
+import { EndSession } from './GameControls'
 import { Section } from './Section'
 import { SettingField, SettingsForm } from './SettingsForm'
 import { TriggerEditor } from './TriggerEditor'
@@ -50,7 +52,7 @@ export function IncastroSidebar({ session }: { session: SessionState }) {
       <GameSwitch session={session} />
 
       <Section title="Connessione" extra={<ConnectionBadge />}>
-        <Connection />
+        <Connection session={session} />
       </Section>
 
       <Section title="Impostazioni stream">
@@ -91,7 +93,7 @@ const control = (command: IncastroCommand) => socket.emit('incastro:control', co
 
 // --- Connessione ---
 
-function Connection() {
+function Connection({ session }: { session: SessionState }) {
   const { incastro, incastroSolution } = useDashboard()
   // Read when the simulator fires, so it is not restarted on every word.
   const live = useRef({ incastro, incastroSolution })
@@ -104,6 +106,9 @@ function Connection() {
   return (
     <>
       <TiktokAccount />
+      <BridgeControl label="Collegati a ZeroFollowerBot (Twitch e TikTok)" />
+      <SettingField session={session} id="audience" />
+      <SettingField session={session} id="voiceFollowersOnly" />
 
       <LiveSimulator makeEvent={() => fakeEvent(live.current.incastro, live.current.incastroSolution)} />
 
@@ -119,6 +124,7 @@ function Connection() {
         ↻ Ricomincia dal livello 1
       </button>
       <MessageComposer />
+      <EndSession ended={Boolean(session.ended)} />
     </>
   )
 }

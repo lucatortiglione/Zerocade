@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto'
-import { existsSync } from 'node:fs'
+import { giochiDb, openSource, sourceReady } from './schema-db.js'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import Database from 'better-sqlite3'
@@ -17,6 +17,7 @@ import {
   type Viewer,
 } from '@zerocade/shared'
 import { toCsv } from './csv.js'
+import { recordScore } from './scores.js'
 import { flagQuizzland, quizzlandFlags, quizzlandTotalsByQuestion, recordQuizzlandAnswer, unflagQuizzland } from './db.js'
 
 // Quizzland, the server-driven quiz. Questions come from the game's SQLite file,
@@ -38,11 +39,14 @@ interface Question {
 }
 
 const here = dirname(fileURLToPath(import.meta.url))
+// The first of these: ZEROCADE_QUIZZLAND_DB, the games' database (schema quizz, database/giochi.sqlite3), then the
+// old files (quizzland.db next to the server, gioco-quizzland/data/domande.db).
 const dbPath = [
   process.env.ZEROCADE_QUIZZLAND_DB,
+  giochiDb && `${giochiDb}#quizz`,
   join(here, 'quizzland.db'),
   join(here, '..', '..', '..', 'gioco-quizzland', 'data', 'domande.db'),
-].find((p): p is string => p !== undefined && existsSync(p))
+].find((p): p is string => typeof p === 'string' && sourceReady(p))
 
 interface Row {
   id: string
@@ -64,7 +68,7 @@ function loadQuestions(): Question[] {
   }
   let db: Database.Database | undefined
   try {
-    db = new Database(dbPath, { readonly: true, fileMustExist: true })
+    db = openSource(dbPath)
     const rows = db
       .prepare(
         `SELECT d.id, d.categoria, d.difficolta, d.testo, d.spiegazione, d.ordine_fisso, o.testo AS opzione, o.giusta
@@ -396,6 +400,7 @@ class QuizzlandRoom {
     for (const b of this.ballots.values()) {
       if (b.choice !== answer) continue
       this.right++
+      recordScore(this.key, 'quizzland', b.player, b.points)
       const s = this.scores.get(b.player.id) ?? { ...b.player, points: 0, correct: 0, streak: 0, last: 0 }
       // The latest name and picture.
       Object.assign(s, b.player, { points: s.points + b.points, correct: s.correct + 1, streak: s.streak + 1, last: b.points })

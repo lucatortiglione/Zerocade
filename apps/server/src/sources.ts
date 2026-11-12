@@ -66,8 +66,14 @@ const toViewer = (id: unknown, nickname: unknown, avatar?: unknown): Viewer => (
 // The viewer of a TikTok event. Version 2 of the connector sometimes leaves userId empty (the
 // @name stands in) and keeps the picture in userDetails rather than profilePictureUrl (which it
 // always leaves null; the picture itself is put there by PushConnection).
-const tiktokViewer = (d: Record<string, unknown>): Viewer =>
-  toViewer(d.userId, d.uniqueId ?? d.nickname, d.profilePictureUrl ?? rec(d.userDetails).profilePictureUrls)
+// followRole is TikTok's follow status (1 follows the host, 2 is a friend); isSubscriber is the
+// subscription badge, which is what the fan club shows as.
+const tiktokViewer = (d: Record<string, unknown>): Viewer => {
+  const viewer = toViewer(d.userId, d.uniqueId ?? d.nickname, d.profilePictureUrl ?? rec(d.userDetails).profilePictureUrls)
+  if (Number(d.followRole) >= 1) viewer.follower = true
+  if (d.isSubscriber === true) viewer.fan = true
+  return viewer
+}
 
 // The connector's most common failures, in the dashboard's language; anything else as it is.
 function tiktokError(err: unknown, user: string): string {

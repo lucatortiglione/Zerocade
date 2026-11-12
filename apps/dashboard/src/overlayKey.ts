@@ -19,6 +19,8 @@ async function loadRoom(): Promise<RoomInfo> {
 const room = await loadRoom()
 
 export const overlayKey = room.key
+// Where the leaderboards are public (the mini server's port), e.g. http://192.168.1.35:3002/classifica/
+export const publicLeaderboardUrl = room.publicUrl
 
 // An overlay hosted on another origin can't ask this server for the room, so its link
 // names it. Otherwise the link is the server's own, the same for every game.
