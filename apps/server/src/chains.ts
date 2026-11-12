@@ -58,5 +58,43 @@ export function buildChains(pools: WordAssociationPool[], count = CHAIN_COUNT): 
   return chains
 }
 
+// The "Parola chiave" mode: a hidden noun and KEY_CLUES of its verified associations as clues, one per
+// meaning group (two of a group would say the same thing), never a pair the pool marks as conflicting
+// and never a word that gives the hidden one away. Each puzzle is [hidden, ...clues].
+export const KEY_CLUES = 6
+
+export function buildKeys(pools: WordAssociationPool[], count = CHAIN_COUNT): string[][] {
+  const rand = seeded(20261113)
+  const seen = new Set<string>()
+  const keys: string[][] = []
+  for (const pool of [...pools].sort((a, b) => a.ref.localeCompare(b.ref))) {
+    if (pool.pos !== 'NOUN' || !NODE.test(pool.prompt) || seen.has(pool.prompt)) continue
+    const answers = [...pool.answers]
+    for (let i = answers.length - 1; i > 0; i--) {
+      const j = Math.floor(rand() * (i + 1))
+      ;[answers[i], answers[j]] = [answers[j], answers[i]]
+    }
+    const groups = new Set<string>()
+    const clues: string[] = []
+    for (const a of answers) {
+      if (clues.length >= KEY_CLUES || !NODE.test(a.word) || groups.has(a.group) || related(a.word, pool.prompt)) continue
+      if (clues.some((c) => related(c, a.word) || pool.conflicts.some(([x, y]) => (x === c && y === a.word) || (x === a.word && y === c)))) continue
+      groups.add(a.group)
+      clues.push(a.word)
+    }
+    if (clues.length < KEY_CLUES) continue
+    seen.add(pool.prompt)
+    keys.push([pool.prompt, ...clues])
+  }
+  for (let i = keys.length - 1; i > 0; i--) {
+    const j = Math.floor(rand() * (i + 1))
+    ;[keys[i], keys[j]] = [keys[j], keys[i]]
+  }
+  return keys.slice(0, count)
+}
+
 let cached: string[][] | null = null
 export const chains = (): string[][] => (cached ??= buildChains(wordAssociation.pools))
+
+let cachedKeys: string[][] | null = null
+export const chainKeys = (): string[][] => (cachedKeys ??= buildKeys(wordAssociation.pools))

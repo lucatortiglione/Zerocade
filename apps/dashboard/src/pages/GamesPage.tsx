@@ -1,4 +1,4 @@
-import { GAMES, type SessionState } from '@zerocade/shared'
+import { GAMES, chainModeLabel, parseChainSecret, type SessionState } from '@zerocade/shared'
 import { BivioSidebar } from '../components/BivioSidebar'
 import { IncastroSidebar } from '../components/IncastroSidebar'
 import { LiveColumn } from '../components/LiveColumn'
@@ -45,8 +45,10 @@ export function GamesPage() {
         {(session?.gameId === 'context' || session?.gameId === 'zerowordle' || session?.gameId === 'zeroreazioniacatena') && (
           <section>
             <h2 className="section-label">Soluzione</h2>
-            <div className="context-solution">{gameSecret ? gameSecret.replaceAll('-', ' → ') : '…'}</div>
-            <p className="text-muted small">La parola segreta del round in corso: la chat non la vede.</p>
+            <div className="context-solution">{gameSecret ? describeSecret(session.gameId, gameSecret) : '…'}</div>
+            <p className="text-muted small">
+              {session.gameId === 'zeroreazioniacatena' ? 'Le parole del round in corso: la chat non le vede.' : 'La parola segreta del round in corso: la chat non la vede.'}
+            </p>
           </section>
         )}
         {session && <GameControls session={session} />}
@@ -72,6 +74,16 @@ export function GamesPage() {
       <LiveColumn />
     </div>
   )
+}
+
+// The round's secret as the creator reads it: ZeroReazioniACatena's with its mode and round, the hidden
+// word of "Parola chiave" before its clues.
+function describeSecret(gameId: string, secret: string): string {
+  const round = gameId === 'zeroreazioniacatena' ? parseChainSecret(secret) : null
+  if (!round) return secret.replaceAll('-', ' → ')
+  const head = `${chainModeLabel(round.mode)}${round.round ? `, round ${round.round}` : ''}: `
+  if (round.mode === 'chiave') return `${head}${round.words[0].toUpperCase()} (indizi: ${round.words.slice(1).join(', ')})`
+  return head + round.words.join(' → ')
 }
 
 const BRAIN_CATEGORIES = new Set(['Quiz', 'Parole'])

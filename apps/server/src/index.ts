@@ -9,6 +9,8 @@ import { Server } from 'socket.io'
 import {
   BACKGROUND_GAMES,
   GAMES,
+  ROOM_SECRET,
+  ROOM_SECRET_MAX,
   allowedToPlay,
   backgroundPath,
   giftById,
@@ -56,7 +58,7 @@ import {
 import { getContent, wordAssociation } from './content.js'
 import { contextFile, isContextFile } from './context.js'
 import { isWordleFile, wordleFile } from './wordle.js'
-import { chains } from './chains.js'
+import { chainKeys, chains } from './chains.js'
 import { publicBaseUrl, startPublicServer } from './public-server.js'
 import { leaderboardCss, leaderboardHtml, leaderboardIndexHtml, leaderboardJs } from './leaderboard-page.js'
 import { PERIODS, leaderboards, recordScore } from './scores.js'
@@ -157,6 +159,8 @@ app.get('/classifica/:game', async (req, reply) => {
 })
 // ZeroReazioniACatena's chains (walks through ZeroAssociazioni's verified pools).
 app.get('/api/chains', async () => chains())
+// Its "Parola chiave" puzzles: [hidden word, ...clues].
+app.get('/api/chains/keys', async () => chainKeys())
 // ZeroWordle's word lists.
 app.get('/api/wordle/:file', async (req, reply) => {
   const name = (req.params as { file: string }).file
@@ -523,8 +527,8 @@ io.on('connection', (socket) => {
   socket.on('secret:round', (raw: unknown) => {
     if (!SECRET_GAMES.includes(getSession(key).gameId) || !raw || typeof raw !== 'object') return
     const { word, prev } = raw as { word?: unknown; prev?: unknown }
-    // One word, or a chain of them joined by "-".
-    if (typeof word !== 'string' || word.length > 160 || !/^[a-zàèéìòù]{2,20}(?:-[a-zàèéìòù]{2,20})*$/.test(word)) return
+    // One word, or a chain of them joined by "-" (ZeroReazioniACatena's led by its mode and round).
+    if (typeof word !== 'string' || word.length > ROOM_SECRET_MAX || !ROOM_SECRET.test(word)) return
     const current = roomSecrets.get(key)
     if (current === undefined || current === (typeof prev === 'string' ? prev : null)) {
       roomSecrets.set(key, word)

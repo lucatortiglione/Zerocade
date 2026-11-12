@@ -1,10 +1,14 @@
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
-import { chainId, maskWord, nextHint, parseChainId, pickChain, readWord, wordValue } from '../apps/overlay/src/games/chainLogic.ts'
+import { maskWord, nextHint, pickChain, readWord, wordValue } from '../apps/overlay/src/games/chainLogic.ts'
 import { buildChains } from '../apps/server/src/chains.ts'
+import { ROOM_SECRET, chainSecret, parseChainSecret } from '../packages/shared/src/chainReaction.ts'
 
-test('a chain travels as one string and a window keeps neighbouring words in order', () => {
-  assert.deepEqual(parseChainId(chainId(['mare', 'sabbia', 'sole'])), ['mare', 'sabbia', 'sole'])
+test('a round travels as one string and a window keeps neighbouring words in order', () => {
+  const round = { mode: 'domino' as const, round: 3, words: ['mare', 'sabbia', 'sole'] }
+  assert.deepEqual(parseChainSecret(chainSecret(round)), round)
+  assert.ok(ROOM_SECRET.test(chainSecret(round)))
+  assert.deepEqual(parseChainSecret('mare-sabbia-sole'), { mode: 'catena', round: 0, words: ['mare', 'sabbia', 'sole'] })
   const walk = ['a1', 'b2', 'c3', 'd4', 'e5', 'f6', 'g7']
   const rand = () => 0.99
   assert.deepEqual(pickChain([walk], 4, rand), ['d4', 'e5', 'f6', 'g7'])
