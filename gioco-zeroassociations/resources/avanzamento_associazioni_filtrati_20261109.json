@@ -1,0 +1,77 @@
+{
+  "schema": "association-expansion-progress-1",
+  "updated_at": "2026-11-09T16:33:54.299725+00:00",
+  "task_complete": false,
+  "reviewer": "ChatGPT",
+  "method": "llm_editorial_review",
+  "human_review": false,
+  "independent_gameplay_qa": false,
+  "lexically_exhaustive": false,
+  "new_pools": 101,
+  "new_associations": 1156,
+  "previous_pools_preserved": 102,
+  "previous_pools_sha256": "37244dbbd54acdbf944cf89dbbce55e01cd5e723fc10a9b39d08e4aa1944d069",
+  "inventory_terms_preserved": 2740419,
+  "positive_prompt_reviews": 4424,
+  "copies": {
+    "prompt_validi.sqlite3": {
+      "prompts": 203,
+      "associations": 2166,
+      "integrity_check": [
+        "ok"
+      ],
+      "foreign_key_errors": 0,
+      "sampled_seven_word_sets": 203,
+      "difficulty": {
+        "easy": 100,
+        "hard": 29,
+        "medium": 881,
+        "unrated": 1156
+      },
+      "shared_answer_words": 404
+    },
+    "prompt.sqlite3": {
+      "prompts": 203,
+      "associations": 2166,
+      "integrity_check": [
+        "ok"
+      ],
+      "foreign_key_errors": 0,
+      "sampled_seven_word_sets": 203
+    }
+  },
+  "queue": {
+    "candidate_count": 9823,
+    "states": {
+      "WAITING_PROMPT_REVIEW": 5400,
+      "WAITING_ASSOCIATIONS": 4221,
+      "REVIEWED_POOL": 202
+    },
+    "updated_at": "2026-11-09T16:33:54.234926+00:00",
+    "semantic_policy": "word-association-semantic-2026-11-08.2",
+    "rules_unchanged": true,
+    "coverage_complete": false,
+    "lexically_exhaustive": false,
+    "independent_gameplay_qa": false
+  },
+  "valid_pools_outside_filtered_snapshot": [
+    "spandere"
+  ],
+  "editorial_source_pack_files": [
+    "resources\\bacini_revisionati_20261109_01.jsonl",
+    "resources\\bacini_revisionati_20261109_02.jsonl",
+    "resources\\bacini_revisionati_20261109_03.jsonl",
+    "resources\\bacini_revisionati_20261109_04.jsonl"
+  ],
+  "python_tests": {
+    "passed": 40,
+    "modules": [
+      "test_association_catalog",
+      "test_prompt_database",
+      "test_validated_prompt_database",
+      "test_review_prompts"
+    ]
+  },
+  "idempotent_reimport_verified": true,
+  "background_worker_running": false
+}

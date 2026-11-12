@@ -303,8 +303,21 @@ def main(argv=None):
         if args.status:sql+=' WHERE status='+literal(args.status)
         result=db.run(sql+' ORDER BY detected_at DESC LIMIT 100;',rows=True)
     elif args.command=='changes':result=list_changes(db,args.update,args.kind,args.limit,args.offset)
-    elif args.command=='decide-update':result=decide_update(db,args.update,args.decision,args.reason,args.actor)
-    elif args.command=='decide-term':result=decide_term(db,args.prompt,args.decision,args.reason,args.actor)
+    elif args.command=='decide-update':
+        result=decide_update(db,args.update,args.decision,args.reason,args.actor)
+        if result['status']=='APPLIED':
+            # L'aggiornamento ha portato parole nella raccolta: si aggiornano prompt_filtrati e prompt_validi.
+            from review_prompts import after_new_words
+            result['refresh']=after_new_words(db.path)
+    elif args.command=='decide-term':
+        result=decide_term(db,args.prompt,args.decision,args.reason,args.actor)
+        from discarded_prompt_database import FILTERED_DB, sync_discarded
+        if db.path==DEFAULT_DB.resolve() and FILTERED_DB.exists():
+            try:
+                result['discarded_db']=sync_discarded(db.path,FILTERED_DB)
+            except (ValueError,RuntimeError,OSError) as error:
+                result['discarded_db_refresh_error']=str(error)
+                result['hint']='La decisione è salvata; rigenerare i filtri e il DB degli scarti.'
     elif args.command=='term':
         prompt=normalize(args.prompt)
         result={'entry':db.run('SELECT * FROM inventory_catalog WHERE prompt='+literal(prompt)+';',rows=True),

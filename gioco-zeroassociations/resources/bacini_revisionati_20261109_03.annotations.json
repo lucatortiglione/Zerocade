@@ -1,0 +1,3112 @@
+{
+  "schema": "association-editorial-decisions-1",
+  "reviewer": "ChatGPT",
+  "method": "llm_editorial_review",
+  "reviewed_at": "2026-11-09",
+  "rules_sha256": {
+    "direttive_word_association_it_v3_6_0.md": "a8e7fb0c1650ec54512ef945c177da4a7a3a9ed58b2dcdeeb573cb588d8e90a8",
+    "DIRETTIVA_INDIZI.md": "027f5afc8a93d7f6efc38be854454f70fbca9a5ccef012785f91c05049288aa8",
+    "REGOLE.md": "ef3c15171bfbfd9dac332179458718f3e4cdfcf910a70a44396c5e919e518c23"
+  },
+  "source_text": "resources\\associazioni_editoriali_20261109_03.txt",
+  "source_text_sha256": "797842f8daec1fcccb5d0e7e6fd055c2637a4e698d033c15250caba20cb0d068",
+  "human_review": false,
+  "independent_gameplay_qa": false,
+  "lexically_exhaustive": false,
+  "entries": [
+    {
+      "prompt": "bottiglia",
+      "validation_id": "72a074c143da9761aab2927c530a874b544d040884f140e8a969ad83dd5c4706",
+      "decision": "accepted",
+      "review_rationale": "Revisione editoriale di ogni coppia per «bottiglia», nel senso «Recipiente con il collo stretto per liquidi». Controllati autonomia, coerenza, forma e ruoli. Gruppi equivalenti limitati a uno per estrazione; nessun test indipendente dichiarato.",
+      "answers": [
+        {
+          "word": "tappo",
+          "answer_sense": "chiusura di un recipiente",
+          "relation": "parte",
+          "meaning_group": "tappo",
+          "rationale": "Il tappo chiude l'apertura della bottiglia.",
+          "decision": "accepted",
+          "editorial_source_line": 6
+        },
+        {
+          "word": "collo",
+          "answer_sense": "parte stretta superiore di un recipiente",
+          "relation": "parte",
+          "meaning_group": "collo",
+          "rationale": "Il collo è la parte stretta della bottiglia sotto l'apertura.",
+          "decision": "accepted",
+          "editorial_source_line": 7
+        },
+        {
+          "word": "fondo",
+          "answer_sense": "base di un recipiente",
+          "relation": "parte",
+          "meaning_group": "fondo",
+          "rationale": "Il fondo chiude la bottiglia nella parte inferiore e sostiene il contenuto.",
+          "decision": "accepted",
+          "editorial_source_line": 8
+        },
+        {
+          "word": "vetro",
+          "answer_sense": "materiale rigido trasparente",
+          "relation": "materiale",
+          "meaning_group": "materiale",
+          "rationale": "Il vetro è un materiale comune delle bottiglie.",
+          "decision": "accepted",
+          "editorial_source_line": 9
+        },
+        {
+          "word": "plastica",
+          "answer_sense": "materiale sintetico modellabile",
+          "relation": "materiale",
+          "meaning_group": "materiale",
+          "rationale": "La plastica viene usata per realizzare molte bottiglie.",
+          "decision": "accepted",
+          "editorial_source_line": 10
+        },
+        {
+          "word": "acqua",
+          "answer_sense": "liquido alimentare",
+          "relation": "contenuto",
+          "meaning_group": "bevanda",
+          "rationale": "L'acqua viene comunemente conservata e venduta in bottiglia.",
+          "decision": "accepted",
+          "editorial_source_line": 11
+        },
+        {
+          "word": "vino",
+          "answer_sense": "bevanda ottenuta dall'uva",
+          "relation": "contenuto",
+          "meaning_group": "bevanda",
+          "rationale": "Il vino viene comunemente conservato e venduto in bottiglia.",
+          "decision": "accepted",
+          "editorial_source_line": 12
+        },
+        {
+          "word": "etichetta",
+          "answer_sense": "cartellino con informazioni sul prodotto",
+          "relation": "parte applicata",
+          "meaning_group": "etichetta",
+          "rationale": "L'etichetta della bottiglia identifica il prodotto contenuto.",
+          "decision": "accepted",
+          "editorial_source_line": 13
+        },
+        {
+          "word": "stappare",
+          "answer_sense": "togliere il tappo",
+          "relation": "apertura",
+          "meaning_group": "stappare",
+          "rationale": "Stappare una bottiglia significa rimuoverne il tappo.",
+          "decision": "accepted",
+          "editorial_source_line": 14
+        },
+        {
+          "word": "versare",
+          "answer_sense": "far uscire un liquido da un recipiente",
+          "relation": "uso",
+          "meaning_group": "versare",
+          "rationale": "Inclinando la bottiglia si può versare il liquido contenuto.",
+          "decision": "accepted",
+          "editorial_source_line": 15
+        },
+        {
+          "word": "cavatappi",
+          "answer_sense": "attrezzo per estrarre tappi",
+          "relation": "strumento",
+          "meaning_group": "cavatappi",
+          "rationale": "Il cavatappi serve per estrarre alcuni tipi di tappo dalle bottiglie.",
+          "decision": "accepted",
+          "editorial_source_line": 16
+        },
+        {
+          "word": "riciclo",
+          "answer_sense": "recupero di materiali per un nuovo utilizzo",
+          "relation": "gestione del materiale",
+          "meaning_group": "riciclo",
+          "rationale": "Le bottiglie di vetro e plastica sono oggetti comuni della raccolta per il riciclo.",
+          "decision": "accepted",
+          "editorial_source_line": 17
+        }
+      ],
+      "group_limits": {
+        "tappo": 1,
+        "collo": 1,
+        "fondo": 1,
+        "materiale": 1,
+        "bevanda": 1,
+        "etichetta": 1,
+        "stappare": 1,
+        "versare": 1,
+        "cavatappi": 1,
+        "riciclo": 1
+      },
+      "conflicts": []
+    },
+    {
+      "prompt": "gelato",
+      "validation_id": "7bab415897be95685d38e868d80cb167af8a26b3d8a17ba757bbabefeab4a2f4",
+      "decision": "accepted",
+      "review_rationale": "Revisione editoriale di ogni coppia per «gelato», nel senso «Dolce freddo a base di latte o frutta». Controllati autonomia, coerenza, forma e ruoli. Gruppi equivalenti limitati a uno per estrazione; nessun test indipendente dichiarato.",
+      "answers": [
+        {
+          "word": "cono",
+          "answer_sense": "cialda conica per servire il gelato",
+          "relation": "contenitore commestibile",
+          "meaning_group": "cono",
+          "rationale": "Il cono permette di tenere e mangiare il gelato senza una coppa.",
+          "decision": "accepted",
+          "editorial_source_line": 20
+        },
+        {
+          "word": "coppetta",
+          "answer_sense": "piccolo recipiente per alimenti",
+          "relation": "contenitore",
+          "meaning_group": "coppetta",
+          "rationale": "La coppetta viene comunemente usata per servire il gelato.",
+          "decision": "accepted",
+          "editorial_source_line": 21
+        },
+        {
+          "word": "latte",
+          "answer_sense": "alimento liquido",
+          "relation": "ingrediente",
+          "meaning_group": "latte",
+          "rationale": "Il latte è una base comune dei gelati alle creme.",
+          "decision": "accepted",
+          "editorial_source_line": 22
+        },
+        {
+          "word": "frutta",
+          "answer_sense": "insieme dei frutti alimentari",
+          "relation": "ingrediente",
+          "meaning_group": "frutta",
+          "rationale": "La frutta viene usata per preparare molti gusti di gelato.",
+          "decision": "accepted",
+          "editorial_source_line": 23
+        },
+        {
+          "word": "panna",
+          "answer_sense": "parte grassa del latte",
+          "relation": "guarnizione",
+          "meaning_group": "panna",
+          "rationale": "La panna montata può accompagnare una porzione di gelato.",
+          "decision": "accepted",
+          "editorial_source_line": 24
+        },
+        {
+          "word": "cioccolato",
+          "answer_sense": "alimento a base di cacao",
+          "relation": "gusto",
+          "meaning_group": "gusto",
+          "rationale": "Il cioccolato è un gusto comune del gelato.",
+          "decision": "accepted",
+          "editorial_source_line": 25
+        },
+        {
+          "word": "vaniglia",
+          "answer_sense": "aroma ricavato da baccelli",
+          "relation": "gusto",
+          "meaning_group": "gusto",
+          "rationale": "La vaniglia è un gusto classico del gelato.",
+          "decision": "accepted",
+          "editorial_source_line": 26
+        },
+        {
+          "word": "fragola",
+          "answer_sense": "frutto rosso",
+          "relation": "gusto",
+          "meaning_group": "gusto",
+          "rationale": "La fragola è un gusto comune del gelato alla frutta.",
+          "decision": "accepted",
+          "editorial_source_line": 27
+        },
+        {
+          "word": "pistacchio",
+          "answer_sense": "seme commestibile",
+          "relation": "gusto",
+          "meaning_group": "gusto",
+          "rationale": "Il pistacchio viene usato per preparare un gusto riconoscibile di gelato.",
+          "decision": "accepted",
+          "editorial_source_line": 28
+        },
+        {
+          "word": "sciogliersi",
+          "answer_sense": "perdere consistenza solida per effetto del calore",
+          "relation": "trasformazione",
+          "meaning_group": "sciogliersi",
+          "rationale": "Il gelato si scioglie quando si riscalda.",
+          "decision": "accepted",
+          "editorial_source_line": 29
+        },
+        {
+          "word": "freddo",
+          "answer_sense": "di bassa temperatura",
+          "relation": "proprietà",
+          "meaning_group": "freddo",
+          "rationale": "Il gelato viene consumato a una temperatura fredda.",
+          "decision": "accepted",
+          "editorial_source_line": 30
+        },
+        {
+          "word": "gelateria",
+          "answer_sense": "esercizio che produce o vende gelato",
+          "relation": "produzione e vendita",
+          "meaning_group": "gelateria",
+          "rationale": "La gelateria è il luogo dedicato alla produzione o vendita del gelato.",
+          "decision": "accepted",
+          "editorial_source_line": 31
+        },
+        {
+          "word": "paletta",
+          "answer_sense": "piccolo utensile piatto",
+          "relation": "utensile",
+          "meaning_group": "paletta",
+          "rationale": "Una paletta viene usata per mangiare il gelato dalla coppetta.",
+          "decision": "accepted",
+          "editorial_source_line": 32
+        },
+        {
+          "word": "cialda",
+          "answer_sense": "preparazione alimentare sottile e croccante",
+          "relation": "accompagnamento",
+          "meaning_group": "cialda",
+          "rationale": "La cialda viene usata come cono o accompagnamento del gelato.",
+          "decision": "accepted",
+          "editorial_source_line": 33
+        }
+      ],
+      "group_limits": {
+        "cono": 1,
+        "coppetta": 1,
+        "latte": 1,
+        "frutta": 1,
+        "panna": 1,
+        "gusto": 1,
+        "sciogliersi": 1,
+        "freddo": 1,
+        "gelateria": 1,
+        "paletta": 1,
+        "cialda": 1
+      },
+      "conflicts": []
+    },
+    {
+      "prompt": "pigiama",
+      "validation_id": "c2365fb6814bc557ea0fc92b67fd92eea1fa565da4fc59fabffcfa1e99ec340e",
+      "decision": "accepted",
+      "review_rationale": "Revisione editoriale di ogni coppia per «pigiama», nel senso «Indumento che si indossa per dormire». Controllati autonomia, coerenza, forma e ruoli. Gruppi equivalenti limitati a uno per estrazione; nessun test indipendente dichiarato.",
+      "answers": [
+        {
+          "word": "notte",
+          "answer_sense": "periodo buio della giornata",
+          "relation": "momento d'uso",
+          "meaning_group": "notte",
+          "rationale": "Il pigiama viene comunemente indossato durante la notte.",
+          "decision": "accepted",
+          "editorial_source_line": 36
+        },
+        {
+          "word": "letto",
+          "answer_sense": "mobile per dormire",
+          "relation": "contesto",
+          "meaning_group": "letto",
+          "rationale": "Il pigiama è un indumento comunemente indossato quando si va a letto.",
+          "decision": "accepted",
+          "editorial_source_line": 37
+        },
+        {
+          "word": "sonno",
+          "answer_sense": "stato fisiologico del dormire",
+          "relation": "uso",
+          "meaning_group": "sonno",
+          "rationale": "Il pigiama è destinato al riposo e al sonno.",
+          "decision": "accepted",
+          "editorial_source_line": 38
+        },
+        {
+          "word": "bottone",
+          "answer_sense": "piccolo elemento di chiusura",
+          "relation": "parte",
+          "meaning_group": "bottone",
+          "rationale": "I bottoni possono chiudere la parte superiore del pigiama.",
+          "decision": "accepted",
+          "editorial_source_line": 39
+        },
+        {
+          "word": "manica",
+          "answer_sense": "parte dell'indumento che riveste il braccio",
+          "relation": "parte",
+          "meaning_group": "manica",
+          "rationale": "La parte superiore di molti pigiami comprende maniche.",
+          "decision": "accepted",
+          "editorial_source_line": 40
+        },
+        {
+          "word": "pantalone",
+          "answer_sense": "parte dell'abbigliamento che copre gli arti inferiori",
+          "relation": "parte",
+          "meaning_group": "pantalone",
+          "rationale": "Il pantalone costituisce la parte inferiore di un pigiama a due pezzi.",
+          "decision": "accepted",
+          "editorial_source_line": 41
+        },
+        {
+          "word": "cotone",
+          "answer_sense": "fibra tessile vegetale",
+          "relation": "materiale",
+          "meaning_group": "materiale",
+          "rationale": "Il cotone è un tessuto comune dei pigiami.",
+          "decision": "accepted",
+          "editorial_source_line": 42
+        },
+        {
+          "word": "flanella",
+          "answer_sense": "tessuto morbido e caldo",
+          "relation": "materiale",
+          "meaning_group": "materiale",
+          "rationale": "La flanella viene usata per pigiami destinati ai periodi freddi.",
+          "decision": "accepted",
+          "editorial_source_line": 43
+        },
+        {
+          "word": "casacca",
+          "answer_sense": "indumento che copre il tronco",
+          "relation": "parte",
+          "meaning_group": "casacca",
+          "rationale": "La casacca è la parte superiore di molti pigiami a due pezzi.",
+          "decision": "accepted",
+          "editorial_source_line": 44
+        },
+        {
+          "word": "vestaglia",
+          "answer_sense": "indumento ampio da casa",
+          "relation": "abbinamento",
+          "meaning_group": "vestaglia",
+          "rationale": "La vestaglia può essere indossata sopra il pigiama.",
+          "decision": "accepted",
+          "editorial_source_line": 45
+        }
+      ],
+      "group_limits": {
+        "notte": 1,
+        "letto": 1,
+        "sonno": 1,
+        "bottone": 1,
+        "manica": 1,
+        "pantalone": 1,
+        "materiale": 1,
+        "casacca": 1,
+        "vestaglia": 1
+      },
+      "conflicts": []
+    },
+    {
+      "prompt": "erba",
+      "validation_id": "8c76fdd0186827ad3f1788a3c241fd215e14753a12cd26d6812feba46829950d",
+      "decision": "accepted",
+      "review_rationale": "Revisione editoriale di ogni coppia per «erba», nel senso «L'erba verde dei prati». Controllati autonomia, coerenza, forma e ruoli. Gruppi equivalenti limitati a uno per estrazione; nessun test indipendente dichiarato.",
+      "answers": [
+        {
+          "word": "prato",
+          "answer_sense": "terreno coperto da vegetazione erbacea",
+          "relation": "ambiente",
+          "meaning_group": "prato",
+          "rationale": "Il prato è caratterizzato da una copertura di erba.",
+          "decision": "accepted",
+          "editorial_source_line": 48
+        },
+        {
+          "word": "verde",
+          "answer_sense": "colore della vegetazione fresca",
+          "relation": "colore",
+          "meaning_group": "verde",
+          "rationale": "Il verde è il colore caratteristico dell'erba fresca.",
+          "decision": "accepted",
+          "editorial_source_line": 49
+        },
+        {
+          "word": "tagliare",
+          "answer_sense": "recidere per accorciare",
+          "relation": "cura",
+          "meaning_group": "tagliare",
+          "rationale": "L'erba del prato viene tagliata per mantenerla all'altezza desiderata.",
+          "decision": "accepted",
+          "editorial_source_line": 50
+        },
+        {
+          "word": "falce",
+          "answer_sense": "attrezzo con lama ricurva",
+          "relation": "strumento",
+          "meaning_group": "taglio",
+          "rationale": "La falce è un attrezzo tradizionale per tagliare l'erba.",
+          "decision": "accepted",
+          "editorial_source_line": 51
+        },
+        {
+          "word": "tosaerba",
+          "answer_sense": "macchina per accorciare la vegetazione del prato",
+          "relation": "strumento",
+          "meaning_group": "taglio",
+          "rationale": "Il tosaerba viene usato per tagliare l'erba del prato.",
+          "decision": "accepted",
+          "editorial_source_line": 52
+        },
+        {
+          "word": "fieno",
+          "answer_sense": "erba tagliata ed essiccata",
+          "relation": "trasformazione",
+          "meaning_group": "fieno",
+          "rationale": "Il fieno si ottiene tagliando ed essiccando erba destinata agli animali.",
+          "decision": "accepted",
+          "editorial_source_line": 53
+        },
+        {
+          "word": "pascolo",
+          "answer_sense": "terreno dove si nutrono animali erbivori",
+          "relation": "uso",
+          "meaning_group": "pascolo",
+          "rationale": "L'erba del pascolo alimenta molti animali allevati.",
+          "decision": "accepted",
+          "editorial_source_line": 54
+        },
+        {
+          "word": "rugiada",
+          "answer_sense": "gocce d'acqua condensate sulle superfici",
+          "relation": "fenomeno",
+          "meaning_group": "rugiada",
+          "rationale": "La rugiada può depositarsi sull'erba durante la notte.",
+          "decision": "accepted",
+          "editorial_source_line": 55
+        },
+        {
+          "word": "radice",
+          "answer_sense": "parte vegetale che assorbe acqua dal terreno",
+          "relation": "parte",
+          "meaning_group": "radice",
+          "rationale": "Le radici ancorano l'erba al terreno e assorbono acqua.",
+          "decision": "accepted",
+          "editorial_source_line": 56
+        },
+        {
+          "word": "seme",
+          "answer_sense": "struttura da cui può svilupparsi una pianta",
+          "relation": "riproduzione",
+          "meaning_group": "seme",
+          "rationale": "I semi permettono di seminare e far crescere un nuovo tappeto d'erba.",
+          "decision": "accepted",
+          "editorial_source_line": 57
+        },
+        {
+          "word": "trifoglio",
+          "answer_sense": "pianta erbacea dalle foglie composte",
+          "relation": "pianta del prato",
+          "meaning_group": "trifoglio",
+          "rationale": "Il trifoglio è una pianta erbacea comune nei prati.",
+          "decision": "accepted",
+          "editorial_source_line": 58
+        }
+      ],
+      "group_limits": {
+        "prato": 1,
+        "verde": 1,
+        "tagliare": 1,
+        "taglio": 1,
+        "fieno": 1,
+        "pascolo": 1,
+        "rugiada": 1,
+        "radice": 1,
+        "seme": 1,
+        "trifoglio": 1
+      },
+      "conflicts": []
+    },
+    {
+      "prompt": "cerchio",
+      "validation_id": "b1c3d7ce0dfaf56c7faedb7f723c4139707bcf36847d6d320d6f852f094c8f68",
+      "decision": "accepted",
+      "review_rationale": "Revisione editoriale di ogni coppia per «cerchio», nel senso «Figura geometrica rotonda». Controllati autonomia, coerenza, forma e ruoli. Gruppi equivalenti limitati a uno per estrazione; nessun test indipendente dichiarato.",
+      "answers": [
+        {
+          "word": "centro",
+          "answer_sense": "punto equidistante dal contorno circolare",
+          "relation": "elemento geometrico",
+          "meaning_group": "centro",
+          "rationale": "Il centro del cerchio è equidistante dai punti della circonferenza.",
+          "decision": "accepted",
+          "editorial_source_line": 61
+        },
+        {
+          "word": "raggio",
+          "answer_sense": "segmento tra centro e circonferenza",
+          "relation": "misura geometrica",
+          "meaning_group": "raggio",
+          "rationale": "Il raggio collega il centro del cerchio a un punto della circonferenza.",
+          "decision": "accepted",
+          "editorial_source_line": 62
+        },
+        {
+          "word": "diametro",
+          "answer_sense": "segmento passante per il centro con estremi sulla circonferenza",
+          "relation": "misura geometrica",
+          "meaning_group": "diametro",
+          "rationale": "Il diametro attraversa il centro del cerchio ed è lungo due raggi.",
+          "decision": "accepted",
+          "editorial_source_line": 63
+        },
+        {
+          "word": "circonferenza",
+          "answer_sense": "linea che delimita il cerchio",
+          "relation": "contorno",
+          "meaning_group": "circonferenza",
+          "rationale": "La circonferenza è il contorno del cerchio.",
+          "decision": "accepted",
+          "editorial_source_line": 64
+        },
+        {
+          "word": "compasso",
+          "answer_sense": "strumento per tracciare circonferenze",
+          "relation": "strumento",
+          "meaning_group": "compasso",
+          "rationale": "Il compasso permette di disegnare il contorno di un cerchio.",
+          "decision": "accepted",
+          "editorial_source_line": 65
+        },
+        {
+          "word": "arco",
+          "answer_sense": "porzione di circonferenza",
+          "relation": "elemento geometrico",
+          "meaning_group": "arco",
+          "rationale": "Un arco è una porzione del contorno circolare del cerchio.",
+          "decision": "accepted",
+          "editorial_source_line": 66
+        },
+        {
+          "word": "corda",
+          "answer_sense": "segmento che collega due punti di una circonferenza",
+          "relation": "elemento geometrico",
+          "meaning_group": "corda",
+          "rationale": "Una corda collega due punti del contorno del cerchio.",
+          "decision": "accepted",
+          "editorial_source_line": 67
+        },
+        {
+          "word": "settore",
+          "answer_sense": "parte di cerchio delimitata da due raggi e un arco",
+          "relation": "parte geometrica",
+          "meaning_group": "settore",
+          "rationale": "Un settore circolare è una parte del cerchio delimitata da due raggi e un arco.",
+          "decision": "accepted",
+          "editorial_source_line": 68
+        },
+        {
+          "word": "disco",
+          "answer_sense": "superficie piana delimitata da una circonferenza",
+          "relation": "concetto equivalente",
+          "meaning_group": "disco",
+          "rationale": "Un disco geometrico rappresenta la regione piana del cerchio.",
+          "decision": "accepted",
+          "editorial_source_line": 69
+        },
+        {
+          "word": "tangente",
+          "answer_sense": "retta con un solo punto in comune con la circonferenza",
+          "relation": "relazione geometrica",
+          "meaning_group": "tangente",
+          "rationale": "Una tangente tocca la circonferenza del cerchio in un solo punto.",
+          "decision": "accepted",
+          "editorial_source_line": 70
+        },
+        {
+          "word": "area",
+          "answer_sense": "misura di una superficie",
+          "relation": "misura geometrica",
+          "meaning_group": "area",
+          "rationale": "L'area misura la superficie occupata dal cerchio.",
+          "decision": "accepted",
+          "editorial_source_line": 71
+        },
+        {
+          "word": "rotondo",
+          "answer_sense": "di forma circolare",
+          "relation": "proprietà della forma",
+          "meaning_group": "rotondo",
+          "rationale": "Il cerchio ha una forma rotonda.",
+          "decision": "accepted",
+          "editorial_source_line": 72
+        }
+      ],
+      "group_limits": {
+        "centro": 1,
+        "raggio": 1,
+        "diametro": 1,
+        "circonferenza": 1,
+        "compasso": 1,
+        "arco": 1,
+        "corda": 1,
+        "settore": 1,
+        "disco": 1,
+        "tangente": 1,
+        "area": 1,
+        "rotondo": 1
+      },
+      "conflicts": []
+    },
+    {
+      "prompt": "cielo",
+      "validation_id": "8e49b3f1d0f19ee0c043594e9470165b3aef270b51e6b6bb728ed6b241c13b17",
+      "decision": "accepted",
+      "review_rationale": "Revisione editoriale di ogni coppia per «cielo», nel senso «Il cielo sopra di noi». Controllati autonomia, coerenza, forma e ruoli. Gruppi equivalenti limitati a uno per estrazione; nessun test indipendente dichiarato.",
+      "answers": [
+        {
+          "word": "sole",
+          "answer_sense": "stella che illumina la Terra",
+          "relation": "astro",
+          "meaning_group": "sole",
+          "rationale": "Il Sole è un elemento riconoscibile del cielo diurno.",
+          "decision": "accepted",
+          "editorial_source_line": 75
+        },
+        {
+          "word": "luna",
+          "answer_sense": "satellite naturale della Terra",
+          "relation": "astro",
+          "meaning_group": "luna",
+          "rationale": "La Luna è visibile nel cielo e caratterizza l'immaginario del cielo notturno.",
+          "decision": "accepted",
+          "editorial_source_line": 76
+        },
+        {
+          "word": "stella",
+          "answer_sense": "astro luminoso",
+          "relation": "astro",
+          "meaning_group": "stella",
+          "rationale": "Le stelle appaiono come punti luminosi nel cielo notturno.",
+          "decision": "accepted",
+          "editorial_source_line": 77
+        },
+        {
+          "word": "nuvola",
+          "answer_sense": "insieme di goccioline o cristalli sospesi",
+          "relation": "fenomeno atmosferico",
+          "meaning_group": "nuvola",
+          "rationale": "Le nuvole attraversano il cielo e possono coprirlo.",
+          "decision": "accepted",
+          "editorial_source_line": 78
+        },
+        {
+          "word": "azzurro",
+          "answer_sense": "colore tra blu e celeste",
+          "relation": "colore",
+          "meaning_group": "azzurro",
+          "rationale": "L'azzurro è il colore comunemente associato al cielo sereno.",
+          "decision": "accepted",
+          "editorial_source_line": 79
+        },
+        {
+          "word": "arcobaleno",
+          "answer_sense": "arco di colori dovuto alla luce nelle gocce d'acqua",
+          "relation": "fenomeno visibile",
+          "meaning_group": "arcobaleno",
+          "rationale": "L'arcobaleno può comparire nel cielo quando luce e gocce d'acqua interagiscono.",
+          "decision": "accepted",
+          "editorial_source_line": 80
+        },
+        {
+          "word": "orizzonte",
+          "answer_sense": "linea apparente tra cielo e superficie terrestre",
+          "relation": "limite visivo",
+          "meaning_group": "orizzonte",
+          "rationale": "L'orizzonte separa apparentemente il cielo dalla terra o dal mare.",
+          "decision": "accepted",
+          "editorial_source_line": 81
+        },
+        {
+          "word": "tramonto",
+          "answer_sense": "discesa apparente del sole sotto l'orizzonte",
+          "relation": "momento",
+          "meaning_group": "tramonto",
+          "rationale": "Al tramonto il cielo può assumere colori rossi e arancioni.",
+          "decision": "accepted",
+          "editorial_source_line": 82
+        },
+        {
+          "word": "alba",
+          "answer_sense": "prime luci del giorno",
+          "relation": "momento",
+          "meaning_group": "alba",
+          "rationale": "All'alba il cielo torna a illuminarsi.",
+          "decision": "accepted",
+          "editorial_source_line": 83
+        },
+        {
+          "word": "temporale",
+          "answer_sense": "fenomeno con fulmini e tuoni",
+          "relation": "fenomeno atmosferico",
+          "meaning_group": "temporale",
+          "rationale": "Durante un temporale il cielo è occupato da nuvole scure e può essere attraversato da fulmini.",
+          "decision": "accepted",
+          "editorial_source_line": 84
+        },
+        {
+          "word": "costellazione",
+          "answer_sense": "insieme convenzionale di stelle",
+          "relation": "organizzazione degli astri",
+          "meaning_group": "costellazione",
+          "rationale": "Le costellazioni raggruppano figure riconoscibili di stelle nel cielo.",
+          "decision": "accepted",
+          "editorial_source_line": 85
+        }
+      ],
+      "group_limits": {
+        "sole": 1,
+        "luna": 1,
+        "stella": 1,
+        "nuvola": 1,
+        "azzurro": 1,
+        "arcobaleno": 1,
+        "orizzonte": 1,
+        "tramonto": 1,
+        "alba": 1,
+        "temporale": 1,
+        "costellazione": 1
+      },
+      "conflicts": []
+    },
+    {
+      "prompt": "lupo",
+      "validation_id": "bc09e0bc0ca09a09ff03a302c2da27cf9852c55041e93449e39d355ae7abbcd0",
+      "decision": "accepted",
+      "review_rationale": "Revisione editoriale di ogni coppia per «lupo», nel senso «Grande canide selvatico». Controllati autonomia, coerenza, forma e ruoli. Gruppi equivalenti limitati a uno per estrazione; nessun test indipendente dichiarato.",
+      "answers": [
+        {
+          "word": "branco",
+          "answer_sense": "gruppo sociale di animali",
+          "relation": "comportamento sociale",
+          "meaning_group": "branco",
+          "rationale": "Il lupo vive comunemente in branchi con legami sociali.",
+          "decision": "accepted",
+          "editorial_source_line": 88
+        },
+        {
+          "word": "ululato",
+          "answer_sense": "verso prolungato di alcuni canidi",
+          "relation": "verso",
+          "meaning_group": "ululato",
+          "rationale": "L'ululato è il verso caratteristico del lupo.",
+          "decision": "accepted",
+          "editorial_source_line": 89
+        },
+        {
+          "word": "preda",
+          "answer_sense": "animale catturato da un predatore",
+          "relation": "alimentazione",
+          "meaning_group": "preda",
+          "rationale": "Il lupo caccia prede per nutrirsi.",
+          "decision": "accepted",
+          "editorial_source_line": 90
+        },
+        {
+          "word": "zanna",
+          "answer_sense": "dente canino sviluppato",
+          "relation": "parte anatomica",
+          "meaning_group": "zanna",
+          "rationale": "Le zanne del lupo permettono di afferrare le prede.",
+          "decision": "accepted",
+          "editorial_source_line": 91
+        },
+        {
+          "word": "bosco",
+          "answer_sense": "territorio coperto da alberi",
+          "relation": "habitat",
+          "meaning_group": "bosco",
+          "rationale": "Il bosco è un ambiente comunemente associato al lupo.",
+          "decision": "accepted",
+          "editorial_source_line": 92
+        },
+        {
+          "word": "pelliccia",
+          "answer_sense": "rivestimento di pelo di un animale",
+          "relation": "rivestimento",
+          "meaning_group": "pelliccia",
+          "rationale": "La pelliccia riveste il corpo del lupo e contribuisce alla protezione termica.",
+          "decision": "accepted",
+          "editorial_source_line": 93
+        },
+        {
+          "word": "canide",
+          "answer_sense": "mammifero della famiglia dei canidi",
+          "relation": "categoria zoologica",
+          "meaning_group": "canide",
+          "rationale": "Il lupo appartiene alla famiglia dei canidi.",
+          "decision": "accepted",
+          "editorial_source_line": 94
+        },
+        {
+          "word": "tana",
+          "answer_sense": "rifugio per animali",
+          "relation": "riparo",
+          "meaning_group": "tana",
+          "rationale": "La tana offre riparo ai piccoli del lupo.",
+          "decision": "accepted",
+          "editorial_source_line": 95
+        },
+        {
+          "word": "caccia",
+          "answer_sense": "ricerca e cattura di animali",
+          "relation": "comportamento",
+          "meaning_group": "caccia",
+          "rationale": "La caccia è un'attività caratteristica del lupo per procurarsi cibo.",
+          "decision": "accepted",
+          "editorial_source_line": 96
+        },
+        {
+          "word": "agnello",
+          "answer_sense": "piccolo della pecora",
+          "relation": "preda e immaginario",
+          "meaning_group": "agnello",
+          "rationale": "L'agnello è una possibile preda del lupo ed è associato ad esso nelle favole.",
+          "decision": "accepted",
+          "editorial_source_line": 97
+        },
+        {
+          "word": "cane",
+          "answer_sense": "canide domestico",
+          "relation": "animale affine",
+          "meaning_group": "cane",
+          "rationale": "Il cane è un animale strettamente affine al lupo.",
+          "decision": "accepted",
+          "editorial_source_line": 98
+        }
+      ],
+      "group_limits": {
+        "branco": 1,
+        "ululato": 1,
+        "preda": 1,
+        "zanna": 1,
+        "bosco": 1,
+        "pelliccia": 1,
+        "canide": 1,
+        "tana": 1,
+        "caccia": 1,
+        "agnello": 1,
+        "cane": 1
+      },
+      "conflicts": []
+    },
+    {
+      "prompt": "asciugamano",
+      "validation_id": "e0b3dcdc790193110156733e85a804c30e3cb85519b825086bed6dbd2398730d",
+      "decision": "accepted",
+      "review_rationale": "Revisione editoriale di ogni coppia per «asciugamano», nel senso «Telo per asciugarsi dopo il lavaggio». Controllati autonomia, coerenza, forma e ruoli. Gruppi equivalenti limitati a uno per estrazione; nessun test indipendente dichiarato.",
+      "answers": [
+        {
+          "word": "spugna",
+          "answer_sense": "tessuto assorbente con superficie a ricci",
+          "relation": "materiale",
+          "meaning_group": "spugna",
+          "rationale": "Il tessuto di spugna è un materiale caratteristico degli asciugamani.",
+          "decision": "accepted",
+          "editorial_source_line": 101
+        },
+        {
+          "word": "telo",
+          "answer_sense": "pezzo ampio di tessuto",
+          "relation": "categoria",
+          "meaning_group": "telo_assorbente",
+          "rationale": "L'asciugamano è un telo destinato ad asciugare.",
+          "decision": "accepted",
+          "editorial_source_line": 102
+        },
+        {
+          "word": "bagno",
+          "answer_sense": "stanza dedicata all'igiene",
+          "relation": "collocazione",
+          "meaning_group": "bagno",
+          "rationale": "L'asciugamano viene comunemente tenuto in bagno.",
+          "decision": "accepted",
+          "editorial_source_line": 103
+        },
+        {
+          "word": "doccia",
+          "answer_sense": "lavaggio del corpo con getti d'acqua",
+          "relation": "occasione d'uso",
+          "meaning_group": "doccia",
+          "rationale": "Dopo la doccia si usa l'asciugamano per asciugare il corpo.",
+          "decision": "accepted",
+          "editorial_source_line": 104
+        },
+        {
+          "word": "mano",
+          "answer_sense": "estremità dell'arto superiore",
+          "relation": "parte asciugata",
+          "meaning_group": "mano",
+          "rationale": "L'asciugamano viene usato per asciugare le mani dopo averle lavate.",
+          "decision": "accepted",
+          "editorial_source_line": 105
+        },
+        {
+          "word": "viso",
+          "answer_sense": "parte anteriore della testa",
+          "relation": "parte asciugata",
+          "meaning_group": "viso",
+          "rationale": "L'asciugamano viene usato per asciugare il viso dopo il lavaggio.",
+          "decision": "accepted",
+          "editorial_source_line": 106
+        },
+        {
+          "word": "acqua",
+          "answer_sense": "liquido che bagna il corpo",
+          "relation": "liquido assorbito",
+          "meaning_group": "acqua",
+          "rationale": "L'asciugamano assorbe l'acqua rimasta sulla pelle.",
+          "decision": "accepted",
+          "editorial_source_line": 107
+        },
+        {
+          "word": "asciugare",
+          "answer_sense": "rimuovere l'umidità",
+          "relation": "funzione",
+          "meaning_group": "asciugare",
+          "rationale": "La funzione dell'asciugamano è asciugare la pelle bagnata.",
+          "decision": "accepted",
+          "editorial_source_line": 108
+        },
+        {
+          "word": "salvietta",
+          "answer_sense": "piccolo telo o foglio per pulirsi",
+          "relation": "oggetto affine",
+          "meaning_group": "telo_assorbente",
+          "rationale": "Una salvietta di tessuto può svolgere la funzione di piccolo asciugamano.",
+          "decision": "accepted",
+          "editorial_source_line": 109
+        },
+        {
+          "word": "accappatoio",
+          "answer_sense": "indumento assorbente da bagno",
+          "relation": "oggetto affine",
+          "meaning_group": "accappatoio",
+          "rationale": "L'accappatoio è un indumento assorbente usato dopo il bagno come l'asciugamano.",
+          "decision": "accepted",
+          "editorial_source_line": 110
+        }
+      ],
+      "group_limits": {
+        "spugna": 1,
+        "telo_assorbente": 1,
+        "bagno": 1,
+        "doccia": 1,
+        "mano": 1,
+        "viso": 1,
+        "acqua": 1,
+        "asciugare": 1,
+        "accappatoio": 1
+      },
+      "conflicts": []
+    },
+    {
+      "prompt": "polpetta",
+      "validation_id": "de209f42fc0a48ac39344dfe5df6d05cc8da5ab893c7d51996b9ecfcc05eb2ba",
+      "decision": "accepted",
+      "review_rationale": "Revisione editoriale di ogni coppia per «polpetta», nel senso «Pallina di carne tritata cucinata». Controllati autonomia, coerenza, forma e ruoli. Gruppi equivalenti limitati a uno per estrazione; nessun test indipendente dichiarato.",
+      "answers": [
+        {
+          "word": "carne",
+          "answer_sense": "alimento costituito da tessuti animali",
+          "relation": "ingrediente",
+          "meaning_group": "carne",
+          "rationale": "Nel senso selezionato la polpetta viene preparata con carne.",
+          "decision": "accepted",
+          "editorial_source_line": 113
+        },
+        {
+          "word": "macinato",
+          "answer_sense": "carne tritata",
+          "relation": "ingrediente",
+          "meaning_group": "carne",
+          "rationale": "La carne macinata è la base tipica dell'impasto delle polpette.",
+          "decision": "accepted",
+          "editorial_source_line": 114
+        },
+        {
+          "word": "pangrattato",
+          "answer_sense": "pane secco ridotto in briciole",
+          "relation": "ingrediente",
+          "meaning_group": "pangrattato",
+          "rationale": "Il pangrattato viene usato nell'impasto o nel rivestimento delle polpette.",
+          "decision": "accepted",
+          "editorial_source_line": 115
+        },
+        {
+          "word": "uovo",
+          "answer_sense": "alimento usato anche per legare impasti",
+          "relation": "ingrediente",
+          "meaning_group": "uovo",
+          "rationale": "L'uovo aiuta a legare gli ingredienti dell'impasto delle polpette.",
+          "decision": "accepted",
+          "editorial_source_line": 116
+        },
+        {
+          "word": "prezzemolo",
+          "answer_sense": "erba aromatica",
+          "relation": "aroma",
+          "meaning_group": "prezzemolo",
+          "rationale": "Il prezzemolo viene comunemente usato per insaporire le polpette.",
+          "decision": "accepted",
+          "editorial_source_line": 117
+        },
+        {
+          "word": "parmigiano",
+          "answer_sense": "formaggio stagionato",
+          "relation": "ingrediente",
+          "meaning_group": "parmigiano",
+          "rationale": "Il parmigiano grattugiato è un ingrediente comune delle polpette.",
+          "decision": "accepted",
+          "editorial_source_line": 118
+        },
+        {
+          "word": "friggere",
+          "answer_sense": "cuocere in grasso caldo",
+          "relation": "cottura",
+          "meaning_group": "cottura",
+          "rationale": "Friggere è un modo comune di cuocere le polpette.",
+          "decision": "accepted",
+          "editorial_source_line": 119
+        },
+        {
+          "word": "forno",
+          "answer_sense": "apparecchio per cuocere",
+          "relation": "cottura",
+          "meaning_group": "cottura",
+          "rationale": "Le polpette possono essere cotte al forno.",
+          "decision": "accepted",
+          "editorial_source_line": 120
+        },
+        {
+          "word": "sugo",
+          "answer_sense": "condimento liquido o semiliquido",
+          "relation": "condimento",
+          "meaning_group": "sugo",
+          "rationale": "Le polpette possono essere cotte o servite nel sugo.",
+          "decision": "accepted",
+          "editorial_source_line": 121
+        },
+        {
+          "word": "padella",
+          "answer_sense": "recipiente basso per la cottura",
+          "relation": "strumento",
+          "meaning_group": "padella",
+          "rationale": "La padella viene usata per cuocere le polpette.",
+          "decision": "accepted",
+          "editorial_source_line": 122
+        },
+        {
+          "word": "impastare",
+          "answer_sense": "amalgamare ingredienti lavorandoli insieme",
+          "relation": "preparazione",
+          "meaning_group": "impastare",
+          "rationale": "Impastare amalgama gli ingredienti prima di formare le polpette.",
+          "decision": "accepted",
+          "editorial_source_line": 123
+        },
+        {
+          "word": "pallina",
+          "answer_sense": "piccolo corpo tondeggiante",
+          "relation": "forma",
+          "meaning_group": "pallina",
+          "rationale": "La polpetta viene comunemente modellata come una pallina di impasto.",
+          "decision": "accepted",
+          "editorial_source_line": 124
+        }
+      ],
+      "group_limits": {
+        "carne": 1,
+        "pangrattato": 1,
+        "uovo": 1,
+        "prezzemolo": 1,
+        "parmigiano": 1,
+        "cottura": 1,
+        "sugo": 1,
+        "padella": 1,
+        "impastare": 1,
+        "pallina": 1
+      },
+      "conflicts": []
+    },
+    {
+      "prompt": "spiaggia",
+      "validation_id": "c541c63b9da2d26defc5561ab1354c26a27927505517a92111eae0710879004b",
+      "decision": "accepted",
+      "review_rationale": "Revisione editoriale di ogni coppia per «spiaggia», nel senso «Riva di sabbia o sassi lungo il mare». Controllati autonomia, coerenza, forma e ruoli. Gruppi equivalenti limitati a uno per estrazione; nessun test indipendente dichiarato.",
+      "answers": [
+        {
+          "word": "sabbia",
+          "answer_sense": "insieme di piccoli granelli minerali",
+          "relation": "materiale",
+          "meaning_group": "materiale",
+          "rationale": "La sabbia forma il suolo di molte spiagge.",
+          "decision": "accepted",
+          "editorial_source_line": 127
+        },
+        {
+          "word": "sasso",
+          "answer_sense": "piccolo frammento di roccia",
+          "relation": "materiale",
+          "meaning_group": "materiale",
+          "rationale": "Alcune spiagge sono costituite da sassi e ciottoli.",
+          "decision": "accepted",
+          "editorial_source_line": 128
+        },
+        {
+          "word": "mare",
+          "answer_sense": "grande massa di acqua salata",
+          "relation": "ambiente",
+          "meaning_group": "mare",
+          "rationale": "La spiaggia nel senso scelto si trova lungo la riva del mare.",
+          "decision": "accepted",
+          "editorial_source_line": 129
+        },
+        {
+          "word": "onda",
+          "answer_sense": "movimento della superficie dell'acqua",
+          "relation": "fenomeno",
+          "meaning_group": "onda",
+          "rationale": "Le onde del mare raggiungono la spiaggia.",
+          "decision": "accepted",
+          "editorial_source_line": 130
+        },
+        {
+          "word": "ombrellone",
+          "answer_sense": "grande ombrello da sole",
+          "relation": "attrezzatura",
+          "meaning_group": "ombrellone",
+          "rationale": "L'ombrellone viene usato sulla spiaggia per ripararsi dal sole.",
+          "decision": "accepted",
+          "editorial_source_line": 131
+        },
+        {
+          "word": "lettino",
+          "answer_sense": "sedile allungato per sdraiarsi",
+          "relation": "attrezzatura",
+          "meaning_group": "lettino",
+          "rationale": "Il lettino permette di sdraiarsi sulla spiaggia.",
+          "decision": "accepted",
+          "editorial_source_line": 132
+        },
+        {
+          "word": "asciugamano",
+          "answer_sense": "telo assorbente",
+          "relation": "oggetto d'uso",
+          "meaning_group": "asciugamano",
+          "rationale": "Sulla spiaggia l'asciugamano viene usato per asciugarsi o per stendersi.",
+          "decision": "accepted",
+          "editorial_source_line": 133
+        },
+        {
+          "word": "conchiglia",
+          "answer_sense": "guscio calcareo di alcuni animali marini",
+          "relation": "elemento naturale",
+          "meaning_group": "conchiglia",
+          "rationale": "Le conchiglie possono essere raccolte sulla spiaggia.",
+          "decision": "accepted",
+          "editorial_source_line": 134
+        },
+        {
+          "word": "secchiello",
+          "answer_sense": "piccolo recipiente con manico",
+          "relation": "gioco",
+          "meaning_group": "gioco",
+          "rationale": "Il secchiello è un gioco comune dei bambini sulla spiaggia.",
+          "decision": "accepted",
+          "editorial_source_line": 135
+        },
+        {
+          "word": "paletta",
+          "answer_sense": "piccolo utensile per raccogliere e scavare",
+          "relation": "gioco",
+          "meaning_group": "gioco",
+          "rationale": "La paletta viene usata dai bambini per scavare nella sabbia della spiaggia.",
+          "decision": "accepted",
+          "editorial_source_line": 136
+        },
+        {
+          "word": "costume",
+          "answer_sense": "indumento da bagno",
+          "relation": "abbigliamento",
+          "meaning_group": "costume",
+          "rationale": "Il costume da bagno è un indumento caratteristico della spiaggia.",
+          "decision": "accepted",
+          "editorial_source_line": 137
+        },
+        {
+          "word": "bagnino",
+          "answer_sense": "addetto alla sorveglianza dei bagnanti",
+          "relation": "professione",
+          "meaning_group": "bagnino",
+          "rationale": "Il bagnino sorveglia i bagnanti nelle spiagge attrezzate.",
+          "decision": "accepted",
+          "editorial_source_line": 138
+        },
+        {
+          "word": "duna",
+          "answer_sense": "accumulo di sabbia modellato dal vento",
+          "relation": "formazione naturale",
+          "meaning_group": "duna",
+          "rationale": "Le dune possono formarsi nella parte retrostante di una spiaggia sabbiosa.",
+          "decision": "accepted",
+          "editorial_source_line": 139
+        }
+      ],
+      "group_limits": {
+        "materiale": 1,
+        "mare": 1,
+        "onda": 1,
+        "ombrellone": 1,
+        "lettino": 1,
+        "asciugamano": 1,
+        "conchiglia": 1,
+        "gioco": 1,
+        "costume": 1,
+        "bagnino": 1,
+        "duna": 1
+      },
+      "conflicts": []
+    },
+    {
+      "prompt": "orecchio",
+      "validation_id": "79619c46066e4e33c1d9a16a31536f87716c159987e1da2dfe6fd12f3d2be3f2",
+      "decision": "accepted",
+      "review_rationale": "Revisione editoriale di ogni coppia per «orecchio», nel senso «L'orecchio, organo dell'udito». Controllati autonomia, coerenza, forma e ruoli. Gruppi equivalenti limitati a uno per estrazione; nessun test indipendente dichiarato.",
+      "answers": [
+        {
+          "word": "padiglione",
+          "answer_sense": "parte esterna cartilaginea dell'orecchio",
+          "relation": "parte anatomica",
+          "meaning_group": "padiglione",
+          "rationale": "Il padiglione è la parte esterna visibile dell'orecchio.",
+          "decision": "accepted",
+          "editorial_source_line": 142
+        },
+        {
+          "word": "lobo",
+          "answer_sense": "parte inferiore morbida del padiglione",
+          "relation": "parte anatomica",
+          "meaning_group": "lobo",
+          "rationale": "Il lobo è la parte inferiore morbida dell'orecchio esterno.",
+          "decision": "accepted",
+          "editorial_source_line": 143
+        },
+        {
+          "word": "timpano",
+          "answer_sense": "membrana che vibra al passaggio dei suoni",
+          "relation": "parte anatomica",
+          "meaning_group": "timpano",
+          "rationale": "Il timpano dell'orecchio vibra in risposta ai suoni.",
+          "decision": "accepted",
+          "editorial_source_line": 144
+        },
+        {
+          "word": "coclea",
+          "answer_sense": "struttura interna che trasforma vibrazioni in segnali nervosi",
+          "relation": "parte anatomica",
+          "meaning_group": "coclea",
+          "rationale": "La coclea fa parte dell'orecchio interno e interviene nell'udito.",
+          "decision": "accepted",
+          "editorial_source_line": 145
+        },
+        {
+          "word": "udito",
+          "answer_sense": "senso che percepisce i suoni",
+          "relation": "funzione sensoriale",
+          "meaning_group": "udito",
+          "rationale": "L'orecchio è l'organo dell'udito.",
+          "decision": "accepted",
+          "editorial_source_line": 146
+        },
+        {
+          "word": "suono",
+          "answer_sense": "vibrazione percepita dall'udito",
+          "relation": "stimolo",
+          "meaning_group": "suono",
+          "rationale": "L'orecchio permette di percepire i suoni.",
+          "decision": "accepted",
+          "editorial_source_line": 147
+        },
+        {
+          "word": "rumore",
+          "answer_sense": "suono percepito come disordinato o fastidioso",
+          "relation": "stimolo",
+          "meaning_group": "suono",
+          "rationale": "Un rumore viene percepito attraverso l'orecchio.",
+          "decision": "accepted",
+          "editorial_source_line": 148
+        },
+        {
+          "word": "cerume",
+          "answer_sense": "secrezione del condotto uditivo esterno",
+          "relation": "secrezione",
+          "meaning_group": "cerume",
+          "rationale": "Il cerume è prodotto nel condotto dell'orecchio esterno.",
+          "decision": "accepted",
+          "editorial_source_line": 149
+        },
+        {
+          "word": "orecchino",
+          "answer_sense": "ornamento applicato all'orecchio",
+          "relation": "ornamento",
+          "meaning_group": "orecchino",
+          "rationale": "L'orecchino viene portato sul lobo o su altre parti dell'orecchio.",
+          "decision": "accepted",
+          "editorial_source_line": 150
+        },
+        {
+          "word": "auricolare",
+          "answer_sense": "piccolo dispositivo per ascoltare",
+          "relation": "dispositivo",
+          "meaning_group": "auricolare",
+          "rationale": "L'auricolare viene collocato vicino o dentro l'orecchio per ascoltare audio.",
+          "decision": "accepted",
+          "editorial_source_line": 151
+        },
+        {
+          "word": "sordità",
+          "answer_sense": "perdita parziale o totale dell'udito",
+          "relation": "disturbo della funzione",
+          "meaning_group": "sordità",
+          "rationale": "La sordità riguarda la capacità di udire i suoni attraverso il sistema uditivo.",
+          "decision": "accepted",
+          "editorial_source_line": 152
+        },
+        {
+          "word": "otite",
+          "answer_sense": "infiammazione dell'orecchio",
+          "relation": "patologia",
+          "meaning_group": "otite",
+          "rationale": "L'otite è un'infiammazione che interessa una parte dell'orecchio.",
+          "decision": "accepted",
+          "editorial_source_line": 153
+        }
+      ],
+      "group_limits": {
+        "padiglione": 1,
+        "lobo": 1,
+        "timpano": 1,
+        "coclea": 1,
+        "udito": 1,
+        "suono": 1,
+        "cerume": 1,
+        "orecchino": 1,
+        "auricolare": 1,
+        "sordità": 1,
+        "otite": 1
+      },
+      "conflicts": []
+    },
+    {
+      "prompt": "candela",
+      "validation_id": "af5fc1731bd62983bf16edf0e3cf6fe19f6c65776507bc879e4075f105bb54a9",
+      "decision": "accepted",
+      "review_rationale": "Revisione editoriale di ogni coppia per «candela», nel senso «Cilindro di cera con lo stoppino». Controllati autonomia, coerenza, forma e ruoli. Gruppi equivalenti limitati a uno per estrazione; nessun test indipendente dichiarato.",
+      "answers": [
+        {
+          "word": "cera",
+          "answer_sense": "materiale combustibile e modellabile",
+          "relation": "materiale",
+          "meaning_group": "cera",
+          "rationale": "La cera costituisce il corpo di molte candele.",
+          "decision": "accepted",
+          "editorial_source_line": 156
+        },
+        {
+          "word": "stoppino",
+          "answer_sense": "filo che alimenta la combustione",
+          "relation": "parte",
+          "meaning_group": "stoppino",
+          "rationale": "Lo stoppino della candela sostiene la fiamma e assorbe il combustibile fuso.",
+          "decision": "accepted",
+          "editorial_source_line": 157
+        },
+        {
+          "word": "fiamma",
+          "answer_sense": "parte luminosa della combustione",
+          "relation": "combustione",
+          "meaning_group": "fiamma",
+          "rationale": "Una candela accesa produce una fiamma sullo stoppino.",
+          "decision": "accepted",
+          "editorial_source_line": 158
+        },
+        {
+          "word": "fiammifero",
+          "answer_sense": "bastoncino che si accende per sfregamento",
+          "relation": "strumento",
+          "meaning_group": "fiammifero",
+          "rationale": "Un fiammifero può essere usato per accendere una candela.",
+          "decision": "accepted",
+          "editorial_source_line": 159
+        },
+        {
+          "word": "accendere",
+          "answer_sense": "avviare la combustione",
+          "relation": "azione",
+          "meaning_group": "accendere",
+          "rationale": "Accendere una candela significa dare fuoco al suo stoppino.",
+          "decision": "accepted",
+          "editorial_source_line": 160
+        },
+        {
+          "word": "spegnere",
+          "answer_sense": "interrompere la combustione",
+          "relation": "azione",
+          "meaning_group": "spegnere",
+          "rationale": "Spegnere una candela interrompe la sua fiamma.",
+          "decision": "accepted",
+          "editorial_source_line": 161
+        },
+        {
+          "word": "luce",
+          "answer_sense": "fenomeno che rende visibili gli oggetti",
+          "relation": "funzione",
+          "meaning_group": "luce",
+          "rationale": "La candela accesa produce luce.",
+          "decision": "accepted",
+          "editorial_source_line": 162
+        },
+        {
+          "word": "candelabro",
+          "answer_sense": "sostegno per più candele",
+          "relation": "supporto",
+          "meaning_group": "candelabro",
+          "rationale": "Il candelabro sostiene una o più candele.",
+          "decision": "accepted",
+          "editorial_source_line": 163
+        },
+        {
+          "word": "soffiare",
+          "answer_sense": "espellere aria dalla bocca",
+          "relation": "spegnimento",
+          "meaning_group": "soffiare",
+          "rationale": "Soffiando si può spegnere la fiamma di una candela.",
+          "decision": "accepted",
+          "editorial_source_line": 164
+        },
+        {
+          "word": "profumo",
+          "answer_sense": "odore gradevole",
+          "relation": "effetto",
+          "meaning_group": "profumo",
+          "rationale": "Una candela profumata diffonde un aroma durante l'uso.",
+          "decision": "accepted",
+          "editorial_source_line": 165
+        },
+        {
+          "word": "compleanno",
+          "answer_sense": "anniversario della nascita",
+          "relation": "occasione",
+          "meaning_group": "compleanno",
+          "rationale": "Piccole candele vengono accese sulla torta di compleanno.",
+          "decision": "accepted",
+          "editorial_source_line": 166
+        }
+      ],
+      "group_limits": {
+        "cera": 1,
+        "stoppino": 1,
+        "fiamma": 1,
+        "fiammifero": 1,
+        "accendere": 1,
+        "spegnere": 1,
+        "luce": 1,
+        "candelabro": 1,
+        "soffiare": 1,
+        "profumo": 1,
+        "compleanno": 1
+      },
+      "conflicts": []
+    },
+    {
+      "prompt": "fazzoletto",
+      "validation_id": "ace84b6b36b201aa01c02911a46f5149026a094c555cbf6f143c65332fc56aa4",
+      "decision": "accepted",
+      "review_rationale": "Revisione editoriale di ogni coppia per «fazzoletto», nel senso «Fazzoletto per soffiarsi il naso». Controllati autonomia, coerenza, forma e ruoli. Gruppi equivalenti limitati a uno per estrazione; nessun test indipendente dichiarato.",
+      "answers": [
+        {
+          "word": "naso",
+          "answer_sense": "organo del volto",
+          "relation": "uso",
+          "meaning_group": "naso",
+          "rationale": "Il fazzoletto nel senso scelto serve per soffiarsi e pulirsi il naso.",
+          "decision": "accepted",
+          "editorial_source_line": 169
+        },
+        {
+          "word": "raffreddore",
+          "answer_sense": "disturbo con secrezione e congestione nasale",
+          "relation": "occasione",
+          "meaning_group": "raffreddore",
+          "rationale": "Durante un raffreddore si usa spesso il fazzoletto per il naso.",
+          "decision": "accepted",
+          "editorial_source_line": 170
+        },
+        {
+          "word": "starnuto",
+          "answer_sense": "espulsione improvvisa di aria dalle vie respiratorie",
+          "relation": "occasione",
+          "meaning_group": "starnuto",
+          "rationale": "Un fazzoletto può coprire naso e bocca durante uno starnuto.",
+          "decision": "accepted",
+          "editorial_source_line": 171
+        },
+        {
+          "word": "muco",
+          "answer_sense": "secrezione delle mucose",
+          "relation": "materiale rimosso",
+          "meaning_group": "muco",
+          "rationale": "Il fazzoletto raccoglie il muco quando ci si soffia il naso.",
+          "decision": "accepted",
+          "editorial_source_line": 172
+        },
+        {
+          "word": "tasca",
+          "answer_sense": "piccolo vano di un indumento",
+          "relation": "custodia",
+          "meaning_group": "tasca",
+          "rationale": "Il fazzoletto viene comunemente tenuto in tasca per averlo a disposizione.",
+          "decision": "accepted",
+          "editorial_source_line": 173
+        },
+        {
+          "word": "carta",
+          "answer_sense": "materiale sottile di fibre vegetali",
+          "relation": "materiale",
+          "meaning_group": "materiale",
+          "rationale": "La carta assorbente viene usata per i fazzoletti monouso.",
+          "decision": "accepted",
+          "editorial_source_line": 174
+        },
+        {
+          "word": "stoffa",
+          "answer_sense": "tessuto",
+          "relation": "materiale",
+          "meaning_group": "materiale",
+          "rationale": "La stoffa viene usata per i fazzoletti lavabili.",
+          "decision": "accepted",
+          "editorial_source_line": 175
+        },
+        {
+          "word": "monouso",
+          "answer_sense": "destinato a essere usato una sola volta",
+          "relation": "tipo",
+          "meaning_group": "monouso",
+          "rationale": "I fazzoletti di carta sono comunemente prodotti monouso.",
+          "decision": "accepted",
+          "editorial_source_line": 176
+        },
+        {
+          "word": "pacchetto",
+          "answer_sense": "piccolo involucro contenente più pezzi",
+          "relation": "confezione",
+          "meaning_group": "pacchetto",
+          "rationale": "I fazzoletti di carta vengono comunemente venduti in piccoli pacchetti tascabili.",
+          "decision": "accepted",
+          "editorial_source_line": 177
+        }
+      ],
+      "group_limits": {
+        "naso": 1,
+        "raffreddore": 1,
+        "starnuto": 1,
+        "muco": 1,
+        "tasca": 1,
+        "materiale": 1,
+        "monouso": 1,
+        "pacchetto": 1
+      },
+      "conflicts": []
+    },
+    {
+      "prompt": "pera",
+      "validation_id": "c18496c913c4240c1b76f61d950da9103ae9727b43d7d167f8e50efffc240e88",
+      "decision": "accepted",
+      "review_rationale": "Revisione editoriale di ogni coppia per «pera», nel senso «Frutto del pero». Controllati autonomia, coerenza, forma e ruoli. Gruppi equivalenti limitati a uno per estrazione; nessun test indipendente dichiarato.",
+      "answers": [
+        {
+          "word": "frutto",
+          "answer_sense": "parte alimentare della pianta contenente semi",
+          "relation": "categoria",
+          "meaning_group": "frutto",
+          "rationale": "La pera è un frutto alimentare.",
+          "decision": "accepted",
+          "editorial_source_line": 180
+        },
+        {
+          "word": "pero",
+          "answer_sense": "albero che produce pere",
+          "relation": "pianta d'origine",
+          "meaning_group": "pero",
+          "rationale": "Il pero è l'albero che produce la pera.",
+          "decision": "accepted",
+          "editorial_source_line": 181
+        },
+        {
+          "word": "buccia",
+          "answer_sense": "rivestimento esterno del frutto",
+          "relation": "parte",
+          "meaning_group": "buccia",
+          "rationale": "La buccia riveste esternamente la pera.",
+          "decision": "accepted",
+          "editorial_source_line": 182
+        },
+        {
+          "word": "polpa",
+          "answer_sense": "parte carnosa del frutto",
+          "relation": "parte",
+          "meaning_group": "polpa",
+          "rationale": "La polpa è la parte carnosa della pera che si mangia.",
+          "decision": "accepted",
+          "editorial_source_line": 183
+        },
+        {
+          "word": "seme",
+          "answer_sense": "struttura vegetale per la riproduzione",
+          "relation": "parte",
+          "meaning_group": "seme",
+          "rationale": "La pera contiene semi nella parte centrale del frutto.",
+          "decision": "accepted",
+          "editorial_source_line": 184
+        },
+        {
+          "word": "picciolo",
+          "answer_sense": "elemento che collega il frutto alla pianta",
+          "relation": "parte",
+          "meaning_group": "picciolo",
+          "rationale": "Il picciolo collega la pera al ramo prima della raccolta.",
+          "decision": "accepted",
+          "editorial_source_line": 185
+        },
+        {
+          "word": "succo",
+          "answer_sense": "liquido estratto dalla frutta",
+          "relation": "derivato",
+          "meaning_group": "succo",
+          "rationale": "Dalla pera si può ricavare succo di frutta.",
+          "decision": "accepted",
+          "editorial_source_line": 186
+        },
+        {
+          "word": "verde",
+          "answer_sense": "colore di alcune varietà",
+          "relation": "colore",
+          "meaning_group": "colore",
+          "rationale": "La buccia di alcune pere rimane verde anche a maturazione.",
+          "decision": "accepted",
+          "editorial_source_line": 187
+        },
+        {
+          "word": "giallo",
+          "answer_sense": "colore di alcune varietà",
+          "relation": "colore",
+          "meaning_group": "colore",
+          "rationale": "Alcune pere mature hanno la buccia gialla.",
+          "decision": "accepted",
+          "editorial_source_line": 188
+        },
+        {
+          "word": "spicchio",
+          "answer_sense": "porzione ricavata tagliando un frutto",
+          "relation": "preparazione",
+          "meaning_group": "spicchio",
+          "rationale": "La pera può essere tagliata e servita a spicchi.",
+          "decision": "accepted",
+          "editorial_source_line": 189
+        },
+        {
+          "word": "confettura",
+          "answer_sense": "conserva dolce di frutta",
+          "relation": "derivato",
+          "meaning_group": "confettura",
+          "rationale": "La pera può essere cotta con zucchero per preparare una confettura.",
+          "decision": "accepted",
+          "editorial_source_line": 190
+        }
+      ],
+      "group_limits": {
+        "frutto": 1,
+        "pero": 1,
+        "buccia": 1,
+        "polpa": 1,
+        "seme": 1,
+        "picciolo": 1,
+        "succo": 1,
+        "colore": 1,
+        "spicchio": 1,
+        "confettura": 1
+      },
+      "conflicts": []
+    },
+    {
+      "prompt": "ginocchio",
+      "validation_id": "acf04edbc0be13bd62297c5b33bf6a90db7b7c731914ab4678e7641c0e17b25c",
+      "decision": "accepted",
+      "review_rationale": "Revisione editoriale di ogni coppia per «ginocchio», nel senso «L'articolazione della gamba». Controllati autonomia, coerenza, forma e ruoli. Gruppi equivalenti limitati a uno per estrazione; nessun test indipendente dichiarato.",
+      "answers": [
+        {
+          "word": "rotula",
+          "answer_sense": "osso anteriore dell'articolazione del ginocchio",
+          "relation": "parte anatomica",
+          "meaning_group": "rotula",
+          "rationale": "La rotula è l'osso posto davanti all'articolazione del ginocchio.",
+          "decision": "accepted",
+          "editorial_source_line": 193
+        },
+        {
+          "word": "articolazione",
+          "answer_sense": "connessione mobile fra ossa",
+          "relation": "categoria anatomica",
+          "meaning_group": "articolazione",
+          "rationale": "Il ginocchio è un'articolazione dell'arto inferiore.",
+          "decision": "accepted",
+          "editorial_source_line": 194
+        },
+        {
+          "word": "gamba",
+          "answer_sense": "parte dell'arto inferiore",
+          "relation": "appartenenza anatomica",
+          "meaning_group": "gamba",
+          "rationale": "Il ginocchio permette di piegare la gamba rispetto alla coscia.",
+          "decision": "accepted",
+          "editorial_source_line": 195
+        },
+        {
+          "word": "femore",
+          "answer_sense": "osso della coscia",
+          "relation": "osso articolato",
+          "meaning_group": "femore",
+          "rationale": "Il femore partecipa all'articolazione del ginocchio.",
+          "decision": "accepted",
+          "editorial_source_line": 196
+        },
+        {
+          "word": "tibia",
+          "answer_sense": "osso della gamba",
+          "relation": "osso articolato",
+          "meaning_group": "tibia",
+          "rationale": "La tibia partecipa all'articolazione del ginocchio insieme al femore.",
+          "decision": "accepted",
+          "editorial_source_line": 197
+        },
+        {
+          "word": "menisco",
+          "answer_sense": "struttura cartilaginea dell'articolazione",
+          "relation": "parte anatomica",
+          "meaning_group": "menisco",
+          "rationale": "I menischi si trovano nel ginocchio fra femore e tibia.",
+          "decision": "accepted",
+          "editorial_source_line": 198
+        },
+        {
+          "word": "legamento",
+          "answer_sense": "struttura fibrosa che stabilizza un'articolazione",
+          "relation": "parte anatomica",
+          "meaning_group": "legamento",
+          "rationale": "I legamenti contribuiscono alla stabilità del ginocchio.",
+          "decision": "accepted",
+          "editorial_source_line": 199
+        },
+        {
+          "word": "piegare",
+          "answer_sense": "flettere un segmento del corpo",
+          "relation": "movimento",
+          "meaning_group": "piegare",
+          "rationale": "Il movimento del ginocchio permette di piegare l'arto inferiore.",
+          "decision": "accepted",
+          "editorial_source_line": 200
+        },
+        {
+          "word": "inginocchiarsi",
+          "answer_sense": "appoggiare uno o entrambi i ginocchi a terra",
+          "relation": "posizione",
+          "meaning_group": "inginocchiarsi",
+          "rationale": "Inginocchiarsi significa appoggiarsi a terra sui ginocchi.",
+          "decision": "accepted",
+          "editorial_source_line": 201
+        },
+        {
+          "word": "cartilagine",
+          "answer_sense": "tessuto che riveste superfici articolari",
+          "relation": "tessuto",
+          "meaning_group": "cartilagine",
+          "rationale": "La cartilagine riveste superfici articolari del ginocchio.",
+          "decision": "accepted",
+          "editorial_source_line": 202
+        },
+        {
+          "word": "ginocchiera",
+          "answer_sense": "protezione o sostegno per il ginocchio",
+          "relation": "ausilio",
+          "meaning_group": "ginocchiera",
+          "rationale": "La ginocchiera protegge o sostiene il ginocchio.",
+          "decision": "accepted",
+          "editorial_source_line": 203
+        }
+      ],
+      "group_limits": {
+        "rotula": 1,
+        "articolazione": 1,
+        "gamba": 1,
+        "femore": 1,
+        "tibia": 1,
+        "menisco": 1,
+        "legamento": 1,
+        "piegare": 1,
+        "inginocchiarsi": 1,
+        "cartilagine": 1,
+        "ginocchiera": 1
+      },
+      "conflicts": []
+    },
+    {
+      "prompt": "coperta",
+      "validation_id": "c1f655a99d49ba4e8bb3b2c62071dd44fdc2691c0d16a5d011087c2f449f9a64",
+      "decision": "accepted",
+      "review_rationale": "Revisione editoriale di ogni coppia per «coperta», nel senso «Panno pesante per coprirsi a letto». Controllati autonomia, coerenza, forma e ruoli. Gruppi equivalenti limitati a uno per estrazione; nessun test indipendente dichiarato.",
+      "answers": [
+        {
+          "word": "letto",
+          "answer_sense": "mobile per dormire",
+          "relation": "collocazione",
+          "meaning_group": "letto",
+          "rationale": "La coperta viene comunemente stesa sul letto.",
+          "decision": "accepted",
+          "editorial_source_line": 206
+        },
+        {
+          "word": "coprirsi",
+          "answer_sense": "rivestire il corpo per ripararlo",
+          "relation": "funzione",
+          "meaning_group": "coprirsi",
+          "rationale": "La coperta permette di coprirsi durante il riposo.",
+          "decision": "accepted",
+          "editorial_source_line": 207
+        },
+        {
+          "word": "lana",
+          "answer_sense": "fibra tessile animale",
+          "relation": "materiale",
+          "meaning_group": "materiale",
+          "rationale": "La lana è un materiale tradizionale delle coperte.",
+          "decision": "accepted",
+          "editorial_source_line": 208
+        },
+        {
+          "word": "cotone",
+          "answer_sense": "fibra tessile vegetale",
+          "relation": "materiale",
+          "meaning_group": "materiale",
+          "rationale": "Il cotone viene usato per realizzare coperte leggere.",
+          "decision": "accepted",
+          "editorial_source_line": 209
+        },
+        {
+          "word": "pile",
+          "answer_sense": "tessuto sintetico morbido e isolante",
+          "relation": "materiale",
+          "meaning_group": "materiale",
+          "rationale": "Il pile viene usato per coperte leggere che trattengono calore.",
+          "decision": "accepted",
+          "editorial_source_line": 210
+        },
+        {
+          "word": "caldo",
+          "answer_sense": "condizione di temperatura confortevole o elevata",
+          "relation": "effetto",
+          "meaning_group": "caldo",
+          "rationale": "La coperta aiuta a mantenere caldo il corpo.",
+          "decision": "accepted",
+          "editorial_source_line": 211
+        },
+        {
+          "word": "sonno",
+          "answer_sense": "stato del dormire",
+          "relation": "occasione",
+          "meaning_group": "sonno",
+          "rationale": "La coperta viene usata per proteggersi durante il sonno.",
+          "decision": "accepted",
+          "editorial_source_line": 212
+        },
+        {
+          "word": "inverno",
+          "answer_sense": "stagione fredda",
+          "relation": "periodo d'uso",
+          "meaning_group": "inverno",
+          "rationale": "La coperta è comunemente associata al riposo durante l'inverno.",
+          "decision": "accepted",
+          "editorial_source_line": 213
+        },
+        {
+          "word": "plaid",
+          "answer_sense": "coperta di dimensioni contenute",
+          "relation": "tipo",
+          "meaning_group": "tipo_coperta",
+          "rationale": "Il plaid è un tipo di coperta usata per coprirsi durante il riposo.",
+          "decision": "accepted",
+          "editorial_source_line": 214
+        },
+        {
+          "word": "trapunta",
+          "answer_sense": "coperta imbottita e cucita",
+          "relation": "tipo",
+          "meaning_group": "tipo_coperta",
+          "rationale": "La trapunta è una coperta imbottita per il letto.",
+          "decision": "accepted",
+          "editorial_source_line": 215
+        },
+        {
+          "word": "morbido",
+          "answer_sense": "cedevole e piacevole al tatto",
+          "relation": "qualità tattile",
+          "meaning_group": "morbido",
+          "rationale": "La morbidezza è una qualità riconoscibile di molte coperte.",
+          "decision": "accepted",
+          "editorial_source_line": 216
+        },
+        {
+          "word": "freddo",
+          "answer_sense": "condizione di bassa temperatura",
+          "relation": "bisogno contrastato",
+          "meaning_group": "freddo",
+          "rationale": "La coperta viene usata per proteggere il corpo dal freddo.",
+          "decision": "accepted",
+          "editorial_source_line": 217
+        }
+      ],
+      "group_limits": {
+        "letto": 1,
+        "coprirsi": 1,
+        "materiale": 1,
+        "caldo": 1,
+        "sonno": 1,
+        "inverno": 1,
+        "tipo_coperta": 1,
+        "morbido": 1,
+        "freddo": 1
+      },
+      "conflicts": []
+    },
+    {
+      "prompt": "cappello",
+      "validation_id": "3db8e3b6dbe242b229dfbcd7a4720fd6e9c35c96cdc9960b349372ec5bbedb8c",
+      "decision": "accepted",
+      "review_rationale": "Revisione editoriale di ogni coppia per «cappello», nel senso «Copricapo da indossare in testa». Controllati autonomia, coerenza, forma e ruoli. Gruppi equivalenti limitati a uno per estrazione; nessun test indipendente dichiarato.",
+      "answers": [
+        {
+          "word": "testa",
+          "answer_sense": "capo del corpo umano",
+          "relation": "sede d'uso",
+          "meaning_group": "testa",
+          "rationale": "Il cappello viene indossato sulla testa.",
+          "decision": "accepted",
+          "editorial_source_line": 220
+        },
+        {
+          "word": "tesa",
+          "answer_sense": "parte sporgente intorno al cappello",
+          "relation": "parte",
+          "meaning_group": "tesa",
+          "rationale": "La tesa sporge dalla base della cupola di molti cappelli.",
+          "decision": "accepted",
+          "editorial_source_line": 221
+        },
+        {
+          "word": "cupola",
+          "answer_sense": "parte del cappello che ricopre il capo",
+          "relation": "parte",
+          "meaning_group": "cupola",
+          "rationale": "La cupola è la parte del cappello che avvolge la testa.",
+          "decision": "accepted",
+          "editorial_source_line": 222
+        },
+        {
+          "word": "visiera",
+          "answer_sense": "parte sporgente che ripara gli occhi",
+          "relation": "parte",
+          "meaning_group": "visiera",
+          "rationale": "Alcuni cappelli hanno una visiera per riparare gli occhi dalla luce.",
+          "decision": "accepted",
+          "editorial_source_line": 223
+        },
+        {
+          "word": "berretto",
+          "answer_sense": "copricapo morbido o con visiera",
+          "relation": "tipo affine",
+          "meaning_group": "tipo",
+          "rationale": "Il berretto è un copricapo comunemente associato ai cappelli.",
+          "decision": "accepted",
+          "editorial_source_line": 224
+        },
+        {
+          "word": "cilindro",
+          "answer_sense": "cappello alto con cupola cilindrica",
+          "relation": "tipo",
+          "meaning_group": "tipo",
+          "rationale": "Il cilindro è un tipo riconoscibile di cappello.",
+          "decision": "accepted",
+          "editorial_source_line": 225
+        },
+        {
+          "word": "coppola",
+          "answer_sense": "copricapo basso con piccola visiera",
+          "relation": "tipo",
+          "meaning_group": "tipo",
+          "rationale": "La coppola è un copricapo tradizionale con una piccola visiera.",
+          "decision": "accepted",
+          "editorial_source_line": 226
+        },
+        {
+          "word": "paglia",
+          "answer_sense": "steli vegetali essiccati",
+          "relation": "materiale",
+          "meaning_group": "materiale",
+          "rationale": "La paglia viene usata per fabbricare cappelli leggeri da sole.",
+          "decision": "accepted",
+          "editorial_source_line": 227
+        },
+        {
+          "word": "feltro",
+          "answer_sense": "materiale tessile compatto",
+          "relation": "materiale",
+          "meaning_group": "materiale",
+          "rationale": "Il feltro è un materiale comune di diversi cappelli.",
+          "decision": "accepted",
+          "editorial_source_line": 228
+        },
+        {
+          "word": "sole",
+          "answer_sense": "sorgente di luce e calore",
+          "relation": "protezione",
+          "meaning_group": "protezione",
+          "rationale": "Un cappello può proteggere la testa e il viso dal sole.",
+          "decision": "accepted",
+          "editorial_source_line": 229
+        },
+        {
+          "word": "freddo",
+          "answer_sense": "bassa temperatura",
+          "relation": "protezione",
+          "meaning_group": "protezione",
+          "rationale": "Un cappello invernale protegge la testa dal freddo.",
+          "decision": "accepted",
+          "editorial_source_line": 230
+        },
+        {
+          "word": "copricapo",
+          "answer_sense": "indumento che copre il capo",
+          "relation": "categoria",
+          "meaning_group": "copricapo",
+          "rationale": "Il cappello è un copricapo.",
+          "decision": "accepted",
+          "editorial_source_line": 231
+        }
+      ],
+      "group_limits": {
+        "testa": 1,
+        "tesa": 1,
+        "cupola": 1,
+        "visiera": 1,
+        "tipo": 1,
+        "materiale": 1,
+        "protezione": 1,
+        "copricapo": 1
+      },
+      "conflicts": []
+    },
+    {
+      "prompt": "carnevale",
+      "validation_id": "f5f6e41bee21ee8ac8254ed091bfe015e912cbf11b200b403178d2c02d54d886",
+      "decision": "accepted",
+      "review_rationale": "Revisione editoriale di ogni coppia per «carnevale», nel senso «Periodo di feste in maschera prima della Quaresima». Controllati autonomia, coerenza, forma e ruoli. Gruppi equivalenti limitati a uno per estrazione; nessun test indipendente dichiarato.",
+      "answers": [
+        {
+          "word": "maschera",
+          "answer_sense": "oggetto o personaggio che cela e trasforma il volto",
+          "relation": "tradizione",
+          "meaning_group": "maschera",
+          "rationale": "La maschera è un elemento caratteristico dei festeggiamenti di Carnevale.",
+          "decision": "accepted",
+          "editorial_source_line": 234
+        },
+        {
+          "word": "costume",
+          "answer_sense": "abito che riproduce un personaggio",
+          "relation": "abbigliamento",
+          "meaning_group": "costume",
+          "rationale": "A Carnevale si indossano costumi di fantasia.",
+          "decision": "accepted",
+          "editorial_source_line": 235
+        },
+        {
+          "word": "coriandolo",
+          "answer_sense": "piccolo ritaglio di carta colorata",
+          "relation": "materiale festivo",
+          "meaning_group": "coriandolo",
+          "rationale": "I coriandoli vengono lanciati durante le feste di Carnevale.",
+          "decision": "accepted",
+          "editorial_source_line": 236
+        },
+        {
+          "word": "sfilata",
+          "answer_sense": "corteo organizzato di persone o mezzi",
+          "relation": "manifestazione",
+          "meaning_group": "sfilata",
+          "rationale": "Le sfilate sono manifestazioni caratteristiche del Carnevale.",
+          "decision": "accepted",
+          "editorial_source_line": 237
+        },
+        {
+          "word": "carro",
+          "answer_sense": "veicolo allestito per un corteo",
+          "relation": "manifestazione",
+          "meaning_group": "carro",
+          "rationale": "I carri allegorici partecipano alle sfilate di Carnevale.",
+          "decision": "accepted",
+          "editorial_source_line": 238
+        },
+        {
+          "word": "travestimento",
+          "answer_sense": "cambiamento dell'aspetto mediante abiti e accessori",
+          "relation": "pratica",
+          "meaning_group": "travestimento",
+          "rationale": "Il travestimento permette di impersonare figure diverse durante il Carnevale.",
+          "decision": "accepted",
+          "editorial_source_line": 239
+        },
+        {
+          "word": "scherzo",
+          "answer_sense": "azione compiuta per divertire o sorprendere",
+          "relation": "usanza",
+          "meaning_group": "scherzo",
+          "rationale": "Gli scherzi sono associati alla tradizione del Carnevale.",
+          "decision": "accepted",
+          "editorial_source_line": 240
+        },
+        {
+          "word": "frittella",
+          "answer_sense": "piccolo dolce fritto",
+          "relation": "dolce tipico",
+          "meaning_group": "dolce",
+          "rationale": "Le frittelle sono dolci tradizionalmente preparati durante il Carnevale.",
+          "decision": "accepted",
+          "editorial_source_line": 241
+        },
+        {
+          "word": "chiacchiera",
+          "answer_sense": "dolce sottile di pasta fritta",
+          "relation": "dolce tipico",
+          "meaning_group": "dolce",
+          "rationale": "Le chiacchiere sono dolci tipici del Carnevale italiano.",
+          "decision": "accepted",
+          "editorial_source_line": 242
+        },
+        {
+          "word": "arlecchino",
+          "answer_sense": "personaggio tradizionale della commedia e del Carnevale",
+          "relation": "personaggio",
+          "meaning_group": "arlecchino",
+          "rationale": "Arlecchino è una maschera tradizionale riconoscibile del Carnevale.",
+          "decision": "accepted",
+          "editorial_source_line": 243
+        },
+        {
+          "word": "quaresima",
+          "answer_sense": "periodo religioso che precede la Pasqua",
+          "relation": "collocazione nel calendario",
+          "meaning_group": "quaresima",
+          "rationale": "Il Carnevale precede la Quaresima nel calendario tradizionale.",
+          "decision": "accepted",
+          "editorial_source_line": 244
+        },
+        {
+          "word": "festa",
+          "answer_sense": "celebrazione collettiva",
+          "relation": "categoria di evento",
+          "meaning_group": "festa",
+          "rationale": "Il Carnevale comprende feste e celebrazioni collettive.",
+          "decision": "accepted",
+          "editorial_source_line": 245
+        }
+      ],
+      "group_limits": {
+        "maschera": 1,
+        "costume": 1,
+        "coriandolo": 1,
+        "sfilata": 1,
+        "carro": 1,
+        "travestimento": 1,
+        "scherzo": 1,
+        "dolce": 1,
+        "arlecchino": 1,
+        "quaresima": 1,
+        "festa": 1
+      },
+      "conflicts": []
+    },
+    {
+      "prompt": "panino",
+      "validation_id": "e5c234248f44dd3450b4c1a30a2bebabe00a472a835e1868a32665441a122a91",
+      "decision": "accepted",
+      "review_rationale": "Revisione editoriale di ogni coppia per «panino», nel senso «Pane farcito da mangiare al volo». Controllati autonomia, coerenza, forma e ruoli. Gruppi equivalenti limitati a uno per estrazione; nessun test indipendente dichiarato.",
+      "answers": [
+        {
+          "word": "pane",
+          "answer_sense": "alimento lievitato e cotto",
+          "relation": "base alimentare",
+          "meaning_group": "pane",
+          "rationale": "Il pane costituisce l'involucro del panino farcito.",
+          "decision": "accepted",
+          "editorial_source_line": 248
+        },
+        {
+          "word": "farcitura",
+          "answer_sense": "insieme degli ingredienti inseriti all'interno",
+          "relation": "componente",
+          "meaning_group": "farcitura",
+          "rationale": "La farcitura distingue il panino da semplice pane non condito.",
+          "decision": "accepted",
+          "editorial_source_line": 249
+        },
+        {
+          "word": "prosciutto",
+          "answer_sense": "salume ottenuto dalla coscia del maiale",
+          "relation": "ingrediente",
+          "meaning_group": "salume",
+          "rationale": "Il prosciutto è una farcitura comune del panino.",
+          "decision": "accepted",
+          "editorial_source_line": 250
+        },
+        {
+          "word": "salame",
+          "answer_sense": "salume insaccato",
+          "relation": "ingrediente",
+          "meaning_group": "salume",
+          "rationale": "Il salame viene comunemente usato per farcire un panino.",
+          "decision": "accepted",
+          "editorial_source_line": 251
+        },
+        {
+          "word": "formaggio",
+          "answer_sense": "alimento ricavato dal latte",
+          "relation": "ingrediente",
+          "meaning_group": "formaggio",
+          "rationale": "Il formaggio è una farcitura comune dei panini.",
+          "decision": "accepted",
+          "editorial_source_line": 252
+        },
+        {
+          "word": "tonno",
+          "answer_sense": "pesce consumato anche conservato",
+          "relation": "ingrediente",
+          "meaning_group": "tonno",
+          "rationale": "Il tonno viene usato per farcire molti panini.",
+          "decision": "accepted",
+          "editorial_source_line": 253
+        },
+        {
+          "word": "insalata",
+          "answer_sense": "foglie commestibili usate crude",
+          "relation": "ingrediente",
+          "meaning_group": "insalata",
+          "rationale": "L'insalata può essere aggiunta alla farcitura di un panino.",
+          "decision": "accepted",
+          "editorial_source_line": 254
+        },
+        {
+          "word": "maionese",
+          "answer_sense": "salsa a base di uovo e olio",
+          "relation": "condimento",
+          "meaning_group": "maionese",
+          "rationale": "La maionese è un condimento comune dei panini farciti.",
+          "decision": "accepted",
+          "editorial_source_line": 255
+        },
+        {
+          "word": "mordere",
+          "answer_sense": "stringere e tagliare con i denti",
+          "relation": "consumo",
+          "meaning_group": "mordere",
+          "rationale": "Un panino viene comunemente mangiato mordendolo.",
+          "decision": "accepted",
+          "editorial_source_line": 256
+        },
+        {
+          "word": "spuntino",
+          "answer_sense": "piccolo pasto",
+          "relation": "occasione",
+          "meaning_group": "spuntino",
+          "rationale": "Un panino è un alimento comune per uno spuntino.",
+          "decision": "accepted",
+          "editorial_source_line": 257
+        },
+        {
+          "word": "bar",
+          "answer_sense": "esercizio di somministrazione",
+          "relation": "luogo di acquisto",
+          "meaning_group": "bar",
+          "rationale": "Il bar è un luogo comune in cui acquistare un panino farcito.",
+          "decision": "accepted",
+          "editorial_source_line": 258
+        },
+        {
+          "word": "toast",
+          "answer_sense": "preparazione di pane farcito e tostato",
+          "relation": "preparazione affine",
+          "meaning_group": "toast",
+          "rationale": "Il toast è una preparazione di pane farcito affine al panino.",
+          "decision": "accepted",
+          "editorial_source_line": 259
+        }
+      ],
+      "group_limits": {
+        "pane": 1,
+        "farcitura": 1,
+        "salume": 1,
+        "formaggio": 1,
+        "tonno": 1,
+        "insalata": 1,
+        "maionese": 1,
+        "mordere": 1,
+        "spuntino": 1,
+        "bar": 1,
+        "toast": 1
+      },
+      "conflicts": []
+    },
+    {
+      "prompt": "drago",
+      "validation_id": "fb0d3a6f6766c20007e75269244a76ac057fb521c17ef777fedbc408c92cd436",
+      "decision": "accepted",
+      "review_rationale": "Revisione editoriale di ogni coppia per «drago», nel senso «Animale fantastico che sputa fuoco». Controllati autonomia, coerenza, forma e ruoli. Gruppi equivalenti limitati a uno per estrazione; nessun test indipendente dichiarato.",
+      "answers": [
+        {
+          "word": "fuoco",
+          "answer_sense": "combustione con fiamme",
+          "relation": "potere fantastico",
+          "meaning_group": "fuoco",
+          "rationale": "Il drago nel senso scelto è la creatura fantastica che sputa fuoco.",
+          "decision": "accepted",
+          "editorial_source_line": 262
+        },
+        {
+          "word": "ala",
+          "answer_sense": "appendice che permette il volo",
+          "relation": "parte fantastica",
+          "meaning_group": "ala",
+          "rationale": "Molte rappresentazioni del drago fantastico comprendono grandi ali.",
+          "decision": "accepted",
+          "editorial_source_line": 263
+        },
+        {
+          "word": "squama",
+          "answer_sense": "elemento del rivestimento di alcuni animali",
+          "relation": "rivestimento fantastico",
+          "meaning_group": "squama",
+          "rationale": "Il drago fantastico viene comunemente rappresentato con squame.",
+          "decision": "accepted",
+          "editorial_source_line": 264
+        },
+        {
+          "word": "artiglio",
+          "answer_sense": "unghia ricurva di un predatore",
+          "relation": "parte fantastica",
+          "meaning_group": "artiglio",
+          "rationale": "Gli artigli sono un tratto comune delle rappresentazioni del drago.",
+          "decision": "accepted",
+          "editorial_source_line": 265
+        },
+        {
+          "word": "coda",
+          "answer_sense": "appendice posteriore del corpo",
+          "relation": "parte fantastica",
+          "meaning_group": "coda",
+          "rationale": "Il drago fantastico viene spesso raffigurato con una lunga coda.",
+          "decision": "accepted",
+          "editorial_source_line": 266
+        },
+        {
+          "word": "cavaliere",
+          "answer_sense": "guerriero delle narrazioni medievali",
+          "relation": "antagonista narrativo",
+          "meaning_group": "cavaliere",
+          "rationale": "Nelle storie il cavaliere può affrontare e combattere il drago.",
+          "decision": "accepted",
+          "editorial_source_line": 267
+        },
+        {
+          "word": "tesoro",
+          "answer_sense": "insieme di oggetti preziosi",
+          "relation": "oggetto custodito",
+          "meaning_group": "tesoro",
+          "rationale": "Nelle leggende il drago può custodire un tesoro.",
+          "decision": "accepted",
+          "editorial_source_line": 268
+        },
+        {
+          "word": "caverna",
+          "answer_sense": "cavità naturale nella roccia",
+          "relation": "dimora fantastica",
+          "meaning_group": "caverna",
+          "rationale": "La caverna è una dimora tipica del drago nell'immaginario fantastico.",
+          "decision": "accepted",
+          "editorial_source_line": 269
+        },
+        {
+          "word": "mostro",
+          "answer_sense": "creatura immaginaria dall'aspetto spaventoso",
+          "relation": "categoria narrativa",
+          "meaning_group": "mostro",
+          "rationale": "Il drago appartiene alle creature mostruose dell'immaginario fantastico.",
+          "decision": "accepted",
+          "editorial_source_line": 270
+        },
+        {
+          "word": "leggenda",
+          "answer_sense": "racconto tradizionale con elementi fantastici",
+          "relation": "fonte narrativa",
+          "meaning_group": "leggenda",
+          "rationale": "Il drago compare in numerose leggende.",
+          "decision": "accepted",
+          "editorial_source_line": 271
+        },
+        {
+          "word": "principessa",
+          "answer_sense": "figura femminile di famiglia regnante nelle fiabe",
+          "relation": "ruolo narrativo",
+          "meaning_group": "principessa",
+          "rationale": "Nelle fiabe una principessa può essere tenuta prigioniera o minacciata da un drago.",
+          "decision": "accepted",
+          "editorial_source_line": 272
+        },
+        {
+          "word": "volare",
+          "answer_sense": "muoversi nell'aria",
+          "relation": "potere fantastico",
+          "meaning_group": "volare",
+          "rationale": "I draghi dotati di ali sono rappresentati capaci di volare.",
+          "decision": "accepted",
+          "editorial_source_line": 273
+        }
+      ],
+      "group_limits": {
+        "fuoco": 1,
+        "ala": 1,
+        "squama": 1,
+        "artiglio": 1,
+        "coda": 1,
+        "cavaliere": 1,
+        "tesoro": 1,
+        "caverna": 1,
+        "mostro": 1,
+        "leggenda": 1,
+        "principessa": 1,
+        "volare": 1
+      },
+      "conflicts": []
+    },
+    {
+      "prompt": "pagina",
+      "validation_id": "7f4683305c9053d4c5ebdb1ed17e9790d800c23d6136459dafcc95e142e17dac",
+      "decision": "accepted",
+      "review_rationale": "Revisione editoriale di ogni coppia per «pagina», nel senso «La pagina di un libro o di un quaderno». Controllati autonomia, coerenza, forma e ruoli. Gruppi equivalenti limitati a uno per estrazione; nessun test indipendente dichiarato.",
+      "answers": [
+        {
+          "word": "libro",
+          "answer_sense": "insieme rilegato di fogli con contenuti",
+          "relation": "appartenenza",
+          "meaning_group": "libro",
+          "rationale": "Le pagine costituiscono le superfici leggibili di un libro.",
+          "decision": "accepted",
+          "editorial_source_line": 276
+        },
+        {
+          "word": "foglio",
+          "answer_sense": "supporto sottile di carta",
+          "relation": "supporto",
+          "meaning_group": "foglio",
+          "rationale": "Una pagina corrisponde a una facciata di un foglio.",
+          "decision": "accepted",
+          "editorial_source_line": 277
+        },
+        {
+          "word": "carta",
+          "answer_sense": "materiale di fibre vegetali",
+          "relation": "materiale",
+          "meaning_group": "carta",
+          "rationale": "La carta è il materiale delle pagine di molti libri e quaderni.",
+          "decision": "accepted",
+          "editorial_source_line": 278
+        },
+        {
+          "word": "numero",
+          "answer_sense": "segno che indica una posizione nella sequenza",
+          "relation": "identificazione",
+          "meaning_group": "numero",
+          "rationale": "Il numero di pagina permette di riconoscere la posizione di una pagina nel libro.",
+          "decision": "accepted",
+          "editorial_source_line": 279
+        },
+        {
+          "word": "testo",
+          "answer_sense": "insieme di parole organizzate",
+          "relation": "contenuto",
+          "meaning_group": "testo",
+          "rationale": "Una pagina può contenere testo scritto o stampato.",
+          "decision": "accepted",
+          "editorial_source_line": 280
+        },
+        {
+          "word": "margine",
+          "answer_sense": "spazio ai bordi del contenuto",
+          "relation": "impaginazione",
+          "meaning_group": "margine",
+          "rationale": "Il margine è lo spazio tra il contenuto e il bordo della pagina.",
+          "decision": "accepted",
+          "editorial_source_line": 281
+        },
+        {
+          "word": "titolo",
+          "answer_sense": "intestazione che identifica un contenuto",
+          "relation": "impaginazione",
+          "meaning_group": "titolo",
+          "rationale": "Il titolo può comparire nella parte superiore di una pagina.",
+          "decision": "accepted",
+          "editorial_source_line": 282
+        },
+        {
+          "word": "capitolo",
+          "answer_sense": "sezione di un libro",
+          "relation": "organizzazione",
+          "meaning_group": "capitolo",
+          "rationale": "Le pagine di un libro sono spesso organizzate in capitoli.",
+          "decision": "accepted",
+          "editorial_source_line": 283
+        },
+        {
+          "word": "riga",
+          "answer_sense": "successione orizzontale di parole",
+          "relation": "impaginazione",
+          "meaning_group": "riga",
+          "rationale": "Il testo della pagina viene disposto in righe.",
+          "decision": "accepted",
+          "editorial_source_line": 284
+        },
+        {
+          "word": "paragrafo",
+          "answer_sense": "unità di testo distinta",
+          "relation": "organizzazione del testo",
+          "meaning_group": "paragrafo",
+          "rationale": "I paragrafi suddividono il testo di una pagina.",
+          "decision": "accepted",
+          "editorial_source_line": 285
+        },
+        {
+          "word": "leggere",
+          "answer_sense": "comprendere un testo scritto",
+          "relation": "uso",
+          "meaning_group": "leggere",
+          "rationale": "Leggere una pagina significa comprenderne il testo.",
+          "decision": "accepted",
+          "editorial_source_line": 286
+        },
+        {
+          "word": "sfogliare",
+          "answer_sense": "voltare in sequenza i fogli",
+          "relation": "azione",
+          "meaning_group": "sfogliare",
+          "rationale": "Sfogliare un libro permette di passare da una pagina all'altra.",
+          "decision": "accepted",
+          "editorial_source_line": 287
+        }
+      ],
+      "group_limits": {
+        "libro": 1,
+        "foglio": 1,
+        "carta": 1,
+        "numero": 1,
+        "testo": 1,
+        "margine": 1,
+        "titolo": 1,
+        "capitolo": 1,
+        "riga": 1,
+        "paragrafo": 1,
+        "leggere": 1,
+        "sfogliare": 1
+      },
+      "conflicts": []
+    },
+    {
+      "prompt": "muro",
+      "validation_id": "60a7c09160099d52a9a3428c1133b2803d01969b803aa25ed6a0d24910b19e9c",
+      "decision": "accepted",
+      "review_rationale": "Revisione editoriale di ogni coppia per «muro», nel senso «Parete in muratura». Controllati autonomia, coerenza, forma e ruoli. Gruppi equivalenti limitati a uno per estrazione; nessun test indipendente dichiarato.",
+      "answers": [
+        {
+          "word": "mattone",
+          "answer_sense": "elemento da costruzione in laterizio",
+          "relation": "materiale",
+          "meaning_group": "mattone",
+          "rationale": "I mattoni sono elementi comuni della costruzione di un muro.",
+          "decision": "accepted",
+          "editorial_source_line": 290
+        },
+        {
+          "word": "cemento",
+          "answer_sense": "legante usato nelle costruzioni",
+          "relation": "materiale",
+          "meaning_group": "cemento",
+          "rationale": "Il cemento viene usato nelle malte e nei conglomerati impiegati nei muri.",
+          "decision": "accepted",
+          "editorial_source_line": 291
+        },
+        {
+          "word": "malta",
+          "answer_sense": "impasto legante per la muratura",
+          "relation": "materiale",
+          "meaning_group": "malta",
+          "rationale": "La malta lega gli elementi di un muro in muratura.",
+          "decision": "accepted",
+          "editorial_source_line": 292
+        },
+        {
+          "word": "intonaco",
+          "answer_sense": "rivestimento di malta su una parete",
+          "relation": "rivestimento",
+          "meaning_group": "intonaco",
+          "rationale": "L'intonaco riveste e regolarizza la superficie di molti muri.",
+          "decision": "accepted",
+          "editorial_source_line": 293
+        },
+        {
+          "word": "vernice",
+          "answer_sense": "prodotto di rivestimento colorato",
+          "relation": "finitura",
+          "meaning_group": "vernice",
+          "rationale": "Una vernice adatta può rivestire e colorare un muro.",
+          "decision": "accepted",
+          "editorial_source_line": 294
+        },
+        {
+          "word": "crepa",
+          "answer_sense": "fessura in un materiale",
+          "relation": "difetto",
+          "meaning_group": "crepa",
+          "rationale": "Una crepa è una fessura che può comparire nel muro.",
+          "decision": "accepted",
+          "editorial_source_line": 295
+        },
+        {
+          "word": "portante",
+          "answer_sense": "che sostiene carichi della costruzione",
+          "relation": "funzione strutturale",
+          "meaning_group": "funzione",
+          "rationale": "Un muro portante sostiene carichi dell'edificio.",
+          "decision": "accepted",
+          "editorial_source_line": 296
+        },
+        {
+          "word": "edificio",
+          "answer_sense": "costruzione destinata a ospitare persone o attività",
+          "relation": "appartenenza",
+          "meaning_group": "edificio",
+          "rationale": "I muri delimitano e possono sostenere un edificio.",
+          "decision": "accepted",
+          "editorial_source_line": 297
+        },
+        {
+          "word": "parete",
+          "answer_sense": "elemento verticale che delimita un ambiente",
+          "relation": "concetto vicino",
+          "meaning_group": "parete",
+          "rationale": "Un muro può costituire la parete di un ambiente.",
+          "decision": "accepted",
+          "editorial_source_line": 298
+        },
+        {
+          "word": "fondazione",
+          "answer_sense": "struttura che trasmette i carichi al terreno",
+          "relation": "sostegno",
+          "meaning_group": "fondazione",
+          "rationale": "Un muro viene sostenuto da una fondazione adeguata.",
+          "decision": "accepted",
+          "editorial_source_line": 299
+        },
+        {
+          "word": "divisorio",
+          "answer_sense": "che separa spazi",
+          "relation": "funzione",
+          "meaning_group": "funzione",
+          "rationale": "Un muro divisorio separa due ambienti.",
+          "decision": "accepted",
+          "editorial_source_line": 300
+        }
+      ],
+      "group_limits": {
+        "mattone": 1,
+        "cemento": 1,
+        "malta": 1,
+        "intonaco": 1,
+        "vernice": 1,
+        "crepa": 1,
+        "funzione": 1,
+        "edificio": 1,
+        "parete": 1,
+        "fondazione": 1
+      },
+      "conflicts": []
+    },
+    {
+      "prompt": "regalo",
+      "validation_id": "8ae5856e159b4f851ed848bea2087251a670922ba712f7d183d6c57c5b140cf8",
+      "decision": "accepted",
+      "review_rationale": "Revisione editoriale di ogni coppia per «regalo», nel senso «Oggetto che si dona a qualcuno». Controllati autonomia, coerenza, forma e ruoli. Gruppi equivalenti limitati a uno per estrazione; nessun test indipendente dichiarato.",
+      "answers": [
+        {
+          "word": "dono",
+          "answer_sense": "cosa offerta gratuitamente",
+          "relation": "sinonimo",
+          "meaning_group": "dono",
+          "rationale": "Dono è un sinonimo di regalo nel senso scelto.",
+          "decision": "accepted",
+          "editorial_source_line": 303
+        },
+        {
+          "word": "pacco",
+          "answer_sense": "involucro contenente un oggetto",
+          "relation": "presentazione",
+          "meaning_group": "pacco",
+          "rationale": "Un regalo viene spesso presentato sotto forma di pacco.",
+          "decision": "accepted",
+          "editorial_source_line": 304
+        },
+        {
+          "word": "carta",
+          "answer_sense": "materiale per avvolgere",
+          "relation": "confezione",
+          "meaning_group": "carta",
+          "rationale": "La carta da regalo avvolge il dono e ne nasconde il contenuto.",
+          "decision": "accepted",
+          "editorial_source_line": 305
+        },
+        {
+          "word": "nastro",
+          "answer_sense": "striscia sottile di tessuto o materiale flessibile",
+          "relation": "confezione",
+          "meaning_group": "nastro",
+          "rationale": "Un nastro può chiudere e decorare la confezione di un regalo.",
+          "decision": "accepted",
+          "editorial_source_line": 306
+        },
+        {
+          "word": "fiocco",
+          "answer_sense": "annodatura ornamentale di un nastro",
+          "relation": "decorazione",
+          "meaning_group": "fiocco",
+          "rationale": "Il fiocco è una decorazione comune dei pacchi regalo.",
+          "decision": "accepted",
+          "editorial_source_line": 307
+        },
+        {
+          "word": "sorpresa",
+          "answer_sense": "evento o oggetto inatteso",
+          "relation": "effetto",
+          "meaning_group": "sorpresa",
+          "rationale": "Il regalo può essere una sorpresa per chi lo riceve.",
+          "decision": "accepted",
+          "editorial_source_line": 308
+        },
+        {
+          "word": "compleanno",
+          "answer_sense": "anniversario della nascita",
+          "relation": "occasione",
+          "meaning_group": "occasione",
+          "rationale": "Il compleanno è un'occasione comune per fare un regalo.",
+          "decision": "accepted",
+          "editorial_source_line": 309
+        },
+        {
+          "word": "natale",
+          "answer_sense": "festa del 25 dicembre",
+          "relation": "occasione",
+          "meaning_group": "occasione",
+          "rationale": "A Natale è tradizione scambiarsi regali.",
+          "decision": "accepted",
+          "editorial_source_line": 310
+        },
+        {
+          "word": "scartare",
+          "answer_sense": "togliere l'involucro",
+          "relation": "apertura",
+          "meaning_group": "scartare",
+          "rationale": "Scartare un regalo significa rimuovere la carta che lo avvolge.",
+          "decision": "accepted",
+          "editorial_source_line": 311
+        },
+        {
+          "word": "augurio",
+          "answer_sense": "espressione di un desiderio favorevole",
+          "relation": "accompagnamento",
+          "meaning_group": "augurio",
+          "rationale": "Un regalo può essere accompagnato da un biglietto di auguri.",
+          "decision": "accepted",
+          "editorial_source_line": 312
+        },
+        {
+          "word": "gratitudine",
+          "answer_sense": "sentimento di riconoscenza",
+          "relation": "reazione",
+          "meaning_group": "gratitudine",
+          "rationale": "Ricevere un regalo può suscitare gratitudine verso chi lo offre.",
+          "decision": "accepted",
+          "editorial_source_line": 313
+        }
+      ],
+      "group_limits": {
+        "dono": 1,
+        "pacco": 1,
+        "carta": 1,
+        "nastro": 1,
+        "fiocco": 1,
+        "sorpresa": 1,
+        "occasione": 1,
+        "scartare": 1,
+        "augurio": 1,
+        "gratitudine": 1
+      },
+      "conflicts": []
+    },
+    {
+      "prompt": "pietra",
+      "validation_id": "0bfe8b64d78ef0abfb1df67600b6c87e9312a16e2ca69483ac6a5955e0853587",
+      "decision": "accepted",
+      "review_rationale": "Revisione editoriale di ogni coppia per «pietra», nel senso «Frammento duro di roccia». Controllati autonomia, coerenza, forma e ruoli. Gruppi equivalenti limitati a uno per estrazione; nessun test indipendente dichiarato.",
+      "answers": [
+        {
+          "word": "roccia",
+          "answer_sense": "aggregato naturale di minerali",
+          "relation": "origine",
+          "meaning_group": "roccia",
+          "rationale": "La pietra nel senso scelto è un frammento di roccia.",
+          "decision": "accepted",
+          "editorial_source_line": 316
+        },
+        {
+          "word": "sasso",
+          "answer_sense": "piccolo pezzo di roccia",
+          "relation": "concetto vicino",
+          "meaning_group": "frammento",
+          "rationale": "Sasso è un nome comune di un pezzo di pietra.",
+          "decision": "accepted",
+          "editorial_source_line": 317
+        },
+        {
+          "word": "masso",
+          "answer_sense": "grosso blocco di roccia",
+          "relation": "tipo dimensionale",
+          "meaning_group": "frammento",
+          "rationale": "Un masso è un grosso blocco di pietra.",
+          "decision": "accepted",
+          "editorial_source_line": 318
+        },
+        {
+          "word": "ciottolo",
+          "answer_sense": "piccolo sasso arrotondato",
+          "relation": "tipo",
+          "meaning_group": "frammento",
+          "rationale": "Il ciottolo è una pietra arrotondata dall'usura naturale.",
+          "decision": "accepted",
+          "editorial_source_line": 319
+        },
+        {
+          "word": "minerale",
+          "answer_sense": "sostanza naturale che compone le rocce",
+          "relation": "composizione",
+          "meaning_group": "minerale",
+          "rationale": "I minerali costituiscono le rocce da cui provengono le pietre.",
+          "decision": "accepted",
+          "editorial_source_line": 320
+        },
+        {
+          "word": "duro",
+          "answer_sense": "resistente alla deformazione e al taglio",
+          "relation": "proprietà",
+          "meaning_group": "duro",
+          "rationale": "La durezza è una proprietà comunemente associata alla pietra.",
+          "decision": "accepted",
+          "editorial_source_line": 321
+        },
+        {
+          "word": "scalpello",
+          "answer_sense": "utensile da taglio per materiali duri",
+          "relation": "strumento",
+          "meaning_group": "scalpello",
+          "rationale": "Lo scalpello viene usato per lavorare e incidere la pietra.",
+          "decision": "accepted",
+          "editorial_source_line": 322
+        },
+        {
+          "word": "levigare",
+          "answer_sense": "rendere una superficie liscia",
+          "relation": "lavorazione",
+          "meaning_group": "levigare",
+          "rationale": "Levigare una pietra ne rende la superficie più liscia.",
+          "decision": "accepted",
+          "editorial_source_line": 323
+        },
+        {
+          "word": "granito",
+          "answer_sense": "roccia magmatica",
+          "relation": "materiale",
+          "meaning_group": "tipo_roccia",
+          "rationale": "Il granito è una roccia da cui si ricavano pietre da costruzione e rivestimento.",
+          "decision": "accepted",
+          "editorial_source_line": 324
+        },
+        {
+          "word": "marmo",
+          "answer_sense": "roccia metamorfica lavorabile",
+          "relation": "materiale",
+          "meaning_group": "tipo_roccia",
+          "rationale": "Il marmo è una pietra impiegata nella scultura e nei rivestimenti.",
+          "decision": "accepted",
+          "editorial_source_line": 325
+        },
+        {
+          "word": "selce",
+          "answer_sense": "roccia silicea dura",
+          "relation": "materiale",
+          "meaning_group": "tipo_roccia",
+          "rationale": "La selce è una pietra dura usata anche per produrre antichi utensili.",
+          "decision": "accepted",
+          "editorial_source_line": 326
+        }
+      ],
+      "group_limits": {
+        "roccia": 1,
+        "frammento": 1,
+        "minerale": 1,
+        "duro": 1,
+        "scalpello": 1,
+        "levigare": 1,
+        "tipo_roccia": 1
+      },
+      "conflicts": []
+    },
+    {
+      "prompt": "poltrona",
+      "validation_id": "d384d4940cc2700b7285655557f1f362cf153abc819a887d84153a5201ed5c4e",
+      "decision": "accepted",
+      "review_rationale": "Revisione editoriale di ogni coppia per «poltrona», nel senso «Sedile imbottito con braccioli». Controllati autonomia, coerenza, forma e ruoli. Gruppi equivalenti limitati a uno per estrazione; nessun test indipendente dichiarato.",
+      "answers": [
+        {
+          "word": "sedile",
+          "answer_sense": "mobile destinato a sedersi",
+          "relation": "categoria",
+          "meaning_group": "sedile",
+          "rationale": "La poltrona è un sedile imbottito destinato a una persona.",
+          "decision": "accepted",
+          "editorial_source_line": 329
+        },
+        {
+          "word": "schienale",
+          "answer_sense": "parte che sostiene la schiena",
+          "relation": "parte",
+          "meaning_group": "schienale",
+          "rationale": "Lo schienale della poltrona sostiene la schiena.",
+          "decision": "accepted",
+          "editorial_source_line": 330
+        },
+        {
+          "word": "bracciolo",
+          "answer_sense": "sostegno laterale per il braccio",
+          "relation": "parte",
+          "meaning_group": "bracciolo",
+          "rationale": "I braccioli sono sostegni laterali caratteristici della poltrona.",
+          "decision": "accepted",
+          "editorial_source_line": 331
+        },
+        {
+          "word": "seduta",
+          "answer_sense": "superficie su cui ci si siede",
+          "relation": "parte",
+          "meaning_group": "seduta",
+          "rationale": "La seduta è la parte della poltrona che sostiene il peso della persona.",
+          "decision": "accepted",
+          "editorial_source_line": 332
+        },
+        {
+          "word": "cuscino",
+          "answer_sense": "elemento morbido imbottito",
+          "relation": "componente",
+          "meaning_group": "cuscino",
+          "rationale": "Un cuscino può formare la seduta o lo schienale della poltrona.",
+          "decision": "accepted",
+          "editorial_source_line": 333
+        },
+        {
+          "word": "imbottitura",
+          "answer_sense": "materiale soffice interno",
+          "relation": "struttura",
+          "meaning_group": "imbottitura",
+          "rationale": "L'imbottitura rende morbide le parti della poltrona a contatto con il corpo.",
+          "decision": "accepted",
+          "editorial_source_line": 334
+        },
+        {
+          "word": "tessuto",
+          "answer_sense": "materiale formato da fibre intrecciate",
+          "relation": "rivestimento",
+          "meaning_group": "rivestimento",
+          "rationale": "Il tessuto viene usato per rivestire molte poltrone.",
+          "decision": "accepted",
+          "editorial_source_line": 335
+        },
+        {
+          "word": "pelle",
+          "answer_sense": "materiale ricavato dalla cute animale",
+          "relation": "rivestimento",
+          "meaning_group": "rivestimento",
+          "rationale": "La pelle è un rivestimento comune delle poltrone.",
+          "decision": "accepted",
+          "editorial_source_line": 336
+        },
+        {
+          "word": "divano",
+          "answer_sense": "sedile imbottito per più persone",
+          "relation": "mobile affine",
+          "meaning_group": "divano",
+          "rationale": "Il divano è un mobile imbottito affine alla poltrona, ma destinato a più persone.",
+          "decision": "accepted",
+          "editorial_source_line": 337
+        },
+        {
+          "word": "sedersi",
+          "answer_sense": "assumere una posizione appoggiata sul sedile",
+          "relation": "funzione",
+          "meaning_group": "sedersi",
+          "rationale": "La poltrona è un mobile sul quale ci si siede.",
+          "decision": "accepted",
+          "editorial_source_line": 338
+        }
+      ],
+      "group_limits": {
+        "sedile": 1,
+        "schienale": 1,
+        "bracciolo": 1,
+        "seduta": 1,
+        "cuscino": 1,
+        "imbottitura": 1,
+        "rivestimento": 1,
+        "divano": 1,
+        "sedersi": 1
+      },
+      "conflicts": []
+    }
+  ]
+}

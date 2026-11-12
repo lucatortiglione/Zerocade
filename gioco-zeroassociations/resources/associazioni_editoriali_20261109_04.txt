@@ -1,0 +1,344 @@
+# Decisioni editoriali di ChatGPT, 9 novembre 2026.
+# risposta | senso della risposta | relazione | gruppo | motivazione
+# Coppie accettate nel significato corrente; nessuna promessa di esaustività.
+
+@ foglia
+picciolo | elemento che collega la foglia al fusto | parte botanica | picciolo | Il picciolo collega al fusto le foglie che ne sono provviste.
+nervatura | struttura di sostegno e trasporto della foglia | parte botanica | nervatura | Le nervature percorrono la foglia e trasportano acqua e sostanze.
+clorofilla | pigmento verde delle parti vegetali | composizione | clorofilla | La clorofilla dà colore verde a molte foglie e partecipa alla fotosintesi.
+fotosintesi | processo con cui le piante usano l'energia luminosa | funzione | fotosintesi | La foglia è un organo principale della fotosintesi nelle piante.
+ramo | parte legnosa che si sviluppa dal fusto | sostegno | ramo | Le foglie degli alberi si sviluppano sui rami.
+verde | colore caratteristico di molte foglie | colore | colore | Il verde è il colore più comunemente associato alla foglia fresca.
+giallo | colore assunto da molte foglie in autunno | colore | colore | In autunno molte foglie diventano gialle prima di cadere.
+autunno | stagione della caduta delle foglie di molte piante | ciclo naturale | autunno | La caduta delle foglie è un fenomeno caratteristico dell'autunno.
+albero | pianta legnosa con tronco | appartenenza | albero | Le foglie formano la parte verde della chioma di molti alberi.
+chioma | insieme dei rami e delle foglie di un albero | insieme botanico | chioma | Le foglie contribuiscono a formare la chioma dell'albero.
+stoma | apertura microscopica della superficie fogliare | parte botanica | stoma | Gli stomi della foglia permettono gli scambi gassosi con l'ambiente.
+lamina | parte appiattita della foglia | parte botanica | lamina | La lamina è la parte appiattita ed estesa di molte foglie.
+
+@ banana
+buccia | rivestimento esterno del frutto | parte | buccia | La banana ha una buccia che viene rimossa prima del consumo.
+giallo | colore della buccia di molte banane mature | colore | giallo | Il giallo è il colore comunemente associato alla banana matura.
+frutto | parte alimentare prodotta da una pianta | categoria | frutto | La banana è un frutto alimentare.
+polpa | parte interna carnosa del frutto | parte | polpa | La polpa è la parte della banana che viene mangiata.
+casco | insieme di banane raggruppate | insieme botanico | casco | Un casco raggruppa numerose banane sulla pianta.
+banano | pianta che produce banane | pianta d'origine | banano | Il banano è la pianta che produce la banana.
+sbucciare | rimuovere il rivestimento esterno di un frutto | preparazione | sbucciare | La banana viene comunemente sbucciata prima di essere mangiata.
+potassio | elemento minerale presente negli alimenti | composizione | potassio | Il contenuto di potassio è una caratteristica alimentare comunemente associata alla banana.
+frullato | bevanda ottenuta frullando ingredienti | preparazione | frullato | La banana viene spesso usata per preparare frullati.
+scimmia | primate | associazione culturale | scimmia | Nell'immaginario quotidiano la banana viene associata alla scimmia, senza presentarla come il suo unico alimento.
+curvo | piegato rispetto a una linea retta | forma | curvo | La forma curva è una caratteristica riconoscibile della banana.
+
+@ foca
+pinna | appendice adatta al movimento nell'acqua | parte anatomica | pinna | Le pinne permettono alla foca di muoversi nell'acqua.
+mare | massa di acqua salata | habitat | mare | La foca è un mammifero marino che vive a contatto con il mare.
+pesce | animale acquatico | alimentazione | pesce | I pesci costituiscono una parte importante dell'alimentazione di molte foche.
+baffo | pelo sensoriale del muso | parte anatomica | baffo | I baffi della foca aiutano a percepire stimoli nell'ambiente acquatico.
+mammifero | animale che allatta i piccoli | categoria zoologica | mammifero | La foca è un mammifero e allatta i propri piccoli.
+ghiaccio | acqua solida | ambiente | ghiaccio | Diverse foche vivono e si riproducono a contatto con il ghiaccio.
+nuotare | spostarsi nell'acqua | movimento | nuotare | La foca usa le pinne e il corpo per nuotare.
+immersione | discesa sotto la superficie dell'acqua | comportamento | immersione | La foca compie immersioni per cercare cibo.
+grasso | tessuto di riserva e isolamento termico | adattamento | grasso | Uno strato di grasso contribuisce a isolare il corpo della foca dal freddo.
+otaria | mammifero marino affine alle foche | animale affine | otaria | L'otaria è un mammifero marino affine alla foca ma appartenente a un gruppo distinto.
+
+@ stanza
+muro | struttura verticale in muratura | delimitazione | muro | I muri possono delimitare lo spazio della stanza.
+pavimento | superficie su cui si cammina | parte | pavimento | Il pavimento costituisce la superficie inferiore della stanza.
+soffitto | superficie superiore interna di un ambiente | parte | soffitto | Il soffitto delimita superiormente la stanza.
+porta | elemento che chiude un accesso | accesso | porta | La porta permette di entrare nella stanza e di chiuderla.
+finestra | apertura che porta luce e aria | apertura | finestra | La finestra può illuminare e ventilare la stanza.
+luce | illuminazione di un ambiente | dotazione | luce | La luce permette di vedere e svolgere attività nella stanza.
+tavolo | mobile con piano di appoggio | arredo | arredo | Un tavolo può arredare una stanza e offrire un piano di lavoro.
+sedia | sedile per una persona | arredo | arredo | La sedia è un arredo comune delle stanze della casa.
+letto | mobile per dormire | arredo | arredo | Il letto caratterizza una stanza destinata al riposo.
+armadio | mobile per riporre vestiti e oggetti | arredo | arredo | L'armadio è un arredo comune delle stanze domestiche.
+
+@ foglio
+carta | materiale sottile composto da fibre | materiale | carta | La carta costituisce il materiale del foglio nel senso scelto.
+penna | strumento che scrive con inchiostro | strumento | strumento | La penna viene usata per scrivere sul foglio.
+matita | strumento che traccia segni con una mina | strumento | strumento | La matita permette di disegnare o scrivere sul foglio.
+scrivere | tracciare caratteri | uso | scrivere | Il foglio offre una superficie sulla quale scrivere.
+disegnare | rappresentare con segni grafici | uso | disegnare | Un foglio può essere usato come supporto per disegnare.
+stampare | riprodurre testi o immagini su un supporto | uso | stampare | La stampante riproduce testi e immagini su un foglio.
+piegare | ripiegare una superficie su se stessa | lavorazione | piegare | Il foglio di carta può essere piegato per modificarne la forma.
+tagliare | separare mediante un bordo affilato | lavorazione | tagliare | Un foglio può essere tagliato per ricavarne parti più piccole.
+quaderno | insieme di fogli rilegati | insieme | quaderno | Il quaderno è composto da fogli rilegati.
+risma | confezione di fogli di carta | insieme | risma | Una risma è una confezione che raccoglie molti fogli di carta.
+origami | arte di piegare la carta | attività | origami | Un foglio viene piegato nell'origami per ottenere figure.
+
+@ minestra
+brodo | liquido alimentare ottenuto per cottura | base | brodo | Il brodo è la base liquida di molte minestre.
+verdura | alimento vegetale | ingrediente | verdura | Le verdure sono ingredienti comuni della minestra.
+pasta | alimento di farina e acqua | ingrediente | pasta | La pasta può essere cotta nel brodo per preparare una minestra.
+legume | seme commestibile di alcune piante | ingrediente | legume | I legumi possono entrare nella preparazione di una minestra.
+cucchiaio | posata concava | consumo | cucchiaio | La minestra viene comunemente mangiata con il cucchiaio.
+piatto | stoviglia per servire il cibo | servizio | piatto | La minestra viene servita in un piatto adatto a contenerne il liquido.
+pentola | recipiente per cuocere | cottura | pentola | La pentola viene usata per cuocere la minestra.
+mestolo | utensile con coppa per raccogliere liquidi | servizio | mestolo | Il mestolo permette di versare la minestra dalla pentola al piatto.
+caldo | di temperatura elevata | temperatura di servizio | caldo | Nel senso scelto la minestra è una pietanza comunemente servita calda.
+carota | radice commestibile | ingrediente | verdura | La carota è una verdura comune nelle minestre.
+patata | tubero commestibile | ingrediente | verdura | La patata può essere cotta fra gli ingredienti della minestra.
+zuppa | pietanza liquida o semiliquida | preparazione affine | zuppa | La zuppa è una preparazione alimentare affine alla minestra.
+
+@ giraffa
+collo | regione che collega testa e tronco | caratteristica anatomica | collo | Il collo molto lungo è il tratto più riconoscibile della giraffa.
+macchia | zona di colore diverso sul mantello | mantello | macchia | Il mantello della giraffa presenta macchie riconoscibili.
+savana | ambiente erboso con alberi sparsi | habitat | savana | La savana africana è un habitat caratteristico della giraffa.
+acacia | albero dai rami spesso spinosi | alimentazione | acacia | Le foglie di acacia sono un alimento comunemente associato alla giraffa.
+foglia | organo verde della pianta | alimentazione | foglia | La giraffa si nutre di foglie raggiunte sui rami degli alberi.
+erbivoro | animale che si nutre di vegetali | dieta | erbivoro | La giraffa è un erbivoro.
+zampa | arto di un animale | parte anatomica | zampa | Le lunghe zampe contribuiscono all'altezza della giraffa.
+lingua | organo muscolare della bocca | alimentazione | lingua | La lunga lingua della giraffa aiuta a prendere le foglie dai rami.
+altezza | dimensione verticale di un corpo | caratteristica | altezza | La grande altezza distingue la giraffa fra gli animali terrestri.
+ruminare | rimasticare il cibo dopo il primo passaggio nello stomaco | comportamento | ruminare | La giraffa è un ruminante e rimastica il cibo.
+
+@ dentifricio
+spazzolino | piccolo utensile con setole per i denti | strumento abbinato | spazzolino | Il dentifricio viene applicato sullo spazzolino per pulire i denti.
+dente | struttura dura della bocca | oggetto della pulizia | dente | Il dentifricio è una preparazione destinata alla pulizia dei denti.
+tubetto | piccolo contenitore comprimibile | confezione | tubetto | Il dentifricio viene comunemente venduto in un tubetto.
+menta | pianta dal caratteristico aroma fresco | aroma | menta | La menta è un aroma comune dei dentifrici.
+fluoro | elemento presente in composti usati per l'igiene dentale | ingrediente | fluoro | Molti dentifrici contengono composti del fluoro per la protezione dei denti.
+spazzolare | pulire passando una spazzola | uso | spazzolare | Il dentifricio viene usato mentre si spazzolano i denti.
+igiene | insieme delle pratiche di pulizia e prevenzione | funzione | igiene | Il dentifricio è un prodotto dell'igiene orale.
+placca | deposito batterico sulla superficie dei denti | deposito da rimuovere | placca | La pulizia con spazzolino e dentifricio aiuta a rimuovere la placca dai denti.
+carie | deterioramento dei tessuti duri del dente | problema contrastato | carie | Il dentifricio viene usato nell'igiene orale che contribuisce alla prevenzione della carie.
+alito | aria emessa dalla bocca | effetto d'uso | alito | Il dentifricio viene comunemente associato alla freschezza dell'alito dopo la pulizia.
+pasta | preparazione densa e modellabile | consistenza | pasta | Il dentifricio è comunemente una pasta da distribuire sullo spazzolino.
+
+@ libro
+pagina | facciata leggibile di un foglio | parte | pagina | Il libro è composto da pagine da leggere.
+copertina | rivestimento esterno di un libro | parte | copertina | La copertina protegge il libro e ne presenta il contenuto.
+dorso | parte esterna che unisce i fogli rilegati | parte | dorso | Il dorso tiene insieme la rilegatura e rende riconoscibile il libro sullo scaffale.
+titolo | nome che identifica un'opera | identificazione | titolo | Il titolo identifica il libro ed è comunemente riportato sulla copertina.
+autore | persona che ha scritto un'opera | creazione | autore | L'autore è chi ha scritto il contenuto del libro.
+capitolo | sezione principale di un testo | organizzazione | capitolo | Molti libri sono divisi in capitoli.
+indice | elenco ordinato delle parti di un libro | consultazione | indice | L'indice aiuta a trovare capitoli e argomenti del libro.
+lettura | attività di leggere | uso | lettura | La lettura è l'attività per cui si usa un libro.
+biblioteca | luogo che conserva e presta libri | luogo | biblioteca | La biblioteca conserva e rende disponibili libri.
+libreria | negozio che vende libri | vendita | libreria | La libreria è un esercizio dedicato alla vendita di libri.
+segnalibro | oggetto che indica una pagina da ritrovare | accessorio | segnalibro | Il segnalibro conserva il punto della lettura nel libro.
+romanzo | opera narrativa in prosa | genere | romanzo | Il romanzo è un genere di opera comunemente pubblicato come libro.
+carta | materiale costituito da fibre vegetali | materiale | carta | La carta costituisce le pagine dei libri tradizionali.
+
+@ scatola
+coperchio | parte che chiude un recipiente dall'alto | parte | coperchio | Il coperchio chiude la scatola nel senso selezionato.
+cartone | materiale spesso ricavato da carta | materiale | cartone | Il cartone è un materiale comune delle scatole.
+contenitore | oggetto destinato a contenere | categoria | contenitore | La scatola è un contenitore per oggetti.
+imballaggio | involucro di protezione per il trasporto | funzione | imballaggio | Una scatola può proteggere gli oggetti come imballaggio.
+pacco | involucro contenente oggetti da spedire o regalare | uso | imballaggio | Una scatola viene comunemente usata per confezionare un pacco.
+regalo | oggetto offerto in dono | occasione | regalo | La scatola può contenere e presentare un regalo.
+scarpa | calzatura | contenuto caratteristico | scarpa | La scatola per le scarpe è un formato di imballaggio e conservazione riconoscibile.
+biscotto | piccolo dolce secco | contenuto caratteristico | biscotto | Una scatola di biscotti è una confezione alimentare comune e riconoscibile.
+conservare | custodire mantenendo in buono stato | funzione | conservare | Una scatola può custodire e conservare oggetti tenendoli raccolti.
+chiudere | impedire l'accesso a un'apertura | operazione | chiudere | Chiudere la scatola con il coperchio protegge il contenuto.
+
+@ pavimento
+piastrella | elemento piano di rivestimento | materiale | materiale | Le piastrelle vengono usate per rivestire molti pavimenti.
+parquet | rivestimento composto da elementi di legno | materiale | materiale | Il parquet è un tipo di pavimento in legno.
+marmo | pietra usata anche nei rivestimenti | materiale | materiale | Il marmo viene usato per realizzare pavimenti.
+camminare | spostarsi a piedi | uso | camminare | Il pavimento è la superficie sulla quale si cammina in una stanza.
+scopa | attrezzo per raccogliere lo sporco | pulizia | scopa | La scopa viene usata per pulire il pavimento.
+straccio | panno destinato alla pulizia | pulizia | straccio | Lo straccio bagnato permette di lavare il pavimento.
+tappeto | rivestimento tessile mobile | arredo | tappeto | Il tappeto viene steso sul pavimento.
+fuga | spazio fra elementi di un rivestimento | parte | fuga | Le fughe separano le piastrelle di un pavimento.
+battiscopa | fascia di protezione alla base della parete | finitura | battiscopa | Il battiscopa corre lungo il bordo del pavimento contro la parete.
+suolo | superficie su cui si appoggia e si cammina | concetto vicino | suolo | Il pavimento costituisce il suolo interno dell'ambiente.
+lavare | pulire con acqua o liquido adatto | manutenzione | lavare | Lavare il pavimento rimuove lo sporco aderente alla superficie.
+
+@ maiale
+grugno | muso sporgente di alcuni animali | parte anatomica | grugno | Il grugno è una parte caratteristica del muso del maiale.
+coda | appendice posteriore del corpo | parte anatomica | coda | La coda arricciata è un tratto comunemente associato al maiale domestico.
+zoccolo | rivestimento corneo dell'estremità dell'arto | parte anatomica | zoccolo | Il maiale ha zoccoli divisi all'estremità degli arti.
+setola | pelo rigido | rivestimento | setola | Le setole sono i peli rigidi presenti sul corpo del maiale.
+porcile | ricovero per maiali | allevamento | porcile | Il porcile è il ricovero destinato ai maiali.
+fango | terreno mescolato ad acqua | comportamento | fango | Il maiale può rotolarsi nel fango anche per regolare la temperatura e proteggere la pelle.
+onnivoro | animale che si nutre di alimenti vegetali e animali | dieta | onnivoro | Il maiale è un animale onnivoro.
+suino | animale della specie del maiale domestico | sinonimo | suino | Suino è un nome del maiale domestico.
+prosciutto | salume ottenuto dalla coscia | prodotto | salume | Il prosciutto viene ottenuto dalla coscia del maiale.
+salame | insaccato stagionato di carne | prodotto | salume | Il maiale fornisce carne usata comunemente per il salame.
+pancetta | taglio di carne dell'addome usato anche come salume | prodotto | salume | La pancetta si ricava dalla parte addominale del maiale.
+cinghiale | suide selvatico | animale affine | cinghiale | Il cinghiale è la forma selvatica strettamente affine al maiale domestico.
+scrofa | femmina adulta del maiale | sesso dell'animale | sesso | La scrofa è la femmina adulta del maiale.
+verro | maschio adulto del maiale destinato alla riproduzione | sesso dell'animale | sesso | Il verro è il maschio adulto del maiale impiegato per la riproduzione.
+
+@ pannolino
+neonato | bambino nel primo periodo dopo la nascita | utilizzatore | neonato | Il pannolino nel senso scelto viene usato per i neonati.
+assorbente | capace di trattenere liquidi | proprietà funzionale | assorbente | Il pannolino contiene materiale assorbente per trattenere i liquidi.
+urina | liquido prodotto dall'apparato urinario | liquido trattenuto | urina | Il pannolino assorbe e trattiene l'urina.
+cambio | sostituzione del pannolino usato | operazione | cambio | Il cambio del pannolino sostituisce quello usato con uno pulito.
+fasciatoio | piano attrezzato per cambiare il bambino | attrezzatura | fasciatoio | Il fasciatoio offre un piano sul quale cambiare il pannolino.
+igiene | pratiche di pulizia e prevenzione | funzione | igiene | Il pannolino fa parte della cura igienica del neonato.
+elastico | elemento flessibile che aderisce al corpo | componente | elastico | Gli elastici aiutano il pannolino ad aderire intorno alla vita e alle gambe.
+mutandina | piccolo indumento che copre il bacino | forma o tipo | mutandina | Alcuni pannolini hanno forma di mutandina da infilare.
+irritazione | reazione della pelle con arrossamento o fastidio | problema collegato | irritazione | Il contatto prolungato con un pannolino umido può favorire un'irritazione della pelle.
+monouso | destinato a un singolo utilizzo | tipo | tipo | Il pannolino monouso viene eliminato dopo l'utilizzo.
+stoffa | tessuto | tipo | tipo | Un pannolino di stoffa può essere lavato e riutilizzato.
+
+@ tovaglia
+tavola | piano apparecchiato per mangiare | collocazione | tavola | La tovaglia viene stesa sulla tavola per il pasto.
+tessuto | materiale formato da fibre | materiale | materiale | Il tessuto è il materiale tradizionale della tovaglia.
+cotone | fibra tessile vegetale | materiale | materiale | Il cotone è un materiale comune delle tovaglie.
+lino | fibra tessile vegetale | materiale | materiale | Il lino viene usato per realizzare tovaglie da tavola.
+tovagliolo | piccolo panno o foglio per pulirsi durante il pasto | oggetto abbinato | tovagliolo | I tovaglioli vengono abbinati alla tovaglia nell'apparecchiatura.
+macchia | traccia di sporco o liquido su una superficie | problema d'uso | macchia | Cibo e bevande possono lasciare macchie sulla tovaglia.
+apparecchiare | preparare la tavola per il pasto | uso | apparecchiare | Stendere la tovaglia è una fase dell'apparecchiare la tavola.
+orlo | bordo rifinito di un tessuto | parte | orlo | L'orlo rifinisce il bordo di una tovaglia di tessuto.
+lavare | pulire mediante acqua e detergente | manutenzione | lavare | La tovaglia di tessuto viene lavata per rimuovere lo sporco del pasto.
+stirare | distendere le pieghe con il ferro | manutenzione | stirare | Stirare una tovaglia permette di eliminare le pieghe del tessuto.
+
+@ re
+corona | copricapo simbolo della regalità | simbolo | corona | La corona è un simbolo caratteristico del re.
+trono | seggio del sovrano | simbolo e arredo | trono | Il trono è il seggio simbolico del re.
+regina | sovrana o consorte di un re | ruolo collegato | regina | La regina è la figura femminile corrispondente al re o la sua consorte.
+regno | territorio o comunità sottoposti a un re | dominio | regno | Il re è il sovrano di un regno.
+sovrano | persona che esercita il potere monarchico | sinonimo | sovrano | Sovrano è un nome del re nel senso monarchico scelto.
+scettro | bastone simbolico dell'autorità monarchica | simbolo | scettro | Lo scettro è un simbolo tradizionale dell'autorità del re.
+castello | edificio fortificato | dimora storica o narrativa | castello | Il castello è una dimora comunemente associata al re nella storia e nelle fiabe.
+suddito | persona soggetta a un sovrano | relazione politica | suddito | Il suddito è una persona sottoposta all'autorità del re.
+monarchia | sistema politico con un sovrano | sistema politico | monarchia | Il re è una figura della monarchia.
+erede | persona destinata a succedere | successione | erede | L'erede può succedere al re secondo le regole del regno.
+corte | insieme delle persone che circondano il sovrano | ambiente istituzionale | corte | La corte comprende persone al servizio o al seguito del re.
+incoronazione | cerimonia con cui viene conferita la corona | cerimonia | incoronazione | L'incoronazione è la cerimonia associata all'assunzione del titolo di re.
+
+@ camera
+letto | mobile per dormire | arredo principale | letto | Il letto è l'arredo caratteristico della camera nel senso di camera da letto.
+cuscino | supporto morbido per la testa | dotazione del letto | cuscino | Il cuscino è una dotazione comune del letto nella camera.
+armadio | mobile per riporre abiti | arredo | armadio | L'armadio è un mobile comune della camera da letto.
+comodino | piccolo mobile accanto al letto | arredo | comodino | Il comodino viene collocato accanto al letto nella camera.
+lenzuolo | telo per rivestire il letto | biancheria | lenzuolo | Le lenzuola rivestono il letto della camera.
+coperta | telo per coprirsi durante il riposo | biancheria | coperta | La coperta viene usata sul letto della camera.
+dormire | riposare nel sonno | funzione della stanza | dormire | La camera da letto è la stanza destinata a dormire.
+materasso | supporto imbottito del letto | dotazione del letto | materasso | Il materasso sostiene il corpo sul letto della camera.
+lampada | apparecchio che produce luce | illuminazione | lampada | Una lampada sul comodino è un punto luce comune della camera da letto.
+sveglia | dispositivo che suona a un'ora fissata | accessorio | sveglia | La sveglia viene comunemente tenuta vicino al letto nella camera.
+guardaroba | mobile per conservare abiti | arredo | armadio | Un guardaroba può arredare la camera e contenere i vestiti.
+
+@ negozio
+vetrina | spazio espositivo affacciato sull'esterno | esposizione | vetrina | La vetrina presenta all'esterno i prodotti del negozio.
+cassa | postazione dove si effettuano i pagamenti | pagamento | cassa | La cassa del negozio viene usata per pagare gli acquisti.
+cliente | persona che acquista beni o servizi | partecipante | cliente | Il cliente entra nel negozio per scegliere o acquistare prodotti.
+commesso | addetto alla vendita | professione | commesso | Il commesso assiste i clienti e cura le vendite nel negozio.
+scaffale | struttura con ripiani | esposizione | scaffale | Gli scaffali del negozio espongono e ordinano la merce.
+merce | insieme dei prodotti destinati alla vendita | contenuto | merce | La merce è ciò che il negozio offre in vendita.
+prezzo | somma richiesta per un prodotto | informazione commerciale | prezzo | Il prezzo indica quanto costa un prodotto nel negozio.
+scontrino | documento che registra un acquisto | documento | scontrino | Lo scontrino documenta un acquisto effettuato nel negozio.
+insegna | segno che identifica un esercizio | identificazione | insegna | L'insegna rende riconoscibile il negozio all'esterno.
+acquisto | ottenimento di un prodotto dietro pagamento | attività | acquisto | L'acquisto è un'attività principale dei clienti del negozio.
+saldo | vendita con riduzione del prezzo | promozione | saldo | I saldi sono periodi di vendita scontata nei negozi.
+saracinesca | chiusura avvolgibile di un accesso | chiusura | saracinesca | La saracinesca può proteggere l'ingresso del negozio quando è chiuso.
+
+@ pianta
+radice | parte che assorbe acqua e ancora al terreno | organo | radice | Le radici ancorano molte piante al terreno e assorbono acqua e nutrienti.
+fusto | asse che sostiene gli organi aerei | organo | fusto | Il fusto sostiene foglie, fiori e altre parti della pianta.
+foglia | organo verde deputato anche alla fotosintesi | organo | foglia | Le foglie sono organi caratteristici di molte piante.
+fiore | organo riproduttivo di alcune piante | organo | fiore | Le piante da fiore producono fiori per la riproduzione.
+seme | struttura da cui può nascere una nuova pianta | riproduzione | seme | Un seme può germinare e dare origine a una pianta.
+terra | terreno di crescita | ambiente | terra | Molte piante crescono nella terra, dove sviluppano le radici.
+vaso | recipiente per coltivare vegetali | contenitore | vaso | Un vaso può contenere una pianta e il suo substrato.
+annaffiare | fornire acqua a una pianta coltivata | cura | annaffiare | Annaffiare fornisce acqua alle piante coltivate.
+fotosintesi | produzione di sostanze organiche usando energia luminosa | funzione | fotosintesi | La fotosintesi è un processo caratteristico delle piante verdi.
+germoglio | giovane sviluppo vegetale | crescita | germoglio | Il germoglio è una nuova crescita della pianta.
+concime | sostanza che apporta nutrienti | cura | concime | Il concime fornisce nutrienti alle piante coltivate.
+potare | tagliare parti per regolare la crescita | cura | potare | La potatura viene usata per regolare lo sviluppo di molte piante.
+
+@ fata
+bacchetta | piccolo bastone usato come strumento magico | strumento fantastico | bacchetta | La bacchetta è uno strumento comunemente attribuito alla fata nelle fiabe.
+magia | potere soprannaturale | potere | magia | La fata nel senso scelto possiede poteri magici.
+ala | appendice che permette il volo | rappresentazione | ala | Molte rappresentazioni delle fate comprendono piccole ali.
+incantesimo | effetto o formula di magia | potere | magia | Nelle fiabe la fata può compiere incantesimi.
+fiaba | racconto fantastico tradizionale | genere narrativo | fiaba | La fata è un personaggio caratteristico delle fiabe.
+desiderio | cosa che si vorrebbe ottenere | ruolo narrativo | desiderio | Nelle fiabe la fata può esaudire un desiderio.
+principessa | figura femminile di famiglia regnante | personaggio collegato | principessa | Nelle fiabe una fata può aiutare o proteggere una principessa.
+bosco | territorio coperto da alberi | ambiente fantastico | bosco | Il bosco è un ambiente tradizionalmente associato alle fate.
+
+@ lucertola
+rettile | vertebrato del gruppo dei rettili | categoria zoologica | rettile | La lucertola appartiene ai rettili.
+coda | appendice posteriore del corpo | parte anatomica | coda | La lunga coda è una parte riconoscibile del corpo della lucertola.
+squama | elemento del rivestimento della pelle | rivestimento | squama | La pelle della lucertola è rivestita di squame.
+zampa | arto di un animale | parte anatomica | zampa | La lucertola comune si muove con quattro zampe.
+sole | sorgente di calore | comportamento termico | sole | La lucertola si espone al sole per riscaldare il corpo.
+muro | struttura verticale in muratura | ambiente | muro | Le lucertole comuni si osservano spesso sui muri riscaldati dal sole.
+insetto | piccolo animale a sei zampe | alimentazione | insetto | Gli insetti costituiscono una parte importante del cibo di molte lucertole.
+roccia | aggregato minerale naturale | ambiente | roccia | Le rocce offrono alla lucertola superfici su cui scaldarsi e fessure di riparo.
+uovo | struttura riproduttiva contenente l'embrione | riproduzione | uovo | Molte lucertole si riproducono deponendo uova.
+autotomia | distacco autonomo di una parte del corpo come difesa | difesa | autotomia | L'autotomia della coda è un meccanismo di difesa riconoscibile di molte lucertole.
+arrampicarsi | salire aggrappandosi a una superficie | movimento | arrampicarsi | Le lucertole possono arrampicarsi su rocce e muri.
+
+@ carta
+foglio | porzione sottile e piana di materiale | formato | foglio | La carta viene comunemente prodotta e usata in fogli.
+fibra | elemento sottile che compone un materiale | composizione | composizione | Le fibre vegetali intrecciate formano la struttura della carta.
+cellulosa | sostanza presente nelle pareti delle cellule vegetali | composizione | composizione | La cellulosa è una sostanza fondamentale nella produzione della carta.
+albero | pianta legnosa | origine del materiale | albero | Il legno degli alberi è una materia prima comune per produrre carta.
+riciclo | recupero di materiale usato | riuso del materiale | riciclo | La carta usata può essere raccolta e riciclata.
+scrivere | tracciare caratteri | uso | scrivere | La carta è un supporto comune sul quale scrivere.
+stampare | riprodurre testi o immagini | uso | stampare | La stampa deposita testi e immagini sulla carta.
+piegare | ripiegare una superficie su se stessa | lavorazione | piegare | La carta può essere piegata per ottenere forme e oggetti.
+cartone | materiale cartaceo spesso e rigido | materiale affine | cartone | Il cartone è un materiale affine alla carta, più spesso e rigido.
+quaderno | insieme di fogli rilegati per scrivere | prodotto | quaderno | Il quaderno è composto da fogli di carta.
+libro | insieme di pagine rilegate | prodotto | libro | Le pagine dei libri tradizionali sono di carta.
+origami | tecnica artistica di piegatura della carta | attività | origami | L'origami trasforma la carta piegata in figure.
+inchiostro | liquido colorato per scrivere e stampare | materiale abbinato | inchiostro | L'inchiostro deposita sulla carta i segni della scrittura o della stampa.
+
+@ canzone
+cantante | persona che esegue musica con la voce | interprete | cantante | Il cantante interpreta la canzone con la voce.
+voce | suono prodotto dall'apparato vocale | mezzo espressivo | voce | La voce esegue la parte cantata della canzone.
+melodia | successione organizzata di suoni | componente | melodia | La melodia è una componente riconoscibile della canzone.
+ritornello | parte che ritorna più volte nel brano | struttura | ritornello | Il ritornello è una sezione ricorrente di molte canzoni.
+strofa | sezione di un testo cantato | struttura | strofa | Le strofe organizzano il testo di molte canzoni.
+testo | insieme delle parole di un'opera | componente | testo | Il testo contiene le parole cantate nella canzone.
+ritmo | organizzazione temporale di accenti e durate | componente | ritmo | Il ritmo organizza il movimento musicale della canzone.
+musica | arte dei suoni organizzati | categoria | musica | La canzone è un'opera musicale destinata al canto.
+microfono | dispositivo che trasforma suoni in segnali | strumento | microfono | Il microfono permette di amplificare o registrare l'esecuzione di una canzone.
+concerto | esecuzione musicale dal vivo | occasione | concerto | Le canzoni vengono eseguite dal vivo durante i concerti.
+ascoltare | percepire un suono prestando attenzione | fruizione | ascoltare | Ascoltare è il modo principale di fruire di una canzone.
+cantare | eseguire una melodia con la voce | esecuzione | cantare | Cantare significa eseguire con la voce la melodia e il testo della canzone.
+radio | mezzo di trasmissione sonora | diffusione | radio | La radio trasmette comunemente canzoni.
+album | raccolta di brani musicali | raccolta | album | Un album può raccogliere più canzoni.
+
+@ estate
+caldo | temperatura elevata | caratteristica climatica | caldo | Il caldo è una caratteristica comunemente associata all'estate.
+sole | stella che illumina e riscalda la Terra | clima | sole | Nell'estate le giornate soleggiate sono associate alle attività all'aperto.
+mare | grande massa di acqua salata | vacanza | mare | Il mare è una meta caratteristica delle vacanze estive.
+spiaggia | riva sabbiosa o sassosa | vacanza | spiaggia | La spiaggia è un luogo comunemente frequentato durante l'estate.
+vacanza | periodo libero dalle attività abituali | periodo di svago | vacanza | Le vacanze estive sono un'associazione riconoscibile dell'estate.
+gelato | dolce freddo | consumo caratteristico | gelato | Il gelato è un alimento particolarmente associato al caldo estivo.
+ombrellone | grande parasole | attrezzatura | ombrellone | L'ombrellone offre riparo dal sole nelle attività estive al mare.
+solstizio | momento astronomico di massimo o minimo della durata del giorno | riferimento astronomico | solstizio | Il solstizio d'estate segna l'inizio dell'estate astronomica.
+giugno | sesto mese dell'anno | mese | mese | Nell'emisfero boreale l'estate astronomica inizia in giugno.
+luglio | settimo mese dell'anno | mese | mese | Luglio è un mese dell'estate nell'emisfero boreale.
+agosto | ottavo mese dell'anno | mese | mese | Agosto è un mese dell'estate nell'emisfero boreale.
+zanzara | insetto che può pungere per nutrirsi di sangue | presenza stagionale | zanzara | Le zanzare sono comunemente associate alle serate estive.
+abbronzatura | scurimento della pelle dopo esposizione solare | esperienza stagionale | abbronzatura | L'abbronzatura è associata all'esposizione al sole durante l'estate.
+siccità | scarsità prolungata di precipitazioni | fenomeno climatico | siccità | La siccità è un fenomeno frequentemente associato alle estati calde e poco piovose.
+
+@ primavera
+fiore | organo riproduttivo di alcune piante | fenomeno naturale | fioritura | I fiori sono un elemento caratteristico della primavera.
+fioritura | comparsa e sviluppo dei fiori | fenomeno naturale | fioritura | La fioritura di molte piante caratterizza la primavera.
+rondine | uccello migratore | presenza stagionale | rondine | Il ritorno delle rondini è un segno tradizionalmente associato alla primavera.
+germoglio | nuovo sviluppo vegetale | crescita | germoglio | La comparsa dei germogli è un fenomeno tipico della ripresa primaverile.
+polline | insieme di granuli prodotti dalle piante per la riproduzione | fenomeno naturale | polline | In primavera molte piante liberano polline nell'aria.
+allergia | reazione dell'organismo a determinate sostanze | problema stagionale | allergia | Le allergie ai pollini sono comunemente associate alla primavera.
+marzo | terzo mese dell'anno | mese | mese | Nell'emisfero boreale la primavera astronomica inizia in marzo.
+aprile | quarto mese dell'anno | mese | mese | Aprile è un mese primaverile nell'emisfero boreale.
+maggio | quinto mese dell'anno | mese | mese | Maggio è un mese primaverile nell'emisfero boreale.
+pasqua | festa religiosa primaverile | ricorrenza | pasqua | La Pasqua cade nel periodo primaverile nel calendario dell'emisfero boreale.
+disgelo | scioglimento di neve e ghiaccio per aumento della temperatura | cambiamento stagionale | disgelo | Il disgelo può accompagnare l'arrivo della primavera nelle zone fredde.
+tepore | calore lieve e gradevole | clima | tepore | Il tepore è una sensazione climatica comunemente associata alle giornate primaverili.
+
+@ giardino
+prato | terreno coperto di erba | componente | prato | Il prato è una componente comune del giardino domestico.
+fiore | organo vegetale apprezzato anche come decorazione | coltivazione | fiore | I fiori vengono coltivati per decorare il giardino.
+albero | pianta legnosa con tronco | coltivazione | albero | Gli alberi possono offrire ombra e struttura al giardino.
+aiuola | spazio delimitato destinato alle piante | organizzazione | aiuola | Le aiuole organizzano le piante e i fiori del giardino.
+siepe | fila fitta di piante | delimitazione | siepe | La siepe può delimitare e schermare il giardino.
+cespuglio | pianta ramificata fin dalla base | coltivazione | cespuglio | I cespugli vengono coltivati come elementi del giardino.
+erba | vegetazione erbacea del prato | componente | prato | L'erba forma la copertura del prato nel giardino.
+tosaerba | macchina per tagliare l'erba | attrezzo | tosaerba | Il tosaerba viene usato per mantenere il prato del giardino.
+annaffiare | fornire acqua alle piante | cura | annaffiare | Annaffiare permette di fornire acqua alle piante del giardino.
+panchina | sedile allungato per più persone | arredo | panchina | Una panchina può offrire un posto di riposo nel giardino.
+recinzione | struttura che delimita uno spazio | delimitazione | recinzione | La recinzione può delimitare il perimetro del giardino.
+fontana | struttura che fa scorrere acqua | arredo | fontana | Una fontana può essere un elemento decorativo del giardino.
+terriccio | substrato usato per coltivare piante | materiale | terriccio | Il terriccio viene usato per mettere a dimora piante nel giardino.
+seme | struttura da cui germina una pianta | coltivazione | seme | I semi vengono seminati nel giardino per ottenere nuove piante.
+rastrello | attrezzo con denti per raccogliere e livellare | attrezzo | rastrello | Il rastrello aiuta a raccogliere foglie e a sistemare il terreno del giardino.
+cancello | chiusura mobile di un accesso recintato | accesso | cancello | Il cancello permette l'accesso a un giardino recintato.

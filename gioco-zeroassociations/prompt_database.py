@@ -20,7 +20,7 @@ import tempfile
 
 from prompt_policy import load_prompt_policy
 from semantic_rules import SEMANTIC_POLICY, SOURCE_ONLY_REASON, WORD_CHECKS
-from sqlite_prompt_runtime import SQLite, VERSION, literal
+from sqlite_prompt_runtime import SQLite, VERSION, literal, publish_database
 
 ROOT = Path(__file__).resolve().parent
 # La raccolta: inventario, fonti, aggiornamenti, decisioni e bacini (gigabyte, fuori da Git).
@@ -128,7 +128,7 @@ def validate_pool(pool, expected_directives=None):
     if any(not isinstance(w,str) or not WORD.fullmatch(w) for w in words):
         raise ValueError('Risposta non canonica')
     if len(set(words)) != len(words) or prompt in words:
-        raise ValueError('Risposte duplicate, non canoniche o uguali al prompt')
+        raise ValueError('Risposte duplicate nello stesso bacino, non canoniche o uguali al prompt')
     if any(not required_text(a.get('rationale'),20) for a in answers):
         raise ValueError('Motivazione individuale mancante o breve')
     if len({a['rationale'] for a in answers}) != len(answers):
@@ -229,15 +229,46 @@ def initialize(db):
     db.run(''.join(statements))
 
 
-def import_reviewed(db, path):
+def import_reviewed(db, path, *, expected_heads=None, new_prompts_only=False, expected_pool_reviews=None):
     pools = [json.loads(line) for line in Path(path).read_text(encoding='utf-8').split('\n') if line.strip()]
     # Tutte le verifiche PRIMA di inizializzare o scrivere il DB. Nessuna promozione
     # automatica delle proposte, nessuna importazione parziale dei pacchetti errati.
     for pool in pools: validate_pool(pool)
     keys = [(p['prompt'], p['sense_description']) for p in pools]
     if len(set(keys)) != len(keys): raise ValueError('Accezione duplicata nel pacchetto')
+    if expected_heads is not None and set(expected_heads) != {p['prompt'] for p in pools}:
+        raise ValueError('Servono i riferimenti di revisione per tutti i prompt del pacchetto')
+    if expected_pool_reviews is not None and set(expected_pool_reviews) != {p['prompt'] for p in pools}:
+        raise ValueError('Servono i riferimenti dei bacini per tutti i prompt del pacchetto')
     initialize(db)
     statements = ['BEGIN IMMEDIATE;\n']
+    # I nuovi bacini possono essere preparati mentre un altro processo rivede
+    # i prompt. Il controllo avviene nella stessa transazione che li inserisce:
+    # non associare parole a una revisione ormai superata, né sostituire un
+    # bacino creato nel frattempo da un altro revisore.
+    if expected_heads is not None or new_prompts_only or expected_pool_reviews is not None:
+        statements.append('CREATE TEMP TABLE association_import_guard(ok INTEGER NOT NULL CHECK(ok=1));')
+        has_term_decisions = bool(db.run("SELECT 1 FROM sqlite_schema WHERE name='inventory_term_decisions' AND type='table';", rows=True))
+        for pool in pools:
+            prompt = literal(pool['prompt'])
+            if has_term_decisions:
+                statements.append('INSERT INTO association_import_guard SELECT NOT EXISTS('
+                    "SELECT 1 FROM inventory_term_decisions WHERE decision IN ('DISCARDED','DEFERRED') AND prompt="+prompt+');')
+            if expected_heads is not None:
+                statements.append('INSERT INTO association_import_guard SELECT EXISTS('
+                    'SELECT 1 FROM prompt_validation_heads WHERE prompt='+prompt+
+                    ' AND validation_id='+literal(expected_heads[pool['prompt']])+');')
+            if new_prompts_only:
+                statements.append('INSERT INTO association_import_guard SELECT NOT EXISTS('
+                    'SELECT 1 FROM prompts WHERE lemma='+prompt+');')
+            if expected_pool_reviews is not None:
+                previous = expected_pool_reviews[pool['prompt']]
+                if previous is None:
+                    statements.append('INSERT INTO association_import_guard SELECT NOT EXISTS('
+                        'SELECT 1 FROM prompts WHERE lemma='+prompt+');')
+                else:
+                    statements.append('INSERT INTO association_import_guard SELECT EXISTS('
+                        'SELECT 1 FROM prompts WHERE lemma='+prompt+' AND review_id='+literal(previous)+');')
     existing = {r['id'] for r in db.run('SELECT id FROM reviews;', rows=True)}
     for pool in pools:
         review_id = pool['content_sha256']
@@ -310,7 +341,7 @@ def export_game_db(db, output=GAME_DB):
         if game.run('PRAGMA foreign_key_check;', rows=True):
             raise ValueError('Errore di integrità referenziale nel database dei bacini')
         pools = len(load_pools(game))
-        temporary.replace(output)
+        publish_database(temporary,output,db.executable)
         return {'output': str(output), 'source': str(db.path), 'pools': pools}
     finally:
         temporary.unlink(missing_ok=True)
@@ -327,6 +358,7 @@ def load_pools(db):
 
 
 def sample_database(db, mode, seed, difficulties=None):
+    """Campiona ogni bacino: una parola estratta resta disponibile per gli altri prompt."""
     result = []; pending = []
     for pool in load_pools(db):
         try:

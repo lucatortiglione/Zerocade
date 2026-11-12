@@ -1,0 +1,23 @@
+{
+  "imported_pools": 20,
+  "already_imported": 0,
+  "backup": "C:\\Progetti\\Zerocade\\gioco-zeroassociations\\database-backups\\before_associations_20261109_173737_739817.sql",
+  "validated_db": {
+    "source": "C:\\Progetti\\Zerocade\\gioco-zeroassociations\\prompt_raw.sqlite3",
+    "destination": "C:\\Progetti\\Zerocade\\gioco-zeroassociations\\prompt_validi.sqlite3",
+    "valid_prompts": 223,
+    "verified_pools": 223,
+    "validated_without_pool_in_filtered_db": 4201,
+    "associations": 2392,
+    "excluded": [],
+    "raw_entries_deleted": 0,
+    "new_semantic_reviews_performed": 0,
+    "independent_gameplay_qa": false,
+    "publish_method": "atomic_replace"
+  },
+  "game_db": {
+    "output": "C:\\Progetti\\Zerocade\\gioco-zeroassociations\\prompt.sqlite3",
+    "source": "C:\\Progetti\\Zerocade\\gioco-zeroassociations\\prompt_raw.sqlite3",
+    "pools": 223
+  }
+}

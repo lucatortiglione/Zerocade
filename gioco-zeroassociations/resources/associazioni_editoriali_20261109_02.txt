@@ -1,0 +1,269 @@
+# Decisioni editoriali di ChatGPT, 9 novembre 2026.
+# risposta | senso della risposta | relazione | gruppo | motivazione
+# Bacini ampliabili; nessuna certificazione di esaustività o QA indipendente.
+
+@ occhio
+pupilla | apertura centrale dell'iride | parte anatomica | pupilla | La pupilla è l'apertura dell'occhio attraverso cui entra la luce.
+iride | parte colorata dell'occhio | parte anatomica | iride | L'iride è la parte colorata dell'occhio che circonda la pupilla.
+retina | membrana sensibile alla luce | parte anatomica | retina | La retina riveste internamente l'occhio e riceve gli stimoli luminosi.
+cornea | parte anteriore trasparente dell'occhio | parte anatomica | cornea | La cornea è la superficie anteriore trasparente dell'occhio.
+palpebra | piega mobile che copre l'occhio | protezione anatomica | palpebra | La palpebra si chiude per coprire e proteggere l'occhio.
+ciglio | pelo disposto sul margine della palpebra | protezione anatomica | ciglio | Le ciglia aiutano a proteggere l'occhio da particelle esterne.
+lacrima | goccia di secrezione lacrimale | secrezione | lacrima | Le lacrime mantengono umida la superficie dell'occhio.
+vista | senso che percepisce immagini e luce | funzione sensoriale | vista | L'occhio è l'organo della vista.
+occhiale | lente con montatura per correggere o proteggere la vista | ausilio | occhiale | Gli occhiali possono correggere difetti visivi o proteggere gli occhi.
+oculista | medico specializzato nell'occhio e nella vista | professione | oculista | L'oculista visita e cura gli occhi e i disturbi della vista.
+miopia | difetto che rende sfocati gli oggetti lontani | disturbo | miopia | La miopia è un difetto visivo dell'occhio.
+sguardo | atto di dirigere gli occhi verso qualcosa | azione | sguardo | Lo sguardo si dirige orientando gli occhi verso ciò che si osserva.
+
+@ disegno
+matita | strumento con mina per tracciare segni | strumento | matita | La matita è uno strumento comune per realizzare un disegno.
+foglio | supporto sottile di carta | supporto | foglio | Il foglio di carta è un supporto comune del disegno.
+gomma | oggetto elastico per cancellare | strumento | gomma | La gomma permette di cancellare tratti a matita nel disegno.
+tratto | segno prodotto da uno strumento grafico | elemento grafico | tratto | Un disegno prende forma attraverso i tratti sul supporto.
+contorno | linea che delimita una figura | elemento grafico | contorno | Il contorno delimita le figure rappresentate in un disegno.
+schizzo | disegno rapido e sommario | fase o tipo | schizzo | Lo schizzo è un disegno rapido che fissa le forme essenziali.
+ombreggiatura | resa grafica delle zone d'ombra | tecnica | ombreggiatura | L'ombreggiatura dà profondità e volume alle forme del disegno.
+prospettiva | tecnica di rappresentazione della profondità | tecnica | prospettiva | La prospettiva permette di rappresentare lo spazio tridimensionale in un disegno.
+ritratto | rappresentazione di una persona | soggetto o genere | ritratto | Un ritratto può essere realizzato mediante un disegno.
+album | raccolta di fogli rilegati | supporto | album | L'album raccoglie fogli destinati anche ai disegni.
+pennarello | strumento grafico con punta inchiostrata | strumento | pennarello | Il pennarello viene usato per tracciare e colorare disegni.
+carboncino | materiale da disegno ottenuto da legno carbonizzato | strumento | carboncino | Il carboncino permette di realizzare disegni con segni scuri e sfumati.
+
+@ forchetta
+rebbio | punta allungata di una forchetta | parte | rebbio | I rebbi sono le punte della forchetta che trattengono il cibo.
+manico | parte allungata che si impugna | parte | manico | Il manico permette di impugnare la forchetta.
+posata | utensile usato per mangiare | categoria | posata | La forchetta è una posata.
+piatto | stoviglia che contiene il cibo | oggetto abbinato | piatto | La forchetta viene usata per prendere il cibo dal piatto.
+tavola | piano apparecchiato per mangiare | collocazione | tavola | La forchetta viene disposta sulla tavola per il pasto.
+coltello | posata con lama | oggetto abbinato | coltello | Forchetta e coltello vengono usati insieme per tagliare e mangiare molti alimenti.
+cucchiaio | posata concava | oggetto abbinato | cucchiaio | Il cucchiaio è un'altra posata che si dispone insieme alla forchetta.
+infilzare | penetrare con una punta | funzione | infilzare | I rebbi della forchetta permettono di infilzare il cibo.
+pasta | alimento di farina e acqua | alimento caratteristico | pasta | La forchetta viene comunemente usata per mangiare la pasta.
+acciaio | lega metallica resistente | materiale | materiale | L'acciaio è un materiale comune delle forchette da tavola.
+argento | metallo prezioso | materiale | materiale | L'argento può essere usato per realizzare forchette e altre posate.
+apparecchiare | preparare la tavola per mangiare | preparazione | apparecchiare | Apparecchiare comprende la disposizione delle forchette.
+
+@ scivolo
+scala | struttura a gradini | parte | scala | La scala consente di raggiungere la sommità dello scivolo.
+discesa | percorso che porta verso il basso | movimento | discesa | Lo scivolo permette ai bambini di compiere una discesa lungo una superficie inclinata.
+rampa | superficie inclinata | parte | rampa | La rampa inclinata è la parte dello scivolo lungo cui si scende.
+bambino | persona nell'infanzia | utilizzatore | bambino | Lo scivolo nel senso scelto è un gioco destinato ai bambini.
+parco | area verde pubblica | collocazione | parco | Lo scivolo è un'attrezzatura comune dei parchi giochi.
+plastica | materiale sintetico modellabile | materiale | materiale | La plastica viene usata per costruire molti scivoli per bambini.
+metallo | materiale duro e lavorabile | materiale | materiale | Gli scivoli tradizionali possono avere una rampa di metallo.
+salire | spostarsi verso una posizione più alta | preparazione | salire | Prima della discesa sullo scivolo si sale alla sua sommità.
+velocità | rapidità del movimento | esperienza | velocità | La velocità della discesa è una componente riconoscibile del gioco sullo scivolo.
+altalena | gioco con sedile oscillante | attrezzatura affine | altalena | Scivolo e altalena sono attrezzature tipiche dei giardini per bambini.
+
+@ penna
+inchiostro | liquido colorato per scrivere | materiale di scrittura | inchiostro | La penna scrive depositando inchiostro sul supporto.
+punta | estremità che traccia il segno | parte | punta | La punta è la parte della penna che entra in contatto con il foglio.
+tappo | elemento che chiude e protegge | parte | tappo | Il tappo protegge la punta di molte penne.
+fusto | corpo allungato dello strumento | parte | fusto | Il fusto è il corpo della penna che viene impugnato per scrivere.
+pennino | punta metallica delle penne stilografiche | parte | punta | Il pennino distribuisce l'inchiostro nella scrittura con una stilografica.
+scrivere | tracciare caratteri di una lingua | funzione | scrivere | La penna è uno strumento destinato a scrivere.
+firma | nome tracciato per attestare identità o consenso | uso | firma | La penna viene usata per apporre una firma su carta.
+quaderno | insieme di fogli rilegati per scrivere | supporto | quaderno | La penna viene comunemente usata per scrivere su un quaderno.
+cartuccia | piccolo contenitore sostituibile di inchiostro | alimentazione | cartuccia | Una cartuccia può fornire inchiostro a una penna stilografica.
+stilografica | penna con serbatoio e pennino | tipo | tipo_penna | La stilografica è un tipo di penna alimentata da un serbatoio di inchiostro.
+biro | penna a sfera | tipo | tipo_penna | Biro è un nome comune della penna a sfera.
+astuccio | contenitore per strumenti di scrittura | custodia | astuccio | La penna viene conservata e trasportata nell'astuccio.
+
+@ nuvola
+cielo | spazio atmosferico visibile sopra la Terra | collocazione | cielo | Le nuvole sono visibili nel cielo.
+goccia | piccola quantità di acqua liquida | composizione | goccia | Le nuvole possono essere formate da minuscole gocce d'acqua sospese.
+condensazione | passaggio del vapore allo stato liquido | formazione | condensazione | La condensazione del vapore contribuisce alla formazione delle nuvole.
+pioggia | precipitazione di gocce d'acqua | precipitazione | pioggia | La pioggia può cadere dalle nuvole.
+neve | precipitazione di cristalli di ghiaccio | precipitazione | neve | La neve si forma nelle nuvole e cade come precipitazione solida.
+vento | movimento dell'aria | movimento | vento | Il vento trasporta le nuvole nel cielo.
+ombra | zona sottratta alla luce diretta | effetto | ombra | Una nuvola può proiettare ombra schermando la luce del sole.
+temporale | fenomeno con fulmini e tuoni | fenomeno meteorologico | temporale | Le nuvole temporalesche sono associate a pioggia intensa, fulmini e tuoni.
+cumulo | nuvola dall'aspetto tondeggiante | tipo | tipo_nuvola | Il cumulo è un tipo di nuvola dall'aspetto sviluppato e tondeggiante.
+cirro | nuvola alta e sottile | tipo | tipo_nuvola | Il cirro è una nuvola alta, sottile e spesso filamentosa.
+grigio | colore intermedio tra bianco e nero | aspetto | grigio | Molte nuvole che coprono il cielo appaiono grigie.
+fulmine | scarica elettrica atmosferica | fenomeno collegato | fulmine | Un fulmine può svilupparsi tra nuvole o fra una nuvola e il suolo.
+
+@ pollo
+petto | parte anteriore del torace usata come taglio di carne | taglio | petto | Il petto è uno dei tagli più comuni della carne di pollo.
+coscia | parte superiore della zampa usata come taglio di carne | taglio | coscia | La coscia è un taglio riconoscibile del pollo da cucinare.
+ala | appendice dell'uccello usata come porzione alimentare | taglio | ala | Le ali sono porzioni del pollo preparate per il consumo.
+arrosto | cotto mediante calore asciutto | preparazione | arrosto | Il pollo arrosto è una preparazione culinaria comune.
+forno | apparecchio per cuocere | cottura | forno | La carne di pollo viene comunemente cotta al forno.
+griglia | struttura metallica per la cottura diretta | cottura | griglia | La griglia viene usata per cuocere il pollo.
+brodo | liquido ottenuto cuocendo ingredienti in acqua | preparazione | brodo | Il pollo viene usato per preparare brodo.
+impanatura | rivestimento di pangrattato | preparazione | impanatura | L'impanatura riveste alcuni preparati a base di carne di pollo prima della cottura.
+spiedo | asta per sostenere la carne durante la cottura | strumento | spiedo | Il pollo allo spiedo viene cotto ruotando su un'asta.
+carne | alimento costituito da tessuti animali | categoria alimentare | carne | Nel senso selezionato, il pollo è carne destinata al consumo.
+pelle | rivestimento esterno dell'animale | parte alimentare | pelle | La pelle può essere lasciata sul pollo durante la cottura, diventando croccante.
+
+@ cucchiaio
+manico | parte impugnabile dell'utensile | parte | manico | Il manico permette di impugnare il cucchiaio.
+posata | utensile usato per mangiare | categoria | posata | Il cucchiaio appartiene alle posate.
+brodo | liquido di cottura alimentare | alimento caratteristico | minestra | Il brodo viene comunemente consumato con il cucchiaio.
+minestra | pietanza liquida o semiliquida | alimento caratteristico | minestra | Il cucchiaio permette di raccogliere e mangiare la minestra.
+zuppa | pietanza a base di liquido e altri ingredienti | alimento caratteristico | minestra | La zuppa viene comunemente mangiata con il cucchiaio.
+yogurt | alimento cremoso ottenuto dalla fermentazione del latte | alimento | yogurt | Il cucchiaio viene comunemente usato per mangiare lo yogurt.
+gelato | preparazione alimentare fredda e cremosa | alimento | gelato | Il gelato servito in una coppa può essere mangiato con il cucchiaio.
+mescolare | muovere ingredienti per amalgamarli | funzione | mescolare | Il cucchiaio viene usato per mescolare liquidi e preparazioni alimentari.
+imboccare | portare il cibo alla bocca di un'altra persona | funzione | imboccare | Un cucchiaio può essere usato per imboccare un bambino o una persona assistita.
+concavo | incurvato verso l'interno | forma | concavo | La parte concava del cucchiaio raccoglie il cibo e i liquidi.
+acciaio | lega metallica | materiale | materiale | L'acciaio è un materiale comune dei cucchiai da tavola.
+legno | materiale ricavato dagli alberi | materiale | materiale | Il legno viene usato per realizzare cucchiai da cucina.
+
+@ cuore
+battito | contrazione ritmica del cuore | attività | battito | Il battito è l'attività ritmica di contrazione del cuore.
+sangue | tessuto liquido che circola nei vasi | fluido pompato | sangue | Il cuore pompa il sangue attraverso il sistema circolatorio.
+arteria | vaso che porta il sangue dal cuore ai tessuti | vaso collegato | arteria | Le arterie trasportano il sangue in uscita dal cuore.
+vena | vaso che riporta il sangue verso il cuore | vaso collegato | vena | Le vene riportano il sangue verso il cuore.
+atrio | cavità cardiaca che riceve sangue | parte anatomica | atrio | Gli atri sono le cavità del cuore che ricevono il sangue.
+ventricolo | cavità cardiaca che spinge il sangue nei vasi | parte anatomica | ventricolo | I ventricoli sono cavità del cuore che spingono il sangue nei vasi.
+valvola | struttura che regola il passaggio del sangue | parte anatomica | valvola | Le valvole cardiache regolano il passaggio del sangue nel cuore.
+pompare | spingere un fluido mediante pressione | funzione | pompare | La funzione caratteristica del cuore è pompare il sangue.
+polso | pulsazione delle arterie percepibile al tatto | segno rilevabile | polso | Il polso permette di percepire le pulsazioni prodotte dal battito del cuore.
+elettrocardiogramma | registrazione dell'attività elettrica cardiaca | esame | elettrocardiogramma | L'elettrocardiogramma registra l'attività elettrica del cuore.
+infarto | danno del tessuto dovuto a mancato apporto di sangue | patologia collegata | infarto | L'infarto cardiaco interessa il muscolo del cuore.
+cardiologo | medico specialista del cuore | professione | cardiologo | Il cardiologo è il medico specializzato nel cuore e nelle sue malattie.
+
+@ leone
+criniera | pelo lungo intorno al capo e al collo | caratteristica anatomica | criniera | La criniera è una caratteristica riconoscibile del leone maschio adulto.
+ruggito | verso potente dei grandi felini | verso | ruggito | Il ruggito è il verso caratteristico del leone.
+zanna | dente canino sviluppato | parte anatomica | zanna | Le zanne del leone servono per afferrare e uccidere le prede.
+artiglio | unghia ricurva dei predatori | parte anatomica | artiglio | Gli artigli permettono al leone di trattenere le prede.
+savana | ambiente tropicale con erbe e alberi sparsi | habitat | savana | La savana è un habitat comunemente associato al leone africano.
+leonessa | femmina del leone | sesso dell'animale | leonessa | La leonessa è la femmina del leone.
+preda | animale catturato da un predatore | alimentazione | preda | Il leone caccia animali che costituiscono le sue prede.
+branco | gruppo sociale di animali | comportamento sociale | branco | I leoni possono vivere in branchi con relazioni sociali stabili.
+felino | mammifero della famiglia dei felidi | categoria zoologica | felino | Il leone appartiene ai felini.
+caccia | ricerca e cattura di prede | comportamento | caccia | La caccia procura al leone il cibo di cui si nutre.
+carnivoro | animale che si nutre di altri animali | dieta | carnivoro | Il leone è un carnivoro e si nutre della carne delle prede.
+
+@ bicchiere
+vetro | materiale trasparente e rigido | materiale | vetro | Il vetro è un materiale caratteristico dei bicchieri da tavola.
+acqua | liquido da bere | contenuto | bevanda | L'acqua viene comunemente bevuta da un bicchiere.
+vino | bevanda ottenuta dall'uva fermentata | contenuto | bevanda | Il vino viene servito in bicchieri adatti.
+birra | bevanda fermentata a base di cereali | contenuto | bevanda | La birra viene comunemente servita in un bicchiere.
+sorso | quantità di liquido bevuta in una volta | consumo | sorso | Un sorso viene bevuto appoggiando il bicchiere alla bocca.
+bordo | margine superiore del recipiente | parte | bordo | Il bordo del bicchiere viene avvicinato alle labbra per bere.
+tavola | piano apparecchiato per il pasto | collocazione | tavola | Il bicchiere viene disposto sulla tavola apparecchiata.
+brindisi | gesto augurale compiuto alzando i bicchieri | gesto | brindisi | Nel brindisi si alza il bicchiere e spesso lo si accosta a quello degli altri.
+lavastoviglie | elettrodomestico per lavare stoviglie | manutenzione | lavastoviglie | I bicchieri compatibili possono essere lavati in lavastoviglie.
+calice | bicchiere con stelo | tipo | tipo_bicchiere | Il calice è un tipo di bicchiere con coppa e stelo.
+boccale | recipiente per bere con manico | tipo | tipo_bicchiere | Il boccale è un recipiente per bere comunemente associato ai bicchieri da birra.
+fragile | che si rompe facilmente | proprietà | fragile | Un bicchiere di vetro è fragile e può rompersi cadendo.
+
+@ patata
+tubero | organo vegetale sotterraneo di riserva | categoria botanica | tubero | La patata consumata come alimento è un tubero.
+buccia | rivestimento esterno di un alimento vegetale | parte | buccia | La patata è rivestita da una buccia che può essere rimossa.
+amido | sostanza di riserva dei vegetali | composizione | amido | La patata contiene una quantità importante di amido.
+orto | terreno coltivato a ortaggi | coltivazione | orto | La patata può essere coltivata nell'orto.
+pelare | togliere il rivestimento esterno | preparazione | pelare | Pelare una patata significa rimuoverne la buccia.
+lessare | cuocere in acqua | cottura | cottura | Lessare è un modo comune di cuocere le patate.
+friggere | cuocere in grasso caldo | cottura | cottura | Le patate fritte si ottengono cuocendole in olio caldo.
+purè | preparazione morbida di patate schiacciate | preparazione | purè | Il purè è una preparazione caratteristica a base di patate.
+gnocco | piccolo impasto alimentare da cuocere | preparazione | gnocco | Le patate lessate vengono usate per preparare molti tipi di gnocchi.
+forno | apparecchio per cuocere | cottura | cottura | Le patate vengono comunemente cotte al forno.
+fecola | amido estratto da tuberi | derivato | fecola | La fecola di patate si ottiene estraendo l'amido dai tuberi.
+terra | suolo | crescita | terra | Le patate si sviluppano sotto terra nella parte sotterranea della pianta.
+
+@ altalena
+sedile | parte su cui ci si siede | parte | sedile | Il sedile sostiene chi gioca sull'altalena.
+catena | insieme di anelli metallici collegati | sospensione | sospensione | Le catene possono collegare il sedile dell'altalena alla struttura superiore.
+corda | elemento flessibile per legare o sostenere | sospensione | sospensione | Le corde possono sostenere il sedile di un'altalena.
+dondolare | muoversi alternativamente avanti e indietro | movimento | dondolare | Il movimento caratteristico dell'altalena è dondolare avanti e indietro.
+spinta | azione che mette in movimento | azione | spinta | Una spinta può avviare o aumentare il movimento dell'altalena.
+bambino | persona nell'infanzia | utilizzatore | bambino | L'altalena dei giardini è un gioco molto usato dai bambini.
+parco | area verde pubblica | collocazione | parco | L'altalena è un'attrezzatura comune dei parchi giochi.
+scivolo | gioco con rampa inclinata | attrezzatura affine | scivolo | Altalena e scivolo si trovano comunemente insieme nei giardini per bambini.
+oscillazione | movimento periodico intorno a una posizione | movimento fisico | dondolare | L'altalena compie oscillazioni intorno alla sua posizione di riposo.
+
+@ cucina
+fornello | elemento che produce calore per cuocere | attrezzatura | fornello | Il fornello è un'attrezzatura caratteristica della stanza adibita a cucina.
+lavello | vasca per lavare alimenti e stoviglie | attrezzatura | lavello | Il lavello permette di lavare alimenti e stoviglie in cucina.
+frigorifero | elettrodomestico che conserva al freddo | elettrodomestico | frigorifero | Il frigorifero viene comunemente collocato in cucina per conservare gli alimenti.
+forno | apparecchio per cuocere | elettrodomestico | forno | Il forno è un apparecchio caratteristico della cucina domestica.
+cappa | dispositivo che aspira vapori e odori | attrezzatura | cappa | La cappa della cucina aspira vapori e odori prodotti dalla cottura.
+pentola | recipiente per cuocere | utensile | pentola | La pentola è un utensile caratteristico usato nella cucina domestica.
+dispensa | spazio per conservare provviste | spazio | dispensa | La dispensa conserva le provviste della cucina.
+tavolo | mobile con piano di appoggio | arredo | tavolo | Il tavolo viene usato in molte cucine per preparare o consumare il cibo.
+lavastoviglie | elettrodomestico per lavare stoviglie | elettrodomestico | lavastoviglie | La lavastoviglie è un elettrodomestico comunemente installato in cucina.
+rubinetto | dispositivo che eroga acqua | impianto | rubinetto | Il rubinetto eroga l'acqua nel lavello della cucina.
+stoviglia | utensile o recipiente per il servizio del cibo | dotazione | stoviglia | Le stoviglie vengono usate e conservate nella cucina domestica.
+cuocere | trasformare alimenti mediante calore | funzione della stanza | cuocere | La cucina è la stanza attrezzata per cuocere gli alimenti.
+
+@ braccio
+spalla | regione che collega arto superiore e tronco | articolazione | spalla | La spalla collega il braccio al tronco.
+gomito | articolazione fra braccio e avambraccio | articolazione | gomito | Il gomito permette di piegare l'arto tra braccio e avambraccio.
+avambraccio | parte dell'arto tra gomito e polso | regione collegata | avambraccio | L'avambraccio prosegue il braccio oltre il gomito.
+omero | osso del braccio | osso | omero | L'omero è l'osso del braccio fra spalla e gomito.
+polso | articolazione che collega avambraccio e mano | articolazione collegata | polso | Il polso è l'articolazione terminale dell'avambraccio collegato al braccio.
+mano | estremità dell'arto superiore | estremità | mano | La mano è l'estremità dell'arto di cui il braccio fa parte.
+bicipite | muscolo anteriore del braccio | muscolo | muscolo | Il bicipite è un muscolo riconoscibile della parte anteriore del braccio.
+tricipite | muscolo posteriore del braccio | muscolo | muscolo | Il tricipite è un muscolo della parte posteriore del braccio.
+muscolo | tessuto contrattile che produce movimento | struttura | muscolo | I muscoli del braccio permettono i movimenti dell'arto.
+manica | parte del vestito che ricopre il braccio | abbigliamento | manica | La manica è la parte dell'indumento che riveste il braccio.
+gesso | rivestimento rigido usato per immobilizzare | cura | gesso | Un braccio fratturato può essere immobilizzato con un gesso.
+
+@ guancia
+viso | parte anteriore della testa | appartenenza anatomica | viso | La guancia è una parte laterale del viso.
+zigomo | rilievo osseo del volto | struttura anatomica | zigomo | Lo zigomo dà rilievo alla parte superiore della guancia.
+bocca | apertura del cavo orale | posizione anatomica | bocca | Le guance delimitano lateralmente il cavo della bocca.
+rossore | colorazione arrossata della pelle | aspetto | rossore | Il rossore può comparire sulle guance per emozione o calore.
+schiaffo | colpo dato con la mano aperta | gesto | schiaffo | La guancia è una sede tipica dello schiaffo.
+bacio | gesto affettuoso compiuto con le labbra | gesto | bacio | Un bacio sulla guancia è un gesto affettuoso o di saluto.
+carezza | contatto lieve e affettuoso | gesto | carezza | Accarezzare la guancia è un gesto di affetto riconoscibile.
+fossetta | piccola depressione della pelle | caratteristica | fossetta | Una fossetta può comparire sulla guancia quando si sorride.
+sorriso | espressione del volto con le labbra sollevate | movimento del volto | sorriso | Il sorriso modifica anche il profilo e i muscoli delle guance.
+
+@ faccia
+viso | parte anteriore della testa | sinonimo | viso | Viso è un sinonimo di faccia nel senso anatomico scelto.
+occhio | organo della vista | parte | occhio | Gli occhi si trovano nella parte superiore della faccia.
+naso | organo dell'olfatto | parte | naso | Il naso si trova al centro della faccia.
+bocca | apertura del cavo orale | parte | bocca | La bocca è un elemento riconoscibile della faccia.
+guancia | parte laterale del volto | parte | guancia | Le guance formano le zone laterali della faccia.
+fronte | area del volto sopra gli occhi | parte | fronte | La fronte occupa la parte superiore della faccia.
+mento | estremità inferiore del volto | parte | mento | Il mento forma la parte inferiore della faccia.
+sorriso | espressione del volto | espressione | sorriso | Un sorriso cambia l'espressione della faccia.
+smorfia | alterazione espressiva dei lineamenti | espressione | smorfia | Una smorfia si manifesta attraverso movimenti dei muscoli della faccia.
+trucco | applicazione di cosmetici | trattamento estetico | trucco | Il trucco modifica o valorizza l'aspetto della faccia.
+barba | peli che crescono su parte del volto | rivestimento | barba | La barba può ricoprire guance, mento e altre parti della faccia.
+
+@ buio
+oscurità | mancanza di illuminazione | sinonimo | oscurità | L'oscurità è la condizione di buio.
+notte | periodo della giornata senza luce solare diretta | occasione naturale | notte | Il buio è caratteristico della notte senza illuminazione artificiale.
+luce | radiazione che rende visibili gli oggetti | contrario | luce | La presenza di luce si contrappone alla condizione di buio.
+torcia | lampada portatile | strumento di illuminazione | illuminazione | Una torcia permette di illuminare un ambiente buio.
+candela | fonte luminosa con stoppino e cera | strumento di illuminazione | illuminazione | Una candela accesa produce luce nel buio.
+lampadina | sorgente elettrica di luce | strumento di illuminazione | illuminazione | Una lampadina accesa illumina uno spazio altrimenti buio.
+paura | emozione di fronte a una minaccia percepita | reazione comune | paura | La paura del buio è un'associazione quotidiana riconoscibile.
+interruttore | dispositivo che apre o chiude un circuito | controllo della luce | interruttore | L'interruttore permette di accendere la luce per uscire dal buio.
+blackout | interruzione della fornitura di energia elettrica | causa | blackout | Un blackout può lasciare al buio gli ambienti che dipendono dall'illuminazione elettrica.
+eclissi | oscuramento di un astro per allineamento di corpi celesti | fenomeno | eclissi | Un'eclissi totale di Sole può produrre temporaneamente buio anche di giorno.
+
+@ freddo
+ghiaccio | acqua allo stato solido | materiale caratteristico | ghiaccio | Il ghiaccio è comunemente associato a una sensazione di freddo.
+neve | cristalli di ghiaccio che cadono dall'atmosfera | fenomeno | neve | La neve è associata a condizioni di freddo.
+inverno | stagione più fredda dell'anno | stagione | inverno | L'inverno è la stagione comunemente associata al freddo.
+brivido | tremore involontario del corpo | reazione | brivido | Il freddo può provocare brividi.
+guanto | indumento che riveste la mano | protezione | protezione | Il guanto protegge la mano dal freddo.
+cappotto | indumento esterno pesante | protezione | protezione | Il cappotto viene indossato per proteggersi dal freddo.
+brina | deposito di cristalli di ghiaccio sulle superfici | fenomeno | brina | La brina si forma sulle superfici in condizioni di freddo.
+termometro | strumento per misurare la temperatura | misura | termometro | Il termometro permette di misurare le basse temperature associate al freddo.
+gelo | condizione di freddo intenso | intensificazione | gelo | Il gelo indica una condizione di freddo intenso.
+coperta | telo che trattiene il calore del corpo | protezione | protezione | La coperta viene usata per proteggersi dal freddo durante il riposo.
+riscaldamento | produzione di calore per aumentare la temperatura | contrasto | riscaldamento | Il riscaldamento riduce il freddo negli ambienti.
+caldo | condizione di temperatura elevata | contrario | caldo | Caldo e freddo rappresentano poli opposti della sensazione termica.
+
+@ sorriso
+labbro | margine carnoso della bocca | parte coinvolta | labbro | Il sorriso si manifesta attraverso il movimento delle labbra.
+dente | struttura dura nella bocca | parte visibile | dente | I denti possono diventare visibili durante un sorriso.
+bocca | apertura del cavo orale | sede | bocca | Il sorriso è riconoscibile dalla forma assunta dalla bocca.
+gioia | emozione positiva intensa | emozione | gioia | La gioia si esprime comunemente attraverso il sorriso.
+felicità | stato di benessere emotivo | emozione | gioia | Il sorriso è una manifestazione comune della felicità.
+allegria | disposizione lieta e vivace | emozione | gioia | L'allegria può manifestarsi con un sorriso.
+gentilezza | atteggiamento premuroso e cortese | funzione sociale | gentilezza | Un sorriso può essere un gesto di gentilezza verso un'altra persona.
+fotografia | immagine ottenuta fotograficamente | occasione | fotografia | Sorridere è una posa comune quando si scatta una fotografia.
+fossetta | piccola depressione della guancia | tratto visibile | fossetta | Una fossetta può diventare visibile quando compare un sorriso.
+espressione | configurazione del volto che comunica uno stato | categoria | espressione | Il sorriso è un'espressione del volto.
+saluto | gesto per riconoscere o accogliere qualcuno | funzione sociale | saluto | Un sorriso può accompagnare o costituire un saluto.
+imbarazzo | disagio in una situazione sociale | emozione | imbarazzo | Un sorriso può esprimere imbarazzo oltre che gioia.

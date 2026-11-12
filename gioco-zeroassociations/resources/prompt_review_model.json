@@ -1,0 +1,25 @@
+{
+  "base_model": "Qwen/Qwen3.8-27B",
+  "base_revision": "37561816e66b5b9153b1b64c10968c18c1e6f4a0",
+  "quantization_repository": "unsloth/Qwen3.8-27B-GGUF",
+  "quantization_revision": "4ca720788d1e01f1bff70c033e0d0028fd02e502",
+  "model_path": "C:\\Users\\lucat\\.cache\\huggingface\\hub\\models--unsloth--Qwen3.8-27B-GGUF\\snapshots\\4ca720788d1e01f1bff70c033e0d0028fd02e502\\Qwen3.8-27B-UD-IQ2_S.gguf",
+  "model_sha256": "7897d2c5a5cee46aef50895141b2c8a0803c1185f3d03c4fda4cd137a7ad77fe",
+  "quantization": "IQ2_S",
+  "served_model": "qwen38-prompt-review-pilot",
+  "endpoint": "http://127.0.0.1:19473",
+  "purpose": "prompt-only editorial review pilot; no association approval",
+  "pilot_status": "REJECTED_FOR_PROMPT_REVIEW",
+  "pilot_assessment": {
+    "assessor": "ChatGPT",
+    "human_review": false,
+    "reviewed": 26,
+    "issues": {
+      "leggero": "Mescola peso, impegno e alimentazione, categoria 058 incompatibile con il senso fisico.",
+      "gru": "Privilegia il senso animale e liquida il comune macchinario come poco familiare.",
+      "grande": "Categoria geografica non coerente con la propriet? dimensionale.",
+      "forte": "Seleziona il nome della fortificazione anzich? il comune aggettivo, senza disambiguazione visibile."
+    },
+    "decisions_imported": 0
+  }
+}

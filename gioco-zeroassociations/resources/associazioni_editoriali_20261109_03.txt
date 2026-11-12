@@ -1,0 +1,338 @@
+# Decisioni editoriali di ChatGPT, 9 novembre 2026.
+# risposta | senso della risposta | relazione | gruppo | motivazione
+# Ogni coppia è stata valutata nel senso corrente del prompt; bacini ampliabili.
+
+@ bottiglia
+tappo | chiusura di un recipiente | parte | tappo | Il tappo chiude l'apertura della bottiglia.
+collo | parte stretta superiore di un recipiente | parte | collo | Il collo è la parte stretta della bottiglia sotto l'apertura.
+fondo | base di un recipiente | parte | fondo | Il fondo chiude la bottiglia nella parte inferiore e sostiene il contenuto.
+vetro | materiale rigido trasparente | materiale | materiale | Il vetro è un materiale comune delle bottiglie.
+plastica | materiale sintetico modellabile | materiale | materiale | La plastica viene usata per realizzare molte bottiglie.
+acqua | liquido alimentare | contenuto | bevanda | L'acqua viene comunemente conservata e venduta in bottiglia.
+vino | bevanda ottenuta dall'uva | contenuto | bevanda | Il vino viene comunemente conservato e venduto in bottiglia.
+etichetta | cartellino con informazioni sul prodotto | parte applicata | etichetta | L'etichetta della bottiglia identifica il prodotto contenuto.
+stappare | togliere il tappo | apertura | stappare | Stappare una bottiglia significa rimuoverne il tappo.
+versare | far uscire un liquido da un recipiente | uso | versare | Inclinando la bottiglia si può versare il liquido contenuto.
+cavatappi | attrezzo per estrarre tappi | strumento | cavatappi | Il cavatappi serve per estrarre alcuni tipi di tappo dalle bottiglie.
+riciclo | recupero di materiali per un nuovo utilizzo | gestione del materiale | riciclo | Le bottiglie di vetro e plastica sono oggetti comuni della raccolta per il riciclo.
+
+@ gelato
+cono | cialda conica per servire il gelato | contenitore commestibile | cono | Il cono permette di tenere e mangiare il gelato senza una coppa.
+coppetta | piccolo recipiente per alimenti | contenitore | coppetta | La coppetta viene comunemente usata per servire il gelato.
+latte | alimento liquido | ingrediente | latte | Il latte è una base comune dei gelati alle creme.
+frutta | insieme dei frutti alimentari | ingrediente | frutta | La frutta viene usata per preparare molti gusti di gelato.
+panna | parte grassa del latte | guarnizione | panna | La panna montata può accompagnare una porzione di gelato.
+cioccolato | alimento a base di cacao | gusto | gusto | Il cioccolato è un gusto comune del gelato.
+vaniglia | aroma ricavato da baccelli | gusto | gusto | La vaniglia è un gusto classico del gelato.
+fragola | frutto rosso | gusto | gusto | La fragola è un gusto comune del gelato alla frutta.
+pistacchio | seme commestibile | gusto | gusto | Il pistacchio viene usato per preparare un gusto riconoscibile di gelato.
+sciogliersi | perdere consistenza solida per effetto del calore | trasformazione | sciogliersi | Il gelato si scioglie quando si riscalda.
+freddo | di bassa temperatura | proprietà | freddo | Il gelato viene consumato a una temperatura fredda.
+gelateria | esercizio che produce o vende gelato | produzione e vendita | gelateria | La gelateria è il luogo dedicato alla produzione o vendita del gelato.
+paletta | piccolo utensile piatto | utensile | paletta | Una paletta viene usata per mangiare il gelato dalla coppetta.
+cialda | preparazione alimentare sottile e croccante | accompagnamento | cialda | La cialda viene usata come cono o accompagnamento del gelato.
+
+@ pigiama
+notte | periodo buio della giornata | momento d'uso | notte | Il pigiama viene comunemente indossato durante la notte.
+letto | mobile per dormire | contesto | letto | Il pigiama è un indumento comunemente indossato quando si va a letto.
+sonno | stato fisiologico del dormire | uso | sonno | Il pigiama è destinato al riposo e al sonno.
+bottone | piccolo elemento di chiusura | parte | bottone | I bottoni possono chiudere la parte superiore del pigiama.
+manica | parte dell'indumento che riveste il braccio | parte | manica | La parte superiore di molti pigiami comprende maniche.
+pantalone | parte dell'abbigliamento che copre gli arti inferiori | parte | pantalone | Il pantalone costituisce la parte inferiore di un pigiama a due pezzi.
+cotone | fibra tessile vegetale | materiale | materiale | Il cotone è un tessuto comune dei pigiami.
+flanella | tessuto morbido e caldo | materiale | materiale | La flanella viene usata per pigiami destinati ai periodi freddi.
+casacca | indumento che copre il tronco | parte | casacca | La casacca è la parte superiore di molti pigiami a due pezzi.
+vestaglia | indumento ampio da casa | abbinamento | vestaglia | La vestaglia può essere indossata sopra il pigiama.
+
+@ erba
+prato | terreno coperto da vegetazione erbacea | ambiente | prato | Il prato è caratterizzato da una copertura di erba.
+verde | colore della vegetazione fresca | colore | verde | Il verde è il colore caratteristico dell'erba fresca.
+tagliare | recidere per accorciare | cura | tagliare | L'erba del prato viene tagliata per mantenerla all'altezza desiderata.
+falce | attrezzo con lama ricurva | strumento | taglio | La falce è un attrezzo tradizionale per tagliare l'erba.
+tosaerba | macchina per accorciare la vegetazione del prato | strumento | taglio | Il tosaerba viene usato per tagliare l'erba del prato.
+fieno | erba tagliata ed essiccata | trasformazione | fieno | Il fieno si ottiene tagliando ed essiccando erba destinata agli animali.
+pascolo | terreno dove si nutrono animali erbivori | uso | pascolo | L'erba del pascolo alimenta molti animali allevati.
+rugiada | gocce d'acqua condensate sulle superfici | fenomeno | rugiada | La rugiada può depositarsi sull'erba durante la notte.
+radice | parte vegetale che assorbe acqua dal terreno | parte | radice | Le radici ancorano l'erba al terreno e assorbono acqua.
+seme | struttura da cui può svilupparsi una pianta | riproduzione | seme | I semi permettono di seminare e far crescere un nuovo tappeto d'erba.
+trifoglio | pianta erbacea dalle foglie composte | pianta del prato | trifoglio | Il trifoglio è una pianta erbacea comune nei prati.
+
+@ cerchio
+centro | punto equidistante dal contorno circolare | elemento geometrico | centro | Il centro del cerchio è equidistante dai punti della circonferenza.
+raggio | segmento tra centro e circonferenza | misura geometrica | raggio | Il raggio collega il centro del cerchio a un punto della circonferenza.
+diametro | segmento passante per il centro con estremi sulla circonferenza | misura geometrica | diametro | Il diametro attraversa il centro del cerchio ed è lungo due raggi.
+circonferenza | linea che delimita il cerchio | contorno | circonferenza | La circonferenza è il contorno del cerchio.
+compasso | strumento per tracciare circonferenze | strumento | compasso | Il compasso permette di disegnare il contorno di un cerchio.
+arco | porzione di circonferenza | elemento geometrico | arco | Un arco è una porzione del contorno circolare del cerchio.
+corda | segmento che collega due punti di una circonferenza | elemento geometrico | corda | Una corda collega due punti del contorno del cerchio.
+settore | parte di cerchio delimitata da due raggi e un arco | parte geometrica | settore | Un settore circolare è una parte del cerchio delimitata da due raggi e un arco.
+disco | superficie piana delimitata da una circonferenza | concetto equivalente | disco | Un disco geometrico rappresenta la regione piana del cerchio.
+tangente | retta con un solo punto in comune con la circonferenza | relazione geometrica | tangente | Una tangente tocca la circonferenza del cerchio in un solo punto.
+area | misura di una superficie | misura geometrica | area | L'area misura la superficie occupata dal cerchio.
+rotondo | di forma circolare | proprietà della forma | rotondo | Il cerchio ha una forma rotonda.
+
+@ cielo
+sole | stella che illumina la Terra | astro | sole | Il Sole è un elemento riconoscibile del cielo diurno.
+luna | satellite naturale della Terra | astro | luna | La Luna è visibile nel cielo e caratterizza l'immaginario del cielo notturno.
+stella | astro luminoso | astro | stella | Le stelle appaiono come punti luminosi nel cielo notturno.
+nuvola | insieme di goccioline o cristalli sospesi | fenomeno atmosferico | nuvola | Le nuvole attraversano il cielo e possono coprirlo.
+azzurro | colore tra blu e celeste | colore | azzurro | L'azzurro è il colore comunemente associato al cielo sereno.
+arcobaleno | arco di colori dovuto alla luce nelle gocce d'acqua | fenomeno visibile | arcobaleno | L'arcobaleno può comparire nel cielo quando luce e gocce d'acqua interagiscono.
+orizzonte | linea apparente tra cielo e superficie terrestre | limite visivo | orizzonte | L'orizzonte separa apparentemente il cielo dalla terra o dal mare.
+tramonto | discesa apparente del sole sotto l'orizzonte | momento | tramonto | Al tramonto il cielo può assumere colori rossi e arancioni.
+alba | prime luci del giorno | momento | alba | All'alba il cielo torna a illuminarsi.
+temporale | fenomeno con fulmini e tuoni | fenomeno atmosferico | temporale | Durante un temporale il cielo è occupato da nuvole scure e può essere attraversato da fulmini.
+costellazione | insieme convenzionale di stelle | organizzazione degli astri | costellazione | Le costellazioni raggruppano figure riconoscibili di stelle nel cielo.
+
+@ lupo
+branco | gruppo sociale di animali | comportamento sociale | branco | Il lupo vive comunemente in branchi con legami sociali.
+ululato | verso prolungato di alcuni canidi | verso | ululato | L'ululato è il verso caratteristico del lupo.
+preda | animale catturato da un predatore | alimentazione | preda | Il lupo caccia prede per nutrirsi.
+zanna | dente canino sviluppato | parte anatomica | zanna | Le zanne del lupo permettono di afferrare le prede.
+bosco | territorio coperto da alberi | habitat | bosco | Il bosco è un ambiente comunemente associato al lupo.
+pelliccia | rivestimento di pelo di un animale | rivestimento | pelliccia | La pelliccia riveste il corpo del lupo e contribuisce alla protezione termica.
+canide | mammifero della famiglia dei canidi | categoria zoologica | canide | Il lupo appartiene alla famiglia dei canidi.
+tana | rifugio per animali | riparo | tana | La tana offre riparo ai piccoli del lupo.
+caccia | ricerca e cattura di animali | comportamento | caccia | La caccia è un'attività caratteristica del lupo per procurarsi cibo.
+agnello | piccolo della pecora | preda e immaginario | agnello | L'agnello è una possibile preda del lupo ed è associato ad esso nelle favole.
+cane | canide domestico | animale affine | cane | Il cane è un animale strettamente affine al lupo.
+
+@ asciugamano
+spugna | tessuto assorbente con superficie a ricci | materiale | spugna | Il tessuto di spugna è un materiale caratteristico degli asciugamani.
+telo | pezzo ampio di tessuto | categoria | telo_assorbente | L'asciugamano è un telo destinato ad asciugare.
+bagno | stanza dedicata all'igiene | collocazione | bagno | L'asciugamano viene comunemente tenuto in bagno.
+doccia | lavaggio del corpo con getti d'acqua | occasione d'uso | doccia | Dopo la doccia si usa l'asciugamano per asciugare il corpo.
+mano | estremità dell'arto superiore | parte asciugata | mano | L'asciugamano viene usato per asciugare le mani dopo averle lavate.
+viso | parte anteriore della testa | parte asciugata | viso | L'asciugamano viene usato per asciugare il viso dopo il lavaggio.
+acqua | liquido che bagna il corpo | liquido assorbito | acqua | L'asciugamano assorbe l'acqua rimasta sulla pelle.
+asciugare | rimuovere l'umidità | funzione | asciugare | La funzione dell'asciugamano è asciugare la pelle bagnata.
+salvietta | piccolo telo o foglio per pulirsi | oggetto affine | telo_assorbente | Una salvietta di tessuto può svolgere la funzione di piccolo asciugamano.
+accappatoio | indumento assorbente da bagno | oggetto affine | accappatoio | L'accappatoio è un indumento assorbente usato dopo il bagno come l'asciugamano.
+
+@ polpetta
+carne | alimento costituito da tessuti animali | ingrediente | carne | Nel senso selezionato la polpetta viene preparata con carne.
+macinato | carne tritata | ingrediente | carne | La carne macinata è la base tipica dell'impasto delle polpette.
+pangrattato | pane secco ridotto in briciole | ingrediente | pangrattato | Il pangrattato viene usato nell'impasto o nel rivestimento delle polpette.
+uovo | alimento usato anche per legare impasti | ingrediente | uovo | L'uovo aiuta a legare gli ingredienti dell'impasto delle polpette.
+prezzemolo | erba aromatica | aroma | prezzemolo | Il prezzemolo viene comunemente usato per insaporire le polpette.
+parmigiano | formaggio stagionato | ingrediente | parmigiano | Il parmigiano grattugiato è un ingrediente comune delle polpette.
+friggere | cuocere in grasso caldo | cottura | cottura | Friggere è un modo comune di cuocere le polpette.
+forno | apparecchio per cuocere | cottura | cottura | Le polpette possono essere cotte al forno.
+sugo | condimento liquido o semiliquido | condimento | sugo | Le polpette possono essere cotte o servite nel sugo.
+padella | recipiente basso per la cottura | strumento | padella | La padella viene usata per cuocere le polpette.
+impastare | amalgamare ingredienti lavorandoli insieme | preparazione | impastare | Impastare amalgama gli ingredienti prima di formare le polpette.
+pallina | piccolo corpo tondeggiante | forma | pallina | La polpetta viene comunemente modellata come una pallina di impasto.
+
+@ spiaggia
+sabbia | insieme di piccoli granelli minerali | materiale | materiale | La sabbia forma il suolo di molte spiagge.
+sasso | piccolo frammento di roccia | materiale | materiale | Alcune spiagge sono costituite da sassi e ciottoli.
+mare | grande massa di acqua salata | ambiente | mare | La spiaggia nel senso scelto si trova lungo la riva del mare.
+onda | movimento della superficie dell'acqua | fenomeno | onda | Le onde del mare raggiungono la spiaggia.
+ombrellone | grande ombrello da sole | attrezzatura | ombrellone | L'ombrellone viene usato sulla spiaggia per ripararsi dal sole.
+lettino | sedile allungato per sdraiarsi | attrezzatura | lettino | Il lettino permette di sdraiarsi sulla spiaggia.
+asciugamano | telo assorbente | oggetto d'uso | asciugamano | Sulla spiaggia l'asciugamano viene usato per asciugarsi o per stendersi.
+conchiglia | guscio calcareo di alcuni animali marini | elemento naturale | conchiglia | Le conchiglie possono essere raccolte sulla spiaggia.
+secchiello | piccolo recipiente con manico | gioco | gioco | Il secchiello è un gioco comune dei bambini sulla spiaggia.
+paletta | piccolo utensile per raccogliere e scavare | gioco | gioco | La paletta viene usata dai bambini per scavare nella sabbia della spiaggia.
+costume | indumento da bagno | abbigliamento | costume | Il costume da bagno è un indumento caratteristico della spiaggia.
+bagnino | addetto alla sorveglianza dei bagnanti | professione | bagnino | Il bagnino sorveglia i bagnanti nelle spiagge attrezzate.
+duna | accumulo di sabbia modellato dal vento | formazione naturale | duna | Le dune possono formarsi nella parte retrostante di una spiaggia sabbiosa.
+
+@ orecchio
+padiglione | parte esterna cartilaginea dell'orecchio | parte anatomica | padiglione | Il padiglione è la parte esterna visibile dell'orecchio.
+lobo | parte inferiore morbida del padiglione | parte anatomica | lobo | Il lobo è la parte inferiore morbida dell'orecchio esterno.
+timpano | membrana che vibra al passaggio dei suoni | parte anatomica | timpano | Il timpano dell'orecchio vibra in risposta ai suoni.
+coclea | struttura interna che trasforma vibrazioni in segnali nervosi | parte anatomica | coclea | La coclea fa parte dell'orecchio interno e interviene nell'udito.
+udito | senso che percepisce i suoni | funzione sensoriale | udito | L'orecchio è l'organo dell'udito.
+suono | vibrazione percepita dall'udito | stimolo | suono | L'orecchio permette di percepire i suoni.
+rumore | suono percepito come disordinato o fastidioso | stimolo | suono | Un rumore viene percepito attraverso l'orecchio.
+cerume | secrezione del condotto uditivo esterno | secrezione | cerume | Il cerume è prodotto nel condotto dell'orecchio esterno.
+orecchino | ornamento applicato all'orecchio | ornamento | orecchino | L'orecchino viene portato sul lobo o su altre parti dell'orecchio.
+auricolare | piccolo dispositivo per ascoltare | dispositivo | auricolare | L'auricolare viene collocato vicino o dentro l'orecchio per ascoltare audio.
+sordità | perdita parziale o totale dell'udito | disturbo della funzione | sordità | La sordità riguarda la capacità di udire i suoni attraverso il sistema uditivo.
+otite | infiammazione dell'orecchio | patologia | otite | L'otite è un'infiammazione che interessa una parte dell'orecchio.
+
+@ candela
+cera | materiale combustibile e modellabile | materiale | cera | La cera costituisce il corpo di molte candele.
+stoppino | filo che alimenta la combustione | parte | stoppino | Lo stoppino della candela sostiene la fiamma e assorbe il combustibile fuso.
+fiamma | parte luminosa della combustione | combustione | fiamma | Una candela accesa produce una fiamma sullo stoppino.
+fiammifero | bastoncino che si accende per sfregamento | strumento | fiammifero | Un fiammifero può essere usato per accendere una candela.
+accendere | avviare la combustione | azione | accendere | Accendere una candela significa dare fuoco al suo stoppino.
+spegnere | interrompere la combustione | azione | spegnere | Spegnere una candela interrompe la sua fiamma.
+luce | fenomeno che rende visibili gli oggetti | funzione | luce | La candela accesa produce luce.
+candelabro | sostegno per più candele | supporto | candelabro | Il candelabro sostiene una o più candele.
+soffiare | espellere aria dalla bocca | spegnimento | soffiare | Soffiando si può spegnere la fiamma di una candela.
+profumo | odore gradevole | effetto | profumo | Una candela profumata diffonde un aroma durante l'uso.
+compleanno | anniversario della nascita | occasione | compleanno | Piccole candele vengono accese sulla torta di compleanno.
+
+@ fazzoletto
+naso | organo del volto | uso | naso | Il fazzoletto nel senso scelto serve per soffiarsi e pulirsi il naso.
+raffreddore | disturbo con secrezione e congestione nasale | occasione | raffreddore | Durante un raffreddore si usa spesso il fazzoletto per il naso.
+starnuto | espulsione improvvisa di aria dalle vie respiratorie | occasione | starnuto | Un fazzoletto può coprire naso e bocca durante uno starnuto.
+muco | secrezione delle mucose | materiale rimosso | muco | Il fazzoletto raccoglie il muco quando ci si soffia il naso.
+tasca | piccolo vano di un indumento | custodia | tasca | Il fazzoletto viene comunemente tenuto in tasca per averlo a disposizione.
+carta | materiale sottile di fibre vegetali | materiale | materiale | La carta assorbente viene usata per i fazzoletti monouso.
+stoffa | tessuto | materiale | materiale | La stoffa viene usata per i fazzoletti lavabili.
+monouso | destinato a essere usato una sola volta | tipo | monouso | I fazzoletti di carta sono comunemente prodotti monouso.
+pacchetto | piccolo involucro contenente più pezzi | confezione | pacchetto | I fazzoletti di carta vengono comunemente venduti in piccoli pacchetti tascabili.
+
+@ pera
+frutto | parte alimentare della pianta contenente semi | categoria | frutto | La pera è un frutto alimentare.
+pero | albero che produce pere | pianta d'origine | pero | Il pero è l'albero che produce la pera.
+buccia | rivestimento esterno del frutto | parte | buccia | La buccia riveste esternamente la pera.
+polpa | parte carnosa del frutto | parte | polpa | La polpa è la parte carnosa della pera che si mangia.
+seme | struttura vegetale per la riproduzione | parte | seme | La pera contiene semi nella parte centrale del frutto.
+picciolo | elemento che collega il frutto alla pianta | parte | picciolo | Il picciolo collega la pera al ramo prima della raccolta.
+succo | liquido estratto dalla frutta | derivato | succo | Dalla pera si può ricavare succo di frutta.
+verde | colore di alcune varietà | colore | colore | La buccia di alcune pere rimane verde anche a maturazione.
+giallo | colore di alcune varietà | colore | colore | Alcune pere mature hanno la buccia gialla.
+spicchio | porzione ricavata tagliando un frutto | preparazione | spicchio | La pera può essere tagliata e servita a spicchi.
+confettura | conserva dolce di frutta | derivato | confettura | La pera può essere cotta con zucchero per preparare una confettura.
+
+@ ginocchio
+rotula | osso anteriore dell'articolazione del ginocchio | parte anatomica | rotula | La rotula è l'osso posto davanti all'articolazione del ginocchio.
+articolazione | connessione mobile fra ossa | categoria anatomica | articolazione | Il ginocchio è un'articolazione dell'arto inferiore.
+gamba | parte dell'arto inferiore | appartenenza anatomica | gamba | Il ginocchio permette di piegare la gamba rispetto alla coscia.
+femore | osso della coscia | osso articolato | femore | Il femore partecipa all'articolazione del ginocchio.
+tibia | osso della gamba | osso articolato | tibia | La tibia partecipa all'articolazione del ginocchio insieme al femore.
+menisco | struttura cartilaginea dell'articolazione | parte anatomica | menisco | I menischi si trovano nel ginocchio fra femore e tibia.
+legamento | struttura fibrosa che stabilizza un'articolazione | parte anatomica | legamento | I legamenti contribuiscono alla stabilità del ginocchio.
+piegare | flettere un segmento del corpo | movimento | piegare | Il movimento del ginocchio permette di piegare l'arto inferiore.
+inginocchiarsi | appoggiare uno o entrambi i ginocchi a terra | posizione | inginocchiarsi | Inginocchiarsi significa appoggiarsi a terra sui ginocchi.
+cartilagine | tessuto che riveste superfici articolari | tessuto | cartilagine | La cartilagine riveste superfici articolari del ginocchio.
+ginocchiera | protezione o sostegno per il ginocchio | ausilio | ginocchiera | La ginocchiera protegge o sostiene il ginocchio.
+
+@ coperta
+letto | mobile per dormire | collocazione | letto | La coperta viene comunemente stesa sul letto.
+coprirsi | rivestire il corpo per ripararlo | funzione | coprirsi | La coperta permette di coprirsi durante il riposo.
+lana | fibra tessile animale | materiale | materiale | La lana è un materiale tradizionale delle coperte.
+cotone | fibra tessile vegetale | materiale | materiale | Il cotone viene usato per realizzare coperte leggere.
+pile | tessuto sintetico morbido e isolante | materiale | materiale | Il pile viene usato per coperte leggere che trattengono calore.
+caldo | condizione di temperatura confortevole o elevata | effetto | caldo | La coperta aiuta a mantenere caldo il corpo.
+sonno | stato del dormire | occasione | sonno | La coperta viene usata per proteggersi durante il sonno.
+inverno | stagione fredda | periodo d'uso | inverno | La coperta è comunemente associata al riposo durante l'inverno.
+plaid | coperta di dimensioni contenute | tipo | tipo_coperta | Il plaid è un tipo di coperta usata per coprirsi durante il riposo.
+trapunta | coperta imbottita e cucita | tipo | tipo_coperta | La trapunta è una coperta imbottita per il letto.
+morbido | cedevole e piacevole al tatto | qualità tattile | morbido | La morbidezza è una qualità riconoscibile di molte coperte.
+freddo | condizione di bassa temperatura | bisogno contrastato | freddo | La coperta viene usata per proteggere il corpo dal freddo.
+
+@ cappello
+testa | capo del corpo umano | sede d'uso | testa | Il cappello viene indossato sulla testa.
+tesa | parte sporgente intorno al cappello | parte | tesa | La tesa sporge dalla base della cupola di molti cappelli.
+cupola | parte del cappello che ricopre il capo | parte | cupola | La cupola è la parte del cappello che avvolge la testa.
+visiera | parte sporgente che ripara gli occhi | parte | visiera | Alcuni cappelli hanno una visiera per riparare gli occhi dalla luce.
+berretto | copricapo morbido o con visiera | tipo affine | tipo | Il berretto è un copricapo comunemente associato ai cappelli.
+cilindro | cappello alto con cupola cilindrica | tipo | tipo | Il cilindro è un tipo riconoscibile di cappello.
+coppola | copricapo basso con piccola visiera | tipo | tipo | La coppola è un copricapo tradizionale con una piccola visiera.
+paglia | steli vegetali essiccati | materiale | materiale | La paglia viene usata per fabbricare cappelli leggeri da sole.
+feltro | materiale tessile compatto | materiale | materiale | Il feltro è un materiale comune di diversi cappelli.
+sole | sorgente di luce e calore | protezione | protezione | Un cappello può proteggere la testa e il viso dal sole.
+freddo | bassa temperatura | protezione | protezione | Un cappello invernale protegge la testa dal freddo.
+copricapo | indumento che copre il capo | categoria | copricapo | Il cappello è un copricapo.
+
+@ carnevale
+maschera | oggetto o personaggio che cela e trasforma il volto | tradizione | maschera | La maschera è un elemento caratteristico dei festeggiamenti di Carnevale.
+costume | abito che riproduce un personaggio | abbigliamento | costume | A Carnevale si indossano costumi di fantasia.
+coriandolo | piccolo ritaglio di carta colorata | materiale festivo | coriandolo | I coriandoli vengono lanciati durante le feste di Carnevale.
+sfilata | corteo organizzato di persone o mezzi | manifestazione | sfilata | Le sfilate sono manifestazioni caratteristiche del Carnevale.
+carro | veicolo allestito per un corteo | manifestazione | carro | I carri allegorici partecipano alle sfilate di Carnevale.
+travestimento | cambiamento dell'aspetto mediante abiti e accessori | pratica | travestimento | Il travestimento permette di impersonare figure diverse durante il Carnevale.
+scherzo | azione compiuta per divertire o sorprendere | usanza | scherzo | Gli scherzi sono associati alla tradizione del Carnevale.
+frittella | piccolo dolce fritto | dolce tipico | dolce | Le frittelle sono dolci tradizionalmente preparati durante il Carnevale.
+chiacchiera | dolce sottile di pasta fritta | dolce tipico | dolce | Le chiacchiere sono dolci tipici del Carnevale italiano.
+arlecchino | personaggio tradizionale della commedia e del Carnevale | personaggio | arlecchino | Arlecchino è una maschera tradizionale riconoscibile del Carnevale.
+quaresima | periodo religioso che precede la Pasqua | collocazione nel calendario | quaresima | Il Carnevale precede la Quaresima nel calendario tradizionale.
+festa | celebrazione collettiva | categoria di evento | festa | Il Carnevale comprende feste e celebrazioni collettive.
+
+@ panino
+pane | alimento lievitato e cotto | base alimentare | pane | Il pane costituisce l'involucro del panino farcito.
+farcitura | insieme degli ingredienti inseriti all'interno | componente | farcitura | La farcitura distingue il panino da semplice pane non condito.
+prosciutto | salume ottenuto dalla coscia del maiale | ingrediente | salume | Il prosciutto è una farcitura comune del panino.
+salame | salume insaccato | ingrediente | salume | Il salame viene comunemente usato per farcire un panino.
+formaggio | alimento ricavato dal latte | ingrediente | formaggio | Il formaggio è una farcitura comune dei panini.
+tonno | pesce consumato anche conservato | ingrediente | tonno | Il tonno viene usato per farcire molti panini.
+insalata | foglie commestibili usate crude | ingrediente | insalata | L'insalata può essere aggiunta alla farcitura di un panino.
+maionese | salsa a base di uovo e olio | condimento | maionese | La maionese è un condimento comune dei panini farciti.
+mordere | stringere e tagliare con i denti | consumo | mordere | Un panino viene comunemente mangiato mordendolo.
+spuntino | piccolo pasto | occasione | spuntino | Un panino è un alimento comune per uno spuntino.
+bar | esercizio di somministrazione | luogo di acquisto | bar | Il bar è un luogo comune in cui acquistare un panino farcito.
+toast | preparazione di pane farcito e tostato | preparazione affine | toast | Il toast è una preparazione di pane farcito affine al panino.
+
+@ drago
+fuoco | combustione con fiamme | potere fantastico | fuoco | Il drago nel senso scelto è la creatura fantastica che sputa fuoco.
+ala | appendice che permette il volo | parte fantastica | ala | Molte rappresentazioni del drago fantastico comprendono grandi ali.
+squama | elemento del rivestimento di alcuni animali | rivestimento fantastico | squama | Il drago fantastico viene comunemente rappresentato con squame.
+artiglio | unghia ricurva di un predatore | parte fantastica | artiglio | Gli artigli sono un tratto comune delle rappresentazioni del drago.
+coda | appendice posteriore del corpo | parte fantastica | coda | Il drago fantastico viene spesso raffigurato con una lunga coda.
+cavaliere | guerriero delle narrazioni medievali | antagonista narrativo | cavaliere | Nelle storie il cavaliere può affrontare e combattere il drago.
+tesoro | insieme di oggetti preziosi | oggetto custodito | tesoro | Nelle leggende il drago può custodire un tesoro.
+caverna | cavità naturale nella roccia | dimora fantastica | caverna | La caverna è una dimora tipica del drago nell'immaginario fantastico.
+mostro | creatura immaginaria dall'aspetto spaventoso | categoria narrativa | mostro | Il drago appartiene alle creature mostruose dell'immaginario fantastico.
+leggenda | racconto tradizionale con elementi fantastici | fonte narrativa | leggenda | Il drago compare in numerose leggende.
+principessa | figura femminile di famiglia regnante nelle fiabe | ruolo narrativo | principessa | Nelle fiabe una principessa può essere tenuta prigioniera o minacciata da un drago.
+volare | muoversi nell'aria | potere fantastico | volare | I draghi dotati di ali sono rappresentati capaci di volare.
+
+@ pagina
+libro | insieme rilegato di fogli con contenuti | appartenenza | libro | Le pagine costituiscono le superfici leggibili di un libro.
+foglio | supporto sottile di carta | supporto | foglio | Una pagina corrisponde a una facciata di un foglio.
+carta | materiale di fibre vegetali | materiale | carta | La carta è il materiale delle pagine di molti libri e quaderni.
+numero | segno che indica una posizione nella sequenza | identificazione | numero | Il numero di pagina permette di riconoscere la posizione di una pagina nel libro.
+testo | insieme di parole organizzate | contenuto | testo | Una pagina può contenere testo scritto o stampato.
+margine | spazio ai bordi del contenuto | impaginazione | margine | Il margine è lo spazio tra il contenuto e il bordo della pagina.
+titolo | intestazione che identifica un contenuto | impaginazione | titolo | Il titolo può comparire nella parte superiore di una pagina.
+capitolo | sezione di un libro | organizzazione | capitolo | Le pagine di un libro sono spesso organizzate in capitoli.
+riga | successione orizzontale di parole | impaginazione | riga | Il testo della pagina viene disposto in righe.
+paragrafo | unità di testo distinta | organizzazione del testo | paragrafo | I paragrafi suddividono il testo di una pagina.
+leggere | comprendere un testo scritto | uso | leggere | Leggere una pagina significa comprenderne il testo.
+sfogliare | voltare in sequenza i fogli | azione | sfogliare | Sfogliare un libro permette di passare da una pagina all'altra.
+
+@ muro
+mattone | elemento da costruzione in laterizio | materiale | mattone | I mattoni sono elementi comuni della costruzione di un muro.
+cemento | legante usato nelle costruzioni | materiale | cemento | Il cemento viene usato nelle malte e nei conglomerati impiegati nei muri.
+malta | impasto legante per la muratura | materiale | malta | La malta lega gli elementi di un muro in muratura.
+intonaco | rivestimento di malta su una parete | rivestimento | intonaco | L'intonaco riveste e regolarizza la superficie di molti muri.
+vernice | prodotto di rivestimento colorato | finitura | vernice | Una vernice adatta può rivestire e colorare un muro.
+crepa | fessura in un materiale | difetto | crepa | Una crepa è una fessura che può comparire nel muro.
+portante | che sostiene carichi della costruzione | funzione strutturale | funzione | Un muro portante sostiene carichi dell'edificio.
+edificio | costruzione destinata a ospitare persone o attività | appartenenza | edificio | I muri delimitano e possono sostenere un edificio.
+parete | elemento verticale che delimita un ambiente | concetto vicino | parete | Un muro può costituire la parete di un ambiente.
+fondazione | struttura che trasmette i carichi al terreno | sostegno | fondazione | Un muro viene sostenuto da una fondazione adeguata.
+divisorio | che separa spazi | funzione | funzione | Un muro divisorio separa due ambienti.
+
+@ regalo
+dono | cosa offerta gratuitamente | sinonimo | dono | Dono è un sinonimo di regalo nel senso scelto.
+pacco | involucro contenente un oggetto | presentazione | pacco | Un regalo viene spesso presentato sotto forma di pacco.
+carta | materiale per avvolgere | confezione | carta | La carta da regalo avvolge il dono e ne nasconde il contenuto.
+nastro | striscia sottile di tessuto o materiale flessibile | confezione | nastro | Un nastro può chiudere e decorare la confezione di un regalo.
+fiocco | annodatura ornamentale di un nastro | decorazione | fiocco | Il fiocco è una decorazione comune dei pacchi regalo.
+sorpresa | evento o oggetto inatteso | effetto | sorpresa | Il regalo può essere una sorpresa per chi lo riceve.
+compleanno | anniversario della nascita | occasione | occasione | Il compleanno è un'occasione comune per fare un regalo.
+natale | festa del 25 dicembre | occasione | occasione | A Natale è tradizione scambiarsi regali.
+scartare | togliere l'involucro | apertura | scartare | Scartare un regalo significa rimuovere la carta che lo avvolge.
+augurio | espressione di un desiderio favorevole | accompagnamento | augurio | Un regalo può essere accompagnato da un biglietto di auguri.
+gratitudine | sentimento di riconoscenza | reazione | gratitudine | Ricevere un regalo può suscitare gratitudine verso chi lo offre.
+
+@ pietra
+roccia | aggregato naturale di minerali | origine | roccia | La pietra nel senso scelto è un frammento di roccia.
+sasso | piccolo pezzo di roccia | concetto vicino | frammento | Sasso è un nome comune di un pezzo di pietra.
+masso | grosso blocco di roccia | tipo dimensionale | frammento | Un masso è un grosso blocco di pietra.
+ciottolo | piccolo sasso arrotondato | tipo | frammento | Il ciottolo è una pietra arrotondata dall'usura naturale.
+minerale | sostanza naturale che compone le rocce | composizione | minerale | I minerali costituiscono le rocce da cui provengono le pietre.
+duro | resistente alla deformazione e al taglio | proprietà | duro | La durezza è una proprietà comunemente associata alla pietra.
+scalpello | utensile da taglio per materiali duri | strumento | scalpello | Lo scalpello viene usato per lavorare e incidere la pietra.
+levigare | rendere una superficie liscia | lavorazione | levigare | Levigare una pietra ne rende la superficie più liscia.
+granito | roccia magmatica | materiale | tipo_roccia | Il granito è una roccia da cui si ricavano pietre da costruzione e rivestimento.
+marmo | roccia metamorfica lavorabile | materiale | tipo_roccia | Il marmo è una pietra impiegata nella scultura e nei rivestimenti.
+selce | roccia silicea dura | materiale | tipo_roccia | La selce è una pietra dura usata anche per produrre antichi utensili.
+
+@ poltrona
+sedile | mobile destinato a sedersi | categoria | sedile | La poltrona è un sedile imbottito destinato a una persona.
+schienale | parte che sostiene la schiena | parte | schienale | Lo schienale della poltrona sostiene la schiena.
+bracciolo | sostegno laterale per il braccio | parte | bracciolo | I braccioli sono sostegni laterali caratteristici della poltrona.
+seduta | superficie su cui ci si siede | parte | seduta | La seduta è la parte della poltrona che sostiene il peso della persona.
+cuscino | elemento morbido imbottito | componente | cuscino | Un cuscino può formare la seduta o lo schienale della poltrona.
+imbottitura | materiale soffice interno | struttura | imbottitura | L'imbottitura rende morbide le parti della poltrona a contatto con il corpo.
+tessuto | materiale formato da fibre intrecciate | rivestimento | rivestimento | Il tessuto viene usato per rivestire molte poltrone.
+pelle | materiale ricavato dalla cute animale | rivestimento | rivestimento | La pelle è un rivestimento comune delle poltrone.
+divano | sedile imbottito per più persone | mobile affine | divano | Il divano è un mobile imbottito affine alla poltrona, ma destinato a più persone.
+sedersi | assumere una posizione appoggiata sul sedile | funzione | sedersi | La poltrona è un mobile sul quale ci si siede.

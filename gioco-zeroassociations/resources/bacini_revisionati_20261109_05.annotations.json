@@ -1,0 +1,2477 @@
+{
+  "schema": "association-editorial-decisions-1",
+  "reviewer": "ChatGPT",
+  "method": "llm_editorial_review",
+  "reviewed_at": "2026-11-09",
+  "rules_sha256": {
+    "direttive_word_association_it_v3_6_0.md": "a8e7fb0c1650ec54512ef945c177da4a7a3a9ed58b2dcdeeb573cb588d8e90a8",
+    "DIRETTIVA_INDIZI.md": "027f5afc8a93d7f6efc38be854454f70fbca9a5ccef012785f91c05049288aa8",
+    "REGOLE.md": "ef3c15171bfbfd9dac332179458718f3e4cdfcf910a70a44396c5e919e518c23"
+  },
+  "source_text": "resources\\associazioni_editoriali_20261109_05.txt",
+  "source_text_sha256": "2cf2333fc5860e7853667eb3771f27c6ad5e26a95229c1ea3c27d5df11f5d220",
+  "human_review": false,
+  "independent_gameplay_qa": false,
+  "lexically_exhaustive": false,
+  "entries": [
+    {
+      "prompt": "maglia",
+      "validation_id": "56b6e7700beb5a2d783d99921533f2aad15edfdefcb977b6bedf37c04b86b8cb",
+      "decision": "accepted",
+      "review_rationale": "Revisione editoriale di ogni coppia per «maglia», nel senso «Indumento che copre il busto». Controllati autonomia, coerenza, forma e ruoli. Gruppi equivalenti limitati a uno per estrazione; nessun test indipendente dichiarato.",
+      "answers": [
+        {
+          "word": "manica",
+          "answer_sense": "parte dell'indumento che ricopre il braccio",
+          "relation": "parte",
+          "meaning_group": "manica",
+          "rationale": "Le maniche possono ricoprire le braccia nella maglia.",
+          "decision": "accepted",
+          "editorial_source_line": 6
+        },
+        {
+          "word": "collo",
+          "answer_sense": "apertura dell'indumento intorno al collo",
+          "relation": "parte",
+          "meaning_group": "collo",
+          "rationale": "Il collo della maglia forma l'apertura per il capo e il collo.",
+          "decision": "accepted",
+          "editorial_source_line": 7
+        },
+        {
+          "word": "tessuto",
+          "answer_sense": "materiale formato da fibre",
+          "relation": "materiale",
+          "meaning_group": "materiale",
+          "rationale": "Il tessuto costituisce il materiale della maglia.",
+          "decision": "accepted",
+          "editorial_source_line": 8
+        },
+        {
+          "word": "cotone",
+          "answer_sense": "fibra tessile vegetale",
+          "relation": "materiale",
+          "meaning_group": "materiale",
+          "rationale": "Il cotone viene usato per realizzare molte maglie.",
+          "decision": "accepted",
+          "editorial_source_line": 9
+        },
+        {
+          "word": "lana",
+          "answer_sense": "fibra tessile animale",
+          "relation": "materiale",
+          "meaning_group": "materiale",
+          "rationale": "La lana è un materiale comune delle maglie calde.",
+          "decision": "accepted",
+          "editorial_source_line": 10
+        },
+        {
+          "word": "taglia",
+          "answer_sense": "misura di un indumento",
+          "relation": "misura",
+          "meaning_group": "taglia",
+          "rationale": "La taglia indica le dimensioni della maglia da indossare.",
+          "decision": "accepted",
+          "editorial_source_line": 11
+        },
+        {
+          "word": "orlo",
+          "answer_sense": "bordo rifinito di un tessuto",
+          "relation": "parte",
+          "meaning_group": "orlo",
+          "rationale": "L'orlo rifinisce i bordi della maglia.",
+          "decision": "accepted",
+          "editorial_source_line": 12
+        },
+        {
+          "word": "girocollo",
+          "answer_sense": "apertura rotonda vicina alla base del collo",
+          "relation": "forma del collo",
+          "meaning_group": "girocollo",
+          "rationale": "Una maglia a girocollo ha un'apertura rotonda intorno al collo.",
+          "decision": "accepted",
+          "editorial_source_line": 13
+        },
+        {
+          "word": "armadio",
+          "answer_sense": "mobile per riporre indumenti",
+          "relation": "conservazione",
+          "meaning_group": "armadio",
+          "rationale": "La maglia viene riposta nell'armadio insieme agli altri indumenti.",
+          "decision": "accepted",
+          "editorial_source_line": 14
+        },
+        {
+          "word": "lavare",
+          "answer_sense": "pulire con acqua e detergente",
+          "relation": "manutenzione",
+          "meaning_group": "lavare",
+          "rationale": "La maglia viene lavata per rimuovere lo sporco dell'uso.",
+          "decision": "accepted",
+          "editorial_source_line": 15
+        },
+        {
+          "word": "maglione",
+          "answer_sense": "indumento di maglia generalmente caldo",
+          "relation": "tipo affine",
+          "meaning_group": "maglione",
+          "rationale": "Il maglione è un tipo di maglia comunemente usato per coprirsi dal freddo.",
+          "decision": "accepted",
+          "editorial_source_line": 16
+        },
+        {
+          "word": "torace",
+          "answer_sense": "parte del tronco racchiusa dalla gabbia toracica",
+          "relation": "parte rivestita",
+          "meaning_group": "torace",
+          "rationale": "La maglia ricopre il torace e parte del tronco.",
+          "decision": "accepted",
+          "editorial_source_line": 17
+        }
+      ],
+      "group_limits": {
+        "manica": 1,
+        "collo": 1,
+        "materiale": 1,
+        "taglia": 1,
+        "orlo": 1,
+        "girocollo": 1,
+        "armadio": 1,
+        "lavare": 1,
+        "maglione": 1,
+        "torace": 1
+      },
+      "conflicts": []
+    },
+    {
+      "prompt": "collana",
+      "validation_id": "e882f8a3d7bb3149182ad6cd6cdb043629b9d56770e94f37d12a93f15d42b542",
+      "decision": "accepted",
+      "review_rationale": "Revisione editoriale di ogni coppia per «collana», nel senso «Gioiello da portare al collo». Controllati autonomia, coerenza, forma e ruoli. Gruppi equivalenti limitati a uno per estrazione; nessun test indipendente dichiarato.",
+      "answers": [
+        {
+          "word": "collo",
+          "answer_sense": "regione fra testa e tronco",
+          "relation": "sede d'uso",
+          "meaning_group": "collo",
+          "rationale": "La collana viene indossata intorno al collo.",
+          "decision": "accepted",
+          "editorial_source_line": 20
+        },
+        {
+          "word": "gioiello",
+          "answer_sense": "ornamento personale di valore o lavorato",
+          "relation": "categoria",
+          "meaning_group": "gioiello",
+          "rationale": "La collana nel senso scelto è un gioiello da indossare.",
+          "decision": "accepted",
+          "editorial_source_line": 21
+        },
+        {
+          "word": "pendente",
+          "answer_sense": "ornamento sospeso a un filo o a una catena",
+          "relation": "parte",
+          "meaning_group": "pendente",
+          "rationale": "Un pendente può essere appeso alla collana.",
+          "decision": "accepted",
+          "editorial_source_line": 22
+        },
+        {
+          "word": "catena",
+          "answer_sense": "successione di elementi collegati",
+          "relation": "struttura",
+          "meaning_group": "catena",
+          "rationale": "La catena è una struttura comune delle collane metalliche.",
+          "decision": "accepted",
+          "editorial_source_line": 23
+        },
+        {
+          "word": "perla",
+          "answer_sense": "formazione tondeggiante usata come ornamento",
+          "relation": "materiale",
+          "meaning_group": "perla",
+          "rationale": "Le perle vengono infilate per comporre una collana.",
+          "decision": "accepted",
+          "editorial_source_line": 24
+        },
+        {
+          "word": "oro",
+          "answer_sense": "metallo prezioso",
+          "relation": "materiale",
+          "meaning_group": "metallo",
+          "rationale": "L'oro è un materiale comune delle collane preziose.",
+          "decision": "accepted",
+          "editorial_source_line": 25
+        },
+        {
+          "word": "argento",
+          "answer_sense": "metallo prezioso",
+          "relation": "materiale",
+          "meaning_group": "metallo",
+          "rationale": "L'argento viene usato per realizzare collane.",
+          "decision": "accepted",
+          "editorial_source_line": 26
+        },
+        {
+          "word": "chiusura",
+          "answer_sense": "dispositivo che unisce le estremità",
+          "relation": "parte",
+          "meaning_group": "chiusura",
+          "rationale": "La chiusura permette di aprire e fissare la collana intorno al collo.",
+          "decision": "accepted",
+          "editorial_source_line": 27
+        },
+        {
+          "word": "ciondolo",
+          "answer_sense": "piccolo ornamento appeso a una catena",
+          "relation": "parte",
+          "meaning_group": "pendente",
+          "rationale": "Il ciondolo è un ornamento che può essere appeso alla collana.",
+          "decision": "accepted",
+          "editorial_source_line": 28
+        },
+        {
+          "word": "gemma",
+          "answer_sense": "pietra preziosa lavorata",
+          "relation": "ornamento",
+          "meaning_group": "gemma",
+          "rationale": "Una gemma può decorare una collana.",
+          "decision": "accepted",
+          "editorial_source_line": 29
+        },
+        {
+          "word": "gioielleria",
+          "answer_sense": "negozio di gioielli",
+          "relation": "vendita",
+          "meaning_group": "gioielleria",
+          "rationale": "La gioielleria è un luogo dedicato alla vendita di collane preziose.",
+          "decision": "accepted",
+          "editorial_source_line": 30
+        },
+        {
+          "word": "filo",
+          "answer_sense": "elemento sottile sul quale infilare grani o perle",
+          "relation": "struttura",
+          "meaning_group": "filo",
+          "rationale": "Il filo tiene insieme gli elementi di molte collane di perle o grani.",
+          "decision": "accepted",
+          "editorial_source_line": 31
+        }
+      ],
+      "group_limits": {
+        "collo": 1,
+        "gioiello": 1,
+        "pendente": 1,
+        "catena": 1,
+        "perla": 1,
+        "metallo": 1,
+        "chiusura": 1,
+        "gemma": 1,
+        "gioielleria": 1,
+        "filo": 1
+      },
+      "conflicts": []
+    },
+    {
+      "prompt": "canottiera",
+      "validation_id": "b56e4c58736d4ec3f4a8f9fed0e58acb4a7d0e2df87ac5a87b233af5b6831497",
+      "decision": "accepted",
+      "review_rationale": "Revisione editoriale di ogni coppia per «canottiera», nel senso «Maglietta senza maniche». Controllati autonomia, coerenza, forma e ruoli. Gruppi equivalenti limitati a uno per estrazione; nessun test indipendente dichiarato.",
+      "answers": [
+        {
+          "word": "spallina",
+          "answer_sense": "striscia che sostiene un indumento sulla spalla",
+          "relation": "parte",
+          "meaning_group": "spallina",
+          "rationale": "Le spalline sostengono la canottiera senza formare maniche.",
+          "decision": "accepted",
+          "editorial_source_line": 34
+        },
+        {
+          "word": "cotone",
+          "answer_sense": "fibra tessile vegetale",
+          "relation": "materiale",
+          "meaning_group": "cotone",
+          "rationale": "Il cotone è un materiale comune delle canottiere.",
+          "decision": "accepted",
+          "editorial_source_line": 35
+        },
+        {
+          "word": "busto",
+          "answer_sense": "parte del corpo compresa fra collo e bacino",
+          "relation": "parte rivestita",
+          "meaning_group": "busto",
+          "rationale": "La canottiera ricopre il busto.",
+          "decision": "accepted",
+          "editorial_source_line": 36
+        },
+        {
+          "word": "intimo",
+          "answer_sense": "abbigliamento portato sotto gli altri vestiti",
+          "relation": "uso",
+          "meaning_group": "intimo",
+          "rationale": "La canottiera viene comunemente usata come indumento intimo.",
+          "decision": "accepted",
+          "editorial_source_line": 37
+        },
+        {
+          "word": "maglietta",
+          "answer_sense": "indumento leggero per il busto",
+          "relation": "indumento affine",
+          "meaning_group": "maglietta",
+          "rationale": "La canottiera è un indumento affine alla maglietta, ma senza maniche.",
+          "decision": "accepted",
+          "editorial_source_line": 38
+        },
+        {
+          "word": "scollatura",
+          "answer_sense": "apertura dell'indumento intorno al collo",
+          "relation": "parte",
+          "meaning_group": "scollatura",
+          "rationale": "La scollatura forma l'apertura superiore della canottiera.",
+          "decision": "accepted",
+          "editorial_source_line": 39
+        },
+        {
+          "word": "sudore",
+          "answer_sense": "liquido prodotto dalle ghiandole sudoripare",
+          "relation": "funzione",
+          "meaning_group": "sudore",
+          "rationale": "La canottiera a contatto con il corpo può assorbire il sudore.",
+          "decision": "accepted",
+          "editorial_source_line": 40
+        },
+        {
+          "word": "estate",
+          "answer_sense": "stagione calda",
+          "relation": "contesto d'uso",
+          "meaning_group": "estate",
+          "rationale": "La canottiera viene anche indossata da sola durante il caldo estivo.",
+          "decision": "accepted",
+          "editorial_source_line": 41
+        },
+        {
+          "word": "leggero",
+          "answer_sense": "di peso ridotto",
+          "relation": "caratteristica",
+          "meaning_group": "leggero",
+          "rationale": "La leggerezza è una caratteristica comune della canottiera.",
+          "decision": "accepted",
+          "editorial_source_line": 42
+        },
+        {
+          "word": "orlo",
+          "answer_sense": "bordo rifinito di tessuto",
+          "relation": "parte",
+          "meaning_group": "orlo",
+          "rationale": "L'orlo rifinisce il bordo inferiore della canottiera.",
+          "decision": "accepted",
+          "editorial_source_line": 43
+        }
+      ],
+      "group_limits": {
+        "spallina": 1,
+        "cotone": 1,
+        "busto": 1,
+        "intimo": 1,
+        "maglietta": 1,
+        "scollatura": 1,
+        "sudore": 1,
+        "estate": 1,
+        "leggero": 1,
+        "orlo": 1
+      },
+      "conflicts": []
+    },
+    {
+      "prompt": "zebra",
+      "validation_id": "981d10a305bcf3a2fcd79789349e78ab17c94403cbae7bdec1791b4eea831913",
+      "decision": "accepted",
+      "review_rationale": "Revisione editoriale di ogni coppia per «zebra», nel senso «Mammifero africano a strisce bianche e nere». Controllati autonomia, coerenza, forma e ruoli. Gruppi equivalenti limitati a uno per estrazione; nessun test indipendente dichiarato.",
+      "answers": [
+        {
+          "word": "striscia",
+          "answer_sense": "fascia allungata di colore",
+          "relation": "mantello",
+          "meaning_group": "striscia",
+          "rationale": "Le strisce sono il tratto più riconoscibile del mantello della zebra.",
+          "decision": "accepted",
+          "editorial_source_line": 46
+        },
+        {
+          "word": "bianco",
+          "answer_sense": "colore chiaro del mantello",
+          "relation": "colore",
+          "meaning_group": "colore",
+          "rationale": "Il bianco è uno dei colori delle strisce della zebra.",
+          "decision": "accepted",
+          "editorial_source_line": 47
+        },
+        {
+          "word": "nero",
+          "answer_sense": "colore scuro del mantello",
+          "relation": "colore",
+          "meaning_group": "colore",
+          "rationale": "Il nero è uno dei colori delle strisce della zebra.",
+          "decision": "accepted",
+          "editorial_source_line": 48
+        },
+        {
+          "word": "savana",
+          "answer_sense": "ambiente tropicale erboso",
+          "relation": "habitat",
+          "meaning_group": "savana",
+          "rationale": "La savana africana è un habitat comunemente associato alla zebra.",
+          "decision": "accepted",
+          "editorial_source_line": 49
+        },
+        {
+          "word": "zoccolo",
+          "answer_sense": "rivestimento corneo dell'estremità dell'arto",
+          "relation": "parte anatomica",
+          "meaning_group": "zoccolo",
+          "rationale": "La zebra cammina su zoccoli.",
+          "decision": "accepted",
+          "editorial_source_line": 50
+        },
+        {
+          "word": "criniera",
+          "answer_sense": "pelo lungo lungo il collo",
+          "relation": "parte anatomica",
+          "meaning_group": "criniera",
+          "rationale": "La zebra ha una criniera corta e generalmente eretta.",
+          "decision": "accepted",
+          "editorial_source_line": 51
+        },
+        {
+          "word": "cavallo",
+          "answer_sense": "equide domestico",
+          "relation": "animale affine",
+          "meaning_group": "cavallo",
+          "rationale": "La zebra è un equide affine al cavallo.",
+          "decision": "accepted",
+          "editorial_source_line": 52
+        },
+        {
+          "word": "branco",
+          "answer_sense": "gruppo sociale di animali",
+          "relation": "comportamento sociale",
+          "meaning_group": "branco",
+          "rationale": "Le zebre possono vivere e spostarsi in branchi.",
+          "decision": "accepted",
+          "editorial_source_line": 53
+        },
+        {
+          "word": "erbivoro",
+          "answer_sense": "animale che si nutre di vegetali",
+          "relation": "dieta",
+          "meaning_group": "erbivoro",
+          "rationale": "La zebra è un erbivoro che si nutre principalmente di erbe.",
+          "decision": "accepted",
+          "editorial_source_line": 54
+        },
+        {
+          "word": "leone",
+          "answer_sense": "grande felino africano",
+          "relation": "predatore",
+          "meaning_group": "leone",
+          "rationale": "Il leone è uno dei predatori della zebra.",
+          "decision": "accepted",
+          "editorial_source_line": 55
+        },
+        {
+          "word": "coda",
+          "answer_sense": "appendice posteriore del corpo",
+          "relation": "parte anatomica",
+          "meaning_group": "coda",
+          "rationale": "La zebra ha una coda che termina con un ciuffo di peli.",
+          "decision": "accepted",
+          "editorial_source_line": 56
+        }
+      ],
+      "group_limits": {
+        "striscia": 1,
+        "colore": 1,
+        "savana": 1,
+        "zoccolo": 1,
+        "criniera": 1,
+        "cavallo": 1,
+        "branco": 1,
+        "erbivoro": 1,
+        "leone": 1,
+        "coda": 1
+      },
+      "conflicts": []
+    },
+    {
+      "prompt": "vestito",
+      "validation_id": "01bc342759e32282e5a369a3de8fa3d04a7dc4869abd75dbe9229e9bbd60c23d",
+      "decision": "accepted",
+      "review_rationale": "Revisione editoriale di ogni coppia per «vestito», nel senso «Abito da indossare». Controllati autonomia, coerenza, forma e ruoli. Gruppi equivalenti limitati a uno per estrazione; nessun test indipendente dichiarato.",
+      "answers": [
+        {
+          "word": "abito",
+          "answer_sense": "indumento o insieme coordinato di indumenti",
+          "relation": "sinonimo",
+          "meaning_group": "abito",
+          "rationale": "Abito è un nome del vestito nel senso dell'abbigliamento.",
+          "decision": "accepted",
+          "editorial_source_line": 59
+        },
+        {
+          "word": "stoffa",
+          "answer_sense": "tessuto",
+          "relation": "materiale",
+          "meaning_group": "stoffa",
+          "rationale": "La stoffa è un materiale usato per confezionare un vestito.",
+          "decision": "accepted",
+          "editorial_source_line": 60
+        },
+        {
+          "word": "sarto",
+          "answer_sense": "professionista che confeziona abiti",
+          "relation": "professione",
+          "meaning_group": "sarto",
+          "rationale": "Il sarto confeziona o modifica vestiti.",
+          "decision": "accepted",
+          "editorial_source_line": 61
+        },
+        {
+          "word": "cucitura",
+          "answer_sense": "unione realizzata mediante filo",
+          "relation": "costruzione",
+          "meaning_group": "cucitura",
+          "rationale": "Le cuciture uniscono le parti di un vestito di tessuto.",
+          "decision": "accepted",
+          "editorial_source_line": 62
+        },
+        {
+          "word": "bottone",
+          "answer_sense": "elemento per chiudere un indumento",
+          "relation": "parte",
+          "meaning_group": "bottone",
+          "rationale": "I bottoni possono chiudere alcune parti del vestito.",
+          "decision": "accepted",
+          "editorial_source_line": 63
+        },
+        {
+          "word": "taglia",
+          "answer_sense": "misura di un indumento",
+          "relation": "misura",
+          "meaning_group": "taglia",
+          "rationale": "La taglia indica le dimensioni del vestito.",
+          "decision": "accepted",
+          "editorial_source_line": 64
+        },
+        {
+          "word": "manica",
+          "answer_sense": "parte che ricopre il braccio",
+          "relation": "parte",
+          "meaning_group": "manica",
+          "rationale": "Un vestito può avere maniche che rivestono le braccia.",
+          "decision": "accepted",
+          "editorial_source_line": 65
+        },
+        {
+          "word": "guardaroba",
+          "answer_sense": "insieme o mobile contenente abiti",
+          "relation": "conservazione",
+          "meaning_group": "guardaroba",
+          "rationale": "Il vestito fa parte degli abiti conservati nel guardaroba.",
+          "decision": "accepted",
+          "editorial_source_line": 66
+        },
+        {
+          "word": "provare",
+          "answer_sense": "indossare per controllare misura e aspetto",
+          "relation": "scelta",
+          "meaning_group": "provare",
+          "rationale": "Provare un vestito permette di valutarne la misura e la vestibilità.",
+          "decision": "accepted",
+          "editorial_source_line": 67
+        },
+        {
+          "word": "lavare",
+          "answer_sense": "pulire con acqua e detergente",
+          "relation": "manutenzione",
+          "meaning_group": "lavare",
+          "rationale": "Il vestito viene lavato secondo le esigenze del suo materiale.",
+          "decision": "accepted",
+          "editorial_source_line": 68
+        },
+        {
+          "word": "stirare",
+          "answer_sense": "distendere le pieghe mediante calore",
+          "relation": "manutenzione",
+          "meaning_group": "stirare",
+          "rationale": "Stirare permette di eliminare le pieghe da un vestito adatto al trattamento.",
+          "decision": "accepted",
+          "editorial_source_line": 69
+        },
+        {
+          "word": "gruccia",
+          "answer_sense": "sostegno per appendere indumenti",
+          "relation": "conservazione",
+          "meaning_group": "gruccia",
+          "rationale": "La gruccia permette di appendere il vestito senza ripiegarlo.",
+          "decision": "accepted",
+          "editorial_source_line": 70
+        }
+      ],
+      "group_limits": {
+        "abito": 1,
+        "stoffa": 1,
+        "sarto": 1,
+        "cucitura": 1,
+        "bottone": 1,
+        "taglia": 1,
+        "manica": 1,
+        "guardaroba": 1,
+        "provare": 1,
+        "lavare": 1,
+        "stirare": 1,
+        "gruccia": 1
+      },
+      "conflicts": []
+    },
+    {
+      "prompt": "corridoio",
+      "validation_id": "5ee002daf1d851780a19a54c300cd62364c93cc002d689a23e6401cc138a81d9",
+      "decision": "accepted",
+      "review_rationale": "Revisione editoriale di ogni coppia per «corridoio», nel senso «Passaggio che collega le stanze». Controllati autonomia, coerenza, forma e ruoli. Gruppi equivalenti limitati a uno per estrazione; nessun test indipendente dichiarato.",
+      "answers": [
+        {
+          "word": "porta",
+          "answer_sense": "elemento mobile che chiude un accesso",
+          "relation": "accesso",
+          "meaning_group": "porta",
+          "rationale": "Le porte delle stanze possono aprirsi sul corridoio.",
+          "decision": "accepted",
+          "editorial_source_line": 73
+        },
+        {
+          "word": "stanza",
+          "answer_sense": "ambiente interno di una casa",
+          "relation": "collegamento",
+          "meaning_group": "stanza",
+          "rationale": "Il corridoio collega le stanze dell'abitazione.",
+          "decision": "accepted",
+          "editorial_source_line": 74
+        },
+        {
+          "word": "passaggio",
+          "answer_sense": "spazio o percorso che consente di transitare",
+          "relation": "funzione",
+          "meaning_group": "passaggio",
+          "rationale": "Il corridoio offre un passaggio fra ambienti diversi.",
+          "decision": "accepted",
+          "editorial_source_line": 75
+        },
+        {
+          "word": "pavimento",
+          "answer_sense": "superficie su cui si cammina",
+          "relation": "parte",
+          "meaning_group": "pavimento",
+          "rationale": "Il pavimento permette di camminare lungo il corridoio.",
+          "decision": "accepted",
+          "editorial_source_line": 76
+        },
+        {
+          "word": "parete",
+          "answer_sense": "superficie verticale che delimita un ambiente",
+          "relation": "parte",
+          "meaning_group": "parete",
+          "rationale": "Le pareti delimitano lateralmente il corridoio.",
+          "decision": "accepted",
+          "editorial_source_line": 77
+        },
+        {
+          "word": "soffitto",
+          "answer_sense": "superficie superiore di un ambiente",
+          "relation": "parte",
+          "meaning_group": "soffitto",
+          "rationale": "Il soffitto chiude superiormente il corridoio interno.",
+          "decision": "accepted",
+          "editorial_source_line": 78
+        },
+        {
+          "word": "luce",
+          "answer_sense": "illuminazione che rende visibile un ambiente",
+          "relation": "dotazione",
+          "meaning_group": "luce",
+          "rationale": "La luce permette di percorrere il corridoio in sicurezza quando manca illuminazione naturale.",
+          "decision": "accepted",
+          "editorial_source_line": 79
+        },
+        {
+          "word": "ingresso",
+          "answer_sense": "punto attraverso cui si entra",
+          "relation": "collegamento",
+          "meaning_group": "ingresso",
+          "rationale": "Il corridoio può collegare l'ingresso dell'abitazione alle stanze.",
+          "decision": "accepted",
+          "editorial_source_line": 80
+        },
+        {
+          "word": "lungo",
+          "answer_sense": "esteso nella direzione principale",
+          "relation": "forma",
+          "meaning_group": "forma",
+          "rationale": "La forma allungata è una caratteristica comune del corridoio.",
+          "decision": "accepted",
+          "editorial_source_line": 81
+        },
+        {
+          "word": "stretto",
+          "answer_sense": "con larghezza limitata",
+          "relation": "forma",
+          "meaning_group": "forma",
+          "rationale": "Un corridoio è comunemente più stretto delle stanze che collega.",
+          "decision": "accepted",
+          "editorial_source_line": 82
+        }
+      ],
+      "group_limits": {
+        "porta": 1,
+        "stanza": 1,
+        "passaggio": 1,
+        "pavimento": 1,
+        "parete": 1,
+        "soffitto": 1,
+        "luce": 1,
+        "ingresso": 1,
+        "forma": 1
+      },
+      "conflicts": []
+    },
+    {
+      "prompt": "orso",
+      "validation_id": "b10b425e2c06a5078583dc3e871893516caff76444264592521d42719e013286",
+      "decision": "accepted",
+      "review_rationale": "Revisione editoriale di ogni coppia per «orso», nel senso «Grande mammifero plantigrado». Controllati autonomia, coerenza, forma e ruoli. Gruppi equivalenti limitati a uno per estrazione; nessun test indipendente dichiarato.",
+      "answers": [
+        {
+          "word": "letargo",
+          "answer_sense": "stato di attività ridotta durante la stagione fredda",
+          "relation": "comportamento",
+          "meaning_group": "letargo",
+          "rationale": "Il letargo è un comportamento invernale comunemente associato a molti orsi.",
+          "decision": "accepted",
+          "editorial_source_line": 85
+        },
+        {
+          "word": "miele",
+          "answer_sense": "sostanza zuccherina prodotta dalle api",
+          "relation": "alimentazione e immaginario",
+          "meaning_group": "miele",
+          "rationale": "Il miele è un alimento riconoscibile nell'immaginario dell'orso ed è consumato da alcuni orsi.",
+          "decision": "accepted",
+          "editorial_source_line": 86
+        },
+        {
+          "word": "zampa",
+          "answer_sense": "arto di un animale",
+          "relation": "parte anatomica",
+          "meaning_group": "zampa",
+          "rationale": "Le grandi zampe sono un elemento riconoscibile del corpo dell'orso.",
+          "decision": "accepted",
+          "editorial_source_line": 87
+        },
+        {
+          "word": "artiglio",
+          "answer_sense": "unghia ricurva e robusta",
+          "relation": "parte anatomica",
+          "meaning_group": "artiglio",
+          "rationale": "Gli artigli dell'orso servono anche per scavare e procurarsi cibo.",
+          "decision": "accepted",
+          "editorial_source_line": 88
+        },
+        {
+          "word": "pelliccia",
+          "answer_sense": "rivestimento di pelo di un mammifero",
+          "relation": "rivestimento",
+          "meaning_group": "pelliccia",
+          "rationale": "La pelliccia riveste e protegge il corpo dell'orso.",
+          "decision": "accepted",
+          "editorial_source_line": 89
+        },
+        {
+          "word": "bosco",
+          "answer_sense": "territorio coperto da alberi",
+          "relation": "habitat",
+          "meaning_group": "bosco",
+          "rationale": "Il bosco è un habitat comunemente associato all'orso bruno.",
+          "decision": "accepted",
+          "editorial_source_line": 90
+        },
+        {
+          "word": "tana",
+          "answer_sense": "rifugio di un animale",
+          "relation": "riparo",
+          "meaning_group": "tana",
+          "rationale": "La tana offre all'orso un luogo riparato, anche durante il riposo invernale.",
+          "decision": "accepted",
+          "editorial_source_line": 91
+        },
+        {
+          "word": "salmone",
+          "answer_sense": "pesce che risale i fiumi per riprodursi",
+          "relation": "alimentazione",
+          "meaning_group": "salmone",
+          "rationale": "Alcuni orsi catturano salmoni nei corsi d'acqua.",
+          "decision": "accepted",
+          "editorial_source_line": 92
+        },
+        {
+          "word": "plantigrado",
+          "answer_sense": "che appoggia al suolo l'intera pianta del piede",
+          "relation": "locomozione",
+          "meaning_group": "plantigrado",
+          "rationale": "L'orso è plantigrado e appoggia al terreno la pianta del piede.",
+          "decision": "accepted",
+          "editorial_source_line": 93
+        },
+        {
+          "word": "bruno",
+          "answer_sense": "di colore marrone scuro",
+          "relation": "tipo riconoscibile",
+          "meaning_group": "bruno",
+          "rationale": "L'orso bruno è una specie comune nell'immaginario dell'orso e ha normalmente mantello bruno.",
+          "decision": "accepted",
+          "editorial_source_line": 94
+        }
+      ],
+      "group_limits": {
+        "letargo": 1,
+        "miele": 1,
+        "zampa": 1,
+        "artiglio": 1,
+        "pelliccia": 1,
+        "bosco": 1,
+        "tana": 1,
+        "salmone": 1,
+        "plantigrado": 1,
+        "bruno": 1
+      },
+      "conflicts": []
+    },
+    {
+      "prompt": "elicottero",
+      "validation_id": "199c5d166b2599b627a84199073581b63d34f0086a1e5dd616b9070e2d8a8575",
+      "decision": "accepted",
+      "review_rationale": "Revisione editoriale di ogni coppia per «elicottero», nel senso «Aeromobile con le pale che girano». Controllati autonomia, coerenza, forma e ruoli. Gruppi equivalenti limitati a uno per estrazione; nessun test indipendente dichiarato.",
+      "answers": [
+        {
+          "word": "rotore",
+          "answer_sense": "insieme rotante di pale che sostiene l'aeromobile",
+          "relation": "parte",
+          "meaning_group": "rotore",
+          "rationale": "Il rotore principale genera la portanza dell'elicottero.",
+          "decision": "accepted",
+          "editorial_source_line": 97
+        },
+        {
+          "word": "pala",
+          "answer_sense": "elemento allungato del rotore",
+          "relation": "parte",
+          "meaning_group": "pala",
+          "rationale": "Le pale dell'elicottero ruotano per sostenere il volo.",
+          "decision": "accepted",
+          "editorial_source_line": 98
+        },
+        {
+          "word": "pilota",
+          "answer_sense": "persona che conduce un aeromobile",
+          "relation": "professione",
+          "meaning_group": "pilota",
+          "rationale": "Il pilota controlla il volo dell'elicottero.",
+          "decision": "accepted",
+          "editorial_source_line": 99
+        },
+        {
+          "word": "cabina",
+          "answer_sense": "spazio che ospita persone e comandi",
+          "relation": "parte",
+          "meaning_group": "cabina",
+          "rationale": "La cabina dell'elicottero ospita il pilota e, secondo il modello, i passeggeri.",
+          "decision": "accepted",
+          "editorial_source_line": 100
+        },
+        {
+          "word": "volo",
+          "answer_sense": "spostamento nell'aria",
+          "relation": "movimento",
+          "meaning_group": "volo",
+          "rationale": "L'elicottero è un aeromobile destinato al volo.",
+          "decision": "accepted",
+          "editorial_source_line": 101
+        },
+        {
+          "word": "decollo",
+          "answer_sense": "passaggio dal suolo al volo",
+          "relation": "operazione",
+          "meaning_group": "decollo",
+          "rationale": "L'elicottero può effettuare un decollo verticale.",
+          "decision": "accepted",
+          "editorial_source_line": 102
+        },
+        {
+          "word": "atterraggio",
+          "answer_sense": "ritorno controllato al suolo",
+          "relation": "operazione",
+          "meaning_group": "atterraggio",
+          "rationale": "L'atterraggio riporta l'elicottero su una superficie di appoggio.",
+          "decision": "accepted",
+          "editorial_source_line": 103
+        },
+        {
+          "word": "elisuperficie",
+          "answer_sense": "area attrezzata per l'atterraggio e il decollo di elicotteri",
+          "relation": "luogo",
+          "meaning_group": "elisuperficie",
+          "rationale": "L'elisuperficie è un'area dedicata alle operazioni degli elicotteri.",
+          "decision": "accepted",
+          "editorial_source_line": 104
+        },
+        {
+          "word": "soccorso",
+          "answer_sense": "intervento di aiuto in una situazione di pericolo",
+          "relation": "impiego",
+          "meaning_group": "soccorso",
+          "rationale": "L'elicottero viene impiegato per interventi di soccorso in luoghi difficili da raggiungere.",
+          "decision": "accepted",
+          "editorial_source_line": 105
+        },
+        {
+          "word": "verricello",
+          "answer_sense": "dispositivo per sollevare mediante cavo",
+          "relation": "attrezzatura",
+          "meaning_group": "verricello",
+          "rationale": "Il verricello di un elicottero da soccorso permette di sollevare persone o carichi.",
+          "decision": "accepted",
+          "editorial_source_line": 106
+        },
+        {
+          "word": "coda",
+          "answer_sense": "parte posteriore dell'aeromobile",
+          "relation": "parte",
+          "meaning_group": "coda",
+          "rationale": "La coda ospita componenti di stabilizzazione o controllo di molti elicotteri.",
+          "decision": "accepted",
+          "editorial_source_line": 107
+        },
+        {
+          "word": "rumore",
+          "answer_sense": "suono intenso o fastidioso",
+          "relation": "effetto percepito",
+          "meaning_group": "rumore",
+          "rationale": "Il rumore delle pale e del motore rende riconoscibile il passaggio di un elicottero.",
+          "decision": "accepted",
+          "editorial_source_line": 108
+        }
+      ],
+      "group_limits": {
+        "rotore": 1,
+        "pala": 1,
+        "pilota": 1,
+        "cabina": 1,
+        "volo": 1,
+        "decollo": 1,
+        "atterraggio": 1,
+        "elisuperficie": 1,
+        "soccorso": 1,
+        "verricello": 1,
+        "coda": 1,
+        "rumore": 1
+      },
+      "conflicts": []
+    },
+    {
+      "prompt": "ragno",
+      "validation_id": "902e1107da79c5f107d5b5ce0ca2777c8ede0da413cdd5d47d4ce974f74679af",
+      "decision": "accepted",
+      "review_rationale": "Revisione editoriale di ogni coppia per «ragno», nel senso «Animale a otto zampe che tesse la tela». Controllati autonomia, coerenza, forma e ruoli. Gruppi equivalenti limitati a uno per estrazione; nessun test indipendente dichiarato.",
+      "answers": [
+        {
+          "word": "ragnatela",
+          "answer_sense": "struttura di fili di seta prodotta dal ragno",
+          "relation": "costruzione",
+          "meaning_group": "ragnatela",
+          "rationale": "Molti ragni costruiscono ragnatele per catturare prede.",
+          "decision": "accepted",
+          "editorial_source_line": 111
+        },
+        {
+          "word": "seta",
+          "answer_sense": "fibra prodotta da alcuni animali",
+          "relation": "materiale prodotto",
+          "meaning_group": "seta",
+          "rationale": "Il ragno produce seta per la tela e altre strutture.",
+          "decision": "accepted",
+          "editorial_source_line": 112
+        },
+        {
+          "word": "zampa",
+          "answer_sense": "arto di un animale",
+          "relation": "parte anatomica",
+          "meaning_group": "zampa",
+          "rationale": "Il ragno adulto ha otto zampe.",
+          "decision": "accepted",
+          "editorial_source_line": 113
+        },
+        {
+          "word": "aracnide",
+          "answer_sense": "animale del gruppo cui appartengono ragni e scorpioni",
+          "relation": "categoria zoologica",
+          "meaning_group": "aracnide",
+          "rationale": "Il ragno è un aracnide e non un insetto.",
+          "decision": "accepted",
+          "editorial_source_line": 114
+        },
+        {
+          "word": "mosca",
+          "answer_sense": "insetto volante",
+          "relation": "preda",
+          "meaning_group": "preda",
+          "rationale": "Le mosche possono essere catturate e mangiate dai ragni.",
+          "decision": "accepted",
+          "editorial_source_line": 115
+        },
+        {
+          "word": "preda",
+          "answer_sense": "animale catturato per nutrimento",
+          "relation": "comportamento alimentare",
+          "meaning_group": "preda",
+          "rationale": "Il ragno cattura prede per nutrirsi.",
+          "decision": "accepted",
+          "editorial_source_line": 116
+        },
+        {
+          "word": "veleno",
+          "answer_sense": "sostanza tossica prodotta da un animale",
+          "relation": "difesa e predazione",
+          "meaning_group": "veleno",
+          "rationale": "Molti ragni usano veleno per immobilizzare le prede.",
+          "decision": "accepted",
+          "editorial_source_line": 117
+        },
+        {
+          "word": "filiera",
+          "answer_sense": "organo che emette i fili di seta",
+          "relation": "parte anatomica",
+          "meaning_group": "filiera",
+          "rationale": "Le filiere del ragno emettono la seta.",
+          "decision": "accepted",
+          "editorial_source_line": 118
+        },
+        {
+          "word": "chelicero",
+          "answer_sense": "appendice boccale degli aracnidi",
+          "relation": "parte anatomica",
+          "meaning_group": "chelicero",
+          "rationale": "I cheliceri sono appendici boccali con cui il ragno afferra le prede.",
+          "decision": "accepted",
+          "editorial_source_line": 119
+        },
+        {
+          "word": "aracnofobia",
+          "answer_sense": "paura intensa dei ragni",
+          "relation": "reazione umana",
+          "meaning_group": "aracnofobia",
+          "rationale": "L'aracnofobia è la paura intensa dei ragni.",
+          "decision": "accepted",
+          "editorial_source_line": 120
+        }
+      ],
+      "group_limits": {
+        "ragnatela": 1,
+        "seta": 1,
+        "zampa": 1,
+        "aracnide": 1,
+        "preda": 1,
+        "veleno": 1,
+        "filiera": 1,
+        "chelicero": 1,
+        "aracnofobia": 1
+      },
+      "conflicts": []
+    },
+    {
+      "prompt": "campagna",
+      "validation_id": "23d3d0a941f4ec6b5982fabb3d754e608fc7a80f6fcf3abb26f72f03789d8225",
+      "decision": "accepted",
+      "review_rationale": "Revisione editoriale di ogni coppia per «campagna», nel senso «Territorio fuori città con campi e fattorie». Controllati autonomia, coerenza, forma e ruoli. Gruppi equivalenti limitati a uno per estrazione; nessun test indipendente dichiarato.",
+      "answers": [
+        {
+          "word": "campo",
+          "answer_sense": "terreno coltivato",
+          "relation": "paesaggio",
+          "meaning_group": "campo",
+          "rationale": "I campi coltivati sono elementi caratteristici della campagna.",
+          "decision": "accepted",
+          "editorial_source_line": 123
+        },
+        {
+          "word": "fattoria",
+          "answer_sense": "azienda agricola con edifici e terreni",
+          "relation": "insediamento",
+          "meaning_group": "fattoria",
+          "rationale": "La fattoria è un insediamento tipico della campagna agricola.",
+          "decision": "accepted",
+          "editorial_source_line": 124
+        },
+        {
+          "word": "contadino",
+          "answer_sense": "persona che lavora la terra",
+          "relation": "professione",
+          "meaning_group": "contadino",
+          "rationale": "Il contadino svolge attività agricole nella campagna.",
+          "decision": "accepted",
+          "editorial_source_line": 125
+        },
+        {
+          "word": "trattore",
+          "answer_sense": "mezzo usato nelle lavorazioni agricole",
+          "relation": "attrezzatura",
+          "meaning_group": "trattore",
+          "rationale": "Il trattore è un mezzo caratteristico del lavoro in campagna.",
+          "decision": "accepted",
+          "editorial_source_line": 126
+        },
+        {
+          "word": "raccolto",
+          "answer_sense": "insieme dei prodotti agricoli ottenuti",
+          "relation": "attività agricola",
+          "meaning_group": "raccolto",
+          "rationale": "Il raccolto proviene dalle coltivazioni della campagna.",
+          "decision": "accepted",
+          "editorial_source_line": 127
+        },
+        {
+          "word": "grano",
+          "answer_sense": "cereale coltivato",
+          "relation": "coltivazione",
+          "meaning_group": "coltivazione",
+          "rationale": "I campi di grano sono un'immagine riconoscibile della campagna.",
+          "decision": "accepted",
+          "editorial_source_line": 128
+        },
+        {
+          "word": "vigneto",
+          "answer_sense": "terreno coltivato a viti",
+          "relation": "coltivazione",
+          "meaning_group": "coltivazione",
+          "rationale": "Il vigneto è una coltivazione tipica di molte campagne italiane.",
+          "decision": "accepted",
+          "editorial_source_line": 129
+        },
+        {
+          "word": "fienile",
+          "answer_sense": "edificio per conservare il fieno",
+          "relation": "edificio rurale",
+          "meaning_group": "fienile",
+          "rationale": "Il fienile è un edificio caratteristico della campagna agricola.",
+          "decision": "accepted",
+          "editorial_source_line": 130
+        },
+        {
+          "word": "orto",
+          "answer_sense": "terreno coltivato a ortaggi",
+          "relation": "coltivazione",
+          "meaning_group": "orto",
+          "rationale": "L'orto è uno spazio coltivato comunemente presente in campagna.",
+          "decision": "accepted",
+          "editorial_source_line": 131
+        },
+        {
+          "word": "pascolo",
+          "answer_sense": "terreno destinato all'alimentazione degli animali",
+          "relation": "allevamento",
+          "meaning_group": "pascolo",
+          "rationale": "Il pascolo è un uso caratteristico dei terreni di campagna.",
+          "decision": "accepted",
+          "editorial_source_line": 132
+        },
+        {
+          "word": "sentiero",
+          "answer_sense": "percorso stretto non necessariamente asfaltato",
+          "relation": "percorso",
+          "meaning_group": "sentiero",
+          "rationale": "I sentieri attraversano comunemente la campagna.",
+          "decision": "accepted",
+          "editorial_source_line": 133
+        },
+        {
+          "word": "casale",
+          "answer_sense": "grande edificio abitativo rurale",
+          "relation": "edificio rurale",
+          "meaning_group": "casale",
+          "rationale": "Il casale è un'abitazione tradizionalmente associata alla campagna.",
+          "decision": "accepted",
+          "editorial_source_line": 134
+        }
+      ],
+      "group_limits": {
+        "campo": 1,
+        "fattoria": 1,
+        "contadino": 1,
+        "trattore": 1,
+        "raccolto": 1,
+        "coltivazione": 1,
+        "fienile": 1,
+        "orto": 1,
+        "pascolo": 1,
+        "sentiero": 1,
+        "casale": 1
+      },
+      "conflicts": []
+    },
+    {
+      "prompt": "maestro",
+      "validation_id": "2e04eb5efd670c4c6ad6564148492a39d3133cd4efcc27f6d7a952f6be33ab5c",
+      "decision": "accepted",
+      "review_rationale": "Revisione editoriale di ogni coppia per «maestro», nel senso «L'insegnante della scuola elementare». Controllati autonomia, coerenza, forma e ruoli. Gruppi equivalenti limitati a uno per estrazione; nessun test indipendente dichiarato.",
+      "answers": [
+        {
+          "word": "alunno",
+          "answer_sense": "bambino che frequenta una scuola",
+          "relation": "relazione educativa",
+          "meaning_group": "alunno",
+          "rationale": "Il maestro insegna agli alunni della scuola primaria.",
+          "decision": "accepted",
+          "editorial_source_line": 137
+        },
+        {
+          "word": "lavagna",
+          "answer_sense": "superficie per scrivere durante la lezione",
+          "relation": "strumento",
+          "meaning_group": "lavagna",
+          "rationale": "Il maestro usa la lavagna per spiegare agli alunni.",
+          "decision": "accepted",
+          "editorial_source_line": 138
+        },
+        {
+          "word": "lezione",
+          "answer_sense": "attività organizzata di insegnamento",
+          "relation": "attività",
+          "meaning_group": "lezione",
+          "rationale": "Il maestro prepara e svolge lezioni.",
+          "decision": "accepted",
+          "editorial_source_line": 139
+        },
+        {
+          "word": "classe",
+          "answer_sense": "gruppo di alunni o ambiente che li ospita",
+          "relation": "contesto",
+          "meaning_group": "classe",
+          "rationale": "Il maestro insegna a una classe di alunni.",
+          "decision": "accepted",
+          "editorial_source_line": 140
+        },
+        {
+          "word": "quaderno",
+          "answer_sense": "insieme di fogli rilegati per scrivere",
+          "relation": "materiale scolastico",
+          "meaning_group": "quaderno",
+          "rationale": "Il maestro può assegnare e correggere esercizi sui quaderni.",
+          "decision": "accepted",
+          "editorial_source_line": 141
+        },
+        {
+          "word": "compito",
+          "answer_sense": "lavoro assegnato agli alunni",
+          "relation": "attività",
+          "meaning_group": "compito",
+          "rationale": "Il maestro assegna compiti per esercitare ciò che viene insegnato.",
+          "decision": "accepted",
+          "editorial_source_line": 142
+        },
+        {
+          "word": "gesso",
+          "answer_sense": "materiale per scrivere sulla lavagna tradizionale",
+          "relation": "strumento",
+          "meaning_group": "gesso",
+          "rationale": "Il gesso viene usato dal maestro per scrivere sulla lavagna tradizionale.",
+          "decision": "accepted",
+          "editorial_source_line": 143
+        },
+        {
+          "word": "registro",
+          "answer_sense": "documento che raccoglie dati della classe",
+          "relation": "documento",
+          "meaning_group": "registro",
+          "rationale": "Il maestro annota presenze e valutazioni nel registro scolastico.",
+          "decision": "accepted",
+          "editorial_source_line": 144
+        },
+        {
+          "word": "scuola",
+          "answer_sense": "istituzione destinata all'istruzione",
+          "relation": "luogo",
+          "meaning_group": "scuola",
+          "rationale": "Il maestro nel senso scelto lavora nella scuola primaria.",
+          "decision": "accepted",
+          "editorial_source_line": 145
+        },
+        {
+          "word": "insegnare",
+          "answer_sense": "trasmettere conoscenze e abilità",
+          "relation": "funzione",
+          "meaning_group": "insegnare",
+          "rationale": "Insegnare è la funzione principale del maestro.",
+          "decision": "accepted",
+          "editorial_source_line": 146
+        },
+        {
+          "word": "verifica",
+          "answer_sense": "prova per valutare l'apprendimento",
+          "relation": "valutazione",
+          "meaning_group": "verifica",
+          "rationale": "Il maestro propone verifiche per valutare gli apprendimenti.",
+          "decision": "accepted",
+          "editorial_source_line": 147
+        },
+        {
+          "word": "voto",
+          "answer_sense": "valutazione espressa in forma sintetica",
+          "relation": "valutazione",
+          "meaning_group": "voto",
+          "rationale": "Il maestro può attribuire voti o altre valutazioni agli elaborati degli alunni.",
+          "decision": "accepted",
+          "editorial_source_line": 148
+        }
+      ],
+      "group_limits": {
+        "alunno": 1,
+        "lavagna": 1,
+        "lezione": 1,
+        "classe": 1,
+        "quaderno": 1,
+        "compito": 1,
+        "gesso": 1,
+        "registro": 1,
+        "scuola": 1,
+        "insegnare": 1,
+        "verifica": 1,
+        "voto": 1
+      },
+      "conflicts": []
+    },
+    {
+      "prompt": "uovo",
+      "validation_id": "51a1cf05b5a8b2eb268cdf87e69cfef7fec7a3f1cb162c6f43b24cdbebe26445",
+      "decision": "accepted",
+      "review_rationale": "Revisione editoriale di ogni coppia per «uovo», nel senso «L'uovo di gallina come alimento». Controllati autonomia, coerenza, forma e ruoli. Gruppi equivalenti limitati a uno per estrazione; nessun test indipendente dichiarato.",
+      "answers": [
+        {
+          "word": "guscio",
+          "answer_sense": "rivestimento esterno duro",
+          "relation": "parte alimentare",
+          "meaning_group": "guscio",
+          "rationale": "Il guscio riveste e protegge il contenuto dell'uovo.",
+          "decision": "accepted",
+          "editorial_source_line": 151
+        },
+        {
+          "word": "tuorlo",
+          "answer_sense": "parte gialla dell'uovo",
+          "relation": "parte alimentare",
+          "meaning_group": "tuorlo",
+          "rationale": "Il tuorlo è la parte gialla dell'uovo usata in molte preparazioni.",
+          "decision": "accepted",
+          "editorial_source_line": 152
+        },
+        {
+          "word": "albume",
+          "answer_sense": "parte trasparente dell'uovo che diventa bianca cuocendo",
+          "relation": "parte alimentare",
+          "meaning_group": "albume",
+          "rationale": "L'albume circonda il tuorlo e viene usato in cucina.",
+          "decision": "accepted",
+          "editorial_source_line": 153
+        },
+        {
+          "word": "frittata",
+          "answer_sense": "preparazione di uova battute e cotte",
+          "relation": "preparazione",
+          "meaning_group": "frittata",
+          "rationale": "La frittata viene preparata con uova battute.",
+          "decision": "accepted",
+          "editorial_source_line": 154
+        },
+        {
+          "word": "omelette",
+          "answer_sense": "preparazione di uova cotte e ripiegate",
+          "relation": "preparazione",
+          "meaning_group": "omelette",
+          "rationale": "L'omelette è una preparazione a base di uova.",
+          "decision": "accepted",
+          "editorial_source_line": 155
+        },
+        {
+          "word": "lessare",
+          "answer_sense": "cuocere in acqua",
+          "relation": "cottura",
+          "meaning_group": "cottura",
+          "rationale": "Lessare permette di cuocere l'uovo nel suo guscio.",
+          "decision": "accepted",
+          "editorial_source_line": 156
+        },
+        {
+          "word": "friggere",
+          "answer_sense": "cuocere in grasso caldo",
+          "relation": "cottura",
+          "meaning_group": "cottura",
+          "rationale": "Friggere è un modo comune di cuocere un uovo in padella.",
+          "decision": "accepted",
+          "editorial_source_line": 157
+        },
+        {
+          "word": "padella",
+          "answer_sense": "recipiente basso per cuocere",
+          "relation": "strumento",
+          "meaning_group": "padella",
+          "rationale": "La padella viene usata per cuocere uova e frittate.",
+          "decision": "accepted",
+          "editorial_source_line": 158
+        },
+        {
+          "word": "proteina",
+          "answer_sense": "sostanza nutritiva costituita da amminoacidi",
+          "relation": "composizione",
+          "meaning_group": "proteina",
+          "rationale": "L'uovo è un alimento comunemente associato all'apporto di proteine.",
+          "decision": "accepted",
+          "editorial_source_line": 159
+        },
+        {
+          "word": "maionese",
+          "answer_sense": "salsa emulsionata a base di uovo e olio",
+          "relation": "preparazione",
+          "meaning_group": "maionese",
+          "rationale": "L'uovo viene usato per preparare la maionese.",
+          "decision": "accepted",
+          "editorial_source_line": 160
+        },
+        {
+          "word": "rompere",
+          "answer_sense": "aprire spezzando il rivestimento",
+          "relation": "preparazione",
+          "meaning_group": "rompere",
+          "rationale": "Rompere il guscio permette di usare il contenuto dell'uovo in cucina.",
+          "decision": "accepted",
+          "editorial_source_line": 161
+        },
+        {
+          "word": "gallina",
+          "answer_sense": "femmina adulta del pollo",
+          "relation": "origine alimentare",
+          "meaning_group": "gallina",
+          "rationale": "Nel senso scelto l'uovo alimentare è prodotto dalla gallina.",
+          "decision": "accepted",
+          "editorial_source_line": 162
+        }
+      ],
+      "group_limits": {
+        "guscio": 1,
+        "tuorlo": 1,
+        "albume": 1,
+        "frittata": 1,
+        "omelette": 1,
+        "cottura": 1,
+        "padella": 1,
+        "proteina": 1,
+        "maionese": 1,
+        "rompere": 1,
+        "gallina": 1
+      },
+      "conflicts": []
+    },
+    {
+      "prompt": "supermercato",
+      "validation_id": "cf7039a33af81fbe14236a1ea2e0151e7d622656e0d2329dfcdb678c1718d573",
+      "decision": "accepted",
+      "review_rationale": "Revisione editoriale di ogni coppia per «supermercato», nel senso «Grande negozio di alimentari a libero servizio». Controllati autonomia, coerenza, forma e ruoli. Gruppi equivalenti limitati a uno per estrazione; nessun test indipendente dichiarato.",
+      "answers": [
+        {
+          "word": "carrello",
+          "answer_sense": "contenitore con ruote per gli acquisti",
+          "relation": "attrezzatura",
+          "meaning_group": "carrello",
+          "rationale": "Il carrello permette di raccogliere e trasportare la spesa nel supermercato.",
+          "decision": "accepted",
+          "editorial_source_line": 165
+        },
+        {
+          "word": "cassa",
+          "answer_sense": "postazione per pagare gli acquisti",
+          "relation": "pagamento",
+          "meaning_group": "cassa",
+          "rationale": "Alla cassa del supermercato si paga la spesa.",
+          "decision": "accepted",
+          "editorial_source_line": 166
+        },
+        {
+          "word": "scaffale",
+          "answer_sense": "struttura con ripiani",
+          "relation": "esposizione",
+          "meaning_group": "scaffale",
+          "rationale": "Gli scaffali espongono i prodotti del supermercato.",
+          "decision": "accepted",
+          "editorial_source_line": 167
+        },
+        {
+          "word": "spesa",
+          "answer_sense": "insieme dei prodotti comprati per le necessità quotidiane",
+          "relation": "attività",
+          "meaning_group": "spesa",
+          "rationale": "Il supermercato è un luogo comune in cui fare la spesa.",
+          "decision": "accepted",
+          "editorial_source_line": 168
+        },
+        {
+          "word": "scontrino",
+          "answer_sense": "documento che registra i prodotti acquistati",
+          "relation": "documento",
+          "meaning_group": "scontrino",
+          "rationale": "Lo scontrino documenta gli acquisti effettuati al supermercato.",
+          "decision": "accepted",
+          "editorial_source_line": 169
+        },
+        {
+          "word": "offerta",
+          "answer_sense": "vendita a condizioni promozionali",
+          "relation": "promozione",
+          "meaning_group": "offerta",
+          "rationale": "Il supermercato propone offerte su alcuni prodotti.",
+          "decision": "accepted",
+          "editorial_source_line": 170
+        },
+        {
+          "word": "corsia",
+          "answer_sense": "passaggio fra file di espositori",
+          "relation": "organizzazione dello spazio",
+          "meaning_group": "corsia",
+          "rationale": "Le corsie separano gli scaffali e permettono di muoversi nel supermercato.",
+          "decision": "accepted",
+          "editorial_source_line": 171
+        },
+        {
+          "word": "reparto",
+          "answer_sense": "settore dedicato a una categoria di prodotti",
+          "relation": "organizzazione commerciale",
+          "meaning_group": "reparto",
+          "rationale": "Il supermercato è diviso in reparti di prodotti.",
+          "decision": "accepted",
+          "editorial_source_line": 172
+        },
+        {
+          "word": "cestino",
+          "answer_sense": "piccolo contenitore per trasportare acquisti",
+          "relation": "attrezzatura",
+          "meaning_group": "carrello",
+          "rationale": "Il cestino permette di portare piccoli acquisti nel supermercato.",
+          "decision": "accepted",
+          "editorial_source_line": 173
+        },
+        {
+          "word": "cliente",
+          "answer_sense": "persona che acquista prodotti",
+          "relation": "partecipante",
+          "meaning_group": "cliente",
+          "rationale": "I clienti scelgono i prodotti ed effettuano la spesa al supermercato.",
+          "decision": "accepted",
+          "editorial_source_line": 174
+        },
+        {
+          "word": "alimentare",
+          "answer_sense": "prodotto destinato alla nutrizione",
+          "relation": "prodotto",
+          "meaning_group": "alimentare",
+          "rationale": "Gli alimentari costituiscono una parte principale dell'offerta del supermercato.",
+          "decision": "accepted",
+          "editorial_source_line": 175
+        },
+        {
+          "word": "sacchetto",
+          "answer_sense": "piccolo contenitore flessibile",
+          "relation": "trasporto della spesa",
+          "meaning_group": "sacchetto",
+          "rationale": "Il sacchetto viene usato per portare via gli acquisti del supermercato.",
+          "decision": "accepted",
+          "editorial_source_line": 176
+        }
+      ],
+      "group_limits": {
+        "carrello": 1,
+        "cassa": 1,
+        "scaffale": 1,
+        "spesa": 1,
+        "scontrino": 1,
+        "offerta": 1,
+        "corsia": 1,
+        "reparto": 1,
+        "cliente": 1,
+        "alimentare": 1,
+        "sacchetto": 1
+      },
+      "conflicts": []
+    },
+    {
+      "prompt": "fattoria",
+      "validation_id": "d11ffba8646c557ffae16a9e60c7ff923b27d79204ea44e6371f70d0577528c1",
+      "decision": "accepted",
+      "review_rationale": "Revisione editoriale di ogni coppia per «fattoria», nel senso «Azienda agricola con animali e campi». Controllati autonomia, coerenza, forma e ruoli. Gruppi equivalenti limitati a uno per estrazione; nessun test indipendente dichiarato.",
+      "answers": [
+        {
+          "word": "contadino",
+          "answer_sense": "persona che lavora la terra",
+          "relation": "professione",
+          "meaning_group": "contadino",
+          "rationale": "Il contadino svolge il lavoro agricolo della fattoria.",
+          "decision": "accepted",
+          "editorial_source_line": 179
+        },
+        {
+          "word": "stalla",
+          "answer_sense": "edificio per ospitare animali allevati",
+          "relation": "edificio",
+          "meaning_group": "stalla",
+          "rationale": "La stalla ospita gli animali allevati nella fattoria.",
+          "decision": "accepted",
+          "editorial_source_line": 180
+        },
+        {
+          "word": "fienile",
+          "answer_sense": "edificio per conservare il fieno",
+          "relation": "edificio",
+          "meaning_group": "fienile",
+          "rationale": "Il fienile conserva il fieno destinato agli animali della fattoria.",
+          "decision": "accepted",
+          "editorial_source_line": 181
+        },
+        {
+          "word": "trattore",
+          "answer_sense": "mezzo per lavori agricoli",
+          "relation": "attrezzatura",
+          "meaning_group": "trattore",
+          "rationale": "Il trattore viene usato nei lavori dei campi della fattoria.",
+          "decision": "accepted",
+          "editorial_source_line": 182
+        },
+        {
+          "word": "campo",
+          "answer_sense": "terreno coltivato",
+          "relation": "terreno",
+          "meaning_group": "campo",
+          "rationale": "I campi fanno parte dei terreni coltivati della fattoria.",
+          "decision": "accepted",
+          "editorial_source_line": 183
+        },
+        {
+          "word": "mucca",
+          "answer_sense": "bovino femmina adulto",
+          "relation": "animale allevato",
+          "meaning_group": "animale",
+          "rationale": "La mucca è un animale comunemente allevato in fattoria.",
+          "decision": "accepted",
+          "editorial_source_line": 184
+        },
+        {
+          "word": "gallina",
+          "answer_sense": "femmina adulta del pollo",
+          "relation": "animale allevato",
+          "meaning_group": "animale",
+          "rationale": "La gallina è un animale comune della fattoria.",
+          "decision": "accepted",
+          "editorial_source_line": 185
+        },
+        {
+          "word": "maiale",
+          "answer_sense": "suino domestico",
+          "relation": "animale allevato",
+          "meaning_group": "animale",
+          "rationale": "Il maiale è un animale comunemente allevato in fattoria.",
+          "decision": "accepted",
+          "editorial_source_line": 186
+        },
+        {
+          "word": "latte",
+          "answer_sense": "secrezione alimentare dei mammiferi",
+          "relation": "prodotto",
+          "meaning_group": "latte",
+          "rationale": "Il latte è un prodotto caratteristico delle fattorie con animali da latte.",
+          "decision": "accepted",
+          "editorial_source_line": 187
+        },
+        {
+          "word": "uovo",
+          "answer_sense": "prodotto alimentare della gallina",
+          "relation": "prodotto",
+          "meaning_group": "uovo",
+          "rationale": "Le uova sono un prodotto comune delle fattorie che allevano galline.",
+          "decision": "accepted",
+          "editorial_source_line": 188
+        },
+        {
+          "word": "raccolto",
+          "answer_sense": "insieme dei prodotti ottenuti dalle coltivazioni",
+          "relation": "attività agricola",
+          "meaning_group": "raccolto",
+          "rationale": "Il raccolto deriva dal lavoro nei campi della fattoria.",
+          "decision": "accepted",
+          "editorial_source_line": 189
+        },
+        {
+          "word": "letame",
+          "answer_sense": "materiale organico degli animali usato come concime",
+          "relation": "gestione agricola",
+          "meaning_group": "letame",
+          "rationale": "Il letame prodotto dagli animali può essere usato per concimare i terreni della fattoria.",
+          "decision": "accepted",
+          "editorial_source_line": 190
+        }
+      ],
+      "group_limits": {
+        "contadino": 1,
+        "stalla": 1,
+        "fienile": 1,
+        "trattore": 1,
+        "campo": 1,
+        "animale": 1,
+        "latte": 1,
+        "uovo": 1,
+        "raccolto": 1,
+        "letame": 1
+      },
+      "conflicts": []
+    },
+    {
+      "prompt": "serpente",
+      "validation_id": "a267f44ecfe6936330aa03b770b789a06b76757bc223ea32455be99477a301cc",
+      "decision": "accepted",
+      "review_rationale": "Revisione editoriale di ogni coppia per «serpente», nel senso «Rettile senza zampe». Controllati autonomia, coerenza, forma e ruoli. Gruppi equivalenti limitati a uno per estrazione; nessun test indipendente dichiarato.",
+      "answers": [
+        {
+          "word": "squama",
+          "answer_sense": "elemento del rivestimento cutaneo",
+          "relation": "rivestimento",
+          "meaning_group": "squama",
+          "rationale": "Il corpo del serpente è rivestito di squame.",
+          "decision": "accepted",
+          "editorial_source_line": 193
+        },
+        {
+          "word": "rettile",
+          "answer_sense": "vertebrato del gruppo dei rettili",
+          "relation": "categoria zoologica",
+          "meaning_group": "rettile",
+          "rationale": "Il serpente è un rettile.",
+          "decision": "accepted",
+          "editorial_source_line": 194
+        },
+        {
+          "word": "strisciare",
+          "answer_sense": "avanzare aderendo al suolo con il corpo",
+          "relation": "locomozione",
+          "meaning_group": "strisciare",
+          "rationale": "Strisciare è il movimento comunemente associato al serpente.",
+          "decision": "accepted",
+          "editorial_source_line": 195
+        },
+        {
+          "word": "lingua",
+          "answer_sense": "organo mobile della bocca",
+          "relation": "parte anatomica",
+          "meaning_group": "lingua",
+          "rationale": "La lingua biforcuta è una caratteristica riconoscibile del serpente.",
+          "decision": "accepted",
+          "editorial_source_line": 196
+        },
+        {
+          "word": "veleno",
+          "answer_sense": "sostanza tossica prodotta da alcuni animali",
+          "relation": "predazione",
+          "meaning_group": "veleno",
+          "rationale": "Alcuni serpenti producono veleno per immobilizzare le prede o difendersi.",
+          "decision": "accepted",
+          "editorial_source_line": 197
+        },
+        {
+          "word": "muta",
+          "answer_sense": "sostituzione del rivestimento esterno",
+          "relation": "crescita",
+          "meaning_group": "muta",
+          "rationale": "Il serpente compie la muta del rivestimento cutaneo durante la crescita.",
+          "decision": "accepted",
+          "editorial_source_line": 198
+        },
+        {
+          "word": "sibilo",
+          "answer_sense": "suono acuto e prolungato",
+          "relation": "emissione sonora",
+          "meaning_group": "sibilo",
+          "rationale": "Il sibilo è un suono comunemente attribuito al serpente.",
+          "decision": "accepted",
+          "editorial_source_line": 199
+        },
+        {
+          "word": "vipera",
+          "answer_sense": "serpente velenoso",
+          "relation": "tipo",
+          "meaning_group": "tipo_serpente",
+          "rationale": "La vipera è un tipo riconoscibile di serpente.",
+          "decision": "accepted",
+          "editorial_source_line": 200
+        },
+        {
+          "word": "pitone",
+          "answer_sense": "grande serpente costrittore",
+          "relation": "tipo",
+          "meaning_group": "tipo_serpente",
+          "rationale": "Il pitone è un serpente che uccide le prede mediante costrizione.",
+          "decision": "accepted",
+          "editorial_source_line": 201
+        },
+        {
+          "word": "cobra",
+          "answer_sense": "serpente che può allargare la regione del collo",
+          "relation": "tipo",
+          "meaning_group": "tipo_serpente",
+          "rationale": "Il cobra è un serpente riconoscibile per la regione del collo allargata.",
+          "decision": "accepted",
+          "editorial_source_line": 202
+        },
+        {
+          "word": "preda",
+          "answer_sense": "animale catturato per nutrimento",
+          "relation": "alimentazione",
+          "meaning_group": "preda",
+          "rationale": "Il serpente cattura e ingerisce prede.",
+          "decision": "accepted",
+          "editorial_source_line": 203
+        },
+        {
+          "word": "uovo",
+          "answer_sense": "struttura riproduttiva contenente l'embrione",
+          "relation": "riproduzione",
+          "meaning_group": "uovo",
+          "rationale": "Molti serpenti depongono uova.",
+          "decision": "accepted",
+          "editorial_source_line": 204
+        }
+      ],
+      "group_limits": {
+        "squama": 1,
+        "rettile": 1,
+        "strisciare": 1,
+        "lingua": 1,
+        "veleno": 1,
+        "muta": 1,
+        "sibilo": 1,
+        "tipo_serpente": 1,
+        "preda": 1,
+        "uovo": 1
+      },
+      "conflicts": []
+    },
+    {
+      "prompt": "quaderno",
+      "validation_id": "5e80d0deba67916001614fd424fd112e3fb7f8ad3e72059354d9b4a8a0cd9d67",
+      "decision": "accepted",
+      "review_rationale": "Revisione editoriale di ogni coppia per «quaderno», nel senso «Fogli rilegati per scrivere a scuola». Controllati autonomia, coerenza, forma e ruoli. Gruppi equivalenti limitati a uno per estrazione; nessun test indipendente dichiarato.",
+      "answers": [
+        {
+          "word": "foglio",
+          "answer_sense": "supporto sottile di carta",
+          "relation": "componente",
+          "meaning_group": "foglio",
+          "rationale": "I fogli rilegati formano il quaderno.",
+          "decision": "accepted",
+          "editorial_source_line": 207
+        },
+        {
+          "word": "pagina",
+          "answer_sense": "facciata di un foglio",
+          "relation": "componente",
+          "meaning_group": "pagina",
+          "rationale": "Le pagine offrono superfici sulle quali scrivere nel quaderno.",
+          "decision": "accepted",
+          "editorial_source_line": 208
+        },
+        {
+          "word": "copertina",
+          "answer_sense": "rivestimento esterno di un insieme di fogli",
+          "relation": "parte",
+          "meaning_group": "copertina",
+          "rationale": "La copertina protegge i fogli del quaderno.",
+          "decision": "accepted",
+          "editorial_source_line": 209
+        },
+        {
+          "word": "riga",
+          "answer_sense": "linea guida o disposizione orizzontale di scrittura",
+          "relation": "formato",
+          "meaning_group": "formato",
+          "rationale": "Le righe guidano la scrittura in molti quaderni scolastici.",
+          "decision": "accepted",
+          "editorial_source_line": 210
+        },
+        {
+          "word": "quadretto",
+          "answer_sense": "piccolo quadrato tracciato sulla pagina",
+          "relation": "formato",
+          "meaning_group": "formato",
+          "rationale": "I quadretti sono un formato comune delle pagine dei quaderni.",
+          "decision": "accepted",
+          "editorial_source_line": 211
+        },
+        {
+          "word": "penna",
+          "answer_sense": "strumento per scrivere con inchiostro",
+          "relation": "strumento",
+          "meaning_group": "strumento",
+          "rationale": "La penna viene usata per scrivere sul quaderno.",
+          "decision": "accepted",
+          "editorial_source_line": 212
+        },
+        {
+          "word": "matita",
+          "answer_sense": "strumento con mina per tracciare segni",
+          "relation": "strumento",
+          "meaning_group": "strumento",
+          "rationale": "La matita viene usata per scrivere o disegnare sul quaderno.",
+          "decision": "accepted",
+          "editorial_source_line": 213
+        },
+        {
+          "word": "compito",
+          "answer_sense": "lavoro assegnato a un alunno",
+          "relation": "contenuto",
+          "meaning_group": "compito",
+          "rationale": "Il quaderno viene usato per svolgere i compiti scolastici.",
+          "decision": "accepted",
+          "editorial_source_line": 214
+        },
+        {
+          "word": "appunto",
+          "answer_sense": "breve annotazione scritta",
+          "relation": "contenuto",
+          "meaning_group": "appunto",
+          "rationale": "Gli appunti vengono comunemente scritti su un quaderno.",
+          "decision": "accepted",
+          "editorial_source_line": 215
+        },
+        {
+          "word": "scuola",
+          "answer_sense": "istituzione educativa",
+          "relation": "contesto",
+          "meaning_group": "scuola",
+          "rationale": "Il quaderno nel senso scelto è un materiale usato a scuola.",
+          "decision": "accepted",
+          "editorial_source_line": 216
+        },
+        {
+          "word": "scrivere",
+          "answer_sense": "tracciare caratteri",
+          "relation": "funzione",
+          "meaning_group": "scrivere",
+          "rationale": "Il quaderno mette a disposizione fogli sui quali scrivere.",
+          "decision": "accepted",
+          "editorial_source_line": 217
+        },
+        {
+          "word": "spirale",
+          "answer_sense": "rilegatura a filo avvolto",
+          "relation": "rilegatura",
+          "meaning_group": "spirale",
+          "rationale": "Una spirale può tenere insieme i fogli del quaderno.",
+          "decision": "accepted",
+          "editorial_source_line": 218
+        }
+      ],
+      "group_limits": {
+        "foglio": 1,
+        "pagina": 1,
+        "copertina": 1,
+        "formato": 1,
+        "strumento": 1,
+        "compito": 1,
+        "appunto": 1,
+        "scuola": 1,
+        "scrivere": 1,
+        "spirale": 1
+      },
+      "conflicts": []
+    },
+    {
+      "prompt": "sciarpa",
+      "validation_id": "c0b5c19ee36628b7bec95ac946875edf69a39ac6b30ba755a43dccfc01caeecd",
+      "decision": "accepted",
+      "review_rationale": "Revisione editoriale di ogni coppia per «sciarpa», nel senso «Indumento lungo avvolto intorno al collo». Controllati autonomia, coerenza, forma e ruoli. Gruppi equivalenti limitati a uno per estrazione; nessun test indipendente dichiarato.",
+      "answers": [
+        {
+          "word": "collo",
+          "answer_sense": "regione fra testa e tronco",
+          "relation": "sede d'uso",
+          "meaning_group": "collo",
+          "rationale": "La sciarpa viene avvolta intorno al collo.",
+          "decision": "accepted",
+          "editorial_source_line": 221
+        },
+        {
+          "word": "lana",
+          "answer_sense": "fibra tessile animale",
+          "relation": "materiale",
+          "meaning_group": "materiale",
+          "rationale": "La lana è un materiale comune delle sciarpe invernali.",
+          "decision": "accepted",
+          "editorial_source_line": 222
+        },
+        {
+          "word": "seta",
+          "answer_sense": "fibra tessile fine",
+          "relation": "materiale",
+          "meaning_group": "materiale",
+          "rationale": "La seta viene usata per realizzare sciarpe leggere.",
+          "decision": "accepted",
+          "editorial_source_line": 223
+        },
+        {
+          "word": "frangia",
+          "answer_sense": "insieme di fili liberi lungo un bordo",
+          "relation": "parte",
+          "meaning_group": "frangia",
+          "rationale": "Le frange possono rifinire le estremità della sciarpa.",
+          "decision": "accepted",
+          "editorial_source_line": 224
+        },
+        {
+          "word": "nodo",
+          "answer_sense": "intreccio che fissa un tessuto",
+          "relation": "modo d'uso",
+          "meaning_group": "nodo",
+          "rationale": "Un nodo può mantenere la sciarpa nella posizione desiderata.",
+          "decision": "accepted",
+          "editorial_source_line": 225
+        },
+        {
+          "word": "freddo",
+          "answer_sense": "bassa temperatura",
+          "relation": "protezione",
+          "meaning_group": "freddo",
+          "rationale": "La sciarpa protegge il collo dal freddo.",
+          "decision": "accepted",
+          "editorial_source_line": 226
+        },
+        {
+          "word": "inverno",
+          "answer_sense": "stagione fredda",
+          "relation": "contesto d'uso",
+          "meaning_group": "inverno",
+          "rationale": "La sciarpa è un accessorio caratteristico dell'abbigliamento invernale.",
+          "decision": "accepted",
+          "editorial_source_line": 227
+        },
+        {
+          "word": "cappotto",
+          "answer_sense": "indumento esterno pesante",
+          "relation": "abbinamento",
+          "meaning_group": "cappotto",
+          "rationale": "La sciarpa viene comunemente abbinata al cappotto.",
+          "decision": "accepted",
+          "editorial_source_line": 228
+        },
+        {
+          "word": "guanto",
+          "answer_sense": "indumento che copre la mano",
+          "relation": "abbinamento",
+          "meaning_group": "guanto",
+          "rationale": "Sciarpa e guanti sono accessori comunemente indossati insieme per ripararsi dal freddo.",
+          "decision": "accepted",
+          "editorial_source_line": 229
+        },
+        {
+          "word": "avvolgere",
+          "answer_sense": "disporre intorno a qualcosa",
+          "relation": "gesto d'uso",
+          "meaning_group": "avvolgere",
+          "rationale": "Avvolgere la sciarpa intorno al collo è il suo modo d'uso caratteristico.",
+          "decision": "accepted",
+          "editorial_source_line": 230
+        }
+      ],
+      "group_limits": {
+        "collo": 1,
+        "materiale": 1,
+        "frangia": 1,
+        "nodo": 1,
+        "freddo": 1,
+        "inverno": 1,
+        "cappotto": 1,
+        "guanto": 1,
+        "avvolgere": 1
+      },
+      "conflicts": []
+    },
+    {
+      "prompt": "granchio",
+      "validation_id": "e68a8c23a8a543ce1648ffb7d29c4dd7457718e2c932800f3d3127d7b21797ac",
+      "decision": "accepted",
+      "review_rationale": "Revisione editoriale di ogni coppia per «granchio», nel senso «Crostaceo acquatico con guscio e chele». Controllati autonomia, coerenza, forma e ruoli. Gruppi equivalenti limitati a uno per estrazione; nessun test indipendente dichiarato.",
+      "answers": [
+        {
+          "word": "chela",
+          "answer_sense": "appendice che funziona come una pinza",
+          "relation": "parte anatomica",
+          "meaning_group": "chela",
+          "rationale": "Le chele del granchio servono per afferrare e difendersi.",
+          "decision": "accepted",
+          "editorial_source_line": 233
+        },
+        {
+          "word": "carapace",
+          "answer_sense": "rivestimento rigido del corpo di alcuni animali",
+          "relation": "rivestimento",
+          "meaning_group": "carapace",
+          "rationale": "Il carapace protegge la parte principale del corpo del granchio.",
+          "decision": "accepted",
+          "editorial_source_line": 234
+        },
+        {
+          "word": "crostaceo",
+          "answer_sense": "artropode acquatico con rivestimento rigido",
+          "relation": "categoria zoologica",
+          "meaning_group": "crostaceo",
+          "rationale": "Il granchio è un crostaceo.",
+          "decision": "accepted",
+          "editorial_source_line": 235
+        },
+        {
+          "word": "zampa",
+          "answer_sense": "arto di un animale",
+          "relation": "parte anatomica",
+          "meaning_group": "zampa",
+          "rationale": "Le zampe permettono al granchio di camminare sul fondo o sulla riva.",
+          "decision": "accepted",
+          "editorial_source_line": 236
+        },
+        {
+          "word": "mare",
+          "answer_sense": "massa di acqua salata",
+          "relation": "habitat",
+          "meaning_group": "mare",
+          "rationale": "Il mare è un habitat comunemente associato ai granchi.",
+          "decision": "accepted",
+          "editorial_source_line": 237
+        },
+        {
+          "word": "scoglio",
+          "answer_sense": "roccia affiorante o vicina alla costa",
+          "relation": "ambiente",
+          "meaning_group": "scoglio",
+          "rationale": "Gli scogli offrono riparo a molti granchi della costa.",
+          "decision": "accepted",
+          "editorial_source_line": 238
+        },
+        {
+          "word": "sabbia",
+          "answer_sense": "materiale formato da piccoli granelli",
+          "relation": "ambiente",
+          "meaning_group": "sabbia",
+          "rationale": "Molti granchi si muovono o scavano nella sabbia della costa.",
+          "decision": "accepted",
+          "editorial_source_line": 239
+        },
+        {
+          "word": "muta",
+          "answer_sense": "sostituzione del rivestimento esterno",
+          "relation": "crescita",
+          "meaning_group": "muta",
+          "rationale": "Il granchio compie la muta del suo rivestimento durante la crescita.",
+          "decision": "accepted",
+          "editorial_source_line": 240
+        },
+        {
+          "word": "antenna",
+          "answer_sense": "appendice sensoriale di alcuni animali",
+          "relation": "parte anatomica",
+          "meaning_group": "antenna",
+          "rationale": "Le antenne del granchio rilevano stimoli dell'ambiente.",
+          "decision": "accepted",
+          "editorial_source_line": 241
+        }
+      ],
+      "group_limits": {
+        "chela": 1,
+        "carapace": 1,
+        "crostaceo": 1,
+        "zampa": 1,
+        "mare": 1,
+        "scoglio": 1,
+        "sabbia": 1,
+        "muta": 1,
+        "antenna": 1
+      },
+      "conflicts": []
+    },
+    {
+      "prompt": "bibita",
+      "validation_id": "57d7ca0de69c5d0a8371ae52cdb4fc5e129a001a7d3f3b00a68a5ae3f88e2c5f",
+      "decision": "accepted",
+      "review_rationale": "Revisione editoriale di ogni coppia per «bibita», nel senso «Bevanda analcolica rinfrescante». Controllati autonomia, coerenza, forma e ruoli. Gruppi equivalenti limitati a uno per estrazione; nessun test indipendente dichiarato.",
+      "answers": [
+        {
+          "word": "bottiglia",
+          "answer_sense": "recipiente per liquidi",
+          "relation": "confezione",
+          "meaning_group": "confezione",
+          "rationale": "La bibita viene comunemente conservata o venduta in bottiglia.",
+          "decision": "accepted",
+          "editorial_source_line": 244
+        },
+        {
+          "word": "lattina",
+          "answer_sense": "piccolo contenitore metallico per bevande",
+          "relation": "confezione",
+          "meaning_group": "confezione",
+          "rationale": "La lattina è una confezione comune delle bibite.",
+          "decision": "accepted",
+          "editorial_source_line": 245
+        },
+        {
+          "word": "bicchiere",
+          "answer_sense": "recipiente da cui si beve",
+          "relation": "servizio",
+          "meaning_group": "bicchiere",
+          "rationale": "La bibita viene comunemente servita in un bicchiere.",
+          "decision": "accepted",
+          "editorial_source_line": 246
+        },
+        {
+          "word": "cannuccia",
+          "answer_sense": "piccolo tubo per aspirare un liquido",
+          "relation": "accessorio",
+          "meaning_group": "cannuccia",
+          "rationale": "La cannuccia può essere usata per bere una bibita.",
+          "decision": "accepted",
+          "editorial_source_line": 247
+        },
+        {
+          "word": "sete",
+          "answer_sense": "bisogno di bere",
+          "relation": "bisogno soddisfatto",
+          "meaning_group": "sete",
+          "rationale": "Una bibita viene bevuta anche per soddisfare la sete.",
+          "decision": "accepted",
+          "editorial_source_line": 248
+        },
+        {
+          "word": "ghiaccio",
+          "answer_sense": "acqua solida",
+          "relation": "servizio",
+          "meaning_group": "ghiaccio",
+          "rationale": "Il ghiaccio viene aggiunto a molte bibite per mantenerle fredde.",
+          "decision": "accepted",
+          "editorial_source_line": 249
+        },
+        {
+          "word": "frizzante",
+          "answer_sense": "contenente gas che produce bollicine",
+          "relation": "tipo",
+          "meaning_group": "frizzante",
+          "rationale": "Una bibita frizzante contiene gas che forma bollicine.",
+          "decision": "accepted",
+          "editorial_source_line": 250
+        },
+        {
+          "word": "zucchero",
+          "answer_sense": "sostanza alimentare dolcificante",
+          "relation": "ingrediente",
+          "meaning_group": "zucchero",
+          "rationale": "Lo zucchero è un ingrediente di molte bibite.",
+          "decision": "accepted",
+          "editorial_source_line": 251
+        },
+        {
+          "word": "aranciata",
+          "answer_sense": "bevanda a base di arancia",
+          "relation": "tipo",
+          "meaning_group": "tipo_bibita",
+          "rationale": "L'aranciata è una bibita analcolica riconoscibile.",
+          "decision": "accepted",
+          "editorial_source_line": 252
+        },
+        {
+          "word": "limonata",
+          "answer_sense": "bevanda a base di limone",
+          "relation": "tipo",
+          "meaning_group": "tipo_bibita",
+          "rationale": "La limonata è una bibita a base di limone.",
+          "decision": "accepted",
+          "editorial_source_line": 253
+        },
+        {
+          "word": "succo",
+          "answer_sense": "liquido estratto dalla frutta",
+          "relation": "ingrediente",
+          "meaning_group": "succo",
+          "rationale": "Il succo di frutta viene usato per preparare alcune bibite.",
+          "decision": "accepted",
+          "editorial_source_line": 254
+        },
+        {
+          "word": "bere",
+          "answer_sense": "ingerire un liquido",
+          "relation": "consumo",
+          "meaning_group": "bere",
+          "rationale": "Bere è l'azione con cui si consuma una bibita.",
+          "decision": "accepted",
+          "editorial_source_line": 255
+        }
+      ],
+      "group_limits": {
+        "confezione": 1,
+        "bicchiere": 1,
+        "cannuccia": 1,
+        "sete": 1,
+        "ghiaccio": 1,
+        "frizzante": 1,
+        "zucchero": 1,
+        "tipo_bibita": 1,
+        "succo": 1,
+        "bere": 1
+      },
+      "conflicts": []
+    },
+    {
+      "prompt": "camion",
+      "validation_id": "1f1680ef050a646a341b792ccbd360747a224607e0318da31fc9bbd97c9e5c3b",
+      "decision": "accepted",
+      "review_rationale": "Revisione editoriale di ogni coppia per «camion», nel senso «Grande automezzo per il trasporto di merci». Controllati autonomia, coerenza, forma e ruoli. Gruppi equivalenti limitati a uno per estrazione; nessun test indipendente dichiarato.",
+      "answers": [
+        {
+          "word": "merce",
+          "answer_sense": "prodotto destinato al commercio",
+          "relation": "carico",
+          "meaning_group": "carico",
+          "rationale": "Il camion trasporta merci per conto di attività commerciali e logistiche.",
+          "decision": "accepted",
+          "editorial_source_line": 258
+        },
+        {
+          "word": "carico",
+          "answer_sense": "insieme dei materiali trasportati",
+          "relation": "funzione",
+          "meaning_group": "carico",
+          "rationale": "Il carico è ciò che il camion porta da un luogo all'altro.",
+          "decision": "accepted",
+          "editorial_source_line": 259
+        },
+        {
+          "word": "rimorchio",
+          "answer_sense": "veicolo trainato",
+          "relation": "componente collegato",
+          "meaning_group": "rimorchio",
+          "rationale": "Un camion può trainare un rimorchio per aumentare la capacità di trasporto.",
+          "decision": "accepted",
+          "editorial_source_line": 260
+        },
+        {
+          "word": "cabina",
+          "answer_sense": "spazio che ospita il conducente",
+          "relation": "parte",
+          "meaning_group": "cabina",
+          "rationale": "La cabina del camion ospita il conducente e i comandi.",
+          "decision": "accepted",
+          "editorial_source_line": 261
+        },
+        {
+          "word": "autista",
+          "answer_sense": "conducente di un veicolo",
+          "relation": "professione",
+          "meaning_group": "autista",
+          "rationale": "L'autista è la persona che guida il camion.",
+          "decision": "accepted",
+          "editorial_source_line": 262
+        },
+        {
+          "word": "ruota",
+          "answer_sense": "elemento circolare che permette il movimento",
+          "relation": "parte",
+          "meaning_group": "ruota",
+          "rationale": "Le ruote sostengono il camion e ne consentono il movimento su strada.",
+          "decision": "accepted",
+          "editorial_source_line": 263
+        },
+        {
+          "word": "autostrada",
+          "answer_sense": "strada destinata al traffico veloce",
+          "relation": "percorso",
+          "meaning_group": "autostrada",
+          "rationale": "L'autostrada è una via comunemente percorsa dai camion per il trasporto su lunghe distanze.",
+          "decision": "accepted",
+          "editorial_source_line": 264
+        },
+        {
+          "word": "scarico",
+          "answer_sense": "rimozione del carico da un veicolo",
+          "relation": "operazione",
+          "meaning_group": "movimentazione",
+          "rationale": "Lo scarico trasferisce le merci dal camion al luogo di destinazione.",
+          "decision": "accepted",
+          "editorial_source_line": 265
+        },
+        {
+          "word": "caricare",
+          "answer_sense": "mettere merci su un veicolo",
+          "relation": "operazione",
+          "meaning_group": "movimentazione",
+          "rationale": "Caricare un camion significa sistemare le merci destinate al trasporto.",
+          "decision": "accepted",
+          "editorial_source_line": 266
+        },
+        {
+          "word": "magazzino",
+          "answer_sense": "luogo dove si custodiscono merci",
+          "relation": "luogo logistico",
+          "meaning_group": "magazzino",
+          "rationale": "Il camion carica o scarica comunemente merci presso un magazzino.",
+          "decision": "accepted",
+          "editorial_source_line": 267
+        },
+        {
+          "word": "cassone",
+          "answer_sense": "vano aperto o struttura che contiene il carico",
+          "relation": "parte",
+          "meaning_group": "cassone",
+          "rationale": "Il cassone contiene il carico in diversi tipi di camion.",
+          "decision": "accepted",
+          "editorial_source_line": 268
+        },
+        {
+          "word": "trasportare",
+          "answer_sense": "portare persone o cose da un luogo a un altro",
+          "relation": "funzione",
+          "meaning_group": "trasportare",
+          "rationale": "La funzione caratteristica del camion è trasportare merci.",
+          "decision": "accepted",
+          "editorial_source_line": 269
+        }
+      ],
+      "group_limits": {
+        "carico": 1,
+        "rimorchio": 1,
+        "cabina": 1,
+        "autista": 1,
+        "ruota": 1,
+        "autostrada": 1,
+        "movimentazione": 1,
+        "magazzino": 1,
+        "cassone": 1,
+        "trasportare": 1
+      },
+      "conflicts": []
+    }
+  ]
+}

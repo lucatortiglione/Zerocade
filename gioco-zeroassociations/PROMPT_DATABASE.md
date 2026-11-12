@@ -1,22 +1,48 @@
 # Database dei prompt italiani
 
+**Avanzamento delle associazioni, 9 novembre 2026:** la lavorazione della coda
+completa prosegue con tre agenti e importazione centrale dei bacini revisionati.
+I conteggi delle copie aggiornate sono nel rapporto. Vedere
+[stato e procedura di ripresa](ASSOCIAZIONI_FILTRATI.md) e
+[rapporto dei controlli](resources/avanzamento_associazioni_filtrati_20261109.json).
+
 Fonti, inventario, aggiornamenti e decisioni convivono nella raccolta
 `prompt_raw.sqlite3`: vedere [la gestione del database unico](AGGIORNAMENTI_FONTI.md).
 
-**Primo step corrente:** [raccogliere e inserire l'inventario dei prompt](PROMPT_INVENTORY.md).
-La richiesta più recente consente di inserire i prompt raccolti nelle tabelle
-`inventory_*`, prima di cercare le associazioni. La verifica preinserimento
-descritta qui sotto riguarda la banca di gioco e le sue associazioni.
+La raccolta di ulteriori fonti prosegue attraverso
+[l'inventario dei prompt](PROMPT_INVENTORY.md). La lavorazione corrente cerca
+le associazioni per ogni candidato dei filtrati e copia nella banca valida
+soltanto i prompt revisionati insieme ai rispettivi bacini. La verifica
+preinserimento descritta qui sotto riguarda la banca di gioco e le associazioni.
 
-Ci sono due database SQLite:
+La raccolta e le copie SQLite hanno ruoli distinti:
 
 - `prompt_raw.sqlite3`, la **raccolta**: il database operativo in cui scrivono
   tutti gli script. Escluso da Git: con l'inventario pesa gigabyte.
+- `prompt_validi.sqlite3`, i **prompt validi con le parole associate**: solo prompt
+  con un verbale di revisione corrente, categoria e senso scelto **e** un bacino
+  verificato del medesimo senso. `validated_prompt_database.py sync` la rigenera
+  senza eliminare la raccolta o lo storico. Una scelta `INTEGRATED` da sola non è
+  una revisione.
+- `prompt_filtrati.sqlite3`, i **candidati e le parole valide come prompt**: oltre
+  alla preselezione automatica (`filtered_prompts`), la tabella `validated_prompts`
+  copia ogni prompt con verbale positivo corrente (senso, POS, categoria, revisore),
+  anche se non ha ancora associazioni. La vista `review_state` indica `VALIDATO` o
+  `DA_RIVEDERE`; scartati e rimandati non vi compaiono. La rigenera
+  `filter_prompts.py build`, chiamato anche dopo ogni importazione di decisioni.
 - `prompt.sqlite3`, i **bacini del gioco**: i soli bacini verificati, con schema,
   verbali, attribuzioni e decisioni sulle voci. Versionato (circa 2 MB). Lo
   rigenera `prompt_database.py dump` (task «Prompt: aggiorna prompt.sqlite3…»),
   e si aggiorna da solo dopo `import-reviewed`. Il gioco ZeroAssociazioni lo legge
   in sola lettura; se è indietro rispetto alla raccolta il server lo segnala.
+
+Le risposte sono riutilizzabili tra prompt, anche nella stessa lista Livecade.
+Ogni associazione ha chiave `(sense_id, word)`: motivazione, significato,
+evidenze e revisione appartengono alla singola coppia. L'approvazione di
+`pane → forno` non approva automaticamente `pizza → forno`; entrambe possono
+essere conservate quando verificate. La copia e l'estrazione non eliminano
+risposte perché presenti in altri bacini. I duplicati restano vietati nel
+singolo bacino e nella singola estrazione.
 
 L'inventario `inventory_*` non entra in `prompt.sqlite3` e si ricostruisce dalle
 fonti con `prompt_inventory.py collect`. Con `dump --output FILE.sql` si ottiene
@@ -31,22 +57,30 @@ La raccolta iniziale usa il dizionario italiano di Wikizionario tramite
 Wikipedia comprende anche nomi propri e parole straniere: essere un titolo
 non prova che una voce sia un prompt italiano adatto al gioco.
 
-Stato del 9 novembre 2026: **102 prompt e 1.010 associazioni**, revisionati
-editorialmente da ChatGPT prima dell'inserimento. Ogni prompt ha una categoria
-e un bacino con almeno sette risposte estraibili. L'esportazione **Livecade usa
-sempre sette parole casuali**; il bacino completo rimane nel database.
-La raccolta separata comprende 52.666 lemmi distinti di dizionario e 451.733
-titoli Wikipedia di una sola parola, per **478.328 proposte distinte complessive**
-dopo deduplicazione. Non sono tutte parole italiane ammissibili: la verifica
-delle proposte restanti è ancora da svolgere. Non è stata completata la lingua
-italiana né la revisione dell'intero vecchio lotto da 5.000 prompt.
-Il [rapporto locale](prompt_database_status.json) documenta i conteggi e il
-ripristino effettivo del dump completo in un secondo database temporaneo.
+Fotografia storica del primo ampliamento del 9 novembre 2026: **983 prompt validati**
+in `prompt_validi.sqlite3`, di cui **620 aggiunti** con questa revisione editoriale
+di ChatGPT. Sono 525 nomi, 40 verbi e 55 aggettivi; ogni nuova voce conserva senso,
+categoria, motivazioni e provenienza. Sette POS automatici sono stati corretti.
+Il catalogo aggiunge 179 (funghi) e 180 (misurazione del tempo), mantenendo gli
+ID precedenti. Il [rapporto della revisione](prompt_review_expansion_20261109.json)
+conserva conteggi, hash dei dati e verifiche di integrità.
+
+**102 prompt hanno anche un bacino verificato**, per **1.010 associazioni**:
+i bacini precedenti sono rimasti invariati. Gli altri **881 prompt validati**
+devono ancora ricevere le associazioni. L'esportazione **Livecade usa sempre
+sette parole casuali** da un bacino verificato sufficiente.
+
+La raccolta comprende **2.740.419 voci distinte**; i filtri ne preselezionano
+14.228 e **13.246 sono ancora in attesa di revisione** dopo questo lotto.
+Non sono tutte parole italiane ammissibili e la verifica dell'intero inventario
+non è conclusa. La revisione editoriale LLM non dichiara verifiche umane o QA
+indipendente di giocabilità.
 
 ## Verifica prima dell'inserimento
 
-Le proposte rimangono nei JSONL `prompt-staging/`, esterni al database.
-Nessuna parola estratta viene inserita automaticamente. Le traduzioni,
+Le proposte raccolte rimangono nell'inventario di `prompt_raw.sqlite3`;
+le bozze di associazioni restano nei JSONL `prompt-staging/`.
+Nessuna proposta viene promossa automaticamente nel catalogo valido. Le traduzioni,
 le cooccorrenze in definizioni e le relazioni lessicografiche a livello di voce
 non diventano risposte approvate. Le fonti e gli output hanno hash e provenienza;
 attribuzioni e condizioni del corpus accompagnano le evidenze importate.

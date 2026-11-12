@@ -1,0 +1,622 @@
+# Revisione editoriale ChatGPT: prompt|POS|categoria|senso selezionato|ancore per motivare la riconoscibilità.
+# Le ancore sono appunti della revisione del prompt, NON risposte approvate per il gioco.
+piuma|NOUN|050|Elemento leggero che riveste il corpo degli uccelli|uccelli, ali e volo
+sciarpa|NOUN|117|Indumento lungo avvolto intorno al collo|collo, lana e freddo
+granchio|NOUN|048|Crostaceo acquatico con guscio e chele|chele, scogli e mare
+bibita|NOUN|017|Bevanda analcolica rinfrescante|bottiglia, sete e bevanda
+sera|NOUN|036|Parte della giornata tra il tramonto e la notte|tramonto, cena e buio
+tesoro|NOUN|100|Insieme di oggetti preziosi nascosti o custoditi|forziere, monete e pirati; escluso il vezzeggiativo affettivo
+fontana|NOUN|023|Costruzione dalla quale sgorga acqua|getto, acqua e vasca
+camion|NOUN|126|Grande automezzo per il trasporto di merci|carico, rimorchio e autista
+vasca|NOUN|023|Recipiente sanitario per fare il bagno|bagno, acqua e rubinetto; scelto il sanitario domestico
+fungo|NOUN|179|Corpo fruttifero dei funghi comunemente riconoscibile da gambo e cappello|bosco, cappello e gambo; esclusi i significati figurati e la classificazione come pianta
+buccia|NOUN|005|Rivestimento esterno di un frutto|frutto, scorza e sbucciare
+lumaca|NOUN|049|Mollusco terrestre dal corpo molle e dal movimento lento|bava, lentezza e orto; senza imporre la presenza del guscio
+film|NOUN|106|Opera cinematografica composta da immagini in movimento|cinema, attori e regista; esclusa la pellicola di materiale
+mese|NOUN|098|Ciascuno dei dodici periodi del calendario annuale|calendario, giorni e anno
+scala|NOUN|021|Struttura a gradini per salire o scendere|gradini, corrimano e piani; esclusi musica e proporzioni
+vento|NOUN|035|Movimento di masse d'aria nell'atmosfera|aria, raffiche e bandiera
+rumore|NOUN|053|Suono percepito come fastidioso o disturbante|udito, frastuono e silenzio
+specchio|NOUN|026|Superficie che riflette l'immagine di chi vi si guarda|riflesso, viso e vetro
+sabbia|NOUN|033|Materiale formato da piccoli granelli presente sulle spiagge|spiaggia, granelli e castello; corretto il POS automatico ADJ
+scimmia|NOUN|047|Primate comunemente riconoscibile per mani prensili e agilità|rami, arrampicata e primati
+bugia|NOUN|066|Affermazione falsa detta per ingannare|menzogna, verità e inganno; esclusa la base portacandela
+arcobaleno|NOUN|035|Arco di colori che può apparire in cielo dopo la pioggia|colori, pioggia e sole
+tuta|NOUN|117|Abbigliamento comodo composto da giacca o felpa e pantaloni|sport, felpa e pantaloni; scelto il completo sportivo
+scusa|NOUN|067|Parola o spiegazione con cui si chiede perdono|perdono, errore e dispiacere
+sogno|NOUN|059|Esperienza di immagini ed eventi durante il sonno|dormire, notte e risveglio; esclusa l'aspirazione futura
+corona|NOUN|087|Copricapo prezioso indossato da un sovrano|re, regina e gioielli; esclusi denti e moneta
+gomma|NOUN|091|Oggetto usato per cancellare segni di matita|matita, cancellare e astuccio; esclusi pneumatico e chewing gum
+zaino|NOUN|119|Sacca con spallacci da portare sulla schiena|spallacci, scuola e schiena; escluso il solo uso pastorale
+agnello|NOUN|045|Piccolo della pecora nel primo periodo di vita|pecora, gregge e belato; scelto l'animale e non il taglio di carne
+zanzara|NOUN|049|Piccolo insetto volante che può pungere e succhiare sangue|puntura, ronzio e prurito
+città|NOUN|034|Centro abitato di grandi dimensioni|strade, edifici e abitanti
+televisione|NOUN|107|Mezzo di trasmissione e visione di programmi audiovisivi|programmi, canali e schermo
+piscina|NOUN|137|Grande vasca destinata al nuoto e alla balneazione|nuoto, corsie e cloro
+crema|NOUN|009|Preparazione dolce morbida usata per farcire dessert|pasticceria, farcitura e cucchiaio; esclusi cosmetici e patina del latte
+punizione|NOUN|065|Sanzione inflitta per un comportamento scorretto|regola, colpa e conseguenza; escluso il calcio di punizione
+orologio|NOUN|180|Dispositivo che indica l'ora|lancette, quadrante e ore
+sporco|NOUN|163|Sostanza che imbratta una superficie|macchie, polvere e pulizia
+pollice|NOUN|051|Dito della mano opponibile alle altre dita|mano, dita e presa; esclusa l'unità di misura
+pentola|NOUN|007|Recipiente da cucina usato per cuocere alimenti|coperchio, fornello e cottura
+pettine|NOUN|057|Strumento dentato usato per sistemare i capelli|denti, capelli e pettinare
+mandarino|NOUN|005|Piccolo agrume arancione suddiviso in spicchi|buccia, agrume e spicchi; esclusi lingua e funzionario cinese
+bacio|NOUN|069|Contatto delle labbra che esprime affetto|labbra, amore e abbraccio
+autunno|NOUN|036|Stagione compresa fra estate e inverno|foglie, vendemmia e castagne
+gonna|NOUN|117|Indumento che scende dalla vita e avvolge le gambe|vita, orlo e tessuto
+tappo|NOUN|001|Oggetto che chiude l'apertura di un recipiente|bottiglia, sughero e chiusura
+cacao|NOUN|009|Polvere alimentare ottenuta dai semi della pianta omonima|cioccolato, dolci e polvere
+sciroppo|NOUN|017|Liquido concentrato e zuccherino per preparare bevande|zucchero, acqua e bevanda; escluso il farmaco
+secchio|NOUN|163|Recipiente con manico usato per contenere liquidi o materiali|manico, acqua e contenitore
+fotografia|NOUN|114|Immagine ottenuta mediante una macchina fotografica|obiettivo, scatto e immagine
+inverno|NOUN|036|Stagione fredda compresa fra autunno e primavera|freddo, neve e cappotto
+scherzo|NOUN|150|Azione fatta per divertire o sorprendere qualcuno|risata, burla e sorpresa; esclusa la composizione musicale
+cimitero|NOUN|099|Luogo destinato alla sepoltura dei defunti|tombe, lapidi e fiori
+coccodrillo|NOUN|048|Grande rettile acquatico dal corpo corazzato|fiume, squame e denti; esclusa l'accezione giornalistica
+calza|NOUN|117|Indumento che riveste il piede e parte della gamba|piede, tessuto e scarpa
+imbuto|NOUN|007|Utensile conico per travasare liquidi|collo della bottiglia, travaso e liquido
+regina|NOUN|087|Donna che regna o moglie di un re|corona, trono e sovrana; escluso il pezzo degli scacchi
+sugo|NOUN|006|Condimento liquido o semiliquido per la pasta|pasta, pomodoro e condimento; escluso il senso figurato
+tamburo|NOUN|102|Strumento a percussione con membrana tesa|bacchette, ritmo e percussione
+grembiule|NOUN|117|Indumento protettivo indossato sopra i vestiti|cucina, macchie e protezione
+racchetta|NOUN|136|Attrezzo con manico e piatto corde per colpire una pallina|tennis, corde e pallina
+pantofola|NOUN|119|Calzatura comoda da usare in casa|piedi, casa e comodità
+ragazza|NOUN|070|Persona di sesso femminile nell'adolescenza o giovinezza|adolescenza, giovane e crescita; escluso l'uso per fidanzata
+calore|NOUN|152|Energia termica e sensazione di caldo che ne deriva|temperatura, riscaldamento e fuoco; escluso l'affetto figurato
+fetta|NOUN|006|Porzione sottile ricavata tagliando un alimento|pane, coltello e porzione
+dispetto|NOUN|066|Piccola azione fatta per infastidire qualcuno|scherzo cattivo, fastidio e ripicca; escluso il solo sentimento di avversione
+paletta|NOUN|148|Piccola pala usata per giocare o raccogliere sabbia|spiaggia, secchiello e sabbia; esclusi segnaletica e gelateria
+laccio|NOUN|119|Cordoncino usato per stringere e chiudere una scarpa|scarpa, nodo e stringa
+canguro|NOUN|047|Marsupiale australiano che si muove saltando|marsupio, salto e Australia
+aranciata|NOUN|017|Bevanda a base di succo d'arancia|arancia, succo e sete
+spinacio|NOUN|005|Ortaggio dalle foglie verdi commestibili|foglie, verdura e contorno
+strada|NOUN|123|Via destinata al passaggio di persone e veicoli|asfalto, traffico e carreggiata
+stagione|NOUN|036|Ciascuno dei quattro periodi climatici dell'anno|primavera, estate e inverno; esclusi campionati e spettacoli
+festa|NOUN|150|Occasione di incontro e divertimento per celebrare qualcosa|invitati, musica e festeggiamento
+lago|NOUN|032|Massa d'acqua raccolta in una depressione della terraferma|riva, acqua e sponda
+forno|NOUN|027|Apparecchio domestico che cuoce gli alimenti con il calore|cottura, teglia e temperatura; esclusa la bottega del panettiere
+pancia|NOUN|051|Parte anteriore del corpo fra torace e bacino|ventre, ombelico e addome
+ladro|NOUN|082|Persona che ruba beni altrui|furto, rubare e refurtiva; corretto il POS automatico ADJ
+scrivania|NOUN|073|Tavolo destinato alla scrittura e al lavoro d'ufficio|cassetti, lavoro e computer
+palo|NOUN|022|Elemento lungo e rigido infisso verticalmente nel terreno|sostegno, legno e recinzione; escluso il palo nel calcio
+salotto|NOUN|026|Stanza della casa destinata al soggiorno e agli ospiti|divano, poltrona e conversazione
+verme|NOUN|049|Piccolo animale dal corpo molle e allungato senza zampe|terreno, strisciare e lombrico; escluso l'insulto figurato
+comodino|NOUN|026|Piccolo mobile posto accanto al letto|letto, cassetto e lampada
+cammello|NOUN|047|Grande mammifero desertico con due gobbe|gobbe, deserto e carovana
+ippopotamo|NOUN|048|Grande mammifero africano che vive vicino all'acqua|fiume, zanne e grande corpo
+gusto|NOUN|053|Senso che permette di percepire i sapori|lingua, dolce e salato; esclusa la preferenza estetica
+vacanza|NOUN|130|Periodo di riposo e svago lontano dalle attività abituali|ferie, viaggio e riposo; esclusa la carica rimasta senza titolare
+quadro|NOUN|111|Dipinto su tela o tavola normalmente esposto a parete|cornice, pittura e tela; esclusi forma geometrica e ruolo aziendale
+bandiera|NOUN|084|Drappo che rappresenta una nazione o un gruppo|asta, colori e simbolo
+prato|NOUN|030|Terreno ricoperto prevalentemente da erba|erba, verde e falciare
+panna|NOUN|004|Parte grassa del latte usata in cucina e pasticceria|latte, montare e dolci
+spigolo|NOUN|151|Linea d'incontro tra due superfici di un solido|angolo, bordo e geometria
+cereale|NOUN|044|Pianta coltivata per i suoi chicchi alimentari|grano, spiga e chicchi
+ponte|NOUN|123|Costruzione che permette di superare un ostacolo o un corso d'acqua|fiume, pilastri e attraversare; esclusi denti e festività
+fiamma|NOUN|153|Parte luminosa e calda di un fuoco|combustione, calore e bruciare
+circo|NOUN|149|Spettacolo con acrobati e altri artisti sotto un tendone|tendone, acrobati e pagliacci; escluso il circo dell'antica Roma
+urlo|NOUN|067|Grido forte e prolungato emesso con la voce|voce, grido e paura
+mento|NOUN|051|Parte sporgente del viso sotto la bocca|viso, mandibola e barba
+applauso|NOUN|104|Battito delle mani per esprimere approvazione|pubblico, mani e spettacolo
+marmellata|NOUN|010|Conserva dolce di frutta e zucchero|frutta, vasetto e spalmare
+immondizia|NOUN|039|Insieme dei rifiuti da eliminare|spazzatura, cassonetto e raccolta
+grandine|NOUN|035|Precipitazione atmosferica composta da chicchi di ghiaccio|temporale, ghiaccio e chicchi
+lepre|NOUN|047|Mammifero selvatico con lunghe orecchie e corsa veloce|orecchie, campagna e corsa
+albicocca|NOUN|005|Frutto estivo arancione con nocciolo|frutta, nocciolo e polpa
+chiesa|NOUN|099|Edificio destinato al culto cristiano|altare, campanile e preghiera; esclusa l'organizzazione dei fedeli
+pace|NOUN|086|Condizione di assenza di guerra tra popoli o Stati|guerra, tregua e trattato
+abito|NOUN|117|Capo o insieme di capi di vestiario indossati|vestire, tessuto e sartoria
+spalla|NOUN|051|Parte del corpo che collega il braccio al tronco|braccio, collo e articolazione
+camicia|NOUN|117|Indumento per il busto con colletto e apertura abbottonata|bottoni, colletto e maniche
+noia|NOUN|061|Stato di fastidio per mancanza di interesse o stimoli|sbadiglio, monotonia e disinteresse
+garage|NOUN|021|Locale destinato al ricovero degli autoveicoli|auto, parcheggio e serranda
+mago|NOUN|100|Personaggio fantastico dotato di poteri magici|bacchetta, incantesimo e magia; distinto dall'illusionista reale
+nodo|NOUN|162|Intreccio stretto di un elemento flessibile|corda, laccio e legare; esclusi velocità e nodo ferroviario
+campana|NOUN|099|Strumento metallico a battaglio usato per richiamare i fedeli|campanile, rintocco e bronzo
+bastone|NOUN|060|Asta rigida usata come appoggio per camminare|appoggio, camminare e impugnatura
+squalo|NOUN|048|Pesce marino cartilagineo noto per denti e pinna dorsale|mare, pinna e denti
+pappagallo|NOUN|047|Uccello dal becco ricurvo capace in alcune specie di imitare suoni|becco, piumaggio e voce
+scoiattolo|NOUN|047|Piccolo roditore arboricolo dalla coda folta|albero, coda e nocciole
+lattuga|NOUN|005|Ortaggio a foglie usato comunemente per l'insalata|insalata, foglie e orto
+melanzana|NOUN|005|Ortaggio generalmente viola dalla polpa chiara|viola, ortaggio e cucina; scelto il frutto alimentare
+sale|NOUN|001|Sostanza cristallina usata per insaporire gli alimenti|salato, cucina e saliera; esclusi sali chimici specifici
+giornale|NOUN|109|Pubblicazione che presenta notizie e informazioni|notizie, cronaca e lettura
+ghiaccio|NOUN|035|Acqua allo stato solido|freddo, congelare e cubetti; corretto il POS automatico ADJ
+burro|NOUN|004|Alimento grasso ricavato dalla panna del latte|latte, panetto e spalmare
+toro|NOUN|045|Maschio adulto dei bovini|corna, mucca e stalla; esclusi costellazione e segno zodiacale
+cassetto|NOUN|026|Scomparto estraibile di un mobile|mobile, maniglia e riporre
+melone|NOUN|005|Grande frutto estivo dolce con polpa e semi centrali|frutta, polpa e semi
+tacchino|NOUN|045|Grande uccello domestico allevato anche per la carne|piume, coda e allevamento
+lettera|NOUN|080|Messaggio scritto destinato a un destinatario|busta, francobollo e posta; esclusa la lettera dell'alfabeto
+angelo|NOUN|099|Essere spirituale tradizionalmente rappresentato con ali|ali, cielo e messaggero; escluso il vezzeggiativo
+moneta|NOUN|076|Dischetto metallico usato come denaro|denaro, valore e coniare
+prete|NOUN|099|Sacerdote della Chiesa cattolica|messa, parrocchia e altare
+tubo|NOUN|023|Condotto cavo usato per far passare fluidi|acqua, condotto e raccordo
+nido|NOUN|050|Rifugio costruito dagli uccelli per uova e piccoli|uova, pulcini e rami; escluso l'asilo nido
+pacco|NOUN|126|Involucro che contiene oggetti da trasportare o spedire|cartone, imballaggio e spedizione
+stalla|NOUN|045|Edificio destinato al ricovero del bestiame|mucche, fieno e allevamento
+cigno|NOUN|048|Grande uccello acquatico con collo lungo|lago, piume e collo
+anatra|NOUN|048|Uccello acquatico con becco largo e zampe palmate|stagno, becco e nuoto
+struzzo|NOUN|047|Grande uccello africano incapace di volare|collo, corsa e uova
+bar|NOUN|019|Locale in cui si servono bevande e consumazioni rapide|bancone, caffè e barista
+caduta|NOUN|174|Perdita di equilibrio con discesa improvvisa verso terra|equilibrio, inciampo e suolo
+sveglia|NOUN|059|Orologio che emette un segnale all'ora stabilita|allarme, mattino e risveglio; escluso il solo risvegliarsi
+ombra|NOUN|152|Zona meno illuminata perché un corpo intercetta la luce|luce, sagoma e sole
+divano|NOUN|026|Sedile imbottito per più persone|cuscini, salotto e sedersi
+cancello|NOUN|021|Chiusura apribile posta all'ingresso di un recinto|ingresso, sbarre e cardini
+zucca|NOUN|005|Grande frutto di una cucurbitacea usato come ortaggio|polpa, semi e buccia
+ballerino|NOUN|105|Persona che pratica la danza|danza, palco e coreografia; corretto il POS automatico ADJ e scartato il senso instabile
+terrazzo|NOUN|021|Spazio esterno praticabile annesso a un piano di un edificio|casa, parapetto e esterno; esclusi geologia e araldica
+poesia|NOUN|110|Composizione letteraria organizzata in versi|versi, rima e poeta
+coltello|NOUN|007|Utensile con lama e manico usato per tagliare|lama, taglio e manico
+fango|NOUN|037|Miscuglio molle di terra e acqua|terra, pioggia e pozzanghera
+cintura|NOUN|119|Fascia indossata in vita per sostenere o completare i vestiti|vita, fibbia e pantaloni; esclusi sicurezza stradale e arti marziali
+padella|NOUN|007|Recipiente basso con manico per cuocere sul fornello|manico, friggere e cucina
+castagna|NOUN|005|Frutto del castagno racchiuso nel riccio|riccio, autunno e caldarroste
+peperone|NOUN|005|Ortaggio carnoso di colore rosso, giallo o verde|ortaggio, semi e cucina
+piazza|NOUN|034|Spazio pubblico aperto circondato da edifici e strade|centro, edifici e incontro
+ragazzo|NOUN|070|Persona di sesso maschile nell'adolescenza o giovinezza|adolescenza, giovane e crescita
+dolore|NOUN|054|Sensazione fisica spiacevole dovuta a lesione o disturbo|male, ferita e sofferenza; escluso il solo dolore morale
+spada|NOUN|087|Arma bianca con lunga lama e impugnatura|lama, elsa e duello; escluso il pesce spada
+parete|NOUN|021|Superficie verticale che delimita una stanza|muro, stanza e intonaco
+chitarra|NOUN|102|Strumento musicale a corde pizzicate|corde, plettro e accordi
+pugno|NOUN|051|Mano chiusa con le dita raccolte sul palmo|mano, dita e colpo
+casco|NOUN|175|Copricapo rigido che protegge la testa dagli urti|testa, protezione e motociclista
+yogurt|NOUN|004|Alimento ottenuto dalla fermentazione del latte|latte, fermenti e vasetto
+parrucchiere|NOUN|071|Professionista che taglia e acconcia i capelli|capelli, forbici e salone
+torre|NOUN|113|Costruzione alta e stretta che si sviluppa verticalmente|altezza, edificio e mura; escluso il pezzo degli scacchi
+dono|NOUN|068|Oggetto o bene offerto gratuitamente a qualcuno|regalo, generosità e destinatario
+corda|NOUN|162|Elemento lungo e flessibile formato da fibre intrecciate|intreccio, nodo e legare; esclusa la corda vocale
+cappotto|NOUN|117|Indumento pesante da indossare sopra gli altri vestiti|inverno, freddo e lana
+alunno|NOUN|091|Persona che frequenta una scuola e riceve insegnamento|scuola, maestra e classe
+kiwi|NOUN|005|Frutto dalla buccia pelosa e polpa ricca di piccoli semi|frutto, semi e polpa; escluso l'uccello
+vetro|NOUN|022|Materiale duro normalmente trasparente usato per lastre e recipienti|trasparenza, finestra e fragilità
+ragazzino|NOUN|070|Ragazzo nell'infanzia avanzata o nella prima adolescenza|giovane età, crescita e scuola
+adulto|NOUN|070|Persona che ha superato l'infanzia e l'adolescenza|età, maturità e crescita
+spazzatura|NOUN|039|Rifiuti prodotti dalle attività quotidiane|rifiuti, sacchetto e raccolta
+ago|NOUN|118|Sottile strumento appuntito con cruna per cucire|cruna, filo e cucito; esclusi siringa e ago magnetico
+sposo|NOUN|069|Uomo nel giorno della celebrazione del matrimonio|nozze, sposa e cerimonia
+dentista|NOUN|060|Professionista sanitario che cura denti e bocca|denti, carie e studio
+ambulanza|NOUN|060|Veicolo attrezzato per il soccorso e il trasporto dei malati|sirena, barella e soccorso
+ciuffo|NOUN|057|Ciocca di capelli che sporge dal resto della capigliatura|capelli, fronte e pettine
+passero|NOUN|047|Piccolo uccello comune dal piumaggio bruno o grigio|becco, cinguettio e piume
+scarafaggio|NOUN|049|Insetto dal corpo appiattito e dalle lunghe antenne|insetto, antenne e blatta
+colombo|NOUN|047|Uccello comune noto anche come piccione|piume, becco e volo
+polvere|NOUN|163|Insieme di particelle minute che si deposita sulle superfici|pulire, pulviscolo e mobili; esclusi esplosivi e polveri alimentari
+cravatta|NOUN|119|Striscia di tessuto annodata attorno al colletto della camicia|nodo, collo e camicia
+schiuma|NOUN|057|Insieme di bollicine che si forma in un liquido|bolle, sapone e lavaggio
+ringhiera|NOUN|021|Parapetto a elementi distanziati che protegge dalle cadute|balcone, protezione e sbarre
+frase|NOUN|094|Insieme di parole che esprime un significato compiuto|parole, sintassi e punto
+foresta|NOUN|042|Vasta area ricoperta da alberi e vegetazione|alberi, sottobosco e bosco
+libreria|NOUN|075|Negozio in cui si vendono libri|libri, scaffali e libraio; esclusi mobile e libreria software
+pianoforte|NOUN|102|Strumento musicale a tastiera e corde percosse da martelletti|tasti, pedali e musica; non approvato sulla sola glossa tautologica
+freccia|NOUN|148|Proiettile appuntito lanciato con un arco|arco, punta e bersaglio; esclusi segnale e indicatore stradale
+tronco|NOUN|042|Fusto legnoso principale di un albero|albero, corteccia e legno
+materasso|NOUN|059|Supporto imbottito del letto sul quale si dorme|letto, riposo e imbottitura
+orecchino|NOUN|120|Gioiello che si porta all'orecchio|orecchio, lobo e gioiello
+zucchina|NOUN|005|Ortaggio allungato raccolto immaturo dalla pianta di zucca|verde, ortaggio e cucina
+moglie|NOUN|069|Donna unita in matrimonio a un'altra persona|matrimonio, coniuge e coppia
+biglietto|NOUN|124|Titolo che consente l'accesso a un mezzo di trasporto|viaggio, convalida e controllore; esclusi messaggio e banconota
+pistola|NOUN|082|Arma da fuoco corta impugnabile con una mano|grilletto, canna e proiettile
+coro|NOUN|103|Gruppo di persone che cantano insieme|voci, canto e direttore
+cinghiale|NOUN|047|Mammifero selvatico simile al maiale con zanne e setole|bosco, zanne e setole
+trattore|NOUN|164|Veicolo agricolo usato per trainare e azionare attrezzi|campo, aratro e ruote
+pinguino|NOUN|048|Uccello marino che nuota ma non vola|ali, nuoto e piumaggio
+slitta|NOUN|138|Mezzo a pattini che scivola su neve o ghiaccio|neve, pattini e traino
+telefono|NOUN|169|Dispositivo che permette di comunicare a distanza con la voce|chiamata, numero e suoneria
+vittoria|NOUN|177|Successo ottenuto in una gara o competizione|gara, vincere e premio; esclusa la persona di nome Vittoria
+poliziotto|NOUN|082|Agente incaricato dei servizi di polizia|divisa, pattuglia e sicurezza
+denaro|NOUN|076|Mezzo di pagamento usato per acquistare beni e servizi|monete, banconote e pagamento
+gioiello|NOUN|120|Oggetto ornamentale realizzato con materiali preziosi|oro, gemma e ornamento
+prugna|NOUN|005|Frutto del susino con nocciolo e buccia sottile|frutto, susina e nocciolo
+gioia|NOUN|061|Emozione di intensa felicità e contentezza|sorriso, allegria e felicità
+angolo|NOUN|151|Parte del piano delimitata da due semirette con origine comune|vertice, lati e gradi; escluso il calcio d'angolo
+nebbia|NOUN|035|Sospensione di goccioline d'acqua che riduce la visibilità|visibilità, umidità e foschia
+tappeto|NOUN|026|Manufatto tessile che ricopre una porzione del pavimento|pavimento, tessuto e arredamento
+risata|NOUN|067|Manifestazione vocale di allegria o divertimento|ridere, voce e divertimento
+orzo|NOUN|044|Cereale coltivato per i suoi chicchi|spiga, chicchi e cereale; esclusa la bevanda sostitutiva del caffè
+lana|NOUN|118|Fibra tessile ricavata soprattutto dal vello delle pecore|pecora, maglia e filato
+tonno|NOUN|003|Grande pesce marino utilizzato come alimento|pesce, mare e conserva
+suora|NOUN|099|Donna appartenente a una comunità religiosa|convento, abito e preghiera
+ospedale|NOUN|060|Struttura sanitaria per il ricovero e la cura dei pazienti|reparto, medico e infermiere
+sorpresa|NOUN|061|Stupore provocato da qualcosa di inatteso|stupore, inatteso e meraviglia; esclusa la sola visita improvvisa
+riso|NOUN|001|Cereale alimentare consumato in chicchi cotti|chicchi, risotto e cottura; escluso il ridere
+galleria|NOUN|123|Passaggio scavato attraverso un rilievo per il transito|tunnel, montagna e strada; esclusa l'esposizione d'arte
+cornice|NOUN|026|Bordo che circonda e sostiene un quadro o una fotografia|quadro, bordo e fotografia
+maionese|NOUN|001|Salsa cremosa ottenuta emulsionando olio e uovo|salsa, uovo e condimento
+radio|NOUN|108|Apparecchio o mezzo per ascoltare trasmissioni sonore|emittente, frequenza e ascolto; escluso l'elemento chimico
+cinema|NOUN|106|Arte e attività della produzione e visione di film|film, schermo e regista
+diavolo|NOUN|099|Figura maligna della tradizione religiosa cristiana|corna, inferno e tentazione
+statua|NOUN|112|Scultura tridimensionale che rappresenta una figura|scultura, marmo e piedistallo
+barba|NOUN|057|Insieme dei peli che crescono sul mento e sulle guance|viso, peli e rasatura
+palma|NOUN|042|Albero con fusto e grandi foglie raccolte sulla sommità|foglie, tronco e tropici; escluso il palmo della mano
+vaso|NOUN|161|Recipiente usato per coltivare o contenere piante|pianta, terriccio e fiori; esclusi vasi sanguigni
+basilico|NOUN|005|Pianta aromatica dalle foglie usate in cucina|foglie, profumo e pesto
+talpa|NOUN|047|Piccolo mammifero che scava gallerie nel terreno|terra, scavo e galleria; escluso l'informatore segreto
+sgabello|NOUN|026|Sedile generalmente privo di schienale|seduta, gambe e appoggio
+cocomero|NOUN|005|Grande frutto estivo con buccia verde e polpa acquosa|anguria, semi e polpa
+paura|NOUN|061|Emozione suscitata dalla percezione di un pericolo|timore, pericolo e spavento
+macchina|NOUN|121|Autoveicolo destinato al trasporto di persone|automobile, motore e volante; esclusi macchinario generico e computer
+marito|NOUN|069|Uomo unito in matrimonio a un'altra persona|matrimonio, coniuge e coppia
+gara|NOUN|177|Confronto regolato fra partecipanti per ottenere un risultato migliore|competizione, vincitore e classifica
+fantasma|NOUN|100|Apparizione immaginaria dello spirito di un defunto|spirito, apparizione e paura
+trappola|NOUN|050|Dispositivo usato per catturare animali|cattura, esca e animale; esclusi inganni figurati
+cantina|NOUN|021|Locale seminterrato o sotterraneo usato come deposito|sotterraneo, bottiglie e ripostiglio
+vela|NOUN|127|Superficie di tessuto che sfrutta il vento per muovere una barca|vento, albero e barca
+zoo|NOUN|050|Parco in cui vengono ospitati animali osservabili dal pubblico|animali, recinti e visita
+fanciullo|NOUN|070|Bambino o ragazzo nell'età dell'infanzia|infanzia, bambino e crescita
+sillaba|NOUN|094|Unità di pronuncia formata attorno a una vocale|vocale, parola e pronuncia
+biscia|NOUN|048|Serpente comune non velenoso spesso legato ad ambienti umidi|serpente, stagno e squame
+rastrello|NOUN|030|Attrezzo a denti usato per raccogliere foglie o livellare il terreno|denti, foglie e giardino
+tramonto|NOUN|036|Momento in cui il sole scompare sotto l'orizzonte|sole, sera e orizzonte
+jeans|NOUN|117|Pantaloni realizzati in tessuto denim|pantaloni, denim e tasche; escluso il solo tessuto
+oro|NOUN|120|Metallo prezioso giallo usato per gioielli e oggetti di valore|gioielli, prezioso e metallo
+memoria|NOUN|062|Facoltà di conservare e richiamare informazioni ed esperienze|ricordo, apprendimento e ricordare; esclusa la memoria informatica
+stomaco|NOUN|052|Organo dell'apparato digerente che riceve il cibo dall'esofago|digestione, cibo e pancia
+riva|NOUN|032|Striscia di terra lungo un fiume o un lago|acqua, sponda e riva del fiume
+aglio|NOUN|005|Pianta dal bulbo suddiviso in spicchi usati come aroma|spicchi, bulbo e cucina
+fune|NOUN|162|Corda robusta usata per legare o sostenere carichi|corda, trazione e nodo
+sorso|NOUN|173|Quantità di liquido bevuta con una singola deglutizione|bere, bicchiere e deglutire
+cesto|NOUN|026|Contenitore realizzato con elementi intrecciati|vimini, intreccio e contenitore
+indumento|NOUN|117|Singolo capo di vestiario indossato sul corpo|vestito, tessuto e abbigliamento
+confetto|NOUN|009|Dolcetto con rivestimento di zucchero spesso intorno a una mandorla|zucchero, mandorla e bomboniera; esclusa l'equivalenza con candito
+salute|NOUN|171|Condizione di benessere fisico e mentale|benessere, prevenzione e organismo
+palazzo|NOUN|021|Edificio di grandi dimensioni adibito ad abitazioni o uffici|piani, portone e edificio
+ristorante|NOUN|018|Locale pubblico in cui si preparano e servono pasti|menu, cameriere e tavolo; corretto il POS automatico ADJ
+gabbia|NOUN|046|Struttura chiusa a sbarre o rete che contiene un animale|sbarre, animale e recinto
+valigia|NOUN|130|Contenitore richiudibile per trasportare gli effetti personali in viaggio|bagaglio, viaggio e manico
+ascensore|NOUN|021|Impianto con cabina che trasporta persone fra i piani|piani, cabina e pulsante
+cenere|NOUN|153|Residuo polveroso lasciato dalla combustione|fuoco, combustione e residuo
+fulmine|NOUN|035|Scarica elettrica atmosferica di grande intensità|temporale, lampo e tuono
+edicola|NOUN|075|Chiosco o negozio che vende giornali e riviste|giornali, riviste e giornalaio; esclusa la nicchia architettonica
+gomito|NOUN|051|Articolazione che collega braccio e avambraccio|braccio, piegare e articolazione
+panno|NOUN|163|Pezzo di tessuto usato per pulire o asciugare|tessuto, pulizia e asciugare
+scalinata|NOUN|113|Scala ampia composta da molti gradini|gradini, salita e edificio
+ciliegia|NOUN|005|Piccolo frutto rosso con nocciolo|frutto, picciolo e nocciolo
+sandalo|NOUN|119|Calzatura aperta fissata al piede con strisce o cinturini|piede, suola e cinturino; esclusa la pianta
+mestolo|NOUN|007|Utensile con manico e coppa per servire liquidi|brodo, pentola e servire
+paradiso|NOUN|099|Luogo di beatitudine eterna nella tradizione religiosa|cielo, angeli e beatitudine
+medaglia|NOUN|177|Oggetto metallico conferito come premio o riconoscimento|podio, premio e vincitore
+incubo|NOUN|059|Sogno angosciante che provoca paura|sonno, paura e risveglio
+roccia|NOUN|037|Aggregato naturale di minerali che forma parte della crosta terrestre|pietra, minerali e montagna
+magazzino|NOUN|126|Locale o edificio in cui vengono depositate merci|merci, scaffali e deposito
+tenda|NOUN|148|Riparo smontabile di tessuto sostenuto da pali|campeggio, picchetti e telo; esclusa la tenda da finestra
+oceano|NOUN|033|Vastissima distesa d'acqua salata fra i continenti|mare, onde e continenti
+seme|NOUN|041|Struttura vegetale da cui può svilupparsi una nuova pianta|pianta, germoglio e semina; esclusi carte e significati anatomici
+cipolla|NOUN|005|Ortaggio a bulbo formato da strati sovrapposti|bulbo, strati e cucina
+corvo|NOUN|047|Uccello dal piumaggio prevalentemente nero e dal becco robusto|piume, becco e gracchiare
+guanto|NOUN|119|Indumento che ricopre la mano e le dita|mano, dita e protezione
+matrimonio|NOUN|069|Unione coniugale formalizzata con una celebrazione|nozze, coniugi e anelli; esclusa la definizione legata a un solo tipo di coppia
+religione|NOUN|099|Insieme di credenze e pratiche relative al sacro|fede, culto e riti
+villaggio|NOUN|034|Piccolo centro abitato|case, abitanti e paese
+hotel|NOUN|130|Struttura che offre camere a pagamento ai viaggiatori|camera, soggiorno e reception
+autobus|NOUN|124|Veicolo collettivo per il trasporto pubblico su strada|fermata, passeggeri e biglietto
+fantasia|NOUN|062|Capacità di immaginare situazioni e cose non presenti|immaginazione, invenzione e creatività
+palco|NOUN|104|Piattaforma sulla quale si esibiscono gli artisti|spettacolo, attori e pubblico; esclusi i palchi dei cervi
+aula|NOUN|091|Stanza destinata alle lezioni scolastiche|banchi, lezione e insegnante; esclusa l'aula giudiziaria
+giacca|NOUN|117|Indumento esterno per il busto con apertura anteriore|maniche, bottoni e tasche
+viale|NOUN|123|Strada generalmente ampia e alberata|alberi, marciapiedi e passeggio
+cervo|NOUN|047|Mammifero ruminante il cui maschio porta palchi ramificati|bosco, palchi e zoccoli
+rubinetto|NOUN|023|Dispositivo che apre e regola l'uscita dell'acqua|acqua, lavandino e manopola
+piccione|NOUN|047|Uccello molto comune nei centri abitati|piume, becco e piazza
+scorpione|NOUN|049|Aracnide con chele e pungiglione sulla coda|chele, coda e veleno; escluso il segno zodiacale
+cetriolo|NOUN|005|Ortaggio allungato con buccia verde e polpa acquosa|ortaggio, verde e insalata
+mensola|NOUN|026|Ripiano fissato a una parete per sostenere oggetti|parete, ripiano e appoggio
+furgone|NOUN|126|Automezzo con vano chiuso per trasportare merci|carico, consegna e vano
+caviglia|NOUN|051|Articolazione tra la gamba e il piede|piede, gamba e distorsione
+aspirapolvere|NOUN|027|Elettrodomestico che aspira polvere e piccoli rifiuti|polvere, aspirazione e pavimento
+panca|NOUN|026|Sedile allungato destinato a più persone|seduta, legno e persone; esclusa la specializzazione sportiva
+termosifone|NOUN|025|Radiatore che riscalda un ambiente domestico|calore, radiatore e riscaldamento
+pidocchio|NOUN|049|Piccolo insetto parassita che può infestare i capelli|capelli, prurito e parassita
+pianeta|NOUN|154|Corpo celeste che orbita attorno a una stella|orbita, stella e Terra; escluso il paramento liturgico
+leggenda|NOUN|100|Racconto tradizionale che mescola elementi reali e fantastici|racconto, tradizione e fantasia
+abitazione|NOUN|021|Edificio o spazio nel quale si vive|casa, stanze e vivere
+vespa|NOUN|049|Insetto volante giallo e nero dotato di pungiglione|pungiglione, ali e nido; escluso lo scooter
+benda|NOUN|060|Striscia di garza o tessuto usata per fasciare|garza, fasciatura e ferita
+vipera|NOUN|047|Serpente velenoso dal corpo squamoso|serpente, veleno e morso
+carciofo|NOUN|005|Ortaggio di cui si mangiano parti del capolino|foglie, cuore e spine
+bruciatura|NOUN|054|Lesione della pelle provocata da calore intenso|pelle, calore e ustione; esclusa la metallurgia
+birillo|NOUN|143|Oggetto allungato da abbattere con una palla in alcuni giochi|bowling, palla e abbattere
+desiderio|NOUN|061|Aspirazione a ottenere qualcosa che si ritiene piacevole|volere, aspirazione e soddisfazione
+fretta|NOUN|174|Condizione di chi deve agire in poco tempo|rapidità, ritardo e urgenza
+funerale|NOUN|099|Cerimonia che accompagna la sepoltura di una persona|lutto, bara e commiato
+vomito|NOUN|054|Espulsione del contenuto dello stomaco attraverso la bocca|nausea, stomaco e malessere
+diluvio|NOUN|035|Pioggia eccezionalmente abbondante e intensa|pioggia, acqua e allagamento
+cicatrice|NOUN|060|Segno lasciato sulla pelle dalla guarigione di una ferita|pelle, ferita e guarigione
+mercato|NOUN|075|Luogo in cui venditori offrono merci agli acquirenti|bancarelle, vendita e acquisto; esclusa l'astrazione finanziaria
+vino|NOUN|012|Bevanda alcolica ottenuta dalla fermentazione dell'uva|uva, calice e cantina
+affetto|NOUN|068|Sentimento di attaccamento e tenerezza verso qualcuno|tenerezza, legame e cura; distinto dal participio di affliggere
+lite|NOUN|067|Discussione accesa tra persone in disaccordo|litigio, discussione e rabbia
+mappa|NOUN|129|Rappresentazione semplificata di un territorio|percorso, orientamento e luoghi
+orto|NOUN|030|Terreno coltivato con ortaggi per l'alimentazione|verdure, semina e coltivare
+cerniera|NOUN|118|Chiusura a denti incastrabili per vestiti o borse|zip, denti e cursore; escluso il cardine del mobile
+pepe|NOUN|005|Spezia in grani o in polvere usata per insaporire|spezia, grani e condimento
+veleno|NOUN|054|Sostanza che può danneggiare gravemente un organismo|tossicità, avvelenamento e dose
+vapore|NOUN|153|Acqua allo stato aeriforme nel linguaggio quotidiano|acqua, ebollizione e caldo
+bottone|NOUN|118|Piccolo elemento usato per chiudere o decorare un indumento|asola, camicia e cucire
+pala|NOUN|162|Attrezzo con manico e lama larga per spostare materiali|manico, terra e scavare
+bava|NOUN|053|Saliva densa che cola dalla bocca|saliva, bocca e sbavare
+fieno|NOUN|045|Erba tagliata ed essiccata usata come foraggio|erba, stalla e bestiame
+abete|NOUN|042|Albero sempreverde con aghi e portamento conico|aghi, conifera e Natale
+ciliegio|NOUN|042|Albero da frutto che produce ciliegie|albero, fiori e ciliegie
+posta|NOUN|080|Servizio per la spedizione e consegna di lettere e pacchi|lettere, francobolli e postino; esclusa la posta in gioco
+incidente|NOUN|123|Evento imprevisto che coinvolge veicoli nella circolazione|scontro, strada e soccorso; corretto il POS automatico ADJ
+sfera|NOUN|151|Solido rotondo con superficie equidistante dal centro|rotondo, centro e raggio
+mandorla|NOUN|005|Seme commestibile del mandorlo racchiuso in un guscio|guscio, seme e frutta secca
+amore|NOUN|069|Sentimento di profondo legame affettivo verso un'altra persona|affetto, coppia e innamoramento
+rabbia|NOUN|061|Emozione di forte irritazione o collera|collera, ira e sfogo; esclusa la malattia infettiva
+fastidio|NOUN|061|Sensazione di irritazione e insofferenza|irritazione, disturbo e insofferenza
+mulino|NOUN|008|Macchina o edificio che macina cereali|macina, grano e farina
+violino|NOUN|102|Strumento musicale a quattro corde suonato con un archetto|archetto, corde e musica
+felpa|NOUN|117|Indumento morbido e comodo per il busto|maniche, cappuccio e abbigliamento; escluso il solo tessuto
+camomilla|NOUN|017|Bevanda in infusione ottenuta dai fiori della pianta omonima|tisana, fiori e infusione; scelto il senso della bevanda
+panettiere|NOUN|071|Artigiano che prepara e cuoce il pane|pane, impasto e forno
+pomata|NOUN|056|Preparato semisolido da applicare sulla pelle|pelle, spalmare e farmaco
+pannocchia|NOUN|044|Spiga del mais con numerosi chicchi disposti sul tutolo|mais, chicchi e spiga; esclusa la generica infiorescenza botanica
+istruzione|NOUN|091|Formazione acquisita attraverso l'insegnamento e lo studio|scuola, studio e apprendimento; escluse le istruzioni operative
+tempesta|NOUN|035|Fenomeno atmosferico violento con vento e precipitazioni|vento, pioggia e maltempo
+cubo|NOUN|151|Solido geometrico con sei facce quadrate uguali|facce, spigoli e quadrati
+flauto|NOUN|102|Strumento a fiato con fori da aprire e chiudere con le dita|soffio, fori e musica
+insetto|NOUN|049|Piccolo animale artropode dotato di sei zampe|zampe, antenne e corpo
+budino|NOUN|009|Dolce morbido preparato e servito in una forma|dolce, stampo e cucchiaio
+zattera|NOUN|127|Galleggiante semplice formato da elementi uniti|galleggiare, legno e acqua
+ovatta|NOUN|057|Materiale soffice a base di fibre di cotone|cotone, morbidezza e batuffolo
+computer|NOUN|169|Dispositivo elettronico programmabile che elabora dati|tastiera, schermo e programmi
+malattia|NOUN|054|Alterazione della salute che provoca disturbi dell'organismo|sintomi, cura e organismo
+parrucca|NOUN|119|Capigliatura artificiale indossata sul capo|capelli, testa e travestimento
+sogliola|NOUN|003|Pesce piatto marino usato come alimento|pesce, piatto e mare
+avventura|NOUN|110|Esperienza insolita ricca di imprevisti e rischi|viaggio, esplorazione e imprevisti; escluse le relazioni amorose
+disastro|NOUN|174|Evento che provoca conseguenze gravemente dannose|danni, emergenza e sciagura
+sacerdote|NOUN|099|Persona che celebra i riti di un culto religioso|culto, riti e religione
+soffitto|NOUN|021|Superficie interna superiore di una stanza|stanza, lampadario e alto
+bilancia|NOUN|152|Strumento usato per misurare il peso|peso, piatti e grammi; esclusa la costellazione
+falco|NOUN|047|Uccello rapace diurno dal becco ricurvo|rapace, artigli e volo
+aceto|NOUN|001|Liquido alimentare acido usato come condimento|acidità, insalata e condire
+pinza|NOUN|162|Utensile a due bracci usato per afferrare o serrare|presa, manici e attrezzo
+seno|NOUN|051|Parte anteriore del torace femminile con le mammelle|torace, mammella e allattamento; escluse matematica e geografia
+mestiere|NOUN|074|Attività lavorativa svolta abitualmente da una persona|lavoro, professione e abilità
+pozzo|NOUN|023|Scavo verticale per raggiungere e prelevare acqua sotterranea|acqua, falda e secchio
+orizzonte|NOUN|031|Linea apparente che separa cielo e superficie terrestre|cielo, distanza e panorama
+straccio|NOUN|163|Pezzo di tessuto usato per pulire|pavimento, panno e pulizia
+merluzzo|NOUN|003|Pesce marino commestibile dalle carni chiare|pesce, mare e alimento
+viaggio|NOUN|130|Spostamento verso un luogo generalmente lontano|partenza, destinazione e bagaglio
+perla|NOUN|120|Formazione sferica prodotta da molluschi e usata in gioielleria|conchiglia, collana e gioiello
+igiene|NOUN|057|Insieme di pratiche per mantenere pulizia e salute|pulizia, lavaggio e prevenzione
+cascata|NOUN|032|Caduta di un corso d'acqua da un dislivello|fiume, salto e acqua
+scaffale|NOUN|026|Struttura con ripiani sovrapposti per disporre oggetti|ripiani, libri e appoggio
+gelatina|NOUN|010|Preparazione alimentare dalla consistenza morbida e gelificata|gelificare, consistenza e alimento; escluso il legame con generici processi biologici
+attrezzo|NOUN|162|Strumento usato per svolgere un lavoro pratico|lavoro manuale, utensile e officina
+alluce|NOUN|051|Dito più grosso del piede|piede, dita e unghia
+notizia|NOUN|109|Informazione su un fatto accaduto|informazione, cronaca e giornale
+ferro|NOUN|037|Metallo comune usato per costruire oggetti e strutture|metallo, ruggine e acciaio; esclusi ferro da stiro e attrezzi specifici
+colonna|NOUN|113|Elemento verticale di sostegno generalmente cilindrico|edificio, sostegno e capitello; escluse tabelle e colonna vertebrale
+povertà|NOUN|079|Condizione di scarsità di mezzi economici essenziali|indigenza, reddito e bisogno
+trono|NOUN|087|Seggio cerimoniale di un sovrano|re, corona e regno
+campanile|NOUN|113|Torre che ospita le campane di una chiesa|campane, chiesa e torre
+rettile|NOUN|047|Animale vertebrato tipicamente rivestito da squame|squame, serpente e lucertola
+gelosia|NOUN|069|Timore di perdere l'affetto esclusivo della persona amata|coppia, sospetto e rivale
+calamita|NOUN|152|Oggetto magnetico capace di attrarre materiali ferrosi|magnete, ferro e attrazione
+scodella|NOUN|007|Recipiente concavo senza manici usato per mangiare|zuppa, cucchiaio e recipiente
+guerra|NOUN|086|Conflitto armato fra gruppi organizzati o Stati|eserciti, armi e battaglia
+preda|NOUN|050|Animale catturato o inseguito da un predatore|predatore, caccia e cattura; escluso il bottino di guerra
+brivido|NOUN|053|Tremito involontario del corpo dovuto a freddo o emozione|freddo, tremore e pelle
+cometa|NOUN|154|Corpo celeste che può mostrare una chioma e una coda luminosa|cielo, coda e orbita
+rivista|NOUN|109|Pubblicazione periodica che raccoglie articoli e immagini|articoli, copertina e periodico
+soldato|NOUN|086|Militare appartenente a un esercito|divisa, esercito e caserma
+fucile|NOUN|082|Arma da fuoco lunga da imbracciare|canna, calcio e proiettile
+infermiere|NOUN|060|Professionista sanitario che assiste e cura i pazienti|assistenza, reparto e paziente
+costa|NOUN|033|Fascia di terra a contatto con il mare|mare, litorale e onde; escluse costola e spesa
+folla|NOUN|068|Grande insieme di persone riunite nello stesso luogo|persone, assembramento e piazza
+timone|NOUN|127|Dispositivo che permette di dirigere una barca|rotta, barca e direzione
+stampella|NOUN|060|Sostegno usato per camminare quando una gamba è in difficoltà|appoggio, camminare e riabilitazione
+peste|NOUN|054|Malattia infettiva storicamente responsabile di grandi epidemie|epidemia, contagio e malattia; escluso il bambino vivace
+antenna|NOUN|159|Dispositivo per trasmettere o ricevere onde radio|segnale, radio e ricezione; escluse anatomia degli insetti e nautica
+pavone|NOUN|047|Uccello il cui maschio può aprire una grande coda a ventaglio|coda, piume e ventaglio
+rinoceronte|NOUN|047|Grande mammifero con uno o due corni sul muso|corno, grande corpo e savana
+odio|NOUN|061|Sentimento intenso di ostilità verso qualcuno o qualcosa|ostilità, rancore e avversione
+ritmo|NOUN|101|Successione regolare di durate e accenti musicali|musica, tempo e battito
+meraviglia|NOUN|061|Stupore di fronte a qualcosa di straordinario|stupore, sorpresa e ammirazione
+mummia|NOUN|166|Corpo conservato mediante imbalsamazione o essiccamento|bende, Egitto e imbalsamazione
+gazza|NOUN|047|Uccello dal piumaggio bianco e nero e dalla coda lunga|uccello, coda e piume
+gita|NOUN|129|Breve viaggio di svago o visita|escursione, compagnia e destinazione
+labirinto|NOUN|145|Percorso intricato in cui è difficile trovare l'uscita|bivi, percorso e uscita
+razzo|NOUN|155|Veicolo spinto dall'espulsione di gas ad alta velocità|propulsione, lancio e spazio; escluso il fuoco d'artificio
+fogna|NOUN|023|Condotto sotterraneo che raccoglie le acque di scarico|scarico, acque reflue e condotto
+ghiro|NOUN|047|Piccolo roditore arboricolo noto per il letargo|letargo, sonno e roditore
+lotta|NOUN|139|Combattimento corpo a corpo fra avversari|presa, avversario e combattimento
+cervello|NOUN|052|Organo principale del sistema nervoso contenuto nel cranio|testa, neuroni e pensiero
+prigione|NOUN|083|Luogo in cui vengono detenute persone private della libertà|celle, detenuti e sbarre
+alba|NOUN|036|Inizio del giorno con la comparsa della luce solare|mattino, sole e orizzonte
+inferno|NOUN|099|Luogo di pena eterna rappresentato nella tradizione religiosa|diavolo, dannazione e fiamme
+diamante|NOUN|120|Gemma trasparente di carbonio nota per la grande durezza|gemma, anello e brillante
+hamburger|NOUN|002|Preparazione di carne macinata modellata in forma appiattita|carne, griglia e panino
+orma|NOUN|050|Impronta lasciata da un piede o da una zampa|piede, zampa e impronta
+miracolo|NOUN|099|Evento straordinario attribuito a un intervento divino|fede, prodigio e divino
+faro|NOUN|127|Torre costiera che emette segnali luminosi per i naviganti|luce, costa e navigazione; escluso il proiettore dell'automobile
+insulto|NOUN|067|Espressione rivolta a qualcuno per offenderlo|offesa, parola e litigio
+tatto|NOUN|053|Senso che percepisce il contatto attraverso la pelle|pelle, toccare e sensazione; esclusa la delicatezza nei rapporti
+fumo|NOUN|153|Prodotto della combustione con particelle sospese nell'aria|fuoco, combustione e aria
+mistero|NOUN|110|Fatto di cui non si conosce la spiegazione|enigma, segreto e indizio
+tomba|NOUN|099|Luogo o struttura che contiene i resti di un defunto|sepoltura, lapide e defunto
+vernice|NOUN|162|Prodotto che riveste una superficie con una pellicola protettiva o colorata|pennello, colore e superficie
+trottola|NOUN|143|Giocattolo che ruota rapidamente intorno al proprio asse|girare, punta e gioco
+usignolo|NOUN|047|Piccolo uccello noto per il canto melodioso|canto, uccello e notte
+ortica|NOUN|041|Pianta dalle foglie e dai peli urticanti|foglie, prurito e pianta
+coppia|NOUN|069|Due persone legate da una relazione affettiva|partner, relazione e amore; esclusi oggetti accoppiati
+carcere|NOUN|083|Istituto in cui si scontano pene detentive|detenuti, celle e pena
+rapimento|NOUN|082|Sequestro di una persona privata della libertà|sequestro, riscatto e liberazione
+stufa|NOUN|025|Apparecchio che produce calore per riscaldare una stanza|calore, combustibile e riscaldamento
+litro|NOUN|151|Unità di misura della capacità pari a un decimetro cubo|capacità, bottiglia e millilitro
+ricchezza|NOUN|079|Disponibilità abbondante di denaro e beni|patrimonio, denaro e benessere economico
+frusta|NOUN|045|Strumento con manico e elemento flessibile usato per percuotere|manico, corda e colpo; escluso l'utensile da cucina
+melograno|NOUN|042|Albero da frutto che produce melagrane|albero, frutto e chicchi
+edificio|NOUN|021|Costruzione stabile destinata a ospitare persone o attività|muri, piani e costruzione
+ospite|NOUN|020|Persona accolta temporaneamente in una casa o struttura|accoglienza, soggiorno e padrone di casa; scelto chi viene accolto
+carro|NOUN|164|Veicolo a ruote tradizionalmente trainato da animali|ruote, traino e carico; escluso il carro armato
+trofeo|NOUN|177|Oggetto conferito come premio a chi vince una competizione|premio, coppa e vittoria
+altare|NOUN|099|Struttura su cui si svolgono riti e celebrazioni religiose|rito, chiesa e celebrazione
+pillola|NOUN|056|Piccola preparazione farmaceutica solida da ingerire|farmaco, bocca e terapia
+trampolino|NOUN|137|Struttura da cui ci si slancia per un tuffo|tuffo, piscina e salto; escluso il trampolino da sci
+speranza|NOUN|061|Aspettativa fiduciosa che accada qualcosa di favorevole|fiducia, attesa e futuro
+argento|NOUN|120|Metallo prezioso di colore bianco lucente|metallo, gioiello e lucentezza
+giglio|NOUN|043|Pianta ornamentale dai grandi fiori vistosi|fiore, petali e giardino
+fionda|NOUN|148|Strumento a forcella con elastico per lanciare piccoli oggetti|elastico, forcella e lancio
+albergo|NOUN|130|Struttura che offre alloggio a pagamento ai viaggiatori|camere, pernottamento e ospiti
+pompa|NOUN|023|Macchina che sposta o mette in pressione un fluido|pressione, liquido e tubo; escluso il senso cerimoniale
+locomotiva|NOUN|125|Veicolo ferroviario a motore che traina un convoglio|binari, treno e trainare
+mente|NOUN|062|Insieme delle facoltà di pensare e comprendere|pensiero, memoria e ragionamento
+motore|NOUN|121|Macchina che fornisce energia meccanica per muovere un veicolo|energia, movimento e automobile
+infezione|NOUN|054|Processo dovuto alla presenza e moltiplicazione di agenti patogeni|microbi, organismo e contagio
+manzo|NOUN|002|Carne di bovino adulto destinata all'alimentazione|carne, bovino e bistecca
+scheletro|NOUN|051|Insieme delle ossa che sostiene il corpo|ossa, cranio e sostegno
+vampiro|NOUN|100|Creatura fantastica che si nutre del sangue dei viventi|canini, sangue e notte; esclusi pipistrello e esattore
+garofano|NOUN|043|Pianta ornamentale dai fiori con petali frastagliati|fiore, petali e giardino
+asparago|NOUN|005|Germoglio commestibile allungato usato come ortaggio|ortaggio, germoglio e cucina
+bomba|NOUN|086|Ordigno esplosivo costruito per scoppiare|esplosivo, detonazione e ordigno; esclusi i significati figurati
+riunione|NOUN|073|Incontro di persone per discutere o decidere insieme|partecipanti, discussione e tavolo
+tennis|NOUN|136|Sport con racchetta e pallina giocato su un campo diviso da una rete|racchetta, pallina e rete
+assassino|NOUN|082|Persona che uccide volontariamente un'altra persona|omicidio, vittima e delitto
+targa|NOUN|123|Piastra con sigla e numeri che identifica un veicolo|veicolo, numeri e identificazione; esclusa la targa commemorativa
+orchestra|NOUN|102|Gruppo organizzato di musicisti che suonano insieme|strumenti, direttore e concerto
+asfalto|NOUN|123|Materiale bituminoso usato per la pavimentazione delle strade|strada, pavimentazione e bitume
+batuffolo|NOUN|057|Piccola massa soffice di fibre come il cotone|cotone, morbidezza e ovatta
+lido|NOUN|033|Tratto di costa sabbiosa destinato alla balneazione|spiaggia, mare e bagnanti
+uragano|NOUN|035|Ciclone tropicale caratterizzato da venti molto violenti|vento, ciclone e tempesta
+teglia|NOUN|007|Recipiente basso usato per cuocere nel forno|forno, cottura e bordo
+museo|NOUN|115|Luogo che conserva ed espone collezioni di interesse culturale|collezione, visita e esposizione
+lardo|NOUN|002|Grasso sottocutaneo del maiale preparato come alimento|maiale, grasso e salume
+libertà|NOUN|084|Condizione di chi può agire senza costrizioni illegittime|diritto, autonomia e prigionia
+pena|NOUN|083|Sanzione stabilita dalla legge per un reato|reato, condanna e giustizia; esclusa la sofferenza morale
+scrittore|NOUN|110|Persona che compone opere letterarie|libri, romanzo e autore
+tessuto|NOUN|118|Materiale ottenuto intrecciando fili per realizzare indumenti|fili, trama e stoffa; escluso il tessuto biologico
+cristallo|NOUN|037|Solido con struttura interna ordinata e regolare|minerale, facce e struttura; esclusa la sola cristalleria
+cracker|NOUN|008|Biscotto sottile e croccante generalmente salato|croccante, salato e spuntino; escluso l'intruso informatico
+peccato|NOUN|099|Azione ritenuta contraria ai precetti religiosi|colpa, confessione e perdono
+esercito|NOUN|086|Organizzazione militare di uno Stato|soldati, caserma e difesa
+suolo|NOUN|031|Superficie terrestre sulla quale si cammina e crescono piante|terra, terreno e superficie
+cortesia|NOUN|065|Comportamento gentile e rispettoso verso gli altri|gentilezza, rispetto e buone maniere
+ricordo|NOUN|062|Contenuto della memoria relativo a un'esperienza passata|memoria, passato e ricordare; escluso l'oggetto souvenir
+ufficio|NOUN|073|Locale nel quale si svolgono attività amministrative o professionali|scrivania, documenti e lavoro; esclusi dovere e incarico astratto
+furto|NOUN|082|Sottrazione di un bene altrui senza consenso|ladro, rubare e refurtiva
+sentiero|NOUN|148|Percorso stretto tracciato sul terreno naturale|camminare, bosco e percorso
+bollitore|NOUN|027|Apparecchio usato per portare l'acqua all'ebollizione|acqua, caldo e tè
+benzina|NOUN|121|Carburante liquido usato in molti motori a combustione|carburante, distributore e serbatoio
+diga|NOUN|040|Sbarramento costruito per trattenere acqua e formare un invaso|bacino, acqua e sbarramento
+bara|NOUN|099|Cassa destinata a contenere il corpo di un defunto|defunto, funerale e sepoltura
+trota|NOUN|048|Pesce d'acqua dolce della famiglia dei salmonidi|fiume, pesce e pinne
+cipresso|NOUN|042|Albero sempreverde dal portamento spesso stretto e slanciato|albero, sempreverde e chioma
+battello|NOUN|127|Imbarcazione di dimensioni contenute per il trasporto sull'acqua|navigare, acqua e passeggeri
+bersaglio|NOUN|177|Punto o oggetto da colpire durante un tiro|mirare, centro e tiro
+rapinatore|NOUN|082|Persona che sottrae beni usando minaccia o violenza|rapina, minaccia e refurtiva
+sigaro|NOUN|171|Rotolo di foglie di tabacco preparato per essere fumato|tabacco, fumo e accendere
+provincia|NOUN|034|Circoscrizione territoriale comprendente più comuni|territorio, comuni e capoluogo; esclusa la provincia romana
+cofano|NOUN|121|Coperchio apribile del vano motore di un'automobile|automobile, motore e apertura
+gru|NOUN|022|Macchina con braccio usata per sollevare carichi|cantiere, braccio e sollevamento; escluso l'uccello
+palude|NOUN|048|Zona di terreno con acqua stagnante e vegetazione umida|acqua, fango e vegetazione
+elica|NOUN|127|Organo rotante a pale che genera la spinta di un'imbarcazione|pale, rotazione e propulsione; scelto l'uso nautico
+rapa|NOUN|005|Ortaggio coltivato per la radice carnosa commestibile|radice, ortaggio e cucina
+burrasca|NOUN|035|Manifestazione di maltempo con vento forte e mare agitato|vento, mare e tempesta
+utensile|NOUN|162|Strumento adoperato per lavori manuali|attrezzo, officina e lavoro; corretto il POS automatico ADJ
+tela|NOUN|118|Tessuto semplice ottenuto intrecciando fibre|fili, trama e tessitura; esclusa la ragnatela
+inganno|NOUN|066|Azione intenzionale che induce qualcuno in errore|menzogna, falsità e raggiro
+aragosta|NOUN|048|Grande crostaceo marino con lunghe antenne|mare, crostaceo e antenne
+ghianda|NOUN|041|Frutto della quercia con una piccola cupola alla base|quercia, frutto e bosco
+scudo|NOUN|087|Oggetto difensivo portato sul braccio per parare colpi|difesa, armatura e colpi; escluse moneta e geologia
+bussola|NOUN|148|Strumento con ago magnetico per individuare il nord|nord, ago e orientamento
+custode|NOUN|074|Persona incaricata di sorvegliare un luogo o un bene|sorveglianza, chiavi e vigilanza
+nazione|NOUN|086|Comunità unita da identità storica o culturale|popolo, identità e territorio
+vedere|VERB|053|Percepire con gli occhi ciò che si trova nel campo visivo|occhi, vista e osservazione
+tagliare|VERB|162|Separare parti di un materiale usando uno strumento affilato|lama, forbici e separazione
+accendere|VERB|025|Far iniziare la combustione di un materiale|fuoco, fiammifero e combustione; esclusa l'accensione di dispositivi elettronici
+spegnere|VERB|025|Far cessare una combustione o una fiamma|fuoco, acqua e estinzione; escluso l'arresto di un computer
+scrivere|VERB|094|Tracciare lettere e parole per esprimere un messaggio|penna, parole e testo
+regalare|VERB|068|Dare qualcosa a qualcuno come dono senza compenso|regalo, dono e generosità
+scendere|VERB|178|Muoversi da un livello più alto a uno più basso|basso, discesa e gradini
+telefonare|VERB|067|Comunicare a distanza usando un telefono|chiamata, numero e interlocutore
+spingere|VERB|152|Esercitare una forza su un oggetto per spostarlo|forza, pressione e movimento
+ballare|VERB|105|Muovere il corpo seguendo un ritmo musicale|musica, danza e passi
+calciare|VERB|131|Colpire un pallone con il piede|pallone, piede e tiro; scelto il gesto calcistico
+cucinare|VERB|006|Preparare gli alimenti per renderli pronti da mangiare|ingredienti, cottura e ricetta
+leccare|VERB|053|Passare la lingua su una superficie o un alimento|lingua, bocca e contatto; esclusi i significati figurati
+obbedire|VERB|065|Comportarsi secondo un ordine o una regola ricevuti|ordine, regola e ubbidienza
+pulire|VERB|163|Rimuovere sporco e impurità da una superficie|sporco, detergente e lavaggio
+nuotare|VERB|137|Spostarsi nell'acqua mediante movimenti del corpo|acqua, bracciata e piscina
+guarire|VERB|060|Tornare in salute dopo una malattia o una lesione|salute, convalescenza e recupero; scelto l'uso intransitivo
+comprare|VERB|075|Ottenere un bene pagando un prezzo|acquisto, denaro e negozio
+strappare|VERB|162|Lacerare un materiale tirandolo con forza|carta, lacerazione e forza; esclusi significati figurati
+costruire|VERB|022|Realizzare una struttura unendo materiali e componenti|materiali, edificio e cantiere
+cullare|VERB|070|Dondolare dolcemente un bambino per calmarlo|bambino, culla e dondolio
+sputare|VERB|053|Espellere saliva dalla bocca|saliva, bocca e espulsione
+baciare|VERB|069|Toccare con le labbra per esprimere affetto|labbra, affetto e bacio
+leggere|VERB|093|Comprendere un testo riconoscendo i segni scritti|libro, parole e lettura
+versare|VERB|006|Far passare un liquido da un recipiente a un altro|liquido, recipiente e travaso; esclusa la prima glossa letteraria
+arrampicarsi|VERB|148|Salire aggrappandosi con mani e piedi a sostegni|salita, appigli e parete
+viaggiare|VERB|130|Spostarsi verso luoghi lontani per visita o altre necessità|partenza, destinazione e trasporto
+immaginare|VERB|062|Formare nella mente rappresentazioni di cose o situazioni|fantasia, mente e rappresentazione
+decorare|VERB|147|Abbellire un oggetto o un ambiente con elementi ornamentali|ornamento, colore e abbellimento
+coccolare|VERB|068|Manifestare affetto mediante gesti di tenerezza e attenzione|carezze, affetto e tenerezza
+salvare|VERB|175|Sottrarre una persona a un pericolo grave|soccorso, pericolo e protezione; escluso il salvataggio informatico
+guidare|VERB|121|Condurre un veicolo controllandone il movimento|volante, strada e conducente; esclusa la guida figurata
+rovesciare|VERB|178|Capovolgere o far cadere il contenuto di un recipiente|recipiente, capovolgere e versamento; escluso il rovesciamento politico
+spaventare|VERB|061|Provocare paura in qualcuno|paura, timore e allarme
+aggiustare|VERB|162|Riparare un oggetto guasto o danneggiato|riparazione, guasto e attrezzi
+spazzare|VERB|163|Rimuovere polvere o rifiuti usando una scopa|scopa, pavimento e polvere
+soffocare|VERB|054|Impedire o rendere impossibile la respirazione|respiro, aria e ostruzione; esclusa la repressione figurata
+offendere|VERB|067|Ferire la dignità di qualcuno con parole o comportamenti|insulto, dignità e parole
+nutrire|VERB|058|Fornire il cibo necessario al sostentamento|cibo, alimentazione e sostentamento
+inquinare|VERB|039|Contaminare un ambiente con sostanze o agenti dannosi|ambiente, contaminazione e sostanze
+morbido|ADJ|053|Che cede facilmente al tatto ed è soffice|tatto, cuscino e soffice
+disubbidiente|ADJ|066|Che non segue gli ordini o le regole ricevute|ordini, regole e ribellione
+duro|ADJ|152|Che oppone resistenza alla pressione e alla deformazione|resistenza, materiale e pressione; esclusi difficoltà e severità figurate
+affamato|ADJ|058|Che sente il bisogno di mangiare|fame, cibo e stomaco
+rotto|ADJ|162|Che presenta una rottura e ha perso integrità o funzionalità|danno, rottura e riparazione
+lento|ADJ|178|Che si muove o procede a bassa velocità|velocità, movimento e lentezza; esclusa la descrizione musicale
+tenero|ADJ|053|Che cede facilmente al tatto o alla pressione|morbidezza, pressione e consistenza; esclusa la tenerezza affettiva
+nuvoloso|ADJ|035|Con il cielo coperto in parte o del tutto da nuvole|cielo, nubi e meteo
+disordinato|ADJ|163|Che presenta oggetti collocati senza ordine|oggetti sparsi, ordine e riordino
+leggero|ADJ|152|Che ha un peso relativamente ridotto|peso, bilancia e sollevare; esclusi alimenti light e significati figurati
+dolce|ADJ|053|Che ha un sapore simile a quello dello zucchero|gusto, zucchero e sapore; escluso il carattere affettuoso
+simpatico|ADJ|063|Che suscita un'impressione gradevole nei rapporti con gli altri|piacevolezza, sorrisi e socialità
+biondo|ADJ|057|Di colore chiaro tendente al giallo riferito ai capelli|capelli, colore e chioma
+asciutto|ADJ|028|Privo di acqua o umidità sulla superficie|umidità, bagnato e asciugatura
+spaventoso|ADJ|061|Che provoca una forte sensazione di paura|paura, timore e terrore
+silenzioso|ADJ|053|Che produce poco o nessun rumore|rumore, silenzio e quiete
+sereno|ADJ|061|Che si trova in uno stato d'animo tranquillo|tranquillità, calma e animo; escluso il cielo senza nubi
+tranquillo|ADJ|061|Che è privo di agitazione o preoccupazioni|calma, pace interiore e quiete
+vecchio|ADJ|070|Che si trova in una fase avanzata della vita|età, anzianità e vita; esclusi oggetti usati
+pulito|ADJ|163|Privo di sporco o impurità|igiene, lavaggio e sporco; esclusi significati morali
+povero|ADJ|079|Che dispone di mezzi economici insufficienti|denaro, indigenza e bisogni; esclusa la commiserazione generica
+debole|ADJ|051|Che ha scarsa forza fisica|forza, muscoli e stanchezza; escluse intensità astratte
+timido|ADJ|063|Che prova impaccio o riserbo nei rapporti con gli altri|riservatezza, imbarazzo e socialità
+vivace|ADJ|063|Che manifesta energia e prontezza nel comportamento|energia, movimento e vitalità; esclusi colori e indicazioni musicali
+nudo|ADJ|117|Che non indossa vestiti|corpo, vestiti e spogliarsi; esclusi significati figurati
+luminoso|ADJ|024|Che emette luce o è intensamente illuminato|luce, illuminazione e brillantezza
+morto|ADJ|070|In cui sono cessate le funzioni vitali|vita, decesso e organismo; esclusi oggetti inattivi
+triste|ADJ|061|Che prova malinconia o sofferenza d'animo|tristezza, pianto e malinconia
+ferito|ADJ|060|Che ha riportato una lesione del corpo|lesione, soccorso e medicazione; non sostituito al nome ferita
+calmo|ADJ|061|Che non manifesta agitazione o turbamento|calma, tranquillità e serenità
+sicuro|ADJ|175|Che è protetto da rischi o pericoli|protezione, rischio e sicurezza; esclusa la certezza di un'opinione
+stanco|ADJ|059|Che avverte un bisogno di riposo dopo uno sforzo|fatica, riposo e sonno
+maleducato|ADJ|066|Che si comporta senza rispetto delle buone maniere|scortesia, modi e rispetto
+curioso|ADJ|062|Desideroso di sapere e conoscere cose nuove|domande, scoperta e conoscenza; escluso il senso insolito
+cieco|ADJ|053|Privo della capacità di vedere|vista, occhi e non vedente; esclusi significati figurati
+aspro|ADJ|053|Che ha un sapore marcatamente acido e poco dolce|gusto, acidità e sapore; esclusa l'asperità del terreno
+pesante|ADJ|152|Che ha un peso relativamente elevato|peso, bilancia e carico; esclusi noia e difficoltà figurate
+attento|ADJ|062|Che concentra l'attenzione su qualcosa|concentrazione, osservazione e cura
+infelice|ADJ|061|Che prova tristezza e mancanza di felicità|tristezza, sofferenza e felicità
+preoccupato|ADJ|061|Che teme conseguenze sfavorevoli o pericoli|timore, pensieri e ansia
+spaventato|ADJ|061|Che prova paura in seguito a una minaccia percepita|paura, timore e spavento
+coraggioso|ADJ|065|Che affronta il pericolo nonostante la paura|coraggio, pericolo e audacia
+violento|ADJ|066|Che ricorre alla forza per danneggiare o imporsi|aggressività, forza e sopraffazione
+onesto|ADJ|065|Che agisce con correttezza e rispetto delle regole morali|correttezza, sincerità e lealtà
+imbarazzato|ADJ|061|Che prova disagio in una situazione sociale|disagio, rossore e impaccio
+gentile|ADJ|065|Che tratta gli altri con cortesia e rispetto|cortesia, rispetto e garbo
+socievole|ADJ|068|Che ricerca volentieri la compagnia e i rapporti con gli altri|compagnia, amicizia e relazioni
+innocente|ADJ|083|Che non ha commesso il fatto di cui è accusato|accusa, colpa e giustizia
+rigido|ADJ|152|Che si piega o si deforma difficilmente|flessibilità, materiale e resistenza; esclusi comportamento e clima
+gioioso|ADJ|061|Che manifesta gioia e contentezza|gioia, sorriso e allegria
+elegante|ADJ|117|Che presenta cura e armonia nell'abbigliamento|abito, stile e cura; esclusa l'eleganza matematica
+pigro|ADJ|066|Che tende a evitare sforzo e attività|pigrizia, inerzia e ozio
+nervoso|ADJ|061|Che si trova in uno stato di tensione e irritabilità|tensione, agitazione e irritabilità; escluso il sistema nervoso
+ricco|ADJ|079|Che possiede abbondanti beni e risorse economiche|patrimonio, denaro e ricchezza
+libero|ADJ|084|Che non è imprigionato e può agire senza costrizioni|libertà, autonomia e prigionia; escluso lo spazio disponibile

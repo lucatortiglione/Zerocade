@@ -9,6 +9,29 @@
 
 ## Aggiornamento prioritario del 9 novembre 2026: database e bacini
 
+### Riutilizzo delle risposte tra prompt diversi
+
+Una stessa parola può essere associata a più prompt, anche nella stessa lista
+Livecade. Non esistono parole «riservate» a un prompt né un limite globale al
+numero di prompt che possono usarle. Per esempio, `ruota` può appartenere al
+bacino di `bicicletta` e a quello di `automobile`, con una relazione pertinente
+documentata per ciascuno.
+
+Si verifica la **coppia prompt–risposta nel senso scelto**: la validità per un
+prompt non approva automaticamente la stessa risposta per un altro. Relazione,
+accezione della risposta, motivazione, evidenze, difficoltà e vincoli del bacino
+si conservano separatamente per ogni coppia. Una bocciatura su un prompt non
+vieta la parola per tutti gli altri.
+
+L'unicità delle risposte vale all'interno del singolo bacino e della singola
+estrazione. Nel DB la chiave dell'associazione è `(sense_id, word)`, senza
+`UNIQUE(word)` globale. La copia nel DB delle voci valide e l'estrazione casuale
+devono preservare tutte le coppie verificate, senza consumare o eliminare una
+parola perché usata per un altro prompt. Frequenza globale e sovrapposizioni
+parziali tra bacini non sono motivi automatici di esclusione.
+
+### Raccolta e costruzione dei bacini
+
 Questa sezione prevale sui precedenti riferimenti a esattamente sette risposte,
 sulla distribuzione rigida delle difficoltà e sui workflow che inseriscono bozze
 nel database prima della revisione. Gli esempi storici con sette parole restano esempi.

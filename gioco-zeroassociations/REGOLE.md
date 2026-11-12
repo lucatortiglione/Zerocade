@@ -30,6 +30,9 @@ Ogni risposta ha una motivazione propria e concreta: «è nella definizione» no
 
 ## Il bacino
 
+- La stessa risposta può appartenere a più prompt, anche nella stessa lista:
+  ogni coppia prompt–risposta richiede una verifica e una motivazione proprie.
+  Niente duplicati all'interno dello stesso bacino o della sua estrazione.
 - Più risposte di quante ne servano (meglio 12–15): il gioco ne estrae 7 o 8 per round.
 - Equivalenti nello stesso **gruppo di significato**, con limite 1 o 2 per round.
 - Coppie che non devono uscire insieme tra i **conflitti**.

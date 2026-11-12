@@ -35,6 +35,8 @@ CREATE TABLE IF NOT EXISTS associations(
   answer_sense TEXT NOT NULL, meaning_group TEXT NOT NULL,
   difficulty TEXT NOT NULL CHECK(difficulty IN ('easy','medium','hard','unrated')),
   difficulty_basis TEXT NOT NULL, review_id TEXT NOT NULL REFERENCES reviews(id),
+  -- La parola è riutilizzabile per altri prompt: unicità solo nella stessa accezione.
+  -- Relazione, motivazione e revisione appartengono alla coppia, non al lemma globale.
   PRIMARY KEY(sense_id,word)
 ) STRICT;
 CREATE INDEX IF NOT EXISTS associations_by_word ON associations(word);

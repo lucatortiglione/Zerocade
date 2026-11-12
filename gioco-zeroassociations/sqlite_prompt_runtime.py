@@ -92,3 +92,27 @@ class SQLite:
             temporary.replace(output)
         finally:
             temporary.unlink(missing_ok=True)
+
+
+def publish_database(temporary: Path, output: Path, executable: Path | None = None):
+    """Pubblica una copia verificata; su Windows gestisce anche lettori SQLite aperti.
+
+    Se Windows vieta il rename, l'Online Backup API aggiorna la destinazione in
+    una transazione SQLite, rispettandone i lock. Non si copiano byte sopra un
+    file aperto. Un lock di scrittura continua a produrre un errore.
+    https://www.sqlite.org/backup.html
+    """
+    temporary,output = Path(temporary).resolve(),Path(output).resolve()
+    if temporary==output:
+        raise ValueError('La copia temporanea deve essere distinta dalla destinazione')
+    try:
+        temporary.replace(output)
+        return 'atomic_replace'
+    except PermissionError:
+        if os.name!='nt' or not output.exists():
+            raise
+        target = output.as_posix()
+        if any(c in target for c in ('"','\r','\n','\0')):
+            raise ValueError('Percorso non valido per la pubblicazione SQLite')
+        SQLite(temporary,executable).run('.backup "'+target+'"\n')
+        return 'sqlite_backup_transaction'

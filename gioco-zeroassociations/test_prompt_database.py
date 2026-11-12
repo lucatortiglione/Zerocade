@@ -132,6 +132,51 @@ class DatabaseTests(unittest.TestCase):
             self.db.run('BEGIN IMMEDIATE;DELETE FROM associations;INSERT INTO missing_table VALUES(1);COMMIT;')
         self.assertEqual(count,self.db.run('SELECT count(*) AS n FROM associations;',rows=True))
 
+    def guarded_source(self):
+        from prompt_database import initialize
+        initialize(self.db)
+        self.db.run('CREATE TABLE prompt_validation_heads(prompt TEXT PRIMARY KEY,validation_id TEXT);'
+            'INSERT INTO prompt_validation_heads VALUES ('+literal('pizza')+','+literal(pool()['content_sha256'])+');')
+        return {'pizza':pool()['content_sha256']}
+
+    def test_guarded_import_rejects_superseded_prompt_before_writing_pool(self):
+        expected = self.guarded_source()
+        self.db.run("UPDATE prompt_validation_heads SET validation_id='changed-since-review';")
+        with self.assertRaisesRegex(RuntimeError,'association_import_guard|CHECK constraint'):
+            import_reviewed(self.db,self.pack,expected_heads=expected,new_prompts_only=True)
+        self.assertEqual(self.db.run('SELECT count(*) AS n FROM associations;',rows=True),[{'n':0}])
+        self.assertEqual(self.db.run('SELECT count(*) AS n FROM reviews;',rows=True),[{'n':0}])
+
+    def test_guarded_import_cannot_replace_pool_created_in_the_meantime(self):
+        expected = self.guarded_source()
+        import_reviewed(self.db,self.pack,expected_heads=expected,new_prompts_only=True)
+        before = load_pools(self.db)
+        with self.assertRaisesRegex(RuntimeError,'association_import_guard|CHECK constraint'):
+            import_reviewed(self.db,self.pack,expected_heads=expected,new_prompts_only=True)
+        self.assertEqual(load_pools(self.db),before)
+
+    def test_guarded_import_honours_new_negative_decision(self):
+        expected = self.guarded_source()
+        self.db.run("CREATE TABLE inventory_term_decisions(prompt TEXT PRIMARY KEY,decision TEXT);"
+                    "INSERT INTO inventory_term_decisions VALUES ('pizza','DEFERRED');")
+        with self.assertRaisesRegex(RuntimeError,'association_import_guard|CHECK constraint'):
+            import_reviewed(self.db,self.pack,expected_heads=expected,new_prompts_only=True)
+        self.assertEqual(self.db.run('SELECT count(*) AS n FROM associations;',rows=True),[{'n':0}])
+
+    def test_guarded_import_requires_all_heads_before_initializing(self):
+        with self.assertRaisesRegex(ValueError,'riferimenti di revisione'):
+            import_reviewed(self.db,self.pack,expected_heads={})
+        self.assertFalse(self.db.path.exists())
+
+    def test_correction_requires_current_pool_revision(self):
+        import_reviewed(self.db,self.pack,expected_pool_reviews={'pizza':None})
+        before=load_pools(self.db)
+        with self.assertRaisesRegex(RuntimeError,'association_import_guard|CHECK constraint'):
+            import_reviewed(self.db,self.pack,expected_pool_reviews={'pizza':'stale-review'})
+        self.assertEqual(load_pools(self.db),before)
+        import_reviewed(self.db,self.pack,expected_pool_reviews={'pizza':pool()['content_sha256']})
+        self.assertEqual(load_pools(self.db),before)
+
     def test_sql_text_cannot_execute_code(self):
         import_reviewed(self.db,self.pack)
         value="'); DROP TABLE prompts;--\n.shell echo test"

@@ -1,0 +1,46 @@
+{
+  "purpose": "Association semantic review pilot, fixed familiar meanings",
+  "model": "Qwen/Qwen3.8-27B",
+  "quantization": "IQ2_S",
+  "model_sha256": "7897d2c5a5cee46aef50895141b2c8a0803c1185f3d03c4fda4cd137a7ad77fe",
+  "assessor": "ChatGPT",
+  "assessed_at": "2026-11-09T18:20:49.693270+00:00",
+  "tested": 32,
+  "target": 32,
+  "false_acceptances": 2,
+  "false_rejections": 1,
+  "differences": [
+    {
+      "i": 10,
+      "d": "A",
+      "r": "Il 'disco' facciale è una caratteristica anatomica distintiva del gufo, termine specifico e coerente con la definizione dell'uccello rapace.",
+      "prompt": "gufo",
+      "word": "disco",
+      "expected": "R",
+      "matches_editorial_expectation": false
+    },
+    {
+      "i": 16,
+      "d": "A",
+      "r": "La formazione è il processo generico che descrive l'evento (il coagulo) senza aggiungere dettagli incidentali, mantenendo la specificità del senso richiesto.",
+      "prompt": "coagulazione",
+      "word": "formazione",
+      "expected": "R",
+      "matches_editorial_expectation": false
+    },
+    {
+      "i": 17,
+      "d": "R",
+      "r": "Il sangue è il substrato o l'agente del processo, non una parola autonoma che descriva la coagulazione stessa; è un elemento di contesto, non l'associazione diretta.",
+      "prompt": "coagulazione",
+      "word": "sangue",
+      "expected": "A",
+      "matches_editorial_expectation": false
+    }
+  ],
+  "decision": "REJECTED_FOR_AUTOMATIC_ASSOCIATION_PROMOTION",
+  "imported": 0,
+  "human_review": false,
+  "independent_gameplay_qa": false,
+  "reason": "Ripete due difetti già segnalati e respinge una relazione fondamentale; non adatto al gate automatico delle associazioni. La valutazione riguarda questa quantizzazione e questo pilota, non l’intera famiglia Qwen."
+}

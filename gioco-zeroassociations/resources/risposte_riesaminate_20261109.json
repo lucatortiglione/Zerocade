@@ -1,0 +1,22 @@
+{
+  "scope": "Decisioni sulle singole coppie durante i primi quattro lotti di associazioni; nessuna blacklist globale",
+  "reviewer": "ChatGPT",
+  "method": "llm_editorial_review",
+  "human_review": false,
+  "independent_gameplay_qa": false,
+  "decisions": [
+    {"prompt":"giocattolo","word":"negozio","decision":"not_selected","reason":"La motivazione proposta si limitava alla vendita, applicabile a moltissimi oggetti; preferite associazioni più caratteristiche del gioco."},
+    {"prompt":"giocattolo","word":"scatola","decision":"not_selected","reason":"Il contenitore generico non aggiungeva abbastanza specificità al bacino costruito."},
+    {"prompt":"giocattolo","word":"giocare","decision":"not_selected","reason":"In questo bacino si è evitata una ripetizione derivativa della funzione già espressa dal prompt; non è un divieto del verbo per altri contesti."},
+    {"prompt":"coniglio","word":"cucciolo","decision":"not_selected","reason":"Voce applicabile genericamente ai piccoli di moltissimi mammiferi; preferite caratteristiche più riconoscibili del coniglio."},
+    {"prompt":"pupazzo","word":"braccio","decision":"not_selected","reason":"La presenza e la forma degli arti variano fra le rappresentazioni; preferiti materiali e costruzione del pupazzo nel senso di giocattolo."},
+    {"prompt":"piatto","word":"fondo","decision":"deferred","reason":"La proposta indicava il tipo piatto fondo: richiede un controllo di autonomia e del senso aggettivale fuori dalla collocazione. Non è stata trasformata in fondo del piatto per salvarla."},
+    {"prompt":"piatto","word":"piano","decision":"deferred","reason":"La proposta indicava il tipo piatto piano: non è stata importata senza risolvere l'autonomia della parola isolata."},
+    {"prompt":"topo","word":"granello","decision":"replaced","replacement":"seme","reason":"Selezionato seme come alimento vegetale riconoscibile; la sostituzione ha motivazione propria nel bacino e non deriva da una normalizzazione automatica."},
+    {"prompt":"buio","word":"cieco","decision":"not_selected","reason":"Il paragone tra buio e cecità non stabilisce un'identità percettiva e non offre un'associazione abbastanza precisa in questo bacino."},
+    {"prompt":"buio","word":"cantina","decision":"not_selected","reason":"Il collegamento dipendeva dall'aggiunta senza illuminazione, condizione possibile per numerosi ambienti; scelta invece blackout come possibile causa del buio."},
+    {"prompt":"altalena","word":"struttura","decision":"not_selected","reason":"Metadescrittore generico dell'attrezzatura, non una parte concreta identificata; non inserito come riempitivo."},
+    {"prompt":"fazzoletto","word":"soffiare","decision":"not_selected","reason":"La motivazione dipendeva dall'espressione completa soffiarsi il naso. Non è stato forzato un verbo isolato per completare il bacino."},
+    {"prompt":"camera","word":"abatjour","decision":"replaced","replacement":"lampada","reason":"Evitata una grafia ottenuta eliminando il trattino da abat-jour; lampada è stata valutata autonomamente come punto luce comune della camera."}
+  ]
+}

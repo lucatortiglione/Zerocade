@@ -1,0 +1,31 @@
+{
+  "base_model": "Qwen/Qwen3.8-27B",
+  "base_revision": "37561816e66b5b9153b1b64c10968c18c1e6f4a0",
+  "quantization_repository": "unsloth/Qwen3.8-27B-GGUF",
+  "quantization_revision": "4ca720788d1e01f1bff70c033e0d0028fd02e502",
+  "model_path": "C:\\Users\\lucat\\AppData\\Local\\Zerocade\\word-association\\local-inference\\Qwen3.8-27B-UD-Q5_K_M.gguf",
+  "model_sha256": "2de73110cb254cbf09b54b717578dadff12ef1194e7271527e68202f39ba4bfd",
+  "quantization": "Q5_K",
+  "served_model": "qwen38-prompt-review-q5",
+  "endpoint": "http://127.0.0.1:19474",
+  "purpose": "prompt-only editorial review; no association approval",
+  "pilot_status": "REJECTED_FOR_AUTOMATIC_PROMOTION",
+  "runtime_parameters": {
+    "gpu_layers": 24,
+    "context": 8192,
+    "parallel": 1,
+    "kv_cache": "q4_0",
+    "reasoning": false
+  },
+  "pilot_assessment": {
+    "assessor": "ChatGPT",
+    "human_review": false,
+    "imported": 0,
+    "issues": {
+      "gru": "Senso del macchinario corretto, ma categoria elettrodomestici errata.",
+      "leggero": "Senso fisico corretto, categoria colori e percezione visiva incoerente.",
+      "grande": "Categoria colori e percezione visiva incoerente con la propriet? dimensionale."
+    },
+    "next_method": "direct ChatGPT editorial review"
+  }
+}

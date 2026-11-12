@@ -7,9 +7,12 @@ prompt_raw.sqlite3
 prompt*.part
 prompt*.part.sql
 *.sqlite3-journal
-# Copia dei prompt validati: si rigenera con validated_prompt_database.py sync.
-prompt_validi*.sqlite3
-prompt_validi*.jsonl
+# File temporanei delle copie (prompt_filtrati e prompt_validi sono versionati).
+prompt_validi.*.sqlite3
+prompt_validi.*.jsonl
+prompt_finale.tmp
+# Copia derivata degli scarti; contiene anche le esclusioni delle fasi iniziali.
+prompt_scartati.sqlite3
 prompt-staging/
 database-backups/
 # Lotti storici dell'estrazione da definizioni (archivio/LEGGIMI.md).

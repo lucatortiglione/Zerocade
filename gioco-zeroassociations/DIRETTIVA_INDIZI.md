@@ -52,6 +52,13 @@ revisione finché scelta del senso, categoria e sette coppie non sono coerenti.
 
 ## Evidenza per ciascuna risposta
 
+La verifica riguarda ciascuna coppia prompt–risposta. Una parola può essere
+riutilizzata per altri prompt, anche nella stessa lista, quando pertinente e
+coerente con ciascun senso scelto. Conservare una motivazione e una revisione
+per ogni coppia: nessuna approvazione o esclusione si trasferisce automaticamente
+da un prompt all'altro. I duplicati sono vietati nel singolo bacino; non esiste
+un divieto globale di riuso delle risposte.
+
 Conservare fuori dal CSV di consegna:
 
 1. Contesto, risposta e rispettive accezioni, con identificativi quando disponibili.

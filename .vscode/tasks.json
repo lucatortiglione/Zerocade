@@ -5,117 +5,489 @@
       "label": "1. Prompt: raccogli e inserisci inventario da tutte le fonti registrate",
       "type": "process",
       "command": "${workspaceFolder}/gioco-zeroassociations/.venv/Scripts/python.exe",
-      "args": ["-B", "prompt_inventory.py", "collect"],
-      "options": {"cwd": "${workspaceFolder}/gioco-zeroassociations"},
+      "args": [
+        "-B",
+        "prompt_inventory.py",
+        "collect"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}/gioco-zeroassociations"
+      },
       "problemMatcher": []
     },
     {
       "label": "Prompt: stato dell'inventario raccolto",
       "type": "process",
       "command": "${workspaceFolder}/gioco-zeroassociations/.venv/Scripts/python.exe",
-      "args": ["-B", "prompt_inventory.py", "status"],
-      "options": {"cwd": "${workspaceFolder}/gioco-zeroassociations"},
+      "args": [
+        "-B",
+        "prompt_inventory.py",
+        "status"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}/gioco-zeroassociations"
+      },
       "problemMatcher": []
     },
     {
       "label": "Fonti: cerca aggiornamenti e prepara il confronto",
       "type": "process",
       "command": "${workspaceFolder}/gioco-zeroassociations/.venv/Scripts/python.exe",
-      "args": ["-B", "inventory_updates.py", "check-updates", "--only", "${input:updateSource}"],
-      "options": {"cwd": "${workspaceFolder}/gioco-zeroassociations"},
+      "args": [
+        "-B",
+        "inventory_updates.py",
+        "check-updates",
+        "--only",
+        "${input:updateSource}"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}/gioco-zeroassociations"
+      },
       "problemMatcher": []
     },
     {
       "label": "Fonti: elenca aggiornamenti e decisioni",
       "type": "process",
       "command": "${workspaceFolder}/gioco-zeroassociations/.venv/Scripts/python.exe",
-      "args": ["-B", "inventory_updates.py", "updates"],
-      "options": {"cwd": "${workspaceFolder}/gioco-zeroassociations"},
+      "args": [
+        "-B",
+        "inventory_updates.py",
+        "updates"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}/gioco-zeroassociations"
+      },
       "problemMatcher": []
     },
     {
       "label": "Fonti: mostra differenze di un aggiornamento",
       "type": "process",
       "command": "${workspaceFolder}/gioco-zeroassociations/.venv/Scripts/python.exe",
-      "args": ["-B", "inventory_updates.py", "changes", "${input:updateId}", "--kind", "${input:changeKind}"],
-      "options": {"cwd": "${workspaceFolder}/gioco-zeroassociations"},
+      "args": [
+        "-B",
+        "inventory_updates.py",
+        "changes",
+        "${input:updateId}",
+        "--kind",
+        "${input:changeKind}"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}/gioco-zeroassociations"
+      },
       "problemMatcher": []
     },
     {
       "label": "Fonti: integra, scarta o rimanda un aggiornamento",
       "type": "process",
       "command": "${workspaceFolder}/gioco-zeroassociations/.venv/Scripts/python.exe",
-      "args": ["-B", "inventory_updates.py", "decide-update", "${input:updateId}", "--decision", "${input:updateDecision}", "--reason", "${input:decisionReason}"],
-      "options": {"cwd": "${workspaceFolder}/gioco-zeroassociations"},
+      "args": [
+        "-B",
+        "inventory_updates.py",
+        "decide-update",
+        "${input:updateId}",
+        "--decision",
+        "${input:updateDecision}",
+        "--reason",
+        "${input:decisionReason}"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}/gioco-zeroassociations"
+      },
       "problemMatcher": []
     },
     {
       "label": "Voci: integra, scarta o rimanda una parola",
       "type": "process",
       "command": "${workspaceFolder}/gioco-zeroassociations/.venv/Scripts/python.exe",
-      "args": ["-B", "inventory_updates.py", "decide-term", "${input:inventoryPrompt}", "--decision", "${input:termDecision}", "--reason", "${input:decisionReason}"],
-      "options": {"cwd": "${workspaceFolder}/gioco-zeroassociations"},
+      "args": [
+        "-B",
+        "inventory_updates.py",
+        "decide-term",
+        "${input:inventoryPrompt}",
+        "--decision",
+        "${input:termDecision}",
+        "--reason",
+        "${input:decisionReason}"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}/gioco-zeroassociations"
+      },
       "problemMatcher": []
     },
     {
       "label": "Voci: mostra scheda e storico di una parola",
       "type": "process",
       "command": "${workspaceFolder}/gioco-zeroassociations/.venv/Scripts/python.exe",
-      "args": ["-B", "inventory_updates.py", "term", "${input:inventoryPrompt}"],
-      "options": {"cwd": "${workspaceFolder}/gioco-zeroassociations"},
+      "args": [
+        "-B",
+        "inventory_updates.py",
+        "term",
+        "${input:inventoryPrompt}"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}/gioco-zeroassociations"
+      },
       "problemMatcher": []
     },
     {
       "label": "Database: backup completo con inventario e decisioni",
       "type": "process",
       "command": "${workspaceFolder}/gioco-zeroassociations/.venv/Scripts/python.exe",
-      "args": ["-B", "inventory_updates.py", "backup"],
-      "options": {"cwd": "${workspaceFolder}/gioco-zeroassociations"},
+      "args": [
+        "-B",
+        "inventory_updates.py",
+        "backup"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}/gioco-zeroassociations"
+      },
       "problemMatcher": []
     },
     {
       "label": "Prompt: importa solo bacini già revisionati",
       "type": "process",
       "command": "${workspaceFolder}/gioco-zeroassociations/.venv/Scripts/python.exe",
-      "args": ["-B", "prompt_database.py", "import-reviewed", "${input:reviewedPools}"],
-      "options": {"cwd": "${workspaceFolder}/gioco-zeroassociations"},
+      "args": [
+        "-B",
+        "prompt_database.py",
+        "import-reviewed",
+        "${input:reviewedPools}"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}/gioco-zeroassociations"
+      },
       "problemMatcher": []
     },
     {
       "label": "Livecade: genera lista (7 risposte per prompt)",
       "type": "process",
       "command": "${workspaceFolder}/gioco-zeroassociations/.venv/Scripts/python.exe",
-      "args": ["-B", "prompt_database.py", "livecade", "--count", "${input:promptCount}", "--seed", "${input:wordSeed}", "--format", "csv"],
-      "options": {"cwd": "${workspaceFolder}/gioco-zeroassociations"},
+      "args": [
+        "-B",
+        "prompt_database.py",
+        "livecade",
+        "--count",
+        "${input:promptCount}",
+        "--seed",
+        "${input:wordSeed}",
+        "--format",
+        "csv"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}/gioco-zeroassociations"
+      },
       "problemMatcher": []
     },
     {
       "label": "Prompt: aggiorna prompt.sqlite3 (bacini del gioco) da prompt_raw.sqlite3",
       "type": "process",
       "command": "${workspaceFolder}/gioco-zeroassociations/.venv/Scripts/python.exe",
-      "args": ["-B", "prompt_database.py", "dump"],
-      "options": {"cwd": "${workspaceFolder}/gioco-zeroassociations"},
+      "args": [
+        "-B",
+        "prompt_database.py",
+        "dump"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}/gioco-zeroassociations"
+      },
       "problemMatcher": []
     },
     {
       "label": "Prompt: stato e integrità del DB",
       "type": "process",
       "command": "${workspaceFolder}/gioco-zeroassociations/.venv/Scripts/python.exe",
-      "args": ["-B", "prompt_database.py", "status"],
-      "options": {"cwd": "${workspaceFolder}/gioco-zeroassociations"},
+      "args": [
+        "-B",
+        "prompt_database.py",
+        "status"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}/gioco-zeroassociations"
+      },
       "problemMatcher": []
+    },
+    {
+      "label": "Prompt: filtra i candidati (prompt_filtrati.sqlite3)",
+      "type": "process",
+      "command": "${workspaceFolder}/gioco-zeroassociations/.venv/Scripts/python.exe",
+      "args": [
+        "-B",
+        "filter_prompts.py",
+        "build"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}/gioco-zeroassociations"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Prompt: aggiorna filtrati e validi dopo nuove parole (refresh)",
+      "type": "process",
+      "command": "${workspaceFolder}/gioco-zeroassociations/.venv/Scripts/python.exe",
+      "args": [
+        "-B",
+        "review_prompts.py",
+        "refresh"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}/gioco-zeroassociations"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Prompt: revisione LLM locale dei candidati in attesa",
+      "type": "process",
+      "command": "${workspaceFolder}/gioco-zeroassociations/.venv/Scripts/python.exe",
+      "args": [
+        "-B",
+        "review_prompts.py",
+        "llm-review",
+        "--limit",
+        "100"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}/gioco-zeroassociations"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Prompt: elenca i candidati da rivedere",
+      "type": "process",
+      "command": "${workspaceFolder}/gioco-zeroassociations/.venv/Scripts/python.exe",
+      "args": [
+        "-B",
+        "review_prompts.py",
+        "pending",
+        "--limit",
+        "50"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}/gioco-zeroassociations"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Prompt: aggiorna DB degli scarti",
+      "type": "process",
+      "command": "${workspaceFolder}/gioco-zeroassociations/.venv/Scripts/python.exe",
+      "args": [
+        "-B",
+        "discarded_prompt_database.py",
+        "sync"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}/gioco-zeroassociations"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Prompt: stato degli scarti",
+      "type": "process",
+      "command": "${workspaceFolder}/gioco-zeroassociations/.venv/Scripts/python.exe",
+      "args": [
+        "-B",
+        "discarded_prompt_database.py",
+        "status"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}/gioco-zeroassociations"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Associazioni: continua con Qwen (bozze, poi revisione)",
+      "type": "process",
+      "command": "${workspaceFolder}/gioco-zeroassociations/.venv/Scripts/python.exe",
+      "args": [
+        "-B",
+        "qwen_associations.py",
+        "drafts"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}/gioco-zeroassociations"
+      },
+      "problemMatcher": [],
+      "detail": "Qwen locale scrive le bozze dei prompt ancora senza bacino; le rivedono gli agenti o un revisore. Riprendibile; avvia il server se serve."
+    },
+    {
+      "label": "Associazioni: continua solo con Qwen (senza agenti)",
+      "type": "process",
+      "command": "${workspaceFolder}/gioco-zeroassociations/.venv/Scripts/python.exe",
+      "args": [
+        "-B",
+        "qwen_associations.py",
+        "solo"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}/gioco-zeroassociations"
+      },
+      "problemMatcher": [],
+      "detail": "Bozza e autoverifica Qwen per ogni coppia. Importa solo se il pilota delle associazioni è superato, altrimenti lascia i lotti da rivedere."
+    },
+    {
+      "label": "Associazioni: pilota Qwen sulle 32 coppie di controllo",
+      "type": "process",
+      "command": "${workspaceFolder}/gioco-zeroassociations/.venv/Scripts/python.exe",
+      "args": [
+        "-B",
+        "qwen_associations.py",
+        "pilot"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}/gioco-zeroassociations"
+      },
+      "problemMatcher": [],
+      "detail": "Decide se la modalità solo Qwen può importare: servono zero accettazioni e zero rifiuti errati."
+    },
+    {
+      "label": "Associazioni: avvia server Qwen locale",
+      "type": "process",
+      "command": "${workspaceFolder}/gioco-zeroassociations/.venv/Scripts/python.exe",
+      "args": [
+        "-B",
+        "qwen_associations.py",
+        "serve"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}/gioco-zeroassociations"
+      },
+      "problemMatcher": [],
+      "detail": "Facoltativo: i task Qwen lo avviano e lo chiudono da soli.",
+      "isBackground": true
+    },
+    {
+      "label": "Associazioni: stato bozze Qwen",
+      "type": "process",
+      "command": "${workspaceFolder}/gioco-zeroassociations/.venv/Scripts/python.exe",
+      "args": [
+        "-B",
+        "qwen_associations.py",
+        "status"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}/gioco-zeroassociations"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Associazioni: importa i lotti rivisti dagli agenti",
+      "type": "process",
+      "command": "${workspaceFolder}/gioco-zeroassociations/.venv/Scripts/python.exe",
+      "args": [
+        "-B",
+        "final_associations.py",
+        "import"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}/gioco-zeroassociations"
+      },
+      "problemMatcher": [],
+      "detail": "Importa nella raccolta i lotti nuovi, aggiorna prompt_validi.sqlite3 e prompt.sqlite3."
+    },
+    {
+      "label": "Associazioni: stato della lavorazione finale",
+      "type": "process",
+      "command": "${workspaceFolder}/gioco-zeroassociations/.venv/Scripts/python.exe",
+      "args": [
+        "-B",
+        "final_associations.py",
+        "status"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}/gioco-zeroassociations"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Prompt: rigenera prompt_finale.sqlite3 (prompt, parole, collegamenti)",
+      "type": "process",
+      "command": "${workspaceFolder}/gioco-zeroassociations/.venv/Scripts/python.exe",
+      "args": [
+        "-B",
+        "final_associations.py",
+        "build",
+        "--sync"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}/gioco-zeroassociations"
+      },
+      "problemMatcher": [],
+      "detail": "Copia i bacini verificati in prompt_finale.sqlite3: ogni parola è unica e collegata a tutti i suoi prompt."
     }
   ],
   "inputs": [
-    {"id":"updateSource","type":"promptString","description":"ID della fonte da controllare, oppure * per tutte le fonti del database","default":"*"},
-    {"id":"updateId","type":"promptString","description":"ID aggiornamento o prefisso univoco di almeno 8 caratteri"},
-    {"id":"changeKind","type":"pickString","description":"Voci da mostrare (prime 50)","options":["NEW","CHANGED","REMOVED","UNCHANGED"],"default":"NEW"},
-    {"id":"updateDecision","type":"pickString","description":"Decisione sull'intero aggiornamento: integra, scarta o rimanda","options":["DEFER","APPLY","DISCARD"],"default":"DEFER"},
-    {"id":"inventoryPrompt","type":"promptString","description":"Parola esatta da cercare o gestire"},
-    {"id":"termDecision","type":"pickString","description":"Decisione sulla parola nell'inventario (non approvazione delle associazioni)","options":["DEFERRED","INTEGRATED","DISCARDED"],"default":"DEFERRED"},
-    {"id":"decisionReason","type":"promptString","description":"Motivazione della decisione, conservata nello storico"},
-    {"id": "promptCount", "type": "promptString", "description": "Numero di prompt distinti da estrarre per Livecade (7 risposte ciascuno)", "default": "50"},
-    {"id": "wordSeed", "type": "promptString", "description": "Seed riproducibile; vuoto per una nuova estrazione casuale", "default": ""},
-    {"id": "reviewedPools", "type": "promptString", "description": "JSONL di bacini verificati semanticamente prima dell'importazione", "default": "resources/prompt_pools_reviewed_20261109.jsonl"}
+    {
+      "id": "updateSource",
+      "type": "promptString",
+      "description": "ID della fonte da controllare, oppure * per tutte le fonti del database",
+      "default": "*"
+    },
+    {
+      "id": "updateId",
+      "type": "promptString",
+      "description": "ID aggiornamento o prefisso univoco di almeno 8 caratteri"
+    },
+    {
+      "id": "changeKind",
+      "type": "pickString",
+      "description": "Voci da mostrare (prime 50)",
+      "options": [
+        "NEW",
+        "CHANGED",
+        "REMOVED",
+        "UNCHANGED"
+      ],
+      "default": "NEW"
+    },
+    {
+      "id": "updateDecision",
+      "type": "pickString",
+      "description": "Decisione sull'intero aggiornamento: integra, scarta o rimanda",
+      "options": [
+        "DEFER",
+        "APPLY",
+        "DISCARD"
+      ],
+      "default": "DEFER"
+    },
+    {
+      "id": "inventoryPrompt",
+      "type": "promptString",
+      "description": "Parola esatta da cercare o gestire"
+    },
+    {
+      "id": "termDecision",
+      "type": "pickString",
+      "description": "Decisione sulla parola nell'inventario (non approvazione delle associazioni)",
+      "options": [
+        "DEFERRED",
+        "INTEGRATED",
+        "DISCARDED"
+      ],
+      "default": "DEFERRED"
+    },
+    {
+      "id": "decisionReason",
+      "type": "promptString",
+      "description": "Motivazione della decisione, conservata nello storico"
+    },
+    {
+      "id": "promptCount",
+      "type": "promptString",
+      "description": "Numero di prompt distinti da estrarre per Livecade (7 risposte ciascuno)",
+      "default": "50"
+    },
+    {
+      "id": "wordSeed",
+      "type": "promptString",
+      "description": "Seed riproducibile; vuoto per una nuova estrazione casuale",
+      "default": ""
+    },
+    {
+      "id": "reviewedPools",
+      "type": "promptString",
+      "description": "JSONL di bacini verificati semanticamente prima dell'importazione",
+      "default": "resources/prompt_pools_reviewed_20261109.jsonl"
+    }
   ]
 }

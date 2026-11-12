@@ -1,8 +1,110 @@
 [
-  {"category_id":"173","cluster_id":"A","cluster_name":"Alimentazione e cucina","category_name":"Pasti, spuntini e abitudini alimentari"},
-  {"category_id":"174","cluster_id":"G","cluster_name":"Psicologia, comportamento e relazioni","category_name":"Eventi, cambiamenti e circostanze"},
-  {"category_id":"175","cluster_id":"G","cluster_name":"Psicologia, comportamento e relazioni","category_name":"Protezione personale e difesa"},
-  {"category_id":"176","cluster_id":"H","cluster_name":"Lavoro, commercio ed economia","category_name":"Competenze, esperienza e consulenza"},
-  {"category_id":"177","cluster_id":"N","cluster_name":"Sport e competizioni","category_name":"Sport e competizione in generale"},
-  {"category_id":"178","cluster_id":"P","cluster_name":"Scienze, matematica e digitale","category_name":"Movimenti, distribuzione e diffusione di materiali"}
+  {
+    "category_id": "173",
+    "cluster_id": "A",
+    "cluster_name": "Alimentazione e cucina",
+    "category_name": "Pasti, spuntini e abitudini alimentari"
+  },
+  {
+    "category_id": "174",
+    "cluster_id": "G",
+    "cluster_name": "Psicologia, comportamento e relazioni",
+    "category_name": "Eventi, cambiamenti e circostanze"
+  },
+  {
+    "category_id": "175",
+    "cluster_id": "G",
+    "cluster_name": "Psicologia, comportamento e relazioni",
+    "category_name": "Protezione personale e difesa"
+  },
+  {
+    "category_id": "176",
+    "cluster_id": "H",
+    "cluster_name": "Lavoro, commercio ed economia",
+    "category_name": "Competenze, esperienza e consulenza"
+  },
+  {
+    "category_id": "177",
+    "cluster_id": "N",
+    "cluster_name": "Sport e competizioni",
+    "category_name": "Sport e competizione in generale"
+  },
+  {
+    "category_id": "178",
+    "cluster_id": "P",
+    "cluster_name": "Scienze, matematica e digitale",
+    "category_name": "Movimenti, distribuzione e diffusione di materiali"
+  },
+  {
+    "category_id": "179",
+    "cluster_id": "E",
+    "cluster_name": "Piante, animali e agricoltura",
+    "category_name": "Funghi e micologia quotidiana"
+  },
+  {
+    "category_id": "180",
+    "cluster_id": "P",
+    "cluster_name": "Scienze, matematica e digitale",
+    "category_name": "Misurazione del tempo e orologi"
+  },
+  {
+    "category_id": "181",
+    "cluster_id": "I",
+    "cluster_name": "Diritto, istituzioni e storia",
+    "category_name": "Armi, equipaggiamento e storia militare"
+  },
+  {
+    "category_id": "182",
+    "cluster_id": "G",
+    "cluster_name": "Psicologia, comportamento e relazioni",
+    "category_name": "Reputazione, celebrità e riconoscimento sociale"
+  },
+  {
+    "category_id": "183",
+    "cluster_id": "P",
+    "cluster_name": "Scienze, matematica e digitale",
+    "category_name": "Biologia, cellule, genetica e microbiologia"
+  },
+  {
+    "category_id": "184",
+    "cluster_id": "F",
+    "cluster_name": "Corpo, medicina e benessere",
+    "category_name": "Colori, luce e percezione visiva"
+  },
+  {
+    "category_id": "185",
+    "cluster_id": "P",
+    "cluster_name": "Scienze, matematica e digitale",
+    "category_name": "Scienze naturali, ricerca e metodo scientifico"
+  },
+  {
+    "category_id": "186",
+    "category_name": "Orientamento, posizioni e relazioni spaziali",
+    "cluster_id": "P",
+    "cluster_name": "Scienze, matematica e digitale"
+  },
+  {
+    "category_id": "187",
+    "category_name": "Arti, creatività e produzione artistica",
+    "cluster_id": "L",
+    "cluster_name": "Arti visive, design e moda"
+  },
+  {
+    "category_id": "188",
+    "category_name": "Giocattoli e gioco infantile",
+    "cluster_id": "O",
+    "cluster_name": "Giochi, hobby e vita ricreativa"
+  },
+  {
+    "category_id": "189",
+    "category_name": "Contenitori, imballaggi e custodia degli oggetti",
+    "cluster_id": "C",
+    "cluster_name": "Casa, abitare e manutenzione"
+  },
+  {
+    "category_id": "190",
+    "category_name": "Azioni manuali e manipolazione quotidiana degli oggetti",
+    "cluster_id": "C",
+    "cluster_name": "Casa, abitare e manutenzione"
+  }
 ]

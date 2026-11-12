@@ -18,6 +18,7 @@ import tempfile
 import unicodedata
 from urllib.parse import quote,urlparse,unquote
 import xml.etree.ElementTree as ET
+import zipfile
 
 from collect_prompt_sources import CACHE,checksum,download
 from prompt_database import ROOT,DEFAULT_DB,insert
@@ -25,7 +26,7 @@ from sqlite_prompt_runtime import SQLite,literal
 
 REGISTRY=ROOT/'resources/prompt_inventory_sources.json'
 SINGLE_WORD=re.compile(r'[a-zàèéìòù]+')
-KINDS={'wiktextract','wiki_titles','hunspell','mythes','wordnet_tab','wordlist','frequency_csv','frequency_text','morphit','sitemap_index','conllu','tei_headwords'}
+KINDS={'wiktextract','wiki_titles','hunspell','mythes','wordnet_tab','wordlist','frequency_csv','frequency_text','morphit','sitemap_index','conllu','tei_headwords','nvdb_text','xlsx_table'}
 FIELD_SEPARATOR='\x1f'
 RECORD_SEPARATOR='\x1e'
 
@@ -42,6 +43,28 @@ def observation(word,locator,role='listed_form',pos='',lemma='',details=None):
     if not prompt or any(ord(c)<32 for c in word):return None
     return {'prompt':prompt,'source_form':word,'locator':str(locator),'role':role,
             'pos':str(pos),'lemma':normalize(lemma) or '', 'details':details or {}}
+
+
+def xlsx_rows(path,sheet):
+    """Le righe di un foglio .xlsx come liste di testi, con la sola libreria standard."""
+    ns={'m':'http://schemas.openxmlformats.org/spreadsheetml/2006/main'}
+    with zipfile.ZipFile(path) as book:
+        shared=([''.join(t.itertext()) for t in ET.fromstring(book.read('xl/sharedStrings.xml')).findall('m:si',ns)]
+                if 'xl/sharedStrings.xml' in book.namelist() else [])
+        root=ET.fromstring(book.read(f'xl/worksheets/sheet{int(sheet)}.xml'))
+    def column(ref):
+        letters=re.match(r'[A-Z]+',ref or 'A')[0];n=0
+        for c in letters:n=n*26+ord(c)-64
+        return n-1
+    for row in root.findall('.//m:row',ns):
+        cells={}
+        for cell in row.findall('m:c',ns):
+            value=cell.find('m:v',ns);kind=cell.get('t')
+            text=(shared[int(value.text)] if kind=='s' and value is not None else
+                  ''.join(cell.find('m:is',ns).itertext()) if kind=='inlineStr' and cell.find('m:is',ns) is not None else
+                  value.text if value is not None else '')
+            cells[column(cell.get('r'))]=text
+        yield [cells.get(i,'') for i in range(max(cells)+1)] if cells else []
 
 
 def records(path,source):
@@ -127,6 +150,35 @@ def records(path,source):
                 row=observation(entry['lemma'],number,'frequency_form',details={
                     'rank':int(entry['rank']),'language_claim':'italian_frequency_list_not_language_proof'})
                 if row:yield row
+    elif kind=='nvdb_text':
+        # Nuovo vocabolario di base (De Mauro): «parola categorie», una voce per riga.
+        with path.open(encoding=encoding) as stream:
+            for number,line in enumerate(stream,1):
+                cells=line.strip().split(None,1)
+                if len(cells)!=2:continue
+                word,categories=cells
+                row=observation(word,number,'lemma',categories,word,{
+                    'language_claim':'it_from_lexicon','basic_vocabulary':source.get('list_name','NVdB'),
+                    'categories':categories})
+                if row:yield row
+    elif kind=='xlsx_table':
+        # Norme lessicali in un foglio: una parola per riga e le colonne numeriche dichiarate.
+        rows=xlsx_rows(path,source.get('sheet',1))
+        header=next(rows)
+        index={name:i for i,name in enumerate(header)}
+        missing={source['word_column'],*source.get('value_columns',{})}-set(index)
+        if missing:raise ValueError('Colonne assenti nel foglio: '+', '.join(sorted(missing)))
+        pos_map=source.get('pos_map',{})
+        for number,cells in enumerate(rows,2):
+            cells+=['']*(len(header)-len(cells))
+            word=cells[index[source['word_column']]].strip()
+            pos=pos_map.get(cells[index[source['pos_column']]].strip(),'') if source.get('pos_column') in index else ''
+            values={}
+            for column,key in source.get('value_columns',{}).items():
+                try:values[key]=float(cells[index[column]])
+                except ValueError:values[key]=None
+            row=observation(word,number,'lemma',pos,word,{'language_claim':source.get('language_claim','it_from_norms'),**values})
+            if row:yield row
     elif kind=='wordnet_tab':
         with path.open(encoding=encoding) as stream:
             for number,line in enumerate(stream,1):
@@ -341,6 +393,11 @@ def main(argv=None):
         report={**status(db),'attempts':results,'all_selected_sources_completed':
             len(results)==len([s for s in sources if not args.only or s['id'] in args.only]) and all(r['status']!='FAILED' for r in results)}
         args.report.write_text(json.dumps(report,ensure_ascii=False,indent=2),encoding='utf-8')
+    if any(r['status']=='IMPORTED' for r in results):
+        # Parole nuove nella raccolta: si aggiornano prompt_filtrati e prompt_validi.
+        from review_prompts import after_new_words
+        refreshed=after_new_words(db.path)
+        if refreshed is not None:print(json.dumps({'refresh':refreshed},ensure_ascii=False),flush=True)
     return 2 if any(r['status']=='FAILED' for r in results) else 0
 
 

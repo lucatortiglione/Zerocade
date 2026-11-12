@@ -1,0 +1,2249 @@
+{
+  "schema": "association-editorial-decisions-1",
+  "reviewer": "ChatGPT",
+  "method": "llm_editorial_review",
+  "reviewed_at": "2026-11-09",
+  "rules_sha256": {
+    "direttive_word_association_it_v3_6_0.md": "a8e7fb0c1650ec54512ef945c177da4a7a3a9ed58b2dcdeeb573cb588d8e90a8",
+    "DIRETTIVA_INDIZI.md": "027f5afc8a93d7f6efc38be854454f70fbca9a5ccef012785f91c05049288aa8",
+    "REGOLE.md": "ef3c15171bfbfd9dac332179458718f3e4cdfcf910a70a44396c5e919e518c23"
+  },
+  "source_text": "resources\\associazioni_editoriali_20261109_02.txt",
+  "source_text_sha256": "5932193daec3e81d6dfe578e28893e3d69f9192c2844e8b48b8dead9ec149842",
+  "human_review": false,
+  "independent_gameplay_qa": false,
+  "lexically_exhaustive": false,
+  "entries": [
+    {
+      "prompt": "occhio",
+      "validation_id": "b63f76c40b7798412c7b6628ea2cea8e4fc530ca4927f6573e01bb5b951298d2",
+      "decision": "accepted",
+      "review_rationale": "Revisione editoriale di ogni coppia per «occhio», nel senso «L'occhio, organo della vista». Controllati autonomia, coerenza, forma e ruoli; gruppi con limite uno per evitare equivalenti nello stesso set. Nessuna prova umana o indipendente dichiarata.",
+      "answers": [
+        {
+          "word": "pupilla",
+          "answer_sense": "apertura centrale dell'iride",
+          "relation": "parte anatomica",
+          "meaning_group": "pupilla",
+          "rationale": "La pupilla è l'apertura dell'occhio attraverso cui entra la luce.",
+          "decision": "accepted"
+        },
+        {
+          "word": "iride",
+          "answer_sense": "parte colorata dell'occhio",
+          "relation": "parte anatomica",
+          "meaning_group": "iride",
+          "rationale": "L'iride è la parte colorata dell'occhio che circonda la pupilla.",
+          "decision": "accepted"
+        },
+        {
+          "word": "retina",
+          "answer_sense": "membrana sensibile alla luce",
+          "relation": "parte anatomica",
+          "meaning_group": "retina",
+          "rationale": "La retina riveste internamente l'occhio e riceve gli stimoli luminosi.",
+          "decision": "accepted"
+        },
+        {
+          "word": "cornea",
+          "answer_sense": "parte anteriore trasparente dell'occhio",
+          "relation": "parte anatomica",
+          "meaning_group": "cornea",
+          "rationale": "La cornea è la superficie anteriore trasparente dell'occhio.",
+          "decision": "accepted"
+        },
+        {
+          "word": "palpebra",
+          "answer_sense": "piega mobile che copre l'occhio",
+          "relation": "protezione anatomica",
+          "meaning_group": "palpebra",
+          "rationale": "La palpebra si chiude per coprire e proteggere l'occhio.",
+          "decision": "accepted"
+        },
+        {
+          "word": "ciglio",
+          "answer_sense": "pelo disposto sul margine della palpebra",
+          "relation": "protezione anatomica",
+          "meaning_group": "ciglio",
+          "rationale": "Le ciglia aiutano a proteggere l'occhio da particelle esterne.",
+          "decision": "accepted"
+        },
+        {
+          "word": "lacrima",
+          "answer_sense": "goccia di secrezione lacrimale",
+          "relation": "secrezione",
+          "meaning_group": "lacrima",
+          "rationale": "Le lacrime mantengono umida la superficie dell'occhio.",
+          "decision": "accepted"
+        },
+        {
+          "word": "vista",
+          "answer_sense": "senso che percepisce immagini e luce",
+          "relation": "funzione sensoriale",
+          "meaning_group": "vista",
+          "rationale": "L'occhio è l'organo della vista.",
+          "decision": "accepted"
+        },
+        {
+          "word": "occhiale",
+          "answer_sense": "lente con montatura per correggere o proteggere la vista",
+          "relation": "ausilio",
+          "meaning_group": "occhiale",
+          "rationale": "Gli occhiali possono correggere difetti visivi o proteggere gli occhi.",
+          "decision": "accepted"
+        },
+        {
+          "word": "oculista",
+          "answer_sense": "medico specializzato nell'occhio e nella vista",
+          "relation": "professione",
+          "meaning_group": "oculista",
+          "rationale": "L'oculista visita e cura gli occhi e i disturbi della vista.",
+          "decision": "accepted"
+        },
+        {
+          "word": "miopia",
+          "answer_sense": "difetto che rende sfocati gli oggetti lontani",
+          "relation": "disturbo",
+          "meaning_group": "miopia",
+          "rationale": "La miopia è un difetto visivo dell'occhio.",
+          "decision": "accepted"
+        },
+        {
+          "word": "sguardo",
+          "answer_sense": "atto di dirigere gli occhi verso qualcosa",
+          "relation": "azione",
+          "meaning_group": "sguardo",
+          "rationale": "Lo sguardo si dirige orientando gli occhi verso ciò che si osserva.",
+          "decision": "accepted"
+        }
+      ],
+      "group_limits": {
+        "pupilla": 1,
+        "iride": 1,
+        "retina": 1,
+        "cornea": 1,
+        "palpebra": 1,
+        "ciglio": 1,
+        "lacrima": 1,
+        "vista": 1,
+        "occhiale": 1,
+        "oculista": 1,
+        "miopia": 1,
+        "sguardo": 1
+      },
+      "conflicts": []
+    },
+    {
+      "prompt": "disegno",
+      "validation_id": "1bcc17144f0430f072b7c95e717049524b071991fc732d682f825af4f0f78758",
+      "decision": "accepted",
+      "review_rationale": "Revisione editoriale di ogni coppia per «disegno», nel senso «Immagine fatta a mano con matite o colori». Controllati autonomia, coerenza, forma e ruoli; gruppi con limite uno per evitare equivalenti nello stesso set. Nessuna prova umana o indipendente dichiarata.",
+      "answers": [
+        {
+          "word": "matita",
+          "answer_sense": "strumento con mina per tracciare segni",
+          "relation": "strumento",
+          "meaning_group": "matita",
+          "rationale": "La matita è uno strumento comune per realizzare un disegno.",
+          "decision": "accepted"
+        },
+        {
+          "word": "foglio",
+          "answer_sense": "supporto sottile di carta",
+          "relation": "supporto",
+          "meaning_group": "foglio",
+          "rationale": "Il foglio di carta è un supporto comune del disegno.",
+          "decision": "accepted"
+        },
+        {
+          "word": "gomma",
+          "answer_sense": "oggetto elastico per cancellare",
+          "relation": "strumento",
+          "meaning_group": "gomma",
+          "rationale": "La gomma permette di cancellare tratti a matita nel disegno.",
+          "decision": "accepted"
+        },
+        {
+          "word": "tratto",
+          "answer_sense": "segno prodotto da uno strumento grafico",
+          "relation": "elemento grafico",
+          "meaning_group": "tratto",
+          "rationale": "Un disegno prende forma attraverso i tratti sul supporto.",
+          "decision": "accepted"
+        },
+        {
+          "word": "contorno",
+          "answer_sense": "linea che delimita una figura",
+          "relation": "elemento grafico",
+          "meaning_group": "contorno",
+          "rationale": "Il contorno delimita le figure rappresentate in un disegno.",
+          "decision": "accepted"
+        },
+        {
+          "word": "schizzo",
+          "answer_sense": "disegno rapido e sommario",
+          "relation": "fase o tipo",
+          "meaning_group": "schizzo",
+          "rationale": "Lo schizzo è un disegno rapido che fissa le forme essenziali.",
+          "decision": "accepted"
+        },
+        {
+          "word": "ombreggiatura",
+          "answer_sense": "resa grafica delle zone d'ombra",
+          "relation": "tecnica",
+          "meaning_group": "ombreggiatura",
+          "rationale": "L'ombreggiatura dà profondità e volume alle forme del disegno.",
+          "decision": "accepted"
+        },
+        {
+          "word": "prospettiva",
+          "answer_sense": "tecnica di rappresentazione della profondità",
+          "relation": "tecnica",
+          "meaning_group": "prospettiva",
+          "rationale": "La prospettiva permette di rappresentare lo spazio tridimensionale in un disegno.",
+          "decision": "accepted"
+        },
+        {
+          "word": "ritratto",
+          "answer_sense": "rappresentazione di una persona",
+          "relation": "soggetto o genere",
+          "meaning_group": "ritratto",
+          "rationale": "Un ritratto può essere realizzato mediante un disegno.",
+          "decision": "accepted"
+        },
+        {
+          "word": "album",
+          "answer_sense": "raccolta di fogli rilegati",
+          "relation": "supporto",
+          "meaning_group": "album",
+          "rationale": "L'album raccoglie fogli destinati anche ai disegni.",
+          "decision": "accepted"
+        },
+        {
+          "word": "pennarello",
+          "answer_sense": "strumento grafico con punta inchiostrata",
+          "relation": "strumento",
+          "meaning_group": "pennarello",
+          "rationale": "Il pennarello viene usato per tracciare e colorare disegni.",
+          "decision": "accepted"
+        },
+        {
+          "word": "carboncino",
+          "answer_sense": "materiale da disegno ottenuto da legno carbonizzato",
+          "relation": "strumento",
+          "meaning_group": "carboncino",
+          "rationale": "Il carboncino permette di realizzare disegni con segni scuri e sfumati.",
+          "decision": "accepted"
+        }
+      ],
+      "group_limits": {
+        "matita": 1,
+        "foglio": 1,
+        "gomma": 1,
+        "tratto": 1,
+        "contorno": 1,
+        "schizzo": 1,
+        "ombreggiatura": 1,
+        "prospettiva": 1,
+        "ritratto": 1,
+        "album": 1,
+        "pennarello": 1,
+        "carboncino": 1
+      },
+      "conflicts": []
+    },
+    {
+      "prompt": "forchetta",
+      "validation_id": "61131a35c99a3cbf73dd203d9221ab195d18c1dda22ee54c725bb19d08394660",
+      "decision": "accepted",
+      "review_rationale": "Revisione editoriale di ogni coppia per «forchetta», nel senso «Posata con i rebbi per prendere il cibo». Controllati autonomia, coerenza, forma e ruoli; gruppi con limite uno per evitare equivalenti nello stesso set. Nessuna prova umana o indipendente dichiarata.",
+      "answers": [
+        {
+          "word": "rebbio",
+          "answer_sense": "punta allungata di una forchetta",
+          "relation": "parte",
+          "meaning_group": "rebbio",
+          "rationale": "I rebbi sono le punte della forchetta che trattengono il cibo.",
+          "decision": "accepted"
+        },
+        {
+          "word": "manico",
+          "answer_sense": "parte allungata che si impugna",
+          "relation": "parte",
+          "meaning_group": "manico",
+          "rationale": "Il manico permette di impugnare la forchetta.",
+          "decision": "accepted"
+        },
+        {
+          "word": "posata",
+          "answer_sense": "utensile usato per mangiare",
+          "relation": "categoria",
+          "meaning_group": "posata",
+          "rationale": "La forchetta è una posata.",
+          "decision": "accepted"
+        },
+        {
+          "word": "piatto",
+          "answer_sense": "stoviglia che contiene il cibo",
+          "relation": "oggetto abbinato",
+          "meaning_group": "piatto",
+          "rationale": "La forchetta viene usata per prendere il cibo dal piatto.",
+          "decision": "accepted"
+        },
+        {
+          "word": "tavola",
+          "answer_sense": "piano apparecchiato per mangiare",
+          "relation": "collocazione",
+          "meaning_group": "tavola",
+          "rationale": "La forchetta viene disposta sulla tavola per il pasto.",
+          "decision": "accepted"
+        },
+        {
+          "word": "coltello",
+          "answer_sense": "posata con lama",
+          "relation": "oggetto abbinato",
+          "meaning_group": "coltello",
+          "rationale": "Forchetta e coltello vengono usati insieme per tagliare e mangiare molti alimenti.",
+          "decision": "accepted"
+        },
+        {
+          "word": "cucchiaio",
+          "answer_sense": "posata concava",
+          "relation": "oggetto abbinato",
+          "meaning_group": "cucchiaio",
+          "rationale": "Il cucchiaio è un'altra posata che si dispone insieme alla forchetta.",
+          "decision": "accepted"
+        },
+        {
+          "word": "infilzare",
+          "answer_sense": "penetrare con una punta",
+          "relation": "funzione",
+          "meaning_group": "infilzare",
+          "rationale": "I rebbi della forchetta permettono di infilzare il cibo.",
+          "decision": "accepted"
+        },
+        {
+          "word": "pasta",
+          "answer_sense": "alimento di farina e acqua",
+          "relation": "alimento caratteristico",
+          "meaning_group": "pasta",
+          "rationale": "La forchetta viene comunemente usata per mangiare la pasta.",
+          "decision": "accepted"
+        },
+        {
+          "word": "acciaio",
+          "answer_sense": "lega metallica resistente",
+          "relation": "materiale",
+          "meaning_group": "materiale",
+          "rationale": "L'acciaio è un materiale comune delle forchette da tavola.",
+          "decision": "accepted"
+        },
+        {
+          "word": "argento",
+          "answer_sense": "metallo prezioso",
+          "relation": "materiale",
+          "meaning_group": "materiale",
+          "rationale": "L'argento può essere usato per realizzare forchette e altre posate.",
+          "decision": "accepted"
+        },
+        {
+          "word": "apparecchiare",
+          "answer_sense": "preparare la tavola per mangiare",
+          "relation": "preparazione",
+          "meaning_group": "apparecchiare",
+          "rationale": "Apparecchiare comprende la disposizione delle forchette.",
+          "decision": "accepted"
+        }
+      ],
+      "group_limits": {
+        "rebbio": 1,
+        "manico": 1,
+        "posata": 1,
+        "piatto": 1,
+        "tavola": 1,
+        "coltello": 1,
+        "cucchiaio": 1,
+        "infilzare": 1,
+        "pasta": 1,
+        "materiale": 1,
+        "apparecchiare": 1
+      },
+      "conflicts": []
+    },
+    {
+      "prompt": "scivolo",
+      "validation_id": "ce02f485902125dcfa963309c004ced652b9fa5db2bf3188991f11b2d0593a70",
+      "decision": "accepted",
+      "review_rationale": "Revisione editoriale di ogni coppia per «scivolo», nel senso «Lo scivolo dei giardini per bambini». Controllati autonomia, coerenza, forma e ruoli; gruppi con limite uno per evitare equivalenti nello stesso set. Nessuna prova umana o indipendente dichiarata.",
+      "answers": [
+        {
+          "word": "scala",
+          "answer_sense": "struttura a gradini",
+          "relation": "parte",
+          "meaning_group": "scala",
+          "rationale": "La scala consente di raggiungere la sommità dello scivolo.",
+          "decision": "accepted"
+        },
+        {
+          "word": "discesa",
+          "answer_sense": "percorso che porta verso il basso",
+          "relation": "movimento",
+          "meaning_group": "discesa",
+          "rationale": "Lo scivolo permette ai bambini di compiere una discesa lungo una superficie inclinata.",
+          "decision": "accepted"
+        },
+        {
+          "word": "rampa",
+          "answer_sense": "superficie inclinata",
+          "relation": "parte",
+          "meaning_group": "rampa",
+          "rationale": "La rampa inclinata è la parte dello scivolo lungo cui si scende.",
+          "decision": "accepted"
+        },
+        {
+          "word": "bambino",
+          "answer_sense": "persona nell'infanzia",
+          "relation": "utilizzatore",
+          "meaning_group": "bambino",
+          "rationale": "Lo scivolo nel senso scelto è un gioco destinato ai bambini.",
+          "decision": "accepted"
+        },
+        {
+          "word": "parco",
+          "answer_sense": "area verde pubblica",
+          "relation": "collocazione",
+          "meaning_group": "parco",
+          "rationale": "Lo scivolo è un'attrezzatura comune dei parchi giochi.",
+          "decision": "accepted"
+        },
+        {
+          "word": "plastica",
+          "answer_sense": "materiale sintetico modellabile",
+          "relation": "materiale",
+          "meaning_group": "materiale",
+          "rationale": "La plastica viene usata per costruire molti scivoli per bambini.",
+          "decision": "accepted"
+        },
+        {
+          "word": "metallo",
+          "answer_sense": "materiale duro e lavorabile",
+          "relation": "materiale",
+          "meaning_group": "materiale",
+          "rationale": "Gli scivoli tradizionali possono avere una rampa di metallo.",
+          "decision": "accepted"
+        },
+        {
+          "word": "salire",
+          "answer_sense": "spostarsi verso una posizione più alta",
+          "relation": "preparazione",
+          "meaning_group": "salire",
+          "rationale": "Prima della discesa sullo scivolo si sale alla sua sommità.",
+          "decision": "accepted"
+        },
+        {
+          "word": "velocità",
+          "answer_sense": "rapidità del movimento",
+          "relation": "esperienza",
+          "meaning_group": "velocità",
+          "rationale": "La velocità della discesa è una componente riconoscibile del gioco sullo scivolo.",
+          "decision": "accepted"
+        },
+        {
+          "word": "altalena",
+          "answer_sense": "gioco con sedile oscillante",
+          "relation": "attrezzatura affine",
+          "meaning_group": "altalena",
+          "rationale": "Scivolo e altalena sono attrezzature tipiche dei giardini per bambini.",
+          "decision": "accepted"
+        }
+      ],
+      "group_limits": {
+        "scala": 1,
+        "discesa": 1,
+        "rampa": 1,
+        "bambino": 1,
+        "parco": 1,
+        "materiale": 1,
+        "salire": 1,
+        "velocità": 1,
+        "altalena": 1
+      },
+      "conflicts": []
+    },
+    {
+      "prompt": "penna",
+      "validation_id": "9e1c80aa72bd8e4ee35e8a80851b5f090125baa1665ea41b43e53c79fb894a63",
+      "decision": "accepted",
+      "review_rationale": "Revisione editoriale di ogni coppia per «penna», nel senso «Strumento per scrivere con l'inchiostro». Controllati autonomia, coerenza, forma e ruoli; gruppi con limite uno per evitare equivalenti nello stesso set. Nessuna prova umana o indipendente dichiarata.",
+      "answers": [
+        {
+          "word": "inchiostro",
+          "answer_sense": "liquido colorato per scrivere",
+          "relation": "materiale di scrittura",
+          "meaning_group": "inchiostro",
+          "rationale": "La penna scrive depositando inchiostro sul supporto.",
+          "decision": "accepted"
+        },
+        {
+          "word": "punta",
+          "answer_sense": "estremità che traccia il segno",
+          "relation": "parte",
+          "meaning_group": "punta",
+          "rationale": "La punta è la parte della penna che entra in contatto con il foglio.",
+          "decision": "accepted"
+        },
+        {
+          "word": "tappo",
+          "answer_sense": "elemento che chiude e protegge",
+          "relation": "parte",
+          "meaning_group": "tappo",
+          "rationale": "Il tappo protegge la punta di molte penne.",
+          "decision": "accepted"
+        },
+        {
+          "word": "fusto",
+          "answer_sense": "corpo allungato dello strumento",
+          "relation": "parte",
+          "meaning_group": "fusto",
+          "rationale": "Il fusto è il corpo della penna che viene impugnato per scrivere.",
+          "decision": "accepted"
+        },
+        {
+          "word": "pennino",
+          "answer_sense": "punta metallica delle penne stilografiche",
+          "relation": "parte",
+          "meaning_group": "punta",
+          "rationale": "Il pennino distribuisce l'inchiostro nella scrittura con una stilografica.",
+          "decision": "accepted"
+        },
+        {
+          "word": "scrivere",
+          "answer_sense": "tracciare caratteri di una lingua",
+          "relation": "funzione",
+          "meaning_group": "scrivere",
+          "rationale": "La penna è uno strumento destinato a scrivere.",
+          "decision": "accepted"
+        },
+        {
+          "word": "firma",
+          "answer_sense": "nome tracciato per attestare identità o consenso",
+          "relation": "uso",
+          "meaning_group": "firma",
+          "rationale": "La penna viene usata per apporre una firma su carta.",
+          "decision": "accepted"
+        },
+        {
+          "word": "quaderno",
+          "answer_sense": "insieme di fogli rilegati per scrivere",
+          "relation": "supporto",
+          "meaning_group": "quaderno",
+          "rationale": "La penna viene comunemente usata per scrivere su un quaderno.",
+          "decision": "accepted"
+        },
+        {
+          "word": "cartuccia",
+          "answer_sense": "piccolo contenitore sostituibile di inchiostro",
+          "relation": "alimentazione",
+          "meaning_group": "cartuccia",
+          "rationale": "Una cartuccia può fornire inchiostro a una penna stilografica.",
+          "decision": "accepted"
+        },
+        {
+          "word": "stilografica",
+          "answer_sense": "penna con serbatoio e pennino",
+          "relation": "tipo",
+          "meaning_group": "tipo_penna",
+          "rationale": "La stilografica è un tipo di penna alimentata da un serbatoio di inchiostro.",
+          "decision": "accepted"
+        },
+        {
+          "word": "biro",
+          "answer_sense": "penna a sfera",
+          "relation": "tipo",
+          "meaning_group": "tipo_penna",
+          "rationale": "Biro è un nome comune della penna a sfera.",
+          "decision": "accepted"
+        },
+        {
+          "word": "astuccio",
+          "answer_sense": "contenitore per strumenti di scrittura",
+          "relation": "custodia",
+          "meaning_group": "astuccio",
+          "rationale": "La penna viene conservata e trasportata nell'astuccio.",
+          "decision": "accepted"
+        }
+      ],
+      "group_limits": {
+        "inchiostro": 1,
+        "punta": 1,
+        "tappo": 1,
+        "fusto": 1,
+        "scrivere": 1,
+        "firma": 1,
+        "quaderno": 1,
+        "cartuccia": 1,
+        "tipo_penna": 1,
+        "astuccio": 1
+      },
+      "conflicts": []
+    },
+    {
+      "prompt": "nuvola",
+      "validation_id": "baa5c36fa665bf17aaff8695daca691a1eb7670f5e7e0b2d6883a52b92626841",
+      "decision": "accepted",
+      "review_rationale": "Revisione editoriale di ogni coppia per «nuvola», nel senso «La nuvola nel cielo». Controllati autonomia, coerenza, forma e ruoli; gruppi con limite uno per evitare equivalenti nello stesso set. Nessuna prova umana o indipendente dichiarata.",
+      "answers": [
+        {
+          "word": "cielo",
+          "answer_sense": "spazio atmosferico visibile sopra la Terra",
+          "relation": "collocazione",
+          "meaning_group": "cielo",
+          "rationale": "Le nuvole sono visibili nel cielo.",
+          "decision": "accepted"
+        },
+        {
+          "word": "goccia",
+          "answer_sense": "piccola quantità di acqua liquida",
+          "relation": "composizione",
+          "meaning_group": "goccia",
+          "rationale": "Le nuvole possono essere formate da minuscole gocce d'acqua sospese.",
+          "decision": "accepted"
+        },
+        {
+          "word": "condensazione",
+          "answer_sense": "passaggio del vapore allo stato liquido",
+          "relation": "formazione",
+          "meaning_group": "condensazione",
+          "rationale": "La condensazione del vapore contribuisce alla formazione delle nuvole.",
+          "decision": "accepted"
+        },
+        {
+          "word": "pioggia",
+          "answer_sense": "precipitazione di gocce d'acqua",
+          "relation": "precipitazione",
+          "meaning_group": "pioggia",
+          "rationale": "La pioggia può cadere dalle nuvole.",
+          "decision": "accepted"
+        },
+        {
+          "word": "neve",
+          "answer_sense": "precipitazione di cristalli di ghiaccio",
+          "relation": "precipitazione",
+          "meaning_group": "neve",
+          "rationale": "La neve si forma nelle nuvole e cade come precipitazione solida.",
+          "decision": "accepted"
+        },
+        {
+          "word": "vento",
+          "answer_sense": "movimento dell'aria",
+          "relation": "movimento",
+          "meaning_group": "vento",
+          "rationale": "Il vento trasporta le nuvole nel cielo.",
+          "decision": "accepted"
+        },
+        {
+          "word": "ombra",
+          "answer_sense": "zona sottratta alla luce diretta",
+          "relation": "effetto",
+          "meaning_group": "ombra",
+          "rationale": "Una nuvola può proiettare ombra schermando la luce del sole.",
+          "decision": "accepted"
+        },
+        {
+          "word": "temporale",
+          "answer_sense": "fenomeno con fulmini e tuoni",
+          "relation": "fenomeno meteorologico",
+          "meaning_group": "temporale",
+          "rationale": "Le nuvole temporalesche sono associate a pioggia intensa, fulmini e tuoni.",
+          "decision": "accepted"
+        },
+        {
+          "word": "cumulo",
+          "answer_sense": "nuvola dall'aspetto tondeggiante",
+          "relation": "tipo",
+          "meaning_group": "tipo_nuvola",
+          "rationale": "Il cumulo è un tipo di nuvola dall'aspetto sviluppato e tondeggiante.",
+          "decision": "accepted"
+        },
+        {
+          "word": "cirro",
+          "answer_sense": "nuvola alta e sottile",
+          "relation": "tipo",
+          "meaning_group": "tipo_nuvola",
+          "rationale": "Il cirro è una nuvola alta, sottile e spesso filamentosa.",
+          "decision": "accepted"
+        },
+        {
+          "word": "grigio",
+          "answer_sense": "colore intermedio tra bianco e nero",
+          "relation": "aspetto",
+          "meaning_group": "grigio",
+          "rationale": "Molte nuvole che coprono il cielo appaiono grigie.",
+          "decision": "accepted"
+        },
+        {
+          "word": "fulmine",
+          "answer_sense": "scarica elettrica atmosferica",
+          "relation": "fenomeno collegato",
+          "meaning_group": "fulmine",
+          "rationale": "Un fulmine può svilupparsi tra nuvole o fra una nuvola e il suolo.",
+          "decision": "accepted"
+        }
+      ],
+      "group_limits": {
+        "cielo": 1,
+        "goccia": 1,
+        "condensazione": 1,
+        "pioggia": 1,
+        "neve": 1,
+        "vento": 1,
+        "ombra": 1,
+        "temporale": 1,
+        "tipo_nuvola": 1,
+        "grigio": 1,
+        "fulmine": 1
+      },
+      "conflicts": []
+    },
+    {
+      "prompt": "pollo",
+      "validation_id": "0722693b0183c37e739b4f68629be8aa779c65343d0b06c9faf19440cbf08a93",
+      "decision": "accepted",
+      "review_rationale": "Revisione editoriale di ogni coppia per «pollo», nel senso «Carne di pollo da cucinare». Controllati autonomia, coerenza, forma e ruoli; gruppi con limite uno per evitare equivalenti nello stesso set. Nessuna prova umana o indipendente dichiarata.",
+      "answers": [
+        {
+          "word": "petto",
+          "answer_sense": "parte anteriore del torace usata come taglio di carne",
+          "relation": "taglio",
+          "meaning_group": "petto",
+          "rationale": "Il petto è uno dei tagli più comuni della carne di pollo.",
+          "decision": "accepted"
+        },
+        {
+          "word": "coscia",
+          "answer_sense": "parte superiore della zampa usata come taglio di carne",
+          "relation": "taglio",
+          "meaning_group": "coscia",
+          "rationale": "La coscia è un taglio riconoscibile del pollo da cucinare.",
+          "decision": "accepted"
+        },
+        {
+          "word": "ala",
+          "answer_sense": "appendice dell'uccello usata come porzione alimentare",
+          "relation": "taglio",
+          "meaning_group": "ala",
+          "rationale": "Le ali sono porzioni del pollo preparate per il consumo.",
+          "decision": "accepted"
+        },
+        {
+          "word": "arrosto",
+          "answer_sense": "cotto mediante calore asciutto",
+          "relation": "preparazione",
+          "meaning_group": "arrosto",
+          "rationale": "Il pollo arrosto è una preparazione culinaria comune.",
+          "decision": "accepted"
+        },
+        {
+          "word": "forno",
+          "answer_sense": "apparecchio per cuocere",
+          "relation": "cottura",
+          "meaning_group": "forno",
+          "rationale": "La carne di pollo viene comunemente cotta al forno.",
+          "decision": "accepted"
+        },
+        {
+          "word": "griglia",
+          "answer_sense": "struttura metallica per la cottura diretta",
+          "relation": "cottura",
+          "meaning_group": "griglia",
+          "rationale": "La griglia viene usata per cuocere il pollo.",
+          "decision": "accepted"
+        },
+        {
+          "word": "brodo",
+          "answer_sense": "liquido ottenuto cuocendo ingredienti in acqua",
+          "relation": "preparazione",
+          "meaning_group": "brodo",
+          "rationale": "Il pollo viene usato per preparare brodo.",
+          "decision": "accepted"
+        },
+        {
+          "word": "impanatura",
+          "answer_sense": "rivestimento di pangrattato",
+          "relation": "preparazione",
+          "meaning_group": "impanatura",
+          "rationale": "L'impanatura riveste alcuni preparati a base di carne di pollo prima della cottura.",
+          "decision": "accepted"
+        },
+        {
+          "word": "spiedo",
+          "answer_sense": "asta per sostenere la carne durante la cottura",
+          "relation": "strumento",
+          "meaning_group": "spiedo",
+          "rationale": "Il pollo allo spiedo viene cotto ruotando su un'asta.",
+          "decision": "accepted"
+        },
+        {
+          "word": "carne",
+          "answer_sense": "alimento costituito da tessuti animali",
+          "relation": "categoria alimentare",
+          "meaning_group": "carne",
+          "rationale": "Nel senso selezionato, il pollo è carne destinata al consumo.",
+          "decision": "accepted"
+        },
+        {
+          "word": "pelle",
+          "answer_sense": "rivestimento esterno dell'animale",
+          "relation": "parte alimentare",
+          "meaning_group": "pelle",
+          "rationale": "La pelle può essere lasciata sul pollo durante la cottura, diventando croccante.",
+          "decision": "accepted"
+        }
+      ],
+      "group_limits": {
+        "petto": 1,
+        "coscia": 1,
+        "ala": 1,
+        "arrosto": 1,
+        "forno": 1,
+        "griglia": 1,
+        "brodo": 1,
+        "impanatura": 1,
+        "spiedo": 1,
+        "carne": 1,
+        "pelle": 1
+      },
+      "conflicts": []
+    },
+    {
+      "prompt": "cucchiaio",
+      "validation_id": "6f837c7f4e0c738123d0042cfd1bbb93137363d183fb50caabe9930a5cf5cac5",
+      "decision": "accepted",
+      "review_rationale": "Revisione editoriale di ogni coppia per «cucchiaio», nel senso «Posata concava per brodo e minestre». Controllati autonomia, coerenza, forma e ruoli; gruppi con limite uno per evitare equivalenti nello stesso set. Nessuna prova umana o indipendente dichiarata.",
+      "answers": [
+        {
+          "word": "manico",
+          "answer_sense": "parte impugnabile dell'utensile",
+          "relation": "parte",
+          "meaning_group": "manico",
+          "rationale": "Il manico permette di impugnare il cucchiaio.",
+          "decision": "accepted"
+        },
+        {
+          "word": "posata",
+          "answer_sense": "utensile usato per mangiare",
+          "relation": "categoria",
+          "meaning_group": "posata",
+          "rationale": "Il cucchiaio appartiene alle posate.",
+          "decision": "accepted"
+        },
+        {
+          "word": "brodo",
+          "answer_sense": "liquido di cottura alimentare",
+          "relation": "alimento caratteristico",
+          "meaning_group": "minestra",
+          "rationale": "Il brodo viene comunemente consumato con il cucchiaio.",
+          "decision": "accepted"
+        },
+        {
+          "word": "minestra",
+          "answer_sense": "pietanza liquida o semiliquida",
+          "relation": "alimento caratteristico",
+          "meaning_group": "minestra",
+          "rationale": "Il cucchiaio permette di raccogliere e mangiare la minestra.",
+          "decision": "accepted"
+        },
+        {
+          "word": "zuppa",
+          "answer_sense": "pietanza a base di liquido e altri ingredienti",
+          "relation": "alimento caratteristico",
+          "meaning_group": "minestra",
+          "rationale": "La zuppa viene comunemente mangiata con il cucchiaio.",
+          "decision": "accepted"
+        },
+        {
+          "word": "yogurt",
+          "answer_sense": "alimento cremoso ottenuto dalla fermentazione del latte",
+          "relation": "alimento",
+          "meaning_group": "yogurt",
+          "rationale": "Il cucchiaio viene comunemente usato per mangiare lo yogurt.",
+          "decision": "accepted"
+        },
+        {
+          "word": "gelato",
+          "answer_sense": "preparazione alimentare fredda e cremosa",
+          "relation": "alimento",
+          "meaning_group": "gelato",
+          "rationale": "Il gelato servito in una coppa può essere mangiato con il cucchiaio.",
+          "decision": "accepted"
+        },
+        {
+          "word": "mescolare",
+          "answer_sense": "muovere ingredienti per amalgamarli",
+          "relation": "funzione",
+          "meaning_group": "mescolare",
+          "rationale": "Il cucchiaio viene usato per mescolare liquidi e preparazioni alimentari.",
+          "decision": "accepted"
+        },
+        {
+          "word": "imboccare",
+          "answer_sense": "portare il cibo alla bocca di un'altra persona",
+          "relation": "funzione",
+          "meaning_group": "imboccare",
+          "rationale": "Un cucchiaio può essere usato per imboccare un bambino o una persona assistita.",
+          "decision": "accepted"
+        },
+        {
+          "word": "concavo",
+          "answer_sense": "incurvato verso l'interno",
+          "relation": "forma",
+          "meaning_group": "concavo",
+          "rationale": "La parte concava del cucchiaio raccoglie il cibo e i liquidi.",
+          "decision": "accepted"
+        },
+        {
+          "word": "acciaio",
+          "answer_sense": "lega metallica",
+          "relation": "materiale",
+          "meaning_group": "materiale",
+          "rationale": "L'acciaio è un materiale comune dei cucchiai da tavola.",
+          "decision": "accepted"
+        },
+        {
+          "word": "legno",
+          "answer_sense": "materiale ricavato dagli alberi",
+          "relation": "materiale",
+          "meaning_group": "materiale",
+          "rationale": "Il legno viene usato per realizzare cucchiai da cucina.",
+          "decision": "accepted"
+        }
+      ],
+      "group_limits": {
+        "manico": 1,
+        "posata": 1,
+        "minestra": 1,
+        "yogurt": 1,
+        "gelato": 1,
+        "mescolare": 1,
+        "imboccare": 1,
+        "concavo": 1,
+        "materiale": 1
+      },
+      "conflicts": []
+    },
+    {
+      "prompt": "cuore",
+      "validation_id": "31f87d46d7c65bbc687862449f9f8d88e18770fdfd3b1fb55f11a19ae2c841c6",
+      "decision": "accepted",
+      "review_rationale": "Revisione editoriale di ogni coppia per «cuore», nel senso «L'organo che pompa il sangue». Controllati autonomia, coerenza, forma e ruoli; gruppi con limite uno per evitare equivalenti nello stesso set. Nessuna prova umana o indipendente dichiarata.",
+      "answers": [
+        {
+          "word": "battito",
+          "answer_sense": "contrazione ritmica del cuore",
+          "relation": "attività",
+          "meaning_group": "battito",
+          "rationale": "Il battito è l'attività ritmica di contrazione del cuore.",
+          "decision": "accepted"
+        },
+        {
+          "word": "sangue",
+          "answer_sense": "tessuto liquido che circola nei vasi",
+          "relation": "fluido pompato",
+          "meaning_group": "sangue",
+          "rationale": "Il cuore pompa il sangue attraverso il sistema circolatorio.",
+          "decision": "accepted"
+        },
+        {
+          "word": "arteria",
+          "answer_sense": "vaso che porta il sangue dal cuore ai tessuti",
+          "relation": "vaso collegato",
+          "meaning_group": "arteria",
+          "rationale": "Le arterie trasportano il sangue in uscita dal cuore.",
+          "decision": "accepted"
+        },
+        {
+          "word": "vena",
+          "answer_sense": "vaso che riporta il sangue verso il cuore",
+          "relation": "vaso collegato",
+          "meaning_group": "vena",
+          "rationale": "Le vene riportano il sangue verso il cuore.",
+          "decision": "accepted"
+        },
+        {
+          "word": "atrio",
+          "answer_sense": "cavità cardiaca che riceve sangue",
+          "relation": "parte anatomica",
+          "meaning_group": "atrio",
+          "rationale": "Gli atri sono le cavità del cuore che ricevono il sangue.",
+          "decision": "accepted"
+        },
+        {
+          "word": "ventricolo",
+          "answer_sense": "cavità cardiaca che spinge il sangue nei vasi",
+          "relation": "parte anatomica",
+          "meaning_group": "ventricolo",
+          "rationale": "I ventricoli sono cavità del cuore che spingono il sangue nei vasi.",
+          "decision": "accepted"
+        },
+        {
+          "word": "valvola",
+          "answer_sense": "struttura che regola il passaggio del sangue",
+          "relation": "parte anatomica",
+          "meaning_group": "valvola",
+          "rationale": "Le valvole cardiache regolano il passaggio del sangue nel cuore.",
+          "decision": "accepted"
+        },
+        {
+          "word": "pompare",
+          "answer_sense": "spingere un fluido mediante pressione",
+          "relation": "funzione",
+          "meaning_group": "pompare",
+          "rationale": "La funzione caratteristica del cuore è pompare il sangue.",
+          "decision": "accepted"
+        },
+        {
+          "word": "polso",
+          "answer_sense": "pulsazione delle arterie percepibile al tatto",
+          "relation": "segno rilevabile",
+          "meaning_group": "polso",
+          "rationale": "Il polso permette di percepire le pulsazioni prodotte dal battito del cuore.",
+          "decision": "accepted"
+        },
+        {
+          "word": "elettrocardiogramma",
+          "answer_sense": "registrazione dell'attività elettrica cardiaca",
+          "relation": "esame",
+          "meaning_group": "elettrocardiogramma",
+          "rationale": "L'elettrocardiogramma registra l'attività elettrica del cuore.",
+          "decision": "accepted"
+        },
+        {
+          "word": "infarto",
+          "answer_sense": "danno del tessuto dovuto a mancato apporto di sangue",
+          "relation": "patologia collegata",
+          "meaning_group": "infarto",
+          "rationale": "L'infarto cardiaco interessa il muscolo del cuore.",
+          "decision": "accepted"
+        },
+        {
+          "word": "cardiologo",
+          "answer_sense": "medico specialista del cuore",
+          "relation": "professione",
+          "meaning_group": "cardiologo",
+          "rationale": "Il cardiologo è il medico specializzato nel cuore e nelle sue malattie.",
+          "decision": "accepted"
+        }
+      ],
+      "group_limits": {
+        "battito": 1,
+        "sangue": 1,
+        "arteria": 1,
+        "vena": 1,
+        "atrio": 1,
+        "ventricolo": 1,
+        "valvola": 1,
+        "pompare": 1,
+        "polso": 1,
+        "elettrocardiogramma": 1,
+        "infarto": 1,
+        "cardiologo": 1
+      },
+      "conflicts": []
+    },
+    {
+      "prompt": "leone",
+      "validation_id": "36fffb51d79408049594650f7becb507457235298a98c1194fedca3a47132c96",
+      "decision": "accepted",
+      "review_rationale": "Revisione editoriale di ogni coppia per «leone», nel senso «Grande felino con la criniera». Controllati autonomia, coerenza, forma e ruoli; gruppi con limite uno per evitare equivalenti nello stesso set. Nessuna prova umana o indipendente dichiarata.",
+      "answers": [
+        {
+          "word": "criniera",
+          "answer_sense": "pelo lungo intorno al capo e al collo",
+          "relation": "caratteristica anatomica",
+          "meaning_group": "criniera",
+          "rationale": "La criniera è una caratteristica riconoscibile del leone maschio adulto.",
+          "decision": "accepted"
+        },
+        {
+          "word": "ruggito",
+          "answer_sense": "verso potente dei grandi felini",
+          "relation": "verso",
+          "meaning_group": "ruggito",
+          "rationale": "Il ruggito è il verso caratteristico del leone.",
+          "decision": "accepted"
+        },
+        {
+          "word": "zanna",
+          "answer_sense": "dente canino sviluppato",
+          "relation": "parte anatomica",
+          "meaning_group": "zanna",
+          "rationale": "Le zanne del leone servono per afferrare e uccidere le prede.",
+          "decision": "accepted"
+        },
+        {
+          "word": "artiglio",
+          "answer_sense": "unghia ricurva dei predatori",
+          "relation": "parte anatomica",
+          "meaning_group": "artiglio",
+          "rationale": "Gli artigli permettono al leone di trattenere le prede.",
+          "decision": "accepted"
+        },
+        {
+          "word": "savana",
+          "answer_sense": "ambiente tropicale con erbe e alberi sparsi",
+          "relation": "habitat",
+          "meaning_group": "savana",
+          "rationale": "La savana è un habitat comunemente associato al leone africano.",
+          "decision": "accepted"
+        },
+        {
+          "word": "leonessa",
+          "answer_sense": "femmina del leone",
+          "relation": "sesso dell'animale",
+          "meaning_group": "leonessa",
+          "rationale": "La leonessa è la femmina del leone.",
+          "decision": "accepted"
+        },
+        {
+          "word": "preda",
+          "answer_sense": "animale catturato da un predatore",
+          "relation": "alimentazione",
+          "meaning_group": "preda",
+          "rationale": "Il leone caccia animali che costituiscono le sue prede.",
+          "decision": "accepted"
+        },
+        {
+          "word": "branco",
+          "answer_sense": "gruppo sociale di animali",
+          "relation": "comportamento sociale",
+          "meaning_group": "branco",
+          "rationale": "I leoni possono vivere in branchi con relazioni sociali stabili.",
+          "decision": "accepted"
+        },
+        {
+          "word": "felino",
+          "answer_sense": "mammifero della famiglia dei felidi",
+          "relation": "categoria zoologica",
+          "meaning_group": "felino",
+          "rationale": "Il leone appartiene ai felini.",
+          "decision": "accepted"
+        },
+        {
+          "word": "caccia",
+          "answer_sense": "ricerca e cattura di prede",
+          "relation": "comportamento",
+          "meaning_group": "caccia",
+          "rationale": "La caccia procura al leone il cibo di cui si nutre.",
+          "decision": "accepted"
+        },
+        {
+          "word": "carnivoro",
+          "answer_sense": "animale che si nutre di altri animali",
+          "relation": "dieta",
+          "meaning_group": "carnivoro",
+          "rationale": "Il leone è un carnivoro e si nutre della carne delle prede.",
+          "decision": "accepted"
+        }
+      ],
+      "group_limits": {
+        "criniera": 1,
+        "ruggito": 1,
+        "zanna": 1,
+        "artiglio": 1,
+        "savana": 1,
+        "leonessa": 1,
+        "preda": 1,
+        "branco": 1,
+        "felino": 1,
+        "caccia": 1,
+        "carnivoro": 1
+      },
+      "conflicts": []
+    },
+    {
+      "prompt": "bicchiere",
+      "validation_id": "66201f42179b338baa1b2a888e0d0c50ccb97de57aa6bad8059e54f213157b84",
+      "decision": "accepted",
+      "review_rationale": "Revisione editoriale di ogni coppia per «bicchiere», nel senso «Recipiente da cui si beve». Controllati autonomia, coerenza, forma e ruoli; gruppi con limite uno per evitare equivalenti nello stesso set. Nessuna prova umana o indipendente dichiarata.",
+      "answers": [
+        {
+          "word": "vetro",
+          "answer_sense": "materiale trasparente e rigido",
+          "relation": "materiale",
+          "meaning_group": "vetro",
+          "rationale": "Il vetro è un materiale caratteristico dei bicchieri da tavola.",
+          "decision": "accepted"
+        },
+        {
+          "word": "acqua",
+          "answer_sense": "liquido da bere",
+          "relation": "contenuto",
+          "meaning_group": "bevanda",
+          "rationale": "L'acqua viene comunemente bevuta da un bicchiere.",
+          "decision": "accepted"
+        },
+        {
+          "word": "vino",
+          "answer_sense": "bevanda ottenuta dall'uva fermentata",
+          "relation": "contenuto",
+          "meaning_group": "bevanda",
+          "rationale": "Il vino viene servito in bicchieri adatti.",
+          "decision": "accepted"
+        },
+        {
+          "word": "birra",
+          "answer_sense": "bevanda fermentata a base di cereali",
+          "relation": "contenuto",
+          "meaning_group": "bevanda",
+          "rationale": "La birra viene comunemente servita in un bicchiere.",
+          "decision": "accepted"
+        },
+        {
+          "word": "sorso",
+          "answer_sense": "quantità di liquido bevuta in una volta",
+          "relation": "consumo",
+          "meaning_group": "sorso",
+          "rationale": "Un sorso viene bevuto appoggiando il bicchiere alla bocca.",
+          "decision": "accepted"
+        },
+        {
+          "word": "bordo",
+          "answer_sense": "margine superiore del recipiente",
+          "relation": "parte",
+          "meaning_group": "bordo",
+          "rationale": "Il bordo del bicchiere viene avvicinato alle labbra per bere.",
+          "decision": "accepted"
+        },
+        {
+          "word": "tavola",
+          "answer_sense": "piano apparecchiato per il pasto",
+          "relation": "collocazione",
+          "meaning_group": "tavola",
+          "rationale": "Il bicchiere viene disposto sulla tavola apparecchiata.",
+          "decision": "accepted"
+        },
+        {
+          "word": "brindisi",
+          "answer_sense": "gesto augurale compiuto alzando i bicchieri",
+          "relation": "gesto",
+          "meaning_group": "brindisi",
+          "rationale": "Nel brindisi si alza il bicchiere e spesso lo si accosta a quello degli altri.",
+          "decision": "accepted"
+        },
+        {
+          "word": "lavastoviglie",
+          "answer_sense": "elettrodomestico per lavare stoviglie",
+          "relation": "manutenzione",
+          "meaning_group": "lavastoviglie",
+          "rationale": "I bicchieri compatibili possono essere lavati in lavastoviglie.",
+          "decision": "accepted"
+        },
+        {
+          "word": "calice",
+          "answer_sense": "bicchiere con stelo",
+          "relation": "tipo",
+          "meaning_group": "tipo_bicchiere",
+          "rationale": "Il calice è un tipo di bicchiere con coppa e stelo.",
+          "decision": "accepted"
+        },
+        {
+          "word": "boccale",
+          "answer_sense": "recipiente per bere con manico",
+          "relation": "tipo",
+          "meaning_group": "tipo_bicchiere",
+          "rationale": "Il boccale è un recipiente per bere comunemente associato ai bicchieri da birra.",
+          "decision": "accepted"
+        },
+        {
+          "word": "fragile",
+          "answer_sense": "che si rompe facilmente",
+          "relation": "proprietà",
+          "meaning_group": "fragile",
+          "rationale": "Un bicchiere di vetro è fragile e può rompersi cadendo.",
+          "decision": "accepted"
+        }
+      ],
+      "group_limits": {
+        "vetro": 1,
+        "bevanda": 1,
+        "sorso": 1,
+        "bordo": 1,
+        "tavola": 1,
+        "brindisi": 1,
+        "lavastoviglie": 1,
+        "tipo_bicchiere": 1,
+        "fragile": 1
+      },
+      "conflicts": []
+    },
+    {
+      "prompt": "patata",
+      "validation_id": "e5e07516a7b90158ab34450be43d205799744962196e2d96e32763260ea59a66",
+      "decision": "accepted",
+      "review_rationale": "Revisione editoriale di ogni coppia per «patata», nel senso «Tubero commestibile». Controllati autonomia, coerenza, forma e ruoli; gruppi con limite uno per evitare equivalenti nello stesso set. Nessuna prova umana o indipendente dichiarata.",
+      "answers": [
+        {
+          "word": "tubero",
+          "answer_sense": "organo vegetale sotterraneo di riserva",
+          "relation": "categoria botanica",
+          "meaning_group": "tubero",
+          "rationale": "La patata consumata come alimento è un tubero.",
+          "decision": "accepted"
+        },
+        {
+          "word": "buccia",
+          "answer_sense": "rivestimento esterno di un alimento vegetale",
+          "relation": "parte",
+          "meaning_group": "buccia",
+          "rationale": "La patata è rivestita da una buccia che può essere rimossa.",
+          "decision": "accepted"
+        },
+        {
+          "word": "amido",
+          "answer_sense": "sostanza di riserva dei vegetali",
+          "relation": "composizione",
+          "meaning_group": "amido",
+          "rationale": "La patata contiene una quantità importante di amido.",
+          "decision": "accepted"
+        },
+        {
+          "word": "orto",
+          "answer_sense": "terreno coltivato a ortaggi",
+          "relation": "coltivazione",
+          "meaning_group": "orto",
+          "rationale": "La patata può essere coltivata nell'orto.",
+          "decision": "accepted"
+        },
+        {
+          "word": "pelare",
+          "answer_sense": "togliere il rivestimento esterno",
+          "relation": "preparazione",
+          "meaning_group": "pelare",
+          "rationale": "Pelare una patata significa rimuoverne la buccia.",
+          "decision": "accepted"
+        },
+        {
+          "word": "lessare",
+          "answer_sense": "cuocere in acqua",
+          "relation": "cottura",
+          "meaning_group": "cottura",
+          "rationale": "Lessare è un modo comune di cuocere le patate.",
+          "decision": "accepted"
+        },
+        {
+          "word": "friggere",
+          "answer_sense": "cuocere in grasso caldo",
+          "relation": "cottura",
+          "meaning_group": "cottura",
+          "rationale": "Le patate fritte si ottengono cuocendole in olio caldo.",
+          "decision": "accepted"
+        },
+        {
+          "word": "purè",
+          "answer_sense": "preparazione morbida di patate schiacciate",
+          "relation": "preparazione",
+          "meaning_group": "purè",
+          "rationale": "Il purè è una preparazione caratteristica a base di patate.",
+          "decision": "accepted"
+        },
+        {
+          "word": "gnocco",
+          "answer_sense": "piccolo impasto alimentare da cuocere",
+          "relation": "preparazione",
+          "meaning_group": "gnocco",
+          "rationale": "Le patate lessate vengono usate per preparare molti tipi di gnocchi.",
+          "decision": "accepted"
+        },
+        {
+          "word": "forno",
+          "answer_sense": "apparecchio per cuocere",
+          "relation": "cottura",
+          "meaning_group": "cottura",
+          "rationale": "Le patate vengono comunemente cotte al forno.",
+          "decision": "accepted"
+        },
+        {
+          "word": "fecola",
+          "answer_sense": "amido estratto da tuberi",
+          "relation": "derivato",
+          "meaning_group": "fecola",
+          "rationale": "La fecola di patate si ottiene estraendo l'amido dai tuberi.",
+          "decision": "accepted"
+        },
+        {
+          "word": "terra",
+          "answer_sense": "suolo",
+          "relation": "crescita",
+          "meaning_group": "terra",
+          "rationale": "Le patate si sviluppano sotto terra nella parte sotterranea della pianta.",
+          "decision": "accepted"
+        }
+      ],
+      "group_limits": {
+        "tubero": 1,
+        "buccia": 1,
+        "amido": 1,
+        "orto": 1,
+        "pelare": 1,
+        "cottura": 1,
+        "purè": 1,
+        "gnocco": 1,
+        "fecola": 1,
+        "terra": 1
+      },
+      "conflicts": []
+    },
+    {
+      "prompt": "altalena",
+      "validation_id": "1149d0e38aaa74f6e33f30a067a118e8e719ead60db03cd70ea2241b8d723cf2",
+      "decision": "accepted",
+      "review_rationale": "Revisione editoriale di ogni coppia per «altalena», nel senso «Gioco dei giardini su cui ci si dondola». Controllati autonomia, coerenza, forma e ruoli; gruppi con limite uno per evitare equivalenti nello stesso set. Nessuna prova umana o indipendente dichiarata.",
+      "answers": [
+        {
+          "word": "sedile",
+          "answer_sense": "parte su cui ci si siede",
+          "relation": "parte",
+          "meaning_group": "sedile",
+          "rationale": "Il sedile sostiene chi gioca sull'altalena.",
+          "decision": "accepted"
+        },
+        {
+          "word": "catena",
+          "answer_sense": "insieme di anelli metallici collegati",
+          "relation": "sospensione",
+          "meaning_group": "sospensione",
+          "rationale": "Le catene possono collegare il sedile dell'altalena alla struttura superiore.",
+          "decision": "accepted"
+        },
+        {
+          "word": "corda",
+          "answer_sense": "elemento flessibile per legare o sostenere",
+          "relation": "sospensione",
+          "meaning_group": "sospensione",
+          "rationale": "Le corde possono sostenere il sedile di un'altalena.",
+          "decision": "accepted"
+        },
+        {
+          "word": "dondolare",
+          "answer_sense": "muoversi alternativamente avanti e indietro",
+          "relation": "movimento",
+          "meaning_group": "dondolare",
+          "rationale": "Il movimento caratteristico dell'altalena è dondolare avanti e indietro.",
+          "decision": "accepted"
+        },
+        {
+          "word": "spinta",
+          "answer_sense": "azione che mette in movimento",
+          "relation": "azione",
+          "meaning_group": "spinta",
+          "rationale": "Una spinta può avviare o aumentare il movimento dell'altalena.",
+          "decision": "accepted"
+        },
+        {
+          "word": "bambino",
+          "answer_sense": "persona nell'infanzia",
+          "relation": "utilizzatore",
+          "meaning_group": "bambino",
+          "rationale": "L'altalena dei giardini è un gioco molto usato dai bambini.",
+          "decision": "accepted"
+        },
+        {
+          "word": "parco",
+          "answer_sense": "area verde pubblica",
+          "relation": "collocazione",
+          "meaning_group": "parco",
+          "rationale": "L'altalena è un'attrezzatura comune dei parchi giochi.",
+          "decision": "accepted"
+        },
+        {
+          "word": "scivolo",
+          "answer_sense": "gioco con rampa inclinata",
+          "relation": "attrezzatura affine",
+          "meaning_group": "scivolo",
+          "rationale": "Altalena e scivolo si trovano comunemente insieme nei giardini per bambini.",
+          "decision": "accepted"
+        },
+        {
+          "word": "oscillazione",
+          "answer_sense": "movimento periodico intorno a una posizione",
+          "relation": "movimento fisico",
+          "meaning_group": "dondolare",
+          "rationale": "L'altalena compie oscillazioni intorno alla sua posizione di riposo.",
+          "decision": "accepted"
+        }
+      ],
+      "group_limits": {
+        "sedile": 1,
+        "sospensione": 1,
+        "dondolare": 1,
+        "spinta": 1,
+        "bambino": 1,
+        "parco": 1,
+        "scivolo": 1
+      },
+      "conflicts": []
+    },
+    {
+      "prompt": "cucina",
+      "validation_id": "1215f0102ca7090ac7fba66b5d6642b0dbcc1c389a9276d6b2babadd56c5e2ac",
+      "decision": "accepted",
+      "review_rationale": "Revisione editoriale di ogni coppia per «cucina», nel senso «La stanza della casa in cui si cucina». Controllati autonomia, coerenza, forma e ruoli; gruppi con limite uno per evitare equivalenti nello stesso set. Nessuna prova umana o indipendente dichiarata.",
+      "answers": [
+        {
+          "word": "fornello",
+          "answer_sense": "elemento che produce calore per cuocere",
+          "relation": "attrezzatura",
+          "meaning_group": "fornello",
+          "rationale": "Il fornello è un'attrezzatura caratteristica della stanza adibita a cucina.",
+          "decision": "accepted"
+        },
+        {
+          "word": "lavello",
+          "answer_sense": "vasca per lavare alimenti e stoviglie",
+          "relation": "attrezzatura",
+          "meaning_group": "lavello",
+          "rationale": "Il lavello permette di lavare alimenti e stoviglie in cucina.",
+          "decision": "accepted"
+        },
+        {
+          "word": "frigorifero",
+          "answer_sense": "elettrodomestico che conserva al freddo",
+          "relation": "elettrodomestico",
+          "meaning_group": "frigorifero",
+          "rationale": "Il frigorifero viene comunemente collocato in cucina per conservare gli alimenti.",
+          "decision": "accepted"
+        },
+        {
+          "word": "forno",
+          "answer_sense": "apparecchio per cuocere",
+          "relation": "elettrodomestico",
+          "meaning_group": "forno",
+          "rationale": "Il forno è un apparecchio caratteristico della cucina domestica.",
+          "decision": "accepted"
+        },
+        {
+          "word": "cappa",
+          "answer_sense": "dispositivo che aspira vapori e odori",
+          "relation": "attrezzatura",
+          "meaning_group": "cappa",
+          "rationale": "La cappa della cucina aspira vapori e odori prodotti dalla cottura.",
+          "decision": "accepted"
+        },
+        {
+          "word": "pentola",
+          "answer_sense": "recipiente per cuocere",
+          "relation": "utensile",
+          "meaning_group": "pentola",
+          "rationale": "La pentola è un utensile caratteristico usato nella cucina domestica.",
+          "decision": "accepted"
+        },
+        {
+          "word": "dispensa",
+          "answer_sense": "spazio per conservare provviste",
+          "relation": "spazio",
+          "meaning_group": "dispensa",
+          "rationale": "La dispensa conserva le provviste della cucina.",
+          "decision": "accepted"
+        },
+        {
+          "word": "tavolo",
+          "answer_sense": "mobile con piano di appoggio",
+          "relation": "arredo",
+          "meaning_group": "tavolo",
+          "rationale": "Il tavolo viene usato in molte cucine per preparare o consumare il cibo.",
+          "decision": "accepted"
+        },
+        {
+          "word": "lavastoviglie",
+          "answer_sense": "elettrodomestico per lavare stoviglie",
+          "relation": "elettrodomestico",
+          "meaning_group": "lavastoviglie",
+          "rationale": "La lavastoviglie è un elettrodomestico comunemente installato in cucina.",
+          "decision": "accepted"
+        },
+        {
+          "word": "rubinetto",
+          "answer_sense": "dispositivo che eroga acqua",
+          "relation": "impianto",
+          "meaning_group": "rubinetto",
+          "rationale": "Il rubinetto eroga l'acqua nel lavello della cucina.",
+          "decision": "accepted"
+        },
+        {
+          "word": "stoviglia",
+          "answer_sense": "utensile o recipiente per il servizio del cibo",
+          "relation": "dotazione",
+          "meaning_group": "stoviglia",
+          "rationale": "Le stoviglie vengono usate e conservate nella cucina domestica.",
+          "decision": "accepted"
+        },
+        {
+          "word": "cuocere",
+          "answer_sense": "trasformare alimenti mediante calore",
+          "relation": "funzione della stanza",
+          "meaning_group": "cuocere",
+          "rationale": "La cucina è la stanza attrezzata per cuocere gli alimenti.",
+          "decision": "accepted"
+        }
+      ],
+      "group_limits": {
+        "fornello": 1,
+        "lavello": 1,
+        "frigorifero": 1,
+        "forno": 1,
+        "cappa": 1,
+        "pentola": 1,
+        "dispensa": 1,
+        "tavolo": 1,
+        "lavastoviglie": 1,
+        "rubinetto": 1,
+        "stoviglia": 1,
+        "cuocere": 1
+      },
+      "conflicts": []
+    },
+    {
+      "prompt": "braccio",
+      "validation_id": "a2e7471b877a2401735007c9f6b7b1bd9423c7220e1d79bf2adfb0205bc1f42a",
+      "decision": "accepted",
+      "review_rationale": "Revisione editoriale di ogni coppia per «braccio», nel senso «Il braccio del corpo umano». Controllati autonomia, coerenza, forma e ruoli; gruppi con limite uno per evitare equivalenti nello stesso set. Nessuna prova umana o indipendente dichiarata.",
+      "answers": [
+        {
+          "word": "spalla",
+          "answer_sense": "regione che collega arto superiore e tronco",
+          "relation": "articolazione",
+          "meaning_group": "spalla",
+          "rationale": "La spalla collega il braccio al tronco.",
+          "decision": "accepted"
+        },
+        {
+          "word": "gomito",
+          "answer_sense": "articolazione fra braccio e avambraccio",
+          "relation": "articolazione",
+          "meaning_group": "gomito",
+          "rationale": "Il gomito permette di piegare l'arto tra braccio e avambraccio.",
+          "decision": "accepted"
+        },
+        {
+          "word": "avambraccio",
+          "answer_sense": "parte dell'arto tra gomito e polso",
+          "relation": "regione collegata",
+          "meaning_group": "avambraccio",
+          "rationale": "L'avambraccio prosegue il braccio oltre il gomito.",
+          "decision": "accepted"
+        },
+        {
+          "word": "omero",
+          "answer_sense": "osso del braccio",
+          "relation": "osso",
+          "meaning_group": "omero",
+          "rationale": "L'omero è l'osso del braccio fra spalla e gomito.",
+          "decision": "accepted"
+        },
+        {
+          "word": "polso",
+          "answer_sense": "articolazione che collega avambraccio e mano",
+          "relation": "articolazione collegata",
+          "meaning_group": "polso",
+          "rationale": "Il polso è l'articolazione terminale dell'avambraccio collegato al braccio.",
+          "decision": "accepted"
+        },
+        {
+          "word": "mano",
+          "answer_sense": "estremità dell'arto superiore",
+          "relation": "estremità",
+          "meaning_group": "mano",
+          "rationale": "La mano è l'estremità dell'arto di cui il braccio fa parte.",
+          "decision": "accepted"
+        },
+        {
+          "word": "bicipite",
+          "answer_sense": "muscolo anteriore del braccio",
+          "relation": "muscolo",
+          "meaning_group": "muscolo",
+          "rationale": "Il bicipite è un muscolo riconoscibile della parte anteriore del braccio.",
+          "decision": "accepted"
+        },
+        {
+          "word": "tricipite",
+          "answer_sense": "muscolo posteriore del braccio",
+          "relation": "muscolo",
+          "meaning_group": "muscolo",
+          "rationale": "Il tricipite è un muscolo della parte posteriore del braccio.",
+          "decision": "accepted"
+        },
+        {
+          "word": "muscolo",
+          "answer_sense": "tessuto contrattile che produce movimento",
+          "relation": "struttura",
+          "meaning_group": "muscolo",
+          "rationale": "I muscoli del braccio permettono i movimenti dell'arto.",
+          "decision": "accepted"
+        },
+        {
+          "word": "manica",
+          "answer_sense": "parte del vestito che ricopre il braccio",
+          "relation": "abbigliamento",
+          "meaning_group": "manica",
+          "rationale": "La manica è la parte dell'indumento che riveste il braccio.",
+          "decision": "accepted"
+        },
+        {
+          "word": "gesso",
+          "answer_sense": "rivestimento rigido usato per immobilizzare",
+          "relation": "cura",
+          "meaning_group": "gesso",
+          "rationale": "Un braccio fratturato può essere immobilizzato con un gesso.",
+          "decision": "accepted"
+        }
+      ],
+      "group_limits": {
+        "spalla": 1,
+        "gomito": 1,
+        "avambraccio": 1,
+        "omero": 1,
+        "polso": 1,
+        "mano": 1,
+        "muscolo": 1,
+        "manica": 1,
+        "gesso": 1
+      },
+      "conflicts": []
+    },
+    {
+      "prompt": "guancia",
+      "validation_id": "e58eb62076c01d1e33dcda54d5cd8ad4a60597c9228d602ee13bf5c588b04657",
+      "decision": "accepted",
+      "review_rationale": "Revisione editoriale di ogni coppia per «guancia», nel senso «La parte laterale del viso». Controllati autonomia, coerenza, forma e ruoli; gruppi con limite uno per evitare equivalenti nello stesso set. Nessuna prova umana o indipendente dichiarata.",
+      "answers": [
+        {
+          "word": "viso",
+          "answer_sense": "parte anteriore della testa",
+          "relation": "appartenenza anatomica",
+          "meaning_group": "viso",
+          "rationale": "La guancia è una parte laterale del viso.",
+          "decision": "accepted"
+        },
+        {
+          "word": "zigomo",
+          "answer_sense": "rilievo osseo del volto",
+          "relation": "struttura anatomica",
+          "meaning_group": "zigomo",
+          "rationale": "Lo zigomo dà rilievo alla parte superiore della guancia.",
+          "decision": "accepted"
+        },
+        {
+          "word": "bocca",
+          "answer_sense": "apertura del cavo orale",
+          "relation": "posizione anatomica",
+          "meaning_group": "bocca",
+          "rationale": "Le guance delimitano lateralmente il cavo della bocca.",
+          "decision": "accepted"
+        },
+        {
+          "word": "rossore",
+          "answer_sense": "colorazione arrossata della pelle",
+          "relation": "aspetto",
+          "meaning_group": "rossore",
+          "rationale": "Il rossore può comparire sulle guance per emozione o calore.",
+          "decision": "accepted"
+        },
+        {
+          "word": "schiaffo",
+          "answer_sense": "colpo dato con la mano aperta",
+          "relation": "gesto",
+          "meaning_group": "schiaffo",
+          "rationale": "La guancia è una sede tipica dello schiaffo.",
+          "decision": "accepted"
+        },
+        {
+          "word": "bacio",
+          "answer_sense": "gesto affettuoso compiuto con le labbra",
+          "relation": "gesto",
+          "meaning_group": "bacio",
+          "rationale": "Un bacio sulla guancia è un gesto affettuoso o di saluto.",
+          "decision": "accepted"
+        },
+        {
+          "word": "carezza",
+          "answer_sense": "contatto lieve e affettuoso",
+          "relation": "gesto",
+          "meaning_group": "carezza",
+          "rationale": "Accarezzare la guancia è un gesto di affetto riconoscibile.",
+          "decision": "accepted"
+        },
+        {
+          "word": "fossetta",
+          "answer_sense": "piccola depressione della pelle",
+          "relation": "caratteristica",
+          "meaning_group": "fossetta",
+          "rationale": "Una fossetta può comparire sulla guancia quando si sorride.",
+          "decision": "accepted"
+        },
+        {
+          "word": "sorriso",
+          "answer_sense": "espressione del volto con le labbra sollevate",
+          "relation": "movimento del volto",
+          "meaning_group": "sorriso",
+          "rationale": "Il sorriso modifica anche il profilo e i muscoli delle guance.",
+          "decision": "accepted"
+        }
+      ],
+      "group_limits": {
+        "viso": 1,
+        "zigomo": 1,
+        "bocca": 1,
+        "rossore": 1,
+        "schiaffo": 1,
+        "bacio": 1,
+        "carezza": 1,
+        "fossetta": 1,
+        "sorriso": 1
+      },
+      "conflicts": []
+    },
+    {
+      "prompt": "faccia",
+      "validation_id": "d693aa2b29008291697d3b7e90fc36a3d4267968f5dbc19b5008a101c843db4f",
+      "decision": "accepted",
+      "review_rationale": "Revisione editoriale di ogni coppia per «faccia», nel senso «Il viso di una persona». Controllati autonomia, coerenza, forma e ruoli; gruppi con limite uno per evitare equivalenti nello stesso set. Nessuna prova umana o indipendente dichiarata.",
+      "answers": [
+        {
+          "word": "viso",
+          "answer_sense": "parte anteriore della testa",
+          "relation": "sinonimo",
+          "meaning_group": "viso",
+          "rationale": "Viso è un sinonimo di faccia nel senso anatomico scelto.",
+          "decision": "accepted"
+        },
+        {
+          "word": "occhio",
+          "answer_sense": "organo della vista",
+          "relation": "parte",
+          "meaning_group": "occhio",
+          "rationale": "Gli occhi si trovano nella parte superiore della faccia.",
+          "decision": "accepted"
+        },
+        {
+          "word": "naso",
+          "answer_sense": "organo dell'olfatto",
+          "relation": "parte",
+          "meaning_group": "naso",
+          "rationale": "Il naso si trova al centro della faccia.",
+          "decision": "accepted"
+        },
+        {
+          "word": "bocca",
+          "answer_sense": "apertura del cavo orale",
+          "relation": "parte",
+          "meaning_group": "bocca",
+          "rationale": "La bocca è un elemento riconoscibile della faccia.",
+          "decision": "accepted"
+        },
+        {
+          "word": "guancia",
+          "answer_sense": "parte laterale del volto",
+          "relation": "parte",
+          "meaning_group": "guancia",
+          "rationale": "Le guance formano le zone laterali della faccia.",
+          "decision": "accepted"
+        },
+        {
+          "word": "fronte",
+          "answer_sense": "area del volto sopra gli occhi",
+          "relation": "parte",
+          "meaning_group": "fronte",
+          "rationale": "La fronte occupa la parte superiore della faccia.",
+          "decision": "accepted"
+        },
+        {
+          "word": "mento",
+          "answer_sense": "estremità inferiore del volto",
+          "relation": "parte",
+          "meaning_group": "mento",
+          "rationale": "Il mento forma la parte inferiore della faccia.",
+          "decision": "accepted"
+        },
+        {
+          "word": "sorriso",
+          "answer_sense": "espressione del volto",
+          "relation": "espressione",
+          "meaning_group": "sorriso",
+          "rationale": "Un sorriso cambia l'espressione della faccia.",
+          "decision": "accepted"
+        },
+        {
+          "word": "smorfia",
+          "answer_sense": "alterazione espressiva dei lineamenti",
+          "relation": "espressione",
+          "meaning_group": "smorfia",
+          "rationale": "Una smorfia si manifesta attraverso movimenti dei muscoli della faccia.",
+          "decision": "accepted"
+        },
+        {
+          "word": "trucco",
+          "answer_sense": "applicazione di cosmetici",
+          "relation": "trattamento estetico",
+          "meaning_group": "trucco",
+          "rationale": "Il trucco modifica o valorizza l'aspetto della faccia.",
+          "decision": "accepted"
+        },
+        {
+          "word": "barba",
+          "answer_sense": "peli che crescono su parte del volto",
+          "relation": "rivestimento",
+          "meaning_group": "barba",
+          "rationale": "La barba può ricoprire guance, mento e altre parti della faccia.",
+          "decision": "accepted"
+        }
+      ],
+      "group_limits": {
+        "viso": 1,
+        "occhio": 1,
+        "naso": 1,
+        "bocca": 1,
+        "guancia": 1,
+        "fronte": 1,
+        "mento": 1,
+        "sorriso": 1,
+        "smorfia": 1,
+        "trucco": 1,
+        "barba": 1
+      },
+      "conflicts": []
+    },
+    {
+      "prompt": "buio",
+      "validation_id": "497eab4ae430a90629bb272da54a75ee4fc4fb0e67190af93782c749a4247ecb",
+      "decision": "accepted",
+      "review_rationale": "Revisione editoriale di ogni coppia per «buio», nel senso «L'assenza di luce». Controllati autonomia, coerenza, forma e ruoli; gruppi con limite uno per evitare equivalenti nello stesso set. Nessuna prova umana o indipendente dichiarata.",
+      "answers": [
+        {
+          "word": "oscurità",
+          "answer_sense": "mancanza di illuminazione",
+          "relation": "sinonimo",
+          "meaning_group": "oscurità",
+          "rationale": "L'oscurità è la condizione di buio.",
+          "decision": "accepted"
+        },
+        {
+          "word": "notte",
+          "answer_sense": "periodo della giornata senza luce solare diretta",
+          "relation": "occasione naturale",
+          "meaning_group": "notte",
+          "rationale": "Il buio è caratteristico della notte senza illuminazione artificiale.",
+          "decision": "accepted"
+        },
+        {
+          "word": "luce",
+          "answer_sense": "radiazione che rende visibili gli oggetti",
+          "relation": "contrario",
+          "meaning_group": "luce",
+          "rationale": "La presenza di luce si contrappone alla condizione di buio.",
+          "decision": "accepted"
+        },
+        {
+          "word": "torcia",
+          "answer_sense": "lampada portatile",
+          "relation": "strumento di illuminazione",
+          "meaning_group": "illuminazione",
+          "rationale": "Una torcia permette di illuminare un ambiente buio.",
+          "decision": "accepted"
+        },
+        {
+          "word": "candela",
+          "answer_sense": "fonte luminosa con stoppino e cera",
+          "relation": "strumento di illuminazione",
+          "meaning_group": "illuminazione",
+          "rationale": "Una candela accesa produce luce nel buio.",
+          "decision": "accepted"
+        },
+        {
+          "word": "lampadina",
+          "answer_sense": "sorgente elettrica di luce",
+          "relation": "strumento di illuminazione",
+          "meaning_group": "illuminazione",
+          "rationale": "Una lampadina accesa illumina uno spazio altrimenti buio.",
+          "decision": "accepted"
+        },
+        {
+          "word": "paura",
+          "answer_sense": "emozione di fronte a una minaccia percepita",
+          "relation": "reazione comune",
+          "meaning_group": "paura",
+          "rationale": "La paura del buio è un'associazione quotidiana riconoscibile.",
+          "decision": "accepted"
+        },
+        {
+          "word": "interruttore",
+          "answer_sense": "dispositivo che apre o chiude un circuito",
+          "relation": "controllo della luce",
+          "meaning_group": "interruttore",
+          "rationale": "L'interruttore permette di accendere la luce per uscire dal buio.",
+          "decision": "accepted"
+        },
+        {
+          "word": "blackout",
+          "answer_sense": "interruzione della fornitura di energia elettrica",
+          "relation": "causa",
+          "meaning_group": "blackout",
+          "rationale": "Un blackout può lasciare al buio gli ambienti che dipendono dall'illuminazione elettrica.",
+          "decision": "accepted"
+        },
+        {
+          "word": "eclissi",
+          "answer_sense": "oscuramento di un astro per allineamento di corpi celesti",
+          "relation": "fenomeno",
+          "meaning_group": "eclissi",
+          "rationale": "Un'eclissi totale di Sole può produrre temporaneamente buio anche di giorno.",
+          "decision": "accepted"
+        }
+      ],
+      "group_limits": {
+        "oscurità": 1,
+        "notte": 1,
+        "luce": 1,
+        "illuminazione": 1,
+        "paura": 1,
+        "interruttore": 1,
+        "blackout": 1,
+        "eclissi": 1
+      },
+      "conflicts": []
+    },
+    {
+      "prompt": "freddo",
+      "validation_id": "a9f82672ccec510e9b8d117a2dc53465722cd03142ad44fb8dfa61d0365cd209",
+      "decision": "accepted",
+      "review_rationale": "Revisione editoriale di ogni coppia per «freddo», nel senso «Di bassa temperatura». Controllati autonomia, coerenza, forma e ruoli; gruppi con limite uno per evitare equivalenti nello stesso set. Nessuna prova umana o indipendente dichiarata.",
+      "answers": [
+        {
+          "word": "ghiaccio",
+          "answer_sense": "acqua allo stato solido",
+          "relation": "materiale caratteristico",
+          "meaning_group": "ghiaccio",
+          "rationale": "Il ghiaccio è comunemente associato a una sensazione di freddo.",
+          "decision": "accepted"
+        },
+        {
+          "word": "neve",
+          "answer_sense": "cristalli di ghiaccio che cadono dall'atmosfera",
+          "relation": "fenomeno",
+          "meaning_group": "neve",
+          "rationale": "La neve è associata a condizioni di freddo.",
+          "decision": "accepted"
+        },
+        {
+          "word": "inverno",
+          "answer_sense": "stagione più fredda dell'anno",
+          "relation": "stagione",
+          "meaning_group": "inverno",
+          "rationale": "L'inverno è la stagione comunemente associata al freddo.",
+          "decision": "accepted"
+        },
+        {
+          "word": "brivido",
+          "answer_sense": "tremore involontario del corpo",
+          "relation": "reazione",
+          "meaning_group": "brivido",
+          "rationale": "Il freddo può provocare brividi.",
+          "decision": "accepted"
+        },
+        {
+          "word": "guanto",
+          "answer_sense": "indumento che riveste la mano",
+          "relation": "protezione",
+          "meaning_group": "protezione",
+          "rationale": "Il guanto protegge la mano dal freddo.",
+          "decision": "accepted"
+        },
+        {
+          "word": "cappotto",
+          "answer_sense": "indumento esterno pesante",
+          "relation": "protezione",
+          "meaning_group": "protezione",
+          "rationale": "Il cappotto viene indossato per proteggersi dal freddo.",
+          "decision": "accepted"
+        },
+        {
+          "word": "brina",
+          "answer_sense": "deposito di cristalli di ghiaccio sulle superfici",
+          "relation": "fenomeno",
+          "meaning_group": "brina",
+          "rationale": "La brina si forma sulle superfici in condizioni di freddo.",
+          "decision": "accepted"
+        },
+        {
+          "word": "termometro",
+          "answer_sense": "strumento per misurare la temperatura",
+          "relation": "misura",
+          "meaning_group": "termometro",
+          "rationale": "Il termometro permette di misurare le basse temperature associate al freddo.",
+          "decision": "accepted"
+        },
+        {
+          "word": "gelo",
+          "answer_sense": "condizione di freddo intenso",
+          "relation": "intensificazione",
+          "meaning_group": "gelo",
+          "rationale": "Il gelo indica una condizione di freddo intenso.",
+          "decision": "accepted"
+        },
+        {
+          "word": "coperta",
+          "answer_sense": "telo che trattiene il calore del corpo",
+          "relation": "protezione",
+          "meaning_group": "protezione",
+          "rationale": "La coperta viene usata per proteggersi dal freddo durante il riposo.",
+          "decision": "accepted"
+        },
+        {
+          "word": "riscaldamento",
+          "answer_sense": "produzione di calore per aumentare la temperatura",
+          "relation": "contrasto",
+          "meaning_group": "riscaldamento",
+          "rationale": "Il riscaldamento riduce il freddo negli ambienti.",
+          "decision": "accepted"
+        },
+        {
+          "word": "caldo",
+          "answer_sense": "condizione di temperatura elevata",
+          "relation": "contrario",
+          "meaning_group": "caldo",
+          "rationale": "Caldo e freddo rappresentano poli opposti della sensazione termica.",
+          "decision": "accepted"
+        }
+      ],
+      "group_limits": {
+        "ghiaccio": 1,
+        "neve": 1,
+        "inverno": 1,
+        "brivido": 1,
+        "protezione": 1,
+        "brina": 1,
+        "termometro": 1,
+        "gelo": 1,
+        "riscaldamento": 1,
+        "caldo": 1
+      },
+      "conflicts": []
+    },
+    {
+      "prompt": "sorriso",
+      "validation_id": "156d3a9a823db6f868a3cdce8b329a527533635e37b00c07012b4ed0b4f797b5",
+      "decision": "accepted",
+      "review_rationale": "Revisione editoriale di ogni coppia per «sorriso», nel senso «L'espressione di chi sorride». Controllati autonomia, coerenza, forma e ruoli; gruppi con limite uno per evitare equivalenti nello stesso set. Nessuna prova umana o indipendente dichiarata.",
+      "answers": [
+        {
+          "word": "labbro",
+          "answer_sense": "margine carnoso della bocca",
+          "relation": "parte coinvolta",
+          "meaning_group": "labbro",
+          "rationale": "Il sorriso si manifesta attraverso il movimento delle labbra.",
+          "decision": "accepted"
+        },
+        {
+          "word": "dente",
+          "answer_sense": "struttura dura nella bocca",
+          "relation": "parte visibile",
+          "meaning_group": "dente",
+          "rationale": "I denti possono diventare visibili durante un sorriso.",
+          "decision": "accepted"
+        },
+        {
+          "word": "bocca",
+          "answer_sense": "apertura del cavo orale",
+          "relation": "sede",
+          "meaning_group": "bocca",
+          "rationale": "Il sorriso è riconoscibile dalla forma assunta dalla bocca.",
+          "decision": "accepted"
+        },
+        {
+          "word": "gioia",
+          "answer_sense": "emozione positiva intensa",
+          "relation": "emozione",
+          "meaning_group": "gioia",
+          "rationale": "La gioia si esprime comunemente attraverso il sorriso.",
+          "decision": "accepted"
+        },
+        {
+          "word": "felicità",
+          "answer_sense": "stato di benessere emotivo",
+          "relation": "emozione",
+          "meaning_group": "gioia",
+          "rationale": "Il sorriso è una manifestazione comune della felicità.",
+          "decision": "accepted"
+        },
+        {
+          "word": "allegria",
+          "answer_sense": "disposizione lieta e vivace",
+          "relation": "emozione",
+          "meaning_group": "gioia",
+          "rationale": "L'allegria può manifestarsi con un sorriso.",
+          "decision": "accepted"
+        },
+        {
+          "word": "gentilezza",
+          "answer_sense": "atteggiamento premuroso e cortese",
+          "relation": "funzione sociale",
+          "meaning_group": "gentilezza",
+          "rationale": "Un sorriso può essere un gesto di gentilezza verso un'altra persona.",
+          "decision": "accepted"
+        },
+        {
+          "word": "fotografia",
+          "answer_sense": "immagine ottenuta fotograficamente",
+          "relation": "occasione",
+          "meaning_group": "fotografia",
+          "rationale": "Sorridere è una posa comune quando si scatta una fotografia.",
+          "decision": "accepted"
+        },
+        {
+          "word": "fossetta",
+          "answer_sense": "piccola depressione della guancia",
+          "relation": "tratto visibile",
+          "meaning_group": "fossetta",
+          "rationale": "Una fossetta può diventare visibile quando compare un sorriso.",
+          "decision": "accepted"
+        },
+        {
+          "word": "espressione",
+          "answer_sense": "configurazione del volto che comunica uno stato",
+          "relation": "categoria",
+          "meaning_group": "espressione",
+          "rationale": "Il sorriso è un'espressione del volto.",
+          "decision": "accepted"
+        },
+        {
+          "word": "saluto",
+          "answer_sense": "gesto per riconoscere o accogliere qualcuno",
+          "relation": "funzione sociale",
+          "meaning_group": "saluto",
+          "rationale": "Un sorriso può accompagnare o costituire un saluto.",
+          "decision": "accepted"
+        },
+        {
+          "word": "imbarazzo",
+          "answer_sense": "disagio in una situazione sociale",
+          "relation": "emozione",
+          "meaning_group": "imbarazzo",
+          "rationale": "Un sorriso può esprimere imbarazzo oltre che gioia.",
+          "decision": "accepted"
+        }
+      ],
+      "group_limits": {
+        "labbro": 1,
+        "dente": 1,
+        "bocca": 1,
+        "gioia": 1,
+        "gentilezza": 1,
+        "fotografia": 1,
+        "fossetta": 1,
+        "espressione": 1,
+        "saluto": 1,
+        "imbarazzo": 1
+      },
+      "conflicts": []
+    }
+  ]
+}

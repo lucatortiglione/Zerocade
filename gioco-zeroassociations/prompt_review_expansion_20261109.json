@@ -1,0 +1,69 @@
+{
+  "before": {
+    "raw_terms": 2740419,
+    "valid_prompts": 363,
+    "pools_sha256": "37244dbbd54acdbf944cf89dbbce55e01cd5e723fc10a9b39d08e4aa1944d069",
+    "verified_pools": 102,
+    "associations": 1010
+  },
+  "scoped_review_state_backup": "C:\\Progetti\\Zerocade\\gioco-zeroassociations\\database-backups\\review_state_before_expansion_20261109_124801.sql",
+  "reviewer": "ChatGPT",
+  "method": "llm_editorial_review",
+  "human_review": false,
+  "independent_gameplay_qa": false,
+  "import_result": {
+    "review_records_processed": 620,
+    "new_reviews": 620,
+    "verified": 620,
+    "rejected_or_deferred": 0,
+    "valid_prompts": 983,
+    "verified_pools": 102,
+    "destination": "C:\\Progetti\\Zerocade\\gioco-zeroassociations\\prompt_validi.sqlite3",
+    "discarded_db": "C:\\Progetti\\Zerocade\\gioco-zeroassociations\\prompt_scartati.sqlite3",
+    "discarded_prompts": 2726178
+  },
+  "after": {
+    "valid_prompts": 983,
+    "added_prompts": 620,
+    "pending_candidates": 13246,
+    "raw_terms": 2740419,
+    "verified_pools": 102,
+    "associations": 1010,
+    "categories": 180,
+    "pools_sha256": "37244dbbd54acdbf944cf89dbbce55e01cd5e723fc10a9b39d08e4aa1944d069"
+  },
+  "checks": {
+    "old_prompt_validations_unchanged": true,
+    "existing_pools_unchanged": true,
+    "collection_terms_unchanged": true,
+    "valid_db_integrity": [
+      {
+        "integrity_check": "ok"
+      }
+    ],
+    "valid_db_foreign_key_errors": [],
+    "game_db_foreign_key_errors": [],
+    "category_errors": [],
+    "targeted_tests_passed": 26
+  },
+  "reviewed_candidates": 620,
+  "by_pos": {
+    "NOUN": 525,
+    "VERB": 40,
+    "ADJ": 55
+  },
+  "corrected_pos_prompts": [
+    "sabbia",
+    "ladro",
+    "ghiaccio",
+    "ballerino",
+    "ristorante",
+    "incidente",
+    "utensile"
+  ],
+  "decision_file": "resources/revisione_prompt_aggiuntivi_20261109.jsonl",
+  "decision_file_sha256": "a6297473390adaa7877e7d0ff10b7456148707a39a61f8c0994967d6a49af8ec",
+  "new_association_reviews": 0,
+  "new_human_reviews": 0,
+  "new_independent_gameplay_qa": 0
+}

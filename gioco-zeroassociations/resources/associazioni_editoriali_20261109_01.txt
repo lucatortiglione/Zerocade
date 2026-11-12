@@ -1,0 +1,420 @@
+# Decisioni editoriali di ChatGPT, 9 novembre 2026.
+# Ogni riga è una coppia accettata dopo valutazione del senso corrente.
+# Formato: risposta | senso della risposta | relazione | gruppo | motivazione.
+# Non è un'estrazione dalle definizioni e non dichiara QA indipendente.
+
+@ bocca
+dente | struttura dura usata per mordere | parte anatomica | dente | I denti si trovano nella bocca e permettono di mordere gli alimenti.
+lingua | organo muscolare del cavo orale | parte anatomica | lingua | La lingua occupa la bocca e interviene nel gusto e nella parola.
+labbro | margine carnoso della bocca | parte anatomica | labbro | Le labbra delimitano esternamente l'apertura della bocca.
+palato | parete superiore del cavo orale | parte anatomica | palato | Il palato costituisce la parete superiore della bocca.
+gengiva | tessuto che circonda i denti | parte anatomica | gengiva | Le gengive rivestono la base dei denti all'interno della bocca.
+saliva | liquido prodotto dalle ghiandole salivari | secrezione | saliva | La saliva bagna la bocca e aiuta a preparare il cibo alla deglutizione.
+masticare | triturare il cibo con i denti | funzione | masticare | La bocca permette di masticare il cibo mediante denti e mandibola.
+parlare | articolare suoni linguistici | funzione | parlare | I movimenti della bocca contribuiscono ad articolare le parole.
+sorriso | espressione con gli angoli delle labbra sollevati | espressione | sorriso | Il sorriso è riconoscibile dal movimento delle labbra della bocca.
+bacio | contatto affettuoso compiuto con le labbra | gesto | bacio | Un bacio viene dato appoggiando le labbra della bocca.
+alito | aria emessa respirando dalla bocca | emissione | alito | L'alito è il respiro che esce dalla bocca.
+sbadiglio | apertura involontaria della bocca durante una profonda inspirazione | movimento | sbadiglio | Durante uno sbadiglio la bocca si apre ampiamente.
+
+@ palla
+rimbalzo | ritorno verso l'alto dopo un urto | movimento | rimbalzo | Una palla elastica rimbalza quando colpisce il terreno.
+lancio | atto di scagliare un oggetto | azione di gioco | lancio | Lanciare la palla è un'azione comune in molti giochi.
+calcio | colpo dato con il piede | azione di gioco | calcio | La palla può essere colpita con un calcio per farla muovere.
+gomma | materiale elastico | materiale | gomma | La gomma è un materiale comune delle palle da gioco.
+sfera | corpo rotondo tridimensionale | forma | sfera | La forma caratteristica della palla è quella di una sfera.
+gioco | attività ricreativa | funzione | gioco | La palla è un oggetto usato per giocare.
+rete | intreccio che forma una struttura di gioco | attrezzatura collegata | rete | La palla viene indirizzata verso una rete in sport come calcio e pallavolo.
+canestro | cerchio con rete del basket | bersaglio | canestro | Nel basket la palla deve essere fatta passare nel canestro.
+portiere | giocatore che difende la porta | ruolo sportivo | portiere | Il portiere cerca di fermare la palla prima che entri in porta.
+passaggio | invio della palla a un compagno | azione di squadra | passaggio | Il passaggio trasferisce la palla da un giocatore a un compagno.
+palleggio | controllo mediante tocchi o rimbalzi ripetuti | tecnica | palleggio | Il palleggio controlla la palla con tocchi o rimbalzi successivi.
+gonfiare | riempire d'aria | preparazione | gonfiare | Molte palle vengono gonfiate per ottenere la pressione adatta al gioco.
+
+@ compleanno
+torta | dolce da dividere in fette | tradizione festiva | torta | La torta è un dolce tradizionalmente preparato per festeggiare un compleanno.
+candelina | piccola candela | tradizione festiva | candelina | Le candeline vengono accese sulla torta di compleanno.
+regalo | oggetto donato a qualcuno | dono | regalo | Nel compleanno si offrono regali alla persona festeggiata.
+festa | incontro organizzato per celebrare | celebrazione | festa | Il compleanno viene spesso celebrato organizzando una festa.
+invitato | persona chiamata a partecipare a una festa | partecipante | invitato | Gli invitati partecipano alla festa della persona che compie gli anni.
+augurio | espressione di un desiderio favorevole | comunicazione | augurio | Gli auguri vengono rivolti alla persona nel giorno del compleanno.
+palloncino | involucro gonfiabile usato nelle feste | decorazione | palloncino | I palloncini sono decorazioni comuni delle feste di compleanno.
+età | numero degli anni di una persona | ricorrenza anagrafica | età | Il compleanno segna l'aumento di un anno dell'età della persona.
+nascita | venuta al mondo | evento commemorato | nascita | Il compleanno ricorda la data della nascita.
+soffiare | espellere aria dalla bocca | gesto tradizionale | soffiare | Nel compleanno si soffia sulle candeline per spegnerle.
+desiderio | cosa che si vorrebbe accadesse | usanza | desiderio | Esprimere un desiderio prima di spegnere le candeline è un'usanza del compleanno.
+sorpresa | evento piacevole non previsto | modalità di festa | sorpresa | Una festa a sorpresa è un modo riconoscibile di organizzare un compleanno.
+
+@ acqua
+sete | bisogno di bere | bisogno soddisfatto | sete | Bere acqua soddisfa la sete e reintegra i liquidi.
+bere | ingerire un liquido | uso quotidiano | bere | L'acqua è il liquido che si beve quotidianamente.
+rubinetto | dispositivo che regola l'uscita di un liquido | erogazione | rubinetto | Il rubinetto permette di prelevare l'acqua dell'impianto domestico.
+bottiglia | recipiente per liquidi | contenitore | bottiglia | La bottiglia è un contenitore comune dell'acqua da bere.
+fonte | punto da cui sgorga acqua | origine naturale | fonte | Da una fonte sgorga acqua dal sottosuolo.
+fiume | corso d'acqua continuo | presenza naturale | fiume | L'acqua scorre nell'alveo di un fiume.
+pioggia | precipitazione di gocce liquide | fenomeno naturale | pioggia | La pioggia fa cadere acqua dalle nuvole.
+goccia | piccola quantità di liquido raccolta in forma tondeggiante | forma del liquido | goccia | Una piccola quantità d'acqua può presentarsi come goccia.
+ghiaccio | acqua allo stato solido | cambiamento di stato | ghiaccio | Il ghiaccio si forma quando l'acqua congela.
+vapore | stato aeriforme dell'acqua | cambiamento di stato | vapore | L'acqua può trasformarsi in vapore riscaldandosi ed evaporando.
+potabile | sicuro da bere | proprietà d'uso | potabile | L'acqua potabile è quella adatta al consumo umano.
+trasparente | che lascia vedere attraverso | proprietà visiva | trasparente | L'acqua limpida è trasparente e lascia vedere gli oggetti immersi.
+nuotare | muoversi nell'acqua | attività | nuotare | Nuotare consiste nello spostarsi nell'acqua con i movimenti del corpo.
+lavare | pulire usando un liquido | impiego | lavare | L'acqua viene usata per lavare persone, oggetti e superfici.
+
+@ torta
+farina | polvere alimentare di cereali | ingrediente | farina | La farina costituisce la base dell'impasto di molte torte da forno.
+uovo | alimento avvolto da guscio | ingrediente | uovo | Le uova entrano comunemente nell'impasto delle torte.
+zucchero | sostanza alimentare dolce | ingrediente | zucchero | Lo zucchero dà dolcezza all'impasto della torta.
+burro | grasso alimentare ricavato dalla panna | ingrediente | burro | Il burro è un grasso usato in molti impasti per torte.
+forno | apparecchio per la cottura | cottura | forno | Una torta da forno viene cotta nel forno.
+teglia | recipiente per la cottura al forno | recipiente | teglia | La teglia contiene l'impasto della torta durante la cottura.
+fetta | porzione ottenuta tagliando | porzione | fetta | La torta viene comunemente divisa in fette per servirla.
+crema | preparazione dolce morbida | farcitura | crema | La crema è una farcitura comune delle torte.
+panna | parte grassa del latte utilizzata in pasticceria | guarnizione | panna | La panna montata viene usata per guarnire molte torte.
+cioccolato | alimento dolce a base di cacao | gusto | cioccolato | Il cioccolato può insaporire, farcire o ricoprire una torta.
+compleanno | anniversario della nascita | occasione | compleanno | La torta è un dolce caratteristico delle feste di compleanno.
+lievito | agente che fa crescere l'impasto | preparazione | lievito | Il lievito viene usato per far crescere l'impasto di molte torte.
+
+@ bambola
+giocattolo | oggetto usato per giocare | categoria | giocattolo | La bambola è un giocattolo che rappresenta una persona.
+vestito | capo di abbigliamento | accessorio | vestito | Le bambole possono essere vestite con piccoli abiti.
+capello | pelo che cresce sul capo | caratteristica riprodotta | capello | I capelli vengono riprodotti sulla testa di molte bambole e si possono pettinare.
+occhio | organo della vista rappresentato sul volto | caratteristica riprodotta | occhio | Gli occhi fanno parte del volto rappresentato dalla bambola.
+culla | piccolo letto per neonati | accessorio di gioco | culla | La culla giocattolo serve per mettere a dormire la bambola.
+passeggino | sedile con ruote per trasportare un bambino | accessorio di gioco | passeggino | Un passeggino giocattolo viene usato per portare a spasso la bambola.
+pettine | oggetto con denti per sistemare i capelli | accessorio di gioco | pettine | Il pettine permette di pettinare i capelli della bambola.
+porcellana | materiale ceramico fine | materiale | porcellana | La porcellana è un materiale tradizionale delle bambole da collezione.
+pezza | pezzo di tessuto | materiale | pezza | Una bambola di pezza è costruita con tessuto e imbottitura.
+plastica | materiale modellabile di origine sintetica | materiale | plastica | Molte bambole moderne hanno il corpo o la testa di plastica.
+bambina | persona di sesso femminile nell'infanzia | gioco simbolico | bambina | La bambina può prendersi cura della bambola nel gioco di imitazione.
+
+@ mano
+palmo | superficie interna della mano | parte anatomica | palmo | Il palmo è la superficie interna della mano.
+dorso | superficie posteriore della mano | parte anatomica | dorso | Il dorso è il lato della mano opposto al palmo.
+dito | estremità articolata della mano | parte anatomica | dito | Le dita permettono alla mano di afferrare e manipolare oggetti.
+pollice | dito opponibile della mano | parte anatomica | dito | Il pollice si oppone alle altre dita nella presa della mano.
+unghia | lamina che protegge l'estremità del dito | parte anatomica | unghia | Le unghie ricoprono l'estremità delle dita della mano.
+polso | articolazione tra mano e avambraccio | articolazione | polso | Il polso collega la mano all'avambraccio e ne permette i movimenti.
+pugno | mano chiusa con le dita ripiegate | posizione | pugno | Il pugno si forma chiudendo le dita della mano.
+carezza | contatto leggero e affettuoso | gesto | carezza | La carezza viene normalmente fatta passando una mano con delicatezza.
+applauso | battito ripetuto delle mani | gesto | applauso | L'applauso si produce battendo una mano contro l'altra.
+guanto | indumento che riveste la mano | protezione | guanto | Il guanto riveste e protegge la mano.
+afferrare | prendere e trattenere con una presa | funzione | afferrare | Afferrare oggetti è una funzione caratteristica della mano.
+stretta | pressione esercitata serrando la mano | saluto | stretta | La stretta di mano è un gesto comune di saluto o accordo.
+
+@ dormire
+letto | mobile destinato al riposo | luogo | letto | Il letto è il luogo domestico abituale in cui dormire.
+cuscino | supporto morbido per la testa | accessorio | cuscino | Per dormire si appoggia comunemente la testa su un cuscino.
+coperta | tessuto usato per coprirsi a letto | accessorio | coperta | La coperta mantiene caldo il corpo mentre si dorme.
+pigiama | indumento indossato per la notte | abbigliamento | pigiama | Il pigiama è un indumento usato per dormire.
+sonno | stato fisiologico di riposo | stato | sonno | Dormire significa trovarsi nello stato di sonno.
+sogno | esperienza mentale durante il sonno | esperienza | sogno | I sogni possono presentarsi mentre si dorme.
+russare | emettere un rumore respiratorio durante il sonno | comportamento | russare | Russare è un comportamento che può manifestarsi durante il sonno.
+notte | parte buia della giornata | momento | notte | La notte è il periodo in cui abitualmente si dorme.
+sveglia | dispositivo che suona all'ora fissata | interruzione | sveglia | La sveglia interrompe il sonno all'ora stabilita.
+riposo | sospensione dello sforzo | funzione | riposo | Dormire permette al corpo e alla mente di riposare.
+insonnia | difficoltà a iniziare o mantenere il sonno | impedimento | insonnia | L'insonnia rende difficile dormire o mantenere il sonno.
+pisolino | breve periodo di sonno | modalità | pisolino | Un pisolino è un breve dormire, spesso durante il giorno.
+
+@ palloncino
+elio | gas leggero | riempimento | elio | L'elio viene usato per gonfiare palloncini che tendono a salire.
+aria | miscela di gas atmosferici | riempimento | aria | Un palloncino può essere gonfiato con aria.
+gomma | materiale elastico | materiale | gomma | La gomma elastica forma l'involucro di molti palloncini.
+gonfiare | riempire di gas aumentando il volume | preparazione | gonfiare | Per usare un palloncino lo si gonfia con aria o altro gas adatto.
+scoppiare | rompersi improvvisamente con un botto | evento | scoppiare | Un palloncino può scoppiare quando il suo involucro si rompe.
+nodo | intreccio che chiude o lega | chiusura | nodo | Un nodo all'imboccatura trattiene il gas nel palloncino.
+filo | elemento sottile usato per legare | legatura | filo | Un filo permette di trattenere un palloncino gonfiato con elio.
+festa | incontro organizzato per celebrare | occasione | festa | I palloncini sono decorazioni caratteristiche delle feste.
+volare | muoversi o restare sollevato nell'aria | movimento | volare | Un palloncino riempito con elio può volare se viene lasciato libero.
+decorazione | oggetto usato per abbellire | funzione | decorazione | Il palloncino viene usato come decorazione di ambienti festivi.
+pompa | dispositivo per spingere aria | strumento | pompa | Una pompa per palloncini permette di gonfiarli senza soffiare direttamente.
+botto | rumore secco e improvviso | effetto sonoro | botto | Lo scoppio di un palloncino produce un botto riconoscibile.
+
+@ fame
+stomaco | organo dell'apparato digerente | sensazione corporea | stomaco | La fame viene comunemente avvertita come una sensazione allo stomaco.
+cibo | ciò che viene mangiato per nutrirsi | oggetto del bisogno | cibo | La fame è il bisogno di assumere cibo.
+appetito | desiderio di mangiare | concetto vicino | appetito | L'appetito è il desiderio di mangiare associato alla fame.
+digiuno | astensione dal cibo | condizione | digiuno | Un periodo di digiuno può far insorgere la fame.
+mangiare | ingerire alimenti | soddisfazione del bisogno | mangiare | Mangiare soddisfa il bisogno espresso dalla fame.
+sazietà | sensazione di aver mangiato abbastanza | stato opposto | sazietà | La sazietà si contrappone alla fame dopo aver mangiato abbastanza.
+pasto | occasione in cui si mangia | occasione | pasto | Il pasto permette di soddisfare la fame attraverso il cibo.
+spuntino | piccolo pasto tra quelli principali | risposta al bisogno | spuntino | Uno spuntino può calmare la fame tra un pasto e l'altro.
+brontolio | rumore gorgogliante dello stomaco | segnale corporeo | brontolio | Il brontolio dello stomaco è un segnale comunemente associato alla fame.
+
+@ asilo
+bambino | persona nei primi anni di vita | frequentante | bambino | L'asilo accoglie bambini prima dell'ingresso nella scuola primaria.
+maestra | insegnante | ruolo educativo | maestra | La maestra guida le attività educative dei bambini all'asilo.
+gioco | attività ludica | attività | gioco | Il gioco è un'attività centrale nella giornata dei bambini all'asilo.
+merenda | piccolo pasto | routine | merenda | La merenda è un momento consueto della giornata all'asilo.
+grembiule | indumento protettivo sopra i vestiti | abbigliamento | grembiule | Il grembiule viene indossato dai bambini in molti asili.
+disegno | immagine realizzata con segni e colori | attività espressiva | disegno | Il disegno è un'attività espressiva comune all'asilo.
+canzone | composizione cantata | attività musicale | canzone | Cantare canzoni insieme è un'attività comune dei bambini all'asilo.
+aula | ambiente destinato alle attività educative | spazio | aula | L'aula ospita molte attività dei bambini all'asilo.
+giardino | spazio verde attrezzato | spazio esterno | giardino | Il giardino dell'asilo viene usato per il gioco all'aperto.
+compagno | bambino dello stesso gruppo scolastico | relazione | compagno | All'asilo i bambini giocano e imparano insieme ai compagni.
+pennarello | strumento per disegnare a inchiostro colorato | materiale | pennarello | I pennarelli sono materiali comuni per le attività grafiche all'asilo.
+fiaba | racconto fantastico | attività narrativa | fiaba | L'ascolto delle fiabe è un'attività educativa comune all'asilo.
+
+@ piede
+tallone | parte posteriore del piede | parte anatomica | tallone | Il tallone è la parte posteriore del piede che appoggia a terra.
+pianta | superficie inferiore del piede | parte anatomica | pianta | La pianta è la superficie del piede rivolta verso il terreno.
+dito | estremità articolata del piede | parte anatomica | dita | Le dita si trovano all'estremità anteriore del piede.
+alluce | primo dito del piede | parte anatomica | dita | L'alluce è il dito più interno e generalmente più robusto del piede.
+unghia | lamina che riveste la punta del dito | parte anatomica | unghia | Le unghie proteggono le estremità delle dita del piede.
+caviglia | articolazione tra gamba e piede | articolazione | caviglia | La caviglia collega il piede alla gamba e ne consente il movimento.
+scarpa | calzatura | protezione | scarpa | La scarpa riveste e protegge il piede.
+calzino | indumento che copre il piede | abbigliamento | calzino | Il calzino viene indossato sul piede, di solito dentro la scarpa.
+passo | movimento compiuto avanzando un piede | movimento | passo | Un passo si compie spostando un piede per avanzare.
+camminare | spostarsi appoggiando alternativamente i piedi | funzione | camminare | I piedi sostengono il corpo e permettono di camminare.
+impronta | traccia lasciata da un appoggio | traccia | impronta | Un piede può lasciare un'impronta sul terreno.
+
+@ giocattolo
+bambino | persona nell'infanzia | utilizzatore | bambino | I giocattoli sono oggetti usati dai bambini nelle attività di gioco.
+bambola | giocattolo che rappresenta una persona | tipo | bambola | La bambola è un tipo riconoscibile di giocattolo.
+palla | oggetto sferico per giocare | tipo | palla | La palla può essere usata come giocattolo in molti giochi infantili.
+peluche | pupazzo morbido rivestito di tessuto | tipo | peluche | Il peluche è un giocattolo morbido da abbracciare.
+macchinina | piccolo modello di automobile | tipo | macchinina | La macchinina riproduce un'automobile in forma di giocattolo.
+trottola | oggetto che gira sulla propria punta | tipo | trottola | La trottola è un giocattolo che ruota su una punta.
+regalo | oggetto donato | occasione | regalo | Un giocattolo è un regalo comune per un bambino.
+batteria | dispositivo che fornisce energia elettrica | alimentazione | batteria | Molti giocattoli elettronici funzionano con batterie.
+costruzione | elemento componibile da assemblare per gioco | tipo | costruzione | Le costruzioni sono giocattoli che permettono di assemblare forme e oggetti.
+
+@ capello
+testa | parte superiore del corpo | sede | testa | I capelli crescono sulla testa.
+pettine | strumento dentato per sistemare i capelli | strumento | pettine | Il pettine serve a districare e ordinare i capelli.
+spazzola | strumento con setole | strumento | pettine | La spazzola viene usata per pettinare e sistemare i capelli.
+taglio | accorciamento e forma dei capelli | trattamento | taglio | Il taglio accorcia i capelli e dà forma all'acconciatura.
+parrucchiere | professionista che cura i capelli | professione | parrucchiere | Il parrucchiere taglia, pettina e tratta i capelli.
+riccio | capello curvato a spirale | forma | forma | Un capello riccio presenta una forma curva o a spirale.
+liscio | privo di ricci o ondulazioni | forma | forma | Un capello liscio non presenta ricci o ondulazioni marcate.
+ciocca | gruppo di capelli | insieme | ciocca | Una ciocca è un gruppo di capelli tenuti o considerati insieme.
+treccia | intreccio di ciocche di capelli | acconciatura | treccia | La treccia si ottiene intrecciando più ciocche di capelli.
+forfora | desquamazione del cuoio capelluto | condizione collegata | forfora | La forfora si deposita fra i capelli come piccole squame chiare.
+calvizie | perdita o assenza dei capelli | condizione opposta | calvizie | La calvizie comporta la perdita dei capelli in una parte del capo.
+follicolo | struttura cutanea da cui cresce un pelo | origine anatomica | follicolo | Ogni capello cresce da un follicolo presente nel cuoio capelluto.
+
+@ naso
+narice | apertura esterna del naso | parte anatomica | narice | Le narici sono le aperture attraverso cui l'aria entra nel naso.
+olfatto | senso che permette di percepire gli odori | funzione sensoriale | olfatto | Il naso è l'organo con cui si esercita l'olfatto.
+odore | sensazione percepita dall'olfatto | percezione | odore | Gli odori vengono percepiti attraverso il naso.
+profumo | odore gradevole | percezione | odore | Un profumo viene riconosciuto annusando con il naso.
+starnuto | espulsione improvvisa di aria dal naso | riflesso | starnuto | Lo starnuto è un riflesso che coinvolge il naso.
+raffreddore | disturbo delle vie respiratorie con congestione nasale | disturbo | raffreddore | Il raffreddore provoca comunemente naso chiuso o che cola.
+muco | secrezione delle mucose | secrezione | muco | Il muco viene prodotto anche dalle mucose del naso.
+setto | parete che separa le cavità nasali | parte anatomica | setto | Il setto nasale divide le due cavità del naso.
+annusare | percepire un odore inspirando dal naso | azione | annusare | Annusare consiste nell'usare il naso per riconoscere un odore.
+respirare | compiere scambi d'aria con l'ambiente | funzione | respirare | Il naso è una delle vie attraverso cui si respira.
+fazzoletto | piccolo telo o foglio usato per pulirsi | oggetto collegato | fazzoletto | Il fazzoletto viene usato per soffiarsi e pulirsi il naso.
+
+@ notte
+buio | assenza di luce | caratteristica | buio | Il buio è una caratteristica della notte senza illuminazione artificiale.
+luna | satellite naturale della Terra | elemento del cielo | luna | La Luna è un elemento caratteristico del cielo notturno.
+stella | astro visibile come punto luminoso | elemento del cielo | stella | Le stelle si osservano più facilmente nel cielo buio della notte.
+sonno | stato di riposo fisiologico | attività umana | sonno | La notte è il periodo abitualmente dedicato al sonno.
+letto | mobile destinato a dormire | luogo del riposo | letto | Durante la notte si trascorre comunemente il riposo a letto.
+sogno | esperienza mentale durante il sonno | esperienza notturna | sogno | I sogni vengono comunemente associati al sonno della notte.
+pigiama | indumento per dormire | abbigliamento | pigiama | Il pigiama è un indumento caratteristico del riposo notturno.
+mezzanotte | ora di passaggio fra due giorni | momento | mezzanotte | La mezzanotte è un momento centrale dell'immaginario della notte.
+tramonto | scomparsa del sole sotto l'orizzonte | confine temporale | tramonto | Il tramonto precede l'arrivo del buio notturno.
+alba | prime luci del mattino | confine temporale | alba | L'alba segna il ritorno della luce dopo la notte.
+gufo | rapace prevalentemente notturno | animale caratteristico | gufo | Il gufo è un animale comunemente associato alla vita notturna.
+lucciola | insetto capace di emettere luce | animale caratteristico | lucciola | La luce delle lucciole si nota nel buio delle notti estive.
+
+@ testa
+cranio | struttura ossea del capo | parte anatomica | cranio | Il cranio costituisce la struttura ossea della testa.
+cervello | organo principale del sistema nervoso | organo contenuto | cervello | Il cervello è contenuto nella testa, protetto dal cranio.
+capello | pelo del cuoio capelluto | rivestimento | capello | I capelli crescono sulla parte superiore della testa.
+viso | parte anteriore della testa | parte anatomica | viso | Il viso è la parte anteriore della testa.
+occhio | organo della vista | organo sensoriale | occhio | Gli occhi sono organi della testa collocati nel viso.
+orecchio | organo dell'udito | organo sensoriale | orecchio | Le orecchie si trovano ai lati della testa.
+naso | organo dell'olfatto | parte del volto | naso | Il naso sporge nella parte centrale del volto sulla testa.
+bocca | apertura del cavo orale | parte del volto | bocca | La bocca si trova nella parte anteriore della testa.
+collo | regione che collega capo e tronco | collegamento anatomico | collo | Il collo sostiene la testa e la collega al tronco.
+fronte | parte del volto sopra gli occhi | parte del volto | fronte | La fronte è la parte anteriore superiore della testa sopra gli occhi.
+mento | parte inferiore del volto | parte del volto | mento | Il mento forma la parte inferiore del volto della testa.
+cefalea | dolore localizzato al capo | disturbo | cefalea | La cefalea è il dolore comunemente chiamato mal di testa.
+
+@ coniglio
+orecchio | organo dell'udito | caratteristica anatomica | orecchio | Le orecchie lunghe sono una caratteristica riconoscibile del coniglio.
+carota | radice commestibile | alimento associato | carota | La carota è un alimento comunemente associato al coniglio nell'immaginario quotidiano.
+tana | rifugio scavato o riparato di un animale | rifugio | tana | Il coniglio vive e trova riparo in tane.
+pelo | rivestimento del corpo dei mammiferi | rivestimento | pelo | Il corpo del coniglio è rivestito di pelo morbido.
+coda | appendice posteriore del corpo | caratteristica anatomica | coda | Il coniglio è riconoscibile anche per la piccola coda corta.
+saltellare | procedere con piccoli salti | movimento | saltellare | Il coniglio si sposta comunemente saltellando.
+fieno | erba essiccata per alimentare animali | alimentazione | fieno | Il fieno è un alimento caratteristico del coniglio domestico.
+lepre | mammifero simile al coniglio | animale affine | lepre | La lepre è un animale simile al coniglio, ma distinto da esso.
+incisivo | dente anteriore tagliente | caratteristica anatomica | incisivo | Gli incisivi del coniglio permettono di tagliare e rosicchiare il cibo.
+rosicchiare | consumare con piccoli morsi | comportamento | rosicchiare | Il coniglio rosicchia il cibo usando i denti anteriori.
+
+@ televisore
+schermo | superficie che mostra immagini | componente | schermo | Lo schermo del televisore mostra le immagini dei programmi.
+telecomando | dispositivo di comando a distanza | comando | telecomando | Il telecomando permette di controllare il televisore a distanza.
+canale | frequenza o servizio di trasmissione televisiva | contenuto trasmesso | canale | Sul televisore si seleziona un canale per vedere una trasmissione.
+antenna | dispositivo che riceve segnali | ricezione | antenna | L'antenna può fornire al televisore il segnale dei canali trasmessi via etere.
+volume | intensità sonora regolabile | regolazione | volume | Il volume regola l'intensità del suono emesso dal televisore.
+programma | trasmissione destinata al pubblico | contenuto | programma | Il televisore permette di guardare programmi televisivi.
+film | opera cinematografica | contenuto | film | Un film è un contenuto comunemente guardato sul televisore.
+telegiornale | notiziario televisivo | contenuto | telegiornale | Il telegiornale è una trasmissione informativa vista sul televisore.
+serie | opera audiovisiva divisa in episodi | contenuto | serie | Le serie televisive sono contenuti abitualmente guardati sul televisore.
+decoder | apparecchio che interpreta un segnale codificato | dispositivo collegato | decoder | Un decoder collegato al televisore permette di ricevere determinati servizi televisivi.
+divano | seduta imbottita per più persone | contesto d'uso | divano | Il televisore si guarda comunemente stando seduti sul divano.
+zapping | cambio rapido e ripetuto di canale | comportamento | zapping | Lo zapping consiste nel cambiare ripetutamente i canali del televisore.
+
+@ pupazzo
+peluche | tessuto a pelo e per estensione giocattolo morbido | tipo | peluche | Un pupazzo di peluche è un giocattolo morbido da abbracciare.
+imbottitura | materiale soffice inserito all'interno | struttura | imbottitura | L'imbottitura dà volume e morbidezza a molti pupazzi.
+stoffa | tessuto | materiale | stoffa | La stoffa forma il rivestimento di molti pupazzi.
+orsacchiotto | pupazzo che rappresenta un piccolo orso | tipo | orsacchiotto | L'orsacchiotto è un pupazzo molto riconoscibile.
+cucitura | unione ottenuta con filo | costruzione | cucitura | Le cuciture uniscono le parti di stoffa di un pupazzo.
+giocattolo | oggetto usato per giocare | categoria | giocattolo | Il pupazzo nel senso scelto è un giocattolo per l'infanzia.
+abbracciare | stringere tra le braccia | uso affettivo | abbracciare | Un pupazzo morbido può essere abbracciato durante il gioco o il riposo.
+morbido | che cede facilmente al contatto | qualità tattile | morbido | La morbidezza è una qualità caratteristica dei pupazzi imbottiti.
+bottone | piccolo elemento cucito su tessuto | dettaglio costruttivo | bottone | I bottoni possono essere usati per rappresentare gli occhi di un pupazzo di stoffa.
+
+@ natale
+albero | pianta allestita come decorazione natalizia | simbolo | albero | L'albero decorato è un simbolo caratteristico del Natale.
+presepe | rappresentazione della nascita di Gesù | tradizione | presepe | Il presepe rappresenta la natività celebrata a Natale.
+regalo | dono | tradizione | regalo | Lo scambio di regali è una tradizione del Natale.
+panettone | dolce lievitato natalizio | dolce tipico | dolce_natalizio | Il panettone è un dolce tradizionale del Natale italiano.
+pandoro | dolce lievitato a forma di stella | dolce tipico | dolce_natalizio | Il pandoro è un dolce comunemente consumato a Natale.
+torrone | dolce a base di miele o zucchero e frutta secca | dolce tipico | dolce_natalizio | Il torrone è un dolce tradizionalmente associato al periodo di Natale.
+renna | cervide del nord | immaginario festivo | renna | Le renne trainano la slitta di Babbo Natale nell'immaginario della festa.
+slitta | veicolo che scivola sulla neve | immaginario festivo | slitta | La slitta è il veicolo attribuito a Babbo Natale nella tradizione.
+vigilia | giorno che precede una festa | ricorrenza | vigilia | La vigilia di Natale precede il giorno della festa ed è celebrata in molte famiglie.
+dicembre | dodicesimo mese dell'anno | collocazione nel calendario | dicembre | Il Natale si celebra nel mese di dicembre.
+stella | figura luminosa o decorativa a punte | simbolo | stella | La stella compare sul presepe e fra le decorazioni di Natale.
+luminarie | insieme di luci decorative | decorazione | luminarie | Le luminarie decorano case e strade durante il Natale.
+augurio | espressione di un desiderio favorevole | comunicazione | augurio | A Natale si scambiano auguri di buone feste.
+
+@ piatto
+ceramica | materiale ottenuto dalla cottura di argilla | materiale | ceramica | La ceramica è un materiale comune dei piatti da tavola.
+porcellana | materiale ceramico fine | materiale | ceramica | La porcellana viene usata per realizzare piatti da tavola.
+posata | utensile per prendere il cibo | oggetto abbinato | posata | Le posate vengono disposte accanto al piatto nell'apparecchiatura.
+tavola | piano apparecchiato per mangiare | collocazione | tavola | Il piatto viene collocato sulla tavola per consumare il pasto.
+cibo | alimento servito | contenuto | cibo | Il piatto serve a contenere il cibo durante il pasto.
+bordo | parte esterna che circonda la superficie | parte | bordo | Il bordo delimita la superficie del piatto.
+lavastoviglie | elettrodomestico per lavare le stoviglie | manutenzione | lavastoviglie | La lavastoviglie viene usata per lavare i piatti compatibili.
+lavare | pulire con acqua e detergente | manutenzione | lavare | Dopo il pasto il piatto viene lavato per rimuovere i residui di cibo.
+apparecchiare | preparare la tavola per un pasto | preparazione | apparecchiare | Apparecchiare comprende la disposizione dei piatti sulla tavola.
+stoviglia | recipiente o utensile da tavola | categoria | stoviglia | Il piatto appartiene alle stoviglie usate per servire e consumare il cibo.
+
+@ topo
+roditore | mammifero con incisivi adatti a rosicchiare | categoria zoologica | roditore | Il topo appartiene ai roditori.
+coda | appendice posteriore del corpo | parte anatomica | coda | Il topo è riconoscibile per la coda lunga rispetto al corpo.
+baffo | pelo sensoriale del muso | parte anatomica | baffo | I baffi del topo sono peli sensoriali posti sul muso.
+rosicchiare | consumare con piccoli morsi | comportamento | rosicchiare | Il topo rosicchia cibo e altri materiali con gli incisivi.
+trappola | dispositivo per catturare animali | cattura | trappola | Le trappole per topi sono dispositivi destinati a catturarli.
+gatto | felino domestico | predatore | gatto | Il gatto è un predatore comunemente associato alla caccia ai topi.
+tana | rifugio di un animale | rifugio | tana | Il topo cerca riparo e può allevare i piccoli in una tana.
+squittio | verso acuto di alcuni piccoli mammiferi | verso | squittio | Lo squittio è il verso comunemente attribuito al topo.
+formaggio | alimento ricavato dal latte | associazione culturale | formaggio | Il formaggio è associato al topo nell'immaginario quotidiano, senza affermare che sia il suo alimento esclusivo.
+incisivo | dente anteriore tagliente | parte anatomica | incisivo | Gli incisivi del topo sono adatti a rosicchiare.
+seme | struttura vegetale che può dare origine a una pianta | alimentazione | seme | Il topo può nutrirsi di semi e chicchi di cereali.
+
+@ biscotto
+latte | alimento liquido di origine animale | abbinamento | latte | Il biscotto viene comunemente mangiato o inzuppato nel latte.
+farina | polvere alimentare ottenuta dai cereali | ingrediente | farina | La farina costituisce la base dell'impasto di molti biscotti.
+zucchero | ingrediente dolcificante | ingrediente | zucchero | Lo zucchero dà dolcezza ai biscotti.
+burro | grasso alimentare | ingrediente | burro | Il burro è un ingrediente comune dei biscotti di pasta frolla.
+forno | apparecchio per cuocere | cottura | forno | Il biscotto viene cotto al forno.
+colazione | primo pasto della giornata | occasione | colazione | I biscotti sono un alimento comune della colazione.
+inzuppare | impregnare immergendo in un liquido | consumo | inzuppare | Il biscotto può essere inzuppato nel latte, nel tè o in altre bevande.
+cioccolato | alimento dolce a base di cacao | gusto | cioccolato | Il cioccolato può arricchire o ricoprire un biscotto.
+impasto | miscela lavorata prima della cottura | preparazione | impasto | L'impasto viene modellato prima di cuocere i biscotti.
+frolla | pasta dolce friabile | preparazione | frolla | La pasta frolla viene usata per preparare molti biscotti.
+teglia | recipiente da forno | strumento | teglia | I biscotti vengono disposti su una teglia per la cottura.
+croccante | che si spezza con un rumore secco | consistenza | croccante | La croccantezza è una consistenza tipica di molti biscotti secchi.
+
+@ dito
+pollice | primo dito della mano | nome di dito | nomi_dita | Il pollice è il dito opponibile della mano.
+indice | secondo dito della mano | nome di dito | nomi_dita | L'indice è un dito usato comunemente per indicare.
+medio | terzo dito della mano | nome di dito | nomi_dita | Il medio è il dito centrale della mano.
+anulare | quarto dito della mano | nome di dito | nomi_dita | L'anulare è il dito sul quale viene spesso portato l'anello.
+mignolo | quinto dito della mano | nome di dito | nomi_dita | Il mignolo è il dito più piccolo della mano.
+unghia | lamina che protegge l'estremità del dito | parte anatomica | unghia | L'unghia ricopre e protegge la parte terminale del dito.
+falange | segmento osseo di un dito | parte anatomica | falange | Le falangi sono le ossa che costituiscono lo scheletro delle dita.
+anello | ornamento circolare indossato al dito | ornamento | anello | L'anello viene indossato intorno a un dito.
+impronta | disegno lasciato dalla pelle del polpastrello | traccia | impronta | Il dito lascia un'impronta riconoscibile attraverso le creste della pelle.
+polpastrello | parte carnosa dell'estremità del dito | parte anatomica | polpastrello | Il polpastrello è la parte terminale del dito usata per il tatto.
+mano | estremità dell'arto superiore | appartenenza anatomica | mano | Le dita sono estremità articolate della mano.
+piede | estremità dell'arto inferiore | appartenenza anatomica | piede | Anche il piede termina con dita.
+indicare | mostrare una direzione o un oggetto | gesto | indicare | Un dito può essere teso per indicare una persona, un oggetto o una direzione.
+
+@ febbre
+termometro | strumento per misurare la temperatura | misura | termometro | Il termometro permette di misurare la temperatura corporea in presenza di febbre.
+temperatura | grandezza che esprime lo stato termico | parametro | temperatura | La febbre comporta un aumento della temperatura corporea.
+brivido | tremore involontario legato a freddo o rialzo termico | sintomo collegato | brivido | I brividi possono accompagnare l'insorgenza della febbre.
+sudore | liquido prodotto dalle ghiandole sudoripare | fenomeno collegato | sudore | La sudorazione può accompagnare le variazioni della febbre.
+influenza | infezione virale respiratoria | causa comune | influenza | L'influenza è una malattia che può causare febbre.
+infezione | invasione e proliferazione di microrganismi | causa | infezione | Molte infezioni possono provocare una risposta febbrile.
+antipiretico | sostanza che riduce la febbre | classe terapeutica | antipiretico | Un antipiretico è definito dalla sua azione di riduzione della febbre.
+riposo | sospensione delle attività e degli sforzi | contesto di malessere | riposo | La febbre è comunemente associata a una condizione di malessere e riposo.
+fronte | parte superiore del volto | controllo quotidiano | fronte | Toccare la fronte è un gesto quotidiano usato per percepire un possibile rialzo febbrile, senza sostituire la misurazione.
+malessere | sensazione di non stare bene | sintomo collegato | malessere | La febbre si accompagna spesso a una sensazione generale di malessere.
+
+@ barca
+scafo | corpo galleggiante dell'imbarcazione | parte | scafo | Lo scafo permette alla barca di galleggiare e contiene i suoi spazi.
+remo | asta usata per spingere un'imbarcazione nell'acqua | propulsione | remo | I remi permettono di muovere una barca a remi.
+vela | superficie che sfrutta il vento | propulsione | vela | La vela sfrutta il vento per muovere una barca a vela.
+motore | macchina che fornisce energia meccanica | propulsione | motore | Un motore può fornire la propulsione a una barca.
+timone | organo che modifica la direzione | governo | timone | Il timone permette di governare la direzione della barca.
+ancora | attrezzo per trattenere un'imbarcazione sul fondo | ormeggio | ancora | L'ancora contribuisce a tenere ferma la barca.
+porto | area attrezzata per l'attracco | luogo | porto | Una barca può attraccare e sostare in porto.
+prua | parte anteriore dell'imbarcazione | parte | prua | La prua è l'estremità anteriore della barca.
+poppa | parte posteriore dell'imbarcazione | parte | poppa | La poppa è l'estremità posteriore della barca.
+galleggiare | restare sulla superficie di un liquido | proprietà funzionale | galleggiare | Una barca deve galleggiare per trasportare persone o cose sull'acqua.
+salvagente | dispositivo di galleggiamento per persone | sicurezza | salvagente | Il salvagente è un dispositivo di sicurezza riconoscibile a bordo di una barca.
+ormeggio | fissaggio di un'imbarcazione a un punto di sosta | operazione | ormeggio | L'ormeggio mantiene la barca collegata al suo punto di sosta.
+
+@ gamba
+ginocchio | articolazione centrale dell'arto inferiore | articolazione | ginocchio | Il ginocchio permette di piegare la gamba.
+tibia | osso anteriore della gamba | osso | tibia | La tibia è uno dei due principali ossi della gamba sotto il ginocchio.
+perone | osso laterale della gamba | osso | perone | Il perone è l'osso laterale della gamba, accanto alla tibia.
+polpaccio | massa muscolare posteriore della gamba | muscolatura | polpaccio | Il polpaccio forma la parte muscolare posteriore della gamba.
+caviglia | articolazione fra gamba e piede | articolazione | caviglia | La caviglia collega la parte inferiore della gamba al piede.
+piede | estremità dell'arto inferiore | collegamento anatomico | piede | Il piede si trova all'estremità inferiore della gamba.
+camminare | spostarsi a piedi | funzione | camminare | I movimenti delle gambe permettono di camminare.
+correre | avanzare velocemente con falcate | funzione | correre | Le gambe sostengono e spingono il corpo durante la corsa.
+pantalone | indumento che copre separatamente gli arti inferiori | abbigliamento | pantalone | Le gambe vengono rivestite dalle due parti del pantalone.
+calza | indumento che riveste il piede e parte della gamba | abbigliamento | calza | Una calza può coprire una parte della gamba oltre al piede.
+crampo | contrazione muscolare involontaria e dolorosa | disturbo | crampo | Un crampo può interessare i muscoli della gamba, in particolare il polpaccio.
+
+@ cuscino
+testa | capo del corpo umano | sostegno | testa | Il cuscino nel senso scelto sostiene la testa durante il riposo.
+letto | mobile destinato a dormire | collocazione | letto | Il cuscino per la testa viene comunemente collocato sul letto.
+federa | rivestimento rimovibile del cuscino | rivestimento | federa | La federa riveste il cuscino e può essere rimossa per lavarla.
+imbottitura | materiale che riempie un oggetto morbido | struttura | imbottitura | L'imbottitura dà volume e sostegno al cuscino.
+piuma | elemento del rivestimento degli uccelli | materiale | materiale | Le piume possono essere usate come imbottitura di un cuscino.
+lattice | materiale elastico | materiale | materiale | Il lattice è un materiale usato per realizzare cuscini di sostegno.
+morbido | che cede facilmente alla pressione | qualità | morbido | La morbidezza è una qualità caratteristica di molti cuscini.
+sonno | stato fisiologico del dormire | uso | sonno | Il cuscino sostiene la testa durante il sonno.
+collo | parte che collega testa e tronco | sostegno | collo | Un cuscino per dormire sostiene anche la posizione del collo.
+guanciale | cuscino sul quale si posa il capo | sinonimo | guanciale | Guanciale è un nome del cuscino destinato ad appoggiare la testa.
+riposo | sospensione dello sforzo | funzione | sonno | Il cuscino rende più confortevole il riposo della testa.
+
+@ cioccolato
+cacao | prodotto alimentare ricavato dai semi dell'omonima pianta | ingrediente caratteristico | cacao | Il cacao è l'ingrediente caratteristico del cioccolato.
+tavoletta | forma piatta e suddivisibile di cioccolato | formato | tavoletta | Il cioccolato viene comunemente venduto in tavolette.
+pralina | piccolo dolce di cioccolato spesso ripieno | preparazione | cioccolatino | La pralina è una piccola preparazione di cioccolato spesso farcita.
+cioccolatino | piccolo dolce di cioccolato | formato | cioccolatino | Un cioccolatino è una porzione di cioccolato preparata come piccolo dolce.
+fondente | cioccolato con cacao e senza aggiunta di latte come ingrediente caratterizzante | varietà | varietà | Il fondente è una varietà riconoscibile di cioccolato.
+latte | alimento usato per una varietà di cioccolato | ingrediente | latte | Il latte è l'ingrediente che caratterizza il cioccolato al latte.
+nocciola | frutto secco del nocciolo | abbinamento | nocciola | Le nocciole vengono comunemente aggiunte al cioccolato.
+ganache | crema di cioccolato e panna | preparazione | ganache | La ganache è una preparazione di pasticceria a base di cioccolato e panna.
+uovo | forma cava di cioccolato tipica della Pasqua | formato festivo | uovo | L'uovo di cioccolato è un prodotto caratteristico della Pasqua.
+torta | dolce da forno da dividere in fette | impiego | torta | Il cioccolato viene usato nell'impasto, nella farcitura o nella copertura di una torta.
+sciogliere | rendere liquido un materiale mediante calore | lavorazione | sciogliere | Il cioccolato si può sciogliere per preparare creme e coperture.
+amaro | sapore con poca dolcezza e note intense di cacao | gusto | amaro | Il cioccolato con elevato contenuto di cacao può avere un gusto amaro riconoscibile.
+
+@ capra
+corno | struttura dura del capo di alcuni animali | parte anatomica | corno | Molte capre presentano corna sul capo.
+barba | ciuffo di peli sotto il mento | caratteristica | barba | La barba sotto il mento è un tratto riconoscibile di molte capre.
+zoccolo | rivestimento corneo dell'estremità dell'arto | parte anatomica | zoccolo | La capra appoggia a terra gli arti mediante zoccoli fessi.
+latte | secrezione alimentare dei mammiferi | prodotto | latte | La capra viene allevata anche per produrre latte.
+formaggio | alimento ottenuto dalla trasformazione del latte | prodotto | formaggio | Il latte di capra viene usato per produrre formaggi.
+gregge | gruppo di animali allevati insieme | gruppo | gregge | Le capre possono essere allevate e condotte in gregge.
+capretto | piccolo della capra | discendenza | capretto | Il capretto è il piccolo della capra.
+belare | emettere il verso di capre e pecore | verso | belare | Belare è il verbo usato per il verso della capra.
+pascolo | terreno dove gli animali si alimentano | alimentazione | pascolo | Le capre vengono condotte al pascolo per alimentarsi.
+ruminare | rimasticare il cibo risalito dallo stomaco | comportamento alimentare | ruminare | La capra è un ruminante e rimastica il cibo durante la ruminazione.
+stalla | edificio destinato agli animali allevati | ricovero | stalla | Una stalla può offrire ricovero alle capre allevate.

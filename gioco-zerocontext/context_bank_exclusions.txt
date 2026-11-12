@@ -1,0 +1,68 @@
+# Parole che build_context_bank.py NON aggiunge alla banca, anche se i filtri
+# automatici le accetterebbero. Una o più parole per riga; "#" apre un commento.
+# Non tocca le parole già presenti nell'esportazione Livecade.
+# Elenco nato dalla rilettura integrale delle aggiunte (12 novembre 2026).
+
+# --- Sesso, volgarità, insulti pesanti: non adatti a una live -----------------
+sesso porno pornografia pornostar pompino scopata sgualdrina troia zoccola
+passera cagna masturbazione erezione sperma eiaculazione coito orgia orgasmo
+penetrazione prostituta prostituzione bordello profilattico condom culetto
+sederino cacca pipì bocchino capezzolo mammella pene vagina vulva clitoride
+scroto testicolo prepuzio pube chiappa deretano didietro fondoschiena peto
+amplesso erotismo fellatio feticismo gigolò guardone libidine libido lolita
+ninfomane pappone promiscuità puttanella sodomia spogliarello tettona vibratore
+concubina castrazione depravazione perversione minchione ciccione nana eunuco
+verginità sessualità omosessualità nudità circoncisione playboy
+
+# --- Droghe -------------------------------------------------------------------
+cocaina droga eroina hashish marijuana oppio crack coca overdose spacciatore
+spaccio stupefacente spinello ecstasy metadone pusher narcos narcotraffico coke
+sballo
+
+# --- Autolesionismo, violenza sessuale, esecuzioni, estremismo ----------------
+suicidio stupro stupratore pedofilia incesto genocidio olocausto nazi nazismo
+svastica antisemitismo lager gulag eutanasia aborto kamikaze molestia
+molestatore autolesionismo impiccagione decapitazione lapidazione smembramento
+linciaggio strangolamento skinhead anoressia bulimia
+
+# --- Appartenenze etniche, religiose e personali; etnonimi --------------------
+ebreo musulmano zingaro pellerossa lesbica trans meticcio indio tutsi sikh
+bolzanino udinese peruviano messicano lettone africana brasiliana colombiana
+ceca serba tedesca svizzera sovietica filippina armena californiana marocchina
+napoletana rumena nordica nanchino kashmir hindi
+
+# --- Nomi propri e marchi rimasti nei dizionari come lemmi --------------------
+marco abba alessia argo batista berta carter henry erica veronica sabina pierre
+newton weber venere plutone medina mecca avana sierra circe cassio celia dacia
+ganimede minosse pegaso samara marcantonio pierino cosetta quintana budda babele
+cerbero sula sura terranova curie kelvin mach lambda
+
+# --- Nomi di lettere ----------------------------------------------------------
+acca effe elle emme enne erre ipsilon kappa
+
+# --- Non sostantivi, forme verbali o aggettivi al femminile -------------------
+calzare concepire malgrado mica tramite vice pochino monarchica prima seconda
+quarta quinta settima decima amor signor evviva tabula interim magnum stia
+abbandonata addetta amministrativa appassionata automatica bancaria brusca
+cattiva cieca clandestina classica colta comica condannata dannata depressa
+detta distratta eletta esperta fallita favorita fonda impegnativa intima
+invitata lasciata magra mala malata matta mista mistica organica piatta
+primitiva pulita sciocca selvaggia tossica unica solitaria tripla scolastica
+statica rovescia salva bruciante contorta effimera bovina tetra interpellato
+trapiantato divorziata adultera bisognoso schizofrenico ventunenne
+venticinquenne quarantenne juniores capa bozzo crono pesta pula rena ripa vico
+
+# --- Sostantivi vivi soltanto dentro una locuzione ----------------------------
+insaputa procinto repentaglio frattempo contempo cospetto indomani pressi
+percento braccetto bilico vece guisa vanvera oltranza malincuore dismisura auge
+mercé panne miao osanna alleluia memento quid
+
+# --- Parole inglesi non acclimatate -------------------------------------------
+beat bond break bridge check color country dance game girl hall lady lord night
+pack pool self serial soul sound spider strip trust west yard bang benefit cent
+style share home hyperlink baby slam tank connection desk executive futures
+piece score panel raider
+
+# --- Doppioni grafici (resta la forma più comune) -----------------------------
+alcool obbiettivo danaro élite équipe eclisse folclore humour zombi psicanalisi
+crocefisso beneficienza aereoporto

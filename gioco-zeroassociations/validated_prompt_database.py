@@ -2,6 +2,10 @@
 
 I verbali devono provenire da una revisione reale già effettuata. I controlli
 del programma verificano il contratto e l'integrità, non il significato.
+prompt_validi.sqlite3 contiene i prompt validati insieme alle loro parole associate:
+solo quelli con un bacino verificato del senso scelto. I prompt validati ancora senza
+associazioni restano nella raccolta e sono copiati in prompt_filtrati.sqlite3
+(filter_prompts.py, tabella validated_prompts).
 """
 from __future__ import annotations
 
@@ -18,7 +22,7 @@ from prompt_database import (DEFAULT_DB, ROOT, WORD, digest, import_reviewed,
     validate_pool)
 from prompt_policy import load_prompt_policy
 from semantic_rules import SEMANTIC_POLICY
-from sqlite_prompt_runtime import SQLite, literal
+from sqlite_prompt_runtime import SQLite, literal, publish_database
 
 VALIDATED_DB = ROOT/'prompt_validi.sqlite3'
 PROMPT_CHECKS = ('single_familiar_sense', 'prompt_language', 'canonical_form',
@@ -113,13 +117,20 @@ def register_reviews(db, records):
     if len({r['prompt'] for r in records}) != len(records):
         raise ValueError('Prompt duplicato nel pacchetto di revisioni')
     # Deve essere una voce già raccolta o un bacino precedentemente revisionato.
-    for record in records:
-        term = literal(record['prompt'])
-        queries = ['SELECT lemma AS prompt FROM prompts WHERE lemma='+term]
-        if has_table(db, 'inventory_terms'):
-            queries.append('SELECT prompt FROM inventory_terms WHERE prompt='+term)
-        if not db.run(' UNION ALL '.join(queries)+' LIMIT 1;', rows=True):
-            raise ValueError('Voce non presente nella raccolta: '+record['prompt'])
+    # Nei lotti grandi si controllano più parole per chiamata, prima di scrivere:
+    # non si avviano due processi SQLite per ciascuno dei migliaia di prompt.
+    inventory = has_table(db, 'inventory_terms')
+    prompts = [r['prompt'] for r in records]
+    for start in range(0,len(prompts),500):
+        chunk = prompts[start:start+500]
+        terms = '('+','.join(literal(p) for p in chunk)+')'
+        queries = ['SELECT lemma AS prompt FROM prompts WHERE lemma IN '+terms]
+        if inventory:
+            queries.append('SELECT prompt FROM inventory_terms WHERE prompt IN '+terms)
+        found = {r['prompt'] for r in db.run(' UNION '.join(queries)+';',rows=True)}
+        missing = [p for p in chunk if p not in found]
+        if missing:
+            raise ValueError('Voce non presente nella raccolta: '+missing[0])
     db.run((ROOT/'prompt_validation_schema.sql').read_text(encoding='utf-8'))
     existing = {r['id'] for r in db.run('SELECT id FROM prompt_validations;', rows=True)}
     statements = ['BEGIN IMMEDIATE;']
@@ -177,6 +188,7 @@ def sync_validated(source, destination=VALIDATED_DB):
             accepted.append(record)
         except (ValueError, TypeError) as error:
             excluded.append({'prompt':row['prompt'], 'reason':str(error)})
+    # Non deduplicare le risposte tra prompt: ogni coppia ha il proprio verbale.
     # Un prompt valido può non avere risposte. Si copiano solo bacini verificati
     # della medesima accezione/categoria/POS, mai pool di un altro senso.
     catalog = {r['prompt']:r for r in accepted}
@@ -190,6 +202,10 @@ def sync_validated(source, destination=VALIDATED_DB):
             pools.append(pool)
         except ValueError:
             pass  # La validità del prompt non approva un bacino obsoleto.
+    # Qui vanno i prompt con le parole associate; gli altri validati sono in prompt_filtrati.sqlite3.
+    with_pool = {pool['prompt'] for pool in pools}
+    without_pool = sum(record['prompt'] not in with_pool for record in accepted)
+    accepted = [record for record in accepted if record['prompt'] in with_pool]
     destination.parent.mkdir(parents=True, exist_ok=True)
     handle, name = tempfile.mkstemp(prefix=destination.stem+'.',suffix='.sqlite3',dir=destination.parent)
     import os
@@ -221,10 +237,11 @@ def sync_validated(source, destination=VALIDATED_DB):
             raise ValueError('Errore di integrità nella copia')
         result = {'source':str(source.path.resolve()),'destination':str(destination),
             'valid_prompts':len(accepted),'verified_pools':len(pools),
+            'validated_without_pool_in_filtered_db':without_pool,
             'associations':sum(len(p['answers']) for p in pools),'excluded':excluded,
             'raw_entries_deleted':0,'new_semantic_reviews_performed':0,
             'independent_gameplay_qa':False}
-        temporary.replace(destination)
+        result['publish_method'] = publish_database(temporary,destination,source.executable)
         return result
     finally:
         temporary.unlink(missing_ok=True)

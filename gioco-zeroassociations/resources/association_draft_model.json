@@ -1,0 +1,25 @@
+{
+  "purpose": "Bozze di associazioni con Qwen locale. Le bozze non sono approvazioni: le importa un revisore, oppure la modalità solo Qwen dopo il pilota superato.",
+  "base_model": "Qwen/Qwen3.8-27B",
+  "base_revision": "37561816e66b5b9153b1b64c10968c18c1e6f4a0",
+  "quantization_repository": "unsloth/Qwen3.8-27B-GGUF",
+  "quantization_revision": "4ca720788d1e01f1bff70c033e0d0028fd02e502",
+  "quantization": "Q5_K_M",
+  "model_path": "%LOCALAPPDATA%\\Zerocade\\word-association\\local-inference\\Qwen3.8-27B-UD-Q5_K_M.gguf",
+  "model_sha256": "2de73110cb254cbf09b54b717578dadff12ef1194e7271527e68202f39ba4bfd",
+  "server_exe": "%LOCALAPPDATA%\\Zerocade\\association-rewrite-runtime\\bin\\llama-server.exe",
+  "served_model": "qwen38-association-drafts-q5",
+  "endpoint": "http://127.0.0.1:19476",
+  "runtime_parameters": {
+    "gpu_layers": 24,
+    "context": 8192,
+    "parallel": 1,
+    "kv_cache": "q4_0",
+    "reasoning": false
+  },
+  "reviewer": "Qwen/Qwen3.8-27B (Q5_K_M, locale) — modalità solo Qwen",
+  "pilot_status": "NOT_RUN",
+  "pilot_rule": "La modalità solo Qwen importa nella raccolta soltanto se il pilota delle associazioni su questo modello registra zero accettazioni errate e zero rifiuti errati.",
+  "human_review": false,
+  "independent_gameplay_qa": false
+}

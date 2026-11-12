@@ -415,5 +415,39 @@
     "attribution": "Autori di UniversalDependencies/UD_Italian-MarkIT, come da README e LICENSE del repository",
     "revision": "e210079df0aea331ec1dcaa90648d815ce94c3ce",
     "source_group": "ud-italian-markit"
+  },
+  {
+    "id": "nvdb-de-mauro-2016",
+    "name": "Nuovo vocabolario di base della lingua italiana (De Mauro, 2016), testo estratto",
+    "kind": "nvdb_text",
+    "url": "https://raw.githubusercontent.com/pettarin/nvdb/b5fb7f8d916a426934bcd20adc84bf97ab5899f6/nvdb.full.txt",
+    "license": "Elenco a cura di Tullio De Mauro con Isabella Chiari e Francesca Ferrucci, pubblicato da Internazionale (2016); estrazione testuale di Alberto Pettarin (CC BY 4.0 / pubblico dominio). Usato come prova di familiarità nella raccolta locale, non redistribuito",
+    "license_url": "https://raw.githubusercontent.com/pettarin/nvdb/b5fb7f8d916a426934bcd20adc84bf97ab5899f6/README.md",
+    "attribution": "Tullio De Mauro, Isabella Chiari, Francesca Ferrucci; Internazionale 2016; estrazione di Alberto Pettarin",
+    "revision": "b5fb7f8d916a426934bcd20adc84bf97ab5899f6",
+    "list_name": "NVdB 2016"
+  },
+  {
+    "id": "itaoa-montefinese-2019",
+    "name": "ItAoA: età di acquisizione di 1.957 parole italiane (Montefinese et al., 2019)",
+    "kind": "xlsx_table",
+    "url": "https://osf.io/download/3nvh6/",
+    "cache_file": "itaoa-montefinese-2019/ItAoA.xlsx",
+    "license": "CC BY 4.0 (progetto OSF 3trg2)",
+    "license_url": "https://api.osf.io/v2/nodes/3trg2/?embed=license",
+    "attribution": "Montefinese, Vinson, Vigliocco, Ambrosini (2019), Italian Age of Acquisition Norms for a Large Set of Words (ItAoA), Frontiers in Psychology 10:278",
+    "sheet": 2,
+    "word_column": "Ita_Word",
+    "pos_column": "WordClass",
+    "pos_map": {
+      "a": "adj",
+      "n": "noun",
+      "v": "verb"
+    },
+    "value_columns": {
+      "M_AoA": "aoa_mean",
+      "SD_AoA": "aoa_sd"
+    },
+    "language_claim": "it_from_norms"
   }
 ]

@@ -4,6 +4,12 @@ Il gioco mostra una parola (il **prompt**) e la chat indovina **7 o 8 parole
 collegate nascoste**. Questa cartella produce e verifica quei dati; il gioco è in
 `apps/overlay/src/games/wordAssociation.ts` e li legge dal server.
 
+La costruzione dei bacini dell'intera coda è in corso: cinque lotti centrali
+e tre agenti su partizioni distinte, con verifica e importazione centrali.
+I 102 bacini precedenti vengono confrontati per preservarne il contenuto.
+I conteggi aggiornati sono in [stato e ripresa](ASSOCIAZIONI_FILTRATI.md) e nel
+[rapporto verificabile](resources/avanzamento_associazioni_filtrati_20261109.json).
+
 ## Il ciclo
 
 1. **Inventario**: raccogliere i prompt dalle fonti (`prompt_inventory.py collect`,
@@ -17,7 +23,7 @@ collegate nascoste**. Questa cartella produce e verifica quei dati; il gioco è 
    verbale completo ([PROMPT_DATABASE.md](PROMPT_DATABASE.md)) nella raccolta
    `prompt_raw.sqlite3`, e aggiorna subito `prompt.sqlite3`, il database del gioco.
    `validated_prompt_database.py sync` ne ricava `prompt_validi.sqlite3`, la copia
-   con i soli prompt validati e i loro bacini.
+   dei prompt validati insieme alle loro parole associate (solo quelli con un bacino).
 4. **Gioco**: a ogni round il server estrae 7 o 8 parole dal bacino, rispettando
    gruppi di equivalenti e coppie incompatibili. Per Livecade: `livecade` (7 parole).
 5. **Telemetria**: la dashboard scarica i CSV «Round» e «Tentativi» del gioco.
@@ -46,6 +52,10 @@ Dalla cartella `gioco-zeroassociations`, con `.venv/Scripts/python.exe -B`:
 | `analyze_telemetry.py --guesses T.csv --rounds R.csv --output rapporto.json --proposals proposte.jsonl` | Analisi della chat |
 | `free_association_llm.py --output r.json recall` | Giocatori simulati sui bacini (LLM locale) |
 | `free_association_llm.py --output b.jsonl propose mare sole` | Bozze di bacino per prompt nuovi |
+| `qwen_associations.py drafts` | Bozze Qwen locali per i prompt senza bacino, da rivedere (task «Associazioni: continua con Qwen…») |
+| `qwen_associations.py solo` | Solo Qwen: bozza e autoverifica; importa solo se il pilota delle associazioni è superato |
+| `final_associations.py import` | Importa i lotti rivisti dagli agenti nella raccolta |
+| `final_associations.py build --sync` | Rigenera `prompt_finale.sqlite3`: prompt, parole uniche e collegamenti |
 
 `npm run test:associations`, dalla radice del progetto, esegue i test Python e quelli del gioco.
 
@@ -66,7 +76,16 @@ riavvio di Zerocade. Il pacchetto Windows include un database ridotto ai soli ba
   l'inventario pesa gigabyte).
 - `prompt.sqlite3`: i bacini verificati e le decisioni sulle voci, versionato: è il
   database del gioco.
-- `prompt_validi.sqlite3`: copia dei prompt validati, esclusa da Git (si rigenera con `sync`).
+- `prompt_finale.sqlite3`: la copia finale per prompt e parole. Tabelle `prompts`, `words`
+  (ogni parola una sola volta) e `prompt_words` (collegamenti molti a molti, con motivazione
+  per coppia); viste `prompt_word_list` e `word_usage`. Contiene solo bacini verificati.
+- `prompt_validi.sqlite3`: i prompt validati con le loro parole associate, esclusa da Git
+  (si rigenera con `sync`).
+- `prompt_filtrati.sqlite3`: candidati preselezionati automaticamente e, nella tabella
+  `validated_prompts`, le parole verificate come prompt (senso e categoria) ancora senza
+  associazioni; la vista `review_state` separa `VALIDATO` da `DA_RIVEDERE`.
+- `prompt_scartati.sqlite3`: scarti dei filtri e scarti espliciti, con motivo e
+  provenienza; vedere [candidati, voci valide e scarti](PROMPT_SCARTATI.md).
 - `prompt_schema.sql`, `prompt_inventory_schema.sql`: schemi.
 - `resources/policy_versions.json`: per ogni testo delle direttive, la versione
   delle regole (`SEMANTIC_POLICY`) con cui i bacini sono stati revisionati.
@@ -81,3 +100,8 @@ riavvio di Zerocade. Il pacchetto Windows include un database ridotto ai soli ba
 
 Nessun controllo automatico approva un'associazione: le revisioni dichiarano chi
 le ha fatte (`human_review`) e i dati di gioco non sostituiscono la revisione.
+
+La stessa risposta può essere usata per più prompt, anche nella stessa lista.
+Ogni coppia ha una revisione e una motivazione proprie: `forno`, per esempio,
+può appartenere sia a PANE sia a PIZZA. Il DB e l'estrazione vietano i duplicati
+soltanto all'interno del singolo bacino o della sua estrazione.

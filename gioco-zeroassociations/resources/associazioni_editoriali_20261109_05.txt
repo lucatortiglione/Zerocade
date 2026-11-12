@@ -1,0 +1,269 @@
+# Decisioni editoriali di ChatGPT, 9 novembre 2026.
+# risposta | senso della risposta | relazione | gruppo | motivazione
+# Valutazione delle singole coppie nel senso corrente; nessuna QA indipendente.
+
+@ maglia
+manica | parte dell'indumento che ricopre il braccio | parte | manica | Le maniche possono ricoprire le braccia nella maglia.
+collo | apertura dell'indumento intorno al collo | parte | collo | Il collo della maglia forma l'apertura per il capo e il collo.
+tessuto | materiale formato da fibre | materiale | materiale | Il tessuto costituisce il materiale della maglia.
+cotone | fibra tessile vegetale | materiale | materiale | Il cotone viene usato per realizzare molte maglie.
+lana | fibra tessile animale | materiale | materiale | La lana è un materiale comune delle maglie calde.
+taglia | misura di un indumento | misura | taglia | La taglia indica le dimensioni della maglia da indossare.
+orlo | bordo rifinito di un tessuto | parte | orlo | L'orlo rifinisce i bordi della maglia.
+girocollo | apertura rotonda vicina alla base del collo | forma del collo | girocollo | Una maglia a girocollo ha un'apertura rotonda intorno al collo.
+armadio | mobile per riporre indumenti | conservazione | armadio | La maglia viene riposta nell'armadio insieme agli altri indumenti.
+lavare | pulire con acqua e detergente | manutenzione | lavare | La maglia viene lavata per rimuovere lo sporco dell'uso.
+maglione | indumento di maglia generalmente caldo | tipo affine | maglione | Il maglione è un tipo di maglia comunemente usato per coprirsi dal freddo.
+torace | parte del tronco racchiusa dalla gabbia toracica | parte rivestita | torace | La maglia ricopre il torace e parte del tronco.
+
+@ collana
+collo | regione fra testa e tronco | sede d'uso | collo | La collana viene indossata intorno al collo.
+gioiello | ornamento personale di valore o lavorato | categoria | gioiello | La collana nel senso scelto è un gioiello da indossare.
+pendente | ornamento sospeso a un filo o a una catena | parte | pendente | Un pendente può essere appeso alla collana.
+catena | successione di elementi collegati | struttura | catena | La catena è una struttura comune delle collane metalliche.
+perla | formazione tondeggiante usata come ornamento | materiale | perla | Le perle vengono infilate per comporre una collana.
+oro | metallo prezioso | materiale | metallo | L'oro è un materiale comune delle collane preziose.
+argento | metallo prezioso | materiale | metallo | L'argento viene usato per realizzare collane.
+chiusura | dispositivo che unisce le estremità | parte | chiusura | La chiusura permette di aprire e fissare la collana intorno al collo.
+ciondolo | piccolo ornamento appeso a una catena | parte | pendente | Il ciondolo è un ornamento che può essere appeso alla collana.
+gemma | pietra preziosa lavorata | ornamento | gemma | Una gemma può decorare una collana.
+gioielleria | negozio di gioielli | vendita | gioielleria | La gioielleria è un luogo dedicato alla vendita di collane preziose.
+filo | elemento sottile sul quale infilare grani o perle | struttura | filo | Il filo tiene insieme gli elementi di molte collane di perle o grani.
+
+@ canottiera
+spallina | striscia che sostiene un indumento sulla spalla | parte | spallina | Le spalline sostengono la canottiera senza formare maniche.
+cotone | fibra tessile vegetale | materiale | cotone | Il cotone è un materiale comune delle canottiere.
+busto | parte del corpo compresa fra collo e bacino | parte rivestita | busto | La canottiera ricopre il busto.
+intimo | abbigliamento portato sotto gli altri vestiti | uso | intimo | La canottiera viene comunemente usata come indumento intimo.
+maglietta | indumento leggero per il busto | indumento affine | maglietta | La canottiera è un indumento affine alla maglietta, ma senza maniche.
+scollatura | apertura dell'indumento intorno al collo | parte | scollatura | La scollatura forma l'apertura superiore della canottiera.
+sudore | liquido prodotto dalle ghiandole sudoripare | funzione | sudore | La canottiera a contatto con il corpo può assorbire il sudore.
+estate | stagione calda | contesto d'uso | estate | La canottiera viene anche indossata da sola durante il caldo estivo.
+leggero | di peso ridotto | caratteristica | leggero | La leggerezza è una caratteristica comune della canottiera.
+orlo | bordo rifinito di tessuto | parte | orlo | L'orlo rifinisce il bordo inferiore della canottiera.
+
+@ zebra
+striscia | fascia allungata di colore | mantello | striscia | Le strisce sono il tratto più riconoscibile del mantello della zebra.
+bianco | colore chiaro del mantello | colore | colore | Il bianco è uno dei colori delle strisce della zebra.
+nero | colore scuro del mantello | colore | colore | Il nero è uno dei colori delle strisce della zebra.
+savana | ambiente tropicale erboso | habitat | savana | La savana africana è un habitat comunemente associato alla zebra.
+zoccolo | rivestimento corneo dell'estremità dell'arto | parte anatomica | zoccolo | La zebra cammina su zoccoli.
+criniera | pelo lungo lungo il collo | parte anatomica | criniera | La zebra ha una criniera corta e generalmente eretta.
+cavallo | equide domestico | animale affine | cavallo | La zebra è un equide affine al cavallo.
+branco | gruppo sociale di animali | comportamento sociale | branco | Le zebre possono vivere e spostarsi in branchi.
+erbivoro | animale che si nutre di vegetali | dieta | erbivoro | La zebra è un erbivoro che si nutre principalmente di erbe.
+leone | grande felino africano | predatore | leone | Il leone è uno dei predatori della zebra.
+coda | appendice posteriore del corpo | parte anatomica | coda | La zebra ha una coda che termina con un ciuffo di peli.
+
+@ vestito
+abito | indumento o insieme coordinato di indumenti | sinonimo | abito | Abito è un nome del vestito nel senso dell'abbigliamento.
+stoffa | tessuto | materiale | stoffa | La stoffa è un materiale usato per confezionare un vestito.
+sarto | professionista che confeziona abiti | professione | sarto | Il sarto confeziona o modifica vestiti.
+cucitura | unione realizzata mediante filo | costruzione | cucitura | Le cuciture uniscono le parti di un vestito di tessuto.
+bottone | elemento per chiudere un indumento | parte | bottone | I bottoni possono chiudere alcune parti del vestito.
+taglia | misura di un indumento | misura | taglia | La taglia indica le dimensioni del vestito.
+manica | parte che ricopre il braccio | parte | manica | Un vestito può avere maniche che rivestono le braccia.
+guardaroba | insieme o mobile contenente abiti | conservazione | guardaroba | Il vestito fa parte degli abiti conservati nel guardaroba.
+provare | indossare per controllare misura e aspetto | scelta | provare | Provare un vestito permette di valutarne la misura e la vestibilità.
+lavare | pulire con acqua e detergente | manutenzione | lavare | Il vestito viene lavato secondo le esigenze del suo materiale.
+stirare | distendere le pieghe mediante calore | manutenzione | stirare | Stirare permette di eliminare le pieghe da un vestito adatto al trattamento.
+gruccia | sostegno per appendere indumenti | conservazione | gruccia | La gruccia permette di appendere il vestito senza ripiegarlo.
+
+@ corridoio
+porta | elemento mobile che chiude un accesso | accesso | porta | Le porte delle stanze possono aprirsi sul corridoio.
+stanza | ambiente interno di una casa | collegamento | stanza | Il corridoio collega le stanze dell'abitazione.
+passaggio | spazio o percorso che consente di transitare | funzione | passaggio | Il corridoio offre un passaggio fra ambienti diversi.
+pavimento | superficie su cui si cammina | parte | pavimento | Il pavimento permette di camminare lungo il corridoio.
+parete | superficie verticale che delimita un ambiente | parte | parete | Le pareti delimitano lateralmente il corridoio.
+soffitto | superficie superiore di un ambiente | parte | soffitto | Il soffitto chiude superiormente il corridoio interno.
+luce | illuminazione che rende visibile un ambiente | dotazione | luce | La luce permette di percorrere il corridoio in sicurezza quando manca illuminazione naturale.
+ingresso | punto attraverso cui si entra | collegamento | ingresso | Il corridoio può collegare l'ingresso dell'abitazione alle stanze.
+lungo | esteso nella direzione principale | forma | forma | La forma allungata è una caratteristica comune del corridoio.
+stretto | con larghezza limitata | forma | forma | Un corridoio è comunemente più stretto delle stanze che collega.
+
+@ orso
+letargo | stato di attività ridotta durante la stagione fredda | comportamento | letargo | Il letargo è un comportamento invernale comunemente associato a molti orsi.
+miele | sostanza zuccherina prodotta dalle api | alimentazione e immaginario | miele | Il miele è un alimento riconoscibile nell'immaginario dell'orso ed è consumato da alcuni orsi.
+zampa | arto di un animale | parte anatomica | zampa | Le grandi zampe sono un elemento riconoscibile del corpo dell'orso.
+artiglio | unghia ricurva e robusta | parte anatomica | artiglio | Gli artigli dell'orso servono anche per scavare e procurarsi cibo.
+pelliccia | rivestimento di pelo di un mammifero | rivestimento | pelliccia | La pelliccia riveste e protegge il corpo dell'orso.
+bosco | territorio coperto da alberi | habitat | bosco | Il bosco è un habitat comunemente associato all'orso bruno.
+tana | rifugio di un animale | riparo | tana | La tana offre all'orso un luogo riparato, anche durante il riposo invernale.
+salmone | pesce che risale i fiumi per riprodursi | alimentazione | salmone | Alcuni orsi catturano salmoni nei corsi d'acqua.
+plantigrado | che appoggia al suolo l'intera pianta del piede | locomozione | plantigrado | L'orso è plantigrado e appoggia al terreno la pianta del piede.
+bruno | di colore marrone scuro | tipo riconoscibile | bruno | L'orso bruno è una specie comune nell'immaginario dell'orso e ha normalmente mantello bruno.
+
+@ elicottero
+rotore | insieme rotante di pale che sostiene l'aeromobile | parte | rotore | Il rotore principale genera la portanza dell'elicottero.
+pala | elemento allungato del rotore | parte | pala | Le pale dell'elicottero ruotano per sostenere il volo.
+pilota | persona che conduce un aeromobile | professione | pilota | Il pilota controlla il volo dell'elicottero.
+cabina | spazio che ospita persone e comandi | parte | cabina | La cabina dell'elicottero ospita il pilota e, secondo il modello, i passeggeri.
+volo | spostamento nell'aria | movimento | volo | L'elicottero è un aeromobile destinato al volo.
+decollo | passaggio dal suolo al volo | operazione | decollo | L'elicottero può effettuare un decollo verticale.
+atterraggio | ritorno controllato al suolo | operazione | atterraggio | L'atterraggio riporta l'elicottero su una superficie di appoggio.
+elisuperficie | area attrezzata per l'atterraggio e il decollo di elicotteri | luogo | elisuperficie | L'elisuperficie è un'area dedicata alle operazioni degli elicotteri.
+soccorso | intervento di aiuto in una situazione di pericolo | impiego | soccorso | L'elicottero viene impiegato per interventi di soccorso in luoghi difficili da raggiungere.
+verricello | dispositivo per sollevare mediante cavo | attrezzatura | verricello | Il verricello di un elicottero da soccorso permette di sollevare persone o carichi.
+coda | parte posteriore dell'aeromobile | parte | coda | La coda ospita componenti di stabilizzazione o controllo di molti elicotteri.
+rumore | suono intenso o fastidioso | effetto percepito | rumore | Il rumore delle pale e del motore rende riconoscibile il passaggio di un elicottero.
+
+@ ragno
+ragnatela | struttura di fili di seta prodotta dal ragno | costruzione | ragnatela | Molti ragni costruiscono ragnatele per catturare prede.
+seta | fibra prodotta da alcuni animali | materiale prodotto | seta | Il ragno produce seta per la tela e altre strutture.
+zampa | arto di un animale | parte anatomica | zampa | Il ragno adulto ha otto zampe.
+aracnide | animale del gruppo cui appartengono ragni e scorpioni | categoria zoologica | aracnide | Il ragno è un aracnide e non un insetto.
+mosca | insetto volante | preda | preda | Le mosche possono essere catturate e mangiate dai ragni.
+preda | animale catturato per nutrimento | comportamento alimentare | preda | Il ragno cattura prede per nutrirsi.
+veleno | sostanza tossica prodotta da un animale | difesa e predazione | veleno | Molti ragni usano veleno per immobilizzare le prede.
+filiera | organo che emette i fili di seta | parte anatomica | filiera | Le filiere del ragno emettono la seta.
+chelicero | appendice boccale degli aracnidi | parte anatomica | chelicero | I cheliceri sono appendici boccali con cui il ragno afferra le prede.
+aracnofobia | paura intensa dei ragni | reazione umana | aracnofobia | L'aracnofobia è la paura intensa dei ragni.
+
+@ campagna
+campo | terreno coltivato | paesaggio | campo | I campi coltivati sono elementi caratteristici della campagna.
+fattoria | azienda agricola con edifici e terreni | insediamento | fattoria | La fattoria è un insediamento tipico della campagna agricola.
+contadino | persona che lavora la terra | professione | contadino | Il contadino svolge attività agricole nella campagna.
+trattore | mezzo usato nelle lavorazioni agricole | attrezzatura | trattore | Il trattore è un mezzo caratteristico del lavoro in campagna.
+raccolto | insieme dei prodotti agricoli ottenuti | attività agricola | raccolto | Il raccolto proviene dalle coltivazioni della campagna.
+grano | cereale coltivato | coltivazione | coltivazione | I campi di grano sono un'immagine riconoscibile della campagna.
+vigneto | terreno coltivato a viti | coltivazione | coltivazione | Il vigneto è una coltivazione tipica di molte campagne italiane.
+fienile | edificio per conservare il fieno | edificio rurale | fienile | Il fienile è un edificio caratteristico della campagna agricola.
+orto | terreno coltivato a ortaggi | coltivazione | orto | L'orto è uno spazio coltivato comunemente presente in campagna.
+pascolo | terreno destinato all'alimentazione degli animali | allevamento | pascolo | Il pascolo è un uso caratteristico dei terreni di campagna.
+sentiero | percorso stretto non necessariamente asfaltato | percorso | sentiero | I sentieri attraversano comunemente la campagna.
+casale | grande edificio abitativo rurale | edificio rurale | casale | Il casale è un'abitazione tradizionalmente associata alla campagna.
+
+@ maestro
+alunno | bambino che frequenta una scuola | relazione educativa | alunno | Il maestro insegna agli alunni della scuola primaria.
+lavagna | superficie per scrivere durante la lezione | strumento | lavagna | Il maestro usa la lavagna per spiegare agli alunni.
+lezione | attività organizzata di insegnamento | attività | lezione | Il maestro prepara e svolge lezioni.
+classe | gruppo di alunni o ambiente che li ospita | contesto | classe | Il maestro insegna a una classe di alunni.
+quaderno | insieme di fogli rilegati per scrivere | materiale scolastico | quaderno | Il maestro può assegnare e correggere esercizi sui quaderni.
+compito | lavoro assegnato agli alunni | attività | compito | Il maestro assegna compiti per esercitare ciò che viene insegnato.
+gesso | materiale per scrivere sulla lavagna tradizionale | strumento | gesso | Il gesso viene usato dal maestro per scrivere sulla lavagna tradizionale.
+registro | documento che raccoglie dati della classe | documento | registro | Il maestro annota presenze e valutazioni nel registro scolastico.
+scuola | istituzione destinata all'istruzione | luogo | scuola | Il maestro nel senso scelto lavora nella scuola primaria.
+insegnare | trasmettere conoscenze e abilità | funzione | insegnare | Insegnare è la funzione principale del maestro.
+verifica | prova per valutare l'apprendimento | valutazione | verifica | Il maestro propone verifiche per valutare gli apprendimenti.
+voto | valutazione espressa in forma sintetica | valutazione | voto | Il maestro può attribuire voti o altre valutazioni agli elaborati degli alunni.
+
+@ uovo
+guscio | rivestimento esterno duro | parte alimentare | guscio | Il guscio riveste e protegge il contenuto dell'uovo.
+tuorlo | parte gialla dell'uovo | parte alimentare | tuorlo | Il tuorlo è la parte gialla dell'uovo usata in molte preparazioni.
+albume | parte trasparente dell'uovo che diventa bianca cuocendo | parte alimentare | albume | L'albume circonda il tuorlo e viene usato in cucina.
+frittata | preparazione di uova battute e cotte | preparazione | frittata | La frittata viene preparata con uova battute.
+omelette | preparazione di uova cotte e ripiegate | preparazione | omelette | L'omelette è una preparazione a base di uova.
+lessare | cuocere in acqua | cottura | cottura | Lessare permette di cuocere l'uovo nel suo guscio.
+friggere | cuocere in grasso caldo | cottura | cottura | Friggere è un modo comune di cuocere un uovo in padella.
+padella | recipiente basso per cuocere | strumento | padella | La padella viene usata per cuocere uova e frittate.
+proteina | sostanza nutritiva costituita da amminoacidi | composizione | proteina | L'uovo è un alimento comunemente associato all'apporto di proteine.
+maionese | salsa emulsionata a base di uovo e olio | preparazione | maionese | L'uovo viene usato per preparare la maionese.
+rompere | aprire spezzando il rivestimento | preparazione | rompere | Rompere il guscio permette di usare il contenuto dell'uovo in cucina.
+gallina | femmina adulta del pollo | origine alimentare | gallina | Nel senso scelto l'uovo alimentare è prodotto dalla gallina.
+
+@ supermercato
+carrello | contenitore con ruote per gli acquisti | attrezzatura | carrello | Il carrello permette di raccogliere e trasportare la spesa nel supermercato.
+cassa | postazione per pagare gli acquisti | pagamento | cassa | Alla cassa del supermercato si paga la spesa.
+scaffale | struttura con ripiani | esposizione | scaffale | Gli scaffali espongono i prodotti del supermercato.
+spesa | insieme dei prodotti comprati per le necessità quotidiane | attività | spesa | Il supermercato è un luogo comune in cui fare la spesa.
+scontrino | documento che registra i prodotti acquistati | documento | scontrino | Lo scontrino documenta gli acquisti effettuati al supermercato.
+offerta | vendita a condizioni promozionali | promozione | offerta | Il supermercato propone offerte su alcuni prodotti.
+corsia | passaggio fra file di espositori | organizzazione dello spazio | corsia | Le corsie separano gli scaffali e permettono di muoversi nel supermercato.
+reparto | settore dedicato a una categoria di prodotti | organizzazione commerciale | reparto | Il supermercato è diviso in reparti di prodotti.
+cestino | piccolo contenitore per trasportare acquisti | attrezzatura | carrello | Il cestino permette di portare piccoli acquisti nel supermercato.
+cliente | persona che acquista prodotti | partecipante | cliente | I clienti scelgono i prodotti ed effettuano la spesa al supermercato.
+alimentare | prodotto destinato alla nutrizione | prodotto | alimentare | Gli alimentari costituiscono una parte principale dell'offerta del supermercato.
+sacchetto | piccolo contenitore flessibile | trasporto della spesa | sacchetto | Il sacchetto viene usato per portare via gli acquisti del supermercato.
+
+@ fattoria
+contadino | persona che lavora la terra | professione | contadino | Il contadino svolge il lavoro agricolo della fattoria.
+stalla | edificio per ospitare animali allevati | edificio | stalla | La stalla ospita gli animali allevati nella fattoria.
+fienile | edificio per conservare il fieno | edificio | fienile | Il fienile conserva il fieno destinato agli animali della fattoria.
+trattore | mezzo per lavori agricoli | attrezzatura | trattore | Il trattore viene usato nei lavori dei campi della fattoria.
+campo | terreno coltivato | terreno | campo | I campi fanno parte dei terreni coltivati della fattoria.
+mucca | bovino femmina adulto | animale allevato | animale | La mucca è un animale comunemente allevato in fattoria.
+gallina | femmina adulta del pollo | animale allevato | animale | La gallina è un animale comune della fattoria.
+maiale | suino domestico | animale allevato | animale | Il maiale è un animale comunemente allevato in fattoria.
+latte | secrezione alimentare dei mammiferi | prodotto | latte | Il latte è un prodotto caratteristico delle fattorie con animali da latte.
+uovo | prodotto alimentare della gallina | prodotto | uovo | Le uova sono un prodotto comune delle fattorie che allevano galline.
+raccolto | insieme dei prodotti ottenuti dalle coltivazioni | attività agricola | raccolto | Il raccolto deriva dal lavoro nei campi della fattoria.
+letame | materiale organico degli animali usato come concime | gestione agricola | letame | Il letame prodotto dagli animali può essere usato per concimare i terreni della fattoria.
+
+@ serpente
+squama | elemento del rivestimento cutaneo | rivestimento | squama | Il corpo del serpente è rivestito di squame.
+rettile | vertebrato del gruppo dei rettili | categoria zoologica | rettile | Il serpente è un rettile.
+strisciare | avanzare aderendo al suolo con il corpo | locomozione | strisciare | Strisciare è il movimento comunemente associato al serpente.
+lingua | organo mobile della bocca | parte anatomica | lingua | La lingua biforcuta è una caratteristica riconoscibile del serpente.
+veleno | sostanza tossica prodotta da alcuni animali | predazione | veleno | Alcuni serpenti producono veleno per immobilizzare le prede o difendersi.
+muta | sostituzione del rivestimento esterno | crescita | muta | Il serpente compie la muta del rivestimento cutaneo durante la crescita.
+sibilo | suono acuto e prolungato | emissione sonora | sibilo | Il sibilo è un suono comunemente attribuito al serpente.
+vipera | serpente velenoso | tipo | tipo_serpente | La vipera è un tipo riconoscibile di serpente.
+pitone | grande serpente costrittore | tipo | tipo_serpente | Il pitone è un serpente che uccide le prede mediante costrizione.
+cobra | serpente che può allargare la regione del collo | tipo | tipo_serpente | Il cobra è un serpente riconoscibile per la regione del collo allargata.
+preda | animale catturato per nutrimento | alimentazione | preda | Il serpente cattura e ingerisce prede.
+uovo | struttura riproduttiva contenente l'embrione | riproduzione | uovo | Molti serpenti depongono uova.
+
+@ quaderno
+foglio | supporto sottile di carta | componente | foglio | I fogli rilegati formano il quaderno.
+pagina | facciata di un foglio | componente | pagina | Le pagine offrono superfici sulle quali scrivere nel quaderno.
+copertina | rivestimento esterno di un insieme di fogli | parte | copertina | La copertina protegge i fogli del quaderno.
+riga | linea guida o disposizione orizzontale di scrittura | formato | formato | Le righe guidano la scrittura in molti quaderni scolastici.
+quadretto | piccolo quadrato tracciato sulla pagina | formato | formato | I quadretti sono un formato comune delle pagine dei quaderni.
+penna | strumento per scrivere con inchiostro | strumento | strumento | La penna viene usata per scrivere sul quaderno.
+matita | strumento con mina per tracciare segni | strumento | strumento | La matita viene usata per scrivere o disegnare sul quaderno.
+compito | lavoro assegnato a un alunno | contenuto | compito | Il quaderno viene usato per svolgere i compiti scolastici.
+appunto | breve annotazione scritta | contenuto | appunto | Gli appunti vengono comunemente scritti su un quaderno.
+scuola | istituzione educativa | contesto | scuola | Il quaderno nel senso scelto è un materiale usato a scuola.
+scrivere | tracciare caratteri | funzione | scrivere | Il quaderno mette a disposizione fogli sui quali scrivere.
+spirale | rilegatura a filo avvolto | rilegatura | spirale | Una spirale può tenere insieme i fogli del quaderno.
+
+@ sciarpa
+collo | regione fra testa e tronco | sede d'uso | collo | La sciarpa viene avvolta intorno al collo.
+lana | fibra tessile animale | materiale | materiale | La lana è un materiale comune delle sciarpe invernali.
+seta | fibra tessile fine | materiale | materiale | La seta viene usata per realizzare sciarpe leggere.
+frangia | insieme di fili liberi lungo un bordo | parte | frangia | Le frange possono rifinire le estremità della sciarpa.
+nodo | intreccio che fissa un tessuto | modo d'uso | nodo | Un nodo può mantenere la sciarpa nella posizione desiderata.
+freddo | bassa temperatura | protezione | freddo | La sciarpa protegge il collo dal freddo.
+inverno | stagione fredda | contesto d'uso | inverno | La sciarpa è un accessorio caratteristico dell'abbigliamento invernale.
+cappotto | indumento esterno pesante | abbinamento | cappotto | La sciarpa viene comunemente abbinata al cappotto.
+guanto | indumento che copre la mano | abbinamento | guanto | Sciarpa e guanti sono accessori comunemente indossati insieme per ripararsi dal freddo.
+avvolgere | disporre intorno a qualcosa | gesto d'uso | avvolgere | Avvolgere la sciarpa intorno al collo è il suo modo d'uso caratteristico.
+
+@ granchio
+chela | appendice che funziona come una pinza | parte anatomica | chela | Le chele del granchio servono per afferrare e difendersi.
+carapace | rivestimento rigido del corpo di alcuni animali | rivestimento | carapace | Il carapace protegge la parte principale del corpo del granchio.
+crostaceo | artropode acquatico con rivestimento rigido | categoria zoologica | crostaceo | Il granchio è un crostaceo.
+zampa | arto di un animale | parte anatomica | zampa | Le zampe permettono al granchio di camminare sul fondo o sulla riva.
+mare | massa di acqua salata | habitat | mare | Il mare è un habitat comunemente associato ai granchi.
+scoglio | roccia affiorante o vicina alla costa | ambiente | scoglio | Gli scogli offrono riparo a molti granchi della costa.
+sabbia | materiale formato da piccoli granelli | ambiente | sabbia | Molti granchi si muovono o scavano nella sabbia della costa.
+muta | sostituzione del rivestimento esterno | crescita | muta | Il granchio compie la muta del suo rivestimento durante la crescita.
+antenna | appendice sensoriale di alcuni animali | parte anatomica | antenna | Le antenne del granchio rilevano stimoli dell'ambiente.
+
+@ bibita
+bottiglia | recipiente per liquidi | confezione | confezione | La bibita viene comunemente conservata o venduta in bottiglia.
+lattina | piccolo contenitore metallico per bevande | confezione | confezione | La lattina è una confezione comune delle bibite.
+bicchiere | recipiente da cui si beve | servizio | bicchiere | La bibita viene comunemente servita in un bicchiere.
+cannuccia | piccolo tubo per aspirare un liquido | accessorio | cannuccia | La cannuccia può essere usata per bere una bibita.
+sete | bisogno di bere | bisogno soddisfatto | sete | Una bibita viene bevuta anche per soddisfare la sete.
+ghiaccio | acqua solida | servizio | ghiaccio | Il ghiaccio viene aggiunto a molte bibite per mantenerle fredde.
+frizzante | contenente gas che produce bollicine | tipo | frizzante | Una bibita frizzante contiene gas che forma bollicine.
+zucchero | sostanza alimentare dolcificante | ingrediente | zucchero | Lo zucchero è un ingrediente di molte bibite.
+aranciata | bevanda a base di arancia | tipo | tipo_bibita | L'aranciata è una bibita analcolica riconoscibile.
+limonata | bevanda a base di limone | tipo | tipo_bibita | La limonata è una bibita a base di limone.
+succo | liquido estratto dalla frutta | ingrediente | succo | Il succo di frutta viene usato per preparare alcune bibite.
+bere | ingerire un liquido | consumo | bere | Bere è l'azione con cui si consuma una bibita.
+
+@ camion
+merce | prodotto destinato al commercio | carico | carico | Il camion trasporta merci per conto di attività commerciali e logistiche.
+carico | insieme dei materiali trasportati | funzione | carico | Il carico è ciò che il camion porta da un luogo all'altro.
+rimorchio | veicolo trainato | componente collegato | rimorchio | Un camion può trainare un rimorchio per aumentare la capacità di trasporto.
+cabina | spazio che ospita il conducente | parte | cabina | La cabina del camion ospita il conducente e i comandi.
+autista | conducente di un veicolo | professione | autista | L'autista è la persona che guida il camion.
+ruota | elemento circolare che permette il movimento | parte | ruota | Le ruote sostengono il camion e ne consentono il movimento su strada.
+autostrada | strada destinata al traffico veloce | percorso | autostrada | L'autostrada è una via comunemente percorsa dai camion per il trasporto su lunghe distanze.
+scarico | rimozione del carico da un veicolo | operazione | movimentazione | Lo scarico trasferisce le merci dal camion al luogo di destinazione.
+caricare | mettere merci su un veicolo | operazione | movimentazione | Caricare un camion significa sistemare le merci destinate al trasporto.
+magazzino | luogo dove si custodiscono merci | luogo logistico | magazzino | Il camion carica o scarica comunemente merci presso un magazzino.
+cassone | vano aperto o struttura che contiene il carico | parte | cassone | Il cassone contiene il carico in diversi tipi di camion.
+trasportare | portare persone o cose da un luogo a un altro | funzione | trasportare | La funzione caratteristica del camion è trasportare merci.
