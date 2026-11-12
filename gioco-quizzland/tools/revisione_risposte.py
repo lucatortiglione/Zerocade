@@ -81,9 +81,13 @@ def change(db_path, restore=False):
     backup_dir = db_path.parent / "backup-revisione"
     backup_dir.mkdir(exist_ok=True)
     backup_path = backup_dir / ("domande-" + datetime.now().strftime("%Y%m%d-%H%M%S-%f") + ".db")
-    with closing(sqlite3.connect(db_path)) as db, db:
-        with closing(sqlite3.connect(backup_path)) as backup:
+    # The backup is the questions alone, as a database of their own (in the games' database: its schema quizz).
+    if domande.giochi.schema_of(db_path) and domande.giochi.active():
+        domande.giochi.db.export_schema(domande.giochi.db.schema_of(db_path), backup_path)
+    else:
+        with closing(sqlite3.connect(db_path)) as db, closing(sqlite3.connect(backup_path)) as backup:
             db.backup(backup)
+    with closing(domande.giochi.connect(db_path)) as db, db:
         db.execute("PRAGMA foreign_keys = ON")
         db.execute("BEGIN IMMEDIATE")
         # Recheck after acquiring the write lock, in case another editor changed the DB.

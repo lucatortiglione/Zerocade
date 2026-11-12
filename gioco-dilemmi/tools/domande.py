@@ -19,12 +19,16 @@ import argparse
 import csv
 import os
 import re
-import sqlite3
 import sys
 from collections import Counter
 
 ROOT = os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
 DB = os.path.join(ROOT, "data", "domande.db")
+
+# The questions live in the games' database (database/giochi.sqlite3), schema dubbi: data/domande.db, the path
+# used here, means that schema (ZEROCADE_GIOCHI_DB=legacy goes back to the old file).
+sys.path.insert(0, os.path.join(ROOT, "..", "database"))
+import giochi  # noqa: E402
 
 SCHEMA = """
 CREATE TABLE IF NOT EXISTS dilemmi (
@@ -45,7 +49,7 @@ CREATE TABLE IF NOT EXISTS testi (
 
 
 def connect(path=DB):
-    db = sqlite3.connect(path)
+    db = giochi.connect(path)
     db.execute("PRAGMA foreign_keys = ON")
     db.executescript(SCHEMA)
     return db
@@ -58,9 +62,9 @@ def languages(names):
 
 def load(path=DB):
     """Every dilemma in order: {id, categoria, difficolta, esplicita, testi: {lingua: (a, b)}}."""
-    if not os.path.exists(path):
+    if not giochi.exists(path):
         sys.exit(f"{path} not found: create it with  python tools/domande.py import <file.csv>")
-    db = sqlite3.connect(f"file:{path}?mode=ro", uri=True)
+    db = giochi.connect(f"file:{path}?mode=ro", uri=True)
     out = {}
     for row in db.execute("SELECT id, categoria, difficolta, esplicita FROM dilemmi ORDER BY ordine"):
         out[row[0]] = {"id": row[0], "categoria": row[1], "difficolta": row[2], "esplicita": bool(row[3]), "testi": {}}

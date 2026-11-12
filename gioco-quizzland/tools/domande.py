@@ -24,12 +24,16 @@ the position of the answer chosen.
 import argparse
 import csv
 import os
-import sqlite3
 import sys
 from collections import Counter
 
 ROOT = os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
 DB = os.path.join(ROOT, "data", "domande.db")
+
+# The questions live in the games' database (database/giochi.sqlite3), schema quizz: data/domande.db, the path
+# used here, means that schema (ZEROCADE_GIOCHI_DB=legacy goes back to the old file).
+sys.path.insert(0, os.path.join(ROOT, "..", "database"))
+import giochi  # noqa: E402
 LETTERS = "abcd"
 
 SCHEMA = """
@@ -57,7 +61,7 @@ PRAGMA user_version = 1;
 
 def connect(path=DB):
     os.makedirs(os.path.dirname(path), exist_ok=True)
-    db = sqlite3.connect(path)
+    db = giochi.connect(path)
     db.execute("PRAGMA foreign_keys = ON")
     db.executescript(SCHEMA)
     return db
@@ -66,9 +70,9 @@ def connect(path=DB):
 def load(path=DB):
     """Every question in order: {id, categoria, difficolta, ordine_fisso, attiva, domanda,
     spiegazione, opzioni: [text, ...], giusta: index}."""
-    if not os.path.exists(path):
+    if not giochi.exists(path):
         sys.exit(f"{path} not found: create it with  python tools/domande.py import <file.csv>")
-    db = sqlite3.connect(f"file:{path}?mode=ro", uri=True)
+    db = giochi.connect(f"file:{path}?mode=ro", uri=True)
     out = {}
     for row in db.execute(
         "SELECT id, categoria, difficolta, ordine_fisso, attiva, testo, spiegazione FROM domande ORDER BY ordine"
