@@ -11,6 +11,7 @@ import {
 } from '@zerocade/shared'
 import sky from '@quizzland/sfondo.svg'
 import { quizSound, roundCheer } from './audio'
+import { NasaBackdrop } from './NasaBackdrop'
 import { useOverlay } from './store'
 import './quizzland.css'
 
@@ -72,15 +73,17 @@ function sharesOf(counts: number[]): number[] {
   return out
 }
 
-type Background = { mode: 'theme' | 'color' | 'transparent' | 'image'; color: string; image: string }
+type Background = { mode: 'theme' | 'nasa' | 'color' | 'transparent' | 'image'; color: string; image: string; minutes: number }
 
 function backgroundOf(s: GameSettings): Background {
   const raw = typeof s.background === 'string' ? s.background : 'theme'
   const image = typeof s.bgImage === 'string' ? s.bgImage : ''
   const color = hex(s.bgColor, '#1d1147')
-  if (raw === 'image' && image) return { mode: 'image', color, image }
-  if (raw === 'color' || raw === 'transparent') return { mode: raw, color, image }
-  return { mode: 'theme', color, image }
+  const minutes = Number(s.photoMinutes) || 3
+  if (raw === 'image' && image) return { mode: 'image', color, image, minutes }
+  if (raw === 'nasa') return { mode: 'nasa', color: '#05080f', image, minutes }
+  if (raw === 'color' || raw === 'transparent') return { mode: raw, color, image, minutes }
+  return { mode: 'theme', color, image, minutes }
 }
 
 // Counts a server duration down locally, ticking ten times a second.
@@ -579,16 +582,19 @@ const GLYPH_PATHS: Record<'q' | 'spark' | 'ring', ReactNode> = {
   ring: <circle cx="12" cy="12" r="7.5" fill="none" strokeWidth="2.2" />,
 }
 
-// The sky (Quizzland's own artwork), a colour or an uploaded picture, with the drifting glyphs
-// over the first two; nothing at all on a transparent background, which has to stay clear for OBS.
+// The sky (Quizzland's own artwork), NASA's picture of the day, a colour or an uploaded picture, with the
+// drifting glyphs over the sky and the colour; nothing at all on a transparent background, which has to stay
+// clear for OBS.
 function Backdrop({ bg }: { bg: Background }) {
   if (bg.mode === 'transparent') return null
+  const photo = bg.mode === 'image' || bg.mode === 'nasa'
   return (
     <div className="qz__backdrop" aria-hidden="true">
       {bg.mode === 'theme' && <div className="qz__sky" style={{ backgroundImage: `url("${sky}")` }} />}
       {bg.mode === 'theme' && <div className="qz__aurora" />}
       {bg.mode === 'image' && <div className="qz__photo" style={{ backgroundImage: `url("${bg.image}")` }} />}
-      {bg.mode !== 'image' && (
+      {bg.mode === 'nasa' && <NasaBackdrop minutes={bg.minutes} veil={false} />}
+      {!photo && (
         <div className="qz__glyphs">
           {GLYPHS.map((g, i) => (
             <svg key={i} viewBox="0 0 24 24" className={`qz-glyph qz-glyph--${g.kind}`} style={g.style as CSSProperties}>
@@ -597,7 +603,7 @@ function Backdrop({ bg }: { bg: Background }) {
           ))}
         </div>
       )}
-      <div className={`qz__veil${bg.mode === 'image' ? ' qz__veil--photo' : ''}`} />
+      <div className={`qz__veil${photo ? ' qz__veil--photo' : ''}`} />
     </div>
   )
 }

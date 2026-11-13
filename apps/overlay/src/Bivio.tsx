@@ -13,6 +13,7 @@ import appDark from '@bivio/backgrounds/app_dark.svg'
 import optionA from '@bivio/backgrounds/option_a.svg'
 import optionB from '@bivio/backgrounds/option_b.svg'
 import { roundCheer } from './audio'
+import { NasaBackdrop } from './NasaBackdrop'
 import { useOverlay } from './store'
 import { ViewerAvatar } from './ViewerAvatar'
 
@@ -106,22 +107,27 @@ function lookOf(s: GameSettings) {
   const b = hex(s.colorB, D.b)
   const accent = hex(s.accent, D.accent)
   const bg = hex(s.bgColor, D.background)
-  const image = typeof s.bgImage === 'string' ? s.bgImage : ''
-  const seeThrough = !image && s.bgTransparent === true
+  // NASA's picture of the day wins over the uploaded image and the colour (the colour shows while it loads).
+  const nasa = s.bgNasa === true
+  const image = !nasa && typeof s.bgImage === 'string' ? s.bgImage : ''
+  const seeThrough = !nasa && !image && s.bgTransparent === true
   const card = (color: string, def: string, art: string) =>
     color === def ? `url("${art}")` : `linear-gradient(135deg, ${color}, ${shade(color)})`
   return {
     stacked: s.layout === 'stacked',
     seeThrough,
+    nasa: nasa ? Number(s.photoMinutes) || 3 : 0,
     cards: { a: card(a, D.a, optionA), b: card(b, D.b, optionB) },
     style: {
-      background: image
-        ? `center / cover no-repeat url("${image}")`
-        : seeThrough
-          ? 'transparent'
-          : bg === D.background
-            ? `center / cover url("${appDark}")`
-            : bg,
+      background: nasa
+        ? bg
+        : image
+          ? `center / cover no-repeat url("${image}")`
+          : seeThrough
+            ? 'transparent'
+            : bg === D.background
+              ? `center / cover url("${appDark}")`
+              : bg,
       color: hex(s.textColor, D.text),
       '--bivio-a': a,
       '--bivio-b': b,
@@ -180,6 +186,7 @@ function Round({ state, at, settings }: { state: BivioState; at: number; setting
   if (!q) {
     return (
       <div className="bivio" style={look.style}>
+        {look.nasa > 0 && <NasaBackdrop minutes={look.nasa} />}
         <p className="bivio__empty">{ui.empty}</p>
       </div>
     )
@@ -214,6 +221,7 @@ function Round({ state, at, settings }: { state: BivioState; at: number; setting
 
   return (
     <div className="bivio" style={look.style}>
+      {look.nasa > 0 && <NasaBackdrop minutes={look.nasa} />}
       <div className="bivio__head">
         {category && (
           <span

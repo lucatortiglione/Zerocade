@@ -1,6 +1,7 @@
 import { useEffect, useRef, useSyncExternalStore } from 'react'
-import { GAMES, describeSource, triggersFor } from '@zerocade/shared'
+import { GAMES, describeSource, sharesPhotoBackground, triggersFor } from '@zerocade/shared'
 import { setRoundCheer } from './audio'
+import { NasaBackdrop } from './NasaBackdrop'
 import { Engine } from './games/engine'
 import { createGame } from './games/registry'
 import { useOverlay } from './store'
@@ -76,12 +77,18 @@ export function App() {
   }, [seq])
 
   const game = session ? GAMES.find((g) => g.id === session.gameId) : undefined
+  // NASA's picture of the day behind the canvas games (ZeroDubbi, ZeroQuizz and ZeroWords draw their own).
+  const photoMinutes =
+    session && !session.ended && game && sharesPhotoBackground(game.id) && (session.settings.background ?? 'nasa') === 'nasa'
+      ? Number(session.settings.photoMinutes) || 3
+      : 0
 
   const scores = session?.gameId === 'incastro' ? incastro?.scores
     : session?.gameId === 'quizzland' ? quizzland?.scores : undefined
 
   return (
     <div className="overlay">
+      {photoMinutes > 0 && <NasaBackdrop minutes={photoMinutes} />}
       <canvas ref={canvasRef} className="overlay__canvas" />
       {session?.gameId === 'zerodubbi' && <Bivio />}
       {session?.gameId === 'incastro' && <Incastro />}

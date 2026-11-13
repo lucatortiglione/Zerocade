@@ -59,6 +59,7 @@ import { getContent, wordAssociation } from './content.js'
 import { contextFile, isContextFile } from './context.js'
 import { isWordleFile, wordleFile } from './wordle.js'
 import { chainKeys, chains } from './chains.js'
+import { nasaPhotos } from './nasa.js'
 import { publicBaseUrl, startPublicServer } from './public-server.js'
 import { leaderboardCss, leaderboardHtml, leaderboardIndexHtml, leaderboardJs } from './leaderboard-page.js'
 import { PERIODS, leaderboards, recordScore } from './scores.js'
@@ -158,6 +159,8 @@ app.get('/classifica/:game', async (req, reply) => {
   return reply.type('text/html; charset=utf-8').header('cache-control', 'no-store').send(leaderboardHtml(game))
 })
 // ZeroReazioniACatena's chains (walks through ZeroAssociazioni's verified pools).
+// NASA's Image of the Day behind the games: the overlay picks the one in view from this list and the clock.
+app.get('/api/nasa', async () => nasaPhotos())
 app.get('/api/chains', async () => chains())
 // Its "Parola chiave" puzzles: [hidden word, ...clues].
 app.get('/api/chains/keys', async () => chainKeys())

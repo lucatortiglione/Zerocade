@@ -464,7 +464,7 @@ export interface IncastroState {
   // Simulated difficulty of the grid in play and its target, 0..100.
   difficulty: { target: number; dsim: number } | null
   // NASA's Image of the Day behind this level, when the background is 'nasa'.
-  photo: { url: string; title: string; link: string } | null
+  photo: NasaPhoto | null
   // The next level's picture, for the overlay to load ahead of time.
   nextPhoto: string | null
   chapter: IncastroChapter
@@ -658,6 +658,56 @@ export const COMMON_SETTINGS: GameSetting[] = [
   },
   { id: 'voiceFollowersOnly', label: 'Voce solo ai follower', kind: 'toggle', default: false, group: 'Chat', hint: VOICE_HINT },
 ]
+
+// NASA's Image of the Day behind a game (GET /api/nasa: the latest few dozen pictures of the feed). The picture
+// in view comes from the clock and that list, so the dashboard preview and the stream show the same one, and it
+// changes every `photoMinutes`.
+export interface NasaPhoto {
+  url: string
+  title: string
+  link: string
+}
+
+const PHOTO_MINUTES = (when: { id: string; value: string | boolean }, group: string): GameSetting => ({
+  id: 'photoMinutes',
+  label: 'Cambia foto ogni (minuti)',
+  group,
+  kind: 'number',
+  min: 1,
+  max: 60,
+  step: 1,
+  default: 3,
+  when,
+})
+
+// The picture in view at `now`: the same in every overlay of the PC for the same list.
+export function nasaPhotoAt(photos: NasaPhoto[], minutes: number, now: number): NasaPhoto | null {
+  if (!photos.length) return null
+  const slot = Math.floor(now / (Math.max(1, minutes) * 60_000))
+  return photos[slot % photos.length]
+}
+
+// The canvas games' background: until now always the plain dark page.
+const PHOTO_BACKGROUND: GameSetting[] = [
+  {
+    id: 'background',
+    label: 'Sfondo',
+    group: 'Aspetto',
+    kind: 'select',
+    default: 'nasa',
+    options: [
+      { value: 'nasa', label: 'Foto NASA del giorno' },
+      { value: 'dark', label: 'Scuro' },
+    ],
+    hint: 'Una delle ultime foto «Image of the Day» della NASA, scurita perché il gioco resti leggibile. Senza internet resta lo sfondo scuro.',
+  },
+  PHOTO_MINUTES({ id: 'background', value: 'nasa' }, 'Aspetto'),
+]
+// Games whose own scene fills the screen and would hide the picture (Lunar Dash's sky, Guess the Location's
+// panorama), and the ones with background settings of their own (ZeroDubbi, ZeroQuizz, ZeroWords).
+const OWN_BACKGROUND = new Set(['lunar-dash', 'guess-location', 'zerodubbi', 'quizzland', 'incastro'])
+// Whether the overlay puts the shared background (PHOTO_BACKGROUND) behind this game's canvas.
+export const sharesPhotoBackground = (gameId: string) => !OWN_BACKGROUND.has(gameId)
 
 const GAME_DEFS: GameDef[] = [
   {
@@ -1558,11 +1608,13 @@ const GAME_DEFS: GameDef[] = [
         default: 'theme',
         options: [
           { value: 'theme', label: 'ZeroQuizz (cielo animato)' },
+          { value: 'nasa', label: 'Foto NASA del giorno' },
           { value: 'color', label: 'Colore' },
           { value: 'transparent', label: 'Trasparente' },
           { value: 'image', label: 'Immagine caricata' },
         ],
       },
+      PHOTO_MINUTES({ id: 'background', value: 'nasa' }, 'Aspetto'),
       { id: 'bgColor', label: 'Colore', group: 'Aspetto', kind: 'color', default: '#1d1147' },
       { id: 'bgImage', label: 'Immagine', group: 'Aspetto', kind: 'image', default: '' },
     ],
@@ -1735,6 +1787,8 @@ const GAME_DEFS: GameDef[] = [
       { id: 'bgColor', label: 'Colore', group: 'Sfondo', kind: 'color', default: BIVIO_DEFAULT_COLORS.background },
       { id: 'bgTransparent', label: 'Trasparente', group: 'Sfondo', kind: 'toggle', default: false },
       { id: 'bgImage', label: 'Immagine (sostituisce il colore)', group: 'Sfondo', kind: 'image', default: '' },
+      { id: 'bgNasa', label: 'Foto NASA del giorno (sostituisce colore e immagine)', group: 'Sfondo', kind: 'toggle', default: false },
+      PHOTO_MINUTES({ id: 'bgNasa', value: true }, 'Sfondo'),
       {
         id: 'liveCounts',
         label: 'Percentuali durante il voto',
@@ -1868,6 +1922,7 @@ export const GAMES: GameDef[] = GAME_DEFS.map((g) => ({
   settings: [
     ...g.settings,
     ...COMMON_SETTINGS.filter((c) => !g.settings.some((x) => x.id === c.id)),
+    ...(OWN_BACKGROUND.has(g.id) ? [] : PHOTO_BACKGROUND.filter((c) => !g.settings.some((x) => x.id === c.id))),
     ...(WITHOUT_ROUNDS.has(g.id) ? [] : [ROUND_CHEER]),
   ],
 }))

@@ -1,18 +1,17 @@
 // NASA's Image of the Day (https://www.nasa.gov/image-of-the-day/), read from its RSS feed:
 // the latest few dozen pictures, fetched when first needed and again every few hours.
-// ZeroWords shows one at random behind each level when its background is 'nasa'.
+// ZeroWords shows one at random behind each level when its background is 'nasa'; the other games get the list
+// (GET /api/nasa) and show the one the clock picks (nasaPhotoAt, @zerocade/shared).
+
+import type { NasaPhoto } from '@zerocade/shared'
+
+export type { NasaPhoto }
 
 const FEED = 'https://www.nasa.gov/feeds/iotd-feed'
 const REFRESH_MS = 6 * 3_600_000
 const RETRY_MS = 10 * 60_000
 // nasa.gov serves resized copies (?w=): a few hundred KB instead of originals of up to 200 MB.
 const WIDTH = 2048
-
-export interface NasaPhoto {
-  url: string
-  title: string
-  link: string
-}
 
 let photos: NasaPhoto[] = []
 let lastTry = 0
