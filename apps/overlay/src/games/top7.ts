@@ -1,6 +1,7 @@
 import type { GameInstance } from './engine'
 import { addPoints, drawLeaderboard, drawTimerBar, newScores, normalize, shuffled } from './common'
 import { itemsFor } from '../content'
+import { roundCheer } from '../audio'
 
 // "Top 7" — one theme, seven answers. Viewers guess the seven hidden answers.
 
@@ -48,6 +49,7 @@ export function createTop7(): GameInstance {
       addPoints(scores, event.user.id, event.user.nickname, event.user.avatar, 10)
       if (prompt.answers.every((a) => found.has(a))) {
         revealed = true
+        roundCheer()
         timer = breakSecs
       }
     },
@@ -62,6 +64,7 @@ export function createTop7(): GameInstance {
       timer -= dt
       if (timer <= 0) {
         revealed = true
+        roundCheer()
         timer = breakSecs
       }
     },

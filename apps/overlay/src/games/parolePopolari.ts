@@ -1,6 +1,7 @@
 import type { GameInstance } from './engine'
 import { addPoints, drawLeaderboard, drawTimerBar, newScores, normalize, shuffled } from './common'
 import { itemsFor } from '../content'
+import { roundCheer } from '../audio'
 
 // "Parole Popolari" — a prompt is shown and viewers guess the most popular
 // answers; each answer is worth its popularity score.
@@ -56,6 +57,7 @@ export function createParolePopolari(): GameInstance {
       addPoints(scores, event.user.id, event.user.nickname, event.user.avatar, match.score)
       if (prompt.answers.every((a) => found.has(a.text))) {
         revealed = true
+        roundCheer()
         timer = breakSecs
       }
     },
@@ -70,6 +72,7 @@ export function createParolePopolari(): GameInstance {
       timer -= dt
       if (timer <= 0) {
         revealed = true
+        roundCheer()
         timer = breakSecs
       }
     },

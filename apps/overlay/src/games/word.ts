@@ -2,6 +2,7 @@ import type { Viewer } from '@zerocade/shared'
 import type { GameInstance } from './engine'
 import { fillTextWithAvatar } from './avatar'
 import { addPoints, newScores } from './common'
+import { roundCheer } from '../audio'
 
 const WORDS = ['TIKTOK', 'STREAM', 'LEGEND', 'ROCKET', 'CROWN', 'GALAXY', 'VIEWER', 'GAMING']
 const MAX_WRONG = 6
@@ -44,6 +45,7 @@ export function createWordGuess(): GameInstance {
         if (!winners.some((w) => w.id === event.user.id)) winners.push(event.user)
         addPoints(scores, event.user.id, event.user.nickname, event.user.avatar, 20)
         revealed = true
+        roundCheer()
         timer = 4
         return
       }
@@ -60,12 +62,14 @@ export function createWordGuess(): GameInstance {
       timer -= dt
       if (isWon() && !revealed) {
         revealed = true
+        roundCheer()
         timer = 4
       }
       if (timer <= 0) {
         if (revealed) pick()
         else {
           revealed = true
+          roundCheer()
           timer = 4
         }
       }

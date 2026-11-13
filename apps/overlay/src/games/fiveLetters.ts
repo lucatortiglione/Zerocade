@@ -4,10 +4,11 @@ import { drawAvatar, fillTextWithAvatar } from './avatar'
 import { addPoints, clamp, drawTimerBar, newScores, shuffled, topOf } from './common'
 import { followSecret, reportSecret } from './roomSecret'
 import { feedback, keyStates, newInfo, parseWordleData, readGuess, type Row, type Tile, type WordleData } from './wordleLogic'
+import { roundCheer } from '../audio'
 
 // ZeroWordle: the chat plays one word together, of 5 to 8 letters (the creator's choice, or random). Every valid word written in chat is a row
 // of green (right place), gold (elsewhere) and grey (not in the word) tiles. The words come from the
-// server (/api/wordle/*, a list per length built from prompt_raw.sqlite3 by gioco-zerowordle); the secret is shared by
+// server (/api/wordle/*, a list per length, schema wordle of database/giochi.sqlite3, built by gioco-zerowordle from the lexical inventory); the secret is shared by
 // the room's overlays (roomSecret.ts) and shown to the creator in the dashboard.
 
 const LENGTHS = [5, 6, 7, 8]
@@ -142,6 +143,7 @@ export function createFiveLetters(): GameInstance {
 
   const finish = (by: Viewer | null) => {
     revealed = true
+    roundCheer()
     solved = by !== null
     solver = by
     timer = breakSecs

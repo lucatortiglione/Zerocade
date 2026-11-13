@@ -187,6 +187,28 @@ export function quizSound(kind: QuizSound) {
   }
 }
 
+// The applause at the end of every round of every game: audio/dragon-studio-crowd-cheer-406646.mp3 at the
+// repository's root (Vite copies it into the build). One at a time; the dashboard's preview (?preview) stays
+// silent, and each game's "Applauso a fine round" setting (roundCheer) turns it off.
+const CHEER_URL = new URL('../../../audio/dragon-studio-crowd-cheer-406646.mp3', import.meta.url).href
+const PREVIEW = typeof window !== 'undefined' && new URLSearchParams(window.location.search).has('preview')
+let cheerOn = true
+let cheer: HTMLAudioElement | null = null
+
+export const setRoundCheer = (on: boolean) => {
+  cheerOn = on
+}
+
+export function roundCheer() {
+  if (PREVIEW || !cheerOn || typeof Audio === 'undefined') return
+  if (cheer && !cheer.paused && !cheer.ended) return
+  const a = new Audio(CHEER_URL)
+  cheer = a
+  playing.add(a)
+  a.addEventListener('ended', () => playing.delete(a))
+  void a.play().catch(() => playing.delete(a))
+}
+
 export function stopSounds() {
   for (const a of playing) a.pause()
   playing.clear()

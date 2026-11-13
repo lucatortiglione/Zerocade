@@ -5,6 +5,7 @@ import { addPoints, clamp, drawTimerBar, newScores, topOf } from './common'
 import { KEY_START_CLUES, dominoOpen, keyValue, nextHint, pickChain, pickKey, readWord, wordValue } from './chainLogic'
 import { fold } from './contextRanking'
 import { followSecret, reportSecret } from './roomSecret'
+import { roundCheer } from '../audio'
 
 // ZeroReazioniACatena: words linked by verified associations, in three modes that take turns (by default
 // every 5 rounds, in this order):
@@ -178,6 +179,7 @@ export function createChainReaction(): GameInstance {
 
   const finish = (by: Viewer | null, late: boolean, pts = 0) => {
     finished = true
+    roundCheer()
     timeUp = late
     finisher = by
     finishPts = pts
@@ -319,7 +321,7 @@ export function createChainReaction(): GameInstance {
       ctx.fillStyle = '#9aa0b8'
       ctx.font = '24px system-ui'
       const dots = '.'.repeat(1 + (Math.floor(now / 400) % 3))
-      ctx.fillText(lists.walks.failed ? 'Nessuna catena disponibile (prompt.sqlite3)' : `Carico le catene${dots}`, cx, top + 130)
+      ctx.fillText(lists.walks.failed ? 'Nessuna catena disponibile (schema associazioni)' : `Carico le catene${dots}`, cx, top + 130)
       return
     }
 

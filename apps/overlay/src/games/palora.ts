@@ -3,6 +3,7 @@ import type { GameInstance } from './engine'
 import { fillTextWithAvatar } from './avatar'
 import { addPoints, drawLeaderboard, drawTimerBar, newScores, normalize, shuffled } from './common'
 import { wordsFor } from '../content'
+import { roundCheer } from '../audio'
 
 // "Palora" — a word's letters are scrambled: viewers unscramble them and type
 // the hidden word.
@@ -44,6 +45,7 @@ export function createPalora(): GameInstance {
       if (event.type !== 'comment' || revealed) return
       if (normalize(event.text) !== normalize(word)) return
       revealed = true
+      roundCheer()
       solver = event.user
       timer = breakSecs
       addPoints(scores, event.user.id, event.user.nickname, event.user.avatar, word.length)
@@ -56,6 +58,7 @@ export function createPalora(): GameInstance {
         if (revealed) pick()
         else {
           revealed = true
+          roundCheer()
           timer = breakSecs
         }
       }

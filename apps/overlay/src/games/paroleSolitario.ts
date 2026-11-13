@@ -3,6 +3,7 @@ import type { GameInstance } from './engine'
 import { fillTextWithAvatar } from './avatar'
 import { addPoints, drawLeaderboard, drawTimerBar, newScores, normalize, shuffled } from './common'
 import { itemsFor } from '../content'
+import { roundCheer } from '../audio'
 
 // "Parole Solitario" — a chain of associated words, revealed one at a time.
 // Viewers guess the next word in the chain to advance.
@@ -56,6 +57,7 @@ export function createParoleSolitario(): GameInstance {
       step++
       if (step >= theme.words.length) {
         revealed = true
+        roundCheer()
         timer = breakSecs
       }
     },
@@ -70,6 +72,7 @@ export function createParoleSolitario(): GameInstance {
       timer -= dt
       if (timer <= 0) {
         revealed = true
+        roundCheer()
         timer = breakSecs
       }
     },

@@ -13,9 +13,10 @@ import type { GameInstance } from './engine'
 import { drawAvatar, fillTextWithAvatar } from './avatar'
 import { addPoints, drawLeaderboard, drawTimerBar, newScores, shuffled, topOf } from './common'
 import { itemsFor } from '../content'
+import { roundCheer } from '../audio'
 
 // ZeroAssociazioni (Word Association v3.6.0): the prompt is shown, the chat guesses its 7 or 8 hidden words, drawn
-// each round from the prompt's verified pool (gioco-zeroassociations/prompt.sqlite3).
+// each round from the prompt's verified pool (schema associazioni of database/giochi.sqlite3).
 // Each word goes to the first viewer who writes it (an inflected form counts too: "pomodori"),
 // with a speed bonus and a combo for words found quickly one after the other. Long words can
 // start with a letter or two, more letters show as the round goes on, and a gift uncovers some.
@@ -232,6 +233,7 @@ export function createWordAssociation(report?: (round: WordAssociationRoundRepor
   const endRound = (by: 'all' | 'time' | 'other') => {
     if (!puzzle || phase !== 'play') return
     phase = 'summary'
+    roundCheer()
     endedBy = by
     timer = breakSecs
     roundsPlayed++

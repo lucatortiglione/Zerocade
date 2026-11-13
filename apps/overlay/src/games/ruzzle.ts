@@ -1,6 +1,7 @@
 import type { GameInstance } from './engine'
 import { addPoints, drawLeaderboard, drawTimerBar, newScores, normalize, shuffled } from './common'
 import { wordsFor } from '../content'
+import { roundCheer } from '../audio'
 
 // "Ruzzle" — a 4x4 letter grid: find as many hidden words as you can before the
 // timer runs out. Longer words score more.
@@ -97,6 +98,7 @@ export function createRuzzle(): GameInstance {
       timer -= dt
       if (timer <= 0) {
         revealed = true
+        roundCheer()
         timer = breakSecs
       }
     },

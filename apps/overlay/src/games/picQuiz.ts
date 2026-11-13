@@ -2,6 +2,7 @@ import type { GameInstance } from './engine'
 import { addPoints } from './common'
 import { drawAvatar } from './avatar'
 import { imageProviderById, type ImageProvider } from './imageProviders'
+import { roundCheer } from '../audio'
 
 // Generic "guess the word(s) from pictures" game.
 // - 4 Pics 1 Word: a round is ONE word with 4 pictures sharing it.
@@ -116,7 +117,10 @@ export function createPicQuiz(rounds: (wordsPerRound: number) => PicPuzzle, titl
         addPoints(scores, event.user.id, event.user.nickname, event.user.avatar, pts)
         solver = { name: event.user.nickname, pts, avatar: event.user.avatar, word: text }
         flash = 3
-        if (allSolved()) timer = 4
+        if (allSolved()) {
+          timer = 4
+          roundCheer()
+        }
         return
       }
     },
@@ -130,6 +134,7 @@ export function createPicQuiz(rounds: (wordsPerRound: number) => PicPuzzle, titl
         if (allSolved() || revealed) next()
         else {
           revealed = true
+          roundCheer()
           timer = revealTotal()
         }
       }

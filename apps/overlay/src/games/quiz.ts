@@ -1,5 +1,6 @@
 import type { GameInstance } from './engine'
 import { addPoints, drawLeaderboard } from './common'
+import { roundCheer } from '../audio'
 
 interface Q {
   q: string
@@ -86,6 +87,7 @@ export function createTrivia(): GameInstance {
         if (revealed) next()
         else {
           revealed = true
+          roundCheer()
           timer = 3
         }
       }

@@ -1,6 +1,7 @@
 import type { GameInstance } from './engine'
 import { addPoints, drawLeaderboard, drawTimerBar, newScores, normalize, shuffled } from './common'
 import { itemsFor } from '../content'
+import { roundCheer } from '../audio'
 
 // "Crostic" — solve the clue answers; their first letters spell a hidden phrase.
 // Each correct answer reveals its first letter in the phrase.
@@ -54,6 +55,7 @@ export function createCrostic(): GameInstance {
       addPoints(scores, event.user.id, event.user.nickname, event.user.avatar, gain)
       if (allFound()) {
         revealed = true
+        roundCheer()
         timer = breakSecs
       }
     },

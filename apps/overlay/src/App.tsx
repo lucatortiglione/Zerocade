@@ -1,5 +1,6 @@
 import { useEffect, useRef, useSyncExternalStore } from 'react'
 import { GAMES, describeSource, triggersFor } from '@zerocade/shared'
+import { setRoundCheer } from './audio'
 import { Engine } from './games/engine'
 import { createGame } from './games/registry'
 import { useOverlay } from './store'
@@ -61,6 +62,7 @@ export function App() {
   // Tune settings live.
   useEffect(() => {
     engineRef.current?.setSettings(session?.settings ?? {})
+    setRoundCheer(session?.settings.roundCheer !== false)
   }, [session?.settings])
 
   // Dispatch matching triggers on each incoming event. Nothing a viewer does (messages, likes, gifts, follows,

@@ -1,6 +1,7 @@
 import type { GameInstance } from './engine'
 import { drawAvatar } from './avatar'
 import { addPoints, drawLeaderboard } from './common'
+import { roundCheer } from '../audio'
 
 // "Word Swipe" — like Zen Word / Words of Wonder: a wheel of letters, viewers type
 // any word they can build from them in chat. Longer words score more.
@@ -97,6 +98,7 @@ export function createWordSwipe(): GameInstance {
         if (revealed) newRound()
         else {
           revealed = true
+          roundCheer()
           timer = 7
         }
       }

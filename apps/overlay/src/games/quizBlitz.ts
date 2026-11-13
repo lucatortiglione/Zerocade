@@ -1,6 +1,7 @@
 import type { GameInstance } from './engine'
 import { addPoints, drawLeaderboard, drawTimerBar, newScores, shuffled } from './common'
 import { itemsFor } from '../content'
+import { roundCheer } from '../audio'
 
 // "Quiz Blitz" — rapid-fire quiz with a short timer and a speed bonus.
 
@@ -84,6 +85,7 @@ export function createQuizBlitz(): GameInstance {
         if (revealed) next()
         else {
           revealed = true
+          roundCheer()
           timer = revealSecs
         }
       }

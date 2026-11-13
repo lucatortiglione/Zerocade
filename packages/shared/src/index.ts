@@ -524,7 +524,7 @@ export type IncastroCommand =
 // Shown as ZeroQuizz; the code, the saved settings and the database still say quizzland.
 // Server-driven like Bivio: the server deals the question, takes each viewer's first answer
 // (A-D, or 1-4) from chat, scores it at the reveal and stores every answer in SQLite. The
-// questions come from gioco-quizzland/data/domande.db. Italian only.
+// questions come from the schema quizz of database/giochi.sqlite3. Italian only.
 
 export interface QuizzlandCategory {
   id: string
@@ -532,7 +532,7 @@ export interface QuizzlandCategory {
   colors: [string, string]
 }
 
-// The categories of domande.db; one missing here still plays, with a neutral chip.
+// The categories of the schema quizz (domande.categoria); one missing here still plays, with a neutral chip.
 export const QUIZZLAND_CATEGORIES: QuizzlandCategory[] = [
   { id: 'logica', label: 'Logica', colors: ['#60a5fa', '#4338ca'] },
   { id: 'numeri', label: 'Numeri', colors: ['#fbbf24', '#ea580c'] },
@@ -1851,9 +1851,25 @@ const GAME_DEFS: GameDef[] = [
   },
 ]
 
+// The applause the overlay plays at the end of every round (apps/overlay/src/audio.ts, roundCheer), for every game
+// that has rounds: Gift Drop and Lunar Dash go on without an end.
+const ROUND_CHEER: GameSetting = {
+  id: 'roundCheer',
+  label: 'Applauso a fine round',
+  hint: 'Alla fine di ogni round l’overlay fa sentire un applauso del pubblico; l’anteprima della dashboard resta muta.',
+  group: 'Effetti',
+  kind: 'toggle',
+  default: true,
+}
+const WITHOUT_ROUNDS = new Set(['gift-drop', 'lunar-dash'])
+
 export const GAMES: GameDef[] = GAME_DEFS.map((g) => ({
   ...g,
-  settings: [...g.settings, ...COMMON_SETTINGS.filter((c) => !g.settings.some((x) => x.id === c.id))],
+  settings: [
+    ...g.settings,
+    ...COMMON_SETTINGS.filter((c) => !g.settings.some((x) => x.id === c.id)),
+    ...(WITHOUT_ROUNDS.has(g.id) ? [] : [ROUND_CHEER]),
+  ],
 }))
 
 // Whether a viewer's comment reaches the game, by the game's "Chi può giocare" setting.

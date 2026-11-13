@@ -1,6 +1,7 @@
 import type { GameInstance } from './engine'
 import { drawAvatar } from './avatar'
 import { addPoints, drawLeaderboard } from './common'
+import { roundCheer } from '../audio'
 
 // "Words of Wonders: Guru" — a crossword board of hidden words: viewers find every
 // word that can be built from the letters. Longer words score more.
@@ -159,7 +160,10 @@ export function createWordsOfWonders(): GameInstance {
       addPoints(scores, event.user.id, event.user.nickname, event.user.avatar, pts)
       last = { name: event.user.nickname, pts, avatar: event.user.avatar, word }
       flash = 3
-      if (allFound()) timer = 4
+      if (allFound()) {
+        timer = 4
+        roundCheer()
+      }
     },
     update(dt, _now, settings) {
       seconds = typeof settings.seconds === 'number' ? settings.seconds : seconds
@@ -169,6 +173,7 @@ export function createWordsOfWonders(): GameInstance {
         if (allFound() || revealed) newRound()
         else {
           revealed = true
+          roundCheer()
           timer = 7
         }
       }

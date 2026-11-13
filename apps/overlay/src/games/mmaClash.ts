@@ -1,6 +1,7 @@
 import { giftById, type Viewer } from '@zerocade/shared'
 import type { GameInstance } from './engine'
 import { fillTextWithAvatar } from './avatar'
+import { roundCheer } from '../audio'
 
 type Side = 'red' | 'blue'
 
@@ -100,6 +101,7 @@ export function createMmaClash(): GameInstance {
       for (const f of [red, blue]) if (now - f.hit > 200) f.hit = 0
 
       if (red.hp <= 0 || blue.hp <= 0) {
+        roundCheer()
         if (red.hp <= 0) blueWins++
         else redWins++
         if (round < rounds) round++

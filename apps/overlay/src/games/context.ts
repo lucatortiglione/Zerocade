@@ -13,6 +13,7 @@ import {
   type Ranking,
 } from './contextRanking'
 import { followSecret, reportSecret } from './roomSecret'
+import { roundCheer } from '../audio'
 
 // ZeroContext: every word typed in chat is ranked by closeness of meaning to a secret word,
 // over the whole Italian vocabulary of gioco-zerocontext (1 = the closest word). Chat narrows
@@ -160,6 +161,7 @@ export function createContext(): GameInstance {
 
   const finish = (by: Viewer | null) => {
     revealed = true
+    roundCheer()
     revealAt = performance.now()
     solver = by
     timer = breakSecs

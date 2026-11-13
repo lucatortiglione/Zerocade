@@ -1,6 +1,7 @@
 import type { GameInstance } from './engine'
 import { addPoints, drawLeaderboard, drawTimerBar, newScores, normalize, shuffled } from './common'
 import { wordsFor } from '../content'
+import { roundCheer } from '../audio'
 
 // "Word Hunt" — a word-search grid: viewers find the hidden words (by word or
 // by coordinates) in chat. Found words are highlighted on the board.
@@ -148,6 +149,7 @@ export function createWordHunt(): GameInstance {
       }
       if (placed.length && found.size >= placed.length) {
         revealed = true
+        roundCheer()
         timer = breakSecs
       }
     },

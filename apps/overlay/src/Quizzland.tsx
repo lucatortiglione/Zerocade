@@ -10,7 +10,7 @@ import {
   type QuizzlandState,
 } from '@zerocade/shared'
 import sky from '@quizzland/sfondo.svg'
-import { quizSound } from './audio'
+import { quizSound, roundCheer } from './audio'
 import { useOverlay } from './store'
 import './quizzland.css'
 
@@ -320,6 +320,7 @@ function useQuizSounds(state: QuizzlandState, remaining: number, on: boolean) {
     else if (state.roundId === prev.roundId && fifty && !prev.fifty) quizSound('fifty')
     else if (state.roundId === prev.roundId && state.phase === 'reveal' && prev.phase === 'question') {
       quizSound(state.right > 0 ? 'right' : 'none')
+      roundCheer()
     }
   }, [state])
 
