@@ -30,16 +30,19 @@ function randomEvent(): LiveEvent {
 
 const send = (event: LiveEvent) => socket.emit('sim:event', event)
 
+// Folded away until the creator starts it: only then the gifts, buttons and comment box show. Stopping it
+// folds it again and ends the random events.
 export function Simulator() {
+  const [open, setOpen] = useState(false)
   const [count, setCount] = useState(1)
   const [auto, setAuto] = useState(false)
   const [comment, setComment] = useState('')
 
   useEffect(() => {
-    if (!auto) return
+    if (!open || !auto) return
     const timer = setInterval(() => send(randomEvent()), 700)
     return () => clearInterval(timer)
-  }, [auto])
+  }, [open, auto])
 
   const sendComment = () => {
     if (!comment.trim()) return
@@ -47,9 +50,30 @@ export function Simulator() {
     setComment('')
   }
 
+  if (!open) {
+    return (
+      <section className="sim-panel">
+        <h2 className="section-label">Live simulator</h2>
+        <button type="button" className="btn" onClick={() => setOpen(true)}>
+          ▶ Avvia simulazione
+        </button>
+      </section>
+    )
+  }
+
   return (
     <section className="sim-panel">
       <h2 className="section-label">Live simulator</h2>
+      <button
+        type="button"
+        className="btn"
+        onClick={() => {
+          setOpen(false)
+          setAuto(false)
+        }}
+      >
+        ■ Ferma simulazione
+      </button>
       <div className="seg" role="group" aria-label="Gifts per click">
         {COUNTS.map((n) => (
           <button
