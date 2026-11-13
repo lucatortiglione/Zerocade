@@ -12,6 +12,7 @@ import {
 import appDark from '@bivio/backgrounds/app_dark.svg'
 import optionA from '@bivio/backgrounds/option_a.svg'
 import optionB from '@bivio/backgrounds/option_b.svg'
+import { roundCheer } from './audio'
 import { useOverlay } from './store'
 import { ViewerAvatar } from './ViewerAvatar'
 
@@ -168,6 +169,13 @@ function Round({ state, at, settings }: { state: BivioState; at: number; setting
     speechSynthesis.cancel()
     speechSynthesis.speak(utterance)
   }, [state.roundId, tts])
+
+  // The applause when the vote closes and the result shows.
+  const phaseRef = useRef(state.phase)
+  useEffect(() => {
+    if (state.phase === 'reveal' && phaseRef.current === 'voting') roundCheer()
+    phaseRef.current = state.phase
+  }, [state.phase])
 
   if (!q) {
     return (

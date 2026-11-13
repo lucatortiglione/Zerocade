@@ -3,6 +3,7 @@ import type { GameInstance } from './engine'
 import { fillTextWithAvatar } from './avatar'
 import { addPoints, clamp, drawLeaderboard, drawTimerBar, newScores, normalize, shuffled } from './common'
 import { itemsFor } from '../content'
+import { roundCheer } from '../audio'
 
 // "Guess the Drawing" — a simple pictogram is drawn stroke by stroke. Viewers
 // guess the word in chat as the drawing reveals itself.
@@ -147,6 +148,7 @@ export function createGuessDrawing(): GameInstance {
       addPoints(scores, event.user.id, event.user.nickname, event.user.avatar, early)
       if (roundMode === 'untilSolved') {
         revealed = true
+        roundCheer()
         timer = breakSecs
       }
     },
@@ -161,6 +163,7 @@ export function createGuessDrawing(): GameInstance {
       timer -= dt
       if (timer <= 0) {
         revealed = true
+        roundCheer()
         timer = breakSecs
       }
     },

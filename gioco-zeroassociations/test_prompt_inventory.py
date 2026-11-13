@@ -128,6 +128,69 @@ class InventoryTests(unittest.TestCase):
         counts=self.db.run('SELECT attestations FROM inventory_source_counts ORDER BY source_key;',rows=True)
         self.assertEqual(counts,[{'attestations':3},{'attestations':2}])
 
+    def test_old_attestation_table_is_migrated_with_the_same_rows_and_layout(self):
+        # 'Casa' è la forma della fonte di 'casa': nelle righe nuove resta solo lei (NULL vuol dire uguale).
+        first=self.directory/'one.txt';first.write_text('Casa\ncane\n',encoding='utf-8')
+        import_source(self.db,source(key='one'),first)
+        query='SELECT * FROM inventory_attestations ORDER BY snapshot_id,prompt,locator,role;'
+        before=self.db.run(query,rows=True)
+        self.assertEqual({r['prompt']:r['source_form'] for r in before},{'casa':'Casa','cane':'cane'})
+        # Il vecchio formato: una tabella con i testi dello snapshot, del ruolo e della categoria in ogni riga.
+        self.db.run('PRAGMA foreign_keys=OFF;BEGIN;CREATE TABLE old_rows AS SELECT * FROM inventory_attestations;'
+            'DROP TRIGGER inventory_attestations_insert;DROP TRIGGER inventory_attestations_delete;'
+            'DROP VIEW inventory_attestations;DROP TABLE inventory_attestation_rows;DROP TABLE inventory_snapshot_numbers;'
+            'DROP TABLE inventory_attestation_roles;DROP TABLE inventory_attestation_pos;'
+            'CREATE TABLE inventory_attestations(prompt TEXT NOT NULL REFERENCES inventory_terms(prompt),'
+            'snapshot_id TEXT NOT NULL REFERENCES inventory_snapshots(id),locator TEXT NOT NULL,role TEXT NOT NULL,'
+            'pos TEXT NOT NULL,source_form TEXT NOT NULL,lemma TEXT NOT NULL,'
+            'details_json TEXT NOT NULL CHECK(json_valid(details_json)),PRIMARY KEY(snapshot_id,prompt,locator,role)) STRICT;'
+            'CREATE INDEX inventory_attestations_by_prompt ON inventory_attestations(prompt);'
+            'INSERT INTO inventory_attestations SELECT * FROM old_rows;DROP TABLE old_rows;COMMIT;')
+        initialize_inventory(self.db)
+        self.assertEqual(self.db.run(query,rows=True),before)
+        self.assertEqual(self.db.run('SELECT prompt,source_form FROM inventory_attestation_rows ORDER BY prompt;',rows=True),
+                         [{'prompt':'cane','source_form':None},{'prompt':'casa','source_form':'Casa'}])
+        # La migrazione arriva allo stesso schema di un database nuovo.
+        fresh=SQLite(self.directory/'fresh.sqlite3');initialize_inventory(fresh)
+        layout=("SELECT type,name,sql FROM sqlite_schema WHERE name LIKE 'inventory_attestation%' "
+                "OR name='inventory_snapshot_numbers' ORDER BY name;")
+        self.assertEqual(self.db.run(layout,rows=True),fresh.run(layout,rows=True))
+        second=self.directory/'two.txt';second.write_text('gatto\n',encoding='utf-8')
+        import_source(self.db,source(key='two'),second)
+        self.assertEqual(status(self.db)['attestations'],len(before)+1)
+        self.assertEqual(self.db.run('PRAGMA foreign_key_check;',rows=True),[])
+
+    def test_old_terms_table_is_migrated_with_the_same_rows_and_layout(self):
+        first=self.directory/'one.txt';first.write_text('Casa\ncane\nla casa\n',encoding='utf-8')
+        import_source(self.db,source(key='one'),first)
+        query='SELECT * FROM inventory_terms ORDER BY prompt;'
+        before=self.db.run(query,rows=True)
+        pending=self.db.run('SELECT * FROM inventory_pending_single_words ORDER BY prompt;',rows=True)
+        self.assertEqual({r['review_status'] for r in before},{'COLLECTED'})
+        # Il vecchio formato: tabella con il rowid e review_status scritto in ogni riga.
+        self.db.run('PRAGMA foreign_keys=OFF;BEGIN;CREATE TABLE old_terms AS SELECT * FROM inventory_terms;DROP TABLE inventory_terms;'
+            'CREATE TABLE inventory_terms(prompt TEXT PRIMARY KEY,is_single_word INTEGER NOT NULL CHECK(is_single_word IN (0,1)),'
+            'has_lemma_evidence INTEGER NOT NULL CHECK(has_lemma_evidence IN (0,1)),'
+            'has_inflected_evidence INTEGER NOT NULL CHECK(has_inflected_evidence IN (0,1)),'
+            'has_proper_name_evidence INTEGER NOT NULL CHECK(has_proper_name_evidence IN (0,1)),'
+            'has_it_dictionary_evidence INTEGER NOT NULL CHECK(has_it_dictionary_evidence IN (0,1)),'
+            "review_status TEXT NOT NULL DEFAULT 'COLLECTED' CHECK(review_status='COLLECTED')) STRICT;"
+            'INSERT INTO inventory_terms SELECT * FROM old_terms;DROP TABLE old_terms;COMMIT;')
+        initialize_inventory(self.db)
+        self.assertEqual(self.db.run(query,rows=True),before)
+        fresh=SQLite(self.directory/'fresh.sqlite3');initialize_inventory(fresh)
+        layout="SELECT type,name,sql FROM sqlite_schema WHERE tbl_name='inventory_terms' ORDER BY name;"
+        self.assertEqual(self.db.run(layout,rows=True),fresh.run(layout,rows=True))
+        self.assertIn('WITHOUT ROWID',self.db.run(layout,rows=True)[0]['sql'])
+        # Le viste e le chiavi esterne che nominano la tabella valgono ancora, e l'importazione aggiorna le voci.
+        self.assertEqual(self.db.run('SELECT * FROM inventory_pending_single_words ORDER BY prompt;',rows=True),pending)
+        self.assertEqual(self.db.run('PRAGMA foreign_key_check;',rows=True),[])
+        second=self.directory/'two.txt';second.write_text('casa\ngatto\n',encoding='utf-8')
+        import_source(self.db,source(key='two'),second)
+        self.assertEqual(status(self.db)['collected_prompts'],len(before)+1)
+        with self.assertRaises(RuntimeError):  # review_status non si scrive: è sempre COLLECTED
+            self.db.run("UPDATE inventory_terms SET review_status='APPROVED';")
+
     def test_malformed_source_leaves_no_snapshot_or_terms(self):
         broken=self.directory/'broken.jsonl'
         broken.write_text('{"word":"casa","lang_code":"it","pos":"noun"}\nBROKEN',encoding='utf-8')

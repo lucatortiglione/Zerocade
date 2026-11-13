@@ -1,4 +1,4 @@
-# `prompt_validi.sqlite3`: cosa contiene e quando una voce può entrarvi
+# Lo schema `validi`: cosa contiene e quando una voce può entrarvi
 
 Documento aggiornato il **9 novembre 2026**, sulla base dell'implementazione
 locale di [validated_prompt_database.py](validated_prompt_database.py),
@@ -6,7 +6,7 @@ locale di [validated_prompt_database.py](validated_prompt_database.py),
 
 ## 1. Regola di ingresso
 
-Nel codice attuale, in `prompt_validi.sqlite3` devono entrare **i prompt che
+Nel codice attuale, nello schema `validi` del DB di lavoro (`database/parole_ita_raw.sqlite3`) devono entrare **i prompt che
 hanno sia una revisione positiva corrente del prompt, sia un bacino di parole
 associate già revisionato e coerente con quella revisione**.
 
@@ -21,8 +21,8 @@ semantica e non genera risposte mancanti.
 
 | Situazione della voce | Entra nella copia valida? | Dove resta altrimenti |
 |---|---|---|
-| Raccolta da una fonte, senza controlli | No | Inventario di `prompt_raw.sqlite3` |
-| Supera i filtri automatici, ma manca una revisione positiva | No | Preselezione di `prompt_filtrati.sqlite3` |
+| Raccolta da una fonte, senza controlli | No | Inventario della raccolta (schema `raw`) |
+| Supera i filtri automatici, ma manca una revisione positiva | No | Preselezione dello schema `filtrati` |
 | Prompt approvato, ma senza bacino verificato | No | Registro delle revisioni nella raccolta e, dopo la ricostruzione, tabella `validated_prompts` dei filtrati |
 | Prompt approvato e bacino verificato dello stesso senso, categoria, POS e lingua | Sì | Copiato nei validi con associazioni, vincoli e prove |
 | Prompt approvato ma bacino di un altro significato | No | Materiale da riallineare e revisionare nella raccolta |
@@ -33,22 +33,22 @@ quattro condizioni diverse.** Il database non le rende equivalenti.
 
 ## 2. Perché è separato dagli altri database
 
-| Database | Funzione |
+| Schema | Funzione |
 |---|---|
-| `prompt_raw.sqlite3` | Archivio principale con inventario, attestazioni, fonti, aggiornamenti, revisioni, decisioni e bacini |
-| `prompt_filtrati.sqlite3` | Candidati preselezionati e catalogo delle revisioni positive, anche dei prompt ancora senza risposte |
-| `prompt_validi.sqlite3` | Copia controllata dei prompt revisionati che dispongono anche del bacino verificato corrispondente |
-| `prompt_scartati.sqlite3` | Esclusioni automatiche e scarti editoriali espliciti, con motivazioni |
-| `prompt.sqlite3` | Copia di distribuzione dei bacini verificati del gioco, esportata separatamente dalla raccolta |
+| `raw` | Archivio principale con inventario, attestazioni, fonti, aggiornamenti, revisioni, decisioni e bacini |
+| `filtrati` | Candidati preselezionati e catalogo delle revisioni positive, anche dei prompt ancora senza risposte |
+| `validi` | Copia controllata dei prompt revisionati che dispongono anche del bacino verificato corrispondente |
+| `scartati` | Esclusioni automatiche e scarti editoriali espliciti, con motivazioni |
+| `game` | I bacini verificati del gioco, come viste sulla raccolta |
 
-`prompt_validi.sqlite3` è una **copia ricostruibile**, non il luogo in cui
+Lo schema `validi` è una **copia ricostruibile**, non il luogo in cui
 accumulare bozze o modificare manualmente l'approvazione delle parole.
 Le revisioni e i dati originali si conservano nella raccolta principale.
 
 Se un prompt validato non ha ancora associazioni, non viene scartato e non si
 perde: resta disponibile per il lavoro successivo sui bacini. Il conteggio dei
 prompt validati può quindi essere molto superiore a quello dei prompt presenti
-in `prompt_validi.sqlite3`.
+nello schema `validi`.
 
 Dettagli sulla fase precedente in [PROMPT_FILTRATI.md](PROMPT_FILTRATI.md).
 
@@ -439,10 +439,10 @@ deve fingere una nuova revisione mai effettuata.
 
 ## 11. Utilizzo nel gioco e nelle liste Livecade
 
-Il server può leggere `prompt_validi.sqlite3` in sola lettura. Nell'ordine delle
+Il server può leggere lo schema `validi` in sola lettura. Nell'ordine delle
 sorgenti di default vengono prima un eventuale percorso configurato tramite
-`ZEROCADE_ASSOCIATIONS_DB` e la copia del pacchetto server; seguono i validi,
-`prompt.sqlite3` e infine la raccolta. Usa la prima sorgente che fornisce bacini
+`ZEROCADE_ASSOCIATIONS_DB` e la copia nello schema `associazioni` di
+`database/giochi.sqlite3`; seguono gli schemi `validi`, `game` e infine `raw`. Usa la prima sorgente che fornisce bacini
 caricabili, non necessariamente il file modificato più di recente.
 
 Il caricamento del gioco considera il senso familiare, le associazioni, i
@@ -500,8 +500,8 @@ di integrità. Non ricostruisce la copia.
 ```
 
 Questo comando scrive la copia valida. Non esegue la revisione dei candidati,
-non genera associazioni, non ricostruisce i filtrati e non esporta da solo
-`prompt.sqlite3`.
+non genera associazioni, non ricostruisce i filtrati e non aggiorna da solo
+lo schema `game`.
 
 ### Importazione di bacini già revisionati e sincronizzazione dei validi
 
@@ -533,7 +533,7 @@ di `validated_prompt_database.py`.
 ### Estrazione esplicita dal database valido
 
 ```powershell
-.venv/Scripts/python.exe -B prompt_database.py --db prompt_validi.sqlite3 livecade --count 20 --seed esempio-1
+.venv/Scripts/python.exe -B prompt_database.py --db ../database/parole_ita_raw.sqlite3#validi livecade --count 20 --seed esempio-1
 ```
 
 Qui `--db` precede il sottocomando. È esplicito perché il comando generico
@@ -543,8 +543,9 @@ documento.
 
 ## 13. Query di consultazione
 
-Le query seguenti si eseguono sul file `prompt_validi.sqlite3` aperto nel client
-SQLite. Non richiedono modifiche ai dati.
+Le query seguenti si eseguono sullo schema `validi`: aperto nel client SQLite il file
+`database/parole_ita_raw.sqlite3`, le tabelle si chiamano `validi__<nome>`, oppure si esporta lo schema
+come DB a sé (`unified_db.py export validi FILE`). Non richiedono modifiche ai dati.
 
 ```sql
 -- Conteggi principali: righe di catalogo, contesti e associazioni.

@@ -1,5 +1,5 @@
 // Word Association v3.6.0: the prompt is shown, the chat guesses its 7 or 8 hidden words.
-// The server reads the verified pools from gioco-zeroassociations/prompt.sqlite3 (the reviewed
+// The server reads the verified pools from the schema associazioni of database/giochi.sqlite3 (the reviewed
 // associations of each prompt's familiar sense); every round draws 7 or 8 words from one pool,
 // respecting the pool's groups of equivalent words and its incompatible pairs.
 

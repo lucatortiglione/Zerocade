@@ -1,7 +1,5 @@
 import { randomUUID } from 'node:crypto'
-import { existsSync } from 'node:fs'
-import { dirname, join } from 'node:path'
-import { fileURLToPath } from 'node:url'
+import { giochiDb, openSource, sourceReady } from './schema-db.js'
 import Database from 'better-sqlite3'
 import {
   QUIZZLAND_LETTERS,
@@ -17,12 +15,13 @@ import {
   type Viewer,
 } from '@zerocade/shared'
 import { toCsv } from './csv.js'
+import { recordScore } from './scores.js'
 import { flagQuizzland, quizzlandFlags, quizzlandTotalsByQuestion, recordQuizzlandAnswer, unflagQuizzland } from './db.js'
 
-// Quizzland, the server-driven quiz. Questions come from the game's SQLite file,
-// gioco-quizzland/data/domande.db (tools/domande.py imports and exports it as CSV), read once
-// at start: a new question only needs an edit and a restart. The Windows package ships a copy
-// next to the server as quizzland.db; ZEROCADE_QUIZZLAND_DB points elsewhere.
+// Quizzland, the server-driven quiz. Questions come from the games' database, schema quizz of
+// database/giochi.sqlite3 (gioco-quizzland/tools/domande.py imports and exports it as CSV), read once
+// at start: a new question only needs an edit and a restart. The Windows package ships the file next
+// to the server; ZEROCADE_QUIZZLAND_DB points elsewhere.
 
 interface Question {
   id: string
@@ -30,19 +29,18 @@ interface Question {
   difficulty: number
   text: string
   explanation: string
-  // The answers keep domande.db's order on screen (Primo, Secondo, Terzo…).
+  // The answers keep the database's order on screen (Primo, Secondo, Terzo…).
   fixedOrder: boolean
-  // In domande.db's order; `answer` is the right one.
+  // In the database's order (opzioni.posizione); `answer` is the right one.
   options: string[]
   answer: number
 }
 
-const here = dirname(fileURLToPath(import.meta.url))
+// ZEROCADE_QUIZZLAND_DB (a database or `file#schema`), otherwise the games' database, schema quizz.
 const dbPath = [
   process.env.ZEROCADE_QUIZZLAND_DB,
-  join(here, 'quizzland.db'),
-  join(here, '..', '..', '..', 'gioco-quizzland', 'data', 'domande.db'),
-].find((p): p is string => p !== undefined && existsSync(p))
+  giochiDb && `${giochiDb}#quizz`,
+].find((p): p is string => typeof p === 'string' && sourceReady(p))
 
 interface Row {
   id: string
@@ -55,20 +53,21 @@ interface Row {
   giusta: number
 }
 
-// The active questions, in domande.db's order. One without 2 to 4 answers, or without
+// The active questions, in the database's order (domande.ordine). One without 2 to 4 answers, or without
 // exactly one right answer, is left out (tools/domande.py stats lists them).
 function loadQuestions(): Question[] {
   if (!dbPath) {
-    console.warn('[quizzland] domande.db not found: the game has no questions')
+    console.warn('[quizzland] no schema quizz in database/giochi.sqlite3: the game has no questions')
     return []
   }
   let db: Database.Database | undefined
   try {
-    db = new Database(dbPath, { readonly: true, fileMustExist: true })
+    db = openSource(dbPath)
     const rows = db
       .prepare(
-        `SELECT d.id, d.categoria, d.difficolta, d.testo, d.spiegazione, d.ordine_fisso, o.testo AS opzione, o.giusta
-         FROM domande d JOIN opzioni o ON o.domanda = d.id
+        `SELECT d.id, c.nome AS categoria, d.difficolta, d.testo, d.spiegazione, d.ordine_fisso, o.testo AS opzione,
+                o.posizione = d.giusta AS giusta
+         FROM domande d JOIN categorie c ON c.n = d.categoria JOIN opzioni o ON o.domanda = d.n
          WHERE d.attiva = 1
          ORDER BY d.ordine, o.posizione`,
       )
@@ -113,7 +112,7 @@ function loadQuestions(): Question[] {
 export const QUESTIONS = loadQuestions()
 
 // Questions marked as wrong from the dashboard (any overlay key): out of the game until
-// unmarked; the CSV export lists them, to be fixed in domande.db.
+// unmarked; the CSV export lists them, to be fixed in the schema quizz.
 const flagged = new Set(quizzlandFlags().map((f) => f.question_id))
 
 function setFlag(id: string, on: boolean): void {
@@ -164,7 +163,7 @@ const SPEED_BONUS = 0.5
 
 interface Ballot {
   player: QuizzlandPlayer
-  // Position on screen, and in domande.db.
+  // Position on screen, and in the database (opzioni.posizione).
   pick: number
   choice: number
   ms: number
@@ -396,6 +395,7 @@ class QuizzlandRoom {
     for (const b of this.ballots.values()) {
       if (b.choice !== answer) continue
       this.right++
+      recordScore(this.key, 'quizzland', b.player, b.points)
       const s = this.scores.get(b.player.id) ?? { ...b.player, points: 0, correct: 0, streak: 0, last: 0 }
       // The latest name and picture.
       Object.assign(s, b.player, { points: s.points + b.points, correct: s.correct + 1, streak: s.streak + 1, last: b.points })
@@ -571,8 +571,8 @@ export function quizzlandStats(): QuizzlandStats {
 }
 
 // Every question with how the chat did on it: share of right answers, how many picked each
-// answer (in domande.db's order, to spot the wrong answers that fool people) and when it was
-// marked as wrong, to be fixed in domande.db. The BOM lets Excel read the accents.
+// answer (in the database's order, to spot the wrong answers that fool people) and when it was
+// marked as wrong, to be fixed in the schema quizz. The BOM lets Excel read the accents.
 export function quizzlandCsv(): string {
   const totals = new Map(quizzlandTotalsByQuestion().map((r) => [r.id, r]))
   const flaggedAt = new Map(quizzlandFlags().map((f) => [f.question_id, f.flagged_at]))

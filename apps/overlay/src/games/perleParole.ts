@@ -3,6 +3,7 @@ import type { GameInstance } from './engine'
 import { fillTextWithAvatar } from './avatar'
 import { addPoints, drawLeaderboard, drawTimerBar, newScores, normalize, shuffled } from './common'
 import { wordsFor } from '../content'
+import { roundCheer } from '../audio'
 
 // "Perle Parole" — the letters are beads arranged in a circle; the word is read
 // clockwise starting from an unknown bead. Viewers type the word.
@@ -43,6 +44,7 @@ export function createPerleParole(): GameInstance {
       if (event.type !== 'comment' || revealed) return
       if (normalize(event.text) !== normalize(word)) return
       revealed = true
+      roundCheer()
       solver = event.user
       timer = breakSecs
       addPoints(scores, event.user.id, event.user.nickname, event.user.avatar, word.length)
@@ -55,6 +57,7 @@ export function createPerleParole(): GameInstance {
         if (revealed) pick()
         else {
           revealed = true
+          roundCheer()
           timer = breakSecs
         }
       }

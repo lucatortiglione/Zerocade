@@ -2,6 +2,7 @@ import type { Viewer } from '@zerocade/shared'
 import type { GameInstance } from './engine'
 import { fillTextWithAvatar } from './avatar'
 import { addPoints, drawLeaderboard, drawTimerBar, newScores } from './common'
+import { roundCheer } from '../audio'
 
 // "Memory Maestro" — a numeric sequence is shown briefly, then hidden. Viewers
 // must type it back in chat; the difficulty grows with each correct answer.
@@ -61,6 +62,7 @@ export function createMemoryMaestro(): GameInstance {
       if (!text) return
       if (text === sequence) {
         phase = 'reveal'
+        roundCheer()
         timer = revealSecs
         solver = event.user
         addPoints(scores, event.user.id, event.user.nickname, event.user.avatar, level * 10)
@@ -80,6 +82,7 @@ export function createMemoryMaestro(): GameInstance {
           timer = answerSecs
         } else if (phase === 'answer') {
           phase = 'reveal'
+          roundCheer()
           timer = revealSecs
         } else if (phase === 'reveal') {
           phase = 'break'

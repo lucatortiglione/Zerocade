@@ -1,4 +1,4 @@
-"""Lavorazione finale delle associazioni e database prompt_finale.sqlite3.
+"""Lavorazione finale delle associazioni e schema finale del DB di lavoro.
 
 prepare    congela la coda dei prompt validati ancora senza bacino e la divide in partizioni
            (sei per gli agenti, una unica per la modalità «solo Qwen»); non scrive nei DB
@@ -7,7 +7,7 @@ serialize  trascrive il foglio editoriale di un revisore (authored_NNNN.txt) nel
 status     avanzamento: bozze Qwen, lotti scritti, bacini importati
 import     importa i lotti rivisti non ancora importati (un backup, una pubblicazione finale)
 sheet      scheda dei prossimi prompt di una partizione, con l'eventuale bozza Qwen
-build      rigenera prompt_finale.sqlite3 dai bacini verificati di prompt_validi.sqlite3:
+build      rigenera lo schema finale dai bacini verificati dello schema validi:
            tabelle prompts, words, prompt_words (molti a molti: una parola serve più prompt)
 
 Foglio editoriale (blocchi separati da una riga vuota):
@@ -26,14 +26,15 @@ from pathlib import Path
 import re
 import sqlite3
 import sys
+import unified_db
 
 from association_catalog import current, rule_hashes, read_only
 from prompt_database import DEFAULT_DB, ROOT, digest, load_categories
 
 JOB = ROOT/'prompt-staging/associations/finale_20261110'
-FILTERED_DB = ROOT/'prompt_filtrati.sqlite3'
-VALID_DB = ROOT/'prompt_validi.sqlite3'
-FINAL_DB = ROOT/'prompt_finale.sqlite3'
+FILTERED_DB = unified_db.address('filtrati')
+VALID_DB = unified_db.address('validi')
+FINAL_DB = unified_db.address('finale')
 AGENT_REVIEWER = 'Claude Opus 5.5 (Anthropic) — agente associations_{:02d}'
 WORD = re.compile(r'[a-zàèéìòóù]+')
 
@@ -363,7 +364,8 @@ def build(source=VALID_DB, output=FINAL_DB):
     finally:
         out.close()
         src.close()
-    temporary.replace(output)
+    from sqlite_prompt_runtime import publish_database  # in the one database the copy replaces its schema
+    publish_database(temporary, output)
     return {'output': str(output), **counts}
 
 
@@ -383,7 +385,7 @@ def main(argv=None):
     h.add_argument('shard')
     h.add_argument('--count', type=int, default=20)
     b = sub.add_parser('build')
-    b.add_argument('--sync', action='store_true', help='rigenera prima prompt_validi.sqlite3 dalla raccolta')
+    b.add_argument('--sync', action='store_true', help='rigenera prima lo schema validi dalla raccolta')
     args = ap.parse_args(argv)
     if args.command == 'prepare':
         result = prepare()

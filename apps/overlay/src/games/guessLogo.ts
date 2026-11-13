@@ -3,6 +3,7 @@ import type { GameInstance } from './engine'
 import { fillTextWithAvatar } from './avatar'
 import { addPoints, clamp, drawLeaderboard, drawTimerBar, newScores, normalize, shuffled } from './common'
 import { itemsFor } from '../content'
+import { roundCheer } from '../audio'
 
 // "Guess the Logo" — a brand logo is progressively revealed (blur / zoom /
 // scramble / none). Viewers guess the brand name (aliases accepted).
@@ -58,6 +59,7 @@ export function createGuessLogo(): GameInstance {
     addPoints(scores, id, name, avatar, pts + (first ? winnerBonus : 0))
     if (roundMode === 'firstWins' && first) {
       revealed = true
+      roundCheer()
       timer = breakSecs
     }
   }
@@ -96,6 +98,7 @@ export function createGuessLogo(): GameInstance {
       timer -= dt
       if (timer <= 0) {
         revealed = true
+        roundCheer()
         timer = breakSecs
       }
     },

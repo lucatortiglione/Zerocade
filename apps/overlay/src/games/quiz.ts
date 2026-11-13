@@ -1,5 +1,6 @@
 import type { GameInstance } from './engine'
-import { drawLeaderboard } from './common'
+import { addPoints, drawLeaderboard } from './common'
+import { roundCheer } from '../audio'
 
 interface Q {
   q: string
@@ -75,8 +76,7 @@ export function createTrivia(): GameInstance {
       if (answered.includes(event.user.id)) return
       answered.push(event.user.id)
       if (pick === q.answer) {
-        const cur = scores.get(event.user.id)
-        scores.set(event.user.id, { name: event.user.nickname, pts: (cur?.pts ?? 0) + 1, avatar: event.user.avatar ?? cur?.avatar })
+        addPoints(scores, event.user.id, event.user.nickname, event.user.avatar, 1)
       }
     },
     update(dt, _now, settings) {
@@ -87,6 +87,7 @@ export function createTrivia(): GameInstance {
         if (revealed) next()
         else {
           revealed = true
+          roundCheer()
           timer = 3
         }
       }

@@ -1,6 +1,7 @@
 import type { GameInstance } from './engine'
 import { addPoints, drawLeaderboard, drawTimerBar, newScores, normalize, shuffled } from './common'
 import { itemsFor } from '../content'
+import { roundCheer } from '../audio'
 
 // "Associations" — a prompt word is shown and viewers type associated words.
 // Every hidden word found is revealed and scores points.
@@ -51,6 +52,7 @@ export function createAssociations(): GameInstance {
       addPoints(scores, event.user.id, event.user.nickname, event.user.avatar, pts)
       if (theme.words.every((word) => found.has(word))) {
         revealed = true
+        roundCheer()
         timer = breakSecs
       }
     },
@@ -65,6 +67,7 @@ export function createAssociations(): GameInstance {
       timer -= dt
       if (timer <= 0) {
         revealed = true
+        roundCheer()
         timer = breakSecs
       }
     },

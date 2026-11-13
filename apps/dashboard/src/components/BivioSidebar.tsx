@@ -14,14 +14,16 @@ import {
   ConnectionBadge,
   GameSwitch,
   LiveSimulator,
+  BridgeControl,
   MessageComposer,
   StreamSettings,
   TiktokAccount,
   pick,
   simViewer,
 } from './Regia'
+import { EndSession } from './GameControls'
 import { Section } from './Section'
-import { SettingsForm } from './SettingsForm'
+import { SettingField, SettingsForm } from './SettingsForm'
 import { TriggerEditor } from './TriggerEditor'
 
 // The whole Bivio (ZeroDubbi) control column: connection and simulator, stream widgets, the round in
@@ -41,7 +43,7 @@ export function BivioSidebar({ session }: { session: SessionState }) {
       <GameSwitch session={session} />
 
       <Section title="Connessione" extra={<ConnectionBadge />}>
-        <Connection />
+        <Connection session={session} />
       </Section>
 
       <Section title="Impostazioni stream">
@@ -76,7 +78,7 @@ export function BivioSidebar({ session }: { session: SessionState }) {
 
 // --- Connessione ---
 
-function Connection() {
+function Connection({ session }: { session: SessionState }) {
   const { bivio } = useDashboard()
   // The simulator reads the round through a ref, so it is not restarted on every vote.
   const bivioRef = useRef(bivio)
@@ -85,6 +87,9 @@ function Connection() {
   return (
     <>
       <TiktokAccount />
+      <BridgeControl label="Collegati a ZeroFollowerBot (Twitch e TikTok)" />
+      <SettingField session={session} id="audience" />
+      <SettingField session={session} id="voiceFollowersOnly" />
 
       <LiveSimulator makeEvent={() => fakeEvent(bivioRef.current)} />
 
@@ -100,6 +105,7 @@ function Connection() {
         ↻ Riavvia gioco
       </button>
       <MessageComposer />
+      <EndSession ended={Boolean(session.ended)} />
     </>
   )
 }

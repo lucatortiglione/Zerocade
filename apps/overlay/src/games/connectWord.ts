@@ -1,6 +1,7 @@
 import type { GameInstance } from './engine'
 import { addPoints, drawLeaderboard, drawTimerBar, newScores, normalize, shuffled } from './common'
 import { wordsFor } from '../content'
+import { roundCheer } from '../audio'
 
 // "Connect Word" — a grid of letters with hidden words. Viewers type the words
 // they can spot (horizontal / vertical). No word list is shown.
@@ -90,6 +91,7 @@ export function createConnectWord(): GameInstance {
       addPoints(scores, event.user.id, event.user.nickname, event.user.avatar, match.word.length)
       if (found.size >= placed.length) {
         revealed = true
+        roundCheer()
         timer = breakSecs
       }
     },

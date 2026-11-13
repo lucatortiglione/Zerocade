@@ -38,32 +38,6 @@ body.scene-host #root { display: grid; place-items: center; }
 .dot { width: 10px; height: 10px; border-radius: 50%; background: #ff5c5c; margin-left: auto; }
 .dot--on { background: #3ccf7a; }
 
-.overlay__toasts {
-  position: absolute;
-  top: 70px;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-  pointer-events: none;
-}
-.toast {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 8px 14px;
-  border-radius: 999px;
-  background: #1b1b21ee;
-  border: 1px solid #26262e;
-  font-size: 15px;
-  white-space: nowrap;
-  max-width: 80vw;
-  overflow: hidden;
-}
-.toast__text { overflow: hidden; text-overflow: ellipsis; }
-
 /* A viewer's picture next to their name (ViewerAvatar): sized on the text around it, with
    their initial underneath for when there is no picture. */
 .viewer-avatar {
@@ -1187,4 +1161,21 @@ body.incastro-on .guide-chip__arrow { color: rgb(255 255 255 / 0.45); }
 @keyframes score-scroll { to { transform: translateX(-50%); } }
 @media (prefers-reduced-motion: reduce) {
   .score-ticker__track { animation: none; }
+}
+
+/* The game is paused, or its session has ended. */
+.overlay-state {
+  position: absolute;
+  left: 50%;
+  top: 14%;
+  transform: translateX(-50%);
+  padding: 10px 22px;
+  border-radius: 999px;
+  background: rgba(10, 12, 24, 0.82);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  color: #fff;
+  font-weight: 800;
+  font-size: 22px;
+  letter-spacing: 0.04em;
+  z-index: 20;
 }

@@ -1,6 +1,7 @@
 import type { GameInstance } from './engine'
 import { addPoints, drawLeaderboard, drawTimerBar, newScores, shuffled } from './common'
 import { itemsFor } from '../content'
+import { roundCheer } from '../audio'
 
 // "Trivia Time" — four-answer quiz with leaderboard, speed bonus and a 50/50 help.
 
@@ -80,6 +81,7 @@ export function createTriviaTime(): GameInstance {
       if (action === 'skip_question') {
         if (!revealed) {
           revealed = true
+          roundCheer()
           timer = breakSecs
         }
         return
@@ -111,6 +113,7 @@ export function createTriviaTime(): GameInstance {
         if (revealed) next()
         else {
           revealed = true
+          roundCheer()
           timer = revealSecs
         }
       }

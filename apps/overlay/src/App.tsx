@@ -1,5 +1,6 @@
-import { useEffect, useRef, useState, useSyncExternalStore } from 'react'
-import { GAMES, describeSource, triggersFor, type LiveEvent, type Viewer } from '@zerocade/shared'
+import { useEffect, useRef, useSyncExternalStore } from 'react'
+import { GAMES, describeSource, triggersFor } from '@zerocade/shared'
+import { setRoundCheer } from './audio'
 import { Engine } from './games/engine'
 import { createGame } from './games/registry'
 import { useOverlay } from './store'
@@ -8,22 +9,14 @@ import { Bivio } from './Bivio'
 import { Incastro } from './Incastro'
 import { Quizzland } from './Quizzland'
 import { isContentReady, loadContent, subscribeContent } from './content'
-import { ViewerAvatar } from './ViewerAvatar'
 import { ScoreTicker } from './ScoreTicker'
 
-interface Toast {
-  id: number
-  icon: string
-  user: Viewer
-  text: string
-}
 
 export function App() {
   const { connected, session, event, seq, message, messageSeq, gif, gifSeq, incastro, quizzland } = useOverlay()
   const contentReady = useSyncExternalStore(subscribeContent, isContentReady)
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const engineRef = useRef<Engine | null>(null)
-  const [toasts, setToasts] = useState<Toast[]>([])
 
   // Boot the engine once.
   useEffect(() => {
@@ -49,37 +42,37 @@ export function App() {
 
   // Swap the game when the selection changes (only once content is loaded).
   // Games without a canvas instance (Bivio, Incastro, Quizzland) leave the canvas blank.
+  // A restart (`run`) starts the game afresh; an ended session shows nothing until it is started again.
   useEffect(() => {
     if (!session || !contentReady) return
+    if (session.ended) {
+      engineRef.current?.clear()
+      return
+    }
     const game = GAMES.find((g) => g.id === session.gameId)
     const instance = game ? createGame(game.id) : null
     if (game && instance) engineRef.current?.setGame(instance, session.settings)
     else engineRef.current?.clear()
-  }, [session?.gameId, contentReady])
+  }, [session?.gameId, session?.run, session?.ended, contentReady])
+
+  useEffect(() => {
+    engineRef.current?.setPaused(Boolean(session?.paused))
+  }, [session?.paused, session?.run, contentReady])
 
   // Tune settings live.
   useEffect(() => {
     engineRef.current?.setSettings(session?.settings ?? {})
+    setRoundCheer(session?.settings.roundCheer !== false)
   }, [session?.settings])
 
-  // Dispatch matching triggers + toast on each incoming event.
+  // Dispatch matching triggers on each incoming event. Nothing a viewer does (messages, likes, gifts, follows,
+  // joins) shows over the game by itself: the Alerts widget does that, when the creator turns it on.
   useEffect(() => {
-    if (!event || !session) return
+    if (!event || !session || session.paused || session.ended) return
     const game = GAMES.find((g) => g.id === session.gameId)
     if (game) {
       for (const t of triggersFor(session.triggers, event)) engineRef.current?.pushAction(t.action, event)
     }
-    // Bivio has no room for toasts over its title: votes show as bubbles, and gifts,
-    // likes and follows can still use the Avvisi widget. In Incastro every comment is a
-    // guess: the words found have their own feed. In Quizzland a toast would show everyone
-    // what each viewer answered.
-    if (session.gameId === 'bivio' || session.gameId === 'incastro' || session.gameId === 'quizzland') return
-    // In ZeroAssociazioni every comment is a guess: a toast would hand the answers to everyone.
-    if (session.gameId === 'word-association' && event.type === 'comment') return
-    const id = Date.now() + Math.random()
-    setToasts((prev) => [...prev.slice(-4), { id, user: event.user, ...describeEvent(event) }])
-    // Not cleared when the next event arrives: every toast removes itself.
-    setTimeout(() => setToasts((prev) => prev.filter((t) => t.id !== id)), 3200)
   }, [seq])
 
   const game = session ? GAMES.find((g) => g.id === session.gameId) : undefined
@@ -90,7 +83,7 @@ export function App() {
   return (
     <div className="overlay">
       <canvas ref={canvasRef} className="overlay__canvas" />
-      {session?.gameId === 'bivio' && <Bivio />}
+      {session?.gameId === 'zerodubbi' && <Bivio />}
       {session?.gameId === 'incastro' && <Incastro />}
       {session?.gameId === 'quizzland' && <Quizzland />}
       <header className="overlay__top">
@@ -101,6 +94,8 @@ export function App() {
 
       {session?.settings.showLeaderboard !== false && scores && <ScoreTicker scores={scores} />}
       <Widgets />
+      {session?.paused && !session.ended && <div className="overlay-state">⏸ In pausa</div>}
+      {session?.ended && <div className="overlay-state">Sessione terminata</div>}
 
       {gif && <img key={gifSeq} className="overlay-gif" src={gif.url} alt={gif.label} />}
 
@@ -109,16 +104,6 @@ export function App() {
           {message}
         </div>
       )}
-
-      <div className="overlay__toasts">
-        {toasts.map((t) => (
-          <div key={t.id} className="toast">
-            <span>{t.icon}</span>
-            <ViewerAvatar viewer={t.user} />
-            <span className="toast__text">{t.text}</span>
-          </div>
-        ))}
-      </div>
 
       {session && game && (
         <footer className="overlay__guide">
@@ -140,20 +125,3 @@ export function App() {
   )
 }
 
-// The toast's icon, and its text after the viewer's picture.
-function describeEvent(event: LiveEvent): { icon: string; text: string } {
-  switch (event.type) {
-    case 'gift':
-      return { icon: '🎁', text: `${event.user.nickname} ×${event.count}` }
-    case 'like':
-      return { icon: '👍', text: `${event.user.nickname} ×${event.count}` }
-    case 'follow':
-      return { icon: '➕', text: `${event.user.nickname} followed` }
-    case 'share':
-      return { icon: '🔁', text: `${event.user.nickname} shared` }
-    case 'comment':
-      return { icon: '💬', text: `${event.user.nickname}: ${event.text}` }
-    case 'join':
-      return { icon: '👋', text: `${event.user.nickname} joined` }
-  }
-}

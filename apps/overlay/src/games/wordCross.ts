@@ -1,6 +1,7 @@
 import type { GameInstance } from './engine'
 import { addPoints, drawLeaderboard, drawTimerBar, newScores, normalize, shuffled } from './common'
 import { itemsFor } from '../content'
+import { roundCheer } from '../audio'
 
 // "Word Cross" — a small crossword built from a set of letters. Viewers type the
 // words in chat to fill the intersecting grid.
@@ -153,6 +154,7 @@ export function createWordCross(): GameInstance {
       if (credit) addPoints(scores, event.user.id, event.user.nickname, event.user.avatar, match.word.length)
       if (allFound()) {
         revealed = true
+        roundCheer()
         timer = breakSecs
       }
     },

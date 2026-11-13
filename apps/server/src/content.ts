@@ -2,51 +2,71 @@ import { mkdirSync, readFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import Database from 'better-sqlite3'
+import { giochiDb, openSchema } from './schema-db.js'
 import { loadWordAssociation } from './word-association.js'
 
-// Game content (word banks, questions, statements, brands, locations, …) lives in
-// its own SQLite database, separate from the sessions/events DB. The overlay loads
-// it over `GET /api/content` instead of keeping it hardcoded in the source.
+// Game content (word banks, questions, statements, brands, locations, …) of the overlay's
+// smaller games, loaded over `GET /api/content` instead of being hardcoded in the source.
 //
-// On first boot the database is seeded from `content.seed.json` (a one-time data
-// migration); afterwards the SQLite file in apps/server/data/content.db is the
-// single source of truth. Set ZEROCADE_CONTENT_DB to override the path.
+// It lives in the games' database, schema contenuti (database/giochi.sqlite3: one JSON item per
+// row), copied from `content.seed.json` by `python database/giochi.py aggiorna contenuti`; read once
+// at start. Without that schema, the old way: a database of its own (apps/server/data/content.db,
+// ZEROCADE_CONTENT_DB), seeded from `content.seed.json` for each game_id that has no rows yet.
 
 const here = dirname(fileURLToPath(import.meta.url))
-const dbPath = process.env.ZEROCADE_CONTENT_DB ?? join(here, '..', 'data', 'content.db')
-mkdirSync(dirname(dbPath), { recursive: true })
 
-const db = new Database(dbPath)
-db.exec('PRAGMA journal_mode = WAL;')
-db.exec(`
-  CREATE TABLE IF NOT EXISTS content_items (
-    game_id TEXT NOT NULL,
-    item TEXT NOT NULL
-  );
-  CREATE INDEX IF NOT EXISTS idx_content_items_game ON content_items(game_id);
-`)
+type Row = { game_id: string; item: string }
 
-const selectAll = db.prepare('SELECT game_id, item FROM content_items ORDER BY rowid')
-
-// Seed on first boot, and re-seed only game_ids that have no rows yet so that
-// adding new games to the seed file works even against an existing database.
-const seed = JSON.parse(readFileSync(join(here, 'content.seed.json'), 'utf-8')) as Record<string, unknown[]>
-const insert = db.prepare('INSERT INTO content_items (game_id, item) VALUES (?, ?)')
-const existingGames = new Set((selectAll.all() as { game_id: string }[]).map((r) => r.game_id))
-const seedAll = db.transaction(() => {
-  for (const [gameId, items] of Object.entries(seed)) {
-    if (existingGames.has(gameId)) continue
-    if (gameId === 'association-themes' && existingGames.has('word-association')) continue
-    for (const item of items) insert.run(gameId, JSON.stringify(item))
+function fromGiochi(): Row[] | null {
+  if (!giochiDb) return null
+  try {
+    const db = openSchema(giochiDb, 'contenuti')
+    try {
+      return db.prepare('SELECT game_id, item FROM items ORDER BY game_id, pos').all() as Row[]
+    } finally {
+      db.close()
+    }
+  } catch {
+    return null
   }
-})
-seedAll()
-// ZeroAssociazioni reads the verified pools of gioco-zeroassociations/prompt.sqlite3.
+}
+
+function fromContentDb(): () => Row[] {
+  const dbPath = process.env.ZEROCADE_CONTENT_DB ?? join(here, '..', 'data', 'content.db')
+  mkdirSync(dirname(dbPath), { recursive: true })
+  const db = new Database(dbPath)
+  db.exec('PRAGMA journal_mode = WAL;')
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS content_items (
+      game_id TEXT NOT NULL,
+      item TEXT NOT NULL
+    );
+    CREATE INDEX IF NOT EXISTS idx_content_items_game ON content_items(game_id);
+  `)
+  const selectAll = db.prepare('SELECT game_id, item FROM content_items ORDER BY rowid')
+  const seed = JSON.parse(readFileSync(join(here, 'content.seed.json'), 'utf-8')) as Record<string, unknown[]>
+  const insert = db.prepare('INSERT INTO content_items (game_id, item) VALUES (?, ?)')
+  const existingGames = new Set((selectAll.all() as Row[]).map((r) => r.game_id))
+  db.transaction(() => {
+    for (const [gameId, items] of Object.entries(seed)) {
+      if (existingGames.has(gameId)) continue
+      if (gameId === 'association-themes' && existingGames.has('word-association')) continue
+      for (const item of items) insert.run(gameId, JSON.stringify(item))
+    }
+  })()
+  return () => selectAll.all() as Row[]
+}
+
+const bank = fromGiochi()
+const rows: () => Row[] = bank ? () => bank : fromContentDb()
+if (!bank) console.warn('[content] no schema contenuti in database/giochi.sqlite3: using apps/server/data/content.db')
+
+// ZeroAssociazioni reads its verified pools (word-association.ts).
 export const wordAssociation = loadWordAssociation()
 
 export function getContent(): Record<string, unknown[]> {
   const out: Record<string, unknown[]> = {}
-  for (const row of selectAll.all() as { game_id: string; item: string }[]) {
+  for (const row of rows()) {
     const items = (out[row.game_id] ??= [])
     try {
       items.push(JSON.parse(row.item))
@@ -54,8 +74,8 @@ export function getContent(): Record<string, unknown[]> {
       // ignore malformed rows
     }
   }
-  // The two other games still use the historical theme bank. Existing databases
-  // retain its old key; ZeroAssociazioni only uses the verified pools of prompt.sqlite3.
+  // The two other games still use the historical theme bank. An old content.db keeps
+  // it under its old key; ZeroAssociazioni only uses its verified pools.
   out['association-themes'] ??= out['word-association'] ?? []
   out['word-association'] = wordAssociation.pools
   return out

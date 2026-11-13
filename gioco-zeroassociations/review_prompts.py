@@ -1,4 +1,4 @@
-"""Validazione dei prompt filtrati: da prompt_filtrati.sqlite3 a prompt_validi.sqlite3.
+"""Validazione dei prompt filtrati: dallo schema filtrati allo schema validi del DB di lavoro.
 
 Un prompt filtrato è solo un candidato. Diventa valido con un verbale verified-prompt-1
 (validated_prompt_database.py): senso familiare, categoria del catalogo, lingua, cinque
@@ -10,10 +10,10 @@ import-decisions  trasforma le decisioni di un revisore (JSONL: una riga per pro
                   senso, categoria e due motivazioni sono del revisore; frequenza, NVdB, età di
                   acquisizione e provenienza vengono dai dati. I prompt validi entrano nella
                   raccolta (prompt_validations), quelli scartati o rimandati diventano decisioni
-                  sulla voce (DISCARDED/DEFERRED); poi si rigenera prompt_validi.sqlite3;
+                  sulla voce (DISCARDED/DEFERRED); poi si rigenera lo schema validi;
 llm-review        fa decidere l'LLM locale (resources/local_llm_policy.json) e importa;
-refresh           dopo nuove parole dalle fonti: rifà prompt_filtrati.sqlite3, fa rivedere all'LLM
-                  locale le sole parole nuove (se il server è attivo), aggiorna prompt_validi.sqlite3.
+refresh           dopo nuove parole dalle fonti: rifà lo schema filtrati, fa rivedere all'LLM
+                  locale le sole parole nuove (se il server è attivo), aggiorna lo schema validi.
 
 Riga di decisione:
   {"prompt": "gatto", "decision": "verified", "pos": "NOUN", "sense": "Piccolo felino domestico",
@@ -27,6 +27,7 @@ from datetime import datetime, timezone
 import json
 from pathlib import Path
 import sqlite3
+import unified_db
 import sys
 import urllib.request
 
@@ -35,7 +36,7 @@ from semantic_rules import SEMANTIC_POLICY
 from sqlite_prompt_runtime import SQLite
 from validated_prompt_database import PROMPT_CHECKS, VALIDATED_DB, register_reviews, sync_validated, validate_record
 
-FILTERED_DB = ROOT/'prompt_filtrati.sqlite3'
+FILTERED_DB = unified_db.address('filtrati')
 LLM_POLICY = ROOT/'resources/local_llm_policy.json'
 DEFAULT_ENDPOINT = 'http://127.0.0.1:19472'
 DECISIONS = {'verified', 'rejected', 'deferred'}
@@ -47,7 +48,7 @@ def today():
 
 
 def read_only(path: Path) -> sqlite3.Connection:
-    db = sqlite3.connect(f'file:{Path(path).resolve().as_posix()}?mode=ro', uri=True)
+    db = unified_db.connect(f'file:{Path(path).resolve().as_posix()}?mode=ro', uri=True)
     db.row_factory = sqlite3.Row
     return db
 
@@ -142,7 +143,7 @@ def build_record(decision: dict, candidate: dict, evidence: list[dict], reviewer
 
 def import_decisions(rows: list[dict], reviewer: str, method: str = 'llm_editorial_review',
                      raw: Path = DEFAULT_DB, filtered: Path = FILTERED_DB, destination: Path = VALIDATED_DB) -> dict:
-    """Verbali per i validi, decisioni per gli scartati; poi prompt_validi.sqlite3. Tutto o niente."""
+    """Verbali per i validi, decisioni per gli scartati; poi lo schema validi. Tutto o niente."""
     if method not in {'llm_editorial_review', 'human_editorial_review'}: raise ValueError('Metodo di revisione non valido')
     if not required_text(reviewer): raise ValueError('Indicare chi ha revisionato')
     candidates = {c['prompt']: c for c in pending(raw, filtered, only={r.get('prompt') for r in rows})}
@@ -175,7 +176,7 @@ def import_decisions(rows: list[dict], reviewer: str, method: str = 'llm_editori
         for prompt, decision, reason in decisions:
             decide_term(db, prompt, decision, reason, actor=reviewer)
     from discarded_prompt_database import sync_discarded
-    discarded = sync_discarded(raw,filtered,Path(filtered).with_name('prompt_scartati.sqlite3'))
+    discarded = sync_discarded(raw,filtered,unified_db.sibling(filtered,'scartati'))
     synced = sync_validated(db, destination)
     keep_game_db_current(raw)
     return {**result, 'verified': len(records), 'rejected_or_deferred': len(decisions),
@@ -185,8 +186,8 @@ def import_decisions(rows: list[dict], reviewer: str, method: str = 'llm_editori
 
 
 def keep_game_db_current(raw: Path):
-    """prompt.sqlite3 porta in Git verbali e decisioni della raccolta vera: si rigenera dopo ogni modifica."""
-    if Path(raw).resolve() == DEFAULT_DB.resolve():
+    """I bacini verificati (schema game) seguono la raccolta vera: si aggiornano dopo ogni modifica."""
+    if unified_db.same_db(raw, DEFAULT_DB):
         from prompt_database import export_game_db
         export_game_db(SQLite(raw))
 
@@ -271,7 +272,7 @@ def refresh(endpoint: str = DEFAULT_ENDPOINT, limit: int = 500, raw: Path = DEFA
     """Dopo nuove parole dalle fonti: filtri, revisione LLM delle sole parole nuove, prompt_validi."""
     from filter_prompts import build
     before = set()
-    if Path(filtered).exists():
+    if unified_db.exists(Path(filtered)):
         db = read_only(filtered)
         try: before = {r[0] for r in db.execute('SELECT prompt FROM filtered_prompts')}
         finally: db.close()
@@ -284,7 +285,7 @@ def refresh(endpoint: str = DEFAULT_ENDPOINT, limit: int = 500, raw: Path = DEFA
         result['llm_review'] = llm_review(limit, endpoint, only=new, raw=raw, filtered=filtered, destination=destination)
     elif new:
         result['llm_review'] = 'LLM locale non attivo: le parole nuove restano in attesa (review_prompts.py pending)'
-    if Path(raw).exists():
+    if unified_db.exists(Path(raw)):
         result['valid_prompts'] = sync_validated(SQLite(raw), destination)['valid_prompts']
         keep_game_db_current(raw)
     return result
@@ -292,8 +293,8 @@ def refresh(endpoint: str = DEFAULT_ENDPOINT, limit: int = 500, raw: Path = DEFA
 
 def after_new_words(raw: Path) -> dict | None:
     """Chiamata da prompt_inventory.py e inventory_updates.py quando la raccolta riceve parole nuove.
-    Solo per la raccolta vera: una raccolta di prova non tocca prompt_filtrati e prompt_validi."""
-    if Path(raw).resolve() != DEFAULT_DB.resolve(): return None
+    Solo per la raccolta vera: una raccolta di prova non tocca gli schemi filtrati e validi."""
+    if not unified_db.same_db(raw, DEFAULT_DB): return None
     try:
         return refresh(raw=raw)
     except Exception as error:  # L'importazione è già conclusa: il problema si segnala, non la annulla.

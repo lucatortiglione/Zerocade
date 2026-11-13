@@ -1,0 +1,3 @@
+# Vettori fastText scaricati da fetch_vectors.py (centinaia di MB): si rigenerano.
+.cache/
+__pycache__/

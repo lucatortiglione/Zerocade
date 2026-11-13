@@ -1,0 +1,21 @@
+# Parole che non devono mai essere la soluzione di ZeroWordle (restano valide come tentativo).
+# Una o più parole per riga; # inizia un commento. Dopo una modifica: python build_wordle_bank.py
+
+# Nomi propri, popoli e luoghi
+altea avana bacco bantu belga berta butch celia celta circe creso dacia giava gauss hindi maori papua romeo sacha
+svevo tamil tutsi umbro ponce anglo norte cesio
+
+# Parole straniere o poco italiane
+cognac airbag saloon soviet dealer rancho parquet target ketchup
+asset basic bebop beige blitz blues bluff brand coach combo cover cross dance denim drill drive drone email flash
+flirt flute frame golem gulag harem hertz hotel humor humus input lager laser login macho match modem motel mouse
+night nurse panel pecan piece plaid poser ramen ranch round score scoop scout share shunt slang slide smash sound
+staff stage stand strip sushi theta toast toner trans trash trend troll trust under zombi ethos locus lupus focus
+ictus bonus bacon cache coque corgi mochi igloo bazar sabra onlus alias sonar notes super suite spoof timer robot
+forum gilet bingo bandi lumen
+
+# Volgari, sessuali o sgradevoli
+porno vulva troia coito zozzo gonzo cozzo cacca sesso fesso puzza puzzo
+
+# Arcaiche, rare o ambigue
+adire almen avito ebbro ebete esoso lungi mecca nomea nenia sepsi greto tutor vello velma visir

@@ -6,8 +6,8 @@ I conteggi delle copie aggiornate sono nel rapporto. Vedere
 [stato e procedura di ripresa](ASSOCIAZIONI_FILTRATI.md) e
 [rapporto dei controlli](resources/avanzamento_associazioni_filtrati_20261109.json).
 
-Fonti, inventario, aggiornamenti e decisioni convivono nella raccolta
-`prompt_raw.sqlite3`: vedere [la gestione del database unico](AGGIORNAMENTI_FONTI.md).
+Fonti, inventario, aggiornamenti e decisioni convivono nella raccolta, schema
+`raw` di `database/parole_ita_raw.sqlite3`: vedere [la gestione del database unico](AGGIORNAMENTI_FONTI.md).
 
 La raccolta di ulteriori fonti prosegue attraverso
 [l'inventario dei prompt](PROMPT_INVENTORY.md). La lavorazione corrente cerca
@@ -15,26 +15,28 @@ le associazioni per ogni candidato dei filtrati e copia nella banca valida
 soltanto i prompt revisionati insieme ai rispettivi bacini. La verifica
 preinserimento descritta qui sotto riguarda la banca di gioco e le associazioni.
 
-La raccolta e le copie SQLite hanno ruoli distinti:
+La raccolta e gli altri schemi del DB di lavoro hanno ruoli distinti:
 
-- `prompt_raw.sqlite3`, la **raccolta**: il database operativo in cui scrivono
+- lo schema `raw`, la **raccolta**: il database operativo in cui scrivono
   tutti gli script. Escluso da Git: con l'inventario pesa gigabyte.
-- `prompt_validi.sqlite3`, i **prompt validi con le parole associate**: solo prompt
+- lo schema `validi`, i **prompt validi con le parole associate**: solo prompt
   con un verbale di revisione corrente, categoria e senso scelto **e** un bacino
   verificato del medesimo senso. `validated_prompt_database.py sync` la rigenera
   senza eliminare la raccolta o lo storico. Una scelta `INTEGRATED` da sola non è
   una revisione.
-- `prompt_filtrati.sqlite3`, i **candidati e le parole valide come prompt**: oltre
+- lo schema `filtrati`, i **candidati e le parole valide come prompt**: oltre
   alla preselezione automatica (`filtered_prompts`), la tabella `validated_prompts`
   copia ogni prompt con verbale positivo corrente (senso, POS, categoria, revisore),
   anche se non ha ancora associazioni. La vista `review_state` indica `VALIDATO` o
   `DA_RIVEDERE`; scartati e rimandati non vi compaiono. La rigenera
   `filter_prompts.py build`, chiamato anche dopo ogni importazione di decisioni.
-- `prompt.sqlite3`, i **bacini del gioco**: i soli bacini verificati, con schema,
-  verbali, attribuzioni e decisioni sulle voci. Versionato (circa 2 MB). Lo
-  rigenera `prompt_database.py dump` (task «Prompt: aggiorna prompt.sqlite3…»),
-  e si aggiorna da solo dopo `import-reviewed`. Il gioco ZeroAssociazioni lo legge
-  in sola lettura; se è indietro rispetto alla raccolta il server lo segnala.
+- lo schema `game`, i **bacini del gioco**: i soli bacini verificati, con schema,
+  verbali, attribuzioni e decisioni sulle voci, come viste sulle tabelle della
+  raccolta: sempre aggiornato, senza copie. `prompt_database.py dump` (task
+  «Prompt: aggiorna lo schema game…») ricrea le viste, e lo fa da sé anche
+  `import-reviewed`. Il gioco legge la copia nello schema `associazioni` di
+  `database/giochi.sqlite3` (`giochi.py aggiorna associazioni`); se è indietro
+  rispetto al DB di lavoro il server lo segnala.
 
 Le risposte sono riutilizzabili tra prompt, anche nella stessa lista Livecade.
 Ogni associazione ha chiave `(sense_id, word)`: motivazione, significato,
@@ -44,7 +46,7 @@ essere conservate quando verificate. La copia e l'estrazione non eliminano
 risposte perché presenti in altri bacini. I duplicati restano vietati nel
 singolo bacino e nella singola estrazione.
 
-L'inventario `inventory_*` non entra in `prompt.sqlite3` e si ricostruisce dalle
+L'inventario `inventory_*` non entra nello schema `game` e si ricostruisce dalle
 fonti con `prompt_inventory.py collect`. Con `dump --output FILE.sql` si ottiene
 invece il dump SQL in testo degli stessi dati. Si usa un runtime
 ufficiale SQLite **3.54.1**, verificato con SHA3-256 e installato nella cache
@@ -58,7 +60,7 @@ Wikipedia comprende anche nomi propri e parole straniere: essere un titolo
 non prova che una voce sia un prompt italiano adatto al gioco.
 
 Fotografia storica del primo ampliamento del 9 novembre 2026: **983 prompt validati**
-in `prompt_validi.sqlite3`, di cui **620 aggiunti** con questa revisione editoriale
+in `prompt_validi.sqlite3` (oggi lo schema `validi`), di cui **620 aggiunti** con questa revisione editoriale
 di ChatGPT. Sono 525 nomi, 40 verbi e 55 aggettivi; ogni nuova voce conserva senso,
 categoria, motivazioni e provenienza. Sette POS automatici sono stati corretti.
 Il catalogo aggiunge 179 (funghi) e 180 (misurazione del tempo), mantenendo gli
@@ -78,7 +80,7 @@ indipendente di giocabilità.
 
 ## Verifica prima dell'inserimento
 
-Le proposte raccolte rimangono nell'inventario di `prompt_raw.sqlite3`;
+Le proposte raccolte rimangono nell'inventario della raccolta (schema `raw`);
 le bozze di associazioni restano nei JSONL `prompt-staging/`.
 Nessuna proposta viene promossa automaticamente nel catalogo valido. Le traduzioni,
 le cooccorrenze in definizioni e le relazioni lessicografiche a livello di voce
@@ -123,9 +125,9 @@ Aprire **Terminale → Esegui attività** e scegliere:
 - **Livecade: genera lista (7 risposte per prompt)**: chiede quanti prompt
   distinti estrarre e un seed facoltativo, sceglie i prompt casualmente e per
   ognuno estrae sette risposte rispettando gruppi e conflitti.
-- **Prompt: aggiorna prompt.sqlite3 (bacini del gioco) da prompt_raw.sqlite3**:
-  rigenera il database dei bacini verificati, da versionare dopo ogni modifica
-  (dopo `import-reviewed` avviene già da sé; serve dopo le decisioni sulle voci).
+- **Prompt: aggiorna lo schema game (bacini verificati) dalla raccolta, schema raw**:
+  ricrea le viste dei bacini verificati (dopo `import-reviewed` avviene già da sé;
+  serve se lo schema `game` è stato toccato a mano).
 - **Prompt: stato e integrità del DB**: riporta conteggi e controlli SQLite.
 
 I task usano l'ambiente `.venv` già presente. Le nuove utility richiedono solo
@@ -193,11 +195,13 @@ Le copie prima della migrazione sono in `database-backups/`.
 
 ## Ripristino
 
-`prompt.sqlite3` è già un database completo dei bacini: per ripartire da quello
-(per esempio su un PC appena clonato) basta copiarlo come nuova raccolta:
+Il DB di lavoro non è in Git: se ne tiene una copia di sicurezza (in `database-backups/`). Un DB a sé con
+l'intera banca dei bacini, come era `prompt.sqlite3`, si scrive dalla raccolta; da lì si può ripartire
+(per esempio su un PC appena clonato) importandolo come schema `raw`:
 
 ```powershell
-Copy-Item prompt.sqlite3 prompt_raw.sqlite3
+python -B prompt_database.py dump --output bacini.sqlite3
+python -B -c "import unified_db; unified_db.import_schema('bacini.sqlite3', 'raw')"
 python -B prompt_database.py status
 ```
 

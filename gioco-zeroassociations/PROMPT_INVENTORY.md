@@ -52,7 +52,7 @@ python -B prompt_inventory.py collect --only de-mauro-sitemaps
 
 ## Cosa viene conservato
 
-Il file operativo è la raccolta `prompt_raw.sqlite3`, con SQLite 3.54.1.
+Il database operativo è la raccolta, schema `raw` di `database/parole_ita_raw.sqlite3`, con SQLite 3.54.1.
 
 - `inventory_terms`: una riga per testo normalizzato del prompt, con stato
   `COLLECTED`, indicazione di parola singola, presenza di prove di lemma,
@@ -60,7 +60,13 @@ Il file operativo è la raccolta `prompt_raw.sqlite3`, con SQLite 3.54.1.
 - `inventory_sources`: nome, indirizzo, tipo, attribuzione e condizioni della fonte.
 - `inventory_snapshots`: versioni effettivamente importate, hash e conteggi.
 - `inventory_attestations`: ogni occorrenza documentata, forma originale,
-  posizione nella fonte, POS, eventuale lemma e metadati.
+  posizione nella fonte, POS, eventuale lemma e metadati. È una vista, e si legge
+  e si inserisce da lì: le righe (milioni) stanno in `inventory_attestation_rows`,
+  con il numero dello snapshot, del ruolo e della POS al posto dei testi
+  (`inventory_snapshot_numbers`, `inventory_attestation_roles`,
+  `inventory_attestation_pos`) e la forma originale solo quando è diversa dal
+  prompt. Un DB del formato precedente si converte da solo al primo comando di
+  `prompt_inventory.py` o `inventory_updates.py` (`migrate_attestations`).
 - `inventory_source_counts`: conteggi per fonte.
 - `inventory_pending_single_words`: parole singole raccolte che non appartengono
   ancora ai prompt verificati della banca di gioco.

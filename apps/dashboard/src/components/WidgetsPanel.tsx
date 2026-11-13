@@ -3,6 +3,7 @@ import { socket } from '../socket'
 
 const WIDGETS: { id: WidgetId; label: string }[] = [
   { id: 'alerts', label: 'Alerts' },
+  { id: 'joins', label: 'Ingressi ("joined")' },
   { id: 'follower', label: 'Latest follower' },
   { id: 'goal', label: 'Goal bar' },
   { id: 'gifters', label: 'Top gifters' },

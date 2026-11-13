@@ -24,8 +24,9 @@ import {
   pick,
   simViewer,
 } from './Regia'
+import { EndSession } from './GameControls'
 import { Section } from './Section'
-import { SettingsForm } from './SettingsForm'
+import { SettingField, SettingsForm } from './SettingsForm'
 import { TriggerEditor } from './TriggerEditor'
 
 // The Quizzland (ZeroQuizz) control column: connection and simulator, stream widgets, the question in
@@ -48,7 +49,7 @@ export function QuizzlandSidebar({ session }: { session: SessionState }) {
       <GameSwitch session={session} />
 
       <Section title="Connessione" extra={<ConnectionBadge />}>
-        <Connection />
+        <Connection session={session} />
       </Section>
 
       <Section title="Impostazioni stream">
@@ -87,7 +88,7 @@ export function QuizzlandSidebar({ session }: { session: SessionState }) {
 
 // --- Connessione ---
 
-function Connection() {
+function Connection({ session }: { session: SessionState }) {
   const { quizzland, quizzlandSolution } = useDashboard()
   // Read when the simulator fires, so it is not restarted on every answer.
   const live = useRef({ quizzland, quizzlandSolution })
@@ -104,6 +105,8 @@ function Connection() {
         &ldquo;Manda chat ed eventi a Zerocade&rdquo; e imposta qui la stessa porta di ascolto.
       </p>
       <BridgeControl label="Ricevi risposte TikTok e Twitch da ZeroBot" />
+      <SettingField session={session} id="audience" />
+      <SettingField session={session} id="voiceFollowersOnly" />
 
       <LiveSimulator makeEvent={() => fakeEvent(live.current.quizzland, live.current.quizzlandSolution)} />
 
@@ -119,6 +122,7 @@ function Connection() {
         ↻ Ricomincia il quiz
       </button>
       <MessageComposer />
+      <EndSession ended={Boolean(session.ended)} />
     </>
   )
 }

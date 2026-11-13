@@ -8,7 +8,7 @@ import type {
   IncastroRecord,
   IncastroState,
 } from '@zerocade/shared'
-import { gameSound, type GameSound } from './audio'
+import { gameSound, roundCheer, type GameSound } from './audio'
 import { socket } from './socket'
 import { useOverlay } from './store'
 
@@ -392,6 +392,7 @@ function Game({ state, at, settings }: { state: IncastroState; at: number; setti
   useEffect(() => {
     if (sounds && state.phase === 'complete' && phaseRef.current === 'playing') {
       gameSound(state.chapterDone ? 'chapter' : 'complete')
+      roundCheer()
     }
     phaseRef.current = state.phase
   }, [state.phase])

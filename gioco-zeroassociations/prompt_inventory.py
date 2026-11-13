@@ -231,10 +231,89 @@ def records(path,source):
                 if row:yield row
 
 
+def schema_block(section: str, name: str) -> str:
+    """Le istruzioni di prompt_inventory_schema.sql fra `-- <section>:<name>` e il segno successivo della sezione."""
+    text = (ROOT/'prompt_inventory_schema.sql').read_text(encoding='utf-8')
+    start = text.index('-- '+section+':'+name+'\n')
+    return text[start:text.index('-- '+section+':', start+1)]
+
+
+def attestation_block(name: str) -> str:
+    return schema_block('attestazioni', name)
+
+
+# Le voci del vecchio formato (tabella con il rowid, review_status scritto in ogni riga) passano nella tabella di
+# prompt_inventory_schema.sql. Niente ALTER TABLE RENAME, che controlla le viste e si fermerebbe su quelle che
+# leggono la tabella: le righe passano da una copia temporanea, la tabella si ricrea con lo stesso nome e le
+# stesse colonne, e le viste e le chiavi esterne che la nominano restano valide.
+TERM_COLUMNS = ('prompt,is_single_word,has_lemma_evidence,has_inflected_evidence,has_proper_name_evidence,'
+                'has_it_dictionary_evidence')
+
+
+def migrate_terms(db) -> bool:
+    """Converte le voci del vecchio formato; False se non ce n'è bisogno (formato nuovo o raccolta vuota)."""
+    found = db.run('SELECT sql FROM sqlite_schema WHERE name='+literal('inventory_terms')+';',rows=True)
+    if not found or 'WITHOUT ROWID' in found[0]['sql'].upper():
+        return False
+    db.run('PRAGMA foreign_keys=OFF;\nPRAGMA cache_size=-1000000;\nBEGIN IMMEDIATE;\n'
+           'CREATE TEMP TABLE terms_copy AS SELECT '+TERM_COLUMNS+' FROM inventory_terms;\n'
+           'DROP TABLE inventory_terms;\n'+schema_block('voci','tabella')+
+           'INSERT INTO inventory_terms('+TERM_COLUMNS+') SELECT '+TERM_COLUMNS+' FROM temp.terms_copy ORDER BY prompt;\n'
+           'DROP TABLE temp.terms_copy;\nCOMMIT;\nPRAGMA foreign_keys=ON;\n')
+    if db.schema:
+        import unified_db
+        unified_db.register_objects(db.schema)
+    return True
+
+
+# Il vecchio formato delle attestazioni (una tabella con i testi dello snapshot, del ruolo e della categoria in
+# ogni riga) diventa quello di prompt_inventory_schema.sql. Le tabelle e la vista sono quelle dello schema
+# (attestation_block), così un database convertito e uno nuovo sono uguali; qui ci sono solo i dati. I numeri
+# degli snapshot seguono l'ordine di acquisizione (uno snapshot sconosciuto va in fondo), quelli dei ruoli e
+# delle categorie l'ordine alfabetico. L'indice per prompt si costruisce dopo le righe (è più veloce che
+# aggiornarlo riga per riga): la seconda passata delle tabelle, tutte IF NOT EXISTS, crea solo lui.
+MIGRATE_ATTESTATIONS_ROWS = '''
+DROP INDEX inventory_attestations_by_prompt;
+INSERT INTO inventory_snapshot_numbers(snapshot_id)
+ SELECT a.snapshot_id FROM (SELECT DISTINCT snapshot_id FROM inventory_attestations) a
+ LEFT JOIN inventory_snapshots s ON s.id=a.snapshot_id
+ ORDER BY s.acquired_at IS NULL,s.acquired_at,a.snapshot_id;
+CREATE TEMP TABLE attestation_kinds AS SELECT DISTINCT role,pos FROM inventory_attestations;
+INSERT INTO inventory_attestation_roles(role) SELECT DISTINCT role FROM temp.attestation_kinds ORDER BY role;
+INSERT INTO inventory_attestation_pos(pos) SELECT DISTINCT pos FROM temp.attestation_kinds ORDER BY pos;
+DROP TABLE temp.attestation_kinds;
+INSERT INTO inventory_attestation_rows(snapshot,prompt,locator,role,pos,source_form,lemma,details_json)
+ SELECT s.n,a.prompt,a.locator,r.n,p.n,nullif(a.source_form,a.prompt),a.lemma,a.details_json
+ FROM inventory_attestations a JOIN inventory_snapshot_numbers s ON s.snapshot_id=a.snapshot_id
+ JOIN inventory_attestation_roles r ON r.role=a.role JOIN inventory_attestation_pos p ON p.pos=a.pos
+ ORDER BY s.n,a.prompt,a.locator,r.n;
+DROP TABLE inventory_attestations;
+'''
+
+
+def migrate_attestations(db) -> bool:
+    """Converte le attestazioni del vecchio formato; False se non ce n'è bisogno (formato nuovo o raccolta vuota)."""
+    kind = db.run('SELECT type FROM sqlite_schema WHERE name='+literal('inventory_attestations')+';',rows=True)
+    if not kind or kind[0]['type']!='table':
+        return False
+    # Il vecchio indice per prompt ha il nome del nuovo: va tolto prima, o CREATE INDEX IF NOT EXISTS lo
+    # salterebbe. La cache grande (1 GB) serve all'ordinamento di milioni di righe.
+    tables = attestation_block('tabelle')
+    db.run('PRAGMA foreign_keys=OFF;\nPRAGMA cache_size=-1000000;\nBEGIN IMMEDIATE;\n'
+           'DROP INDEX IF EXISTS inventory_attestations_by_prompt;\n'+tables+MIGRATE_ATTESTATIONS_ROWS+tables+
+           attestation_block('vista')+'COMMIT;\nPRAGMA foreign_keys=ON;\n')
+    if db.schema:
+        import unified_db
+        unified_db.register_objects(db.schema)
+    return True
+
+
 def initialize_inventory(db):
     # Il database operativo può essere ancora vuoto: il primo step non richiede
     # che esistano bacini di associazioni né una revisione editoriale.
     db.path.parent.mkdir(parents=True,exist_ok=True)
+    migrate_terms(db)
+    migrate_attestations(db)
     db.run((ROOT/'prompt_schema.sql').read_text(encoding='utf-8')+
            (ROOT/'prompt_inventory_schema.sql').read_text(encoding='utf-8')+
            (ROOT/'inventory_updates_schema.sql').read_text(encoding='utf-8'))

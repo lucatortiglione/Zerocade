@@ -1,6 +1,7 @@
 import type { GameInstance } from './engine'
 import { addPoints, drawLeaderboard, drawTimerBar, newScores, shuffled } from './common'
 import { itemsFor } from '../content'
+import { roundCheer } from '../audio'
 
 // "Million Quiz" — a Who-Wants-To-Be-A-Millionaire style game. The crowd votes
 // A/B/C/D and the majority answer is locked in. Correct answers climb the prize
@@ -78,6 +79,7 @@ export function createMillionQuiz(): GameInstance {
   }
 
   const lock = () => {
+    roundCheer()
     const counts = [0, 0, 0, 0]
     for (const v of votes.values()) counts[v]++
     majority = counts.indexOf(Math.max(...counts))

@@ -1,6 +1,7 @@
 import type { GameInstance } from './engine'
 import { addPoints, drawLeaderboard, drawTimerBar, newScores, shuffled } from './common'
 import { itemsFor } from '../content'
+import { roundCheer } from '../audio'
 
 // "True or False" — viewers judge a statement by typing V/F (or true/false).
 // The reveal shows the answer, the explanation and the winners.
@@ -54,6 +55,7 @@ export function createTrueOrFalse(): GameInstance {
       if (action === 'skip_statement') {
         if (!revealed) {
           revealed = true
+          roundCheer()
           timer = breakSecs
         }
         return
@@ -87,6 +89,7 @@ export function createTrueOrFalse(): GameInstance {
         if (revealed) pick()
         else {
           revealed = true
+          roundCheer()
           timer = revealSecs
         }
       }

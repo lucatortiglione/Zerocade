@@ -23,6 +23,8 @@ export class Engine {
   private settings: GameSettings = {}
   private raf = 0
   private last = 0
+  // A paused game keeps its last frame: no updates, no actions.
+  private paused = false
 
   constructor(ctx: CanvasRenderingContext2D) {
     this.ctx = ctx
@@ -46,8 +48,13 @@ export class Engine {
     this.settings = settings
   }
 
+  setPaused(paused: boolean) {
+    this.paused = paused
+    if (paused) this.actions.length = 0
+  }
+
   pushAction(action: string, event: LiveEvent) {
-    if (!this.instance) return
+    if (!this.instance || this.paused) return
     this.actions.push({ action, event, now: performance.now() })
     if (this.actions.length > 300) this.actions.shift()
   }
@@ -58,9 +65,11 @@ export class Engine {
       const dt = Math.min((now - this.last) / 1000, 0.05)
       this.last = now
       if (this.instance) {
-        for (const a of this.actions) this.instance.onAction(a.action, a.event, a.now)
-        this.actions.length = 0
-        this.instance.update(dt, now, this.settings)
+        if (!this.paused) {
+          for (const a of this.actions) this.instance.onAction(a.action, a.event, a.now)
+          this.actions.length = 0
+          this.instance.update(dt, now, this.settings)
+        }
         this.instance.draw(this.ctx, now)
       }
       this.raf = requestAnimationFrame(loop)

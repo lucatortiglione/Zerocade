@@ -252,7 +252,7 @@ function ImagePicker({
   const input = useRef<HTMLInputElement>(null)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
-  const game = BACKGROUND_GAMES.find((g) => g === gameId) ?? 'bivio'
+  const game = BACKGROUND_GAMES.find((g) => g === gameId) ?? 'zerodubbi'
 
   const upload = async (file: File) => {
     setBusy(true)

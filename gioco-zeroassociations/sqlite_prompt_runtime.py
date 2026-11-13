@@ -11,6 +11,8 @@ import tempfile
 import urllib.request
 import zipfile
 
+import unified_db
+
 VERSION = '3.54.1'
 URL = 'https://www.sqlite.org/2026/sqlite-tools-win-x64-3540100.zip'
 SHA3 = 'e171f3993a992edf076746926dd52b5e2ebfabaee38818e74987e1d8112ab987'
@@ -64,11 +66,17 @@ class SQLite:
     def __init__(self, path: Path, executable: Path | None = None):
         self.path = Path(path).resolve()
         self.executable = sqlite_executable(executable)
+        # Uno schema del DB unico (database/parole_ita_raw.sqlite3#raw, o il vecchio nome prompt_raw.sqlite3) si
+        # apre nel DB unico: l'SQL resta scritto con i nomi senza prefisso e viene riscritto in run().
+        self.schema = unified_db.schema_of(self.path) if unified_db.active() else None
+        self.file = unified_db.UNIFIED if self.schema else unified_db.file_of(self.path)
 
     def run(self, sql: str, *, rows=False):
+        if unified_db.active():
+            sql, _ = unified_db.prepare_sql(sql, self.schema, main_is_unified=self.schema is not None)
         args = [str(self.executable), '-batch', '-bail']
         if rows: args.append('-json')
-        args.append(str(self.path))
+        args.append(str(self.file))
         result = subprocess.run(args, input='PRAGMA foreign_keys=ON;\n'+sql,
             capture_output=True, encoding='utf-8', creationflags=window_flags())
         if result.returncode:
@@ -79,6 +87,12 @@ class SQLite:
         """Il dump SQL completo, oppure delle sole tabelle e viste `objects`."""
         if objects is not None and not all(re.fullmatch(r'[A-Za-z_][A-Za-z0-9_]*', o) for o in objects):
             raise ValueError('Nome di tabella non valido per il dump')
+        if self.schema:
+            # Nel DB unico gli oggetti hanno il prefisso dello schema; il dump esce senza (come il vecchio file).
+            known = unified_db.objects_of(self.schema)
+            if objects is None:
+                objects = sorted(known)
+            objects = [unified_db.prefixed(self.schema, o) if o in known else o for o in objects]
         command = '.dump' + ''.join(' '+o for o in objects or [])
         output = Path(output)
         output.parent.mkdir(parents=True,exist_ok=True)
@@ -86,9 +100,11 @@ class SQLite:
         temporary = Path(name)
         try:
             with os.fdopen(handle,'wb') as stream:
-                result = subprocess.run([str(self.executable), '-batch', '-bail', str(self.path), command],
+                result = subprocess.run([str(self.executable), '-batch', '-bail', str(self.file), command],
                     stdout=stream, stderr=subprocess.PIPE, creationflags=window_flags())
             if result.returncode: raise RuntimeError(result.stderr.decode('utf-8'))
+            if self.schema:
+                temporary.write_bytes(unified_db.deprefix(temporary.read_text(encoding='utf-8'), self.schema).encode('utf-8'))
             temporary.replace(output)
         finally:
             temporary.unlink(missing_ok=True)
@@ -105,6 +121,13 @@ def publish_database(temporary: Path, output: Path, executable: Path | None = No
     temporary,output = Path(temporary).resolve(),Path(output).resolve()
     if temporary==output:
         raise ValueError('La copia temporanea deve essere distinta dalla destinazione')
+    schema = unified_db.schema_of(output) if unified_db.active() else None
+    if schema:
+        # Il destinatario è uno schema del DB unico: la copia ricostruita ne prende il posto, in una transazione.
+        unified_db.import_schema(temporary, schema)
+        temporary.unlink(missing_ok=True)
+        return 'unified_import'
+    output = unified_db.file_of(output)
     try:
         temporary.replace(output)
         return 'atomic_replace'

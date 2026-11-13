@@ -54,7 +54,7 @@ Le istruzioni degli agenti sono in `ISTRUZIONI_AGENTI.md`, nella stessa cartella
 | Bozze Qwen da rivedere | task «Associazioni: continua con Qwen (bozze, poi revisione)» |
 | Solo Qwen, senza agenti | task «Associazioni: continua solo con Qwen (senza agenti)» |
 | Importazione dei lotti rivisti | task «Associazioni: importa i lotti rivisti dagli agenti» |
-| Database finale | task «Prompt: rigenera prompt_finale.sqlite3 (prompt, parole, collegamenti)» |
+| Database finale | task «Prompt: rigenera lo schema finale (prompt, parole, collegamenti)» |
 
 Le bozze Qwen (`qwen/drafts.jsonl`) non sono approvazioni: il revisore verifica ogni
 parola, scarta le difettose e aggiunge le mancanti; il serializzatore registra quante ne

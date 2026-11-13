@@ -3,6 +3,7 @@ import type { GameInstance } from './engine'
 import { fillTextWithAvatar } from './avatar'
 import { addPoints, drawLeaderboard, drawTimerBar, newScores, normalize, shuffled } from './common'
 import { itemsFor } from '../content'
+import { roundCheer } from '../audio'
 
 // "Guess the Location" — a stylised panorama with a landmark. Viewers guess the
 // country (and optionally the city). Letters reveal progressively as hints.
@@ -56,6 +57,7 @@ export function createGuessLocation(): GameInstance {
 
   const finish = () => {
     revealed = true
+    roundCheer()
     timer = revealSecs
   }
 

@@ -11,10 +11,11 @@ from dataclasses import dataclass, field
 from pathlib import Path
 import re
 import sqlite3
+import unified_db
 import unicodedata
 
 ROOT = Path(__file__).resolve().parent
-DEFAULT_DB = ROOT/'prompt.sqlite3'
+DEFAULT_DB = unified_db.address('game')
 
 
 def answer_key(text: str) -> str:
@@ -75,8 +76,8 @@ def load_pools(path: Path = DEFAULT_DB) -> list[Pool]:
     """Il senso familiare di ogni prompt con revisione verificata, come lo legge il server
     (senza i prompt che la raccolta segna DISCARDED o DEFERRED)."""
     path = Path(path)
-    if not path.exists(): raise FileNotFoundError(f'Database assente: {path}')
-    db = sqlite3.connect(f'file:{path.as_posix()}?mode=ro', uri=True)
+    if not unified_db.exists(path): raise FileNotFoundError(f'Database assente: {path}')
+    db = unified_db.connect(f'file:{path.as_posix()}?mode=ro', uri=True)
     try:
         db.row_factory = sqlite3.Row
         pools = {}

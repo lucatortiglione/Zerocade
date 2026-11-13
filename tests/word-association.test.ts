@@ -1,5 +1,6 @@
 // Synthetic fixtures exercise game mechanics, transport and telemetry, never semantic QA.
 import assert from 'node:assert/strict'
+import { createHash } from 'node:crypto'
 import { mkdtempSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
@@ -170,6 +171,57 @@ test('server reads the familiar sense of each verified prompt from SQLite, read-
     assert.deepEqual(loadWordAssociation(join(root, 'broken.sqlite3')).pools, [])
   } finally {
     console.warn = warn
+    rmSync(root, { recursive: true, force: true })
+  }
+})
+
+test("the games' database has the prompts, each word once and the links (schema associazioni)", () => {
+  const root = mkdtempSync(join(tmpdir(), 'zerocade-associations-'))
+  try {
+    const file = join(root, 'giochi.sqlite3')
+    const db = new Database(file)
+    // As database/giochi.py writes it: numeric keys, the pool's ref kept with the prompt, the words once.
+    db.exec(`
+      CREATE TABLE zerodb_meta(name TEXT PRIMARY KEY, value TEXT NOT NULL);
+      CREATE TABLE zerodb_objects(schema TEXT, name TEXT, type TEXT, tbl_name TEXT, rows INTEGER, PRIMARY KEY(schema, name));
+      INSERT INTO zerodb_meta VALUES ('verified', '1');
+      CREATE TABLE associazioni__prompts(id INTEGER PRIMARY KEY, prompt TEXT UNIQUE, pos TEXT, sense TEXT, category_id TEXT,
+        ref TEXT UNIQUE, review_id TEXT);
+      CREATE TABLE associazioni__words(id INTEGER PRIMARY KEY, word TEXT UNIQUE);
+      CREATE TABLE associazioni__difficulties(id INTEGER PRIMARY KEY, name TEXT UNIQUE);
+      CREATE TABLE associazioni__meaning_groups(prompt_id INTEGER, name_id INTEGER, maximum INTEGER,
+        PRIMARY KEY(prompt_id, name_id)) WITHOUT ROWID;
+      CREATE TABLE associazioni__prompt_words(prompt_id INTEGER, word_id INTEGER, group_name_id INTEGER, difficulty INTEGER,
+        PRIMARY KEY(prompt_id, word_id)) WITHOUT ROWID;
+      CREATE TABLE associazioni__conflicts(prompt_id INTEGER, word_a INTEGER, word_b INTEGER,
+        PRIMARY KEY(prompt_id, word_a, word_b)) WITHOUT ROWID;
+      INSERT INTO associazioni__difficulties VALUES (1, 'easy'), (2, 'medium'), (3, 'hard'), (4, 'unrated');
+    `)
+    db.prepare('INSERT INTO associazioni__prompts VALUES (1, ?, ?, ?, ?, ?, ?)').run('pizza', 'NOUN', 'Piatto tondo', '009', poolRef('s1'), 'r1')
+    const words = [...WORDS, 'teglia']
+    const id = (w: string) => words.indexOf(w) + 1
+    for (const w of words) {
+      db.prepare('INSERT INTO associazioni__words VALUES (?, ?)').run(id(w), w)
+      db.prepare('INSERT INTO associazioni__meaning_groups VALUES (1, ?, ?)').run(id(w), w === 'forno' ? 1 : null)
+      db.prepare('INSERT INTO associazioni__prompt_words VALUES (1, ?, ?, 1)').run(id(w), id(w))
+    }
+    db.prepare('INSERT INTO associazioni__conflicts VALUES (1, ?, ?)').run(id('forno'), id('teglia'))
+    const register = db.prepare("INSERT INTO zerodb_objects VALUES ('associazioni', ?, 'table', ?, NULL)")
+    for (const t of ['prompts', 'words', 'difficulties', 'meaning_groups', 'prompt_words', 'conflicts']) register.run(t, t)
+    db.close()
+
+    const loaded = loadWordAssociation(`${file}#associazioni`)
+    const [read, ...others] = loaded.pools
+    assert.equal(others.length, 0)
+    assert.equal(read.ref, poolRef('s1'))
+    assert.equal(read.sense, 'Piatto tondo')
+    assert.deepEqual(read.answers.map((a) => a.word), [...words].sort())
+    assert.equal(read.answers[0].difficulty, 'easy')
+    assert.deepEqual(read.group_limits, { forno: 1 })
+    assert.deepEqual(read.conflicts, [['forno', 'teglia']])
+    // The same contentId the working database gives for the same review: the "behind" check compares them.
+    assert.equal(loaded.contentId, createHash('sha256').update('r1').digest('hex').slice(0, 16))
+  } finally {
     rmSync(root, { recursive: true, force: true })
   }
 })

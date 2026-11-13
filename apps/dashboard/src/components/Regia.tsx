@@ -237,6 +237,7 @@ export function LiveSimulator({ makeEvent }: { makeEvent: () => LiveEvent }) {
 
 const WIDGETS: { id: WidgetId; label: string; icon: string }[] = [
   { id: 'alerts', label: 'Avvisi', icon: '🔔' },
+  { id: 'joins', label: 'Ingressi', icon: '👋' },
   { id: 'follower', label: 'Ultimo follower', icon: '➕' },
   { id: 'goal', label: 'Barra obiettivo', icon: '🎯' },
   { id: 'gifters', label: 'Top donatori', icon: '🏆' },

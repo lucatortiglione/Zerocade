@@ -1,5 +1,6 @@
 import type { WordAssociationRoundReport } from '@zerocade/shared'
 import type { GameInstance } from './engine'
+import { setScoreGame } from './scoreReport'
 import { createGiftDrop } from './giftDrop'
 import { createMmaClash } from './mmaClash'
 import { createLunarDash } from './lunarDash'
@@ -10,6 +11,7 @@ import { createWordGuess } from './word'
 import { createWordSwipe } from './wordSwipe'
 import { createWordsOfWonders } from './wordsOfWonders'
 import { createFiveLetters } from './fiveLetters'
+import { createChainReaction } from './chainReaction'
 import { createFindTheWord } from './findTheWord'
 import { createTrueOrFalse } from './trueOrFalse'
 import { createTriviaTime } from './triviaTime'
@@ -55,7 +57,8 @@ const registry: Record<string, () => GameInstance> = {
   'wow-guru': createWordsOfWonders,
   'four-pics': createFourPics,
   picwords: createPicwords,
-  'five-letters': createFiveLetters,
+  'zerowordle': createFiveLetters,
+  zeroreazioniacatena: createChainReaction,
   'find-the-word': createFindTheWord,
   'true-or-false': createTrueOrFalse,
   'trivia-time': createTriviaTime,
@@ -84,5 +87,8 @@ const registry: Record<string, () => GameInstance> = {
   'word-merge': createWordMerge,
 }
 
-export const createGame = (gameId: string): GameInstance | null => registry[gameId]?.() ?? null
+export const createGame = (gameId: string): GameInstance | null => {
+  setScoreGame(gameId)
+  return registry[gameId]?.() ?? null
+}
 

@@ -3,6 +3,7 @@ import type { GameInstance } from './engine'
 import { fillTextWithAvatar } from './avatar'
 import { addPoints, drawLeaderboard, drawTimerBar, newScores, normalize, shuffled } from './common'
 import { wordsFor } from '../content'
+import { roundCheer } from '../audio'
 
 // "Find the Word" — the visible prefix of a hidden word grows as viewers guess.
 // Guessing the next letter advances the word; guessing the full word solves it.
@@ -53,6 +54,7 @@ export function createFindTheWord(): GameInstance {
       const text = normalize(event.text)
       if (text === word) {
         done = true
+        roundCheer()
         solver = event.user
         timer = breakSecs
         addPoints(scores, event.user.id, event.user.nickname, event.user.avatar, fullBonus + (word.length - revealed) * perLetter)
@@ -63,6 +65,7 @@ export function createFindTheWord(): GameInstance {
         addPoints(scores, event.user.id, event.user.nickname, event.user.avatar, perLetter)
         if (revealed >= word.length) {
           done = true
+          roundCheer()
           timer = breakSecs
         }
       }
@@ -75,6 +78,7 @@ export function createFindTheWord(): GameInstance {
         if (done) pick()
         else {
           done = true
+          roundCheer()
           timer = breakSecs
         }
       }

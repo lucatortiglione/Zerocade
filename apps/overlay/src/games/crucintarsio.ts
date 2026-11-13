@@ -2,6 +2,7 @@ import type { GameInstance } from './engine'
 import { addPoints, drawLeaderboard, drawTimerBar, newScores, normalize, shuffled } from './common'
 import { itemsFor } from '../content'
 import { buildCrossword, cellKey, cellSolved, type CrosswordBoard, type CrosswordEntry } from './crossword'
+import { roundCheer } from '../audio'
 
 // "Crucintarsio" — an Italian-style crossword (Orizzontali / Verticali) built
 // from intersecting words. Viewers type the words to fill the board.
@@ -45,6 +46,7 @@ export function createCrucintarsio(): GameInstance {
       if (credit) addPoints(scores, event.user.id, event.user.nickname, event.user.avatar, match.word.length)
       if (board.placed.every((p) => found.has(p.word))) {
         revealed = true
+        roundCheer()
         timer = breakSecs
       }
     },

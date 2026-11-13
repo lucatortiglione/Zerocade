@@ -26,11 +26,9 @@ export function Widgets() {
   const { session, event, seq, ranking, lastFollower, totalCoins } = useOverlay()
   if (!session) return null
   const w = session.widgets
-  // In Bivio comments are the votes: they are listed under the options, and an alert
-  // would sit on top of option A. In Incastro they are the words played; in ZeroAssociazioni
-  // the guesses, which an alert would hand to everyone.
-  const guessing = session.gameId === 'bivio' || session.gameId === 'incastro' || session.gameId === 'word-association'
-  const alert = guessing && event?.type === 'comment' ? null : event
+  // What the viewers write is never an alert, in any game (in many it is a guess, which an alert would hand to
+  // everyone). The "X joined" notices only when the creator turns them on.
+  const alert = event?.type === 'comment' || (event?.type === 'join' && !w.joins) ? null : event
 
   return (
     <>

@@ -28,7 +28,13 @@ function sanitizeViewer(raw: unknown): Viewer | null {
   const r = asRecord(raw)
   if (!r || typeof r.id !== 'string' || typeof r.nickname !== 'string' || !r.nickname) return null
   const avatar = typeof r.avatar === 'string' && /^https?:\/\//.test(r.avatar) ? r.avatar.slice(0, 512) : undefined
-  return { id: r.id.slice(0, 64), nickname: r.nickname.slice(0, 32), avatar }
+  return {
+    id: r.id.slice(0, 64),
+    nickname: r.nickname.slice(0, 32),
+    avatar,
+    ...(r.follower === true && { follower: true }),
+    ...(r.fan === true && { fan: true }),
+  }
 }
 
 export function sanitizeEvent(raw: unknown): LiveEvent | null {

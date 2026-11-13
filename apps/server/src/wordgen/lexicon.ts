@@ -1,7 +1,7 @@
-import { readFileSync } from 'node:fs'
-import { files } from './files.js'
+import { readBlocklist, readWords } from './files.js'
 
-// The Italian lexicon (gioco-parole/lexicon/it/words.tsv: word, Zipf frequency, tier) with
+// The Italian lexicon (schema parole of database/giochi.sqlite3, from gioco-parole/lexicon/it/words.tsv:
+// word, Zipf frequency, tier) with
 // each word's Zipf frequency and rank (1 = most common) and the multiset index: signature (letters in
 // order, CARTE -> ACERT) -> words, so every word a wheel makes is a few hundred lookups away.
 
@@ -12,7 +12,7 @@ export const signature = (word: string) => [...word].sort().join('')
 function loadBlocklist(): (word: string) => boolean {
   const exact = new Set<string>()
   const prefixes: string[] = []
-  for (const raw of readFileSync(files.blocklist, 'utf-8').split(/\r?\n/)) {
+  for (const raw of readBlocklist()) {
     const line = raw.trim().toUpperCase()
     if (!line || line.startsWith('#')) continue
     if (line.endsWith('*')) prefixes.push(line.slice(0, -1))
@@ -33,12 +33,10 @@ export class Lexicon {
   constructor() {
     const blocked = loadBlocklist()
     const rows: [string, number][] = []
-    const lines = readFileSync(files.words, 'utf-8').split(/\r?\n/)
-    for (const line of lines.slice(1)) {
-      const [word, zipf, tier] = line.split('\t')
+    for (const { word, zipf, tier } of readWords()) {
       if (!word || blocked(word)) continue
-      rows.push([word, Number(zipf)])
-      this.zipf.set(word, Number(zipf))
+      rows.push([word, zipf])
+      this.zipf.set(word, zipf)
       if (tier === 'main') this.main.add(word)
     }
     rows.sort((a, b) => b[1] - a[1] || (a[0] < b[0] ? -1 : 1))

@@ -1,4 +1,4 @@
-"""Convert the questions (data/domande.db) into a Livecade "Would You Rather" import CSV.
+"""Convert the questions (schema dubbi of database/giochi.sqlite3) into a Livecade "Would You Rather" import CSV.
 
 Livecade imports one language per file (CSV UTF-8, max 16 MB / 20,000 rows) and
 does not publish the column names of each game. The reliable way is to export the
@@ -58,7 +58,7 @@ def detect_roles(header):
 
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("db", nargs="?", default=DB, help="the questions database (default data/domande.db)")
+    ap.add_argument("db", nargs="?", default=DB, help="the questions database (default: schema dubbi of database/giochi.sqlite3)")
     ap.add_argument("--lang", required=True, help="language code, e.g. it or en (needs <lang>_a/<lang>_b columns)")
     ap.add_argument("--out", required=True)
     ap.add_argument("--template", help="a CSV exported from Livecade (same game and language)")
