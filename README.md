@@ -81,10 +81,19 @@ contenuti (parole, domande, temi) li prendono dallo schema `contenuti` di `datab
 In ogni gioco con dei round, alla fine di ciascuno l'overlay fa sentire un applauso
 (`audio/dragon-studio-crowd-cheer-406646.mp3`); l'impostazione «Applauso a fine round» lo spegne.
 
+Dietro i giochi può esserci la foto NASA del giorno, una delle ultime «Image of the Day», che cambia ogni pochi minuti:
+- nei giochi su canvas è lo sfondo di base («Sfondo» nel gruppo Aspetto);
+- in ZeroWords è lo sfondo di base, una foto per livello;
+- in ZeroQuizz e ZeroDubbi si sceglie nelle impostazioni dello sfondo.
+
+Lunar Dash e Guess the Location ne restano senza, perché la loro scena occupa tutto lo schermo
+(`apps/overlay/src/NasaBackdrop.tsx`).
+
 ## I dati
 
-- **`database/giochi.sqlite3`**, in Git: i contenuti di tutti i giochi, uno schema per gioco. È l'unico file
-  che il server e il pacchetto Windows leggono per i giochi. Vedi [database/README.md](database/README.md).
+- **`database/giochi.sqlite3`**, in Git: i contenuti dei giochi di parole e degli altri giochi dell'overlay, uno
+  schema per gioco. Vedi [database/README.md](database/README.md).
+- **`database/ZeroQuizz.sqlite3`**, in Git: le domande e le risposte di ZeroQuizz, un DB a sé.
 - **`database/parole_ita_raw.sqlite3`**, fuori da Git (2,3 GB): il DB di lavoro di ZeroAssociazioni, con la
   raccolta delle parole italiane da cui nascono anche le parole di ZeroWordle e ZeroContext.
 - [database/DB.md](database/DB.md) spiega ogni file e il percorso di una parola dalla raccolta al gioco.
@@ -118,8 +127,9 @@ python database/giochi.py verify            confronta ogni schema di giochi.sqli
 
 - Lessico di ZeroWords: Morph-it! di M. Baroni ed E. Zanchetta (CC BY-SA 2.0) e frequenze wordfreq
   (CC BY-SA 4.0); lessico e livelli di ZeroWords sono CC BY-SA ([gioco-parole/lexicon/it/SOURCE](gioco-parole/lexicon/it/SOURCE)).
-- Domande di ZeroQuizz: in gioco quelle tradotte da Open Trivia Database e AI2 Reasoning Challenge (entrambe
-  CC BY-SA 4.0). The Trivia API, OpenBookQA e API Ninjas sono scaricate ma non in gioco, per le loro licenze.
-  Licenze e condizioni sono nelle cartelle di [gioco-quizzland/data/fonti](gioco-quizzland/data/fonti).
+- Domande di ZeroQuizz, tradotte in italiano: Open Trivia Database e AI2 Reasoning Challenge (CC BY-SA 4.0), The Trivia
+  API (CC BY-NC 4.0), OpenBookQA (licenza non nota) e API Ninjas (solo uso personale). Licenze e condizioni sono nelle
+  cartelle di [gioco-quizzland/data/fonti](gioco-quizzland/data/fonti); [gioco-quizzland/README.md](gioco-quizzland/README.md)
+  spiega quali vanno decise prima di una diretta monetizzata.
 - ZeroContext usa i vettori fastText italiani `cc.it.300` (`gioco-zerocontext/fetch_vectors.py`).
-- Gli sfondi di ZeroWords possono essere le foto «Image of the Day» della NASA, scaricate durante la partita.
+- Le foto di sfondo sono le «Image of the Day» della NASA, scaricate durante la partita.
