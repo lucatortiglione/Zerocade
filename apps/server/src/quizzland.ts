@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto'
-import { giochiDb, openSource, sourceReady } from './schema-db.js'
+import { openSource, sourceReady, zeroQuizzDb } from './schema-db.js'
 import Database from 'better-sqlite3'
 import {
   QUIZZLAND_LETTERS,
@@ -18,10 +18,10 @@ import { toCsv } from './csv.js'
 import { recordScore } from './scores.js'
 import { flagQuizzland, quizzlandFlags, quizzlandTotalsByQuestion, recordQuizzlandAnswer, unflagQuizzland } from './db.js'
 
-// Quizzland, the server-driven quiz. Questions come from the games' database, schema quizz of
-// database/giochi.sqlite3 (gioco-quizzland/tools/domande.py imports and exports it as CSV), read once
-// at start: a new question only needs an edit and a restart. The Windows package ships the file next
-// to the server; ZEROCADE_QUIZZLAND_DB points elsewhere.
+// Quizzland (ZeroQuizz), the server-driven quiz. Questions come from its own database,
+// database/ZeroQuizz.sqlite3 (tables domande, opzioni, categorie; gioco-quizzland/tools/domande.py imports
+// and exports it as CSV), read once at start: a new question only needs an edit and a restart. The
+// Windows package ships the file next to the server; ZEROCADE_QUIZZLAND_DB points elsewhere.
 
 interface Question {
   id: string
@@ -36,10 +36,10 @@ interface Question {
   answer: number
 }
 
-// ZEROCADE_QUIZZLAND_DB (a database or `file#schema`), otherwise the games' database, schema quizz.
+// ZEROCADE_QUIZZLAND_DB (a database or `file#schema`), otherwise database/ZeroQuizz.sqlite3.
 const dbPath = [
   process.env.ZEROCADE_QUIZZLAND_DB,
-  giochiDb && `${giochiDb}#quizz`,
+  zeroQuizzDb,
 ].find((p): p is string => typeof p === 'string' && sourceReady(p))
 
 interface Row {
@@ -57,7 +57,7 @@ interface Row {
 // exactly one right answer, is left out (tools/domande.py stats lists them).
 function loadQuestions(): Question[] {
   if (!dbPath) {
-    console.warn('[quizzland] no schema quizz in database/giochi.sqlite3: the game has no questions')
+    console.warn('[quizzland] database/ZeroQuizz.sqlite3 not found: the game has no questions')
     return []
   }
   let db: Database.Database | undefined
@@ -112,7 +112,7 @@ function loadQuestions(): Question[] {
 export const QUESTIONS = loadQuestions()
 
 // Questions marked as wrong from the dashboard (any overlay key): out of the game until
-// unmarked; the CSV export lists them, to be fixed in the schema quizz.
+// unmarked; the CSV export lists them, to be fixed in database/ZeroQuizz.sqlite3.
 const flagged = new Set(quizzlandFlags().map((f) => f.question_id))
 
 function setFlag(id: string, on: boolean): void {
@@ -572,7 +572,7 @@ export function quizzlandStats(): QuizzlandStats {
 
 // Every question with how the chat did on it: share of right answers, how many picked each
 // answer (in the database's order, to spot the wrong answers that fool people) and when it was
-// marked as wrong, to be fixed in the schema quizz. The BOM lets Excel read the accents.
+// marked as wrong, to be fixed in database/ZeroQuizz.sqlite3. The BOM lets Excel read the accents.
 export function quizzlandCsv(): string {
   const totals = new Map(quizzlandTotalsByQuestion().map((r) => [r.id, r]))
   const flaggedAt = new Map(quizzlandFlags().map((f) => [f.question_id, f.flagged_at]))

@@ -10,7 +10,7 @@ Modifiche rispetto all'originale:
 - Le categorie di Open Trivia sono riunite nella categoria `cultura`.
 - Per le domande Vero/Falso le risposte sono "Vero" e "Falso".
 
-Le traduzioni (`it/*.json` e le domande `otdb-…` dello schema `quizz` di `database/giochi.sqlite3`) sono distribuite con la stessa licenza CC BY-SA 4.0.
+Le traduzioni (`it/*.json` e le domande `otdb-…` di `database/ZeroQuizz.sqlite3`) sono distribuite con la stessa licenza CC BY-SA 4.0.
 Chi le riusa deve citare Open Trivia Database, indicare la licenza e mantenerla.
 
 `opentdb-en.json` contiene le domande originali in inglese, scaricate con `python tools/fonti.py download opentdb`.

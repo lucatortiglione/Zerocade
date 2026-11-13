@@ -5,7 +5,7 @@ Usage:
   python tools/fonti.py todo FONTE [N]       the next N questions without a translation, one per line
   python tools/fonti.py nuove [FONTE]        how many questions the source has now against the ones we
                                              hold: one light request, nothing downloaded
-  python tools/fonti.py csv domande.csv      the questions of the schema quizz that come from no
+  python tools/fonti.py csv domande.csv      the questions of database/ZeroQuizz.sqlite3 that come from no
                                              source, then every translated one: a CSV for
                                              domande.py import
 

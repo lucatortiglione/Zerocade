@@ -524,7 +524,7 @@ export type IncastroCommand =
 // Shown as ZeroQuizz; the code, the saved settings and the database still say quizzland.
 // Server-driven like Bivio: the server deals the question, takes each viewer's first answer
 // (A-D, or 1-4) from chat, scores it at the reveal and stores every answer in SQLite. The
-// questions come from the schema quizz of database/giochi.sqlite3. Italian only.
+// questions come from database/ZeroQuizz.sqlite3. Italian only.
 
 export interface QuizzlandCategory {
   id: string
@@ -532,7 +532,7 @@ export interface QuizzlandCategory {
   colors: [string, string]
 }
 
-// The categories of the schema quizz (domande.categoria); one missing here still plays, with a neutral chip.
+// The categories of database/ZeroQuizz.sqlite3 (table categorie); one missing here still plays, with a neutral chip.
 export const QUIZZLAND_CATEGORIES: QuizzlandCategory[] = [
   { id: 'logica', label: 'Logica', colors: ['#60a5fa', '#4338ca'] },
   { id: 'numeri', label: 'Numeri', colors: ['#fbbf24', '#ea580c'] },

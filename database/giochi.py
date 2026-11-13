@@ -1,7 +1,6 @@
 """Il DB dei giochi: database/giochi.sqlite3, piccolo e versionato in Git, con uno schema per gioco.
 
   dubbi   ZeroDubbi: i dilemmi (era gioco-dilemmi/data/domande.db)
-  quizz   ZeroQuizz: domande e risposte (era gioco-quizzland/data/domande.db)
   wordle  ZeroWordle: soluzioni e parole ammesse, da 5 a 8 lettere (gioco-zerowordle/build_wordle_bank.py)
   context ZeroContext: parole giocabili e parole segrete (gioco-zerocontext/build_context_data.py); i vettori,
           18 MB, restano nel file gioco-zerocontext/data/vectors.bin, nello stesso ordine delle parole
@@ -10,12 +9,14 @@
   parole  ZeroWords: lessico, lista di esclusione, capitoli e curva di difficoltà (dai file di gioco-parole)
   contenuti     la banca degli altri giochi dell'overlay (apps/server/src/content.seed.json), un elemento JSON per riga
 
-I dati di Zerocade in diretta (sessioni, eventi, classifiche) restano in apps/server/data/zerocade.db.
+ZeroQuizz non è qui: è un gioco di domande e risposte, non di parole, e ha un DB a sé, database/ZeroQuizz.sqlite3
+(gioco-quizzland/tools/domande.py). I dati di Zerocade in diretta (sessioni, eventi, classifiche) restano in
+apps/server/data/zerocade.db.
 
-Gli strumenti di ZeroDubbi e ZeroQuizz indicano il loro schema come database/giochi.sqlite3#dubbi e #quizz
-(address), la stessa scrittura del server, e scrivono l'SQL con i nomi senza prefisso, che viene riscritto al volo
-(schemadb.py). Il vecchio percorso, gioco-*/data/domande.db, indica ancora lo stesso schema. Con
-ZEROCADE_GIOCHI_DB=legacy tornano ai vecchi file, che non si aggiornano più. wordle e context li scrivono i loro script di costruzione; associazioni, parole e contenuti
+Gli strumenti di ZeroDubbi indicano il loro schema come database/giochi.sqlite3#dubbi (address), la stessa
+scrittura del server, e scrivono l'SQL con i nomi senza prefisso, che viene riscritto al volo (schemadb.py). Il
+vecchio DB a sé, gioco-dilemmi/data/domande.db, indica ancora lo stesso schema; con ZEROCADE_GIOCHI_DB=legacy
+si torna a quel file, che non si aggiorna più. wordle e context li scrivono i loro script di costruzione; associazioni, parole e contenuti
 sono copie delle loro origini, che restano dove sono: dopo una modifica all'origine si aggiornano con `aggiorna`.
 
 Comandi:
@@ -43,10 +44,9 @@ from schemadb import SchemaDb  # noqa: E402
 
 # ZEROCADE_GIOCHI_FILE moves it (for example, to try the tools on a copy).
 FILE = Path(os.environ.get('ZEROCADE_GIOCHI_FILE') or HERE / 'giochi.sqlite3')
-# I vecchi DB di ZeroDubbi e ZeroQuizz, da cui vengono gli schemi dubbi e quizz: non si aggiornano più, servono a
-# build --replace e a ZEROCADE_GIOCHI_DB=legacy.
+# Il vecchio DB di ZeroDubbi, da cui viene lo schema dubbi: non si aggiorna più, serve a build --replace, a verify e
+# a ZEROCADE_GIOCHI_DB=legacy.
 DUBBI = ROOT / 'gioco-dilemmi' / 'data' / 'domande.db'
-QUIZZ = ROOT / 'gioco-quizzland' / 'data' / 'domande.db'
 WORDLE_DATA = ROOT / 'gioco-zerowordle' / 'data'
 CONTEXT_DATA = ROOT / 'gioco-zerocontext' / 'data'
 # ZeroAssociazioni: il DB di lavoro, uno schema per ognuno dei sei DB storici (gioco-zeroassociations/unified_db.py).
@@ -60,12 +60,12 @@ PAROLE_FILES = {
 }
 SEED = ROOT / 'apps' / 'server' / 'src' / 'content.seed.json'
 
-db = SchemaDb(FILE, {DUBBI: 'dubbi', QUIZZ: 'quizz'}, 'ZEROCADE_GIOCHI_DB')
+db = SchemaDb(FILE, {DUBBI: 'dubbi'}, 'ZEROCADE_GIOCHI_DB')
 connect = db.connect
 exists = db.exists
 active = db.active
 schema_of = db.schema_of
-# Come gli strumenti indicano uno schema: address('quizz') -> database/giochi.sqlite3#quizz.
+# Come gli strumenti indicano uno schema: address('dubbi') -> database/giochi.sqlite3#dubbi.
 address = db.address
 file_of = db.file_of
 
@@ -430,27 +430,6 @@ def verify_files() -> list[str]:
     return problems
 
 
-def _quizz_converted(old: Path) -> Path:
-    """Una copia del vecchio domande.db di ZeroQuizz nel formato attuale (gioco-quizzland/tools/domande.py, migrate):
-    il file resta com'è. La copia sta in una cartella temporanea, cancellata all'uscita."""
-    import atexit
-    import importlib.util
-    import shutil
-    folder = Path(tempfile.mkdtemp(prefix='giochi-quizz-'))
-    atexit.register(shutil.rmtree, folder, ignore_errors=True)
-    copy = folder / 'domande.db'
-    shutil.copyfile(old, copy)
-    spec = importlib.util.spec_from_file_location('quizz_domande', ROOT / 'gioco-quizzland' / 'tools' / 'domande.py')
-    domande = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(domande)
-    con = sqlite3.connect(copy)
-    try:
-        domande.migrate(con, str(copy))
-    finally:
-        con.close()
-    return copy
-
-
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     sub = ap.add_subparsers(dest='command', required=True)
@@ -464,10 +443,11 @@ def main(argv=None) -> int:
     e.add_argument('schema')
     e.add_argument('output', type=Path)
     args = ap.parse_args(argv)
-    sources = {s: p for p, s in ((DUBBI, 'dubbi'), (QUIZZ, 'quizz')) if p.exists()}
-    if 'quizz' in sources and args.command in ('build', 'verify'):
-        # ZeroQuizz's old file has the format before: build and verify use a copy converted the way the tools do.
-        sources['quizz'] = _quizz_converted(sources['quizz'])
+    sources = {s: p for p, s in ((DUBBI, 'dubbi'),) if p.exists()}
+    if args.command in ('build', 'verify'):
+        for p, s in ((DUBBI, 'dubbi'),):
+            if s not in sources:
+                print(f'{s}: il vecchio DB {p} non c\'è, lo schema non si confronta con la sua origine', file=sys.stderr)
     if args.command == 'build':
         print(json.dumps(db.build(sources, args.replace), indent=2))
         _from_files()

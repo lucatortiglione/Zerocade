@@ -15,6 +15,12 @@ export const giochiDb = [process.env.ZEROCADE_GIOCHI_FILE, join(here, 'giochi.sq
   (p): p is string => p !== undefined && existsSync(p),
 )
 
+// ZeroQuizz's questions and answers (database/ZeroQuizz.sqlite3): a database of their own, not a schema of the games'
+// database, which holds the word games. Next to the server in the Windows package, or in the repository.
+export const zeroQuizzDb = [join(here, 'ZeroQuizz.sqlite3'), join(here, '..', '..', '..', 'database', 'ZeroQuizz.sqlite3')].find(
+  (p) => existsSync(p),
+)
+
 export function openSchema(file: string, schema: string): Database.Database {
   const db = new Database(file, { readonly: true, fileMustExist: true })
   db.pragma('busy_timeout = 5000')

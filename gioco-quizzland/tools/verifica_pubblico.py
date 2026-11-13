@@ -233,7 +233,7 @@ def main():
     fingerprint = hashlib.sha256(json.dumps(questions, ensure_ascii=False, sort_keys=True).encode()).hexdigest()
     metadata = {
         "versione": 1, "data": datetime.date(2026, 11, 6).isoformat(),
-        "ambito": "Tutte le domande presenti nello schema quizz di database/giochi.sqlite3, incluse quelle precedentemente non attive. I record già omessi dalle fonti con traduzione [] non sono nel DB e non rientrano in questa revisione.",
+        "ambito": "Tutte le domande presenti in database/ZeroQuizz.sqlite3, incluse quelle precedentemente non attive. I record già omessi dalle fonti con traduzione [] non sono nel DB e non rientrano in questa revisione.",
         "metodo": "Screening automatico di ogni domanda, opzione e originale disponibile; regole trasparenti e decisioni editoriali esplicite nel programma tools/verifica_pubblico.py.",
         "limiti": "Non costituisce lettura editoriale individuale né verifica fattuale completa di tutte le risposte. Le traduzioni poco naturali non sono tutte riconoscibili con regole; assenza dall'elenco non certifica correttezza o idoneità.",
         "stato_db": f"Domande attive: {sum(q['attiva'] for q in questions)} su {len(questions)}. Questo elenco propone esclusioni e non modifica il database; per la revisione delle risposte vedere REVISIONE-RISPOSTE.md.",

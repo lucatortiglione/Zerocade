@@ -1,11 +1,12 @@
-"""The ZeroQuizz questions (quizzland in the code) live in the games' database, schema quizz of
-database/giochi.sqlite3 (tables quizz__domande and quizz__opzioni): the Zerocade server reads them
-from there at start. This tool fills the schema from a CSV and writes it back to one, for anyone
-who edits the questions in a spreadsheet; any SQLite editor (DB Browser for SQLite) works on the
-file directly too.
+"""The ZeroQuizz questions (quizzland in the code) live in a database of their own,
+database/ZeroQuizz.sqlite3: a quiz of questions and answers, kept apart from the word games of
+database/giochi.sqlite3. The Zerocade server reads it at start. This tool fills it from a CSV and
+writes it back to one, for anyone who edits the questions in a spreadsheet; any SQLite editor
+(DB Browser for SQLite) works on the file directly too. ZEROCADE_QUIZZLAND_DB points the tools and
+the server to another file (for example a copy, to try something).
 
 Usage:
-  python tools/domande.py import domande.csv   replaces every question in the schema quizz
+  python tools/domande.py import domande.csv   replaces every question in database/ZeroQuizz.sqlite3
   python tools/domande.py export domande.csv   writes them all out, same columns
   python tools/domande.py stats                counts per category and difficulty, and problems
 
@@ -14,27 +15,27 @@ answers are never shuffled, e.g. Primo/Secondo/Terzo), attiva (0 keeps it out of
 domanda, a, b, c, d (two to four answers: leave c and d empty for fewer), giusta (the letter of
 the right answer), spiegazione (shown with the answer; may be empty).
 
-Schema:
-  domande(id, categoria, difficolta, testo, spiegazione, ordine_fisso, attiva, ordine)
-      ordine keeps the CSV's order
-  opzioni(domanda, posizione, testo, giusta)
-      one row per answer, posizione 0-3 (A-D), exactly one with giusta = 1
+Tables:
+  categorie(n, nome)
+  domande(n, id, categoria, difficolta, testo, spiegazione, giusta, ordine_fisso, attiva, ordine)
+      categoria is categorie.n, giusta the position (0-3 = A-D) of the right answer, ordine the CSV's order
+  opzioni(domanda, posizione, testo)
+      one row per answer: domanda is domande.n, posizione 0-3 (A-D)
 Never reuse the id of a deleted question: the answers Zerocade saves are tied to it, and to
 the position of the answer chosen.
 """
 import argparse
 import csv
 import os
+import sqlite3
 import sys
+from pathlib import Path
 from collections import Counter
 
 ROOT = os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
 
-# The questions live in the games' database: DB is the address of its schema quizz,
-# database/giochi.sqlite3#quizz (ZEROCADE_GIOCHI_DB=legacy goes back to the old data/domande.db).
-sys.path.insert(0, os.path.join(ROOT, "..", "database"))
-import giochi  # noqa: E402
-DB = giochi.address("quizz")
+# The questions: database/ZeroQuizz.sqlite3, or the file ZEROCADE_QUIZZLAND_DB names (the server reads the same).
+DB = os.environ.get("ZEROCADE_QUIZZLAND_DB") or os.path.normpath(os.path.join(ROOT, "..", "database", "ZeroQuizz.sqlite3"))
 LETTERS = "abcd"
 
 # Nothing written twice. A question has a number (n), and its answers carry that number, not the id: the id
@@ -116,22 +117,17 @@ PRAGMA foreign_keys = ON;
 
 def migrate(db, path=DB):
     """Converts the questions of the format before (opzioni with a giusta column) to the current one; False if
-    there is nothing to convert. In the games' database the schema's list of objects is updated too."""
+    there is nothing to convert (an old backup in data/backup-revisione, for example)."""
     columns = {row[1] for row in db.execute("PRAGMA table_info(opzioni)")}
     if "giusta" not in columns:
         return False
     db.executescript(MIGRATE)
-    # The connection notes the tables it created in the list of objects: that write has to be committed before
-    # the list is rebuilt from another connection.
-    db.commit()
-    if giochi.schema_of(path) and giochi.active():
-        giochi.db.register_objects(giochi.schema_of(path))
     return True
 
 
 def connect(path=DB):
     os.makedirs(os.path.dirname(path), exist_ok=True)
-    db = giochi.connect(path)
+    db = sqlite3.connect(path)
     migrate(db, path)
     db.execute("PRAGMA foreign_keys = ON")
     db.executescript(SCHEMA)
@@ -141,14 +137,14 @@ def connect(path=DB):
 def load(path=DB):
     """Every question in order: {id, categoria, difficolta, ordine_fisso, attiva, domanda,
     spiegazione, opzioni: [text, ...], giusta: index}."""
-    if not giochi.exists(path):
+    if not os.path.exists(path):
         sys.exit(f"{path} not found: create it with  python tools/domande.py import <file.csv>")
-    db = giochi.connect(f"file:{path}?mode=ro", uri=True)
+    db = sqlite3.connect(f"file:{Path(path).as_posix()}?mode=ro", uri=True)
     if "giusta" in {row[1] for row in db.execute("PRAGMA table_info(opzioni)")}:
         # The format before: converted once (connect), then read.
         db.close()
         connect(path).close()
-        db = giochi.connect(f"file:{path}?mode=ro", uri=True)
+        db = sqlite3.connect(f"file:{Path(path).as_posix()}?mode=ro", uri=True)
     out = {}
     right = {}
     for row in db.execute(

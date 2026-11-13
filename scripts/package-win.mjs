@@ -10,8 +10,10 @@
 //   app/wordgen-worker.mjs          ZeroWords' level generator, run in a worker thread
 //   app/public/{dashboard,overlay}  the built pages
 //   app/giochi.sqlite3              the games' database (database/giochi.sqlite3), one schema per game:
-//                                   questions, word lists, ZeroAssociazioni's verified pools, ZeroWords'
+//                                   Bivio's dilemmas, word lists, ZeroAssociazioni's verified pools, ZeroWords'
 //                                   lexicon and the other games' content
+//   app/ZeroQuizz.sqlite3           ZeroQuizz's questions and answers (database/ZeroQuizz.sqlite3), a database
+//                                   of their own
 //   app/zerocontext/vectors.bin     ZeroContext's vectors (gioco-zerocontext/data)
 //   app/CREDITI-parole.txt          the credits of ZeroWords' word list
 //   app/node_modules/better-sqlite3 the prebuilt win32-x64 SQLite binding
@@ -76,7 +78,7 @@ cpSync(join(root, 'apps', 'overlay', 'dist'), join(app, 'public', 'overlay'), { 
 // The games' database: every game's content, one schema each (apps/server/src/schema-db.ts). It must
 // be verified and have them all: the package has no other copy of the pools, words and banks.
 const giochi = join(root, 'database', 'giochi.sqlite3')
-const SCHEMAS = ['dubbi', 'quizz', 'wordle', 'context', 'associazioni', 'parole', 'contenuti']
+const SCHEMAS = ['dubbi', 'wordle', 'context', 'associazioni', 'parole', 'contenuti']
 {
   const Database = createRequire(join(root, 'apps', 'server', 'package.json'))('better-sqlite3')
   const db = new Database(giochi, { readonly: true, fileMustExist: true })
@@ -90,6 +92,19 @@ const SCHEMAS = ['dubbi', 'quizz', 'wordle', 'context', 'associazioni', 'parole'
   }
 }
 copyFileSync(giochi, join(app, 'giochi.sqlite3'))
+// ZeroQuizz: its questions are a database of their own (apps/server/src/quizzland.ts); without it the game has none.
+const zeroQuizz = join(root, 'database', 'ZeroQuizz.sqlite3')
+{
+  const Database = createRequire(join(root, 'apps', 'server', 'package.json'))('better-sqlite3')
+  const db = new Database(zeroQuizz, { readonly: true, fileMustExist: true })
+  const questions = db.prepare('SELECT count(*) FROM domande WHERE attiva = 1').pluck().get()
+  db.close()
+  if (!questions) {
+    console.error('✗ database/ZeroQuizz.sqlite3 has no active questions')
+    process.exit(1)
+  }
+}
+copyFileSync(zeroQuizz, join(app, 'ZeroQuizz.sqlite3'))
 // ZeroContext: the vectors of the playable words, in their order (apps/server/src/context.ts).
 mkdirSync(join(app, 'zerocontext'), { recursive: true })
 copyFileSync(join(root, 'gioco-zerocontext', 'data', 'vectors.bin'), join(app, 'zerocontext', 'vectors.bin'))
@@ -258,10 +273,11 @@ writeFileSync(
     '',
     'IL DATABASE DEI GIOCHI',
     '  app\\giochi.sqlite3, un database SQLite con uno "schema" per gioco: il prefisso delle',
-    '  tabelle. dubbi__ (ZeroDubbi), quizz__ (ZeroQuizz), wordle__ (ZeroWordle), context__',
-    '  (ZeroContext), associazioni__ (ZeroAssociazioni e ZeroReazioniACatena), parole__',
-    '  (ZeroWords), contenuti__ (gli altri giochi). I vettori di ZeroContext sono a parte, in',
-    '  app\\zerocontext\\vectors.bin.',
+    '  tabelle. dubbi__ (ZeroDubbi), wordle__ (ZeroWordle), context__ (ZeroContext),',
+    '  associazioni__ (ZeroAssociazioni e ZeroReazioniACatena), parole__ (ZeroWords),',
+    '  contenuti__ (gli altri giochi). I vettori di ZeroContext sono a parte, in',
+    '  app\\zerocontext\\vectors.bin. Le domande di ZeroQuizz hanno un database a sé,',
+    '  app\\ZeroQuizz.sqlite3.',
     '',
     'DOMANDE DI BIVIO',
     '  app\\giochi.sqlite3, tabella dubbi__dilemmi (id, categoria, difficolta, esplicita,',
@@ -271,10 +287,10 @@ writeFileSync(
     '  i voti salvati sono legati all\'id.',
     '',
     'DOMANDE DI ZEROQUIZZ',
-    '  app\\giochi.sqlite3, tabella quizz__domande (n, id, categoria, difficolta 1-3, testo,',
-    '  spiegazione, giusta, ordine_fisso, attiva, ordine), tabella quizz__opzioni (domanda,',
-    '  posizione 0-3 = A-D, testo) e tabella quizz__categorie (n, nome). Le risposte di una',
-    '  domanda hanno in "domanda" il suo numero n; la categoria è il numero n di quizz__categorie;',
+    '  app\\ZeroQuizz.sqlite3, tabella domande (n, id, categoria, difficolta 1-3, testo,',
+    '  spiegazione, giusta, ordine_fisso, attiva, ordine), tabella opzioni (domanda,',
+    '  posizione 0-3 = A-D, testo) e tabella categorie (n, nome). Le risposte di una',
+    '  domanda hanno in "domanda" il suo numero n; la categoria è il numero n di categorie;',
     '  giusta è la posizione della risposta giusta (0-3 = A-D) e deve essere una delle risposte',
     '  della domanda. attiva = 0 tiene fuori una domanda; ordine_fisso = 1 non mescola le',
     '  risposte. Si modifica con DB Browser for SQLite (con "Write Changes"), poi riavvia',

@@ -1,8 +1,8 @@
 """Più DB SQLite in un solo file, uno "schema" ciascuno.
 
 SQLite non ha schemi dentro un file: qui lo schema è il prefisso `<schema>__` di tabelle, indici, viste e
-trigger. Uno schema si indica come `<file unico>#<schema>` (address: database/giochi.sqlite3#quizz), la stessa
-scrittura del server; il vecchio percorso del DB a sé (gioco-quizzland/data/domande.db) indica ancora lo stesso
+trigger. Uno schema si indica come `<file unico>#<schema>` (address: database/giochi.sqlite3#dubbi), la stessa
+scrittura del server; il percorso del vecchio DB a sé (gioco-dilemmi/data/domande.db) indica ancora lo stesso
 schema. Gli strumenti scrivono l'SQL con i nomi senza prefisso, che viene riscritto al volo. È lo stesso meccanismo di gioco-zeroassociations/unified_db.py, qui generico (database/giochi.py).
 """
 from __future__ import annotations
@@ -153,7 +153,7 @@ class SchemaDb:
     # --- uso da parte degli strumenti ---
 
     def address(self, schema: str) -> str:
-        """Come si indica uno schema: `<file unico>#<schema>`, per esempio database/giochi.sqlite3#quizz (la stessa
+        """Come si indica uno schema: `<file unico>#<schema>`, per esempio database/giochi.sqlite3#dubbi (la stessa
         scrittura del server). Gli strumenti lo passano come un percorso."""
         if schema not in self.schemas.values():
             raise ValueError(f'Schema sconosciuto: {schema}')
@@ -171,7 +171,7 @@ class SchemaDb:
 
     def schema_of(self, path) -> str | None:
         """Lo schema indicato da `path`: l'indirizzo `<file unico>#<schema>`, oppure il vecchio percorso del DB a sé
-        (gioco-quizzland/data/domande.db, …), che vale ancora."""
+        (gioco-dilemmi/data/domande.db, …), che vale ancora."""
         _, text, _ = self._split_uri(path)
         try:
             if '#' in text:

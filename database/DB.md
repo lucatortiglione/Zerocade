@@ -1,11 +1,12 @@
 # I file .sqlite3 di `database/`
 
-Situazione al 13/11/2026: due file, ed entrambi servono.
+Situazione al 13/11/2026: tre file, e tutti servono.
 
 | File | Peso | In Git | A che cosa serve |
 | --- | ---: | :---: | --- |
-| `giochi.sqlite3` | 18 MB | sì | Il DB dei giochi: uno schema per gioco, letto dal server e dal pacchetto Windows |
+| `giochi.sqlite3` | 11 MB | sì | Il DB dei giochi di parole: uno schema per gioco, letto dal server e dal pacchetto Windows |
 | `parole_ita_raw.sqlite3` | 2,3 GB | no | Il DB di lavoro di ZeroAssociazioni: i sei DB storici, uno schema ciascuno |
+| `ZeroQuizz.sqlite3` | 7 MB | sì | Il DB di ZeroQuizz: domande e risposte, un gioco a sé (era `gioco-quizzland/data/domande.db`, poi lo schema `quizz` di `giochi.sqlite3`). Lo leggono il server e il pacchetto Windows |
 
 `parole_ita_raw.sqlite3` non è in Git perché supera i 100 MB, il limite di GitHub per un file (`.gitignore`).
 
@@ -16,7 +17,6 @@ Il DB che i giochi leggono, in sola lettura. Sta in Git e va nel pacchetto Windo
 | Schema | Gioco |
 | --- | --- |
 | `dubbi` | ZeroDubbi |
-| `quizz` | ZeroQuizz |
 | `wordle` | ZeroWordle |
 | `context` | ZeroContext (le parole; i vettori sono in `gioco-zerocontext/data/vectors.bin`) |
 | `associazioni` | ZeroAssociazioni e ZeroReazioniACatena: solo i prompt, le parole (ognuna una volta) e i collegamenti |
@@ -150,4 +150,4 @@ poi i file sono stati cancellati:
 | --- | --- |
 | `apps/server/data/zerocade.db` | **Sì**: sessioni, eventi, classifiche, voti e progressi della diretta |
 | `apps/server/data/content.db` | No: la banca dei giochi ora è lo schema `contenuti`. Il server lo crea solo se quello schema manca |
-| `gioco-dilemmi/data/domande.db`, `gioco-quizzland/data/domande.db` | No: sono le copie di prima di `dubbi` e `quizz`. Servono solo a `giochi.py build --replace` e a `ZEROCADE_GIOCHI_DB=legacy` |
+| `gioco-dilemmi/data/domande.db` | No: è la copia di prima di `dubbi`. Serve solo a `giochi.py build --replace`, a `verify` e a `ZEROCADE_GIOCHI_DB=legacy` |

@@ -8,6 +8,6 @@ data
 .env
 .env.*
 release
-# ZeroQuizz's questions (gioco-quizzland) are the game's content, kept in git: the server only reads them.
+# ZeroQuizz's sources, translations and reviews (gioco-quizzland/data) are kept in git. Its questions are in
+# database/ZeroQuizz.sqlite3 (.sqlite3, not ignored); a domande.db back in the old place stays out (*.db).
 !gioco-quizzland/data/
-!gioco-quizzland/data/domande.db
