@@ -1,4 +1,4 @@
-# `prompt_filtrati.sqlite3`: contenuto, criteri e verifiche
+# Lo schema `filtrati`: contenuto, criteri e verifiche
 
 Documento aggiornato il **9 novembre 2026**, sulla base del codice locale di
 [filter_prompts.py](filter_prompts.py), [review_prompts.py](review_prompts.py) e
@@ -6,7 +6,7 @@ Documento aggiornato il **9 novembre 2026**, sulla base del codice locale di
 
 ## 1. A cosa serve questo database
 
-`prompt_filtrati.sqlite3` serve a organizzare i **candidati al ruolo di prompt**
+Lo schema `filtrati` del DB di lavoro (`database/parole_ita_raw.sqlite3`) serve a organizzare i **candidati al ruolo di prompt**
 raccolti dalle fonti e a distinguere quelli ancora da revisionare da quelli che
 hanno già una revisione positiva documentata.
 
@@ -31,17 +31,17 @@ Non si devono inventare sette associazioni per poterlo conservare nel catalogo.
 
 ## 2. Rapporto con gli altri database
 
-| File | Ruolo nel flusso |
+| Schema | Ruolo nel flusso |
 |---|---|
-| `prompt_raw.sqlite3` | Archivio principale: voci raccolte, attestazioni, fonti, istantanee delle fonti, revisioni, decisioni e relativo storico |
-| `prompt_filtrati.sqlite3` | Copia ricostruibile: preselezione automatica, diagnostica dei filtri e, nello schema aggiornato, copia dei prompt con revisione positiva, anche senza risposte |
-| `prompt_scartati.sqlite3` | Copia delle esclusioni automatiche e degli scarti editoriali espliciti, con motivazione; i rinvii `DEFERRED` non sono scarti definitivi |
-| `prompt_validi.sqlite3` | Nel codice attuale di `sync_validated`, copia dei prompt validati che hanno anche un bacino verificato dello stesso senso, categoria, POS e lingua |
-| `prompt.sqlite3` | Database di distribuzione dei bacini verificati del gioco, distinto dall'inventario completo |
+| `raw` | Archivio principale: voci raccolte, attestazioni, fonti, istantanee delle fonti, revisioni, decisioni e relativo storico |
+| `filtrati` | Copia ricostruibile: preselezione automatica, diagnostica dei filtri e, nello schema aggiornato, copia dei prompt con revisione positiva, anche senza risposte |
+| `scartati` | Copia delle esclusioni automatiche e degli scarti editoriali espliciti, con motivazione; i rinvii `DEFERRED` non sono scarti definitivi |
+| `validi` | Nel codice attuale di `sync_validated`, copia dei prompt validati che hanno anche un bacino verificato dello stesso senso, categoria, POS e lingua |
+| `game` | I bacini verificati, come viste sulla raccolta, distinti dall'inventario completo |
 
 Il criterio dell'ultima sincronizzazione implementata è quindi: **un prompt
-validato senza bacino resta registrato nella raccolta e viene riportato in
-`prompt_filtrati.sqlite3`; entra nella copia `prompt_validi.sqlite3` quando esiste
+validato senza bacino resta registrato nella raccolta e viene riportato nello
+schema `filtrati`; entra nella copia, lo schema `validi`, quando esiste
 anche il bacino corrispondente verificato**.
 
 Le copie già presenti su disco possono essere state generate da una versione
@@ -282,7 +282,7 @@ grammaticali né accezioni rare per raggiungere sette risposte.
 
 ## 6. Come viene documentata e controllata la revisione
 
-I verbali positivi vengono registrati in `prompt_raw.sqlite3`:
+I verbali positivi vengono registrati nella raccolta (schema `raw`):
 
 - `prompt_validations` conserva i verbali identificati dal relativo hash;
 - `prompt_validation_heads` indica il verbale corrente di ciascun prompt;
@@ -375,7 +375,7 @@ Non è l'elenco completo di tutte le esclusioni dell'inventario. Locuzioni,
 forme non canoniche, voci prive di prova di lemma e parole sotto soglia possono
 essere escluse prima e non comparire qui.
 
-La copia completa delle esclusioni è `prompt_scartati.sqlite3`, che distingue
+La copia completa delle esclusioni è lo schema `scartati`, che distingue
 `AUTOMATIC_FILTER` da `EDITORIAL_DECISION`. `DEFERRED` resta fuori dagli scarti
 definitivi. Una revisione positiva corrente può prevalere su un'esclusione
 automatica; una decisione esplicita negativa può bloccare il prompt.
@@ -471,7 +471,7 @@ Dalla cartella `gioco-zeroassociations`, in PowerShell:
 .venv/Scripts/python.exe -B filter_prompts.py build
 ```
 
-Il task VS Code **«Prompt: filtra i candidati (prompt_filtrati.sqlite3)»**
+Il task VS Code **«Prompt: filtra i candidati (schema filtrati)»**
 esegue la ricostruzione. Non produce una revisione semantica LLM.
 
 Il task **«Prompt: aggiorna filtrati e validi dopo nuove parole (refresh)»** ha
@@ -535,7 +535,7 @@ candidati effettivamente ancora in attesa.
 L'ispezione è stata eseguita in sola lettura. **Per scrivere questo documento
 non è stato ricostruito né modificato alcun database.**
 
-Il file `prompt_filtrati.sqlite3` presente al momento del controllo dichiara:
+Il file `prompt_filtrati.sqlite3` (oggi lo schema `filtrati`) presente al momento del controllo dichiara:
 
 | Dato | Valore osservato |
 |---|---|

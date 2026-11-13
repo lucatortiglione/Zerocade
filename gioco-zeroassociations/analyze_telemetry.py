@@ -1,7 +1,7 @@
 """Cosa dice la chat sui bacini: difficoltà misurata, parole mai trovate, associazioni attese.
 
 Legge i CSV che la dashboard scarica con ZeroAssociazioni selezionato (Round e Tentativi:
-/api/word-association/rounds.csv e guesses.csv) e, se c'è, prompt.sqlite3 per conoscere i
+/api/word-association/rounds.csv e guesses.csv) e, se c'è, lo schema game del DB di lavoro per conoscere i
 bacini interi. Scrive un rapporto JSON e, a richiesta, le parole che la chat scrive spesso e che
 il bacino non contiene, come proposte da revisionare (AWAITING_SEMANTIC_REVIEW).
 
@@ -132,7 +132,7 @@ def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument('--guesses', type=Path, required=True, help='CSV «Tentativi» (word-association-tentativi.csv)')
     ap.add_argument('--rounds', type=Path, help='CSV «Round» (word-association-round.csv): round completati')
-    ap.add_argument('--db', type=Path, default=DEFAULT_DB, help='prompt.sqlite3, per i bacini interi (facoltativo)')
+    ap.add_argument('--db', type=Path, default=DEFAULT_DB, help='i bacini verificati (schema game del DB di lavoro), per i bacini interi (facoltativo)')
     ap.add_argument('--output', type=Path, help='Rapporto JSON (non sovrascrive un file esistente)')
     ap.add_argument('--proposals', type=Path, help='JSONL delle parole candidate, da revisionare')
     ap.add_argument('--min-rounds', type=int, default=5, help='Round minimi per misurare una parola')

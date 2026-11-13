@@ -21,9 +21,11 @@ I conteggi aggiornati sono in [stato e ripresa](ASSOCIAZIONI_FILTRATI.md) e nel
    `free_association_llm.py propose`). Ogni parola si verifica con le [regole](REGOLE.md).
 3. **Importazione**: `prompt_database.py import-reviewed` accetta solo bacini con
    verbale completo ([PROMPT_DATABASE.md](PROMPT_DATABASE.md)) nella raccolta
-   `prompt_raw.sqlite3`, e aggiorna subito `prompt.sqlite3`, il database del gioco.
-   `validated_prompt_database.py sync` ne ricava `prompt_validi.sqlite3`, la copia
+   (schema `raw`); lo schema `game`, i soli bacini, è fatto di viste sulla raccolta.
+   `validated_prompt_database.py sync` ne ricava lo schema `validi`, la copia
    dei prompt validati insieme alle loro parole associate (solo quelli con un bacino).
+   Sono schemi del DB unico `database/parole_ita_raw.sqlite3`; il gioco li vede dopo
+   `python database/giochi.py aggiorna associazioni`.
 4. **Gioco**: a ogni round il server estrae 7 o 8 parole dal bacino, rispettando
    gruppi di equivalenti e coppie incompatibili. Per Livecade: `livecade` (7 parole).
 5. **Telemetria**: la dashboard scarica i CSV «Round» e «Tentativi» del gioco.
@@ -44,66 +46,72 @@ Dalla cartella `gioco-zeroassociations`, con `.venv/Scripts/python.exe -B`:
 | `prompt_inventory.py collect` | Raccoglie l'inventario dei prompt (task «1. Prompt: raccogli…») |
 | `prompt_database.py import-reviewed FILE.jsonl` | Importa bacini già revisionati, tutto o niente |
 | `prompt_database.py status` | Conteggi e integrità del DB |
-| `prompt_database.py dump` | Rigenera `prompt.sqlite3` dalla raccolta (solo bacini, senza inventario) |
+| `prompt_database.py dump` | Ricrea lo schema `game`, viste sui bacini della raccolta (senza inventario); con `--output FILE` scrive i bacini in un DB a sé |
 | `prompt_database.py livecade --count N` | CSV per Livecade: N prompt, 7 risposte ciascuno |
 | `prompt_database.py register-directives` | Dopo un ritocco al testo delle direttive che non cambia le regole |
 | `inventory_updates.py …` | Aggiornamenti delle fonti e decisioni sulle voci (task «Fonti: …» e «Voci: …») |
-| `validated_prompt_database.py sync` | Rigenera `prompt_validi.sqlite3` dai verbali correnti |
+| `validated_prompt_database.py sync` | Rigenera lo schema `validi` dai verbali correnti |
 | `analyze_telemetry.py --guesses T.csv --rounds R.csv --output rapporto.json --proposals proposte.jsonl` | Analisi della chat |
 | `free_association_llm.py --output r.json recall` | Giocatori simulati sui bacini (LLM locale) |
 | `free_association_llm.py --output b.jsonl propose mare sole` | Bozze di bacino per prompt nuovi |
 | `qwen_associations.py drafts` | Bozze Qwen locali per i prompt senza bacino, da rivedere (task «Associazioni: continua con Qwen…») |
 | `qwen_associations.py solo` | Solo Qwen: bozza e autoverifica; importa solo se il pilota delle associazioni è superato |
 | `final_associations.py import` | Importa i lotti rivisti dagli agenti nella raccolta |
-| `final_associations.py build --sync` | Rigenera `prompt_finale.sqlite3`: prompt, parole uniche e collegamenti |
+| `final_associations.py build --sync` | Rigenera lo schema `finale`: prompt, parole uniche e collegamenti |
 
 `npm run test:associations`, dalla radice del progetto, esegue i test Python e quelli del gioco.
 
 ## Dove legge il gioco
 
-Il server usa, in sola lettura, la prima fonte che contiene bacini:
-`prompt_validi.sqlite3`, poi `prompt.sqlite3` (in Git: un clone appena scaricato
-ha già i prompt), poi la raccolta `prompt_raw.sqlite3`. Solo i prompt con
-revisione `verified`, nel senso indicato da `prompts.familiar_sense`; mai quelli
-che la raccolta segna `DISCARDED` o `DEFERRED`. Se `prompt.sqlite3` è indietro
-rispetto alla raccolta, il log del server lo dice. I bacini nuovi compaiono al
-riavvio di Zerocade. Il pacchetto Windows include un database ridotto ai soli bacini
-(`zeroassociations.db`, circa 2 MB).
+Il server legge, in sola lettura, lo schema `associazioni` del DB dei giochi
+(`database/giochi.sqlite3`, in Git): i soli bacini che il gioco usa, copiati dal DB
+di lavoro con `python database/giochi.py aggiorna associazioni` (dalla radice del
+progetto). Solo i prompt con revisione `verified`, nel senso indicato da
+`prompts.familiar_sense`; mai quelli che la raccolta segna `DISCARDED` o `DEFERRED`.
+Se la copia è indietro rispetto al DB di lavoro, il log del server lo dice. Senza lo
+schema il server legge il DB di lavoro (`#validi`, poi `#game`, poi `#raw`). I bacini
+nuovi compaiono dopo la copia e un riavvio di Zerocade. Il pacchetto Windows ha
+soltanto `giochi.sqlite3`.
 
 ## Il DB unico
 
-`zeroassociazioni.sqlite3` riunisce i sei DB qui sotto in un solo file, uno **schema** ciascuno. In SQLite
-lo schema è il prefisso `<schema>__` di tabelle, indici, viste e trigger: `raw` (prompt_raw.sqlite3),
-`game` (prompt.sqlite3), `validi`, `filtrati`, `finale`, `scartati`. Non è in Git (pesa gigabyte).
+`database/parole_ita_raw.sqlite3` riunisce i sei DB storici in un solo file, uno **schema** ciascuno. In
+SQLite lo schema è il prefisso `<schema>__` di tabelle, indici, viste e trigger: `raw`, `game`, `validi`,
+`filtrati`, `finale`, `scartati`, più `candidati`, nato nel DB unico. Non è in Git (2,3 GB). Si chiamava
+`zeroassociazioni.sqlite3`. Sta nella cartella `database/` del repository (`unified_db.DB_DIR`), non accanto
+agli script; [database/DB.md](../database/DB.md) spiega ogni file.
 
-- `unified_db.py build` lo crea copiando i sei DB, che restano dove sono; `verify` confronta ogni
-  tabella con il file d'origine (righe e contenuto) e solo allora il DB unico viene usato;
-  `status` mostra schemi, oggetti e righe; `export SCHEMA FILE` riscrive uno schema come DB a sé.
-- Gli script non cambiano: continuano a indicare `prompt_raw.sqlite3`, `prompt_validi.sqlite3`, …, e
-  quel percorso significa lo schema corrispondente del DB unico. L'SQL resta scritto coi nomi senza
-  prefisso e viene riscritto al volo (`SQLite` in `sqlite_prompt_runtime.py`, `unified_db.connect`). Un
+- I sei file storici sono stati cancellati il 13/11, dopo il confronto riga per riga con i loro schemi:
+  `unified_db.py build`, che creava il DB unico copiandoli, non ha più da dove copiare. Va tenuta una
+  copia di sicurezza del DB unico. `verify` confronta una tabella con il file d'origine solo se quel file
+  c'è; `status` mostra schemi, oggetti e righe; `export SCHEMA FILE` riscrive uno schema come DB a sé.
+- Gli script indicano uno schema come `database/parole_ita_raw.sqlite3#raw` (`unified_db.address('raw')`), la
+  stessa scrittura del server. Il vecchio nome del file (`prompt_raw.sqlite3`, …), che compare nei metadati e
+  nelle ricevute già scritti, indica ancora lo stesso schema (`unified_db.same_db`). L'SQL resta scritto coi
+  nomi senza prefisso e viene riscritto al volo (`SQLite` in `sqlite_prompt_runtime.py`, `unified_db.connect`). Un
   file con un altro nome (le copie temporanee, i test) è un DB normale. Le copie ricostruite
   (`publish_database`) sostituiscono lo schema in una transazione.
-- Il server e il pacchetto Windows leggono `zeroassociazioni.sqlite3#validi`, poi `#game`, poi `#raw`.
-- `ZEROASSOC_DB=legacy` fa tornare gli script ai vecchi file. I vecchi file non vengono più aggiornati
-  quando il DB unico è in uso: si possono cancellare dopo `verify`, ma conviene conservarne una copia.
+- Il server legge la copia nello schema `associazioni` di `database/giochi.sqlite3`; senza, legge
+  `parole_ita_raw.sqlite3#validi`, poi `#game`, poi `#raw`.
+- `ZEROASSOC_DB=legacy` faceva tornare gli script ai vecchi file, che non ci sono più.
 
 ## File
 
-- `prompt_raw.sqlite3`: la raccolta, database operativo unico, esclusa da Git (con
-  l'inventario pesa gigabyte).
-- `prompt.sqlite3`: i bacini verificati e le decisioni sulle voci, versionato: è il
-  database del gioco.
-- `prompt_finale.sqlite3`: la copia finale per prompt e parole. Tabelle `prompts`, `words`
+Gli schemi del DB unico (fra parentesi il nome del file storico, che indica ancora lo stesso schema).
+
+- `raw` (`prompt_raw.sqlite3`): la raccolta, database operativo (con l'inventario è quasi tutto il file).
+- `game` (`prompt.sqlite3`): i bacini verificati e le decisioni sulle voci, come viste sulle tabelle di `raw`.
+- `finale` (`prompt_finale.sqlite3`): la copia finale per prompt e parole. Tabelle `prompts`, `words`
   (ogni parola una sola volta) e `prompt_words` (collegamenti molti a molti, con motivazione
   per coppia); viste `prompt_word_list` e `word_usage`. Contiene solo bacini verificati.
-- `prompt_validi.sqlite3`: i prompt validati con le loro parole associate, esclusa da Git
+- `validi` (`prompt_validi.sqlite3`): i prompt validati con le loro parole associate
   (si rigenera con `sync`).
-- `prompt_filtrati.sqlite3`: candidati preselezionati automaticamente e, nella tabella
+- `filtrati` (`prompt_filtrati.sqlite3`): candidati preselezionati automaticamente e, nella tabella
   `validated_prompts`, le parole verificate come prompt (senso e categoria) ancora senza
   associazioni; la vista `review_state` separa `VALIDATO` da `DA_RIVEDERE`.
-- `prompt_scartati.sqlite3`: scarti dei filtri e scarti espliciti, con motivo e
+- `scartati` (`prompt_scartati.sqlite3`): scarti dei filtri e scarti espliciti, con motivo e
   provenienza; vedere [candidati, voci valide e scarti](PROMPT_SCARTATI.md).
+- `candidati`: le parole dei filtrati giudicate buoni prompt; vedere [database/DB.md](../database/DB.md).
 - `prompt_schema.sql`, `prompt_inventory_schema.sql`: schemi.
 - `resources/policy_versions.json`: per ogni testo delle direttive, la versione
   delle regole (`SEMANTIC_POLICY`) con cui i bacini sono stati revisionati.

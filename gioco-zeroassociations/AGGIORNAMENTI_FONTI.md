@@ -1,6 +1,6 @@
 # Database unico, aggiornamenti e decisioni
 
-Il database operativo è la raccolta **`prompt_raw.sqlite3`**. Contiene voci raccolte,
+Il database operativo è la raccolta, **schema `raw` di `database/parole_ita_raw.sqlite3`**. Contiene voci raccolte,
 attestazioni, fonti, versioni, confronti, decisioni, storico e bacini verificati.
 Non esiste un database operativo separato per ciascuna fonte.
 
@@ -104,9 +104,10 @@ consistente in `database-backups/`, con nome progressivo temporale, senza
 sovrascrivere backup esistenti. È una copia di conservazione del medesimo
 database, non un secondo archivio operativo.
 
-Il piccolo `prompt.sqlite3` (i bacini del gioco, versionato) conserva i bacini
-verificati e le decisioni sulle voci, così il gioco e il ripristino rispettano
-anche le esclusioni: dopo una decisione si aggiorna con `prompt_database.py dump`. Non contiene
+Lo schema `game` (i bacini del gioco) mostra i bacini verificati e le decisioni
+sulle voci, come viste sulla raccolta, così il gioco e il ripristino rispettano
+anche le esclusioni: è sempre aggiornato; `prompt_database.py dump --output FILE`
+li scrive in un DB a sé. Non contiene
 le grandi attestazioni, i download preparati e i confronti integrali: per
 conservare tutto questo, incluse le decisioni, serve il backup SQLite completo.
 I dati grezzi si possono riscaricare; le decisioni dell'utente non si ricavano

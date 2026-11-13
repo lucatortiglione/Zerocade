@@ -1,4 +1,4 @@
-"""Import a Livecade "Would You Rather" CSV into the questions database (data/domande.db).
+"""Import a Livecade "Would You Rather" CSV into the questions database (schema dubbi of database/giochi.sqlite3).
 
 The reverse of tools/to_livecade.py: the columns are recognised the same way (and --map
 takes the same JSON file), Livecade's category and difficulty values are turned back into
@@ -39,7 +39,7 @@ def norm(value):
 def main():
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("csv", help="a Livecade Would You Rather CSV (an export, or a file from to_livecade.py)")
-    ap.add_argument("--db", default=DB, help="the questions database (default data/domande.db)")
+    ap.add_argument("--db", default=DB, help="the questions database (default: schema dubbi of database/giochi.sqlite3)")
     ap.add_argument("--lang", help="language code (it, en, ...) when the file has no language column")
     ap.add_argument("--map", help='JSON: {"columns": {"Header": "role"}, "category_values": {...}, "difficulty_values": {...}}, as for to_livecade.py')
     ap.add_argument("--category", default="dilemmi", help="our category for Livecade values we do not know (default dilemmi)")

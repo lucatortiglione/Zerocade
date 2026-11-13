@@ -78,14 +78,15 @@ def change(db_path, restore=False):
     if not pending:
         print("Nessuna modifica: tutte le decisioni sono già nello stato richiesto.")
         return
-    backup_dir = db_path.parent / "backup-revisione"
+    # The backups stay in gioco-quizzland/data, whatever the database (db_path can be the schema's address).
+    backup_dir = Path(domande.ROOT) / "data" / "backup-revisione"
     backup_dir.mkdir(exist_ok=True)
     backup_path = backup_dir / ("domande-" + datetime.now().strftime("%Y%m%d-%H%M%S-%f") + ".db")
     # The backup is the questions alone, as a database of their own (in the games' database: its schema quizz).
     if domande.giochi.schema_of(db_path) and domande.giochi.active():
         domande.giochi.db.export_schema(domande.giochi.db.schema_of(db_path), backup_path)
     else:
-        with closing(sqlite3.connect(db_path)) as db, closing(sqlite3.connect(backup_path)) as backup:
+        with closing(sqlite3.connect(domande.giochi.file_of(db_path))) as db, closing(sqlite3.connect(backup_path)) as backup:
             db.backup(backup)
     with closing(domande.giochi.connect(db_path)) as db, db:
         db.execute("PRAGMA foreign_keys = ON")
@@ -95,13 +96,13 @@ def change(db_path, restore=False):
         if any(not same(locked[q["id"]], current[q["id"]]) for q in pending):
             raise ValueError("Il database è cambiato durante la preparazione; operazione annullata")
         for q in pending:
-            db.execute("UPDATE domande SET testo=?, spiegazione=?, attiva=?, ordine_fisso=? WHERE id=?",
-                       (q["domanda"], q["spiegazione"], int(q["attiva"]), int(q["ordine_fisso"]), q["id"]))
-            # Clear the old key first to respect the unique partial index if it changes.
-            db.execute("UPDATE opzioni SET giusta=0 WHERE domanda=?", (q["id"],))
+            # The right answer is a column of the question (its position); the answers are found by the question's
+            # number. The foreign key from giusta to the answers is checked at commit.
+            db.execute("UPDATE domande SET testo=?, spiegazione=?, attiva=?, ordine_fisso=?, giusta=? WHERE id=?",
+                       (q["domanda"], q["spiegazione"], int(q["attiva"]), int(q["ordine_fisso"]), q["giusta"], q["id"]))
             for pos, option in enumerate(q["opzioni"]):
-                db.execute("UPDATE opzioni SET testo=?, giusta=? WHERE domanda=? AND posizione=?",
-                           (option, int(pos == q["giusta"]), q["id"], pos))
+                db.execute("UPDATE opzioni SET testo=? WHERE domanda=(SELECT n FROM domande WHERE id=?) AND posizione=?",
+                           (option, q["id"], pos))
         if db.execute("PRAGMA integrity_check").fetchone()[0] != "ok" or db.execute("PRAGMA foreign_key_check").fetchall():
             raise ValueError("Verifica integrità fallita: transazione annullata")
     print(f"{'Ripristinate' if restore else 'Applicate'} {len(pending)} decisioni. Backup: {backup_path}")

@@ -7,7 +7,7 @@ sheet   scheda compatta da leggere: indice, parola, POS, frequenza, segnalazioni
 check   controlla le bozze (una riga per indice) senza registrare nulla
 record  unisce le bozze di un intervallo completo in un file di decisioni verificabile
 import  importa le decisioni nella raccolta (review_prompts.import_decisions), poi rigenera
-        prompt_filtrati.sqlite3 (con le voci valide) e prompt_scartati.sqlite3
+        gli schemi filtrati (con le voci valide) e scartati
 import-chatgpt  importa un lotto annotato da ChatGPT e rimasto senza importazione, a nome di
         ChatGPT; le righe corrette dal coordinatore entrano a nome di Claude
 

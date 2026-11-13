@@ -175,8 +175,8 @@ class ReviewPipelineTests(unittest.TestCase):
         discarded = self.dir/'prompt_scartati.sqlite3'
         before = discarded.read_bytes()
         self.db.run("INSERT INTO inventory_terms(prompt,is_single_word,has_lemma_evidence,has_inflected_evidence,"
-                    "has_proper_name_evidence,has_it_dictionary_evidence,review_status) "
-                    "VALUES ('nuovaparola',1,1,0,0,1,'COLLECTED');")
+                    "has_proper_name_evidence,has_it_dictionary_evidence) "
+                    "VALUES ('nuovaparola',1,1,0,0,1);")
         with self.assertRaisesRegex(ValueError,'Raccolta cambiata'):
             sync_discarded(self.raw,self.filtered,discarded)
         self.assertEqual(discarded.read_bytes(),before)

@@ -179,7 +179,7 @@
       "problemMatcher": []
     },
     {
-      "label": "Prompt: aggiorna prompt.sqlite3 (bacini del gioco) da prompt_raw.sqlite3",
+      "label": "Prompt: aggiorna lo schema game (bacini verificati) dalla raccolta, schema raw",
       "type": "process",
       "command": "${workspaceFolder}/gioco-zeroassociations/.venv/Scripts/python.exe",
       "args": [
@@ -217,35 +217,6 @@
       ],
       "options": {
         "cwd": "${workspaceFolder}"
-      },
-      "problemMatcher": []
-    },
-    {
-      "label": "DB unico: costruisci zeroassociazioni.sqlite3 dai sei DB (i vecchi restano)",
-      "type": "process",
-      "command": "${workspaceFolder}/gioco-zeroassociations/.venv/Scripts/python.exe",
-      "args": [
-        "-B",
-        "unified_db.py",
-        "build"
-      ],
-      "options": {
-        "cwd": "${workspaceFolder}/gioco-zeroassociations"
-      },
-      "problemMatcher": []
-    },
-    {
-      "label": "DB unico: ricostruisci (sostituisce zeroassociazioni.sqlite3)",
-      "type": "process",
-      "command": "${workspaceFolder}/gioco-zeroassociations/.venv/Scripts/python.exe",
-      "args": [
-        "-B",
-        "unified_db.py",
-        "build",
-        "--replace"
-      ],
-      "options": {
-        "cwd": "${workspaceFolder}/gioco-zeroassociations"
       },
       "problemMatcher": []
     },
@@ -292,7 +263,7 @@
       "problemMatcher": []
     },
     {
-      "label": "Prompt: filtra i candidati (prompt_filtrati.sqlite3)",
+      "label": "Prompt: filtra i candidati (schema filtrati)",
       "type": "process",
       "command": "${workspaceFolder}/gioco-zeroassociations/.venv/Scripts/python.exe",
       "args": [
@@ -467,7 +438,7 @@
         "cwd": "${workspaceFolder}/gioco-zeroassociations"
       },
       "problemMatcher": [],
-      "detail": "Importa nella raccolta i lotti nuovi, aggiorna prompt_validi.sqlite3 e prompt.sqlite3."
+      "detail": "Importa nella raccolta i lotti nuovi, aggiorna gli schemi validi e game."
     },
     {
       "label": "Associazioni: stato della lavorazione finale",
@@ -484,7 +455,7 @@
       "problemMatcher": []
     },
     {
-      "label": "Prompt: rigenera prompt_finale.sqlite3 (prompt, parole, collegamenti)",
+      "label": "Prompt: rigenera lo schema finale (prompt, parole, collegamenti)",
       "type": "process",
       "command": "${workspaceFolder}/gioco-zeroassociations/.venv/Scripts/python.exe",
       "args": [
@@ -497,7 +468,7 @@
         "cwd": "${workspaceFolder}/gioco-zeroassociations"
       },
       "problemMatcher": [],
-      "detail": "Copia i bacini verificati in prompt_finale.sqlite3: ogni parola è unica e collegata a tutti i suoi prompt."
+      "detail": "Copia i bacini verificati nello schema finale: ogni parola è unica e collegata a tutti i suoi prompt."
     }
   ],
   "inputs": [

@@ -2,9 +2,9 @@
 
 I verbali devono provenire da una revisione reale già effettuata. I controlli
 del programma verificano il contratto e l'integrità, non il significato.
-prompt_validi.sqlite3 contiene i prompt validati insieme alle loro parole associate:
+Lo schema validi contiene i prompt validati insieme alle loro parole associate:
 solo quelli con un bacino verificato del senso scelto. I prompt validati ancora senza
-associazioni restano nella raccolta e sono copiati in prompt_filtrati.sqlite3
+associazioni restano nella raccolta e sono copiati nello schema filtrati
 (filter_prompts.py, tabella validated_prompts).
 """
 from __future__ import annotations
@@ -25,7 +25,7 @@ from prompt_policy import load_prompt_policy
 from semantic_rules import SEMANTIC_POLICY
 from sqlite_prompt_runtime import SQLite, literal, publish_database
 
-VALIDATED_DB = ROOT/'prompt_validi.sqlite3'
+VALIDATED_DB = unified_db.address('validi')
 PROMPT_CHECKS = ('single_familiar_sense', 'prompt_language', 'canonical_form',
                  'familiarity', 'category_reviewed')
 VALIDATED_SCHEMA = """
@@ -203,7 +203,7 @@ def sync_validated(source, destination=VALIDATED_DB):
             pools.append(pool)
         except ValueError:
             pass  # La validità del prompt non approva un bacino obsoleto.
-    # Qui vanno i prompt con le parole associate; gli altri validati sono in prompt_filtrati.sqlite3.
+    # Qui vanno i prompt con le parole associate; gli altri validati sono nello schema filtrati.
     with_pool = {pool['prompt'] for pool in pools}
     without_pool = sum(record['prompt'] not in with_pool for record in accepted)
     accepted = [record for record in accepted if record['prompt'] in with_pool]
@@ -263,7 +263,7 @@ def main(argv=None):
     sub.add_parser('status')
     args = parser.parse_args(argv)
     source = SQLite(args.source)
-    if args.source.resolve() == args.destination.resolve():
+    if unified_db.same_db(args.source, args.destination):
         raise ValueError('Sorgente e destinazione devono essere distinte')
     if args.command == 'status':
         if not unified_db.exists(args.destination):

@@ -1,12 +1,14 @@
 # Candidati, voci valide e scarti
 
-| File | Contenuto | Utilizzo |
+Tutti schemi del DB di lavoro `database/parole_ita_raw.sqlite3`.
+
+| Schema | Contenuto | Utilizzo |
 |---|---|---|
-| `prompt_raw.sqlite3` | Raccolta completa, fonti, aggiornamenti e storico delle decisioni | Archivio principale, nessuna cancellazione per effetto dei filtri |
-| `prompt_filtrati.sqlite3` | Candidati che superano i filtri automatici e, in `validated_prompts`, le parole verificate come prompt con senso e categoria | Base dei prompt da completare con le associazioni; `review_state` separa `VALIDATO` da `DA_RIVEDERE` |
-| `prompt_validi.sqlite3` | Prompt validati insieme alle loro parole associate (bacino verificato) | Prompt completi, pronti per il gioco |
-| `prompt_scartati.sqlite3` | Scarti automatici e scarti espliciti, con motivo | Consultazione e riconsiderazione, senza proporli come prompt utilizzabili |
-| `prompt.sqlite3` | Copia dei bacini verificati destinata al gioco | Distribuzione dei bacini, distinta dall'inventario completo |
+| `raw` | Raccolta completa, fonti, aggiornamenti e storico delle decisioni | Archivio principale, nessuna cancellazione per effetto dei filtri |
+| `filtrati` | Candidati che superano i filtri automatici e, in `validated_prompts`, le parole verificate come prompt con senso e categoria | Base dei prompt da completare con le associazioni; `review_state` separa `VALIDATO` da `DA_RIVEDERE` |
+| `validi` | Prompt validati insieme alle loro parole associate (bacino verificato) | Prompt completi, pronti per il gioco |
+| `scartati` | Scarti automatici e scarti espliciti, con motivo | Consultazione e riconsiderazione, senza proporli come prompt utilizzabili |
+| `game` | I bacini verificati, come viste sulla raccolta | Distribuzione dei bacini, distinta dall'inventario completo |
 
 Nel DB degli scarti, `discarded_prompts` contiene una sola riga per prompt:
 
@@ -16,6 +18,10 @@ Nel DB degli scarti, `discarded_prompts` contiene una sola riga per prompt:
 - `zipf`: frequenza, se già disponibile nel risultato del filtro;
 - `actor`, `decided_at`, `decision_history_id`: autore, data e riferimento allo
   storico per gli scarti espliciti.
+
+`discarded_prompts` è una vista con queste colonne, e si legge e si scrive da lì.
+Le coppie fase-motivo, poche centinaia per milioni di righe, stanno una volta sola
+in `discarded_reasons`; le righe, in `discarded_rows`, ne portano il numero.
 
 Gli scarti editoriali della revisione di Claude (candidati 7900–13245,
 `editorial_review_claude.py`, cartella `prompt-staging/reviews/completion_20261109_claude`)

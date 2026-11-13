@@ -12,6 +12,12 @@ CREATE TABLE opzioni(domanda TEXT NOT NULL REFERENCES domande(id) ON DELETE CASC
   testo TEXT NOT NULL, giusta INTEGER NOT NULL DEFAULT 0, PRIMARY KEY(domanda, posizione));
 CREATE UNIQUE INDEX opzioni_una_giusta ON opzioni(domanda) WHERE giusta = 1;
 '''
+QUESTIONS_WITHOUT_ROWID = '''
+CREATE TABLE domande(id TEXT PRIMARY KEY, testo TEXT NOT NULL, ordine INTEGER NOT NULL) WITHOUT ROWID;
+CREATE TABLE opzioni(domanda TEXT NOT NULL REFERENCES domande(id) ON DELETE CASCADE, posizione INTEGER NOT NULL,
+  testo TEXT NOT NULL, giusta INTEGER NOT NULL DEFAULT 0, PRIMARY KEY(domanda, posizione)) WITHOUT ROWID;
+CREATE UNIQUE INDEX opzioni_una_giusta ON opzioni(domanda) WHERE giusta = 1;
+'''
 
 
 def make(path: Path, rows):
@@ -100,6 +106,78 @@ class SchemaDbTest(unittest.TestCase):
         con = sqlite3.connect(out)
         self.assertEqual(con.execute('SELECT testo FROM opzioni').fetchall(), [('Roma',)])
         con.close()
+
+    def test_a_view_keeps_an_old_table_name(self):
+        db = self.built()
+        src = Path(self.tmp.name) / 'con_vista.db'
+        con = sqlite3.connect(src)
+        con.executescript('CREATE TABLE righe(n INTEGER PRIMARY KEY, testo TEXT NOT NULL) STRICT;'
+                          'CREATE VIEW domande AS SELECT n AS id, testo FROM righe;'
+                          "INSERT INTO righe VALUES(1, 'Capitale?');")
+        con.close()
+        db.import_schema(src, 'uno')
+        con = db.connect(self.a)
+        self.assertEqual(con.execute('SELECT id, testo FROM domande').fetchall(), [(1, 'Capitale?')])
+        con.close()
+        con = sqlite3.connect(db.file)
+        self.assertEqual(dict(con.execute("SELECT name, type FROM zerodb_objects WHERE schema='uno'")),
+                         {'righe': 'table', 'domande': 'view'})
+        self.assertIn('FROM uno__righe', con.execute("SELECT sql FROM sqlite_schema WHERE name='uno__domande'").fetchone()[0])
+        con.close()
+        out = Path(self.tmp.name) / 'uno.db'
+        self.assertEqual(db.export_schema('uno', out), {'righe': 1})
+        con = sqlite3.connect(out)
+        self.assertEqual(con.execute('SELECT testo FROM domande').fetchall(), [('Capitale?',)])
+        con.close()
+
+    def test_verify_does_not_depend_on_the_order_of_the_rows_in_the_file(self):
+        # In the old file 'a0' comes after 'q1' (insertion order); WITHOUT ROWID keeps it before (key order).
+        con = sqlite3.connect(self.a)
+        con.execute("INSERT INTO domande VALUES('a0','Fiume?',2)")
+        con.execute("INSERT INTO opzioni VALUES('a0',0,'Po',1)")
+        con.commit()
+        con.close()
+        db = self.built()
+        src = Path(self.tmp.name) / 'senza_rowid.db'
+        con = sqlite3.connect(src)
+        con.executescript(QUESTIONS_WITHOUT_ROWID)
+        con.execute(f"ATTACH DATABASE '{self.a}' AS a")
+        con.execute('INSERT INTO domande SELECT * FROM a.domande')
+        con.execute('INSERT INTO opzioni SELECT * FROM a.opzioni')
+        con.commit()
+        # Read like _digest reads them (every column, so no covering index): file order.
+        self.assertEqual(con.execute('SELECT id, testo FROM domande').fetchall(), [('a0', 'Fiume?'), ('q1', 'Capitale?')])
+        self.assertEqual(con.execute('SELECT id, testo FROM a.domande').fetchall(), [('q1', 'Capitale?'), ('a0', 'Fiume?')])
+        con.close()
+        db.import_schema(src, 'uno')
+        self.assertEqual(db.verify({'uno': self.a, 'due': self.b}), [])
+
+    def test_an_address_names_a_schema_and_legacy_goes_back_to_the_old_file(self):
+        db = self.built()
+        address = db.address('uno')
+        self.assertEqual(address, f'{db.file}#uno')
+        self.assertEqual(db.schema_of(address), 'uno')
+        self.assertEqual(db.schema_of(f'file:{db.address("due")}?mode=ro'), 'due')
+        self.assertIsNone(db.schema_of(f'{db.file}#altro'))  # not a schema of this file
+        with self.assertRaises(ValueError):
+            db.address('altro')
+        con = db.connect(address)
+        self.assertEqual(con.execute('SELECT testo FROM domande').fetchall(), [('Capitale?',)])
+        con.close()
+        con = db.connect(f'file:{address}?mode=ro', uri=True)
+        self.assertEqual(con.execute('SELECT count(*) FROM opzioni').fetchone(), (1,))
+        con.close()
+        self.assertTrue(db.exists(address))
+        import os
+        os.environ['TEST_SCHEMADB'] = 'legacy'
+        try:  # without the file of all schemas, the address is the old database of its schema
+            self.assertEqual(Path(db.file_of(address)).resolve(), self.a.resolve())
+            con = db.connect(f'file:{address}?mode=ro', uri=True)
+            self.assertEqual(con.execute('SELECT testo FROM domande').fetchall(), [('Capitale?',)])
+            con.close()
+            self.assertTrue(db.exists(address))
+        finally:
+            del os.environ['TEST_SCHEMADB']
 
     def test_rewrite_keeps_aliases_text_and_columns(self):
         names = {'domande', 'opzioni'}

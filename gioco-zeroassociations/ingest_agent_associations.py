@@ -18,6 +18,7 @@ from prompt_database import ROOT, DEFAULT_DB, GAME_DB, digest, import_reviewed, 
 from review_prompts import build_record, evidence_for
 from validated_prompt_database import validate_record, register_reviews, sync_validated, VALIDATED_DB
 from sqlite_prompt_runtime import SQLite
+import unified_db
 
 
 def rows(path):
@@ -144,7 +145,7 @@ def ingest(batch, raw=DEFAULT_DB, valid=VALIDATED_DB, *, publish=True, backup=Tr
             'already_imported':len(skipped),'negative_pending':negative,'backup':relative(backup) if backup else None}
     if publish:
         result['validated_db']=sync_validated(db,valid)
-        if Path(raw).resolve()==DEFAULT_DB.resolve():result['game_db']=export_game_db(db,GAME_DB)
+        if unified_db.same_db(raw,DEFAULT_DB):result['game_db']=export_game_db(db,GAME_DB)
         result['queue']=status(JOB,raw)
     (output/'receipt.json').write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
     return result

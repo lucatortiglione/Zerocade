@@ -1,24 +1,30 @@
-"""Il DB unico di ZeroAssociazioni: zeroassociazioni.sqlite3, uno "schema" per ognuno dei sei DB storici.
+"""Il DB unico di ZeroAssociazioni: database/parole_ita_raw.sqlite3, uno "schema" per ognuno dei sei DB storici.
 
 SQLite non ha schemi dentro un file: qui lo schema è il prefisso `<schema>__` delle tabelle, degli
-indici, delle viste e dei trigger. Gli schemi e i file da cui vengono:
+indici, delle viste e dei trigger. Gli schemi (e il file storico da cui vengono):
 
-  raw       prompt_raw.sqlite3       la raccolta, database operativo (con l'inventario lessicale)
-  game      prompt.sqlite3           i bacini verificati letti dal gioco
-  validi    prompt_validi.sqlite3    prompt validati con le parole associate
-  filtrati  prompt_filtrati.sqlite3  candidati e filtri
-  finale    prompt_finale.sqlite3    prompt, parole e collegamenti della lavorazione finale
-  scartati  prompt_scartati.sqlite3  scarti, con il motivo
+  raw       la raccolta, database operativo, con l'inventario lessicale  (prompt_raw.sqlite3)
+  game      i bacini verificati: viste sugli oggetti di raw              (prompt.sqlite3)
+  validi    prompt validati con le parole associate                     (prompt_validi.sqlite3)
+  filtrati  candidati e filtri                                          (prompt_filtrati.sqlite3)
+  finale    prompt, parole e collegamenti della lavorazione finale      (prompt_finale.sqlite3)
+  scartati  scarti, con il motivo                                       (prompt_scartati.sqlite3)
+  candidati i buoni prompt scelti fra i filtrati                        (nato nel DB unico)
 
-Gli script non cambiano il modo di indicare i DB: continuano a passare i vecchi percorsi
-(`prompt_raw.sqlite3`, …). Quando il DB unico esiste ed è verificato, un vecchio percorso significa
-"lo schema corrispondente del DB unico": le istruzioni SQL, scritte con i nomi senza prefisso,
-vengono riscritte al volo (riscrivi). Un file con un altro nome (le copie temporanee, i test) resta
-un normale DB a sé. Con ZEROASSOC_DB=legacy si usano di nuovo i vecchi file.
+Uno schema si indica come `database/parole_ita_raw.sqlite3#raw` (address('raw')), la stessa scrittura del
+server: gli strumenti lo passano come un percorso, e le istruzioni SQL, scritte con i nomi senza prefisso,
+vengono riscritte al volo (riscrivi). Il vecchio nome del file (`prompt_raw.sqlite3`, …) indica ancora lo
+stesso schema, perché i metadati e le ricevute già scritti lo contengono; same_db li riconosce uguali. Un file
+con un altro nome (le copie temporanee, i test) resta un normale DB a sé. Con ZEROASSOC_DB=legacy un
+indirizzo torna al vecchio file del suo schema (file_of).
+
+I sei file storici non ci sono più (13/11/2026). Il DB unico quindi non si ricostruisce più da quei file, e
+verify confronta solo gli schemi la cui origine è ancora un file a sé. Va tenuta una copia di sicurezza del DB
+unico.
 
 Comandi:
-  python unified_db.py build [--replace]  crea il DB unico copiando i sei DB (i vecchi restano)
-  python unified_db.py verify             confronta ogni tabella con il suo file d'origine
+  python unified_db.py build [--replace]  crea il DB unico copiando i sei DB (servono tutti e sei i file)
+  python unified_db.py verify             confronta ogni tabella con il suo file d'origine, se c'è ancora
   python unified_db.py status             schemi, oggetti, righe e dimensioni
   python unified_db.py export SCHEMA OUT  scrive uno schema come DB a sé (senza prefissi)
 """
@@ -34,13 +40,17 @@ import sys
 import tempfile
 from datetime import datetime, timezone
 from pathlib import Path
+from urllib.parse import unquote
 
 ROOT = Path(__file__).resolve().parent
+# I DB stanno nella cartella dei DB del repository (database/), non accanto agli script.
+DB_DIR = ROOT.parent / 'database'
 # ZEROASSOC_UNIFIED sposta il DB unico (per provare le scritture su una copia).
-UNIFIED = Path(os.environ.get('ZEROASSOC_UNIFIED') or ROOT / 'zeroassociazioni.sqlite3')
+UNIFIED = Path(os.environ.get('ZEROASSOC_UNIFIED') or DB_DIR / 'parole_ita_raw.sqlite3')
 SEP = '__'
 
-# Il file storico -> lo schema del DB unico.
+# Il file storico -> lo schema del DB unico. Gli strumenti indicano gli schemi con address(); questi nomi restano
+# validi per i percorsi già scritti nei metadati e nelle ricevute.
 SCHEMAS = {
     'prompt_raw.sqlite3': 'raw',
     'prompt.sqlite3': 'game',
@@ -48,6 +58,8 @@ SCHEMAS = {
     'prompt_filtrati.sqlite3': 'filtrati',
     'prompt_finale.sqlite3': 'finale',
     'prompt_scartati.sqlite3': 'scartati',
+    # Nato nel DB unico (13/11/2026), senza un file storico: i candidati scelti fra i filtrati.
+    'prompt_candidati.sqlite3': 'candidati',
 }
 FILES = {schema: name for name, schema in SCHEMAS.items()}
 REGISTRY = ('zerodb_meta', 'zerodb_schemas', 'zerodb_objects')
@@ -69,14 +81,58 @@ HEXNAME = re.compile(r"((?:tbl_)?name\s*=\s*)CAST\s*\(\s*X'([0-9A-Fa-f]*)'\s+AS\
 HEXTEXT = re.compile(r"CAST\s*\(\s*X'([0-9A-Fa-f]*)'\s+AS\s+TEXT\s*\)", re.I)
 
 
+def address(schema: str) -> Path:
+    """Come si indica uno schema del DB unico: `<DB unico>#<schema>`, per esempio
+    database/parole_ita_raw.sqlite3#raw (la stessa scrittura del server). Gli strumenti lo passano come un percorso."""
+    if schema not in FILES:
+        raise ValueError(f'Schema sconosciuto: {schema}')
+    return UNIFIED.parent / f'{UNIFIED.name}#{schema}'
+
+
 def schema_of(path) -> str | None:
-    """Lo schema di un vecchio percorso (solo quelli accanto agli script), altrimenti None."""
-    p = Path(str(path).split('?')[0].removeprefix('file:').lstrip('/') if str(path).startswith('file:') else path)
+    """Lo schema indicato da `path`, altrimenti None. Vale l'indirizzo `<DB unico>#<schema>` (anche come URI
+    file:, dove # diventa %23) e vale ancora il vecchio nome del file (nella cartella dei DB, o accanto agli script
+    dove stava prima): lo usano i metadati e le ricevute già scritti."""
+    text = str(path)
+    if text.startswith('file:'):
+        text = unquote(text.split('?')[0].removeprefix('file:').lstrip('/'))
+    if '#' in text:
+        file, _, schema = text.rpartition('#')
+        try:
+            same = Path(file).resolve() == UNIFIED.resolve()
+        except OSError:
+            return None
+        return schema if same and schema in FILES else None
     try:
-        p = p.resolve()
+        p = Path(text).resolve()
     except OSError:
         return None
-    return SCHEMAS.get(p.name) if p.parent == ROOT else None
+    return SCHEMAS.get(p.name) if p.parent in (DB_DIR.resolve(), ROOT) else None
+
+
+def file_of(path) -> Path:
+    """Il file da aprire quando il DB unico non si usa (ZEROASSOC_DB=legacy): per un indirizzo, il vecchio file del
+    suo schema nella cartella dei DB; per ogni altro percorso, il percorso stesso."""
+    text = str(path)
+    if '#' in Path(text).name:
+        file, _, schema = text.rpartition('#')
+        if Path(file).name == UNIFIED.name and schema in FILES:
+            return Path(file).parent / FILES[schema]
+    return Path(path)
+
+
+def sibling(path, schema: str) -> Path:
+    """Il DB `schema` che accompagna `path`: lo schema del DB unico, se `path` ne indica uno; altrimenti il file
+    con il nome storico dello schema nella stessa cartella (le copie a sé e i test)."""
+    return address(schema) if schema_of(path) else Path(path).with_name(FILES[schema])
+
+
+def same_db(a, b) -> bool:
+    """`a` e `b` indicano lo stesso DB: lo stesso schema (con l'indirizzo o con il vecchio nome) o lo stesso file."""
+    sa, sb = schema_of(a), schema_of(b)
+    if sa or sb:
+        return sa == sb
+    return Path(a).resolve() == Path(b).resolve()
 
 
 def exists(path) -> bool:
@@ -84,7 +140,7 @@ def exists(path) -> bool:
     schema = schema_of(path) if active() else None
     if schema:
         return bool(objects_of(schema))
-    return Path(path).exists()
+    return file_of(path).exists()
 
 
 def active() -> bool:
@@ -264,7 +320,7 @@ def connect(path, *, readonly: bool = False, uri: bool = False, **kwargs) -> sql
     """
     schema = schema_of(path) if active() else None
     if schema is None:
-        return sqlite3.connect(path, uri=uri, **kwargs)
+        return sqlite3.connect(path if uri else file_of(path), uri=uri, **kwargs)
     target = f'file:{UNIFIED.as_posix()}' + ('?mode=ro' if readonly or 'mode=ro' in str(path) else '')
     con = sqlite3.connect(target, uri=True, factory=Connection, **kwargs)
     con.schema = schema
@@ -288,7 +344,10 @@ def insertable(con: sqlite3.Connection, table: str, qualifier: str = '') -> str:
 
 
 def build(replace: bool = False, sources: dict[str, Path] | None = None, output: Path = UNIFIED) -> dict:
-    sources = sources or {schema: ROOT / name for name, schema in SCHEMAS.items()}
+    sources = sources or {schema: DB_DIR / name for name, schema in SCHEMAS.items()}
+    if any(Path(p).resolve() == Path(output).resolve() for p in sources.values()):
+        raise SystemExit(f"{Path(output).name} è il DB unico e anche l'origine di uno schema: "
+                         'non si ricostruisce dai vecchi file (per uno schema solo, import_schema)')
     missing = [str(p) for p in sources.values() if not Path(p).exists()]
     if missing:
         raise SystemExit('DB mancanti: ' + ', '.join(missing))
@@ -377,11 +436,17 @@ def _digest(con: sqlite3.Connection, table: str) -> tuple[int, str]:
 
 
 def verify(unified: Path = UNIFIED, *, deep: bool = True, mark: bool = True) -> dict:
-    """Ogni tabella del DB unico deve avere le stesse righe del file d'origine."""
+    """Ogni tabella del DB unico deve avere le stesse righe del file d'origine, se quel file c'è ancora.
+
+    Un'origine cancellata, o il cui nome è passato al DB unico stesso, non si confronta (`skipped`)."""
     con = sqlite3.connect(f'file:{unified.as_posix()}?mode=ro', uri=True)
-    result: dict = {'tables': {}, 'problems': []}
+    result: dict = {'tables': {}, 'problems': [], 'skipped': []}
     for schema, file in con.execute('SELECT name,source_file FROM zerodb_schemas').fetchall():
-        src = sqlite3.connect(f'file:{(unified.parent / file).as_posix()}?mode=ro', uri=True)
+        origin = unified.parent / file
+        if not origin.exists() or origin.resolve() == unified.resolve():
+            result['skipped'].append(schema)
+            continue
+        src = sqlite3.connect(f'file:{origin.as_posix()}?mode=ro', uri=True)
         tables = [n for t, n, *_ in _objects(src) if t == 'table']
         for table in tables:
             a = src.execute(f'SELECT count(*) FROM "{table}"').fetchone()[0]
@@ -451,6 +516,60 @@ def import_schema(source: Path, schema: str, unified: Path = UNIFIED) -> dict:
         src.close()
     _cache.clear()
     return {'schema': schema, 'rows': sum(counts.values())}
+
+
+def link_schema(schema: str, source: str, names: list[str], unified: Path = UNIFIED) -> dict:
+    """Lo schema `schema` diventa una vista per ognuno degli oggetti `names` dello schema `source` dello stesso file
+    (`schema__x` AS SELECT * FROM `source__x`): le stesse righe, sempre aggiornate, senza copiarle. Gli oggetti di
+    prima dello schema spariscono, nella stessa transazione."""
+    con = sqlite3.connect(unified, isolation_level=None)
+    try:
+        con.execute('PRAGMA foreign_keys=OFF')
+        con.execute('BEGIN IMMEDIATE')
+        try:
+            kinds = dict(con.execute('SELECT name,type FROM zerodb_objects WHERE schema=?', (source,)))
+            missing = [n for n in names if kinds.get(n) not in ('table', 'view')]
+            if missing:
+                raise ValueError(f'{source}: nessuna tabella o vista {", ".join(missing)}')
+            old = con.execute('SELECT name,type FROM zerodb_objects WHERE schema=?', (schema,)).fetchall()
+            for kind in ('trigger', 'view', 'index', 'table'):
+                for name, t in old:
+                    if t == kind:
+                        con.execute(f'DROP {kind.upper()} IF EXISTS "{prefixed(schema, name)}"')
+            con.execute('DELETE FROM zerodb_objects WHERE schema=?', (schema,))
+            for name in names:
+                con.execute(f'CREATE VIEW "{prefixed(schema, name)}" AS SELECT * FROM "{prefixed(source, name)}"')
+                con.execute('INSERT INTO zerodb_objects VALUES(?,?,?,?,?)', (schema, name, 'view', name, None))
+            con.execute('UPDATE zerodb_schemas SET copied_at=? WHERE name=?', (datetime.now(timezone.utc).isoformat(), schema))
+            con.execute('COMMIT')
+        except BaseException:
+            if con.in_transaction:
+                con.execute('ROLLBACK')
+            raise
+    finally:
+        con.close()
+    _cache.clear()
+    return {'schema': schema, 'source': source, 'views': len(names)}
+
+
+def register_objects(schema: str, unified: Path = UNIFIED) -> dict:
+    """Rimette in zerodb_objects gli oggetti dello schema come sono nel file, dopo che uno strumento ne ha creati o
+    tolti con il suo SQL (la riscrittura dà il prefisso ai nomi nuovi, ma non li registra)."""
+    prefix = prefixed(schema, '')
+    con = sqlite3.connect(unified, isolation_level=None)
+    try:
+        objs = [(t, n[len(prefix):], tbl[len(prefix):] if tbl.startswith(prefix) else tbl)
+                for t, n, tbl in con.execute('SELECT type,name,tbl_name FROM sqlite_schema WHERE substr(name,1,?)=? AND sql IS NOT NULL',
+                                             (len(prefix), prefix))]
+        counts = {n: con.execute(f'SELECT count(*) FROM "{prefix}{n}"').fetchone()[0] for t, n, _ in objs if t == 'table'}
+        con.execute('BEGIN IMMEDIATE')
+        con.execute('DELETE FROM zerodb_objects WHERE schema=?', (schema,))
+        con.executemany('INSERT INTO zerodb_objects VALUES(?,?,?,?,?)', [(schema, n, t, tbl, counts.get(n)) for t, n, tbl in objs])
+        con.execute('COMMIT')
+    finally:
+        con.close()
+    _cache.clear()
+    return {'schema': schema, 'objects': len(objs)}
 
 
 def export_schema(schema: str, output: Path, unified: Path = UNIFIED) -> dict:
@@ -523,7 +642,8 @@ def main(argv=None) -> int:
             return 0 if result['ok'] else 1
     elif args.command == 'verify':
         result = verify(deep=not args.quick, mark=not args.quick)
-        print(json.dumps({'ok': result['ok'], 'problems': result['problems'], 'tables': len(result['tables'])}, indent=2))
+        print(json.dumps({'ok': result['ok'], 'problems': result['problems'], 'tables': len(result['tables']),
+                          'senza_origine': result['skipped']}, indent=2))
         return 0 if result['ok'] else 1
     elif args.command == 'status':
         print(json.dumps(status(), indent=2, ensure_ascii=False))

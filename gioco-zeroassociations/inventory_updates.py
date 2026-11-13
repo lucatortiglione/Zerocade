@@ -1,4 +1,4 @@
-"""Aggiornamenti e decisioni persistenti nella raccolta prompt_raw.sqlite3."""
+"""Aggiornamenti e decisioni persistenti nella raccolta (schema raw del DB di lavoro)."""
 from __future__ import annotations
 
 import unified_db
@@ -314,7 +314,7 @@ def main(argv=None):
     elif args.command=='decide-term':
         result=decide_term(db,args.prompt,args.decision,args.reason,args.actor)
         from discarded_prompt_database import FILTERED_DB, sync_discarded
-        if db.path==DEFAULT_DB.resolve() and FILTERED_DB.exists():
+        if unified_db.same_db(db.path,DEFAULT_DB) and unified_db.exists(FILTERED_DB):
             try:
                 result['discarded_db']=sync_discarded(db.path,FILTERED_DB)
             except (ValueError,RuntimeError,OSError) as error:

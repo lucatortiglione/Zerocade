@@ -39,7 +39,7 @@ class UnifiedTest(unittest.TestCase):
                                                       ('INSERT INTO associations VALUES(2,1,?)', ('sabbia',))])
         make(self.dir/'prompt.sqlite3', SCHEMA_B, [('INSERT INTO prompts(id,lemma) VALUES(7,?)', ('sole',))])
         self.sources = {'raw': self.dir/'prompt_raw.sqlite3', 'game': self.dir/'prompt.sqlite3'}
-        self.patches = [mock.patch.object(u, 'ROOT', self.dir), mock.patch.object(u, 'UNIFIED', self.dir/'zeroassociazioni.sqlite3')]
+        self.patches = [mock.patch.object(u, 'DB_DIR', self.dir), mock.patch.object(u, 'UNIFIED', self.dir/'zeroassociazioni.sqlite3')]
         for p in self.patches:
             p.start()
         u._cache.clear()
@@ -74,6 +74,23 @@ class UnifiedTest(unittest.TestCase):
         db.commit()
         db.close()
         self.assertFalse(u.verify(u.UNIFIED, mark=False)['ok'])
+
+    def test_the_one_database_can_take_the_name_of_the_collection(self):
+        # Il DB unico rinominato prompt_raw.sqlite3 al posto del vecchio file della raccolta.
+        self.build()
+        (self.dir/'prompt_raw.sqlite3').unlink()
+        u.UNIFIED.rename(self.dir/'prompt_raw.sqlite3')
+        with mock.patch.object(u, 'UNIFIED', self.dir/'prompt_raw.sqlite3'):
+            u._cache.clear()
+            self.assertTrue(u.active())
+            result = u.verify(u.UNIFIED, mark=False)
+            self.assertTrue(result['ok'], result['problems'])
+            self.assertEqual(result['skipped'], ['raw'])
+            con = u.connect(self.dir/'prompt_raw.sqlite3')
+            self.assertEqual(con.execute('SELECT lemma FROM prompts').fetchall(), [('mare',)])
+            con.close()
+            with self.assertRaises(SystemExit):
+                u.build(replace=True, sources=self.sources, output=u.UNIFIED)
 
     def test_not_active_until_verified_and_legacy_switch(self):
         u.build(sources=self.sources, output=u.UNIFIED)
@@ -135,6 +152,56 @@ class UnifiedTest(unittest.TestCase):
         self.assertEqual(db.execute('SELECT lemma FROM game__prompts ORDER BY id').fetchall(), [('luna',), ('stella',)])
         self.assertEqual(db.execute('SELECT count(*) FROM raw__associations').fetchone(), (2,))
         self.assertEqual(db.execute("SELECT rows FROM zerodb_objects WHERE schema='game' AND name='prompts'").fetchone(), (2,))
+
+    def test_an_address_names_a_schema_like_the_old_file_name(self):
+        self.build()
+        raw = u.address('raw')
+        self.assertEqual(raw, u.UNIFIED.parent / f'{u.UNIFIED.name}#raw')
+        self.assertEqual(u.schema_of(raw), 'raw')
+        self.assertEqual(u.schema_of(raw.as_uri() + '?mode=ro'), 'raw')  # in a URI the # is %23
+        self.assertIsNone(u.schema_of(self.dir/'altro.sqlite3#raw'))  # another file: not the unified DB
+        # the old name, still in metadata and receipts, is the same database
+        self.assertTrue(u.same_db(raw, self.dir/'prompt_raw.sqlite3'))
+        self.assertFalse(u.same_db(raw, u.address('game')))
+        self.assertTrue(u.same_db(self.dir/'a.sqlite3', self.dir/'a.sqlite3'))
+        # next to a schema, another schema; next to a standalone file, the old name in its folder
+        self.assertEqual(u.sibling(raw, 'scartati'), u.address('scartati'))
+        self.assertEqual(u.sibling(self.dir/'copia'/'filtri.sqlite3', 'scartati'), self.dir/'copia'/'prompt_scartati.sqlite3')
+        with self.assertRaises(ValueError):
+            u.address('nessuno')
+        con = u.connect(raw)
+        self.assertEqual(con.execute('SELECT lemma FROM prompts').fetchall(), [('mare',)])
+        con.close()
+        self.assertTrue(u.exists(raw))
+        with mock.patch.dict('os.environ', {'ZEROASSOC_DB': 'legacy'}):
+            u._cache.clear()
+            self.assertEqual(u.file_of(raw), self.dir/'prompt_raw.sqlite3')
+            con = u.connect(raw)  # the old file of the schema
+            self.assertEqual(con.execute('SELECT lemma FROM prompts').fetchall(), [('mare',)])
+            con.close()
+        u._cache.clear()
+
+    def test_a_linked_schema_reads_the_source_rows_without_copying_them(self):
+        self.build()
+        self.assertEqual(u.link_schema('game', 'raw', ['prompts', 'associations', 'pool_sizes'], u.UNIFIED),
+                         {'schema': 'game', 'source': 'raw', 'views': 3})
+        db = sqlite3.connect(u.UNIFIED)
+        self.assertEqual(dict(db.execute("SELECT name,type FROM zerodb_objects WHERE schema='game'")),
+                         {'prompts': 'view', 'associations': 'view', 'pool_sizes': 'view'})
+        # the old game tables are gone, the views follow raw, also after a change
+        names = {n for (n,) in db.execute("SELECT name FROM sqlite_schema WHERE name LIKE 'game\\_\\_%' ESCAPE '\\'")}
+        self.assertEqual(names, {'game__prompts', 'game__associations', 'game__pool_sizes'})
+        db.execute("INSERT INTO raw__associations VALUES(3,1,'conchiglia')")
+        db.commit()
+        self.assertEqual(db.execute('SELECT lemma,n FROM game__pool_sizes').fetchone(), ('mare', 3))
+        db.close()
+        # an old path reads the views as before
+        con = u.connect(self.dir/'prompt.sqlite3')
+        self.assertEqual(con.execute('SELECT word FROM associations ORDER BY id').fetchall(), [('onda',), ('sabbia',), ('conchiglia',)])
+        con.close()
+        with self.assertRaises(ValueError):  # only objects the source has
+            u.link_schema('game', 'raw', ['prompts', 'nessuna'], u.UNIFIED)
+        self.assertEqual(len(u.objects_of('game')), 3)  # a refused link leaves the schema as it was
 
     def test_export_gives_back_a_standalone_database_without_prefixes(self):
         self.build()

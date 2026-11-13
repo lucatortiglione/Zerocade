@@ -461,7 +461,7 @@ export const unflagBivio = (questionId: string): void => void bivioFlagDelete.ru
 
 // --- Quizzland answers ---
 // Each viewer's first answer to each question: `choice` is the option's position in
-// domande.db (0 = the first), whatever order the overlay showed; `ms` how long it took.
+// the questions' database (opzioni.posizione, 0 = the first), whatever order the overlay showed; `ms` how long it took.
 
 export interface QuizzlandAnswer {
   roundId: string
@@ -479,7 +479,7 @@ export interface QuizzlandTotalsRow {
   rounds: number
   answers: number
   correct: number
-  // How many chose each position of domande.db (c0 = the first answer).
+  // How many chose each position in the questions' database (c0 = the first answer).
   c0: number
   c1: number
   c2: number

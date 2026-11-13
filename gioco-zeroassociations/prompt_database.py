@@ -25,9 +25,9 @@ from sqlite_prompt_runtime import SQLite, VERSION, literal, publish_database
 
 ROOT = Path(__file__).resolve().parent
 # La raccolta: inventario, fonti, aggiornamenti, decisioni e bacini (gigabyte, fuori da Git).
-DEFAULT_DB = ROOT/'prompt_raw.sqlite3'
+DEFAULT_DB = unified_db.address('raw')
 # Il database dei soli bacini verificati, quello che legge il gioco (versionato in Git).
-GAME_DB = ROOT/'prompt.sqlite3'
+GAME_DB = unified_db.address('game')
 DIRECTIVES = ROOT/'direttive_word_association_it_v3_6_0.md'
 # Hash delle direttive -> versione delle regole (semantic_rules.SEMANTIC_POLICY) che contenevano.
 POLICY_VERSIONS = ROOT/'resources/policy_versions.json'
@@ -317,18 +317,32 @@ def pool_objects(db):
     Le attestazioni e gli aggiornamenti integrali restano nel database operativo;
     per conservarli con le decisioni si usa inventory_updates.py backup.
     """
-    rows = db.run("SELECT name FROM sqlite_schema WHERE type IN ('table','view') "
-                  "AND (name NOT LIKE 'inventory%' OR name IN ('inventory_term_decisions','inventory_decision_history')) "
-                  "AND name NOT LIKE 'sqlite%' ORDER BY name;", rows=True)
+    keep = "(name NOT LIKE 'inventory%' OR name IN ('inventory_term_decisions','inventory_decision_history'))"
+    if db.schema:
+        # Nel DB unico sqlite_schema elenca gli oggetti di tutti gli schemi: quelli di questo sono nel registro.
+        rows = db.run("SELECT name FROM zerodb_objects WHERE schema="+literal(db.schema)+
+                      " AND type IN ('table','view') AND "+keep+" ORDER BY name;", rows=True)
+    else:
+        rows = db.run("SELECT name FROM sqlite_schema WHERE type IN ('table','view') AND "+keep+
+                      " AND name NOT LIKE 'sqlite%' ORDER BY name;", rows=True)
     return [r['name'] for r in rows]
 
 
 def export_game_db(db, output=GAME_DB):
-    """Ricostruisce `output` (prompt.sqlite3) con le sole tabelle di pool_objects della raccolta:
+    """Ricostruisce `output` (lo schema game) con le sole tabelle di pool_objects della raccolta:
     bacini verificati, verbali, categorie e decisioni sulle voci, con schema, vincoli e viste.
-    Sostituzione atomica: un errore lascia il file precedente com'era."""
+    Sostituzione atomica: un errore lascia il file precedente com'era.
+
+    Nel DB unico, quando la raccolta e la destinazione sono due schemi dello stesso file, la destinazione non è una
+    copia: ha una vista per ogni oggetto di pool_objects sugli oggetti della raccolta (unified_db.link_schema), con
+    le stesse righe sempre aggiornate."""
     output = Path(output).resolve()
     if output == db.path: raise ValueError('Il database dei bacini deve essere distinto dalla raccolta')
+    target = unified_db.schema_of(output) if unified_db.active() else None
+    if target and db.schema and target != db.schema:
+        linked = unified_db.link_schema(target, db.schema, pool_objects(db))
+        return {'output': str(output), 'source': str(db.path), 'pools': len(load_pools(SQLite(output, db.executable))),
+                'views_on_source': linked['views']}
     output.parent.mkdir(parents=True, exist_ok=True)
     handle, name = tempfile.mkstemp(prefix=output.stem+'.', suffix='.part', dir=output.parent)
     os.close(handle)
@@ -433,7 +447,7 @@ def main(argv=None):
     sub.add_parser('init')
     imp=sub.add_parser('import-reviewed'); imp.add_argument('file',type=Path)
     sub.add_parser('status')
-    dump=sub.add_parser('dump',help="prompt.sqlite3: database dei soli bacini verificati, dalla raccolta")
+    dump=sub.add_parser('dump',help="lo schema game: i soli bacini verificati, dalla raccolta")
     dump.add_argument('--output',type=Path,default=GAME_DB,help='Un .sql scrive invece il dump SQL in testo')
     sub.add_parser('register-directives',help='Dopo un ritocco al testo delle direttive che non cambia le regole')
     sample=sub.add_parser('sample'); sample.add_argument('--answers',choices=['7','8','random'],default='7')
@@ -455,8 +469,8 @@ def main(argv=None):
     if args.command=='init': initialize(db); print(db.path)
     elif args.command=='import-reviewed':
         result={'reviewed_pools_processed':import_reviewed(db,args.file)}
-        # Il gioco legge prompt.sqlite3: dopo un'importazione nella raccolta si aggiorna subito.
-        if db.path==DEFAULT_DB.resolve(): result['game_db']=export_game_db(db)
+        # I bacini verificati (schema game) seguono la raccolta: dopo un'importazione si aggiornano subito.
+        if unified_db.same_db(db.path,DEFAULT_DB): result['game_db']=export_game_db(db)
         print(json.dumps(result,ensure_ascii=False))
     else:
         if not unified_db.exists(db.path): raise ValueError('Database assente: eseguire init e import-reviewed')

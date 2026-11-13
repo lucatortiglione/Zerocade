@@ -1,6 +1,6 @@
-"""Costruisce le parole di ZeroWordle dall'inventario lessicale di prompt_raw.sqlite3.
+"""Costruisce le parole di ZeroWordle dall'inventario lessicale di ZeroAssociazioni.
 
-Parte dai termini di 5, 6, 7 e 8 lettere dell'inventario (gioco-zeroassociations/prompt_raw.sqlite3,
+Parte dai termini di 5, 6, 7 e 8 lettere dell'inventario (schema raw di database/parole_ita_raw.sqlite3,
 aperto in sola lettura) e per ogni lunghezza N li divide in due elenchi, in data/ (versionati: li legge il server):
 
   solutions-N.txt  le parole che possono essere la soluzione: lemmi italiani comuni, attestati da
@@ -23,16 +23,18 @@ import json
 import random
 import re
 import sys
-import sqlite3
 import unicodedata
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE.parent / "database"))
 import giochi  # noqa: E402
+sys.path.insert(0, str(HERE.parent / "gioco-zeroassociations"))
+import unified_db  # noqa: E402
 DATA = HERE / "data"
 ROOT = HERE.parent
-DEFAULT_DB = ROOT / "gioco-zeroassociations" / "prompt_raw.sqlite3"
+# L'inventario: lo schema raw del DB di lavoro (database/parole_ita_raw.sqlite3#raw).
+DEFAULT_DB = unified_db.address("raw")
 EXCLUSIONS = HERE / "wordle_exclusions.txt"
 
 # Le regole sulle fonti e sulle etichette sono quelle della banca di ZeroContext.
@@ -55,7 +57,8 @@ def fold(word: str) -> str:
 
 
 def collect(db: Path, length: int) -> dict[str, dict]:
-    con = sqlite3.connect(f"file:{db.as_posix()}?mode=ro", uri=True)
+    # Uno schema del DB di lavoro o un file a sé: l'SQL resta quello con i nomi senza prefisso (unified_db).
+    con = unified_db.connect(f"file:{db.as_posix()}?mode=ro", uri=True)
     snapshots = dict(con.execute("select id,source_key from inventory_snapshots"))
     terms = [
         r[0]
@@ -91,10 +94,12 @@ def collect(db: Path, length: int) -> dict[str, dict]:
                 f["prop"].add(fam)
             elif role == "frequency_form":
                 d = json.loads(details)
+                # Una parola può comparire più volte nella stessa lista (per esempio "ﬂare", con la legatura, e "flare"):
+                # vale il rango migliore e la frequenza più alta, qualunque sia l'ordine delle righe.
                 if "rank" in d:
-                    f["wf"] = d["rank"]
+                    f["wf"] = min(f.get("wf", d["rank"]), d["rank"])
                 if "frequency" in d:
-                    f["os"] = d["frequency"]
+                    f["os"] = max(f.get("os", d["frequency"]), d["frequency"])
         feats[prompt] = f
     con.close()
     return feats

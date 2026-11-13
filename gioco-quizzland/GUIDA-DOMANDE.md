@@ -112,7 +112,7 @@ Le varianti servono a due cose:
 
 Le idee classiche (enigmi popolari, test di riflessione) si possono usare: le idee non sono proteggibili. **Il testo invece è sempre nostro.** Non si copia da libri, app, programmi TV o file di domande di altri: è la stessa regola di ZeroDubbi.
 
-Gli esempi di logica, numeri e trabocchetti di questa sezione sono già in gioco: sono le domande da q009 a q022 di `data/domande.db`.
+Gli esempi di logica, numeri e trabocchetti di questa sezione sono già in gioco: sono le domande da q009 a q022 dello schema `quizz` di `database/giochi.sqlite3`.
 
 ### Logica
 
@@ -275,7 +275,7 @@ Sono proposte: niente di questo è ancora fatto.
 
 | Cosa | Dove | A cosa serve |
 |---|---|---|
-| Colonne `famiglia`, `trappola` (la lettera della risposta trappola) e `note` | `domande.db`, CSV, `domande.py` | Varietà nel mazzo, 50:50 che lascia la trappola, statistiche sulla trappola |
+| Colonne `famiglia`, `trappola` (la lettera della risposta trappola) e `note` | schema `quizz`, CSV, `domande.py` | Varietà nel mazzo, 50:50 che lascia la trappola, statistiche sulla trappola |
 | `python tools/domande.py check` | `domande.py` | I limiti della sezione 2 e le regole della 3:<br>• errori: ambiguità note, "tutte le precedenti" senza ordine fisso<br>• avvisi: lunghezze, spiegazione mancante, risposte numeriche non in ordine, testi quasi uguali |
 | `python tools/domande.py calibra <zerocade.db>` | `domande.py` | Percentuali sulle prime 10 risposte di ogni partita, distrattori morti, difficoltà proposta. Con `--applica` la scrive |
 | Onde di difficoltà, varietà, tempo per difficoltà | `apps/server/src/quizzland.ts` | Il ritmo della sezione 7 |

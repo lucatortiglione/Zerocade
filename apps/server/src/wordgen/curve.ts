@@ -1,5 +1,4 @@
-import { readFileSync } from 'node:fs'
-import { files } from './files.js'
+import { readCurve } from './files.js'
 
 // The difficulty curve and matrix of gioco-parole/tools/curve.json (ALGORITMO.md explains
 // every value). Levels never run out: the ramp of the sawtooth and the growth of wheels and
@@ -51,7 +50,7 @@ export interface Curve {
   }
 }
 
-export const CURVE = JSON.parse(readFileSync(files.curve, 'utf-8')) as Curve
+export const CURVE = readCurve<Curve>()
 
 export const lerp = (a: number, b: number, t: number) => a + (b - a) * t
 export const clamp = (x: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, x))

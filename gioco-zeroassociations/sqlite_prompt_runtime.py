@@ -66,10 +66,10 @@ class SQLite:
     def __init__(self, path: Path, executable: Path | None = None):
         self.path = Path(path).resolve()
         self.executable = sqlite_executable(executable)
-        # Un vecchio percorso (prompt_raw.sqlite3, …) è lo schema corrispondente del DB unico, se esiste
-        # (unified_db.py): l'SQL resta quello di prima e viene riscritto in run().
+        # Uno schema del DB unico (database/parole_ita_raw.sqlite3#raw, o il vecchio nome prompt_raw.sqlite3) si
+        # apre nel DB unico: l'SQL resta scritto con i nomi senza prefisso e viene riscritto in run().
         self.schema = unified_db.schema_of(self.path) if unified_db.active() else None
-        self.file = unified_db.UNIFIED if self.schema else self.path
+        self.file = unified_db.UNIFIED if self.schema else unified_db.file_of(self.path)
 
     def run(self, sql: str, *, rows=False):
         if unified_db.active():
@@ -127,6 +127,7 @@ def publish_database(temporary: Path, output: Path, executable: Path | None = No
         unified_db.import_schema(temporary, schema)
         temporary.unlink(missing_ok=True)
         return 'unified_import'
+    output = unified_db.file_of(output)
     try:
         temporary.replace(output)
         return 'atomic_replace'

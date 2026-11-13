@@ -1,9 +1,9 @@
 """Più DB SQLite in un solo file, uno "schema" ciascuno.
 
 SQLite non ha schemi dentro un file: qui lo schema è il prefisso `<schema>__` di tabelle, indici, viste e
-trigger. Un vecchio percorso (per esempio gioco-quizzland/data/domande.db) significa "lo schema corrispondente
-del file unico": gli strumenti continuano a scrivere l'SQL con i nomi senza prefisso, che viene riscritto al
-volo. È lo stesso meccanismo di gioco-zeroassociations/unified_db.py, qui generico (database/giochi.py).
+trigger. Uno schema si indica come `<file unico>#<schema>` (address: database/giochi.sqlite3#quizz), la stessa
+scrittura del server; il vecchio percorso del DB a sé (gioco-quizzland/data/domande.db) indica ancora lo stesso
+schema. Gli strumenti scrivono l'SQL con i nomi senza prefisso, che viene riscritto al volo. È lo stesso meccanismo di gioco-zeroassociations/unified_db.py, qui generico (database/giochi.py).
 """
 from __future__ import annotations
 
@@ -14,6 +14,7 @@ import sqlite3
 import tempfile
 from datetime import datetime, timezone
 from pathlib import Path
+from urllib.parse import unquote
 
 SEP = '__'
 IDENT = r'[A-Za-z_][A-Za-z0-9_]*'
@@ -83,8 +84,11 @@ def insertable(con: sqlite3.Connection, table: str) -> str:
 
 
 def _digest(con: sqlite3.Connection, table: str) -> str:
+    """L'impronta delle righe in ordine, non in quello del file: una tabella WITHOUT ROWID le tiene in ordine di
+    chiave, la stessa tabella con il rowid in ordine d'inserimento."""
+    cols = insertable(con, table)
     h = hashlib.sha256()
-    for row in con.execute(f'SELECT {insertable(con, table)} FROM "{table}"'):
+    for row in con.execute(f'SELECT {cols} FROM "{table}" ORDER BY {",".join(str(i + 1) for i in range(cols.count(",") + 1))}'):
         h.update(repr(row).encode('utf-8'))
     return h.hexdigest()
 
@@ -148,14 +152,45 @@ class SchemaDb:
 
     # --- uso da parte degli strumenti ---
 
-    def schema_of(self, path) -> str | None:
+    def address(self, schema: str) -> str:
+        """Come si indica uno schema: `<file unico>#<schema>`, per esempio database/giochi.sqlite3#quizz (la stessa
+        scrittura del server). Gli strumenti lo passano come un percorso."""
+        if schema not in self.schemas.values():
+            raise ValueError(f'Schema sconosciuto: {schema}')
+        return f'{self.file}#{schema}'
+
+    @staticmethod
+    def _split_uri(path) -> tuple[str, str, str]:
+        """(prefisso 'file:' o '', percorso, '?parametri' o '') di un percorso o di un URI file:."""
         text = str(path)
-        if text.startswith('file:'):
-            text = text[5:].split('?')[0].lstrip('/') if os.name == 'nt' else text[5:].split('?')[0]
+        if not text.startswith('file:'):
+            return '', text, ''
+        body, mark, query = text[5:].partition('?')
+        body = unquote(body)
+        return 'file:', body.lstrip('/') if os.name == 'nt' else body, mark + query
+
+    def schema_of(self, path) -> str | None:
+        """Lo schema indicato da `path`: l'indirizzo `<file unico>#<schema>`, oppure il vecchio percorso del DB a sé
+        (gioco-quizzland/data/domande.db, …), che vale ancora."""
+        _, text, _ = self._split_uri(path)
         try:
+            if '#' in text:
+                file, _, schema = text.rpartition('#')
+                return schema if Path(file).resolve() == self.file.resolve() and schema in self.schemas.values() else None
             return self.schemas.get(Path(text).resolve())
         except OSError:
             return None
+
+    def file_of(self, path) -> str:
+        """Il DB da aprire quando il file unico non si usa (legacy): per un indirizzo, il vecchio file del suo schema
+        (anche dentro un URI file:); per ogni altro percorso, il percorso stesso."""
+        prefix, text, query = self._split_uri(path)
+        if '#' in text:
+            file, _, schema = text.rpartition('#')
+            legacy = {s: p for p, s in self.schemas.items()}.get(schema)
+            if legacy is not None and Path(file).name == self.file.name:
+                return prefix + (legacy.as_posix() if prefix else str(legacy)) + query
+        return str(path)
 
     def active(self) -> bool:
         if os.environ.get(self.legacy_env, '').lower() == 'legacy' or not self.file.exists():
@@ -181,7 +216,7 @@ class SchemaDb:
         """sqlite3.connect che, per un vecchio percorso, apre il suo schema nel file unico."""
         schema = self.schema_of(path) if self.active() else None
         if schema is None:
-            return sqlite3.connect(path, uri=uri, **kwargs)
+            return sqlite3.connect(self.file_of(path), uri=uri, **kwargs)
         readonly = 'mode=ro' in str(path)
         con = sqlite3.connect(f'file:{self.file.as_posix()}' + ('?mode=ro' if readonly else ''), uri=True, factory=_Connection, **kwargs)
         con.schema = schema
@@ -190,7 +225,7 @@ class SchemaDb:
 
     def exists(self, path) -> bool:
         schema = self.schema_of(path) if self.active() else None
-        return bool(self.names_of(schema)) if schema else Path(path).exists()
+        return bool(self.names_of(schema)) if schema else Path(self._split_uri(self.file_of(path))[1]).exists()
 
     def register_new_objects(self, schema: str) -> None:
         """Dopo che uno strumento ha creato tabelle nuove nello schema: le aggiunge all'elenco."""
@@ -203,6 +238,24 @@ class SchemaDb:
                 bare, bare_tbl = name[len(schema) + 2:], tbl[len(schema) + 2:]
                 con.execute('INSERT OR IGNORE INTO zerodb_objects(schema,name,type,tbl_name,rows) VALUES(?,?,?,?,NULL)', (schema, bare, t, bare_tbl))
             con.commit()
+        finally:
+            con.close()
+
+    def register_objects(self, schema: str) -> None:
+        """Rimette l'elenco degli oggetti dello schema come sono nel file, dopo che uno strumento ne ha creati,
+        rinominati o tolti (register_new_objects li aggiunge soltanto)."""
+        prefix = prefixed(schema, '')
+        con = sqlite3.connect(self.file, isolation_level=None)
+        try:
+            objs = [(t, n[len(prefix):], tbl[len(prefix):] if tbl.startswith(prefix) else tbl)
+                    for t, n, tbl in con.execute('SELECT type,name,tbl_name FROM sqlite_schema WHERE substr(name,1,?)=? AND sql IS NOT NULL',
+                                                 (len(prefix), prefix))]
+            counts = {n: con.execute(f'SELECT count(*) FROM "{prefix}{n}"').fetchone()[0] for t, n, _ in objs if t == 'table'}
+            con.execute('BEGIN IMMEDIATE')
+            con.execute('DELETE FROM zerodb_objects WHERE schema=?', (schema,))
+            con.executemany('INSERT INTO zerodb_objects(schema,name,type,tbl_name,rows) VALUES(?,?,?,?,?)',
+                            [(schema, n, t, tbl, counts.get(n)) for t, n, tbl in objs])
+            con.execute('COMMIT')
         finally:
             con.close()
 

@@ -19,17 +19,35 @@ from semantic_rules import SEMANTIC_POLICY
 from sqlite_prompt_runtime import SQLite, literal, publish_database
 from validated_prompt_database import has_table, validate_record
 
-DISCARDED_DB = ROOT/'prompt_scartati.sqlite3'
-FILTERED_DB = ROOT/'prompt_filtrati.sqlite3'
+DISCARDED_DB = unified_db.address('scartati')
+FILTERED_DB = unified_db.address('filtrati')
 ROLE = 'discarded-prompts-1'
+# Gli scarti sono milioni di righe con poche centinaia di coppie fase-motivo: le coppie stanno una volta sola in
+# discarded_reasons e ogni riga ne porta il numero (anche l'indice per motivo indicizza il numero, non i testi).
+# Le righe sono WITHOUT ROWID: niente indice a parte per la chiave. La vista discarded_prompts ha le colonne di
+# prima e si legge e si scrive da lì; con INSERT OR REPLACE la regola vale anche per le istruzioni del trigger.
 SCHEMA = """
 CREATE TABLE metadata(key TEXT PRIMARY KEY,value TEXT NOT NULL) STRICT;
-CREATE TABLE discarded_prompts(
- prompt TEXT PRIMARY KEY,reason TEXT NOT NULL,
+CREATE TABLE discarded_reasons(
+ n INTEGER PRIMARY KEY,
  stage TEXT NOT NULL CHECK(stage IN ('AUTOMATIC_FILTER','EDITORIAL_DECISION')),
- zipf REAL,actor TEXT,decided_at TEXT,decision_history_id INTEGER
+ reason TEXT NOT NULL,UNIQUE(stage,reason)
 ) STRICT;
-CREATE INDEX discarded_by_reason ON discarded_prompts(stage,reason);
+CREATE TABLE discarded_rows(
+ prompt TEXT PRIMARY KEY,reason INTEGER NOT NULL REFERENCES discarded_reasons(n),
+ zipf REAL,actor TEXT,decided_at TEXT,decision_history_id INTEGER
+) STRICT,WITHOUT ROWID;
+CREATE INDEX discarded_by_reason ON discarded_rows(reason);
+CREATE VIEW discarded_prompts AS
+ SELECT d.prompt,r.reason,r.stage,d.zipf,d.actor,d.decided_at,d.decision_history_id
+ FROM discarded_rows d JOIN discarded_reasons r ON r.n=d.reason;
+CREATE TRIGGER discarded_prompts_insert INSTEAD OF INSERT ON discarded_prompts BEGIN
+ INSERT INTO discarded_reasons(stage,reason) SELECT NEW.stage,NEW.reason
+  WHERE NOT EXISTS(SELECT 1 FROM discarded_reasons WHERE stage=NEW.stage AND reason=NEW.reason);
+ INSERT INTO discarded_rows VALUES(NEW.prompt,
+  (SELECT n FROM discarded_reasons WHERE stage=NEW.stage AND reason=NEW.reason),
+  NEW.zipf,NEW.actor,NEW.decided_at,NEW.decision_history_id);
+END;
 CREATE VIEW discarded_catalog AS SELECT * FROM discarded_prompts;
 """
 
@@ -44,7 +62,7 @@ def status(db):
 
 def sync_discarded(raw_path=DEFAULT_DB, filtered_path=FILTERED_DB, output=DISCARDED_DB):
     raw_path,filtered_path,output = (Path(p).resolve() for p in (raw_path,filtered_path,output))
-    if output in {raw_path,filtered_path,ROOT/'prompt_validi.sqlite3',ROOT/'prompt.sqlite3'}:
+    if any(unified_db.same_db(output,p) for p in (raw_path,filtered_path,unified_db.address('validi'),unified_db.address('game'))):
         raise ValueError('Il database degli scarti deve essere un file distinto')
     if not unified_db.exists(raw_path) or not unified_db.exists(filtered_path):
         raise ValueError('Servono la raccolta e il database dei candidati filtrati')
@@ -56,7 +74,8 @@ def sync_discarded(raw_path=DEFAULT_DB, filtered_path=FILTERED_DB, output=DISCAR
                 "SELECT value FROM metadata WHERE key='database_role' AND value="+literal(ROLE)+';',rows=True):
             raise ValueError('Destinazione esistente non gestita: scegliere un nuovo file')
     meta = {r['key']:r['value'] for r in filtered.run('SELECT * FROM metadata;',rows=True)}
-    if Path(meta.get('source_db','')).resolve() != raw_path:
+    # source_db può avere il vecchio nome della raccolta (prompt_raw.sqlite3): same_db lo riconosce.
+    if not unified_db.same_db(meta.get('source_db',''),raw_path):
         raise ValueError('I filtri appartengono a una raccolta diversa: ricostruirli')
     # Una revisione positiva corrente prevale sui filtri automatici. Lo scarto
     # esplicito successivo prevale comunque sulla revisione precedente.

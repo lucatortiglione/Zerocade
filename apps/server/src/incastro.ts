@@ -1,4 +1,3 @@
-import { existsSync, readFileSync } from 'node:fs'
 import type {
   GameSettings,
   IncastroChapter,
@@ -26,7 +25,7 @@ import {
   type ZerowordsPlayEnd,
 } from './db.js'
 import { nasaPhotos, randomPhoto, type NasaPhoto } from './nasa.js'
-import { files } from './wordgen/files.js'
+import { readChapters } from './wordgen/files.js'
 import type { Placed } from './wordgen/board.js'
 import type { GeneratedLevel, Grid } from './wordgen/generator.js'
 import { MIN_LEN } from './wordgen/lexicon.js'
@@ -52,9 +51,7 @@ interface Chapter {
   accent: string
 }
 
-const CHAPTER_DATA = existsSync(files.chapters)
-  ? (JSON.parse(readFileSync(files.chapters, 'utf-8')) as { levelsPerChapter: number; chapters: Chapter[] })
-  : { levelsPerChapter: 20, chapters: [] }
+const CHAPTER_DATA = readChapters<{ levelsPerChapter: number; chapters: Chapter[] }>() ?? { levelsPerChapter: 20, chapters: [] }
 
 const VARIANTS: IncastroVariant[] = ['easy', 'standard', 'expert']
 // DDA: automatic letters and dashboard hints that completed this share of the words mean the

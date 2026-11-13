@@ -1,4 +1,4 @@
--- Sorgente dello schema; prompt.sqlite3 (bacini del gioco) viene esportato dalla raccolta prompt_raw.sqlite3.
+-- Sorgente dello schema; lo schema game (bacini verificati) segue la raccolta, schema raw del DB di lavoro.
 PRAGMA foreign_keys=ON;
 CREATE TABLE IF NOT EXISTS metadata(key TEXT PRIMARY KEY, value TEXT NOT NULL) STRICT;
 CREATE TABLE IF NOT EXISTS categories(

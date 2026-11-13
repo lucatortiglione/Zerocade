@@ -2,7 +2,7 @@
 
 Parte dall'esportazione Livecade (livecade-context-it-bank.csv, mai modificata)
 e aggiunge i sostantivi italiani comuni ricavati dall'inventario lessicale di
-gioco-zeroassociations/prompt_raw.sqlite3 (aperto in sola lettura).
+ZeroAssociazioni (schema raw di database/parole_ita_raw.sqlite3, aperto in sola lettura).
 
 Uscite, nella cartella di questo script:
   zerocontext-it-bank-aggiunte.csv  solo le parole nuove, da integrare al CSV Livecade
@@ -20,11 +20,15 @@ import csv
 import hashlib
 import json
 import re
-import sqlite3
+import sys
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
-DEFAULT_DB = HERE.parent / "gioco-zeroassociations" / "prompt_raw.sqlite3"
+sys.path.insert(0, str(HERE.parent / "gioco-zeroassociations"))
+import unified_db  # noqa: E402
+
+# L'inventario: lo schema raw del DB di lavoro (database/parole_ita_raw.sqlite3#raw).
+DEFAULT_DB = unified_db.address("raw")
 LIVECADE_CSV = HERE / "livecade-context-it-bank.csv"
 EXCLUSIONS = HERE / "context_bank_exclusions.txt"
 OUT_CSV = HERE / "zerocontext-it-bank.csv"
@@ -70,7 +74,8 @@ def kind(source: str, pos: str) -> str:
 
 def collect(db: Path) -> dict[str, dict]:
     """Un solo passaggio sulle attestazioni: prove per parola."""
-    con = sqlite3.connect(f"file:{db.as_posix()}?mode=ro", uri=True)
+    # Uno schema del DB di lavoro o un file a sé: l'SQL resta quello con i nomi senza prefisso (unified_db).
+    con = unified_db.connect(f"file:{db.as_posix()}?mode=ro", uri=True)
     snapshots = dict(con.execute("select id,source_key from inventory_snapshots"))
     feats: dict[str, dict] = {}
     query = "select prompt,snapshot_id,role,pos,lemma,details_json from inventory_attestations"
@@ -112,10 +117,12 @@ def collect(db: Path) -> dict[str, dict]:
             f["prop"].add(fam)
         elif role == "frequency_form":
             d = json.loads(details)
+            # Una parola può comparire più volte nella stessa lista (per esempio "ﬂare", con la legatura, e "flare"):
+            # vale il rango migliore e la frequenza più alta, qualunque sia l'ordine delle righe.
             if "rank" in d:
-                f["wf"] = d["rank"]
+                f["wf"] = min(f.get("wf", d["rank"]), d["rank"])
             if "frequency" in d:
-                f["os"] = d["frequency"]
+                f["os"] = max(f.get("os", d["frequency"]), d["frequency"])
     con.close()
     return feats
 

@@ -15,7 +15,7 @@ import unified_db
 import unicodedata
 
 ROOT = Path(__file__).resolve().parent
-DEFAULT_DB = ROOT/'prompt.sqlite3'
+DEFAULT_DB = unified_db.address('game')
 
 
 def answer_key(text: str) -> str:

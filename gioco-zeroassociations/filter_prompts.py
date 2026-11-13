@@ -1,6 +1,6 @@
-"""prompt_filtrati.sqlite3: le voci della raccolta che superano i filtri automatici.
+"""Lo schema filtrati del DB di lavoro: le voci della raccolta che superano i filtri automatici.
 
-Dalla raccolta prompt_raw.sqlite3 (sola lettura) tiene una voce solo se:
+Dalla raccolta (schema raw, sola lettura) tiene una voce solo se:
 
 1. è una parola singola con prova di lemma, in forma canonica (2-15 lettere minuscole);
 2. è familiare: frequenza wordfreq (Zipf) almeno pari alla soglia di resources/prompt_policy.json
@@ -24,7 +24,7 @@ Ogni voce tenuta conserva le prove (frequenza, appartenenza al NVdB, età di acq
 categorie, prima definizione, fonti) e alcune
 segnalazioni per chi la rivede (probabile astratto, molti sensi, anche participio...). Le voci
 familiari escluse restano in filter_rejections con il motivo; tutti gli scarti delle varie
-fasi sono copiati in prompt_scartati.sqlite3, distinguendo filtri e decisioni.
+fasi sono copiati nello schema scartati, distinguendo filtri e decisioni.
 È una preselezione, non una
 validazione: lo stato è FILTERED_AUTOMATIC e un prompt entra nel gioco solo con un verbale di
 revisione (validated_prompt_database.py, import-reviewed). La tabella validated_prompts copia le
@@ -53,9 +53,9 @@ from prompt_policy import load_prompt_policy
 from sqlite_prompt_runtime import publish_database
 
 ROOT = Path(__file__).resolve().parent
-RAW_DB = ROOT/'prompt_raw.sqlite3'
-GAME_DB = ROOT/'prompt.sqlite3'
-FILTERED_DB = ROOT/'prompt_filtrati.sqlite3'
+RAW_DB = unified_db.address('raw')
+GAME_DB = unified_db.address('game')
+FILTERED_DB = unified_db.address('filtrati')
 FILTER_VERSION = 'prompt-filters-2026-11-09.3'
 
 CANONICAL = re.compile(r'[a-zàèéìòù]{2,15}')
@@ -215,8 +215,8 @@ def validated_records(raw: sqlite3.Connection, decided: set[str]) -> list[tuple]
 def build(raw_path: Path = RAW_DB, output: Path = FILTERED_DB, game_path: Path | None = GAME_DB,
           zipf: Callable[[str], float] | None = None, policy: dict | None = None) -> dict:
     raw_path, output = Path(raw_path).resolve(), Path(output).resolve()
-    if output in {raw_path, Path(game_path).resolve() if game_path else None}:
-        raise ValueError('prompt_filtrati.sqlite3 deve essere un file distinto')
+    if any(unified_db.same_db(output, p) for p in (raw_path, game_path) if p):
+        raise ValueError('Il DB dei filtrati deve essere distinto dalla raccolta e dai bacini')
     policy = policy or load_prompt_policy()
     zipf = zipf or wordfreq_zipf()
     raw = unified_db.connect(f'file:{raw_path.as_posix()}?mode=ro', uri=True)
@@ -304,7 +304,7 @@ def build(raw_path: Path = RAW_DB, output: Path = FILTERED_DB, game_path: Path |
     finally:
         temporary.unlink(missing_ok=True)
     from discarded_prompt_database import sync_discarded
-    discarded = sync_discarded(raw_path,output,output.with_name('prompt_scartati.sqlite3'))
+    discarded = sync_discarded(raw_path,output,unified_db.sibling(output,'scartati'))
     return {'output': str(output), 'kept': len(kept), 'validated_prompts': len(validated),
             'rejected_familiar': len(rejected),
             'discarded_db':discarded['output'],'discarded_prompts':discarded['discarded_prompts'],
@@ -333,7 +333,7 @@ def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument('--output', type=Path, default=FILTERED_DB)
     sub = ap.add_subparsers(dest='command', required=True)
-    b = sub.add_parser('build', help='Ricostruisce prompt_filtrati.sqlite3 dalla raccolta')
+    b = sub.add_parser('build', help='Ricostruisce lo schema filtrati dalla raccolta')
     b.add_argument('--source', type=Path, default=RAW_DB)
     b.add_argument('--game-db', type=Path, default=GAME_DB)
     sub.add_parser('status', help='Passaggi del filtro e conteggi')

@@ -24,7 +24,7 @@ from semantic_rules import SEMANTIC_POLICY
 from sqlite_prompt_runtime import SQLite
 from validated_prompt_database import validate_record, sync_validated, VALIDATED_DB
 
-FILTERED_DB = ROOT/'prompt_filtrati.sqlite3'
+FILTERED_DB = unified_db.address('filtrati')
 JOB = ROOT/'prompt-staging/associations/filtered_20261109'
 RULE_FILES = ('direttive_word_association_it_v3_6_0.md', 'DIRETTIVA_INDIZI.md', 'REGOLE.md')
 
@@ -103,7 +103,7 @@ def status(folder=JOB, raw=DEFAULT_DB):
     content = (folder/'entries.jsonl').read_bytes()
     if hashlib.sha256(content).hexdigest() != manifest['entries_sha256']:
         raise ValueError('Coda modificata dopo la preparazione')
-    if Path(manifest['raw']).resolve() != Path(raw).resolve():
+    if not unified_db.same_db(manifest['raw'], raw):
         raise ValueError('La coda appartiene a una raccolta diversa')
     heads, pools, blocked = current(raw)
     states = []
@@ -341,7 +341,7 @@ def apply_reviewed(pack, raw=DEFAULT_DB, valid=VALIDATED_DB):
     result = {'imported_pools':len(todo),'already_imported':len(pools)-len(todo),
               'backup':str(backup) if backup else None,
               'validated_db':sync_validated(db,valid)}
-    if Path(raw).resolve() == DEFAULT_DB.resolve():
+    if unified_db.same_db(raw, DEFAULT_DB):
         result['game_db'] = export_game_db(db,GAME_DB)
     receipt = pack.with_suffix('.import.json')
     if receipt.exists():

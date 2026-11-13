@@ -21,7 +21,8 @@ export function openSchema(file: string, schema: string): Database.Database {
   try {
     const verified = db.prepare("SELECT value FROM zerodb_meta WHERE name = 'verified'").pluck().get()
     if (verified !== '1') throw new Error(`${file} not verified`)
-    const tables = db.prepare("SELECT name FROM zerodb_objects WHERE schema = ? AND type = 'table'").pluck().all(schema) as string[]
+    // Views too: a schema can keep a table's old name as a view over smaller tables (associazioni.associations).
+    const tables = db.prepare("SELECT name FROM zerodb_objects WHERE schema = ? AND type IN ('table', 'view')").pluck().all(schema) as string[]
     if (!tables.length) throw new Error(`${file} has no schema ${schema}`)
     for (const t of tables) db.exec(`CREATE TEMP VIEW "${t}" AS SELECT * FROM "${schema}__${t}"`)
     return db

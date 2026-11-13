@@ -1,9 +1,10 @@
-"""The Bivio questions live in data/domande.db (SQLite): the Zerocade server reads them
-from there, and so does tools/to_livecade.py. This tool fills the database from a CSV and
-writes it back to one, for anyone who edits the questions in a spreadsheet.
+"""The Bivio questions (ZeroDubbi) live in the games' database, schema dubbi of
+database/giochi.sqlite3 (tables dubbi__dilemmi and dubbi__testi): the Zerocade server reads them from
+there, and so does tools/to_livecade.py. This tool fills the schema from a CSV and writes it back
+to one, for anyone who edits the questions in a spreadsheet.
 
 Usage:
-  python tools/domande.py import domande.csv   replaces every question in data/domande.db
+  python tools/domande.py import domande.csv   replaces every question in the schema dubbi
   python tools/domande.py export domande.csv   writes them all out, same columns
   python tools/domande.py stats                counts per category, difficulty and language
 
@@ -11,7 +12,7 @@ CSV columns: id, categoria, difficolta, esplicita, then <lingua>_a and <lingua>_
 language (it_a, it_b, en_a, en_b; another language is two more columns). UTF-8.
 
 Schema:
-  dilemmi(id, categoria, difficolta, esplicita, ordine)   ordine keeps the file's order
+  dilemmi(id, categoria, difficolta, esplicita, ordine)   ordine keeps the CSV's order
   testi(dilemma, lingua, a, b)                            one row per dilemma and language
 Never reuse the id of a deleted question: the votes Zerocade saves are tied to it.
 """
@@ -23,12 +24,12 @@ import sys
 from collections import Counter
 
 ROOT = os.path.normpath(os.path.join(os.path.dirname(os.path.abspath(__file__)), ".."))
-DB = os.path.join(ROOT, "data", "domande.db")
 
-# The questions live in the games' database (database/giochi.sqlite3), schema dubbi: data/domande.db, the path
-# used here, means that schema (ZEROCADE_GIOCHI_DB=legacy goes back to the old file).
+# The questions live in the games' database: DB is the address of its schema dubbi,
+# database/giochi.sqlite3#dubbi (ZEROCADE_GIOCHI_DB=legacy goes back to the old data/domande.db).
 sys.path.insert(0, os.path.join(ROOT, "..", "database"))
 import giochi  # noqa: E402
+DB = giochi.address("dubbi")
 
 SCHEMA = """
 CREATE TABLE IF NOT EXISTS dilemmi (
