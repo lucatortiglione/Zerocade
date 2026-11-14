@@ -5,10 +5,19 @@ import { GamesPage } from './pages/GamesPage'
 import { GiftsPage } from './pages/GiftsPage'
 import { SetupPage } from './pages/SetupPage'
 import { SourcesPage } from './pages/SourcesPage'
+import { clearRuntimeIssue, useDashboard } from './store'
+
+function RuntimeIssue() {
+  const { runtimeIssue } = useDashboard()
+  return runtimeIssue ? <aside className="runtime-issue" role="alert">{runtimeIssue}
+    <button type="button" className="btn btn--small" onClick={clearRuntimeIssue}>Chiudi avviso</button>
+  </aside> : null
+}
 
 export function App() {
   return (
     <BrowserRouter>
+      <RuntimeIssue />
       <div className="shell">
         <LeftRail />
         <Routes>

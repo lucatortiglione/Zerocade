@@ -13,4 +13,4 @@ Modifiche rispetto all'originale:
 Le traduzioni (`it/*.json` e le domande `otdb-…` di `database/ZeroQuizz.sqlite3`) sono distribuite con la stessa licenza CC BY-SA 4.0.
 Chi le riusa deve citare Open Trivia Database, indicare la licenza e mantenerla.
 
-`opentdb-en.json` contiene le domande originali in inglese, scaricate con `python tools/fonti.py download opentdb`.
+`opentdb-en.json` contiene le domande originali in inglese, scaricate con `python script/fonti.py download opentdb`.

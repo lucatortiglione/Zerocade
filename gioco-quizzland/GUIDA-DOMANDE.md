@@ -226,9 +226,9 @@ La proposta:
 1. **Scegli una famiglia** (sezione 4) oppure creane una nuova con meccanismo, trappola e parametri.
 2. **Scrivi 3–5 varianti** con numeri e contesti diversi. Le risposte numeriche si verificano con un calcolo, non a occhio.
 3. **Test del pignolo.** Per ogni risposta sbagliata, prova per 30 secondi a sostenere che sia giusta. Se ci riesci, riscrivi la domanda.
-4. **Controllo automatico**: `python tools/domande.py stats` (oggi), più i controlli proposti nella sezione 10.
+4. **Controllo automatico**: `python script/domande.py stats` (oggi), più i controlli proposti nella sezione 10.
 5. **Prova a freddo.** Leggila a due persone che non l'hanno scritta e cronometra: devono rispondere entro 15 secondi.
-6. **Importala** (`python tools/domande.py import`) e riavvia Zerocade.
+6. **Importala** (`python script/domande.py import`) e riavvia Zerocade.
 7. **Ogni settimana guarda i dati:**
    - "Le più sbagliate" nella dashboard.
    - Le domande segnalate.
@@ -276,7 +276,7 @@ Sono proposte: niente di questo è ancora fatto.
 | Cosa | Dove | A cosa serve |
 |---|---|---|
 | Colonne `famiglia`, `trappola` (la lettera della risposta trappola) e `note` | `ZeroQuizz.sqlite3`, CSV, `domande.py` | Varietà nel mazzo, 50:50 che lascia la trappola, statistiche sulla trappola |
-| `python tools/domande.py check` | `domande.py` | I limiti della sezione 2 e le regole della 3:<br>• errori: ambiguità note, "tutte le precedenti" senza ordine fisso<br>• avvisi: lunghezze, spiegazione mancante, risposte numeriche non in ordine, testi quasi uguali |
-| `python tools/domande.py calibra <zerocade.db>` | `domande.py` | Percentuali sulle prime 10 risposte di ogni partita, distrattori morti, difficoltà proposta. Con `--applica` la scrive |
+| `python script/domande.py check` | `domande.py` | I limiti della sezione 2 e le regole della 3:<br>• errori: ambiguità note, "tutte le precedenti" senza ordine fisso<br>• avvisi: lunghezze, spiegazione mancante, risposte numeriche non in ordine, testi quasi uguali |
+| `python script/domande.py calibra <zerocade.db>` | `domande.py` | Percentuali sulle prime 10 risposte di ogni partita, distrattori morti, difficoltà proposta. Con `--applica` la scrive |
 | Onde di difficoltà, varietà, tempo per difficoltà | `apps/server/src/quizzland.ts` | Il ritmo della sezione 7 |
 | Categorie `indovinelli` e `parole` | `packages/shared`, `Quizzland.tsx` | Da decidere |

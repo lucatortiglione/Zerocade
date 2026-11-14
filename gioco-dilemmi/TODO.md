@@ -23,11 +23,11 @@ Questo piano nasce dal reverse engineering di Dilemmaly 1.4.1 (`com.vanilla.woul
 | Percorso | Contenuto |
 |---|---|
 | schema `dubbi` di `database/giochi.sqlite3` | 120 dilemmi originali, in italiano e inglese, divisi in 12 categorie da 10 (lo legge il server di Zerocade; `data/domande.db` è la vecchia copia, non più aggiornata) |
-| `tools/domande.py` | Importa le domande da un CSV nello schema `dubbi` e le esporta in CSV, per chi le modifica in un foglio di calcolo |
+| `script/domande.py` | Importa le domande da un CSV nello schema `dubbi` e le esporta in CSV, per chi le modifica in un foglio di calcolo |
 | `data/livecade/wyr_it.csv`, `wyr_en.csv` | Gli stessi dilemmi nel formato di importazione Livecade (intestazione provvisoria, vedi sezione 3, M11) |
-| `tools/to_livecade.py` | Convertitore dallo schema `dubbi` al CSV Livecade, con mappatura automatica sull'intestazione di un export reale |
-| `tools/from_livecade.py` | Il contrario: importa nello schema `dubbi` un CSV Livecade (un export della dashboard o un file di `to_livecade.py`). Riconosce le colonne allo stesso modo, riporta categorie e difficoltà ai nostri valori, dà id nuovi (b0121…) e salta le domande già presenti, anche con A e B invertite. `--dry-run` mostra cosa importerebbe |
-| `tools/make_category_assets.py` | Genera icone, card e sfondi delle categorie |
+| `script/to_livecade.py` | Convertitore dallo schema `dubbi` al CSV Livecade, con mappatura automatica sull'intestazione di un export reale |
+| `script/from_livecade.py` | Il contrario: importa nello schema `dubbi` un CSV Livecade (un export della dashboard o un file di `to_livecade.py`). Riconosce le colonne allo stesso modo, riporta categorie e difficoltà ai nostri valori, dà id nuovi (b0121…) e salta le domande già presenti, anche con A e B invertite. `--dry-run` mostra cosa importerebbe |
+| `script/make_category_assets.py` | Genera icone, card e sfondi delle categorie |
 | `assets/icon/` | Icona dell'app (SVG 1024) e icona adattiva Android (primo piano e sfondo) |
 | `assets/category-icons/` | 12 icone bianche 100×100 |
 | `assets/category-cards/` | 12 card verticali 632×832 |
@@ -47,7 +47,7 @@ Tabelle dello schema `dubbi` (in `giochi.sqlite3` hanno il prefisso `dubbi__`):
 | `testi.dilemma`, `testi.lingua` | Una riga per dilemma e lingua (`it`, `en`; per aggiungere una lingua bastano nuove righe) |
 | `testi.a`, `testi.b` | Le due opzioni, scritte come completamento di "Preferiresti…" |
 
-Per lavorare in un foglio di calcolo: `python tools/domande.py export domande.csv`, si modifica il file (colonne `id`, `categoria`, `difficolta`, `esplicita`, `<lingua>_a`, `<lingua>_b`), poi `python tools/domande.py import domande.csv`. `python tools/domande.py stats` conta dilemmi per categoria, difficoltà e lingua.
+Per lavorare in un foglio di calcolo: `python script/domande.py export domande.csv`, si modifica il file (colonne `id`, `categoria`, `difficolta`, `esplicita`, `<lingua>_a`, `<lingua>_b`), poi `python script/domande.py import domande.csv`. `python script/domande.py stats` conta dilemmi per categoria, difficoltà e lingua.
 
 ---
 
@@ -107,7 +107,7 @@ Le stime valgono per uno sviluppatore che conosce Flutter e sono indicative.
 - [ ] Flavor `dev` e `prod` (package id diversi)
 
 ### M1 · Pipeline dei contenuti (2–3 giorni)
-- [ ] `tools/build_bundle.py`: dallo schema `dubbi` a `assets/data/questions_<lingua>.json`, **un file per lingua**. Il riferimento usa un unico JSON da 24 MB con 22 lingue, che pesa in memoria e all'avvio.
+- [ ] `script/build_bundle.py`: dallo schema `dubbi` a `assets/data/questions_<lingua>.json`, **un file per lingua**. Il riferimento usa un unico JSON da 24 MB con 22 lingue, che pesa in memoria e all'avvio.
   ```json
   { "version": 1, "generatedAt": "2026-11-01", "language": "it",
     "categories": [{ "id": "cibo", "title": "Cibo", "premium": false, "explicit": false }],
@@ -134,7 +134,7 @@ Le stime valgono per uno sviluppatore che conosce Flutter e sono indicative.
 ### M3 · Mazzo personalizzato (3–4 giorni)
 - [ ] Creare, modificare ed eliminare domande (due campi, anteprima sulla card vera)
 - [ ] Salvataggio locale
-- [ ] Export e import CSV con lo stesso schema di `tools/domande.py`, per riusare le domande su Livecade con `tools/to_livecade.py`
+- [ ] Export e import CSV con lo stesso schema di `script/domande.py`, per riusare le domande su Livecade con `script/to_livecade.py`
 - [ ] Limite di lunghezza e contatore di caratteri
 
 ### M4 · Localizzazione (3 giorni di codice, più il tempo delle traduzioni)
@@ -199,7 +199,7 @@ Livecade ha già un gioco Would You Rather con oltre 4900 domande per lingua, it
 Livecade non pubblica i nomi delle colonne del gioco Would You Rather. Il processo affidabile è questo:
 
 1. [ ] Nella dashboard: Would You Rather → Your question bank → lingua `it` → **Export** → CSV. L'export è gratuito su tutti i piani.
-2. [ ] `python tools/to_livecade.py --lang it --template <export>.csv --out data/livecade/wyr_it.csv` (legge lo schema `dubbi`)
+2. [ ] `python script/to_livecade.py --lang it --template <export>.csv --out data/livecade/wyr_it.csv` (legge lo schema `dubbi`)
    - Il convertitore copia l'intestazione dell'export e mappa automaticamente lingua, opzione A, opzione B, categoria e difficoltà.
    - Avvisa se i nostri valori di categoria o difficoltà non esistono nel banco di Livecade. In quel caso si correggono con `--map`:
      ```json

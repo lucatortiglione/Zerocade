@@ -1,8 +1,8 @@
 # Lo schema `validi`: cosa contiene e quando una voce può entrarvi
 
 Documento aggiornato il **9 novembre 2026**, sulla base dell'implementazione
-locale di [validated_prompt_database.py](validated_prompt_database.py),
-[prompt_database.py](prompt_database.py) e [prompt_schema.sql](prompt_schema.sql).
+locale di [script/validated_prompt_database.py](script/validated_prompt_database.py),
+[script/prompt_database.py](script/prompt_database.py) e [prompt_schema.sql](prompt_schema.sql).
 
 ## 1. Regola di ingresso
 
@@ -81,7 +81,7 @@ il cluster si ricavano dal catalogo, senza inventare etichette sostitutive.
 
 Il contratto dei verbali accetta forme composte dalle lettere italiane previste
 da `WORD`, senza spazi o simboli. Il limite di 2–15 caratteri della preselezione
-automatica appartiene a `filter_prompts.py`: non è un ulteriore limite applicato
+automatica appartiene a `script/filter_prompts.py`: non è un ulteriore limite applicato
 da `validate_pool()` o `validate_record()` con la stessa espressione regolare.
 
 Il campo `prompt_language` va dichiarato correttamente dal revisore. Il codice
@@ -487,7 +487,7 @@ Dalla cartella `gioco-zeroassociations`, in PowerShell.
 ### Consultazione dello stato esistente
 
 ```powershell
-.venv/Scripts/python.exe -B validated_prompt_database.py status
+.venv/Scripts/python.exe -B script/validated_prompt_database.py status
 ```
 
 Mostra i conteggi delle principali tabelle, la versione SQLite e i controlli
@@ -496,7 +496,7 @@ di integrità. Non ricostruisce la copia.
 ### Sincronizzazione dai verbali già presenti nella raccolta
 
 ```powershell
-.venv/Scripts/python.exe -B validated_prompt_database.py sync
+.venv/Scripts/python.exe -B script/validated_prompt_database.py sync
 ```
 
 Questo comando scrive la copia valida. Non esegue la revisione dei candidati,
@@ -507,7 +507,7 @@ lo schema `game`.
 
 ```powershell
 # Sostituire il percorso con un pacchetto completo realmente revisionato.
-.venv/Scripts/python.exe -B validated_prompt_database.py import-pools percorso/bacini_revisionati.jsonl
+.venv/Scripts/python.exe -B script/validated_prompt_database.py import-pools percorso/bacini_revisionati.jsonl
 ```
 
 `import-pools` richiede verbali completi `verified-pool-1`, importa i bacini
@@ -519,25 +519,25 @@ le associazioni di un nuovo bacino nelle relative tabelle.
 
 ```powershell
 # Candidati e catalogo delle revisioni positive, compresi i prompt senza bacino.
-.venv/Scripts/python.exe -B filter_prompts.py build
+.venv/Scripts/python.exe -B script/filter_prompts.py build
 
 # Copia di distribuzione dei bacini destinata al gioco.
-.venv/Scripts/python.exe -B prompt_database.py dump
+.venv/Scripts/python.exe -B script/prompt_database.py dump
 ```
 
-Sono comandi distinti. Il comando diretto `prompt_database.py import-reviewed`
+Sono comandi distinti. Il comando diretto `script/prompt_database.py import-reviewed`
 aggiorna la raccolta e la sua copia di gioco nel percorso standard, ma non
 sostituisce automaticamente l'intero flusso di registrazione e sincronizzazione
-di `validated_prompt_database.py`.
+di `script/validated_prompt_database.py`.
 
 ### Estrazione esplicita dal database valido
 
 ```powershell
-.venv/Scripts/python.exe -B prompt_database.py --db ../database/parole_ita_raw.sqlite3#validi livecade --count 20 --seed esempio-1
+.venv/Scripts/python.exe -B script/prompt_database.py --db ../database/parole_ita_raw.sqlite3#validi livecade --count 20 --seed esempio-1
 ```
 
 Qui `--db` precede il sottocomando. È esplicito perché il comando generico
-`prompt_database.py` usa altrimenti la raccolta come sorgente predefinita.
+`script/prompt_database.py` usa altrimenti la raccolta come sorgente predefinita.
 L'esempio genera un export candidato: non è stato eseguito per scrivere questo
 documento.
 
@@ -545,7 +545,7 @@ documento.
 
 Le query seguenti si eseguono sullo schema `validi`: aperto nel client SQLite il file
 `database/parole_ita_raw.sqlite3`, le tabelle si chiamano `validi__<nome>`, oppure si esporta lo schema
-come DB a sé (`unified_db.py export validi FILE`). Non richiedono modifiche ai dati.
+come DB a sé (`script/unified_db.py export validi FILE`). Non richiedono modifiche ai dati.
 
 ```sql
 -- Conteggi principali: righe di catalogo, contesti e associazioni.
@@ -638,15 +638,15 @@ generato liste o eseguito nuove verifiche semantiche dei bacini esistenti.
 - [PROMPT_FILTRATI.md](PROMPT_FILTRATI.md): preselezione e catalogo delle
   revisioni dei prompt, anche prima delle associazioni.
 - [PROMPT_SCARTATI.md](PROMPT_SCARTATI.md): scarti automatici, decisioni e rinvii.
-- [validated_prompt_database.py](validated_prompt_database.py): selezione dei
+- [script/validated_prompt_database.py](script/validated_prompt_database.py): selezione dei
   verbali e sincronizzazione della copia valida.
-- [prompt_database.py](prompt_database.py): contratto dei bacini, importazione,
+- [script/prompt_database.py](script/prompt_database.py): contratto dei bacini, importazione,
   campionamento ed esportazione.
 - [prompt_schema.sql](prompt_schema.sql): schema di bacini, risposte, vincoli e
   prove; la tabella aggiuntiva dei validati è definita nello script di copia.
 - [prompt_validation_schema.sql](prompt_validation_schema.sql): registro delle
   revisioni correnti e storiche nella raccolta.
-- [semantic_rules.py](semantic_rules.py): versione semantica e controlli
+- [script/semantic_rules.py](script/semantic_rules.py): versione semantica e controlli
   editoriali del progetto.
 - [direttive_word_association_it_v3_6_0.md](direttive_word_association_it_v3_6_0.md):
   direttiva operativa.

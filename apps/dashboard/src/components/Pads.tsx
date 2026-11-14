@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, type CSSProperties, type FormEvent } from 'react'
+import { apiFetch, UnconfirmedRequestError } from '@zerocade/browser-runtime'
 import { DJ_SOUNDS, PAD_COLORS, PAD_SLOTS, padFilePath, type Pad, type PadInput, type PadKind } from '@zerocade/shared'
 import { overlayKey } from '../overlayKey'
 import { socket } from '../socket'
@@ -155,7 +156,7 @@ export function Pads() {
 function Volume({ value }: { value: number }) {
   const [draft, setDraft] = useState(value)
   const timer = useRef<number | undefined>(undefined)
-  useEffect(() => setDraft(value), [value])
+  useEffect(() => { clearTimeout(timer.current); setDraft(value) }, [value])
   useEffect(() => () => clearTimeout(timer.current), [])
   const set = (next: number) => {
     setDraft(next)
@@ -203,6 +204,9 @@ function PadEditor({
   const [preview, setPreview] = useState('')
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
+  const alive = useRef(true)
+  const saving = useRef(false)
+  useEffect(() => { alive.current = true; return () => { alive.current = false } }, [])
 
   useEffect(() => () => URL.revokeObjectURL(preview), [preview])
 
@@ -218,30 +222,45 @@ function PadEditor({
 
   const save = async (e: FormEvent) => {
     e.preventDefault()
+    if (saving.current) return
+    saving.current = true
     setBusy(true)
     setError('')
     try {
       const input: PadInput = { kind, slot: position, label, color, ...(pad ? { id: pad.id } : {}), ...(soundId ? { soundId } : {}) }
       if (file && !soundId) input.upload = { type: typeOf(file), data: await toBase64(file) }
-      const res = await fetch(`/api/pads/${overlayKey}`, {
+      if (!alive.current) return
+      const res = await apiFetch(`/api/pads/${overlayKey}`, {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
         body: JSON.stringify(input),
-      })
+      }, 15_000, 256 * 1024)
+      if (!alive.current) return
       if (res.ok) return onClose()
       const body = (await res.json().catch(() => null)) as { error?: string } | null
       setError(body?.error ?? 'Salvataggio non riuscito.')
-    } catch {
-      setError('Il server non risponde.')
+    } catch (error) {
+      if (alive.current) setError(error instanceof UnconfirmedRequestError ? error.message : 'Salvataggio non riuscito.')
     } finally {
-      setBusy(false)
+      saving.current = false
+      if (alive.current) setBusy(false)
     }
   }
 
-  const remove = () => {
-    if (pad && window.confirm(`Eliminare "${pad.label}"?`)) {
-      socket.emit('pad:remove', pad.id)
-      onClose()
+  const remove = async () => {
+    if (!pad || saving.current || !window.confirm(`Eliminare "${pad.label}"?`)) return
+    saving.current = true
+    setBusy(true)
+    setError('')
+    try {
+      const response = await apiFetch(`/api/pads/${overlayKey}/${encodeURIComponent(pad.id)}`, { method: 'DELETE' })
+      if (!response.ok) throw new Error('Eliminazione non riuscita.')
+      if (alive.current) onClose()
+    } catch (error) {
+      if (alive.current) setError(error instanceof Error ? error.message : 'Eliminazione non riuscita.')
+    } finally {
+      saving.current = false
+      if (alive.current) setBusy(false)
     }
   }
 
@@ -257,13 +276,13 @@ function PadEditor({
 
       <label className="form__field">
         <span className="form__label">Nome</span>
-        <input type="text" maxLength={24} value={label} onChange={(e) => setLabel(e.target.value)} placeholder="Es. Applausi" />
+        <input type="text" maxLength={24} value={label} disabled={busy} onChange={(e) => setLabel(e.target.value)} placeholder="Es. Applausi" />
       </label>
 
       {kind === 'sound' && (
         <label className="form__field">
           <span className="form__label">Suono</span>
-          <select value={soundId} onChange={(e) => setSoundId(e.target.value)}>
+          <select value={soundId} disabled={busy} onChange={(e) => setSoundId(e.target.value)}>
             <option value="">{file ? `File: ${file.name}` : pad?.file ? 'File caricato' : 'Un file audio…'}</option>
             {DJ_SOUNDS.map((s) => (
               <option key={s.id} value={s.id}>
@@ -279,7 +298,7 @@ function PadEditor({
           {kind === 'gif' && <span className="image-picker__thumb">{thumb ? <img src={thumb} alt="" /> : 'Nessuna GIF'}</span>}
           <label className="btn btn--small">
             {file || pad?.file ? 'Cambia file…' : 'Scegli file…'}
-            <input type="file" accept={accept} hidden onChange={(e) => pick(e.target.files?.[0])} />
+            <input type="file" accept={accept} hidden disabled={busy} onChange={(e) => pick(e.target.files?.[0])} />
           </label>
           <span className="text-muted small">{kind === 'sound' ? 'MP3, WAV, OGG, M4A' : 'GIF, WebP, PNG, JPG'} · max 6 MB</span>
         </div>
@@ -296,17 +315,18 @@ function PadEditor({
               style={{ background: c }}
               aria-label={`Colore ${c}`}
               aria-pressed={color === c}
+              disabled={busy}
               onClick={() => setColor(c)}
             />
           ))}
-          <input type="color" className="form__color" value={color} aria-label="Altro colore" onChange={(e) => setColor(e.target.value)} />
+          <input type="color" className="form__color" value={color} disabled={busy} aria-label="Altro colore" onChange={(e) => setColor(e.target.value)} />
         </div>
       </div>
 
       {pad && (
         <label className="form__field">
           <span className="form__label">Posizione</span>
-          <select value={position} onChange={(e) => setPosition(Number(e.target.value))}>
+          <select value={position} disabled={busy} onChange={(e) => setPosition(Number(e.target.value))}>
             {Array.from({ length: PAD_SLOTS }, (_, i) => (
               <option key={i} value={i}>
                 {i + 1}
@@ -318,16 +338,17 @@ function PadEditor({
       )}
 
       {error && <p className="form__error">{error}</p>}
+      {busy && <p className="text-muted small">L'operazione avviata continua anche se chiudi questa finestra.</p>}
 
       <div className="pad-editor__actions">
         <button type="submit" className="btn btn--primary btn--small" disabled={busy || !label.trim()}>
           {busy ? 'Salvo…' : 'Salva'}
         </button>
         <button type="button" className="btn btn--small" onClick={onClose}>
-          Annulla
+          {busy ? 'Chiudi' : 'Annulla'}
         </button>
         {pad && (
-          <button type="button" className="btn btn--small pad-editor__delete" onClick={remove}>
+          <button type="button" className="btn btn--small pad-editor__delete" disabled={busy} onClick={remove}>
             Elimina
           </button>
         )}

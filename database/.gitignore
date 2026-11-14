@@ -2,7 +2,7 @@ __pycache__/
 # Copie temporanee della costruzione.
 giochi.sqlite3.*.part
 
-# ZeroAssociazioni: il DB di lavoro (gioco-zeroassociations/unified_db.py) pesa gigabyte, oltre i 100 MB che
+# ZeroAssociazioni: il DB di lavoro (gioco-zeroassociations/script/unified_db.py) pesa gigabyte, oltre i 100 MB che
 # GitHub accetta per un file (DB.md spiega ogni file).
 parole_ita_raw.sqlite3
 parole_ita_raw.sqlite3.*

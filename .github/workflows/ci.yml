@@ -5,7 +5,7 @@ on:
     branches: [main]
   pull_request:
 
-# Stessi controlli di DIRETTIVE.md, sezione 16: typecheck, test Node, test Python del database, npm audit.
+# Controlli DIRETTIVE.md: tipi, confini/credenziali, build, test, smoke isolati e audit.
 jobs:
   controlli:
     runs-on: windows-latest
@@ -21,6 +21,10 @@ jobs:
           python-version: '3.x'
       - run: npm ci
       - run: npm run typecheck
+      - run: node scripts/check-infrastructure.mjs
+      - run: npm run build
       - run: node --import tsx --test tests/*.test.ts
-      - run: python -I -m unittest discover -s database
+      - run: python -I -m unittest discover -s database/script
+      - run: node scripts/smoke-runtime.mjs
+      - run: node scripts/smoke-runtime.mjs --bundle
       - run: npm audit --omit=dev

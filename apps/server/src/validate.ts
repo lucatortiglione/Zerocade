@@ -34,6 +34,7 @@ function sanitizeViewer(raw: unknown): Viewer | null {
     avatar,
     ...(r.follower === true && { follower: true }),
     ...(r.fan === true && { fan: true }),
+    ...(r.host === true && { host: true }),
   }
 }
 
@@ -163,8 +164,9 @@ export function sanitizeScene(raw: unknown): Partial<WidgetConfig> | null {
     const w = asRecord(r.widgets)
     if (!w) return null
     const widgets: Record<string, boolean> = {}
+    const widgetIds = new Set(['alerts', 'joins', 'follower', 'goal', 'gifters'])
     for (const [k, v] of Object.entries(w)) {
-      if (typeof v !== 'boolean') return null
+      if (!widgetIds.has(k) || typeof v !== 'boolean') return null
       widgets[k] = v
     }
     out.widgets = widgets as Record<WidgetId, boolean>

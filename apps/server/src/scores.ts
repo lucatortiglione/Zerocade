@@ -74,8 +74,7 @@ export function resetLeaderboard(key: string, gameId: string, period: PeriodId, 
 // When each period of a game was last reset (period -> time), for the dashboard.
 export const leaderboardResetTimes = (key: string, gameId: string): Partial<Record<PeriodId, number>> => leaderboardResets(key, gameId)
 
-export function leaderboards(key: string, gameId: string, limit = 10, now = new Date()): Boards {
-  const start = sessionSince(key, gameId)
+export function leaderboards(key: string, gameId: string, limit = 10, now = new Date(), start = sessionSince(key, gameId)): Boards {
   const resets = leaderboardResets(key, gameId)
   const out = {} as Boards
   for (const { id } of PERIODS) {

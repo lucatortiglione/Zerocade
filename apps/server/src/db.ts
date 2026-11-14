@@ -5,6 +5,7 @@ import { fileURLToPath } from 'node:url'
 import Database from 'better-sqlite3'
 import {
   BRIDGE_DEFAULT_PORT,
+  payloadBytes,
   giftById,
   type BivioChoice,
   type BridgeConfig,
@@ -18,17 +19,20 @@ import {
   type SavedSources,
   type SourceKind,
 } from '@zerocade/shared'
+import { REPORT_MAX_BYTES } from './csv.js'
 
 // Local persistence via better-sqlite3 (latest stable SQLite engine). The DB file
 // lives in apps/server/data and is gitignored; set ZEROCADE_DB to override the path.
 
 const here = dirname(fileURLToPath(import.meta.url))
-const dbPath = process.env.ZEROCADE_DB ?? join(here, '..', 'data', 'zerocade.db')
+export const dbPath = process.env.ZEROCADE_DB ?? join(here, '..', 'data', 'zerocade.db')
 export const dataDir = dirname(dbPath)
 mkdirSync(dataDir, { recursive: true })
 
 const db = new Database(dbPath)
+export const databaseSnapshot = <T>(read: () => T): T => db.transaction(read)()
 db.exec('PRAGMA journal_mode = WAL;')
+db.pragma('foreign_keys = ON')
 // Another process opening the file (a tool, a second copy) waits up to 5 s for the lock instead of failing at once.
 db.exec('PRAGMA busy_timeout = 5000;')
 
@@ -220,15 +224,27 @@ const ADDED_COLUMNS: [table: string, column: string, definition: string][] = [
   // The gifter's profile picture, for the Top donatori widget.
   ['gifters', 'avatar', 'TEXT'],
 ]
-for (const [table, column, definition] of ADDED_COLUMNS) {
-  if (hasColumn(table, column)) continue
-  try {
-    db.exec(`ALTER TABLE ${table} ADD COLUMN ${column} ${definition}`)
-  } catch (err) {
-    throw new Error(`[db] cannot add the column ${table}.${column} to ${dbPath}: ${err instanceof Error ? err.message : String(err)}`, {
-      cause: err,
-    })
+const migrateColumns = db.transaction(() => {
+  db.exec(`CREATE TABLE IF NOT EXISTS infrastructure_migrations (
+    version INTEGER PRIMARY KEY, name TEXT NOT NULL,
+    applied_at TEXT NOT NULL DEFAULT (datetime('now'))
+  )`)
+  for (const [table, column, definition] of ADDED_COLUMNS) {
+    if (hasColumn(table, column)) continue
+    try {
+      db.exec(`ALTER TABLE ${table} ADD COLUMN ${column} ${definition}`)
+    } catch (err) {
+      throw new Error(`[db] cannot add the column ${table}.${column} to ${dbPath}: ${err instanceof Error ? err.message : String(err)}`, {
+        cause: err,
+      })
+    }
   }
+  db.prepare('INSERT OR IGNORE INTO infrastructure_migrations (version, name) VALUES (?, ?)').run(1, 'widgets-goal-avatars')
+})
+try { migrateColumns.immediate() }
+catch (error) {
+  db.close()
+  throw new Error(`[db] migration v1 (widgets-goal-avatars) failed for ${dbPath}`, { cause: error })
 }
 
 // Games that changed id: the saved sessions, gifts and creators follow them.
@@ -430,7 +446,7 @@ export const getRanking = (key: string): Gifter[] =>
 
 // --- Events ---
 
-const eventInsert = db.prepare('INSERT INTO events (key, type, payload) VALUES (?, ?, ?)')
+const eventInsert = db.prepare('INSERT INTO events (key, type, payload, created_at) VALUES (?, ?, ?, ?)')
 const eventSelect = db.prepare<[string, number], EventRow>('SELECT id, type, payload, created_at FROM events WHERE key = ? ORDER BY id DESC LIMIT ?')
 const eventPrune = db.prepare(`
   DELETE FROM events WHERE key = ? AND id NOT IN (
@@ -448,8 +464,8 @@ export interface EventRow {
 export const listEvents = (key: string, limit: number): EventRow[] =>
   eventSelect.all(key, limit)
 
-export const recordEvent = (key: string, event: LiveEvent): void => {
-  eventInsert.run(key, event.type, JSON.stringify(event))
+export const recordEvent = (key: string, event: LiveEvent, at = Date.now()): void => {
+  eventInsert.run(key, event.type, JSON.stringify(event), new Date(at).toISOString().slice(0, 19).replace('T', ' '))
   eventPrune.run(key, key)
   if (event.type === 'gift') {
     const coins = (giftById(event.giftId)?.coins ?? 0) * event.count
@@ -691,17 +707,25 @@ export const addZerowordsAnswer = (answer: ZerowordsAnswer): void => {
 }
 
 // Column names and rows, for the CSV downloads.
-const table = (stmt: Database.Statement) => ({
-  columns: stmt.columns().map((c) => c.name),
-  rows: stmt.raw().all() as (string | number | null)[][],
-})
+const table = (stmt: Database.Statement) => {
+  const rows: (string | number | null)[][] = []
+  let bytes = 0
+  // Reject before retaining a row. iterate() releases its statement on error.
+  for (const raw of stmt.raw().iterate()) {
+    const row = raw as (string | number | null)[]
+    bytes += payloadBytes(row, REPORT_MAX_BYTES)
+    if (rows.length >= 49_999 || bytes > REPORT_MAX_BYTES) throw new Error('Export troppo grande: massimo 50.000 righe o 16 MiB.')
+    rows.push(row)
+  }
+  return { columns: stmt.columns().map((c) => c.name), rows }
+}
 
 export const zerowordsPlays = () => table(zwPlaysAll)
 export const zerowordsAnswers = () => table(zwAnswersAll)
 
 // --- Word Association telemetry ---
 // One row per round an overlay played to the end, and per hidden word (found or missed) and
-// frequent wrong guess in it: what gioco-zeroassociations/analyze_telemetry.py reads to
+// frequent wrong guess in it: what gioco-zeroassociations/script/analyze_telemetry.py reads to
 // measure difficulty and find the associations the chat expects. No viewer is stored.
 
 const WORD_ASSOCIATION_DAYS_KEPT = 365
@@ -846,10 +870,18 @@ const giftTop = db.prepare(
 )
 const giftCreators = db.prepare('SELECT DISTINCT creator FROM gifts')
 
-export const recordGift = (key: string, creator: string, gameId: string, event: GiftEvent): void => {
+export const recordGift = (key: string, creator: string, gameId: string, event: GiftEvent, at = Date.now()): void => {
   const coins = (giftById(event.giftId)?.coins ?? 0) * event.count
-  giftInsert.run(key, creator, gameId, event.user.id, event.user.nickname, event.user.avatar ?? null, event.giftId, event.count, coins, Date.now())
+  giftInsert.run(key, creator, gameId, event.user.id, event.user.nickname, event.user.avatar ?? null, event.giftId, event.count, coins, at)
 }
+
+// The live-event worker commits the event, donor total and gift together.
+export const recordLiveEvent = db.transaction((key: string, creator: string, gameId: string, event: LiveEvent, at = Date.now()) => {
+  recordEvent(key, event, at)
+  if (event.type !== 'gift') return null
+  recordGift(key, creator, gameId, event, at)
+  return getRanking(key)
+})
 
 // `creator` undefined means every creator; '' the simulator.
 // A gift row without a picture leaves `avatar` out rather than null.

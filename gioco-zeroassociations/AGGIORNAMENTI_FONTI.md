@@ -26,7 +26,7 @@ con la versione già archiviata. Errori di rete vengono riportati e non autorizz
 un ripiego silenzioso su una versione presentata come aggiornata.
 
 Una fonte cambiata viene **preparata per il confronto, senza sostituire
-automaticamente la versione attiva**. Anche `prompt_inventory.py collect`
+automaticamente la versione attiva**. Anche `script/prompt_inventory.py collect`
 prepara un confronto se una fonte già importata ha contenuto diverso. La prima
 raccolta di una fonte nuova continua a popolare l'inventario grezzo.
 
@@ -78,12 +78,12 @@ essere attestate altrove o avere decisioni e associazioni già documentate.
 Dalla cartella `gioco-zeroassociations`:
 
 ```powershell
-python -B inventory_updates.py check-updates --only freedict-ita-deu
-python -B inventory_updates.py updates
-python -B inventory_updates.py changes ID_AGGIORNAMENTO --kind NEW --limit 50 --offset 0
-python -B inventory_updates.py decide-update ID_AGGIORNAMENTO --decision APPLY --reason "Versione esaminata"
-python -B inventory_updates.py term parola
-python -B inventory_updates.py decide-term parola --decision DISCARDED --reason "Motivo della scelta"
+python -B script/inventory_updates.py check-updates --only freedict-ita-deu
+python -B script/inventory_updates.py updates
+python -B script/inventory_updates.py changes ID_AGGIORNAMENTO --kind NEW --limit 50 --offset 0
+python -B script/inventory_updates.py decide-update ID_AGGIORNAMENTO --decision APPLY --reason "Versione esaminata"
+python -B script/inventory_updates.py term parola
+python -B script/inventory_updates.py decide-term parola --decision DISCARDED --reason "Motivo della scelta"
 ```
 
 Gli ID possono essere abbreviati a un prefisso univoco di almeno otto caratteri.
@@ -94,11 +94,11 @@ Il JSON `resources/prompt_inventory_sources.json` rimane una configurazione
 versionabile per aggiungere fonti. Per registrare le modifiche nel DB:
 
 ```powershell
-python -B inventory_updates.py register-sources
+python -B script/inventory_updates.py register-sources
 ```
 
 La registrazione non acquisisce le parole né crea uno snapshot. Il primo
-`prompt_inventory.py collect` importa la fonte anche se era già registrata;
+`script/prompt_inventory.py collect` importa la fonte anche se era già registrata;
 soltanto le acquisizioni successive con dati diversi preparano un confronto.
 
 ## Fonti di parole, lemmi e morfologia
@@ -123,7 +123,7 @@ sono conservate nel registro; i file di licenza si scaricano insieme alle fonti.
 Per scaricare e raccogliere soltanto le tre nuove risorse (Flex_it ha due file):
 
 ```powershell
-python -B prompt_inventory.py collect --only unimorph-ita glaffit flex-it-nouns flex-it-adjectives
+python -B script/prompt_inventory.py collect --only unimorph-ita glaffit flex-it-nouns flex-it-adjectives
 ```
 
 Le attestazioni esplicite dei lemmi vengono raccolte anche quando il file elenca
@@ -141,7 +141,7 @@ database, non un secondo archivio operativo.
 
 Lo schema `game` (i bacini del gioco) mostra i bacini verificati e le decisioni
 sulle voci, come viste sulla raccolta, così il gioco e il ripristino rispettano
-anche le esclusioni: è sempre aggiornato; `prompt_database.py dump --output FILE`
+anche le esclusioni: è sempre aggiornato; `script/prompt_database.py dump --output FILE`
 li scrive in un DB a sé. Non contiene
 le grandi attestazioni, i download preparati e i confronti integrali: per
 conservare tutto questo, incluse le decisioni, serve il backup SQLite completo.

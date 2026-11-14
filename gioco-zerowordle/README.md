@@ -29,9 +29,9 @@ Le parole vengono dall'inventario lessicale di ZeroAssociazioni (schema `raw` di
 `database/parole_ita_raw.sqlite3`, fuori da Git, letto in sola lettura). Dalla cartella `gioco-zerowordle`:
 
 ```
-python build_wordle_bank.py              riscrive lo schema wordle
-python build_wordle_bank.py --report     anche i conteggi dei motivi di esclusione
-python build_wordle_bank.py --sample 40  anche un campione di soluzioni per ogni lunghezza
+python script/build_wordle_bank.py              riscrive lo schema wordle
+python script/build_wordle_bank.py --report     anche i conteggi dei motivi di esclusione
+python script/build_wordle_bank.py --sample 40  anche un campione di soluzioni per ogni lunghezza
 ```
 
 Le soluzioni da togliere a mano vanno in [`wordle_exclusions.txt`](wordle_exclusions.txt): una o più parole per

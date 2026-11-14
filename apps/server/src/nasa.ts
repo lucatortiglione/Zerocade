@@ -3,7 +3,7 @@
 // ZeroWords shows one at random behind each level when its background is 'nasa'; the other games get the list
 // (GET /api/nasa) and show the one the clock picks (nasaPhotoAt, @zerocade/shared).
 
-import type { NasaPhoto } from '@zerocade/shared'
+import { readBoundedBytes, type NasaPhoto } from '@zerocade/shared'
 
 export type { NasaPhoto }
 
@@ -20,14 +20,15 @@ let pending: Promise<NasaPhoto[]> | null = null
 const decode = (s: string) =>
   s
     .replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, '$1')
-    .replace(/&#(\d+);/g, (_, n: string) => String.fromCodePoint(Number(n)))
-    .replace(/&#x([0-9a-f]+);/gi, (_, n: string) => String.fromCodePoint(parseInt(n, 16)))
+    .replace(/&#(\d+);/g, (_, n: string) => codePoint(Number(n)))
+    .replace(/&#x([0-9a-f]+);/gi, (_, n: string) => codePoint(parseInt(n, 16)))
     .replace(/&quot;/g, '"')
     .replace(/&apos;/g, "'")
     .replace(/&lt;/g, '<')
     .replace(/&gt;/g, '>')
     .replace(/&amp;/g, '&')
     .trim()
+const codePoint = (n: number) => Number.isInteger(n) && n >= 0 && n <= 0x10ffff && !(n >= 0xd800 && n <= 0xdfff) ? String.fromCodePoint(n) : '\ufffd'
 
 // The pictures of the feed: an image enclosure on nasa.gov, with its title and page.
 export function parseFeed(xml: string): NasaPhoto[] {
@@ -36,10 +37,12 @@ export function parseFeed(xml: string): NasaPhoto[] {
     const enclosure = /<enclosure\s+url="([^"]+)"[^>]*type="image\//.exec(item)
     const url = enclosure ? decode(enclosure[1]) : ''
     if (!/^https:\/\/www\.nasa\.gov\/[^?#"]+$/.test(url)) continue
+    if (out.length >= 100) break
+    const link = decode(/<link>([\s\S]*?)<\/link>/.exec(item)?.[1] ?? '')
     out.push({
       url: `${url}?w=${WIDTH}`,
-      title: decode(/<title>([\s\S]*?)<\/title>/.exec(item)?.[1] ?? ''),
-      link: decode(/<link>([\s\S]*?)<\/link>/.exec(item)?.[1] ?? 'https://www.nasa.gov/image-of-the-day/'),
+      title: decode(/<title>([\s\S]*?)<\/title>/.exec(item)?.[1] ?? '').slice(0, 300),
+      link: /^https:\/\/www\.nasa\.gov\//.test(link) ? link : 'https://www.nasa.gov/image-of-the-day/',
     })
   }
   return out
@@ -54,7 +57,7 @@ export function nasaPhotos(): Promise<NasaPhoto[]> {
     try {
       const res = await fetch(FEED, { signal: AbortSignal.timeout(15_000) })
       if (!res.ok) throw new Error(`HTTP ${res.status}`)
-      const list = parseFeed(await res.text())
+      const list = parseFeed(new TextDecoder('utf-8', { fatal: true }).decode(await readBoundedBytes(res, 2 * 1024 * 1024)))
       if (list.length) photos = list
     } catch (err) {
       console.warn(`[nasa] ${FEED}: ${err instanceof Error ? err.message : String(err)}`)

@@ -45,9 +45,9 @@ quando si vogliono esportare bacini già verificati.
 Da terminale, nella cartella `gioco-zeroassociations`:
 
 ```powershell
-python -B prompt_inventory.py collect
-python -B prompt_inventory.py status
-python -B prompt_inventory.py collect --only de-mauro-sitemaps
+python -B script/prompt_inventory.py collect
+python -B script/prompt_inventory.py status
+python -B script/prompt_inventory.py collect --only de-mauro-sitemaps
 ```
 
 ## Cosa viene conservato
@@ -66,7 +66,7 @@ Il database operativo è la raccolta, schema `raw` di `database/parole_ita_raw.s
   (`inventory_snapshot_numbers`, `inventory_attestation_roles`,
   `inventory_attestation_pos`) e la forma originale solo quando è diversa dal
   prompt. Un DB del formato precedente si converte da solo al primo comando di
-  `prompt_inventory.py` o `inventory_updates.py` (`migrate_attestations`).
+  `script/prompt_inventory.py` o `script/inventory_updates.py` (`migrate_attestations`).
 - `inventory_source_counts`: conteggi per fonte.
 - `inventory_pending_single_words`: parole singole raccolte che non appartengono
   ancora ai prompt verificati della banca di gioco.

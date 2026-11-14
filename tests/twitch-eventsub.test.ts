@@ -5,6 +5,7 @@ const { TwitchEventSub, parseEventSubMessage } = await import('../apps/server/sr
 
 process.env.TWITCH_CLIENT_ID = 'client-id'
 process.env.TWITCH_CLIENT_SECRET = 'very-secret-value'
+process.env.TWITCH_USER_ACCESS_TOKEN = 'user-token-secret'
 
 const json = (body: unknown, status = 200) => new Response(JSON.stringify(body), { status })
 
@@ -18,17 +19,19 @@ test('a message that is not JSON or lacks metadata and payload is ignored, not t
   assert.equal(ok?.metadata.message_type, 'notification')
 })
 
-test('the app token is requested in the body, never in the URL', async () => {
-  const seen: { url: string; body: string }[] = []
+test('a user token is validated in the header; no app token or secret is sent in a URL', async () => {
+  const seen: { url: string; body: string; authorization: string | null }[] = []
   const fetchFn = (async (url: string, init?: RequestInit) => {
-    seen.push({ url: String(url), body: String(init?.body ?? '') })
+    seen.push({ url: String(url), body: String(init?.body ?? ''), authorization: new Headers(init?.headers).get('authorization') })
     return json({}, 500)
   }) as unknown as typeof fetch
   const ev = new TwitchEventSub('chan', () => {}, { fetchFn })
-  await assert.rejects(ev.start(), /app token request failed \(HTTP 500\)/)
+  await assert.rejects(ev.start(), /token validation failed \(HTTP 500\)/)
   assert.equal(seen.length, 1)
   assert.ok(!seen[0].url.includes('very-secret-value'), 'the secret must not be in the URL')
-  assert.ok(seen[0].body.includes('client_secret=very-secret-value'))
+  assert.equal(seen[0].body, '')
+  assert.equal(seen[0].authorization, 'OAuth user-token-secret')
+  assert.ok(!seen[0].url.includes('user-token-secret'))
 })
 
 test('a request that never answers is abandoned, and the error does not mention the secret', async () => {
@@ -38,7 +41,7 @@ test('a request that never answers is abandoned, and the error does not mention 
     })) as unknown as typeof fetch
   const ev = new TwitchEventSub('chan', () => {}, { fetchFn, requestTimeoutMs: 30 })
   await assert.rejects(ev.start(), (err: Error) => {
-    assert.match(err.message, /app token request: no answer in time/)
+    assert.match(err.message, /token validation: no answer in time/)
     assert.ok(!err.message.includes('very-secret-value'))
     return true
   })
@@ -46,7 +49,7 @@ test('a request that never answers is abandoned, and the error does not mention 
 
 test('an unknown channel is reported by name', async () => {
   let calls = 0
-  const fetchFn = (async () => (++calls === 1 ? json({ access_token: 't' }) : json({ data: [] }))) as unknown as typeof fetch
+  const fetchFn = (async () => (++calls === 1 ? json({ client_id: 'client-id', user_id: '1', scopes: [] }) : json({ data: [] }))) as unknown as typeof fetch
   const ev = new TwitchEventSub('nobody', () => {}, { fetchFn })
   await assert.rejects(ev.start(), /channel not found: nobody/)
 })

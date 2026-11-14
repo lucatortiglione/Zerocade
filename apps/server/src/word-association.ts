@@ -21,8 +21,8 @@ import {
 // pools only need a copy and a restart. The first of these with pools is used:
 // - ZEROCADE_ASSOCIATIONS_DB (a .sqlite3/.db database or a .sql dump);
 // - the games' database, schema associazioni (database/giochi.sqlite3, next to the server in the Windows
-//   package): the verified pools alone, copied from the working database by `database/giochi.py aggiorna`;
-// - the working database itself, database/parole_ita_raw.sqlite3 (gioco-zeroassociations/unified_db.py,
+//   package): the verified pools alone, copied from the working database by `database/script/giochi.py aggiorna`;
+// - the working database itself, database/parole_ita_raw.sqlite3 (gioco-zeroassociations/script/unified_db.py,
 //   gigabytes, not in git), whose schemas are written `file#schema`: validi (the validated prompts), game
 //   (the verified pools, views over raw), raw (the collection itself, with the lexical inventory).
 // A prompt the collection marks DISCARDED or DEFERRED (inventory_term_decisions) never plays.
@@ -113,7 +113,7 @@ interface PromptRow {
   review_id: string
 }
 
-// The games' database, schema associazioni (database/giochi.py): the prompts, each word once and the links between
+// The games' database, schema associazioni (database/script/giochi.py): the prompts, each word once and the links between
 // them (prompt_words), with the pool's ref already stored. A meaning group is named by a word: the link and the
 // group's limit carry that word's number.
 function fromGameTables(db: Database.Database): Candidate[] {
@@ -164,7 +164,7 @@ export function loadWordAssociation(path?: string | null): LoadedWordAssociation
             const origin = loadWordAssociation(work)
             if (!origin.pools.length) continue
             if (origin.contentId !== loaded.contentId)
-              console.warn('[word-association] the pools in database/giochi.sqlite3 are behind the working database: run `python database/giochi.py aggiorna associazioni`')
+              console.warn('[word-association] the pools in database/giochi.sqlite3 are behind the working database: run `python database/script/giochi.py aggiorna associazioni`')
             break
           }
         }

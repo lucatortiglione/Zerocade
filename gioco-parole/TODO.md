@@ -32,11 +32,11 @@ Il riferimento tecnico resta in `../Words_of_Wonders_RE/` e **non** va copiato q
 | `lexicon/it/SOURCE` | Fonti, versioni, licenze e attribuzione da mostrare | ✅ |
 | `lexicon/it/not_in_grid.txt` | Parole valide che non vanno mai nello schema (nomi, sigle, prestiti, interiezioni) | ✅ prima revisione |
 | `lexicon/blocklist_it.txt` | Parole escluse ovunque: volgari, offensive, sensibili | ✅ prima revisione |
-| `tools/build_lexicon.py` | M1: Morph-it! + frequenze wordfreq → `words.tsv` | ✅ |
+| `script/build_lexicon.py` | M1: Morph-it! + frequenze wordfreq → `words.tsv` | ✅ |
 | `apps/server/src/wordgen/` (fuori da questa cartella) | M2: generatore dei livelli in TypeScript, dentro il server di Zerocade: livelli senza fine, creati durante la partita e deterministici dal numero; `npm run wordgen -w @zerocade/server` per tararlo ([ALGORITMO.md](ALGORITMO.md)) | ✅ |
-| `tools/validate_levels.py` | M2: validatore dei livelli scritti dal generatore (esce con 1 se un livello è sbagliato) | ✅ livelli 1–600, 0 errori |
+| `script/validate_levels.py` | M2: validatore dei livelli scritti dal generatore (esce con 1 se un livello è sbagliato) | ✅ livelli 1–600, 0 errori |
 | `tools/curve.json` | Curva di difficoltà (al posto di `curve.yaml`: niente dipendenza da PyYAML) | ✅ da tarare col playtest |
-| `tools/make_backgrounds.py` | Disegna gli sfondi dei capitoli e scrive `data/chapters.json` | ✅ |
+| `script/make_backgrounds.py` | Disegna gli sfondi dei capitoli e scrive `data/chapters.json` | ✅ |
 | `data/levels/it/pack_NNN.json` | Livelli scritti solo per il controllo (`--write N`), 100 per file; il server non li legge | ✅ |
 | `data/chapters.json` | 30 capitoli da 20 livelli: nome, stagione, ora, sfondo, colore | ✅ (JSON invece di CSV) |
 | `assets/backgrounds/chapter_NN.svg` | 30 sfondi 1080 × 1920: il giardino che cresce | ✅ |
@@ -45,10 +45,10 @@ Il riferimento tecnico resta in `../Words_of_Wonders_RE/` e **non** va copiato q
 Rigenerare tutto (serve `pip install wordfreq`; le liste sorgente non stanno nel repository, vedi `SOURCE`):
 
 ```
-python tools/build_lexicon.py <percorso>/morph-it_048.txt
+python script/build_lexicon.py <percorso>/morph-it_048.txt
 npm run wordgen -w @zerocade/server -- --write 600
-python tools/validate_levels.py
-python tools/make_backgrounds.py
+python script/validate_levels.py
+python script/make_backgrounds.py
 ```
 
 ### Versione PC per Zerocade (fatta)
@@ -132,14 +132,14 @@ Le stime valgono per uno sviluppatore che conosce Flutter e sono indicative.
   - `l10n/`.
 - [ ] Dipendenze di base: `go_router`, `flutter_riverpod`, `hive_ce`, `flutter_svg`, `just_audio` (o `audioplayers`), `audio_session`, `in_app_review`, `flutter_local_notifications`, `timezone`, `url_launcher`, `in_app_purchase`
 - [ ] `flutter_lints` più `analysis_options.yaml` rigoroso
-- [ ] CI con GitHub Actions: `flutter analyze`, `flutter test`, `python tools/validate_levels.py`, build dell'APK di debug
+- [ ] CI con GitHub Actions: `flutter analyze`, `flutter test`, `python script/validate_levels.py`, build dell'APK di debug
 - [ ] Flavor `dev` e `prod`
 
 ### M1 · Dizionario (3–5 giorni più la revisione)
 - [ ] **Fonti con licenza verificata**, in `lexicon/it/SOURCE` (URL, versione, licenza):
   - Italiano: valutare Morph-it! (CC BY-SA / LGPL), le liste derivate da Hunspell `it_IT` (GPL/LGPL: attenzione se si includono nell'app) o Wiktionary (CC BY-SA). **Va chiesta la conferma di un legale sulla licenza per un'app commerciale.** Le licenze share-alike possono estendersi ai file dei livelli.
   - Frequenza d'uso: `wordfreq` (codice Apache 2.0, dati CC BY-SA 4.0) o un corpus con licenza compatibile.
-- [ ] `tools/build_lexicon.py`:
+- [ ] `script/build_lexicon.py`:
   1. maiuscolo; per l'italiano, accenti piegati sulla lettera base (decisione 1);
   2. solo lettere A–Z, lunghezza 3–8;
   3. via nomi propri, sigle, forme arcaiche e la blocklist;
@@ -174,7 +174,7 @@ RAMO     L'esempio rispetta le regole del validatore: AMO e ORA incrociano RAMO
 - [ ] **Lemmi nel lessico:** tenere in `words.tsv` il lemma di Morph-it! (ricostruendo il lessico) e limitare le forme dello stesso lemma per griglia.
 - [ ] **Rating della chat** (media mobile su circa dieci livelli) al posto della serie di due esiti, quando i dati delle partite diranno come pesare tempi, stalli e partecipanti.
 - [ ] **Livelli tutorial** (i primi 5–10) fatti a mano e marcati `"handmade": true`
-- [ ] **Validatore** (`tools/validate_levels.py`, eseguito in CI). Fallisce se:
+- [ ] **Validatore** (`script/validate_levels.py`, eseguito in CI). Fallisce se:
   - una parola esce dallo schema, o due parole si contraddicono in una casella;
   - una parola non è componibile con le lettere della ruota;
   - nello schema esistono sequenze orizzontali o verticali di 2+ lettere che non sono parole dichiarate (parole "involontarie");

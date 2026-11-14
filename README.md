@@ -25,6 +25,12 @@ l'uso, gioco per gioco (`scripts/package-win.mjs`).
 
 La chat arriva da TikTok (tiktok-live-connector), da Twitch (tmi.js) oppure da ZeroFollowerBot sullo stesso PC.
 
+Accanto allo stato di ZeroFollowerBot, **Ritenta connessione** annulla l'attesa
+o il tentativo in corso e riprova subito sulla porta configurata. Quando il
+ponte è collegato, lo stesso pulsante diventa **Ricollega**. È disponibile
+nei controlli dei giochi e nella pagina delle sorgenti, con il ponte acceso;
+i tentativi automatici continuano dopo un errore.
+
 ## I giochi
 
 Sette giochi hanno una cartella propria, con i dati e gli strumenti per prepararli:
@@ -107,6 +113,7 @@ Lunar Dash e Guess the Location ne restano senza, perché la loro scena occupa t
 | `apps/overlay` | L'overlay (React e canvas): i giochi in `src/games`, ZeroDubbi, ZeroQuizz e ZeroWords come pagine a sé |
 | `apps/dashboard` | La dashboard di regia (React) |
 | `packages/shared` | Catalogo dei giochi, impostazioni, tipi e regole comuni a server e overlay |
+| `packages/browser-runtime` | Socket.IO nei Web Worker di dashboard e overlay, richieste HTTP limitate e notifiche per frame |
 | `database` | Il DB dei giochi e gli strumenti per costruirlo e verificarlo |
 | `gioco-*` | Dati e strumenti dei sette giochi con una cartella propria |
 | `audio` | I suoni dell'overlay |
@@ -115,13 +122,40 @@ Lunar Dash e Guess the Location ne restano senza, perché la loro scena occupa t
 
 ## Controlli
 
+L'infrastruttura usa due thread Node dedicati a persistenza e report. Il server mantiene il coordinamento
+della diretta; ogni dashboard e overlay usa un Web Worker per la connessione Socket.IO. DOM, React e canvas
+restano sul thread dell'interfaccia. Questa revisione non parallelizza gli algoritmi dei giochi.
+
+Code, deadline, compatibilità, prove e limiti sono descritti nell'[audit delle direttive](docs/DIRETTIVE-audit-2026-11-14.md).
+`GET /api/live` indica che il processo risponde; `GET /api/health` mostra disponibilità dei worker,
+saturazione, memoria e latenze. Un problema di persistenza appare anche nella dashboard: un evento ricevuto
+non viene presentato come salvato se manca la conferma. Gli export CSV rifiutano risultati oltre
+50.000 righe o il budget di 16 MiB; non restituiscono un file troncato.
+
+Per EventSub Twitch servono `TWITCH_CLIENT_ID` e `TWITCH_USER_ACCESS_TOKEN`, un **token utente** della stessa app.
+I follow richiedono lo scope `moderator:read:followers` e un utente autorizzato come moderatore del canale.
+La chat funziona anche senza EventSub. Il token si configura nell'ambiente del processo e si sostituisce
+quando scade o viene revocato; non c'è un flusso interattivo di rinnovo OAuth. Le prove locali usano fixture,
+non un account Twitch reale.
+
 ```
 npm run typecheck                           TypeScript di server, overlay, dashboard e shared
 node --import tsx --test tests/*.test.ts    test di server e overlay
 npm run test:associations                   test di ZeroAssociazioni
-python -m unittest discover -s database     test del DB dei giochi
-python database/giochi.py verify            confronta ogni schema di giochi.sqlite3 con la sua origine
+python -m unittest discover -s database/script     test del DB dei giochi
+python database/script/giochi.py verify            confronta ogni schema di giochi.sqlite3 con la sua origine
+node scripts/check-infrastructure.mjs              confini tra app e pattern di credenziali nel sorgente
+node scripts/smoke-runtime.mjs                     avvio isolato del server sorgente
+node scripts/smoke-runtime.mjs --bundle            avvio isolato dei bundle Node e worker
+node --import tsx scripts/benchmark-infrastructure.ts   confronto SQLite sul main e nel worker (DB temporanei)
 ```
+
+Backup del database operativo, senza sovrascrivere una destinazione esistente:
+`node scripts/backup-live.mjs apps/server/data/zerocade.db C:\Backup\zerocade-2026-11-14.db`.
+Lo script include il WAL confermato e verifica `integrity_check`. Per un backup completo, fermare il server
+e copiare anche `pads/` e `backgrounds/` dalla stessa cartella dati. Per ripristinare, fermare Zerocade,
+conservare la cartella dati attuale e ripristinare database e media della stessa copia: non sostituire un
+database aperto né associarlo ai vecchi file `-wal` e `-shm`.
 
 ## Crediti
 
@@ -131,5 +165,5 @@ python database/giochi.py verify            confronta ogni schema di giochi.sqli
   API (CC BY-NC 4.0), OpenBookQA (licenza non nota) e API Ninjas (solo uso personale). Licenze e condizioni sono nelle
   cartelle di [gioco-quizzland/data/fonti](gioco-quizzland/data/fonti); [gioco-quizzland/README.md](gioco-quizzland/README.md)
   spiega quali vanno decise prima di una diretta monetizzata.
-- ZeroContext usa i vettori fastText italiani `cc.it.300` (`gioco-zerocontext/fetch_vectors.py`).
+- ZeroContext usa i vettori fastText italiani `cc.it.300` (`gioco-zerocontext/script/fetch_vectors.py`).
 - Le foto di sfondo sono le «Image of the Day» della NASA, scaricate durante la partita.

@@ -1,5 +1,5 @@
-import { io, type Socket } from 'socket.io-client'
-import type { ClientToServerEvents, RoomInfo, ServerToClientEvents } from '@zerocade/shared'
+import { LiveSocket, apiFetch } from '@zerocade/browser-runtime'
+import type { RoomInfo } from '@zerocade/shared'
 
 // The overlay link has no key: the overlay asks the server for its room, retrying while
 // Zerocade is still starting. A link that names a room (?key=…: the dashboard's preview,
@@ -9,7 +9,7 @@ async function roomKey(): Promise<string> {
   if (named) return named
   for (;;) {
     try {
-      const res = await fetch('/api/room')
+      const res = await apiFetch('/api/room', {}, 10_000, 32 * 1024)
       if (res.ok) return ((await res.json()) as RoomInfo).key
     } catch {
       // Server not up yet.
@@ -20,8 +20,4 @@ async function roomKey(): Promise<string> {
 
 const key = await roomKey()
 
-export const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io({
-  path: '/socket.io',
-  transports: ['websocket'],
-  auth: { clientType: 'overlay', key },
-})
+export const socket = new LiveSocket(window.location.origin, { clientType: 'overlay', key })

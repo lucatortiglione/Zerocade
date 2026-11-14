@@ -1,11 +1,11 @@
 import { useEffect, useRef, useSyncExternalStore } from 'react'
-import { GAMES, activeTriggers, describeSource, sharesPhotoBackground, triggersFor, type GameCommand } from '@zerocade/shared'
+import { GAMES, activeTriggers, describeSource, sharesPhotoBackground, triggersFor, type GameCommand, type LiveEvent } from '@zerocade/shared'
 import { setRoundCheer } from './audio'
 import { NasaBackdrop } from './NasaBackdrop'
 import { Engine } from './games/engine'
 import { createGame } from './games/registry'
 import { socket } from './socket'
-import { useOverlay } from './store'
+import { overlaySnapshot, useOverlay } from './store'
 import { Widgets } from './Widgets'
 import { Bivio } from './Bivio'
 import { Incastro } from './Incastro'
@@ -15,7 +15,7 @@ import { ScoreTicker } from './ScoreTicker'
 
 
 export function App() {
-  const { connected, session, event, seq, message, messageSeq, gif, gifSeq, incastro, quizzland } = useOverlay()
+  const { connected, session, message, messageSeq, gif, gifSeq, incastro, quizzland } = useOverlay()
   const contentReady = useSyncExternalStore(subscribeContent, isContentReady)
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const engineRef = useRef<Engine | null>(null)
@@ -79,13 +79,18 @@ export function App() {
   // Dispatch matching triggers on each incoming event. Nothing a viewer does (messages, likes, gifts, follows,
   // joins) shows over the game by itself: the Alerts widget does that, when the creator turns it on.
   useEffect(() => {
-    if (!event || !session || session.paused || session.ended) return
-    const game = GAMES.find((g) => g.id === session.gameId)
-    if (game) {
-      // Without the triggers whose help the creator switched off ("Aiuti dal pubblico").
-      for (const t of triggersFor(activeTriggers(session), event)) engineRef.current?.pushAction(t.action, event)
+    const dispatch = (event: LiveEvent) => {
+      const { session } = overlaySnapshot()
+      if (!session || session.paused || session.ended) return
+      if (GAMES.some((g) => g.id === session.gameId)) {
+        for (const t of triggersFor(activeTriggers(session), event)) engineRef.current?.pushAction(t.action, event)
+      }
     }
-  }, [seq])
+    // Subscribe directly: React may combine renders, but each worker event must
+    // reach the engine once, in order, including bursts of chat messages.
+    socket.on('live:event', dispatch)
+    return () => { socket.off('live:event', dispatch) }
+  }, [])
 
   const game = session ? GAMES.find((g) => g.id === session.gameId) : undefined
   // NASA's picture of the day behind the canvas games (ZeroDubbi, ZeroQuizz and ZeroWords draw their own).

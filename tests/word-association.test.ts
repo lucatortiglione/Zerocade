@@ -180,7 +180,7 @@ test("the games' database has the prompts, each word once and the links (schema 
   try {
     const file = join(root, 'giochi.sqlite3')
     const db = new Database(file)
-    // As database/giochi.py writes it: numeric keys, the pool's ref kept with the prompt, the words once.
+    // As database/script/giochi.py writes it: numeric keys, the pool's ref kept with the prompt, the words once.
     db.exec(`
       CREATE TABLE zerodb_meta(name TEXT PRIMARY KEY, value TEXT NOT NULL);
       CREATE TABLE zerodb_objects(schema TEXT, name TEXT, type TEXT, tbl_name TEXT, rows INTEGER, PRIMARY KEY(schema, name));

@@ -12,7 +12,7 @@ words.tsv (italiano) è derivato da:
 
 Rigenerare:
   pip install wordfreq
-  python tools/build_lexicon.py it <percorso>/morph-it_048.txt
+  python script/build_lexicon.py it <percorso>/morph-it_048.txt
 
 Attribuzione da mostrare (crediti del gioco e LEGGIMI):
   Parole: Morph-it! di M. Baroni ed E. Zanchetta (CC BY-SA 2.0) e frequenze wordfreq

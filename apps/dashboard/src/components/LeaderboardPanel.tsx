@@ -1,5 +1,6 @@
 import { GAMES } from '@zerocade/shared'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import { apiFetch } from '@zerocade/browser-runtime'
 import { overlayUrl, publicLeaderboardUrl } from '../overlayKey'
 import { socket } from '../socket'
 
@@ -19,21 +20,33 @@ const when = (at: number) => new Date(at).toLocaleString('it-IT', { day: 'numeri
 export function LeaderboardPanel({ gameId }: { gameId: string }) {
   const base = new URL(`/classifica/${gameId}`, overlayUrl).href
   const [info, setInfo] = useState<BoardsInfo | null>(null)
+  const request = useRef<AbortController | null>(null)
+  const target = useRef(gameId)
+  const alive = useRef(true)
+  target.current = gameId
 
   const load = useCallback(async () => {
+    if (!alive.current || target.current !== gameId) return
+    request.current?.abort()
+    const controller = new AbortController()
+    request.current = controller
     try {
-      const res = await fetch(`/api/leaderboard/${encodeURIComponent(gameId)}?limit=1`, { cache: 'no-store' })
-      if (res.ok) setInfo((await res.json()) as BoardsInfo)
+      const res = await apiFetch(`/api/leaderboard/${encodeURIComponent(gameId)}?limit=1`, { cache: 'no-store', signal: controller.signal })
+      if (res.ok) {
+        const next = (await res.json()) as BoardsInfo
+        if (alive.current && target.current === gameId && !controller.signal.aborted && request.current === controller) setInfo(next)
+      }
     } catch {
       // The server is restarting: the next round fills it in.
     }
   }, [gameId])
 
   useEffect(() => {
+    alive.current = true
     setInfo(null)
     void load()
     const timer = window.setInterval(() => void load(), 10_000)
-    return () => window.clearInterval(timer)
+    return () => { alive.current = false; window.clearInterval(timer); request.current?.abort() }
   }, [load])
 
   const reset = (period: { id: string; label: string }) => {

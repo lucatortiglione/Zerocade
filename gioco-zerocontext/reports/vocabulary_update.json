@@ -1,0 +1,72 @@
+{
+  "updated_at": "2026-11-14T13:29:54.070803+00:00",
+  "previous_words": 60229,
+  "words": 101304,
+  "added": 41075,
+  "removed": 0,
+  "secrets": 6837,
+  "dim": 600,
+  "frequency_limit": 60000,
+  "attested_words": 93528,
+  "lexical_snapshots": [
+    [
+      "flex-it-adjectives",
+      "6f75c70786e2087ebe557926a93521322b4d4e70a0cebf4759aeddfd81a669d0"
+    ],
+    [
+      "flex-it-nouns",
+      "d993ea00882d27c20a0f500bf63a9badbf02d701a692ad25f87cbaf265d6139e"
+    ],
+    [
+      "freedict-ita-deu",
+      "77b4ff98d1cb45ae675f4dec5f15d058c7bd77b8abbae696edd8953ee55bde19"
+    ],
+    [
+      "glaffit",
+      "3ea20ca80b679d0abc392ec9463896195875b557f033f1cc3a7d7ebee60cb260"
+    ],
+    [
+      "itaoa-montefinese-2019",
+      "e7e7ee444f08cae360d5a7c6b6b51bc799e7b0f7d6261844f251cd47e470f605"
+    ],
+    [
+      "kaikki-dewiktionary-it",
+      "9fff6763755b58d67d1e8eb41a72a3867dd728f22555a2dc159760bc981e670e"
+    ],
+    [
+      "kaikki-enwiktionary-it",
+      "476addc4c7118fc79ae79e2815b169ef62d3072f3d9e5ab066e53c611f8fae08"
+    ],
+    [
+      "kaikki-eswiktionary-it",
+      "0deab9226eab98866f1476c0061f51b62684f3a188be2d906c6699d9d655aec6"
+    ],
+    [
+      "kaikki-frwiktionary-it",
+      "6aef94cf4cf98c8555d08b7e38fb54f68209983fca0ecf8c0a1a67eb73f73f51"
+    ],
+    [
+      "kaikki-itwiktionary",
+      "bb039bab0c56cc7363f052ca53104866814e15cd4e5a2e7c8dfcd8b467531487"
+    ],
+    [
+      "morphit-048-mirror",
+      "d64de8e0979b9fe5374b3faf40370fc1787532ad7a0d7e70a0d6f8227df9d31e"
+    ],
+    [
+      "nvdb-de-mauro-2016",
+      "b6d2a71affe04806e59c865aed81d4fb583d6ca48b2da32c454a07080bf4e1cc"
+    ],
+    [
+      "omw-multiwordnet-it",
+      "e1fbadd830b71ffa5e21c4c7d94c9a486bcc8412e35222a264c0a242b4303503"
+    ],
+    [
+      "unimorph-ita",
+      "acc8ca2917dd51fd7b93d27b3bdd2f5898db3a873dc974dcf921d2c3d68fe9fb"
+    ]
+  ],
+  "policy": "Vocabolario per frequenza e banca, più lemmi e forme flesse con vettore: Morph-it!/Flex_it, UniMorph o NVdB; altrimenti due famiglie lessicali indipendenti.",
+  "vocab_sha256": "96146fd5fba70b8e086ee5c12a57c2dffbecc9fb80d9b2b6bccdac386d9770a8",
+  "vectors_sha256": "15e8924c6b5561eaac83dead634a6ac8e930a2b3325f5fe82a5227620b7dc01a"
+}

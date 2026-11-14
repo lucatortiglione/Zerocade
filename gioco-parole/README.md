@@ -36,7 +36,7 @@ questa cartella:
 Dopo una modifica a uno di questi file si ricopia lo schema:
 
 ```
-python database/giochi.py aggiorna parole
+python database/script/giochi.py aggiorna parole
 ```
 
 [`lexicon/it/SOURCE`](lexicon/it/SOURCE) indica fonti, versioni e licenze del lessico: Morph-it! (CC BY-SA 2.0 e
@@ -48,10 +48,10 @@ Dalla cartella `gioco-parole`:
 
 | Comando | Cosa fa |
 | --- | --- |
-| `python tools/build_lexicon.py morph-it_048.txt` | Ricostruisce `lexicon/it/words.tsv` (serve `pip install wordfreq`; il file di Morph-it! non è nel repository) |
-| `python tools/make_backgrounds.py` | Disegna gli sfondi dei capitoli (`assets/backgrounds/chapter_NN.svg`) e scrive `data/chapters.json` |
+| `python script/build_lexicon.py morph-it_048.txt` | Ricostruisce `lexicon/it/words.tsv` (serve `pip install wordfreq`; il file di Morph-it! non è nel repository) |
+| `python script/make_backgrounds.py` | Disegna gli sfondi dei capitoli (`assets/backgrounds/chapter_NN.svg`) e scrive `data/chapters.json` |
 | `npm run wordgen -w @zerocade/server -- --write N` | Fa scrivere al generatore i livelli da 1 a N in `data/levels/it`, solo per controllarli |
-| `python tools/validate_levels.py` | Controlla quei livelli: schema connesso, parole valide e nella ruota, varianti, parola segreta |
+| `python script/validate_levels.py` | Controlla quei livelli: schema connesso, parole valide e nella ruota, varianti, parola segreta |
 
 ## File
 

@@ -9,7 +9,7 @@ import { loadWordAssociation } from './word-association.js'
 // smaller games, loaded over `GET /api/content` instead of being hardcoded in the source.
 //
 // It lives in the games' database, schema contenuti (database/giochi.sqlite3: one JSON item per
-// row), copied from `content.seed.json` by `python database/giochi.py aggiorna contenuti`; read once
+// row), copied from `content.seed.json` by `python database/script/giochi.py aggiorna contenuti`; read once
 // at start. Without that schema, the old way: a database of its own (apps/server/data/content.db,
 // ZEROCADE_CONTENT_DB), seeded from `content.seed.json` for each game_id that has no rows yet.
 

@@ -4,9 +4,13 @@ import type { GameCommand, GameSettings, LiveEvent } from '@zerocade/shared'
 // in when the dashboard selects a new game, without ever reloading the overlay.
 
 export interface GameInstance {
+  // Optional resources owned by a game (e.g. ZeroContext's worker).
+  dispose?(): void
+  onOverload?(): void
   reset(settings: GameSettings, width: number, height: number): void
   // Games that cache settings can apply changes before the next frame's queued actions.
   setSettings?(settings: GameSettings): void
+  setPaused?(paused: boolean): void
   onAction(action: string, event: LiveEvent, now: number): void
   // A command of the creator from the dashboard; a game without it ignores them.
   onCommand?(command: GameCommand): void
@@ -36,15 +40,18 @@ export class Engine {
   }
 
   setGame(instance: GameInstance, settings: GameSettings) {
+    if (this.instance !== instance) this.instance?.dispose?.()
     this.instance = instance
     this.settings = settings
     this.actions.length = 0
     this.commands.length = 0
     instance.reset(settings, this.ctx.canvas.width, this.ctx.canvas.height)
+    instance.setPaused?.(this.paused)
   }
 
   // No canvas game (Bivio renders in the DOM, or the id is unknown): blank the canvas.
   clear() {
+    this.instance?.dispose?.()
     this.instance = null
     this.actions.length = 0
     this.commands.length = 0
@@ -58,6 +65,7 @@ export class Engine {
 
   setPaused(paused: boolean) {
     this.paused = paused
+    this.instance?.setPaused?.(paused)
     if (paused) {
       this.actions.length = 0
       this.commands.length = 0
@@ -66,6 +74,11 @@ export class Engine {
 
   pushAction(action: string, event: LiveEvent) {
     if (!this.instance || this.paused) return
+    if (this.actions.length >= 300 && this.instance.onOverload) {
+      this.actions.length = 0
+      this.instance.onOverload()
+      return
+    }
     this.actions.push({ action, event, now: performance.now() })
     if (this.actions.length > 300) this.actions.shift()
   }
@@ -99,5 +112,9 @@ export class Engine {
 
   stop() {
     cancelAnimationFrame(this.raf)
+    this.instance?.dispose?.()
+    this.instance = null
+    this.actions.length = 0
+    this.commands.length = 0
   }
 }

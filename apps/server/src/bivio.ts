@@ -1,5 +1,5 @@
 import { randomUUID } from 'node:crypto'
-import { giochiDb, openSource, sourceReady } from './schema-db.js'
+import { openSource, sourceReady, zeroDubbiDb } from './schema-db.js'
 import { writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import {
@@ -18,8 +18,8 @@ import { toCsv } from './csv.js'
 import { bivioFlags, bivioTotals, bivioTotalsByQuestion, dataDir, flagBivio, recordBivioVote, unflagBivio } from './db.js'
 
 // Bivio ("Preferiresti…?"), the server-driven game. Questions come from the games' database,
-// schema dubbi of database/giochi.sqlite3 (gioco-dilemmi/tools/domande.py imports and exports it as
-// CSV, tools/to_livecade.py exports from it), read once at start: a new dilemma only needs an edit
+// database/ZeroDubbi.sqlite3, tables dilemmi and testi (gioco-dilemmi/script/domande.py imports and exports it as
+// CSV, script/to_livecade.py exports from it), read once at start: a new dilemma only needs an edit
 // and a restart. The Windows package ships the file next to the server; ZEROCADE_BIVIO_DB points
 // elsewhere.
 
@@ -31,10 +31,10 @@ interface Dilemma {
   text: Record<string, { a: string; b: string }>
 }
 
-// ZEROCADE_BIVIO_DB (a database or `file#schema`), otherwise the games' database, schema dubbi.
+// ZEROCADE_BIVIO_DB (a database), otherwise database/ZeroDubbi.sqlite3.
 const dbPath = [
   process.env.ZEROCADE_BIVIO_DB,
-  giochiDb && `${giochiDb}#dubbi`,
+  zeroDubbiDb,
 ].find((p): p is string => typeof p === 'string' && sourceReady(p))
 
 interface TextRow {
@@ -47,10 +47,10 @@ interface TextRow {
 }
 
 // Every language a dilemma has, Italian first: textFor falls back on the first one.
-// Explicit dilemmas are left out, as in tools/to_livecade.py.
+// Explicit dilemmas are left out, as in script/to_livecade.py.
 function loadDilemmas(): Dilemma[] {
   if (!dbPath) {
-    console.warn('[bivio] no schema dubbi in database/giochi.sqlite3: the game has no questions')
+    console.warn('[bivio] database/ZeroDubbi.sqlite3 not found: the game has no questions')
     return []
   }
   const db = openSource(dbPath)
@@ -81,7 +81,7 @@ function loadDilemmas(): Dilemma[] {
 export const DILEMMAS = loadDilemmas()
 
 // Questions marked as wrong from the dashboard (any overlay key): out of the game until
-// unmarked, and listed in data/bivio-domande-sbagliate.csv to be fixed in the schema dubbi.
+// unmarked, and listed in data/bivio-domande-sbagliate.csv to be fixed in database/ZeroDubbi.sqlite3.
 const FLAGS_FILE = join(dataDir, 'bivio-domande-sbagliate.csv')
 const flagged = new Set(bivioFlags().map((f) => f.question_id))
 
@@ -439,7 +439,7 @@ export function bivioStats(lang: BivioLang): BivioStats {
 }
 
 // The questions marked as wrong, oldest first, with their texts in every language of
-// the schema dubbi: the list to fix there. Excel-friendly like bivioCsv.
+// the schema dubbi: the list to fix there (database/ZeroDubbi.sqlite3). Excel-friendly like bivioCsv.
 export function bivioFlagsCsv(): string {
   const byId = new Map(DILEMMAS.map((d) => [d.id, d]))
   const langs = [...new Set(DILEMMAS.flatMap((d) => Object.keys(d.text)))]
@@ -453,7 +453,7 @@ export function bivioFlagsCsv(): string {
   return toCsv(rows)
 }
 
-// Results per dilemma, with every language of the schema dubbi, to spot the lopsided
+// Results per dilemma, with every language of the dilemmas, to spot the lopsided
 // ones (beyond 90/10) worth rewriting. The BOM lets Excel read the accents.
 export function bivioCsv(): string {
   const totals = totalsById()

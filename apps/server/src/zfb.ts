@@ -26,6 +26,12 @@ const MAX_ID = 128
 const MAX_WORDS = 4096
 const MAX_WORD = 32
 
+// A comment made of one word, as ZeroFollowerBot counts them (core/src/gamewords.rs): punctuation, emoji, spaces and
+// apostrophes separate words. "Casa!" and "CASA 😀" are one word; "l'albero" and "è casa" are two; "😀 !!" is none.
+export function singleWord(text: string): boolean {
+  return text.split(/[^\p{L}\p{N}\p{M}]+/u).filter(Boolean).length === 1
+}
+
 // Each event with its feed, the account read there and the message's id ('' when it has none).
 type Emit = (event: LiveEvent, kind: SourceKind, account: string, id: string) => void
 
@@ -61,6 +67,8 @@ function viewerOf(raw: unknown, kind: SourceKind): Viewer {
     // absent, a viewer stays unknown.
     ...(flag(u, 'follower', 'isFollower', 'is_follower') !== undefined && { follower: flag(u, 'follower', 'isFollower', 'is_follower') }),
     ...(flag(u, 'fan', 'isSubscriber', 'is_subscriber') !== undefined && { fan: flag(u, 'fan', 'isSubscriber', 'is_subscriber') }),
+    // The streamer: ZeroFollowerBot sends it only when true.
+    ...(flag(u, 'host', 'isAnchor', 'is_host') === true && { host: true }),
   }
 }
 
@@ -97,6 +105,7 @@ export class ZfbBridge {
   private config: BridgeConfig = { enabled: false, port: 0 }
   private socket: WebSocket | null = null
   private retry: NodeJS.Timeout | undefined
+  private welcome: NodeJS.Timeout | undefined
   private attempt = 0
   private state: BridgeStatus['state'] = 'off'
   private message: string | undefined
@@ -147,6 +156,15 @@ export class ZfbBridge {
     else this.update('off')
   }
 
+  // A manual attempt cancels the pending backoff and replaces even a socket
+  // still waiting for the bridge's hello. The configured port and words stay.
+  reconnect(): void {
+    if (!this.config.enabled) return
+    this.stop()
+    this.attempt = 0
+    this.open()
+  }
+
   close(): void {
     this.config = { ...this.config, enabled: false }
     this.stop()
@@ -175,6 +193,7 @@ export class ZfbBridge {
 
   private stop(): void {
     clearTimeout(this.retry)
+    clearTimeout(this.welcome)
     this.retry = undefined
     const socket = this.socket
     this.socket = null
@@ -185,9 +204,19 @@ export class ZfbBridge {
   private open(): void {
     const socket = new WebSocket(`ws://127.0.0.1:${this.config.port}/`)
     this.socket = socket
+    clearTimeout(this.welcome)
+    this.welcome = setTimeout(() => {
+      if (this.socket === socket && this.state !== 'connected') socket.close()
+    }, 10_000)
+    this.welcome.unref()
     this.update('connecting', this.attempt ? this.message : undefined)
     socket.addEventListener('message', (e) => {
       if (this.socket !== socket || typeof e.data !== 'string') return
+      if (e.data.length > 256 * 1024) {
+        this.message = 'Messaggio del ponte troppo grande: riconnetto ZeroFollowerBot.'
+        socket.close()
+        return
+      }
       let message: unknown
       try {
         message = JSON.parse(e.data)
@@ -199,6 +228,7 @@ export class ZfbBridge {
     // 'error' is always followed by 'close'.
     socket.addEventListener('close', () => {
       if (this.socket !== socket) return
+      clearTimeout(this.welcome)
       this.socket = null
       this.setAccounts('', '')
       const wait = RETRY_MS[Math.min(this.attempt, RETRY_MS.length - 1)]
@@ -217,6 +247,7 @@ export class ZfbBridge {
 
   private onMessage(socket: WebSocket, m: Record<string, unknown>): void {
     if (m.type === 'hello') {
+      clearTimeout(this.welcome)
       if (m.protocol !== PROTOCOL) {
         this.message = `Versione del ponte non supportata (${String(m.protocol)}): aggiorna Zerocade o ZeroFollowerBot.`
         socket.close()

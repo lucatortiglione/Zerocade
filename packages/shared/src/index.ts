@@ -1,5 +1,9 @@
 // Types and catalogs shared by the server, the dashboard and the overlay.
 import type { WordAssociationRoundReport } from './wordAssociation.js'
+import { CONTEXT_COLOR_STOPS, CONTEXT_COLOR_MAX } from './context.js'
+export { CONTEXT_LIMITS, CONTEXT_COLORS, CONTEXT_COLOR_STOPS, CONTEXT_COLOR_MAX, normalizeContextColors, ContextError, type ContextErrorKind } from './context.js'
+export { payloadBytes } from './threadBudget.js'
+export { BodyLimitError, readBoundedBytes } from './httpBody.js'
 
 export {
   WORD_ASSOCIATION_MAX_WORDS,
@@ -35,9 +39,10 @@ export interface Viewer {
   nickname: string
   avatar?: string
   // Only when the source says so (TikTok's follow status and subscription badge): a game can be
-  // restricted to followers or to the fan club.
+  // restricted to followers or to the fan club. `host` is the streamer, who may always play.
   follower?: boolean
   fan?: boolean
+  host?: boolean
 }
 
 export type LiveEvent =
@@ -291,7 +296,7 @@ export interface BivioCategory {
   colors: [string, string]
 }
 
-// Same ids and colours as gioco-dilemmi/tools/make_category_assets.py.
+// Same ids and colours as gioco-dilemmi/script/make_category_assets.py.
 export const BIVIO_CATEGORIES: BivioCategory[] = [
   { id: 'cibo', it: 'Cibo', en: 'Food', colors: ['#ffb547', '#f97316'] },
   { id: 'soldi', it: 'Soldi', en: 'Money', colors: ['#4ade80', '#15803d'] },
@@ -656,7 +661,7 @@ export const COMMON_SETTINGS: GameSetting[] = [
       { value: 'followers', label: 'Solo i follower' },
       { value: 'fans', label: 'Solo il fan club' },
     ],
-    hint: 'I commenti di chi non rientra vengono ignorati dal gioco. Conta chi scrive dopo il collegamento TikTok, che dice se segue il profilo o ha il badge del fan club (abbonamento): se non lo sa, il commento non vale.',
+    hint: 'I commenti di chi non rientra vengono ignorati dal gioco. Conta chi scrive dopo il collegamento TikTok, che dice se segue il profilo o ha il badge del fan club (abbonamento): se non lo sa, il commento non vale. Chi segue durante la diretta vale subito come follower, anche prima che TikTok lo dica. Lo streamer gioca sempre.',
   },
   { id: 'voiceFollowersOnly', label: 'Voce solo ai follower', kind: 'toggle', default: false, group: 'Chat', hint: VOICE_HINT },
 ]
@@ -1286,14 +1291,16 @@ const GAME_DEFS: GameDef[] = [
     settings: [
       { id: 'disableAllHints', label: 'Disabilita tutti gli aiuti', kind: 'toggle', default: false, hint: 'Blocca regali, comandi, suggerimenti automatici e iniziali e lettere rivelate. Nasconde gli aiuti già mostrati, conservando i tentativi dei giocatori.' },
       { id: 'starterWords', label: 'Parole iniziali', kind: 'toggle', default: false, hint: 'A inizio round mostra tre parole lontane, per dare alla chat un punto di partenza.' },
-      { id: 'startHintOn', label: 'Suggerimento iniziale', kind: 'toggle', default: true, hint: 'Ogni round parte con una parola già sul tabellone. Spento, il tabellone parte vuoto (o con le parole iniziali).' },
+      { id: 'startHintOn', label: 'Suggerimento iniziale', kind: 'toggle', default: false, hint: 'Ogni round parte con una parola già sul tabellone. Spento (predefinito), il tabellone parte vuoto (o con le parole iniziali).' },
       { id: 'startHint', label: 'Posizione del suggerimento iniziale', kind: 'number', min: 3, max: 1000, step: 1, default: 30, when: { id: 'startHintOn', value: true }, hint: 'La parola a questa posizione è già sul tabellone: un poco lontana dalla più vicina (la 2).' },
       { id: 'autoHints', label: 'Suggerimenti automatici', kind: 'toggle', default: false },
       { id: 'autoHintSeconds', label: 'Secondi tra aiuti', kind: 'number', min: 15, max: 180, step: 5, default: 45, when: { id: 'autoHints', value: true } },
       { id: 'hintClosest', label: 'Posizione più vicina di un aiuto', kind: 'number', min: 2, max: 100, step: 1, default: 4, hint: 'Un aiuto non rivela mai una parola più vicina di questa posizione (2 = la più vicina di tutte: la 1 è la parola segreta).' },
       { id: 'maxHintsPerRound', label: 'Aiuti massimi per parola', kind: 'number', min: 1, max: 30, step: 1, default: 5 },
-      { id: 'greenRank', label: 'Verde fino alla posizione', kind: 'number', min: 2, max: 1000, step: 1, default: 100 },
-      { id: 'orangeRank', label: 'Arancione fino alla posizione', kind: 'number', min: 10, max: 20000, step: 10, default: 1000, hint: 'Oltre questa posizione il tentativo è rosso.' },
+      { id: 'redUntil', label: 'Rosso fino alla posizione', kind: 'number', min: 1, max: CONTEXT_COLOR_MAX.red, step: 1, default: CONTEXT_COLOR_STOPS.red, hint: 'Le parole più vicine alla soluzione. La posizione 1 è la soluzione.' },
+      { id: 'orangeUntil', label: 'Arancione fino alla posizione', kind: 'number', min: 2, max: CONTEXT_COLOR_MAX.orange, step: 1, default: CONTEXT_COLOR_STOPS.orange },
+      { id: 'yellowUntil', label: 'Giallo fino alla posizione', kind: 'number', min: 3, max: CONTEXT_COLOR_MAX.yellow, step: 1, default: CONTEXT_COLOR_STOPS.yellow },
+      { id: 'cyanUntil', label: 'Ciano fino alla posizione', kind: 'number', min: 4, max: CONTEXT_COLOR_MAX.cyan, step: 1, default: CONTEXT_COLOR_STOPS.cyan, hint: 'Oltre questa posizione le parole sono blu.' },
       { id: 'breakSeconds', label: 'Secondi prima della prossima parola', kind: 'number', min: 3, max: 30, step: 1, default: 8 },
       { id: 'finderPoints', label: 'Punti per la parola trovata', kind: 'number', min: 0, max: 10000, step: 10, default: 100 },
       {
@@ -1967,6 +1974,7 @@ export const GAMES: GameDef[] = GAME_DEFS.map((g) => ({
 
 // Whether a viewer's comment reaches the game, by the game's "Chi può giocare" setting.
 export function allowedToPlay(settings: GameSettings, user: Viewer): boolean {
+  if (user.host === true) return true // the streamer, to try the game whatever the setting
   if (settings.audience === 'followers') return user.follower === true || user.fan === true
   if (settings.audience === 'fans') return user.fan === true
   return true
@@ -2168,6 +2176,7 @@ export interface LiveStats {
 export const EMPTY_LIVE_STATS: LiveStats = { viewers: null, comments: 0, likes: 0, gifts: 0, coins: 0, follows: 0 }
 
 export interface ServerToClientEvents {
+  'runtime:issue': (issue: { component: 'persistence' | 'transport'; message: string; at: number }) => void
   // Dashboards only: the live's counters, on connecting and as they change.
   'stats:update': (stats: LiveStats) => void
   'session:state': (state: SessionState) => void
@@ -2210,6 +2219,7 @@ export interface ClientToServerEvents {
   'source:connect': (config: SourceConfig) => void
   'source:disconnect': (kind: SourceKind) => void
   'bridge:set': (config: BridgeConfig) => void
+  'bridge:retry': () => void
   'scene:set': (scene: Partial<WidgetConfig>) => void
   'bivio:control': (command: BivioCommand) => void
   'incastro:control': (command: IncastroCommand) => void
@@ -2222,6 +2232,9 @@ export interface ClientToServerEvents {
   // ZeroContext: an overlay starts a round with this secret word; `prev` is the word of the round
   // it replaces (null at the start). The server keeps one secret per room.
   'secret:round': (round: { word: string; prev: string | null }) => void
+  // ZeroContext: an overlay shows the word of the round (found, or "Termina round"); until the next round the
+  // server asks ZeroFollowerBot's voice not to read the chat's single words.
+  'secret:revealed': (revealed: { word: string }) => void
   // Pause, restart or end (and start again) the game in play.
   'game:control': (command: GameControl) => void
   // The dashboard: a command to the game in play ("Termina round").

@@ -1,4 +1,5 @@
 import { useEffect, useState, useSyncExternalStore } from 'react'
+import { apiFetch } from '@zerocade/browser-runtime'
 import { nasaPhotoAt, type NasaPhoto } from '@zerocade/shared'
 
 // NASA's Image of the Day behind a game. The list comes from the server (GET /api/nasa, the latest pictures of
@@ -11,20 +12,26 @@ const RETRY_MS = 60_000
 
 let photos: NasaPhoto[] = []
 let started = false
+let version = 0
+let pending: AbortController | null = null
+let refresh: ReturnType<typeof setTimeout> | undefined
 const listeners = new Set<() => void>()
 
 async function load() {
+  const revision = version
+  const controller = new AbortController()
+  pending = controller
   try {
-    const res = await fetch('/api/nasa', { cache: 'no-store' })
+    const res = await apiFetch('/api/nasa', { cache: 'no-store', signal: controller.signal }, 20_000, 256 * 1024)
     const list = res.ok ? ((await res.json()) as NasaPhoto[]) : []
-    if (Array.isArray(list) && list.length) {
+    if (revision === version && listeners.size && Array.isArray(list) && list.length) {
       photos = list
       listeners.forEach((l) => l())
     }
   } catch {
     // The server is restarting: the next try comes soon.
   }
-  setTimeout(load, photos.length ? REFRESH_MS : RETRY_MS)
+  if (revision === version && listeners.size) refresh = setTimeout(load, photos.length ? REFRESH_MS : RETRY_MS)
 }
 
 function subscribe(listener: () => void) {
@@ -33,7 +40,10 @@ function subscribe(listener: () => void) {
     started = true
     void load()
   }
-  return () => listeners.delete(listener)
+  return () => {
+    listeners.delete(listener)
+    if (!listeners.size) { version++; started = false; clearTimeout(refresh); pending?.abort(); pending = null }
+  }
 }
 
 const useNasaPhotos = () => useSyncExternalStore(subscribe, () => photos)

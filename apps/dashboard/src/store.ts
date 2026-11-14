@@ -1,4 +1,5 @@
 import { useSyncExternalStore } from 'react'
+import { frameNotifications } from '@zerocade/browser-runtime'
 import {
   EMPTY_LIVE_STATS,
   type BivioState,
@@ -30,6 +31,7 @@ export interface FeedItem extends FeedEvent {
 const FEED_KEPT = 150
 
 interface DashboardState {
+  runtimeIssue: string | null
   connected: boolean
   session: SessionState | null
   gifters: Gifter[]
@@ -54,6 +56,7 @@ interface DashboardState {
 }
 
 let state: DashboardState = {
+  runtimeIssue: null,
   connected: false,
   session: null,
   gifters: [],
@@ -71,10 +74,11 @@ let state: DashboardState = {
   stats: EMPTY_LIVE_STATS,
 }
 const listeners = new Set<() => void>()
+const notifications = frameNotifications(() => { for (const listener of listeners) listener() })
 
 function update(patch: Partial<DashboardState>) {
   state = { ...state, ...patch }
-  for (const listener of listeners) listener()
+  notifications.notify()
 }
 
 // ZeroWords' verdict on the chat: each word found, extra, secret or repeated (the wheel's
@@ -126,6 +130,8 @@ socket.on('source:status', (status) => {
 })
 socket.on('source:saved', (savedSources) => update({ savedSources }))
 socket.on('bridge:status', (bridge) => update({ bridge }))
+socket.on('runtime:issue', (issue) => update({ runtimeIssue: issue.message }))
+export const clearRuntimeIssue = () => update({ runtimeIssue: null })
 socket.on('bivio:state', (bivio) => update({ bivio }))
 socket.on('incastro:state', (incastro) => update({ incastro, feed: marked(state.feed, incastro.moments) }))
 socket.on('incastro:solution', (incastroSolution) => update({ incastroSolution }))
@@ -137,6 +143,7 @@ function subscribe(listener: () => void) {
   listeners.add(listener)
   return () => {
     listeners.delete(listener)
+    if (!listeners.size) notifications.cancel()
   }
 }
 

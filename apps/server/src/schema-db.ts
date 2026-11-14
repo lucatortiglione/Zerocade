@@ -4,7 +4,7 @@ import { fileURLToPath } from 'node:url'
 import Database from 'better-sqlite3'
 
 // Databases that hold several old ones, one "schema" each: SQLite has no schemas inside a file, so a schema is
-// the `<schema>__` prefix of its tables (database/schemadb.py, gioco-zeroassociations/unified_db.py). A source is
+// the `<schema>__` prefix of its tables (database/script/schemadb.py, gioco-zeroassociations/script/unified_db.py). A source is
 // written `file#schema`; opened here it looks like the old database, through temporary views with the tables'
 // old names (read only). Only a file its tools have verified is used.
 
@@ -18,6 +18,11 @@ export const giochiDb = [process.env.ZEROCADE_GIOCHI_FILE, join(here, 'giochi.sq
 // ZeroQuizz's questions and answers (database/ZeroQuizz.sqlite3): a database of their own, not a schema of the games'
 // database, which holds the word games. Next to the server in the Windows package, or in the repository.
 export const zeroQuizzDb = [join(here, 'ZeroQuizz.sqlite3'), join(here, '..', '..', '..', 'database', 'ZeroQuizz.sqlite3')].find(
+  (p) => existsSync(p),
+)
+
+// ZeroDubbi's dilemmas (database/ZeroDubbi.sqlite3, tables dilemmi and testi): a database of their own too.
+export const zeroDubbiDb = [join(here, 'ZeroDubbi.sqlite3'), join(here, '..', '..', '..', 'database', 'ZeroDubbi.sqlite3')].find(
   (p) => existsSync(p),
 )
 

@@ -15,6 +15,12 @@ test('"Chi può giocare" lets in everyone, the followers (and the fan club) or t
   assert.equal(allowedToPlay({ audience: 'fans' }, viewer({ fan: true })), true)
 })
 
+test('the streamer always plays, whoever "Chi può giocare" lets in', () => {
+  for (const audience of ['all', 'followers', 'fans']) {
+    assert.equal(allowedToPlay({ audience }, viewer({ host: true, follower: false })), true)
+  }
+})
+
 test('every game has the audience and voice settings, once, with ZeroContext reading only followers by default', () => {
   for (const game of GAMES) {
     assert.equal(game.settings.filter((s) => s.id === 'audience').length, 1, game.id)

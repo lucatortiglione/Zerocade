@@ -4,6 +4,12 @@
 
 ## Ingegnerizzazione secondo DIRETTIVE.md — audit del 14 novembre 2026
 
+Aggiornamento infrastrutturale successivo: [rapporto con evidenze e limiti](docs/DIRETTIVE-audit-2026-11-14.md).
+Implementati worker di persistenza/report, trasporto browser in worker, limiti/cancellazione, media atomici,
+retry ZFB, readiness e correzione EventSub con token utente, follow v2, keepalive e reconnect.
+Il backlog storico sotto descrive la situazione precedente; la live Twitch reale, la verifica visuale in OBS,
+la separazione dei commit e l'esecuzione CI su GitHub restano gate distinti prima della distribuzione.
+
 Audit del server (`apps/server/src`, circa 6.000 righe) con ricerca di pattern (SQL, `fetch`, timer, `catch`, `JSON.parse`,
 chiusura, crescita delle strutture), poi di overlay, dashboard, `scripts/` e strumenti Python dei giochi con le stesse
 ricerche. **Non coperti:** `packages/shared` e un'analisi riga per riga di tutto il codice. Baseline iniziale: `typecheck`

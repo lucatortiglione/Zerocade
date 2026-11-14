@@ -66,13 +66,19 @@ const toViewer = (id: unknown, nickname: unknown, avatar?: unknown): Viewer => (
 // The viewer of a TikTok event. Version 2 of the connector sometimes leaves userId empty (the
 // @name stands in) and keeps the picture in userDetails rather than profilePictureUrl (which it
 // always leaves null; the picture itself is put there by PushConnection).
-// followRole is TikTok's follow status (1 follows the host, 2 is a friend); isSubscriber is the
-// subscription badge, which is what the fan club shows as.
+// Whether the viewer follows the host, and is in the fan club ("Chi può giocare"). In the comments TikTok says it
+// in userIdentity (isFollowerOfAnchor, isMutualFollowingWithAnchor, isSubscriberOfAnchor): followRole, from the
+// user's followInfo, does not come with them. followRole (1 follows, 2 is a friend) and isSubscriber, the
+// subscription badge, still count where they come.
 export const tiktokViewer = (d: Record<string, unknown>): Viewer => {
   const shown = typeof d.nickname === 'string' && d.nickname.trim() ? d.nickname : d.uniqueId
   const viewer = toViewer(String(d.userId ?? '').trim() || d.uniqueId, shown, d.profilePictureUrl ?? rec(d.userDetails).profilePictureUrls)
-  if (Number(d.followRole) >= 1) viewer.follower = true
-  if (d.isSubscriber === true) viewer.fan = true
+  const identity = rec(d.userIdentity)
+  if (Number(d.followRole) >= 1 || identity.isFollowerOfAnchor === true || identity.isMutualFollowingWithAnchor === true) {
+    viewer.follower = true
+  }
+  if (d.isSubscriber === true || identity.isSubscriberOfAnchor === true) viewer.fan = true
+  if (identity.isAnchor === true) viewer.host = true
   return viewer
 }
 
@@ -161,7 +167,7 @@ export class RoomSources {
     this.tiktokUser = uname
     this.tiktokState = 'connecting'
     this.status({ kind: 'tiktok', username: uname, state: 'connecting' })
-    const emit = (event: LiveEvent) => this.emit(event, 'tiktok')
+    const emit = (event: LiveEvent) => { if (conn && this.tiktok === conn) this.emit(event, 'tiktok') }
 
     let conn: LegacyTikTokConn | null = null
     try {
@@ -201,6 +207,7 @@ export class RoomSources {
       conn.on('share', (data) => emit({ type: 'share', user: tiktokViewer(rec(data)) }))
       conn.on('member', (data) => emit({ type: 'join', user: tiktokViewer(rec(data)) }))
       conn.on('roomUser', (data) => {
+        if (this.tiktok !== conn) return
         const d = rec(data)
         const viewers = Math.floor(Number(d.viewerCount ?? d.total))
         if (Number.isFinite(viewers) && viewers >= 0) this.tiktokViewers = viewers
@@ -254,18 +261,16 @@ export class RoomSources {
     this.twitchUser = ch
     this.twitchState = 'connecting'
     this.status({ kind: 'twitch', username: ch, state: 'connecting' })
-    const emit = (event: LiveEvent) => this.emit(event, 'twitch')
+    const emit = (event: LiveEvent) => { if (this.twitch === client) this.emit(event, 'twitch') }
 
     const client = new TmiClient({ channels: [ch] })
     this.twitch = client
     try {
       client.on('message', (_channel, tags, message, self) => {
         if (self) return
-        emit({
-          type: 'comment',
-          user: toViewer(tags['user-id'], tags['display-name'] || tags.username),
-          text: message.slice(0, 140),
-        })
+        const user = toViewer(tags['user-id'], tags['display-name'] || tags.username)
+        if (tags.badges?.broadcaster) user.host = true // the channel's streamer
+        emit({ type: 'comment', user, text: message.slice(0, 140) })
       })
       client.on('cheer', (_channel, tags, _message) => {
         emit({
@@ -275,23 +280,33 @@ export class RoomSources {
         })
       })
       await client.connect()
-      // EventSub (follows/raids) needs TWITCH_CLIENT_ID/SECRET; chat works without it.
+      if (this.twitch !== client) { void client.disconnect().catch(() => undefined); return }
+      // EventSub needs a user token; anonymous chat works without it.
       let note = ''
-      if (process.env.TWITCH_CLIENT_ID && process.env.TWITCH_CLIENT_SECRET) {
+      if (process.env.TWITCH_CLIENT_ID && process.env.TWITCH_USER_ACCESS_TOKEN) {
+        const ev = new TwitchEventSub(ch, emit, { onStatus: (message) => {
+          if (this.twitch === client && this.twitchEv === ev && this.twitchState === 'connected')
+            this.status({ kind: 'twitch', username: ch, state: 'connected', message: message ? `EventSub: ${message}` : undefined })
+        } })
+        this.twitchEv = ev
         try {
-          const ev = new TwitchEventSub(ch, emit)
           const refused = await ev.start()
-          this.twitchEv = ev
+          if (this.twitch !== client || this.twitchEv !== ev) { ev.close(); return }
           // Twitch refused some subscriptions: chat and the rest still work, but the streamer must be told.
           if (refused.length) note = ` EventSub: ${refused.join('; ')}`
         } catch (err) {
+          ev.close()
+          if (this.twitch !== client) return
           note = ` EventSub: ${err instanceof Error ? err.message : String(err)}`
         }
+      } else if (process.env.TWITCH_CLIENT_ID || process.env.TWITCH_CLIENT_SECRET) {
+        note = ' EventSub: configura TWITCH_USER_ACCESS_TOKEN (token utente); la chat resta attiva.'
       }
       this.twitchSince = Date.now()
       this.twitchState = 'connected'
       this.status({ kind: 'twitch', username: ch, state: 'connected', message: note || undefined })
     } catch (err) {
+      if (this.twitch !== client) return
       this.twitch = null
       this.twitchState = 'error'
       this.status({

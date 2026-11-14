@@ -42,11 +42,11 @@ Questo documento descrive, passo per passo, come ZeroWords costruisce ogni livel
 | `apps/server/src/incastro.ts` | Il livello in gioco: chat, punti, aiuti, difficoltà automatica, dati delle partite |
 | `apps/server/src/db.ts` | Tabelle `zerowords_plays` e `zerowords_answers` (§10.4) |
 | `tools/curve.json` | Tutti i parametri regolabili |
-| `tools/build_lexicon.py`, `tools/validate_levels.py` | Costruzione del lessico, controllo dei livelli |
+| `script/build_lexicon.py`, `script/validate_levels.py` | Costruzione del lessico, controllo dei livelli |
 
 ## 2. Il lessico: da dove vengono le parole
 
-`lexicon/it/words.tsv` è costruito una volta da `tools/build_lexicon.py`, partendo da due fonti libere (licenze in `lexicon/it/SOURCE`):
+`lexicon/it/words.tsv` è costruito una volta da `script/build_lexicon.py`, partendo da due fonti libere (licenze in `lexicon/it/SOURCE`):
 
 - **Morph-it!**, il lessico morfologico dell'italiano: ogni forma flessa (CASA, CASE, CANTAVO…), con la sua categoria grammaticale;
 - **wordfreq**, la frequenza d'uso di ogni forma (scala Zipf: 3 = circa una volta per milione di parole).
@@ -620,7 +620,7 @@ npm run wordgen -w @zerocade/server -- --only 1-40     questi livelli, una riga 
 npm run wordgen -w @zerocade/server -- --calibrate     distribuzione del punteggio grezzo, per solver.scale
 npm run wordgen -w @zerocade/server -- --selftest      lo sforzo del solver non cresce mai svelando lettere
 npm run wordgen -w @zerocade/server -- --write 600     livelli 1..600 in data/levels/it/pack_NNN.json
-python tools/validate_levels.py                        controlla quei pacchetti (esce con 1 se un livello è rotto)
+python script/validate_levels.py                        controlla quei pacchetti (esce con 1 se un livello è rotto)
 ```
 
 I pacchetti servono solo al controllo: il server non li legge.

@@ -1,8 +1,9 @@
 import { randomUUID } from 'node:crypto'
-import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import { closeSync, fsyncSync, mkdirSync, openSync, renameSync, rmSync, writeFileSync } from 'node:fs'
+import { readFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { DJ_SOUNDS, PAD_COLORS, PAD_SLOTS, djSoundById, type Pad, type PadBoard, type PadKind } from '@zerocade/shared'
-import { createPadBoard, dataDir, deletePad, getPad, listPads, padAt, padVolume, savePad } from './db.js'
+import { createPadBoard, databaseSnapshot, dataDir, deletePad, getPad, listPads, padAt, padVolume, savePad } from './db.js'
 
 // The Sounds and GIFs boards of each overlay key. Uploaded files live in the data folder
 // under a fresh random name per upload, so they can be cached forever.
@@ -42,6 +43,10 @@ const FILE_NAME = /^[0-9a-f-]{36}\.(mp3|wav|ogg|m4a|webm|gif|webp|png|jpg)$/
 const removeFile = (file?: string) => {
   if (file && FILE_NAME.test(file)) rmSync(join(padsDir, file), { force: true })
 }
+const cleanupFile = (file?: string) => {
+  try { removeFile(file) }
+  catch (error) { console.warn('[pads] pulsante salvato, pulizia del file precedente non riuscita', error instanceof Error ? error.name : 'errore filesystem') }
+}
 
 export function padBoard(key: string): PadBoard {
   let volume = padVolume(key)
@@ -62,11 +67,11 @@ export function padBoard(key: string): PadBoard {
   return { volume, pads: listPads(key) }
 }
 
-export function padFile(name: string): { type: string; body: Buffer } | null {
+export async function padFile(name: string): Promise<{ type: string; body: Buffer } | null> {
   if (!FILE_NAME.test(name)) return null
   const path = join(padsDir, name)
-  if (!existsSync(path)) return null
-  return { type: CONTENT_TYPES[name.split('.').pop()!], body: readFileSync(path) }
+  try { return { type: CONTENT_TYPES[name.split('.').pop()!], body: await readFile(path) } }
+  catch (error) { if (error instanceof Error && 'code' in error && error.code === 'ENOENT') return null; throw error }
 }
 
 const asRecord = (raw: unknown) => (raw && typeof raw === 'object' ? (raw as Record<string, unknown>) : null)
@@ -88,36 +93,64 @@ export function savePadInput(key: string, raw: unknown): string | null {
 
   let soundId = kind === 'sound' && typeof r.soundId === 'string' && djSoundById(r.soundId) ? r.soundId : undefined
   let file = soundId ? undefined : existing?.file
+  let uploaded: string | undefined
   const upload = asRecord(r.upload)
   if (upload) {
-    const ext = FILE_TYPES[kind][String(upload.type)]
+    const type = typeof upload.type === 'string' ? upload.type : ''
+    const ext = Object.hasOwn(FILE_TYPES[kind], type) ? FILE_TYPES[kind][type] : undefined
     if (!ext) return kind === 'sound' ? 'Usa un file MP3, WAV, OGG o M4A.' : 'Usa una GIF, WebP, PNG o JPG.'
-    const body = typeof upload.data === 'string' ? Buffer.from(upload.data, 'base64') : null
+    if (typeof upload.data !== 'string' || upload.data.length > Math.ceil(PAD_FILE_MAX / 3) * 4 ||
+      upload.data.length % 4 !== 0 || !/^[A-Za-z0-9+/]*={0,2}$/.test(upload.data)) return 'File non valido o oltre 6 MB.'
+    const body = Buffer.from(upload.data, 'base64')
     if (!body?.length) return 'Il file è vuoto.'
     if (body.length > PAD_FILE_MAX) return 'Il file supera 6 MB.'
     mkdirSync(padsDir, { recursive: true })
     file = `${randomUUID()}.${ext}`
-    writeFileSync(join(padsDir, file), body)
+    const destination = join(padsDir, file)
+    const temporary = `${destination}.upload`
+    let fd: number | undefined
+    try {
+      fd = openSync(temporary, 'wx')
+      writeFileSync(fd, body)
+      fsyncSync(fd)
+      closeSync(fd)
+      fd = undefined
+      renameSync(temporary, destination)
+      uploaded = file
+    } finally {
+      if (fd !== undefined) closeSync(fd)
+      rmSync(temporary, { force: true })
+    }
     soundId = undefined
   }
   if (!soundId && !file) return kind === 'sound' ? 'Scegli un file audio o un suono incluso.' : 'Scegli una GIF.'
 
-  if (existing?.file && existing.file !== file) removeFile(existing.file)
   const pad: Pad = { id: existing?.id ?? randomUUID(), kind, slot, label, color, ...(soundId ? { soundId } : {}), ...(file ? { file } : {}) }
 
   // A pad moved onto another swaps places with it. A new pad only meets one when a second
   // dashboard filled the slot meanwhile: the newer one wins.
-  const occupant = padAt(key, kind, slot)
-  if (occupant && occupant.id !== pad.id) {
-    if (existing) {
-      savePad(key, { ...occupant, slot: -1 })
-      savePad(key, pad)
-      savePad(key, { ...occupant, slot: existing.slot })
-      return null
-    }
-    removePad(key, occupant.id)
+  const obsolete: string[] = []
+  try {
+    databaseSnapshot(() => {
+      const occupant = padAt(key, kind, slot)
+      if (occupant && occupant.id !== pad.id) {
+        if (existing) {
+          savePad(key, { ...occupant, slot: -1 })
+          savePad(key, pad)
+          savePad(key, { ...occupant, slot: existing.slot })
+        } else {
+          deletePad(key, occupant.id)
+          if (occupant.file) obsolete.push(occupant.file)
+          savePad(key, pad)
+        }
+      } else savePad(key, pad)
+    })
+  } catch (error) {
+    if (uploaded) cleanupFile(uploaded)
+    throw error
   }
-  savePad(key, pad)
+  if (existing?.file && existing.file !== file) obsolete.push(existing.file)
+  for (const previous of obsolete) cleanupFile(previous)
   return null
 }
 
@@ -125,5 +158,5 @@ export function removePad(key: string, id: string): void {
   const pad = getPad(key, id)
   if (!pad) return
   deletePad(key, id)
-  removeFile(pad.file)
+  cleanupFile(pad.file)
 }

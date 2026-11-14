@@ -14,7 +14,7 @@ Dalla cartella `gioco-zeroassociations`, nell'ambiente Python 3.13 di generazion
 .\.venv\Scripts\python.exe -m pip install -r requirements-generation.txt
 .\.venv\Scripts\python.exe -m pip install -r requirements-nlp.txt
 .\.venv\Scripts\python.exe -m spacy download it_core_news_md
-.\.venv\Scripts\python.exe -B nlp_tools.py download-stanza
+.\.venv\Scripts\python.exe -B script/nlp_tools.py download-stanza
 ```
 
 spaCy usa per impostazione predefinita `it_core_news_md`, già usato dal validatore.
@@ -37,7 +37,7 @@ per la generazione e non sono richieste dal server dei giochi.
 ## Consultazione delle parole isolate
 
 ```powershell
-.\.venv\Scripts\python.exe -B nlp_tools.py lookup porta
+.\.venv\Scripts\python.exe -B script/nlp_tools.py lookup porta
 ```
 
 Si leggono `inventory_current_attestations`, quindi soltanto gli snapshot attivi.
@@ -53,9 +53,9 @@ a dipendere dal bacino verificato e dalle regole del gioco.
 ## Analisi dei testi e salvataggio
 
 ```powershell
-.\.venv\Scripts\python.exe -B nlp_tools.py analyze --text "Chiudi la porta." --save
-.\.venv\Scripts\python.exe -B nlp_tools.py analyze --text "Luca porta il pane." --engine stanza --save
-.\.venv\Scripts\python.exe -B nlp_tools.py analyze --text "bambini" --scope isolated --engine simplemma
+.\.venv\Scripts\python.exe -B script/nlp_tools.py analyze --text "Chiudi la porta." --save
+.\.venv\Scripts\python.exe -B script/nlp_tools.py analyze --text "Luca porta il pane." --engine stanza --save
+.\.venv\Scripts\python.exe -B script/nlp_tools.py analyze --text "bambini" --scope isolated --engine simplemma
 ```
 
 Ogni token porta forma, lemma, UPOS, XPOS, tratti morfologici e offset nel testo
@@ -84,7 +84,7 @@ di Stanza per evitare una chiamata separata alla pipeline per ogni frase.
 ## Applicazione ai database esistenti
 
 ```powershell
-.\.venv\Scripts\python.exe -B audit_word_databases.py
+.\.venv\Scripts\python.exe -B script/audit_word_databases.py
 ```
 
 Il comando legge le banche di parole di `database/giochi.sqlite3` (associazioni,
@@ -137,7 +137,7 @@ ORDER BY location, word;
 ## Confronto dei motori
 
 ```powershell
-.\.venv\Scripts\python.exe -B nlp_tools.py benchmark --output resources/nlp_smoke_results.json
+.\.venv\Scripts\python.exe -B script/nlp_tools.py benchmark --output resources/nlp_smoke_results.json
 ```
 
 `resources/nlp_gold_it.jsonl` contiene **12 frasi sintetiche di regressione**,

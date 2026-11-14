@@ -24,12 +24,12 @@ Dalla cartella `gioco-dilemmi`:
 
 | Comando | Cosa fa |
 | --- | --- |
-| `python tools/domande.py export domande.csv` | Scrive tutte le domande in un CSV, da modificare in un foglio di calcolo |
-| `python tools/domande.py import domande.csv` | Sostituisce tutte le domande dello schema con quelle del CSV |
-| `python tools/domande.py stats` | Conteggi per categoria, difficoltà e lingua |
-| `python tools/to_livecade.py … --lang it --out wyr_it.csv` | Le domande nel CSV di importazione di Livecade («Would You Rather»), una lingua per file |
-| `python tools/from_livecade.py export_it.csv --dry-run` | Il contrario: importa un CSV di Livecade e dà id nuovi; salta le domande già presenti, anche con A e B invertite |
-| `python tools/make_category_assets.py` | Rigenera icone, card e sfondi delle categorie in `assets/` |
+| `python script/domande.py export domande.csv` | Scrive tutte le domande in un CSV, da modificare in un foglio di calcolo |
+| `python script/domande.py import domande.csv` | Sostituisce tutte le domande dello schema con quelle del CSV |
+| `python script/domande.py stats` | Conteggi per categoria, difficoltà e lingua |
+| `python script/to_livecade.py … --lang it --out wyr_it.csv` | Le domande nel CSV di importazione di Livecade («Would You Rather»), una lingua per file |
+| `python script/from_livecade.py export_it.csv --dry-run` | Il contrario: importa un CSV di Livecade e dà id nuovi; salta le domande già presenti, anche con A e B invertite |
+| `python script/make_category_assets.py` | Rigenera icone, card e sfondi delle categorie in `assets/` |
 
 Colonne del CSV: `id, categoria, difficolta, esplicita`, poi `it_a, it_b, en_a, en_b` (un'altra lingua sono altre
 due colonne).

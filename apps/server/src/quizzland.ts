@@ -19,7 +19,7 @@ import { recordScore } from './scores.js'
 import { flagQuizzland, quizzlandFlags, quizzlandTotalsByQuestion, recordQuizzlandAnswer, unflagQuizzland } from './db.js'
 
 // Quizzland (ZeroQuizz), the server-driven quiz. Questions come from its own database,
-// database/ZeroQuizz.sqlite3 (tables domande, opzioni, categorie; gioco-quizzland/tools/domande.py imports
+// database/ZeroQuizz.sqlite3 (tables domande, opzioni, categorie; gioco-quizzland/script/domande.py imports
 // and exports it as CSV), read once at start: a new question only needs an edit and a restart. The
 // Windows package ships the file next to the server; ZEROCADE_QUIZZLAND_DB points elsewhere.
 
@@ -54,7 +54,7 @@ interface Row {
 }
 
 // The active questions, in the database's order (domande.ordine). One without 2 to 4 answers, or without
-// exactly one right answer, is left out (tools/domande.py stats lists them).
+// exactly one right answer, is left out (script/domande.py stats lists them).
 function loadQuestions(): Question[] {
   if (!dbPath) {
     console.warn('[quizzland] database/ZeroQuizz.sqlite3 not found: the game has no questions')

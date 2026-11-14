@@ -1,9 +1,4 @@
-import { io, type Socket } from 'socket.io-client'
-import type { ClientToServerEvents, ServerToClientEvents } from '@zerocade/shared'
+import { LiveSocket } from '@zerocade/browser-runtime'
 import { overlayKey } from './overlayKey'
 
-export const socket: Socket<ServerToClientEvents, ClientToServerEvents> = io({
-  path: '/socket.io',
-  transports: ['websocket'],
-  auth: { clientType: 'dashboard', key: overlayKey },
-})
+export const socket = new LiveSocket(window.location.origin, { clientType: 'dashboard', key: overlayKey })

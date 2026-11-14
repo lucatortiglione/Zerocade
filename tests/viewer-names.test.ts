@@ -17,6 +17,37 @@ test('TikTok falls back to the account name when the display name is missing', (
   }
 })
 
+test('a TikTok comment says who follows the host and who is in the fan club through userIdentity', () => {
+  const comment = (identity: Record<string, boolean>) => tiktokViewer({ userId: '42', uniqueId: 'anna', userIdentity: identity })
+  assert.equal(comment({ isFollowerOfAnchor: true }).follower, true)
+  assert.equal(comment({ isMutualFollowingWithAnchor: true }).follower, true)
+  assert.equal(comment({ isSubscriberOfAnchor: true }).fan, true)
+  // TikTok sends false for both "does not follow" and "not said": the viewer stays unknown.
+  const nobody = comment({ isFollowerOfAnchor: false, isSubscriberOfAnchor: false })
+  assert.equal(nobody.follower, undefined)
+  assert.equal(nobody.fan, undefined)
+  assert.equal(tiktokViewer({ userId: '42', uniqueId: 'anna', followRole: 1 }).follower, true)
+  assert.equal(comment({ isAnchor: true }).host, true)
+  assert.equal(nobody.host, undefined)
+})
+
+test('the bridge says who follows and who is in the fan club, as ZeroFollowerBot sends it', () => {
+  const user = (fields: Record<string, unknown>) => {
+    const converted = bridgeEvent({ type: 'comment', platform: 'tiktok', text: 'casa', id: 'm1',
+      user: { id: '42', name: 'anna', nickname: 'Anna', ...fields } })
+    assert.ok(converted && 'user' in converted.event)
+    return converted.event.user
+  }
+  const fan = user({ follower: true, fan: true, moderator: true })
+  assert.equal(fan.follower, true)
+  assert.equal(fan.fan, true)
+  assert.equal(user({ follower: false }).follower, false)
+  // not said: unknown, not "does not follow"
+  assert.equal(user({}).follower, undefined)
+  assert.equal(user({ host: true }).host, true)
+  assert.equal(user({}).host, undefined)
+})
+
 test('the bridge shows profile names on both platforms without merging identities', () => {
   for (const platform of ['tiktok', 'twitch']) {
     const converted = bridgeEvent({ type: 'comment', platform, text: 'ciao',

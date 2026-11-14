@@ -7,12 +7,22 @@ import { useDashboard } from '../store'
 // game switcher, the TikTok link, the live simulator, the creator's message and the
 // stream widgets.
 
+const BRAIN_CATEGORIES = new Set(['Quiz', 'Parole'])
+const BRAIN_GAMES = new Set(['memory-maestro', 'zerodubbi'])
+
+// The games the dashboard offers, in every game menu: only the quiz and brain games (the arcade, fighting and party
+// ones stay out; the game in play is always there), in one alphabetical list by name, ignoring case.
+export function listedGames(currentId?: string) {
+  const listed = GAMES.filter((g) => BRAIN_CATEGORIES.has(g.category) || BRAIN_GAMES.has(g.id) || g.id === currentId)
+  return listed.sort((x, y) => x.name.localeCompare(y.name, 'it', { sensitivity: 'base' }))
+}
+
 export function GameSwitch({ session }: { session: SessionState }) {
   return (
     <label className="side__switch">
       <span>Gioco</span>
       <select value={session.gameId} onChange={(e) => socket.emit('game:select', e.target.value)}>
-        {GAMES.map((g) => (
+        {listedGames(session.gameId).map((g) => (
           <option key={g.id} value={g.id}>
             {g.emoji} {g.name}
           </option>
@@ -102,7 +112,7 @@ export function BridgeSummary() {
 
 // The bridge's switch and port (Sources page): Zerocade listens to ZeroFollowerBot on this PC.
 export function BridgeControl({ label = 'Ricevi chat ed eventi da ZeroFollowerBot' }: { label?: string }) {
-  const { bridge } = useDashboard()
+  const { bridge, connected } = useDashboard()
   const [port, setPort] = useState('')
   useEffect(() => {
     if (bridge) setPort(String(bridge.port))
@@ -129,6 +139,16 @@ export function BridgeControl({ label = 'Ricevi chat ed eventi da ZeroFollowerBo
             onBlur={() => bridge.enabled && portNumber !== bridge.port && set(true)}
           />
         </label>
+        {bridge.enabled && (
+          <button
+            type="button"
+            className="btn btn--small"
+            disabled={!connected}
+            onClick={() => socket.emit('bridge:retry')}
+          >
+            {bridge.state === 'connected' ? 'Ricollega' : 'Ritenta connessione'}
+          </button>
+        )}
       </div>
       <BridgeSummary />
     </>

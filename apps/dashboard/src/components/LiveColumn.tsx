@@ -1,4 +1,5 @@
 import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type FormEvent, type ReactNode } from 'react'
+import { apiFetch } from '@zerocade/browser-runtime'
 import {
   GAMES,
   TIER_COLORS,
@@ -47,18 +48,27 @@ function useFeed(creator: string) {
   const [feed, setFeed] = useState<Feed | null>(null)
   useEffect(() => {
     let alive = true
+    let busy = false
+    const controller = new AbortController()
+    setFeed(null)
     const load = async () => {
+      if (busy || !alive) return
+      busy = true
       try {
-        const res = await fetch(`/api/feed?creator=${encodeURIComponent(creator)}`)
-        if (res.ok && alive) setFeed((await res.json()) as Feed)
+        const res = await apiFetch(`/api/feed?creator=${encodeURIComponent(creator)}`, { signal: controller.signal })
+        if (res.ok) {
+          const next = (await res.json()) as Feed
+          if (alive) setFeed(next)
+        }
       } catch {
         // Server down: keep the last feed; the left rail already shows it is offline.
-      }
+      } finally { busy = false }
     }
     void load()
     const timer = setInterval(load, FEED_MS)
     return () => {
       alive = false
+      controller.abort()
       clearInterval(timer)
     }
   }, [creator])

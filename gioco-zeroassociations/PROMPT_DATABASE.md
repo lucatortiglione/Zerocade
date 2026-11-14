@@ -21,7 +21,7 @@ La raccolta e gli altri schemi del DB di lavoro hanno ruoli distinti:
   tutti gli script. Escluso da Git: con l'inventario pesa gigabyte.
 - lo schema `validi`, i **prompt validi con le parole associate**: solo prompt
   con un verbale di revisione corrente, categoria e senso scelto **e** un bacino
-  verificato del medesimo senso. `validated_prompt_database.py sync` la rigenera
+  verificato del medesimo senso. `script/validated_prompt_database.py sync` la rigenera
   senza eliminare la raccolta o lo storico. Una scelta `INTEGRATED` da sola non è
   una revisione.
 - lo schema `filtrati`, i **candidati e le parole valide come prompt**: oltre
@@ -29,10 +29,10 @@ La raccolta e gli altri schemi del DB di lavoro hanno ruoli distinti:
   copia ogni prompt con verbale positivo corrente (senso, POS, categoria, revisore),
   anche se non ha ancora associazioni. La vista `review_state` indica `VALIDATO` o
   `DA_RIVEDERE`; scartati e rimandati non vi compaiono. La rigenera
-  `filter_prompts.py build`, chiamato anche dopo ogni importazione di decisioni.
+  `script/filter_prompts.py build`, chiamato anche dopo ogni importazione di decisioni.
 - lo schema `game`, i **bacini del gioco**: i soli bacini verificati, con schema,
   verbali, attribuzioni e decisioni sulle voci, come viste sulle tabelle della
-  raccolta: sempre aggiornato, senza copie. `prompt_database.py dump` (task
+  raccolta: sempre aggiornato, senza copie. `script/prompt_database.py dump` (task
   «Prompt: aggiorna lo schema game…») ricrea le viste, e lo fa da sé anche
   `import-reviewed`. Il gioco legge la copia nello schema `associazioni` di
   `database/giochi.sqlite3` (`giochi.py aggiorna associazioni`); se è indietro
@@ -47,7 +47,7 @@ risposte perché presenti in altri bacini. I duplicati restano vietati nel
 singolo bacino e nella singola estrazione.
 
 L'inventario `inventory_*` non entra nello schema `game` e si ricostruisce dalle
-fonti con `prompt_inventory.py collect`. Con `dump --output FILE.sql` si ottiene
+fonti con `script/prompt_inventory.py collect`. Con `dump --output FILE.sql` si ottiene
 invece il dump SQL in testo degli stessi dati. Si usa un runtime
 ufficiale SQLite **3.54.1**, verificato con SHA3-256 e installato nella cache
 utente. Python e il motore SQLite del server non vengono modificati.
@@ -105,11 +105,11 @@ Una riga non conforme respinge il pacchetto. Il reimport dello stesso contenuto
 quello precedente nell'audit.
 
 Ogni verbale risponde a una **versione delle regole** (`SEMANTIC_POLICY` in
-`semantic_rules.py`): dichiarata in `review.policy_version`, oppure ricavata
+`script/semantic_rules.py`): dichiarata in `review.policy_version`, oppure ricavata
 dall'hash delle direttive registrato in `resources/policy_versions.json`.
 Un ritocco al testo delle direttive che non cambia le regole non invalida i
 bacini: dopo la modifica si registra il nuovo testo con
-`python -B prompt_database.py register-directives`. Un cambio di regole fa
+`python -B script/prompt_database.py register-directives`. Un cambio di regole fa
 salire `SEMANTIC_POLICY` e manda in rivalutazione tutti i bacini.
 
 ## Task VS Code
@@ -137,11 +137,11 @@ Su sistemi diversi da Windows indicare `--sqlite /percorso/sqlite3` alla version
 Esempi dalla cartella `gioco-zeroassociations`:
 
 ```powershell
-python -B prompt_database.py import-reviewed resources/prompt_pools_reviewed_20261109.jsonl
-python -B prompt_database.py status
-python -B prompt_database.py livecade --count 50 --seed lotto-1
-python -B prompt_database.py livecade --category 008 --seed panificazione
-python -B prompt_database.py dump
+python -B script/prompt_database.py import-reviewed resources/prompt_pools_reviewed_20261109.jsonl
+python -B script/prompt_database.py status
+python -B script/prompt_database.py livecade --count 50 --seed lotto-1
+python -B script/prompt_database.py livecade --category 008 --seed panificazione
+python -B script/prompt_database.py dump
 ```
 
 I CSV a cinque colonne hanno suffisso progressivo da `0001`; non sovrascrivono
@@ -200,13 +200,13 @@ l'intera banca dei bacini, come era `prompt.sqlite3`, si scrive dalla raccolta; 
 (per esempio su un PC appena clonato) importandolo come schema `raw`:
 
 ```powershell
-python -B prompt_database.py dump --output bacini.sqlite3
+python -B script/prompt_database.py dump --output bacini.sqlite3
 python -B -c "import unified_db; unified_db.import_schema('bacini.sqlite3', 'raw')"
-python -B prompt_database.py status
+python -B script/prompt_database.py status
 ```
 
 Contiene anche i verbali editoriali, le attribuzioni e le decisioni sulle voci,
-non l'inventario: si raccoglie di nuovo con `prompt_inventory.py collect`. I precedenti
+non l'inventario: si raccoglie di nuovo con `script/prompt_inventory.py collect`. I precedenti
 CSV da 5.000 prompt, le bozze locali in quarantena e i generatori storici non
 vengono importati o promossi automaticamente. La revisione di quei dati resta
 un lavoro distinto; il nuovo database non significa che tutti i 5.000 siano corretti.

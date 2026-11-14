@@ -5,7 +5,7 @@ import { giochiDb, openSchema } from './schema-db.js'
 
 // ZeroWordle's words, for each length from 5 to 8 letters: the ones that can be the solution (solutions-N.txt)
 // and every word accepted as a guess (words-N.txt). They live in the games' database, schema wordle
-// (database/giochi.sqlite3, written by gioco-zerowordle/build_wordle_bank.py); the overlay downloads them once,
+// (database/giochi.sqlite3, written by gioco-zerowordle/script/build_wordle_bank.py); the overlay downloads them once,
 // as text. Without that schema, the old text files: ZEROCADE_WORDLE_DATA, zerowordle/ next to the server, then
 // gioco-zerowordle/data.
 
@@ -42,7 +42,7 @@ const dir = lists
       (d): d is string => d !== undefined && existsSync(join(d, 'solutions-5.txt')),
     )
 
-if (!lists && !dir) console.warn('[wordle] no words (database/giochi.sqlite3, schema wordle): run gioco-zerowordle/build_wordle_bank.py')
+if (!lists && !dir) console.warn('[wordle] no words (database/giochi.sqlite3, schema wordle): run gioco-zerowordle/script/build_wordle_bank.py')
 
 export const isWordleFile = (name: string) => FILE.test(name)
 

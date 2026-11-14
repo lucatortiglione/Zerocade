@@ -24,7 +24,7 @@ simili non stanno mai una dopo l'altra: uguali, una dentro l'altra o con la stes
 
 Il server costruisce 1.500 catene alla prima richiesta, con un seme fisso: al riavvio le catene restano le stesse.
 Ogni catena ha da 5 a 9 parole, e l'overlay ne prende un tratto della lunghezza che gli serve. Quando entrano
-nuovi bacini in ZeroAssociazioni (`python database/giochi.py aggiorna associazioni`), le catene cambiano.
+nuovi bacini in ZeroAssociazioni (`python database/script/giochi.py aggiorna associazioni`), le catene cambiano.
 
 ## Nel codice
 

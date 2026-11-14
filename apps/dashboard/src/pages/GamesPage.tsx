@@ -4,7 +4,7 @@ import { IncastroSidebar } from '../components/IncastroSidebar'
 import { LeaderboardPanel } from '../components/LeaderboardPanel'
 import { LiveColumn } from '../components/LiveColumn'
 import { GameControls } from '../components/GameControls'
-import { BridgeControl } from '../components/Regia'
+import { BridgeControl, listedGames } from '../components/Regia'
 import { QuizzlandSidebar } from '../components/QuizzlandSidebar'
 import { SettingsPanel } from '../components/SettingsPanel'
 import { Simulator } from '../components/Simulator'
@@ -104,17 +104,11 @@ function describeSecret(gameId: string, secret: string): string {
   return head + round.words.join(' → ')
 }
 
-const BRAIN_CATEGORIES = new Set(['Quiz', 'Parole'])
-const BRAIN_GAMES = new Set(['memory-maestro', 'zerodubbi'])
-
 // The games in a drop-down, in alphabetical order; the chosen game's description sits below it.
 function GamePicker({ session }: { session: SessionState | null }) {
   const current = GAMES.find((g) => g.id === session?.gameId)
-  // Only the quiz and brain games: the arcade, fighting and party ones stay out of the list (a session
-  // already on one of them still shows it).
-  const listed = GAMES.filter((g) => BRAIN_CATEGORIES.has(g.category) || BRAIN_GAMES.has(g.id) || g.id === current?.id)
-  // One list in alphabetical order (by name, ignoring case), not grouped by category.
-  const sorted = [...listed].sort((x, y) => x.name.localeCompare(y.name, 'it', { sensitivity: 'base' }))
+  // The same list as every other game menu (listedGames): quiz and brain games, in alphabetical order.
+  const sorted = listedGames(current?.id)
   return (
     <div className="game-picker">
       <select
@@ -134,7 +128,7 @@ function GamePicker({ session }: { session: SessionState | null }) {
   )
 }
 
-// Word Association's telemetry, for gioco-zeroassociations/analyze_telemetry.py: which hidden
+// Word Association's telemetry, for gioco-zeroassociations/script/analyze_telemetry.py: which hidden
 // words the chat finds, how fast, and what it writes instead.
 function WordAssociationData() {
   return (

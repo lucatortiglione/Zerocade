@@ -723,7 +723,7 @@ più rigida. Le versioni esatte non si ripetono qui: stanno in `package.json`, `
 - **Dati:** SQLite. `database/giochi.sqlite3` (contenuti, uno schema per gioco) e `database/ZeroQuizz.sqlite3` sono in
   Git; `database/parole_ita_raw.sqlite3` (2,3 GB) è fuori da Git; i dati della diretta stanno in
   `apps/server/data/zerocade.db` sul PC (ignorato da Git). Valgono le regole della sezione 8 per transazioni,
-  migrazioni e compatibilità; ogni schema dei giochi si confronta con la sua origine (`database/giochi.py verify`).
+  migrazioni e compatibilità; ogni schema dei giochi si confronta con la sua origine (`database/script/giochi.py verify`).
 - **Giochi con cartella propria** (`gioco-*`): dati, strumenti e prove in Python; ogni gioco ha il suo `README.md`
   e, dove serve, il suo `TODO.md`.
 
@@ -747,8 +747,8 @@ Si eseguono dalla cartella radice e si riportano gli esiti reali (sezione 14):
 
 - `npm run typecheck`
 - `node --import tsx --test tests/*.test.ts`
-- `python -m unittest discover -s database` e, per ZeroAssociazioni, `npm run test:associations`
-- `python database/giochi.py verify` se si toccano i contenuti dei giochi
+- `python -m unittest discover -s database/script` e, per ZeroAssociazioni, `npm run test:associations`
+- `python database/script/giochi.py verify` se si toccano i contenuti dei giochi
 - `npm run build` per overlay e dashboard, e un avvio di prova del server con dati isolati (sezione 12)
 - `npm audit --omit=dev` per le dipendenze; con npm 12 gli script di installazione sono bloccati, e solo
   `better-sqlite3` ed `esbuild` sono consentiti in `allowScripts` del `package.json`

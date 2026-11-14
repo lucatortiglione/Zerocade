@@ -6,7 +6,7 @@ import { giochiDb, openSchema } from '../schema-db.js'
 
 // ZeroWords' data: the lexicon (word, Zipf frequency, tier), the blocklist, the chapters and the
 // difficulty curve. They live in the games' database, schema parole (database/giochi.sqlite3, copied
-// from gioco-parole by `python database/giochi.py aggiorna parole`). Without that schema, the files:
+// from gioco-parole by `python database/script/giochi.py aggiorna parole`). Without that schema, the files:
 // ZEROCADE_INCASTRO_DATA or app/incastro laid out as chapters.json, curve.json, lexicon/words.tsv and
 // lexicon/blocklist.txt, then gioco-parole/ of the repository, where the tools write them.
 const here = dirname(fileURLToPath(import.meta.url))
@@ -83,5 +83,5 @@ export function readCurve<T>(): T {
   return JSON.parse(meta('curve') ?? readFileSync(files.curve, 'utf-8')) as T
 }
 
-// Level packs written by the CLI, for tools/validate_levels.py.
+// Level packs written by the CLI, for script/validate_levels.py.
 export const packsDir = join(repo, 'data', 'levels', 'it')

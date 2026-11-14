@@ -12,6 +12,7 @@
 //   app/giochi.sqlite3              the games' database (database/giochi.sqlite3), one schema per game:
 //                                   Bivio's dilemmas, word lists, ZeroAssociazioni's verified pools, ZeroWords'
 //                                   lexicon and the other games' content
+//   app/ZeroDubbi.sqlite3           Bivio's dilemmas (database/ZeroDubbi.sqlite3), a database of their own
 //   app/ZeroQuizz.sqlite3           ZeroQuizz's questions and answers (database/ZeroQuizz.sqlite3), a database
 //                                   of their own
 //   app/zerocontext/vectors.bin     ZeroContext's vectors (gioco-zerocontext/data)
@@ -59,6 +60,7 @@ await build({
   entryPoints: {
     server: join(root, 'apps', 'server', 'src', 'index.ts'),
     'wordgen-worker': join(root, 'apps', 'server', 'src', 'wordgen', 'worker.ts'),
+    'infrastructure-worker': join(root, 'apps', 'server', 'src', 'infrastructure-worker.ts'),
   },
   outdir: app,
   outExtension: { '.js': '.mjs' },
@@ -79,7 +81,7 @@ cpSync(join(root, 'apps', 'overlay', 'dist'), join(app, 'public', 'overlay'), { 
 // The games' database: every game's content, one schema each (apps/server/src/schema-db.ts). It must
 // be verified and have them all: the package has no other copy of the pools, words and banks.
 const giochi = join(root, 'database', 'giochi.sqlite3')
-const SCHEMAS = ['dubbi', 'wordle', 'context', 'associazioni', 'parole', 'contenuti']
+const SCHEMAS = ['wordle', 'context', 'associazioni', 'parole', 'contenuti']
 {
   const Database = createRequire(join(root, 'apps', 'server', 'package.json'))('better-sqlite3')
   const db = new Database(giochi, { readonly: true, fileMustExist: true })
@@ -88,11 +90,24 @@ const SCHEMAS = ['dubbi', 'wordle', 'context', 'associazioni', 'parole', 'conten
   db.close()
   const missing = SCHEMAS.filter((s) => !present.has(s))
   if (verified !== '1' || missing.length) {
-    console.error(`✗ database/giochi.sqlite3 ${verified !== '1' ? 'is not verified' : `has no schema ${missing.join(', ')}`}: run python database/giochi.py aggiorna`)
+    console.error(`✗ database/giochi.sqlite3 ${verified !== '1' ? 'is not verified' : `has no schema ${missing.join(', ')}`}: run python database/script/giochi.py aggiorna`)
     process.exit(1)
   }
 }
 copyFileSync(giochi, join(app, 'giochi.sqlite3'))
+// ZeroDubbi: Bivio's dilemmas are a database of their own (apps/server/src/bivio.ts), read by the server.
+const zeroDubbi = join(root, 'database', 'ZeroDubbi.sqlite3')
+{
+  const Database = createRequire(join(root, 'apps', 'server', 'package.json'))('better-sqlite3')
+  const db = new Database(zeroDubbi, { readonly: true, fileMustExist: true })
+  const dilemmas = db.prepare('SELECT count(*) FROM dilemmi WHERE esplicita = 0').pluck().get()
+  db.close()
+  if (!dilemmas) {
+    console.error('✗ database/ZeroDubbi.sqlite3 has no dilemmas')
+    process.exit(1)
+  }
+}
+copyFileSync(zeroDubbi, join(app, 'ZeroDubbi.sqlite3'))
 // ZeroQuizz: its questions are a database of their own (apps/server/src/quizzland.ts); without it the game has none.
 const zeroQuizz = join(root, 'database', 'ZeroQuizz.sqlite3')
 {
@@ -213,7 +228,7 @@ writeFileSync(
     '  segreta o già trovata.',
     '  Una domanda scritta male o tradotta male: "Domanda sbagliata" (Info partita). Non',
     '  viene più proposta e finisce in data\\bivio-domande-sbagliate.csv, con i testi in tutte',
-    '  le lingue, da correggere in app\\giochi.sqlite3 (tabelle dubbi__). "Annulla" la rimette in gioco.',
+    '  le lingue, da correggere in app\\ZeroDubbi.sqlite3 (tabelle dilemmi e testi). "Annulla" la rimette in gioco.',
     '',
     'ZEROWORDS (ruota di lettere e schema a incastro)',
     '  1. Nella dashboard scegli il gioco "ZeroWords"; TikTok come per ZeroDubbi.',
@@ -292,15 +307,15 @@ writeFileSync(
     '',
     'IL DATABASE DEI GIOCHI',
     '  app\\giochi.sqlite3, un database SQLite con uno "schema" per gioco: il prefisso delle',
-    '  tabelle. dubbi__ (ZeroDubbi), wordle__ (ZeroWordle), context__ (ZeroContext),',
+    '  tabelle. wordle__ (ZeroWordle), context__ (ZeroContext),',
     '  associazioni__ (ZeroAssociazioni e ZeroReazioniACatena), parole__ (ZeroWords),',
     '  contenuti__ (gli altri giochi). I vettori di ZeroContext sono a parte, in',
     '  app\\zerocontext\\vectors.bin. Le domande di ZeroQuizz hanno un database a sé,',
     '  app\\ZeroQuizz.sqlite3.',
     '',
     'DOMANDE DI BIVIO',
-    '  app\\giochi.sqlite3, tabella dubbi__dilemmi (id, categoria, difficolta, esplicita,',
-    '  ordine) e tabella dubbi__testi (una riga per dilemma e lingua: dilemma, lingua, a, b).',
+    '  app\\ZeroDubbi.sqlite3, tabella dilemmi (id, categoria, difficolta, esplicita,',
+    '  ordine) e tabella testi (una riga per dilemma e lingua: dilemma, lingua, a, b).',
     '  Si modifica con un programma per SQLite, per esempio DB Browser for SQLite (gratuito).',
     '  Dopo una modifica riavvia Zerocade. Non riusare l\'id di una domanda cancellata:',
     '  i voti salvati sono legati all\'id.',

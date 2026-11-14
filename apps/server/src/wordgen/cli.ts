@@ -10,7 +10,7 @@ import { GENERATOR_VERSION, Generator, rivalsOf, rngFrom, wordEffort, type Gener
 //   npm run wordgen -w @zerocade/server -- --calibrate     raw difficulty spread, for solver.scale
 //   npm run wordgen -w @zerocade/server -- --write [N]     levels 1..N (default curve packLevels)
 //                                                         into gioco-parole/data/levels/it, for
-//                                                         python tools/validate_levels.py
+//                                                         python script/validate_levels.py
 //   npm run wordgen -w @zerocade/server -- --selftest      the solver's effort never grows as
 //                                                         letters show, and ends at the input cost
 
@@ -25,7 +25,7 @@ function parseOnly(text: string): number[] {
   return [...out].sort((x, y) => x - y)
 }
 
-// Pack shape read by tools/validate_levels.py: the archetype among the metrics.
+// Pack shape read by script/validate_levels.py: the archetype among the metrics.
 const packed = ({ archetype, metrics, ...level }: GeneratedLevel) => ({ ...level, metrics: { archetype, ...metrics } })
 
 function line(level: GeneratedLevel, ms: number): string {

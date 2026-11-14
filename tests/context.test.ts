@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
 import { bandColor, closerHint, lookup, maskedWord, parseContextData, position, rankAgainst, startHint } from '../apps/overlay/src/games/contextRanking.ts'
+import { inlineContextComputer, settleContext } from './helpers/inlineContextComputer.ts'
 
 // Four words in 2 dimensions: "mare" and "onda" point the same way, "sabbia" is near, "città" opposite.
 const vocab = 'città\nmare\nonda\nsabbia\n'
@@ -43,22 +44,11 @@ test('an unaccented guess finds the secret even when both spellings have their o
 
 test('the game awards the finder points and ends the round for an unaccented winning guess', async () => {
   const { createContext } = await import('../apps/overlay/src/games/context.ts')
-  const originalFetch = globalThis.fetch
-  globalThis.fetch = async (input) => {
-    const path = String(input)
-    if (path.endsWith('vectors.bin')) return new Response(new Int8Array([100, 0, 95, 30, 0, 100]))
-    if (path.endsWith('secrets.txt')) return new Response('proprietà\n')
-    if (path.endsWith('links.json')) return new Response(null, { status: 404 })
-    return new Response('proprieta\nproprietà\nmare\n')
-  }
+  const fixture = parseContextData('proprieta\nproprietà\nmare\n', new Int8Array([100, 0, 95, 30, 0, 100]).buffer, 'proprietà\n')
   const settings = { startHintOn: false, finderPoints: 100, showLeaderboard: true }
-  const game = createContext()
-  try {
-    game.reset(settings, 1080, 1920)
-    await new Promise<void>((resolve) => setImmediate(resolve))
-  } finally {
-    globalThis.fetch = originalFetch
-  }
+  const game = createContext(() => inlineContextComputer(fixture))
+  game.reset(settings, 1080, 1920)
+  await settleContext()
   const texts: string[] = []
   const canvas = new Proxy({
     font: '', fillText: (text: string) => texts.push(text),
@@ -71,6 +61,7 @@ test('the game awards the finder points and ends the round for an unaccented win
   assert.match(draw(), /100 pt/)
   game.onAction('guess', { type: 'comment', text: 'proprietà', user: { id: 'b', nickname: 'Secondo' } }, 0)
   assert.doesNotMatch(draw(), /Secondo/)
+  game.dispose?.()
 })
 
 test('ranks run from the secret (0) to the farthest word', () => {
@@ -109,15 +100,13 @@ test('on screen the secret is always position 1 and the closest word position 2'
   assert.equal(shown('sabbia'), 3)
 })
 
-test('the colour bands end at the positions the settings name', () => {
-  const green = '#2fbf6c'
-  const orange = '#E0A022'
-  // "Verde fino alla posizione 100": position 100 is rank 99, position 101 is rank 100.
-  assert.equal(bandColor(99, 100, 1000), green)
-  assert.equal(bandColor(100, 100, 1000), orange)
-  assert.equal(bandColor(999, 100, 1000), orange)
-  assert.equal(bandColor(1000, 100, 1000), '#D9435E')
-  assert.equal(bandColor(0, 100, 1000), '#1FA35B')
+test('five colour bands include every boundary and the secret uses red with the closest words', () => {
+  const examples = [[1, '#ef4444'], [10, '#ef4444'], [11, '#f97316'], [100, '#f97316'],
+    [101, '#facc15'], [1000, '#facc15'], [1001, '#22d3ee'], [10000, '#22d3ee'],
+    [10001, '#3b82f6'], [101304, '#3b82f6']] as const
+  for (const [at, color] of examples) assert.equal(bandColor(at - 1), color, `position ${at}`)
+  assert.equal(bandColor(19, 20, 200, 2000, 20000), '#ef4444')
+  assert.equal(bandColor(20, 20, 200, 2000, 20000), '#f97316')
 })
 
 test('every round starts from a hint a little way from the closest word, never the secret', () => {
@@ -126,6 +115,7 @@ test('every round starts from a hint a little way from the closest word, never t
   assert.equal(word(startHint(r, 3)), 'sabbia') // position 3, one past the closest ("onda")
   assert.equal(word(startHint(r, 30)), 'città') // farther than the list: the farthest word
   assert.equal(word(startHint(r, 2, 2)), 'sabbia') // never closer than the hints' floor
+  assert.equal(startHint(r, 30, 10), -1, 'a small vocabulary cannot cross the configured hint floor')
   const alone = rankAgainst(parseContextData('mare\n', new Int8Array([100, 0]).buffer, 'mare\n'), 0)
   assert.equal(startHint(alone, 30), -1) // only the secret: no hint
 })
@@ -152,12 +142,17 @@ test('the shipped data is consistent: vectors match the vocabulary and neighbour
     JSON.parse(contextFile('links.json')!.toString('utf-8')),
   )
   assert.ok(real.secrets.length > 5000)
+  assert.ok(real.words.length > 100_000, `expanded vocabulary: ${real.words.length}`)
+  for (const word of ['zuccheriera', 'videochiamare', 'mostriciattolo'])
+    assert.notEqual(lookup(real, word), -1, `new playable word: ${word}`)
   // Most secrets have words tied to them, and every link names a secret and a playable word.
   assert.ok(real.linkBoost > 0 && real.links.size > 4000, `links for ${real.links.size} secrets`)
   const secret = new Set(real.secrets)
   assert.ok([...real.links.keys()].every((s) => secret.has(s)))
   assert.ok(real.links.get(real.index.get('spiaggia')!)!.includes(real.index.get('ombrellone')!))
   const r = rankAgainst(real, real.index.get('spiaggia')!)
+  assert.equal(new Set(r.order).size, real.words.length)
+  assert.equal(r.rankOf[r.order[real.words.length - 1]], real.words.length - 1)
   const top = [...r.order.slice(1, 30)].map((i) => real.words[i])
   assert.ok(top.includes('mare') && top.includes('sabbia'), `closest to spiaggia: ${top.join(', ')}`)
   assert.ok(r.rankOf[real.index.get('mare')!] < r.rankOf[real.index.get('automobile')!])

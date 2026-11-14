@@ -54,6 +54,7 @@ test('an old database gets the missing columns and keeps its rows; opening it ag
   assert.ok(columns(db, 'gifts').includes('avatar') && columns(db, 'gifters').includes('avatar'))
   assert.deepEqual(db.prepare('SELECT game_id, widgets, goal FROM sessions').get(), { game_id: 'quizzland', widgets: '{}', goal: 1000 })
   assert.deepEqual(db.prepare('SELECT nickname, coins, avatar FROM gifters').get(), { nickname: 'luna', coins: 50, avatar: null })
+  assert.deepEqual(db.prepare('SELECT version, name FROM infrastructure_migrations').all(), [{ version: 1, name: 'widgets-goal-avatars' }])
   db.close()
 })
 
@@ -71,8 +72,8 @@ test('a migration that fails for a reason of its own stops the start with that r
   try {
     const { status, stderr } = openServerDatabase(file)
     assert.notEqual(status, 0)
-    // The first missing column and the cause.
-    assert.match(stderr, /cannot add the column sessions\.widgets/)
+    // The atomic migration cannot acquire its write lock; its identity and cause survive.
+    assert.match(stderr, /migration v1 \(widgets-goal-avatars\) failed/)
     assert.match(stderr, /locked/i)
   } finally {
     db.exec('ROLLBACK')

@@ -46,7 +46,7 @@ Una domanda può avere più motivi: la somma delle segnalazioni può superare le
 
 ## Metodo e limiti
 
-Screening automatico di ogni domanda, opzione e originale disponibile; regole trasparenti e decisioni editoriali esplicite nel programma tools/verifica_pubblico.py.
+Screening automatico di ogni domanda, opzione e originale disponibile; regole trasparenti e decisioni editoriali esplicite nel programma script/verifica_pubblico.py.
 
 Non costituisce lettura editoriale individuale né verifica fattuale completa di tutte le risposte. Le traduzioni poco naturali non sono tutte riconoscibili con regole; assenza dall'elenco non certifica correttezza o idoneità.
 
@@ -54,7 +54,7 @@ Tutte le domande presenti in data/domande.db, incluse quelle precedentemente non
 
 Le impostazioni di attivazione non risolvono i vincoli di licenza descritti nei file LICENZA.md delle fonti.
 
-Per rigenerare l'elenco: `python gioco-quizzland/tools/verifica_pubblico.py`. Il programma legge il DB senza modificarlo.
+Per rigenerare l'elenco: `python gioco-quizzland/script/verifica_pubblico.py`. Il programma legge il DB senza modificarlo.
 
 ## Elenco sintetico
 

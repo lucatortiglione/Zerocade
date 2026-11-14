@@ -1,4 +1,5 @@
 import { Fragment, useEffect, useRef, useState } from 'react'
+import { apiFetch, UnconfirmedRequestError } from '@zerocade/browser-runtime'
 import { BACKGROUND_GAMES, GAMES, backgroundPath, settingVisible, type GameSetting, type SessionState } from '@zerocade/shared'
 import { overlayKey } from '../overlayKey'
 import { socket } from '../socket'
@@ -33,7 +34,7 @@ export function SettingsForm({ session, omit = [] }: { session: SessionState; om
         const fields = group.settings.map((s) => {
           const field = (
             <Field
-              key={s.id}
+              key={`${game.id}:${s.id}`}
               gameId={game.id}
               setting={s}
               value={session.settings[s.id] ?? s.default}
@@ -66,7 +67,7 @@ export function SettingField({ session, id }: { session: SessionState; id: strin
   const game = GAMES.find((g) => g.id === session.gameId)
   const setting = game?.settings.find((s) => s.id === id)
   if (!game || !setting) return null
-  return <Field gameId={game.id} setting={setting} value={session.settings[id] ?? setting.default} onChange={(v) => set(id, v)} />
+  return <Field key={`${game.id}:${id}`} gameId={game.id} setting={setting} value={session.settings[id] ?? setting.default} onChange={(v) => set(id, v)} />
 }
 
 function Label({ setting }: { setting: GameSetting }) {
@@ -171,7 +172,7 @@ function NumberInput({
 function ColorInput({ value, onChange }: { value: string; onChange: (v: string) => void }) {
   const [draft, setDraft] = useState(value)
   const timer = useRef<number | undefined>(undefined)
-  useEffect(() => setDraft(value), [value])
+  useEffect(() => { clearTimeout(timer.current); setDraft(value) }, [value])
   useEffect(() => () => clearTimeout(timer.current), [])
   return (
     <input
@@ -253,23 +254,35 @@ function ImagePicker({
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
   const game = BACKGROUND_GAMES.find((g) => g === gameId) ?? 'zerodubbi'
+  const operation = useRef(0)
+  const target = useRef(game)
+  target.current = game
+  useEffect(() => {
+    operation.current++
+    setBusy(false)
+    setError('')
+    return () => { operation.current++ }
+  }, [game])
 
   const upload = async (file: File) => {
+    if (file.size > 8 * 1024 * 1024) { setError('Il file supera 8 MB.'); return }
+    const version = ++operation.current
     setBusy(true)
     setError('')
     try {
-      const res = await fetch(backgroundPath(game, overlayKey), {
+      const res = await apiFetch(backgroundPath(game, overlayKey), {
         method: 'POST',
         headers: { 'content-type': file.type },
         body: file,
-      })
+      }, 15_000, 32 * 1024)
       if (!res.ok) throw new Error(String(res.status))
       const { url } = (await res.json()) as { url: string }
-      onChange(url)
-    } catch {
-      setError('Caricamento non riuscito: usa un PNG, JPG, WebP o GIF fino a 8 MB.')
+      if (operation.current === version && target.current === game) onChange(url)
+    } catch (error) {
+      if (operation.current === version) setError(error instanceof UnconfirmedRequestError ? error.message
+        : 'Caricamento non riuscito: usa un PNG, JPG, WebP o GIF fino a 8 MB.')
     } finally {
-      setBusy(false)
+      if (operation.current === version) setBusy(false)
     }
   }
 
@@ -282,7 +295,7 @@ function ImagePicker({
           {busy ? 'Caricamento…' : 'Scegli'}
         </button>
         {value && (
-          <button type="button" className="btn btn--small btn--ghost" onClick={() => onChange('')}>
+          <button type="button" className="btn btn--small btn--ghost" disabled={busy} onClick={() => onChange('')}>
             Rimuovi
           </button>
         )}

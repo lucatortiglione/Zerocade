@@ -1,12 +1,14 @@
 # I file .sqlite3 di `database/`
 
-Situazione al 13/11/2026: tre file, e tutti servono.
+Situazione al 13/11/2026, con l'aggiunta di ZeroLettere il 14/11: quattro file, e tutti servono.
 
 | File | Peso | In Git | A che cosa serve |
 | --- | ---: | :---: | --- |
 | `giochi.sqlite3` | 11 MB | sì | Il DB dei giochi di parole: uno schema per gioco, letto dal server e dal pacchetto Windows |
 | `parole_ita_raw.sqlite3` | 2,3 GB | no | Il DB di lavoro di ZeroAssociazioni: i sei DB storici, uno schema ciascuno |
 | `ZeroQuizz.sqlite3` | 7 MB | sì | Il DB di ZeroQuizz: domande e risposte, un gioco a sé (era `gioco-quizzland/data/domande.db`, poi lo schema `quizz` di `giochi.sqlite3`). Lo leggono il server e il pacchetto Windows |
+| `ZeroDubbi.sqlite3` | piccolo | sì | Il DB di ZeroDubbi: i dilemmi (tabelle `dilemmi` e `testi`), un gioco a sé come ZeroQuizz. Lo leggono il server e il pacchetto Windows (`app\ZeroDubbi.sqlite3`) |
+| `ZeroLettere.sqlite3` | 836 KiB | sì | Banca autonoma di ZeroLettere: 5.661 indizi e risposte, più 109 alternative, importati dal CSV in `gioco-zerolettere`. Dati e comando in [README](../gioco-zerolettere/README.md) |
 
 `parole_ita_raw.sqlite3` non è in Git perché supera i 100 MB, il limite di GitHub per un file (`.gitignore`).
 
@@ -16,7 +18,6 @@ Il DB che i giochi leggono, in sola lettura. Sta in Git e va nel pacchetto Windo
 
 | Schema | Gioco |
 | --- | --- |
-| `dubbi` | ZeroDubbi |
 | `wordle` | ZeroWordle |
 | `context` | ZeroContext (le parole e i collegamenti con ZeroAssociazioni; i vettori sono in `gioco-zerocontext/data/vectors.bin`) |
 | `associazioni` | ZeroAssociazioni e ZeroReazioniACatena: solo i prompt, le parole (ognuna una volta) e i collegamenti |
@@ -24,7 +25,7 @@ Il DB che i giochi leggono, in sola lettura. Sta in Git e va nel pacchetto Windo
 | `contenuti` | gli altri giochi dell'overlay |
 
 `associazioni`, `parole` e `contenuti` sono copie delle loro origini. Dopo una modifica all'origine si ricopiano
-con `python database/giochi.py aggiorna`. Dettagli in [README.md](README.md).
+con `python database/script/giochi.py aggiorna`. Dettagli in [README.md](README.md).
 
 ## `parole_ita_raw.sqlite3`
 
@@ -44,7 +45,7 @@ Il DB su cui lavorano gli strumenti di `gioco-zeroassociations` (`unified_db.py`
 Gli script indicano uno schema con il suo indirizzo, `database/parole_ita_raw.sqlite3#raw` (`unified_db.address`),
 la stessa scrittura del server, e leggono e scrivono qui. Il nome storico del file indica ancora lo stesso schema,
 perché compare nei metadati e nelle ricevute già scritti, ma i file con quei nomi non esistono più. Da qui
-`giochi.py aggiorna associazioni` copia i bacini del gioco, prendendoli dallo schema `validi`.
+`script/giochi.py aggiorna associazioni` copia i bacini del gioco, prendendoli dallo schema `validi`.
 
 ### Com'è fatto
 
@@ -103,7 +104,7 @@ In breve:
 
 Le 2.649 candidate senza bacino sono tutte nella coda della lavorazione `finale_20261110`
 (`gioco-zeroassociations/prompt-staging/associations/finale_20261110`). Quando il loro bacino è verificato, entrano
-in `validi` con `validated_prompt_database.py sync`, e poi nel gioco con `python database/giochi.py aggiorna
+in `validi` con `validated_prompt_database.py sync`, e poi nel gioco con `python database/script/giochi.py aggiorna
 associazioni`.
 
 ### Lo schema `candidati`
@@ -150,4 +151,4 @@ poi i file sono stati cancellati:
 | --- | --- |
 | `apps/server/data/zerocade.db` | **Sì**: sessioni, eventi, classifiche, voti e progressi della diretta |
 | `apps/server/data/content.db` | No: la banca dei giochi ora è lo schema `contenuti`. Il server lo crea solo se quello schema manca |
-| `gioco-dilemmi/data/domande.db` | No: è la copia di prima di `dubbi`. Serve solo a `giochi.py build --replace`, a `verify` e a `ZEROCADE_GIOCHI_DB=legacy` |
+| `gioco-dilemmi/data/domande.db` | No: era il DB di ZeroDubbi, ora `ZeroDubbi.sqlite3`. Non serve più a nessuno strumento |

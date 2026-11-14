@@ -50,17 +50,17 @@ Dalla cartella `gioco-quizzland`:
 
 | Comando | Cosa fa |
 | --- | --- |
-| `python tools/domande.py export domande.csv` | Scrive tutte le domande in un CSV, da modificare in un foglio di calcolo |
-| `python tools/domande.py import domande.csv` | Sostituisce tutte le domande del DB con quelle del CSV |
-| `python tools/domande.py stats` | Conteggi per categoria e difficoltà, e i problemi trovati |
-| `python tools/fonti.py download FONTE` | Scarica le domande di una fonte in `data/fonti/FONTE` |
-| `python tools/fonti.py nuove [FONTE]` | Quante domande nuove ha una fonte, senza scaricarle |
-| `python tools/fonti.py csv domande.csv` | Un CSV con tutte le domande, tradotte comprese, da passare a `domande.py import` |
-| `python tools/traduci_fonti.py arc openbookqa` | Completa le traduzioni mancanti con Google Traduttore; poi vanno rilette |
-| `python tools/verifica_pubblico.py` | Controlla le domande adatte al pubblico italiano e scrive `data/REVISIONE-DOMANDE.md` |
-| `python tools/revisione_risposte.py audit` | Cerca risposte sospette, da leggere una per una |
-| `python tools/revisione_risposte.py apply` / `restore` | Applica o annulla le correzioni decise in `data/correzioni-risposte.json`, con un backup prima |
-| `python tools/make_backdrop.py` | Rigenera lo sfondo `assets/sfondo.svg` |
+| `python script/domande.py export domande.csv` | Scrive tutte le domande in un CSV, da modificare in un foglio di calcolo |
+| `python script/domande.py import domande.csv` | Sostituisce tutte le domande del DB con quelle del CSV |
+| `python script/domande.py stats` | Conteggi per categoria e difficoltà, e i problemi trovati |
+| `python script/fonti.py download FONTE` | Scarica le domande di una fonte in `data/fonti/FONTE` |
+| `python script/fonti.py nuove [FONTE]` | Quante domande nuove ha una fonte, senza scaricarle |
+| `python script/fonti.py csv domande.csv` | Un CSV con tutte le domande, tradotte comprese, da passare a `domande.py import` |
+| `python script/traduci_fonti.py arc openbookqa` | Completa le traduzioni mancanti con Google Traduttore; poi vanno rilette |
+| `python script/verifica_pubblico.py` | Controlla le domande adatte al pubblico italiano e scrive `data/REVISIONE-DOMANDE.md` |
+| `python script/revisione_risposte.py audit` | Cerca risposte sospette, da leggere una per una |
+| `python script/revisione_risposte.py apply` / `restore` | Applica o annulla le correzioni decise in `data/correzioni-risposte.json`, con un backup prima |
+| `python script/make_backdrop.py` | Rigenera lo sfondo `assets/sfondo.svg` |
 
 Colonne del CSV: `id, categoria, difficolta, ordine_fisso, attiva, domanda, a, b, c, d, giusta` (la lettera della
 risposta giusta) e `spiegazione`. Le colonne `c` e `d` restano vuote per le domande con meno risposte.

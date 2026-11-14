@@ -7,7 +7,7 @@
       "command": "${workspaceFolder}/gioco-zeroassociations/.venv/Scripts/python.exe",
       "args": [
         "-B",
-        "prompt_inventory.py",
+        "script/prompt_inventory.py",
         "collect"
       ],
       "options": {
@@ -16,12 +16,294 @@
       "problemMatcher": []
     },
     {
+      "label": "Fonti: controlla tutte le fonti registrate",
+      "type": "process",
+      "command": "${workspaceFolder}/gioco-zeroassociations/.venv/Scripts/python.exe",
+      "args": [
+        "-B",
+        "script/inventory_updates.py",
+        "check-updates",
+        "--only",
+        "*"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}/gioco-zeroassociations"
+      },
+      "problemMatcher": [],
+      "detail": "Scarica le versioni correnti di ogni fonte abilitata e salva il confronto (NEW/CHANGED/REMOVED) senza toccare l'inventario."
+    },
+    {
+      "label": "Fonti: elenca gli aggiornamenti in attesa",
+      "type": "process",
+      "command": "${workspaceFolder}/gioco-zeroassociations/.venv/Scripts/python.exe",
+      "args": [
+        "-B",
+        "script/inventory_updates.py",
+        "updates",
+        "--status",
+        "PENDING"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}/gioco-zeroassociations"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "1)Parole: aggiorna dalle fonti nel DB",
+      "dependsOrder": "sequence",
+      "dependsOn": [
+        "1. Prompt: raccogli e inserisci inventario da tutte le fonti registrate",
+        "Fonti: controlla tutte le fonti registrate",
+        "Fonti: elenca gli aggiornamenti in attesa"
+      ],
+      "problemMatcher": [],
+      "detail": "1) fonti nuove: parole in raw.inventory_terms e inventory_attestations; 2) fonti già importate: confronto in raw.inventory_updates; 3) elenco da decidere. Poi 'Fonti: integra, scarta o rimanda un aggiornamento' (APPLY) porta le parole nuove nell'inventario e rinfresca filtrati e validi."
+    },
+    {
+      "label": "Parole: audit lessicale e NLP dei DB",
+      "type": "process",
+      "command": "${workspaceFolder}/gioco-zeroassociations/.venv/Scripts/python.exe",
+      "args": [
+        "-B",
+        "script/audit_word_databases.py"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}/gioco-zeroassociations"
+      },
+      "problemMatcher": [],
+      "detail": "Applica i controlli lessicali e NLP ai dati correnti dei DB di parole e scrive il rapporto in resources/nlp_db_audit_latest.json."
+    },
+    {
+      "label": "2)Parole: verifica quelle da escludere",
+      "dependsOrder": "sequence",
+      "dependsOn": [
+        "Parole: audit lessicale e NLP dei DB",
+        "Prompt: stato degli scarti",
+        "Prompt: elenca i candidati da rivedere"
+      ],
+      "problemMatcher": [],
+      "detail": "1) audit lessicale/NLP delle parole nei DB (rapporto con le voci sospette); 2) stato degli scarti già registrati; 3) candidati ancora da rivedere. L'esclusione si registra con 'Voci: integra, scarta o rimanda una parola' (DISCARDED, con motivazione)."
+    },
+    {
+      "label": "3)Parole: scarta quelle non utili e filtrate",
+      "dependsOrder": "sequence",
+      "dependsOn": [
+        "Prompt: aggiorna filtrati e validi dopo nuove parole (refresh)",
+        "Prompt: aggiorna DB degli scarti",
+        "Prompt: stato degli scarti"
+      ],
+      "problemMatcher": [],
+      "detail": "1) applica i filtri automatici alle parole nuove (schemi filtrati e validi); 2) copia nello schema scartati le parole filtrate e quelle con decisione DISCARDED, con il motivo; 3) mostra i conteggi. I rinvii DEFERRED restano in attesa. Gli scarti automatici non sono un divieto di usare la parola come risposta."
+    },
+    {
+      "label": "Prompt: esporta i candidati da rivedere (JSONL per gli agenti)",
+      "type": "process",
+      "command": "${workspaceFolder}/gioco-zeroassociations/.venv/Scripts/python.exe",
+      "args": [
+        "-B",
+        "script/review_prompts.py",
+        "pending",
+        "--limit",
+        "${input:reviewLimit}",
+        "--output",
+        "prompt-staging/reviews/pending_agenti.jsonl"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}/gioco-zeroassociations"
+      },
+      "problemMatcher": [],
+      "detail": "Scrive prompt-staging/reviews/pending_agenti.jsonl (sovrascritto a ogni esecuzione) con parola, categoria, frequenza, segnalazioni e sensi."
+    },
+    {
+      "label": "4)Parole: prepara la revisione dei candidati (senza LLM locale)",
+      "dependsOrder": "sequence",
+      "dependsOn": [
+        "Parole: audit lessicale e NLP dei DB",
+        "Prompt: esporta i candidati da rivedere (JSONL per gli agenti)",
+        "Prompt: elenca i candidati da rivedere"
+      ],
+      "problemMatcher": [],
+      "detail": "1) controlli automatici sulle parole (audit NLP); 2) esporta in JSONL i candidati in attesa; 3) li elenca. Poi li rivedono gli agenti Claude (o una persona, per i FLAGGED del §9) scrivendo un file di decisioni; si registra con '4b)Parole: importa le decisioni di revisione'."
+    },
+    {
+      "label": "4b)Parole: importa le decisioni di revisione",
+      "type": "process",
+      "command": "${workspaceFolder}/gioco-zeroassociations/.venv/Scripts/python.exe",
+      "args": [
+        "-B",
+        "script/review_prompts.py",
+        "import-decisions",
+        "${input:decisionsFile}",
+        "--reviewer",
+        "${input:reviewerName}",
+        "--method",
+        "${input:reviewMethod}"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}/gioco-zeroassociations"
+      },
+      "problemMatcher": [],
+      "detail": "Registra nella raccolta i verbali di un file di decisioni (JSONL, un prompt per riga, senza ripetizioni)."
+    },
+    {
+      "label": "Associazioni: agenti, scheda dei prossimi prompt di una partizione",
+      "type": "process",
+      "command": "${workspaceFolder}/gioco-zeroassociations/.venv/Scripts/python.exe",
+      "args": [
+        "-B",
+        "script/final_associations.py",
+        "sheet",
+        "${input:associationShard}",
+        "--count",
+        "${input:sheetCount}"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}/gioco-zeroassociations",
+        "env": {
+          "ZEROCADE_ASSOCIATIONS_JOB": "${input:associationJob}"
+        }
+      },
+      "problemMatcher": [],
+      "detail": "Metodo agenti Claude, passo 1: la scheda da dare all'agente (con l'eventuale bozza Qwen). L'agente scrive il foglio editoriale authored_NNNN.txt."
+    },
+    {
+      "label": "Associazioni: agenti, trascrivi il foglio in un lotto (serialize)",
+      "type": "process",
+      "command": "${workspaceFolder}/gioco-zeroassociations/.venv/Scripts/python.exe",
+      "args": [
+        "-B",
+        "script/final_associations.py",
+        "serialize",
+        "${input:associationShard}",
+        "${input:sheetNumber}"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}/gioco-zeroassociations",
+        "env": {
+          "ZEROCADE_ASSOCIATIONS_JOB": "${input:associationJob}"
+        }
+      },
+      "problemMatcher": [],
+      "detail": "Metodo agenti Claude, passo 2: controlla forma, unicità e appartenenza alla partizione e scrive il lotto JSONL importabile. Non decide nulla."
+    },
+    {
+      "label": "Associazioni: giocatori simulati, recuperabilità dei bacini (recall)",
+      "type": "process",
+      "command": "${workspaceFolder}/gioco-zeroassociations/.venv/Scripts/python.exe",
+      "args": [
+        "-B",
+        "script/free_association_llm.py",
+        "--output",
+        "${input:recallOutput}",
+        "recall"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}/gioco-zeroassociations"
+      },
+      "problemMatcher": [],
+      "detail": "Per ogni bacino verificato, 8 giocatori simulati scrivono le parole che direbbero: segnala le risposte poco recuperabili e le parole mancanti dal bacino. È una diagnosi, non un'approvazione. Non avvia il server (llama.cpp locale); il file di output non viene sovrascritto."
+    },
+    {
+      "label": "Giochi: copia i bacini verificati in giochi.sqlite3",
+      "type": "process",
+      "command": "python",
+      "args": [
+        "-B",
+        "database/script/giochi.py",
+        "aggiorna",
+        "associazioni"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "5)Associazioni: importa i bacini rivisti",
+      "dependsOrder": "sequence",
+      "dependsOn": [
+        "Associazioni: importa i lotti rivisti dagli agenti",
+        "Prompt: rigenera lo schema finale (prompt, parole, collegamenti)"
+      ],
+      "problemMatcher": [],
+      "detail": "Importa nella raccolta i lotti nuovi della cartella di lavoro scelta (finale_20261110 o quella del 5a) (i lotti già importati si saltano; con la coda del 5a i bacini congelati vengono sostituiti), aggiorna validi e game e rigenera lo schema finale. I bacini si producono prima: agenti Claude ('Associazioni: agenti, scheda…' e 'trascrivi…'), 'Associazioni: continua con Qwen (bozze, poi revisione)', 'Associazioni: continua solo con Qwen (senza agenti)' (importa solo a pilota superato) o 'Prompt: importa solo bacini già revisionati'. Poi 6)Giochi: pubblica."
+    },
+    {
+      "label": "5a)Associazioni, tutte: congela la coda per rifare i bacini di tutti i validi",
+      "type": "process",
+      "command": "${workspaceFolder}/gioco-zeroassociations/.venv/Scripts/python.exe",
+      "args": [
+        "-B",
+        "script/final_associations.py",
+        "prepare",
+        "--rifai-validi"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}/gioco-zeroassociations",
+        "env": {
+          "ZEROCADE_ASSOCIATIONS_JOB": "${input:redoJob}"
+        }
+      },
+      "problemMatcher": [],
+      "detail": "Crea una nuova cartella di lavoro con tutti i prompt che hanno già un bacino, divisi in sei partizioni per gli agenti e una per solo Qwen, con il bacino attuale come riferimento e le istruzioni per gli agenti. Non scrive nei DB. Poi: agenti (scheda e trascrivi) o Qwen indicando questa cartella, quindi 5) e 6). Un bacino viene sostituito solo se nel frattempo nessuno l'ha cambiato; il senso del prompt non può cambiare."
+    },
+    {
+      "label": "6)Giochi: pubblica i bacini in giochi.sqlite3",
+      "dependsOrder": "sequence",
+      "dependsOn": [
+        "Giochi: copia i bacini verificati in giochi.sqlite3",
+        "DB dei giochi: verifica giochi.sqlite3"
+      ],
+      "problemMatcher": [],
+      "detail": "Copia i bacini verificati di validi nello schema associazioni di giochi.sqlite3 e lo verifica contro l'origine. Il DB dei giochi non si modifica a mano."
+    },
+    {
+      "label": "Database: analisi secondo le direttive (sola lettura)",
+      "type": "process",
+      "command": "python",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": [],
+      "args": [
+        "-B",
+        "database/script/ottimizza_db.py",
+        "analizza"
+      ],
+      "detail": "Per ogni DB di database/: pagine libere, integrità, chiavi esterne orfane, tabelle e colonne più pesanti, e i punti di DIRETTIVE.md con la loro evidenza (§1 valori composti, §3 lookup, §6 WITHOUT ROWID, §7 UNIQUE, §9 VACUUM). Non modifica nulla."
+    },
+    {
+      "label": "Database: compatta dove serve (VACUUM e optimize)",
+      "type": "process",
+      "command": "python",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": [],
+      "args": [
+        "-B",
+        "database/script/ottimizza_db.py",
+        "compatta"
+      ],
+      "detail": "VACUUM e PRAGMA optimize solo sui DB con pagine libere oltre la soglia (10% o 64 MB): controllo d'integrità prima e dopo, spazio su disco verificato, dimensioni misurate. Fallisce senza danni se il DB è aperto da un altro programma."
+    },
+    {
+      "label": "7)Database: ottimizza secondo le direttive",
+      "dependsOrder": "sequence",
+      "dependsOn": [
+        "Database: analisi secondo le direttive (sola lettura)",
+        "Database: compatta dove serve (VACUUM e optimize)"
+      ],
+      "problemMatcher": [],
+      "detail": "Alla fine del ciclo, dopo 1)-6), con server e altri task fermi. giochi.sqlite3 si compatta già con il 6); il 7) controlla tutti i DB e salta quelli senza spazio da recuperare. Prima le misure, poi gli interventi (DIRETTIVE.md, ultima sezione): analisi con le evidenze, poi compattazione dei soli DB che ne hanno bisogno. La normalizzazione dello schema indicata dall'analisi (§1, §3, §6, §7) si progetta tabella per tabella, con viste che conservano i vecchi nomi; il DB della diretta (zerocade.db) resta fuori."
+    },
+    {
       "label": "Prompt: stato dell'inventario raccolto",
       "type": "process",
       "command": "${workspaceFolder}/gioco-zeroassociations/.venv/Scripts/python.exe",
       "args": [
         "-B",
-        "prompt_inventory.py",
+        "script/prompt_inventory.py",
         "status"
       ],
       "options": {
@@ -35,7 +317,7 @@
       "command": "${workspaceFolder}/gioco-zeroassociations/.venv/Scripts/python.exe",
       "args": [
         "-B",
-        "inventory_updates.py",
+        "script/inventory_updates.py",
         "check-updates",
         "--only",
         "${input:updateSource}"
@@ -51,7 +333,7 @@
       "command": "${workspaceFolder}/gioco-zeroassociations/.venv/Scripts/python.exe",
       "args": [
         "-B",
-        "inventory_updates.py",
+        "script/inventory_updates.py",
         "updates"
       ],
       "options": {
@@ -65,7 +347,7 @@
       "command": "${workspaceFolder}/gioco-zeroassociations/.venv/Scripts/python.exe",
       "args": [
         "-B",
-        "inventory_updates.py",
+        "script/inventory_updates.py",
         "changes",
         "${input:updateId}",
         "--kind",
@@ -82,7 +364,7 @@
       "command": "${workspaceFolder}/gioco-zeroassociations/.venv/Scripts/python.exe",
       "args": [
         "-B",
-        "inventory_updates.py",
+        "script/inventory_updates.py",
         "decide-update",
         "${input:updateId}",
         "--decision",
@@ -101,7 +383,7 @@
       "command": "${workspaceFolder}/gioco-zeroassociations/.venv/Scripts/python.exe",
       "args": [
         "-B",
-        "inventory_updates.py",
+        "script/inventory_updates.py",
         "decide-term",
         "${input:inventoryPrompt}",
         "--decision",
@@ -120,7 +402,7 @@
       "command": "${workspaceFolder}/gioco-zeroassociations/.venv/Scripts/python.exe",
       "args": [
         "-B",
-        "inventory_updates.py",
+        "script/inventory_updates.py",
         "term",
         "${input:inventoryPrompt}"
       ],
@@ -135,7 +417,7 @@
       "command": "${workspaceFolder}/gioco-zeroassociations/.venv/Scripts/python.exe",
       "args": [
         "-B",
-        "inventory_updates.py",
+        "script/inventory_updates.py",
         "backup"
       ],
       "options": {
@@ -149,7 +431,7 @@
       "command": "${workspaceFolder}/gioco-zeroassociations/.venv/Scripts/python.exe",
       "args": [
         "-B",
-        "prompt_database.py",
+        "script/prompt_database.py",
         "import-reviewed",
         "${input:reviewedPools}"
       ],
@@ -164,7 +446,7 @@
       "command": "${workspaceFolder}/gioco-zeroassociations/.venv/Scripts/python.exe",
       "args": [
         "-B",
-        "prompt_database.py",
+        "script/prompt_database.py",
         "livecade",
         "--count",
         "${input:promptCount}",
@@ -184,7 +466,7 @@
       "command": "${workspaceFolder}/gioco-zeroassociations/.venv/Scripts/python.exe",
       "args": [
         "-B",
-        "prompt_database.py",
+        "script/prompt_database.py",
         "dump"
       ],
       "options": {
@@ -198,7 +480,7 @@
       "command": "python",
       "args": [
         "-B",
-        "database/giochi.py",
+        "database/script/giochi.py",
         "verify"
       ],
       "options": {
@@ -212,7 +494,7 @@
       "command": "python",
       "args": [
         "-B",
-        "database/giochi.py",
+        "database/script/giochi.py",
         "status"
       ],
       "options": {
@@ -226,7 +508,7 @@
       "command": "${workspaceFolder}/gioco-zeroassociations/.venv/Scripts/python.exe",
       "args": [
         "-B",
-        "unified_db.py",
+        "script/unified_db.py",
         "verify"
       ],
       "options": {
@@ -240,7 +522,7 @@
       "command": "${workspaceFolder}/gioco-zeroassociations/.venv/Scripts/python.exe",
       "args": [
         "-B",
-        "unified_db.py",
+        "script/unified_db.py",
         "status"
       ],
       "options": {
@@ -254,7 +536,7 @@
       "command": "${workspaceFolder}/gioco-zeroassociations/.venv/Scripts/python.exe",
       "args": [
         "-B",
-        "prompt_database.py",
+        "script/prompt_database.py",
         "status"
       ],
       "options": {
@@ -268,7 +550,7 @@
       "command": "${workspaceFolder}/gioco-zeroassociations/.venv/Scripts/python.exe",
       "args": [
         "-B",
-        "filter_prompts.py",
+        "script/filter_prompts.py",
         "build"
       ],
       "options": {
@@ -282,7 +564,7 @@
       "command": "${workspaceFolder}/gioco-zeroassociations/.venv/Scripts/python.exe",
       "args": [
         "-B",
-        "review_prompts.py",
+        "script/review_prompts.py",
         "refresh"
       ],
       "options": {
@@ -296,7 +578,7 @@
       "command": "${workspaceFolder}/gioco-zeroassociations/.venv/Scripts/python.exe",
       "args": [
         "-B",
-        "review_prompts.py",
+        "script/review_prompts.py",
         "llm-review",
         "--limit",
         "100"
@@ -312,7 +594,7 @@
       "command": "${workspaceFolder}/gioco-zeroassociations/.venv/Scripts/python.exe",
       "args": [
         "-B",
-        "review_prompts.py",
+        "script/review_prompts.py",
         "pending",
         "--limit",
         "50"
@@ -328,7 +610,7 @@
       "command": "${workspaceFolder}/gioco-zeroassociations/.venv/Scripts/python.exe",
       "args": [
         "-B",
-        "discarded_prompt_database.py",
+        "script/discarded_prompt_database.py",
         "sync"
       ],
       "options": {
@@ -342,7 +624,7 @@
       "command": "${workspaceFolder}/gioco-zeroassociations/.venv/Scripts/python.exe",
       "args": [
         "-B",
-        "discarded_prompt_database.py",
+        "script/discarded_prompt_database.py",
         "status"
       ],
       "options": {
@@ -356,11 +638,14 @@
       "command": "${workspaceFolder}/gioco-zeroassociations/.venv/Scripts/python.exe",
       "args": [
         "-B",
-        "qwen_associations.py",
+        "script/qwen_associations.py",
         "drafts"
       ],
       "options": {
-        "cwd": "${workspaceFolder}/gioco-zeroassociations"
+        "cwd": "${workspaceFolder}/gioco-zeroassociations",
+        "env": {
+          "ZEROCADE_ASSOCIATIONS_JOB": "${input:associationJob}"
+        }
       },
       "problemMatcher": [],
       "detail": "Qwen locale scrive le bozze dei prompt ancora senza bacino; le rivedono gli agenti o un revisore. Riprendibile; avvia il server se serve."
@@ -371,11 +656,14 @@
       "command": "${workspaceFolder}/gioco-zeroassociations/.venv/Scripts/python.exe",
       "args": [
         "-B",
-        "qwen_associations.py",
+        "script/qwen_associations.py",
         "solo"
       ],
       "options": {
-        "cwd": "${workspaceFolder}/gioco-zeroassociations"
+        "cwd": "${workspaceFolder}/gioco-zeroassociations",
+        "env": {
+          "ZEROCADE_ASSOCIATIONS_JOB": "${input:associationJob}"
+        }
       },
       "problemMatcher": [],
       "detail": "Bozza e autoverifica Qwen per ogni coppia. Importa solo se il pilota delle associazioni è superato, altrimenti lascia i lotti da rivedere."
@@ -386,7 +674,7 @@
       "command": "${workspaceFolder}/gioco-zeroassociations/.venv/Scripts/python.exe",
       "args": [
         "-B",
-        "qwen_associations.py",
+        "script/qwen_associations.py",
         "pilot"
       ],
       "options": {
@@ -401,7 +689,7 @@
       "command": "${workspaceFolder}/gioco-zeroassociations/.venv/Scripts/python.exe",
       "args": [
         "-B",
-        "qwen_associations.py",
+        "script/qwen_associations.py",
         "serve"
       ],
       "options": {
@@ -417,11 +705,14 @@
       "command": "${workspaceFolder}/gioco-zeroassociations/.venv/Scripts/python.exe",
       "args": [
         "-B",
-        "qwen_associations.py",
+        "script/qwen_associations.py",
         "status"
       ],
       "options": {
-        "cwd": "${workspaceFolder}/gioco-zeroassociations"
+        "cwd": "${workspaceFolder}/gioco-zeroassociations",
+        "env": {
+          "ZEROCADE_ASSOCIATIONS_JOB": "${input:associationJob}"
+        }
       },
       "problemMatcher": []
     },
@@ -431,11 +722,14 @@
       "command": "${workspaceFolder}/gioco-zeroassociations/.venv/Scripts/python.exe",
       "args": [
         "-B",
-        "final_associations.py",
+        "script/final_associations.py",
         "import"
       ],
       "options": {
-        "cwd": "${workspaceFolder}/gioco-zeroassociations"
+        "cwd": "${workspaceFolder}/gioco-zeroassociations",
+        "env": {
+          "ZEROCADE_ASSOCIATIONS_JOB": "${input:associationJob}"
+        }
       },
       "problemMatcher": [],
       "detail": "Importa nella raccolta i lotti nuovi, aggiorna gli schemi validi e game."
@@ -446,11 +740,14 @@
       "command": "${workspaceFolder}/gioco-zeroassociations/.venv/Scripts/python.exe",
       "args": [
         "-B",
-        "final_associations.py",
+        "script/final_associations.py",
         "status"
       ],
       "options": {
-        "cwd": "${workspaceFolder}/gioco-zeroassociations"
+        "cwd": "${workspaceFolder}/gioco-zeroassociations",
+        "env": {
+          "ZEROCADE_ASSOCIATIONS_JOB": "${input:associationJob}"
+        }
       },
       "problemMatcher": []
     },
@@ -460,7 +757,7 @@
       "command": "${workspaceFolder}/gioco-zeroassociations/.venv/Scripts/python.exe",
       "args": [
         "-B",
-        "final_associations.py",
+        "script/final_associations.py",
         "build",
         "--sync"
       ],
@@ -472,6 +769,18 @@
     }
   ],
   "inputs": [
+    {
+      "id": "associationJob",
+      "type": "promptString",
+      "description": "Cartella di lavoro delle associazioni: finale_20261110 per i prompt nuovi, quella del 5a per rifare i validi",
+      "default": "prompt-staging/associations/finale_20261110"
+    },
+    {
+      "id": "redoJob",
+      "type": "promptString",
+      "description": "Nuova cartella di lavoro per rifare i bacini (relativa a gioco-zeroassociations; non deve esistere già una coda)",
+      "default": "prompt-staging/associations/rifai_validi_20261114"
+    },
     {
       "id": "updateSource",
       "type": "promptString",
@@ -538,6 +847,54 @@
       "type": "promptString",
       "description": "Seed riproducibile; vuoto per una nuova estrazione casuale",
       "default": ""
+    },
+    {
+      "id": "reviewLimit",
+      "type": "promptString",
+      "description": "Numero di candidati da esportare per la revisione",
+      "default": "200"
+    },
+    {
+      "id": "decisionsFile",
+      "type": "promptString",
+      "description": "File JSONL delle decisioni di revisione (percorso relativo a gioco-zeroassociations)"
+    },
+    {
+      "id": "reviewerName",
+      "type": "promptString",
+      "description": "Nome del revisore registrato nel verbale (agente o persona)"
+    },
+    {
+      "id": "reviewMethod",
+      "type": "pickString",
+      "description": "Metodo di revisione",
+      "options": [
+        "llm_editorial_review",
+        "human_editorial_review"
+      ],
+      "default": "llm_editorial_review"
+    },
+    {
+      "id": "associationShard",
+      "type": "promptString",
+      "description": "Partizione della coda finale (per esempio shard_01; vedi 'Associazioni: stato della lavorazione finale')"
+    },
+    {
+      "id": "sheetCount",
+      "type": "promptString",
+      "description": "Numero di prompt nella scheda",
+      "default": "20"
+    },
+    {
+      "id": "sheetNumber",
+      "type": "promptString",
+      "description": "Numero del foglio editoriale (authored_NNNN.txt) da trascrivere"
+    },
+    {
+      "id": "recallOutput",
+      "type": "promptString",
+      "description": "File JSON del rapporto (non viene sovrascritto: usare un nome nuovo)",
+      "default": "resources/free_association_recall_20261114.json"
     },
     {
       "id": "reviewedPools",

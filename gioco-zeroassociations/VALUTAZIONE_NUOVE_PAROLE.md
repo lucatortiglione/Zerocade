@@ -75,7 +75,7 @@ ORDER BY word;
 Dalla cartella `gioco-zeroassociations`, nell'ambiente di generazione:
 
 ```powershell
-.\.venv\Scripts\python.exe -B evaluate_imported_words.py
+.\.venv\Scripts\python.exe -B script/evaluate_imported_words.py
 ```
 
 `--baseline`, `--import-report`, `--raw-db` e `--output` permettono di indicare
@@ -83,7 +83,7 @@ un altro lotto. Lo script controlla che differenze, conteggi e snapshot coincida
 con l'importazione dichiarata; lo stesso manifest non duplica gli esiti nel DB.
 
 Il valutatore riusa i criteri di `build_wordle_bank.py`, `build_context_bank.py`
-e `tools/build_lexicon.py`. Le fonti derivate non contano due volte: GLAFF-IT
+e `script/build_lexicon.py`. Le fonti derivate non contano due volte: GLAFF-IT
 condivide la famiglia del Wikizionario italiano; Flex_it quella di Morph-it!.
 Per i bonus verifica anche i multinsiemi di lettere dei semi effettivi, non
 soltanto la lunghezza. Le regole predefinite dei generatori rimangono quelle

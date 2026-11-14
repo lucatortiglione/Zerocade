@@ -1,8 +1,8 @@
 # Lo schema `filtrati`: contenuto, criteri e verifiche
 
 Documento aggiornato il **9 novembre 2026**, sulla base del codice locale di
-[filter_prompts.py](filter_prompts.py), [review_prompts.py](review_prompts.py) e
-[validated_prompt_database.py](validated_prompt_database.py).
+[script/filter_prompts.py](script/filter_prompts.py), [script/review_prompts.py](script/review_prompts.py) e
+[script/validated_prompt_database.py](script/validated_prompt_database.py).
 
 ## 1. A cosa serve questo database
 
@@ -182,7 +182,7 @@ etichettate `it`: non è una certificazione della lingua. Il revisore deve
 controllare anche le prove lessicografiche e non può approvare un forestierismo
 fuori lista solo perché l'euristica non lo ha riconosciuto.
 
-`prompt_policy.py` contiene anche strumenti per leggere indizi di prestito
+`script/prompt_policy.py` contiene anche strumenti per leggere indizi di prestito
 dalle fonti, ma `filter_prompts.judge()` non li usa come sostituto del controllo
 grafico qui descritto.
 
@@ -198,7 +198,7 @@ Una decisione corrente `DISCARDED` oppure `DEFERRED` in
 | `INTEGRATED` | Scelta di integrazione nella raccolta; da sola non è una revisione semantica positiva |
 
 Una vecchia copia dei filtrati può ancora mostrare una voce appena scartata o
-rinviata. `review_prompts.py pending` consulta anche le decisioni e le revisioni
+rinviata. `script/review_prompts.py pending` consulta anche le decisioni e le revisioni
 nella raccolta, per non riproporla come candidata ancora da esaminare.
 
 ## 4. Campi della tabella `filtered_prompts`
@@ -321,7 +321,7 @@ prompt non dichiara QA indipendente di giocabilità: in questo contratto il camp
 
 ## 7. Tabella `validated_prompts` nei filtrati e viste di consultazione
 
-Durante `filter_prompts.py build`, il codice aggiornato copia nella tabella
+Durante `script/filter_prompts.py build`, il codice aggiornato copia nella tabella
 `validated_prompts` i verbali positivi correnti che superano il contratto e non
 sono bloccati da una decisione `DISCARDED` o `DEFERRED`.
 
@@ -438,7 +438,7 @@ usare la lista dei filtrati come se fosse un bacino approvato.
 
 ## 10. Giocabilità simulata: controllo facoltativo
 
-`filter_prompts.py score-playability` può interrogare un LLM locale attraverso
+`script/filter_prompts.py score-playability` può interrogare un LLM locale attraverso
 `free_association_llm.propose()`.
 
 Più giocatori simulati ricevono il prompt e propongono associazioni. Il campo
@@ -462,13 +462,13 @@ Dalla cartella `gioco-zeroassociations`, in PowerShell:
 
 ```powershell
 # Legge i conteggi e i metadati del file esistente.
-.venv/Scripts/python.exe -B filter_prompts.py status
+.venv/Scripts/python.exe -B script/filter_prompts.py status
 
 # Elenca 50 candidati ancora da esaminare, tenendo conto anche della raccolta.
-.venv/Scripts/python.exe -B review_prompts.py pending --limit 50
+.venv/Scripts/python.exe -B script/review_prompts.py pending --limit 50
 
 # Ricostruisce i filtrati dalla raccolta e aggiorna anche la copia degli scarti.
-.venv/Scripts/python.exe -B filter_prompts.py build
+.venv/Scripts/python.exe -B script/filter_prompts.py build
 ```
 
 Il task VS Code **«Prompt: filtra i candidati (schema filtrati)»**
@@ -549,7 +549,7 @@ Il file `prompt_filtrati.sqlite3` (oggi lo schema `filtrati`) presente al moment
 | Righe in `filter_rejections` | 6.211 |
 
 **In questa copia fisica non esistono ancora `validated_prompts` e
-`review_state`.** Il codice corrente di `filter_prompts.py` le crea alla
+`review_state`.** Il codice corrente di `script/filter_prompts.py` le crea alla
 successiva ricostruzione. La versione dichiarata nei metadati è rimasta la
 stessa: per distinguere gli schemi bisogna controllare anche `sqlite_schema`,
 non soltanto il numero di versione.
@@ -557,22 +557,22 @@ non soltanto il numero di versione.
 Questi numeri descrivono una fotografia precedente alle revisioni successive.
 Le 14.228 righe non sono 14.228 prompt pronti per Livecade e neppure 14.228 voci
 necessariamente ancora da esaminare. Per la coda aggiornata si usa
-`review_prompts.py pending`, che consulta anche l'archivio principale.
+`script/review_prompts.py pending`, che consulta anche l'archivio principale.
 
 ## 13. Riferimenti di implementazione
 
 | Argomento | Codice di riferimento |
 |---|---|
-| Schema, filtri, copia dei validati e diagnostica | [filter_prompts.py](filter_prompts.py) |
+| Schema, filtri, copia dei validati e diagnostica | [script/filter_prompts.py](script/filter_prompts.py) |
 | Soglia e lista dei prestiti | [resources/prompt_policy.json](resources/prompt_policy.json) |
-| Strumenti di politica linguistica e familiarità | [prompt_policy.py](prompt_policy.py) |
-| Coda da revisionare e importazione delle decisioni | [review_prompts.py](review_prompts.py) |
-| Contratto dei verbali e sincronizzazione dei prompt con bacino | [validated_prompt_database.py](validated_prompt_database.py) |
+| Strumenti di politica linguistica e familiarità | [script/prompt_policy.py](script/prompt_policy.py) |
+| Coda da revisionare e importazione delle decisioni | [script/review_prompts.py](script/review_prompts.py) |
+| Contratto dei verbali e sincronizzazione dei prompt con bacino | [script/validated_prompt_database.py](script/validated_prompt_database.py) |
 | Registro dei verbali nella raccolta | [prompt_validation_schema.sql](prompt_validation_schema.sql) |
 | Raccolta e attestazioni delle fonti | [prompt_inventory_schema.sql](prompt_inventory_schema.sql) |
-| Copia degli scarti e gestione dei rinvii | [discarded_prompt_database.py](discarded_prompt_database.py) |
-| Simulazioni di associazione | [free_association_llm.py](free_association_llm.py) |
-| Categorie, bacini e campionamento | [prompt_database.py](prompt_database.py) |
+| Copia degli scarti e gestione dei rinvii | [script/discarded_prompt_database.py](script/discarded_prompt_database.py) |
+| Simulazioni di associazione | [script/free_association_llm.py](script/free_association_llm.py) |
+| Categorie, bacini e campionamento | [script/prompt_database.py](script/prompt_database.py) |
 
 In caso di successive modifiche al codice, alla politica o alle direttive,
 aggiornare questo documento e ricostruire le copie necessarie. Un nuovo filtro

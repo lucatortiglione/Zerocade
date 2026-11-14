@@ -23,9 +23,9 @@ La precedente revisione per pubblico italiano resta separata: qui non si escludo
 - `fonti/openbookqa/contesto-originale.json`: quesiti originali e fatti di supporto della fonte; usati per ricostruire l’intento, non assunti come garanzia di correttezza.
 - `audit-risposte.json`: una riga per ogni ID e impronta del contenuto controllato.
 - `backup-revisione/`: backup SQLite precedente a ogni applicazione o ripristino.
-- `python gioco-quizzland/tools/revisione_risposte.py apply`: applica le decisioni; rifiuta modifiche concorrenti.
-- `python gioco-quizzland/tools/revisione_risposte.py restore`: ripristina solo le decisioni di questo registro, se non modificate nel frattempo.
-- `python gioco-quizzland/tools/revisione_risposte.py audit`: rigenera il controllo dell’intero catalogo.
+- `python gioco-quizzland/script/revisione_risposte.py apply`: applica le decisioni; rifiuta modifiche concorrenti.
+- `python gioco-quizzland/script/revisione_risposte.py restore`: ripristina solo le decisioni di questo registro, se non modificate nel frattempo.
+- `python gioco-quizzland/script/revisione_risposte.py audit`: rigenera il controllo dell’intero catalogo.
 
 Il CSV rigenerato da `fonti.py csv` conserva queste correzioni e disattivazioni. Il server carica le domande all’avvio: riavviarlo per utilizzare il catalogo aggiornato.
 

@@ -1,4 +1,5 @@
 import type { RoomInfo } from '@zerocade/shared'
+import { apiFetch } from '@zerocade/browser-runtime'
 
 // The room comes from the server, so every browser that opens the dashboard drives the same
 // overlay and the overlay link never changes. In dev the server may start after this page:
@@ -7,7 +8,7 @@ import type { RoomInfo } from '@zerocade/shared'
 async function loadRoom(): Promise<RoomInfo> {
   for (;;) {
     try {
-      const res = await fetch('/api/room')
+      const res = await apiFetch('/api/room', {}, 10_000, 32 * 1024)
       if (res.ok) return (await res.json()) as RoomInfo
     } catch {
       // Server not up yet.

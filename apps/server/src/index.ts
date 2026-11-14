@@ -1,5 +1,7 @@
 import { spawn } from 'node:child_process'
-import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import { createReadStream } from 'node:fs'
+import { mkdir, rename, rm, stat, writeFile } from 'node:fs/promises'
+import { existsSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import Fastify from 'fastify'
@@ -32,48 +34,39 @@ import {
   type RoomInfo,
   type ServerToClientEvents,
 } from '@zerocade/shared'
-import { BivioRooms, bivioCsv, bivioFlagsCsv, bivioStats } from './bivio.js'
-import { IncastroRooms, zerowordsCsv } from './incastro.js'
-import { QuizzlandRooms, quizzlandCsv, quizzlandStats } from './quizzland.js'
+import { BivioRooms, bivioStats } from './bivio.js'
+import { IncastroRooms } from './incastro.js'
+import { QuizzlandRooms, quizzlandStats } from './quizzland.js'
 import {
   closeDb,
   dataDir,
   getPad,
-  getRanking,
-  giftedCreators,
   bridgeConfig,
-  latestGifts,
-  listEvents,
-  recentCreators,
-  recordEvent,
-  recordGift,
   recordWordAssociationRound,
   roomKey,
   saveBridgeConfig,
   saveSource,
   savedSources,
-  setPadVolume,
-  topGiftSince,
-  touchCreator,
-  wordAssociationGuesses,
-  wordAssociationRounds,
 } from './db.js'
 import { getContent, wordAssociation } from './content.js'
-import { contextFile, isContextFile } from './context.js'
+import { contextFileBudget, contextResource, isContextFile } from './context.js'
 import { isWordleFile, wordleFile } from './wordle.js'
 import { chainKeys, chains } from './chains.js'
 import { nasaPhotos } from './nasa.js'
 import { createShutdown } from './shutdown.js'
 import { startLeaderboardPublisher } from './leaderboard-publish.js'
 import { leaderboardCss, leaderboardHtml, leaderboardIndexHtml, leaderboardJs } from './leaderboard-page.js'
-import { PERIODS, isPeriod, leaderboardResetTimes, leaderboards, recordScore, resetLeaderboard } from './scores.js'
-import { toCsv } from './csv.js'
+import { PERIODS, isPeriod, recordScore, resetLeaderboard } from './scores.js'
 import { sanitizeRoundReport } from './word-association.js'
 import { HOSTS_LINE, LOCAL_DOMAIN, domainRegistered, ensureDomain } from './hosts.js'
-import { PAD_FILE_MAX, padBoard, padFile, removePad, savePadInput } from './pads.js'
+import { PAD_FILE_MAX, padBoard, padFile } from './pads.js'
 import { controlGame, getSession, selectGame, setScene, setSettings, setTriggers } from './sessions.js'
 import { RoomSources, sourceUsername } from './sources.js'
-import { ZfbBridge } from './zfb.js'
+import { ZfbBridge, singleWord } from './zfb.js'
+import { RecentFollows } from './follows.js'
+import { persistence, reports, WorkerJobError } from './infrastructureClient.js'
+import { sessionSince } from './sessions.js'
+import { localAccess } from './localAccess.js'
 import {
   sanitizeBivioCommand,
   sanitizeDj,
@@ -102,7 +95,30 @@ const pagesDir = (name: string) =>
 const dashboardDir = pagesDir('dashboard')
 const overlayDir = pagesDir('overlay')
 
-const app = Fastify({ logger: { level: process.env.LOG_LEVEL ?? 'info' } })
+const app = Fastify({
+  bodyLimit: 1024 * 1024, requestTimeout: 15_000, connectionTimeout: 30_000,
+  disableRequestLogging: true,
+  logger: { level: process.env.LOG_LEVEL ?? 'info', redact: ['req.headers.authorization', 'req.headers.cookie', '*.access_token', '*.client_secret', '*.password'] },
+})
+let draining = false
+let httpActive = 0
+let uploadsActive = 0
+let errorLogWindow = performance.now()
+let errorLogs = 0
+let suppressedErrors = 0
+let persistenceIssue: { component: 'persistence'; message: string; at: number } | null = null
+app.server.maxConnections = 128
+app.setErrorHandler((error, req, reply) => {
+  if (performance.now() - errorLogWindow >= 1000) { errorLogWindow = performance.now(); errorLogs = 0 }
+  if (errorLogs++ < 5) app.log.error({ err: error, requestId: req.id, route: req.routeOptions.url }, 'Richiesta non completata')
+  else suppressedErrors++
+  if (error instanceof WorkerJobError) return reply.code(503).send({
+    error: error.outcome === 'not-started' ? 'Operazione non avviata: server occupato.' : 'Esito non confermato. Aggiorna i dati prima di riprovare.',
+    outcome: error.outcome, requestId: req.id,
+  })
+  const status = error instanceof Error && 'statusCode' in error && typeof error.statusCode === 'number' ? error.statusCode : 500
+  return reply.code(status).send({ error: status >= 500 ? 'Operazione non riuscita.' : 'Richiesta non valida.', requestId: req.id })
+})
 // A stray rejected promise (a live feed failing, a socket closing) is logged: it must not
 // take the server, and the stream with it, down.
 process.on('unhandledRejection', (err) => app.log.error({ err }, 'unhandled rejection'))
@@ -125,12 +141,33 @@ await app.register(helmet, {
 const PUBLIC_URL = /^https?:\/\//.test(process.env.ZEROCADE_PUBLIC_URL ?? '')
   ? process.env.ZEROCADE_PUBLIC_URL!.replace(/\/*$/, '/')
   : undefined
-const LOCAL_HOST = /^(localhost|127\.0\.0\.1|\[::1\]|zerocade\.test)(:\d+)?$/
 app.addHook('onRequest', async (req, reply) => {
-  if (!LOCAL_HOST.test(req.headers.host ?? '')) return reply.code(403).send({ error: 'forbidden' })
+  if (!localAccess(req.headers.host, req.headers.origin, PORT)) return reply.code(403).send({ error: 'forbidden' })
+  if (req.headers['sec-fetch-site'] === 'cross-site') return reply.code(403).send({ error: 'forbidden' })
+  if (draining && !req.url.startsWith('/api/health') && !req.url.startsWith('/api/live')) return reply.code(503).send({ error: 'Arresto in corso.' })
+  const upload = req.method === 'POST' && (/^\/api\/pads\//.test(req.url) || /\/background\//.test(req.url))
+  if (httpActive >= 32 || (upload && uploadsActive >= 4)) return reply.code(503).send({ error: 'Server occupato: operazione non avviata.', outcome: 'not-started' })
+  httpActive++
+  if (upload) uploadsActive++
+  let released = false
+  const release = () => {
+    if (released) return
+    released = true
+    httpActive--
+    if (upload) uploadsActive--
+    reply.raw.off('finish', release)
+    reply.raw.off('close', release)
+  }
+  reply.raw.once('finish', release)
+  reply.raw.once('close', release)
 })
 
-app.get('/api/health', async () => ({ ok: true }))
+app.get('/api/live', async () => ({ ok: true }))
+app.get('/api/health', async (_req, reply) => {
+  const workers = { persistence: persistence.metrics(), reports: reports.metrics() }
+  const ok = !draining && Object.values(workers).every((worker) => worker.state === 'ready' && worker.queued < worker.capacity)
+  return reply.code(ok ? 200 : 503).send({ ok, draining, workers, http: { active: httpActive, uploads: uploadsActive, capacity: 32, uploadCapacity: 4, suppressedErrors }, memory: process.memoryUsage(), uptimeSeconds: process.uptime() })
+})
 app.get('/api/room', async (): Promise<RoomInfo> => ({
   key: roomKey,
   overlayUrl: OVERLAY_URL,
@@ -143,8 +180,16 @@ app.get('/api/content', async () => getContent())
 // ZeroContext's words and vectors: static files, cached by the browser until the next build.
 app.get('/api/context/:file', async (req, reply) => {
   const name = (req.params as { file: string }).file
-  const body = isContextFile(name) ? contextFile(name) : null
-  if (!body) return reply.code(404).send({ error: 'not found' })
+  const resource = isContextFile(name) ? contextResource(name) : null
+  if (!resource) return reply.code(404).send({ error: 'not found' })
+  if (typeof resource === 'string') {
+    try {
+      const details = await stat(resource)
+      if (isContextFile(name) && details.size > contextFileBudget(name)) return reply.code(413).send({ error: 'Risorsa ZeroContext oltre il limite consentito.' })
+    }
+    catch (error) { if (error instanceof Error && 'code' in error && error.code === 'ENOENT') return reply.code(404).send({ error: 'not found' }); throw error }
+  }
+  const body = typeof resource === 'string' ? createReadStream(resource) : resource
   const type = name.endsWith('.bin') ? 'application/octet-stream' : name.endsWith('.json') ? 'application/json' : 'text/plain; charset=utf-8'
   return reply.header('content-type', type).header('cache-control', 'no-cache').send(body)
 })
@@ -154,12 +199,13 @@ app.get('/api/leaderboard/:game', async (req, reply) => {
   const game = GAMES.find((g) => g.id === (req.params as { game: string }).game)
   if (!game) return reply.code(404).send({ error: 'not found' })
   const limit = Math.min(50, Math.max(1, Math.floor(Number((req.query as { limit?: string }).limit)) || 10))
+  const computed = await reports.run('boards', { key: roomKey, game: game.id, limit, at: Date.now(), start: sessionSince(roomKey, game.id) })
   return reply.header('cache-control', 'no-store').send({
     game: { id: game.id, name: game.name, emoji: game.emoji },
     periods: PERIODS,
-    boards: leaderboards(roomKey, game.id, limit),
+    boards: computed.boards,
     // When each period was last reset from the dashboard (period -> time).
-    resets: leaderboardResetTimes(roomKey, game.id),
+    resets: computed.resets,
   })
 })
 app.get('/classifica', async (_req, reply) => reply.type('text/html; charset=utf-8').send(leaderboardIndexHtml()))
@@ -188,7 +234,8 @@ app.get('/api/events', async (req) => {
   const q = (req.query ?? {}) as { key?: string; limit?: number }
   const key = q.key ?? ''
   const limit = Math.min(Math.max(Number(q.limit) || 50, 1), 500)
-  return { events: listEvents(key, limit) }
+  await persistence.run('barrier', null)
+  return { events: await reports.run('events', { key, limit }) }
 })
 app.get('/api/bivio/stats', async (req) => {
   const { lang } = (req.query ?? {}) as { lang?: string }
@@ -199,14 +246,14 @@ app.get('/api/bivio/export.csv', async (_req, reply) => {
   return reply
     .header('content-type', 'text/csv; charset=utf-8')
     .header('content-disposition', `attachment; filename="bivio-risultati-${day}.csv"`)
-    .send(bivioCsv())
+    .send(await reports.run('export', { kind: 'bivio' }))
 })
 // The questions marked as wrong (also saved as data/bivio-domande-sbagliate.csv).
 app.get('/api/bivio/flagged.csv', async (_req, reply) =>
   reply
     .header('content-type', 'text/csv; charset=utf-8')
     .header('content-disposition', 'attachment; filename="bivio-domande-sbagliate.csv"')
-    .send(bivioFlagsCsv()),
+    .send(await reports.run('export', { kind: 'bivio-flags' })),
 )
 app.get('/api/quizzland/stats', async () => quizzlandStats())
 app.get('/api/quizzland/export.csv', async (_req, reply) => {
@@ -214,7 +261,7 @@ app.get('/api/quizzland/export.csv', async (_req, reply) => {
   return reply
     .header('content-type', 'text/csv; charset=utf-8')
     .header('content-disposition', `attachment; filename="zeroquizz-risposte-${day}.csv"`)
-    .send(quizzlandCsv())
+    .send(await reports.run('export', { kind: 'quizzland' }))
 })
 // ZeroWords' plays (one row per level) and the answers and hints within them: the data to
 // calibrate the level generator on.
@@ -223,19 +270,18 @@ for (const which of ['plays', 'answers'] as const) {
     reply
       .header('content-type', 'text/csv; charset=utf-8')
       .header('content-disposition', `attachment; filename="zerowords-${which === 'plays' ? 'partite' : 'risposte'}.csv"`)
-      .send(zerowordsCsv(which)),
+      .send(await reports.run('export', { kind: which === 'plays' ? 'zw-plays' : 'zw-answers' })),
   )
 }
 
 // Word Association's rounds and, within them, the hidden words found or missed and the chat's
-// frequent wrong guesses: what gioco-zeroassociations/analyze_telemetry.py reads.
+// frequent wrong guesses: what gioco-zeroassociations/script/analyze_telemetry.py reads.
 for (const which of ['rounds', 'guesses'] as const) {
   app.get(`/api/word-association/${which}.csv`, async (_req, reply) => {
-    const { columns, rows } = which === 'rounds' ? wordAssociationRounds() : wordAssociationGuesses()
     return reply
       .header('content-type', 'text/csv; charset=utf-8')
       .header('content-disposition', `attachment; filename="word-association-${which === 'rounds' ? 'round' : 'tentativi'}.csv"`)
-      .send(toCsv([columns, ...rows]))
+      .send(await reports.run('export', { kind: which === 'rounds' ? 'wa-rounds' : 'wa-guesses' }))
   })
 }
 
@@ -247,6 +293,7 @@ const backgroundsDir = join(dataDir, 'backgrounds')
 const backgroundFile = (game: BackgroundGame, key: string, ext: string) =>
   join(backgroundsDir, game === 'zerodubbi' ? `${key}.${ext}` : `${game}-${key}.${ext}`)
 const backgroundGame = (raw: string) => BACKGROUND_GAMES.find((g) => g === raw)
+const backgroundWrites = new Map<string, Promise<void>>()
 app.addContentTypeParser(Object.keys(BACKGROUND_TYPES), { parseAs: 'buffer', bodyLimit: 8 * 1024 * 1024 }, (_req, body, done) =>
   done(null, body),
 )
@@ -254,11 +301,25 @@ app.post('/api/:game/background/:key', async (req, reply) => {
   const params = req.params as { game: string; key: string }
   const { key } = params
   const game = backgroundGame(params.game)
-  const ext = BACKGROUND_TYPES[String(req.headers['content-type']).split(';')[0].trim()]
+  const mime = String(req.headers['content-type']).split(';')[0].trim()
+  const ext = Object.hasOwn(BACKGROUND_TYPES, mime) ? BACKGROUND_TYPES[mime] : undefined
   if (!game || !isValidKey(key) || !ext || !Buffer.isBuffer(req.body)) return reply.code(400).send({ error: 'bad request' })
-  mkdirSync(backgroundsDir, { recursive: true })
-  for (const old of Object.values(BACKGROUND_TYPES)) rmSync(backgroundFile(game, key, old), { force: true })
-  writeFileSync(backgroundFile(game, key, ext), req.body)
+  const resource = `${game}:${key}`
+  const previous = backgroundWrites.get(resource)
+  const body = req.body
+  const writing = (async () => {
+    if (previous) await previous.catch(() => undefined) // A failed upload does not block a later replacement.
+    await mkdir(backgroundsDir, { recursive: true })
+    const destination = backgroundFile(game, key, ext)
+    const temporary = `${destination}.upload`
+    try {
+      await writeFile(temporary, body, { flush: true })
+      await rename(temporary, destination)
+      for (const old of Object.values(BACKGROUND_TYPES)) if (old !== ext) await rm(backgroundFile(game, key, old), { force: true })
+    } finally { await rm(temporary, { force: true }) }
+  })()
+  backgroundWrites.set(resource, writing)
+  try { await writing } finally { if (backgroundWrites.get(resource) === writing) backgroundWrites.delete(resource) }
   // The version busts the overlay's cached copy when the image is replaced.
   return { url: `${backgroundPath(game, key)}?v=${Date.now()}` }
 })
@@ -266,28 +327,36 @@ app.get('/api/:game/background/:key', async (req, reply) => {
   const params = req.params as { game: string; key: string }
   const { key } = params
   const game = backgroundGame(params.game)
-  const found =
-    game && isValidKey(key)
-      ? Object.entries(BACKGROUND_TYPES).find(([, ext]) => existsSync(backgroundFile(game, key, ext)))
-      : undefined
-  if (!game || !found) return reply.code(404).send({ error: 'not found' })
-  return reply.header('content-type', found[0]).send(readFileSync(backgroundFile(game, key, found[1])))
+  if (!game || !isValidKey(key)) return reply.code(404).send({ error: 'not found' })
+  for (const [type, ext] of Object.entries(BACKGROUND_TYPES)) {
+    const file = backgroundFile(game, key, ext)
+    try { await stat(file) }
+    catch (error) { if (error instanceof Error && 'code' in error && error.code === 'ENOENT') continue; throw error }
+    return reply.header('content-type', type).send(createReadStream(file))
+  }
+  return reply.code(404).send({ error: 'not found' })
 })
 
 // Pads: a new or edited pad arrives as JSON, with any uploaded file inside as base64.
 app.post('/api/pads/:key', { bodyLimit: Math.ceil((PAD_FILE_MAX * 4) / 3) + 64 * 1024 }, async (req, reply) => {
   const { key } = req.params as { key: string }
   if (!isValidKey(key)) return reply.code(400).send({ error: 'Chiave non valida.' })
-  const error = savePadInput(key, req.body)
+  const { error, board } = await persistence.run('padSave', { key, input: req.body })
   if (error) return reply.code(400).send({ error })
-  const board = padBoard(key)
   io.to(key).emit('pads:state', board)
   return board
 })
 app.get('/api/pads/file/:name', async (req, reply) => {
-  const file = padFile((req.params as { name: string }).name)
+  const file = await padFile((req.params as { name: string }).name)
   if (!file) return reply.code(404).send({ error: 'not found' })
   return reply.header('content-type', file.type).header('cache-control', 'public, max-age=31536000, immutable').send(file.body)
+})
+app.delete('/api/pads/:key/:id', async (req, reply) => {
+  const { key, id } = req.params as { key: string; id: string }
+  if (!isValidKey(key) || !/^[A-Za-z0-9-]{1,64}$/.test(id)) return reply.code(400).send({ error: 'Identificativo non valido.' })
+  const board = await persistence.run('padRemove', { key, id })
+  io.to(key).emit('pads:state', board)
+  return board
 })
 
 // Creators live on this Zerocade (every overlay key) and the gifts they received.
@@ -298,12 +367,12 @@ app.get('/api/feed', async (req): Promise<Feed> => {
   const live = liveCreators()
   const isLive = new Set(live.map((c) => `${c.kind}:${c.username}`))
   const midnight = new Date().setHours(0, 0, 0, 0)
+  await persistence.run('barrier', null)
+  const snapshot = await reports.run('feed', { creator, since: midnight })
   return {
     live,
-    recent: recentCreators(20).filter((c) => !isLive.has(`${c.kind}:${c.username}`)),
-    creators: giftedCreators(),
-    top: topGiftSince(creator, midnight),
-    gifts: latestGifts(creator, 40),
+    ...snapshot,
+    recent: snapshot.recent.filter((c) => !isLive.has(`${c.kind}:${c.username}`)),
   }
 })
 
@@ -326,7 +395,8 @@ if (dashboardDir) {
 const io = new Server<ClientToServerEvents, ServerToClientEvents>(app.server, {
   path: '/socket.io',
   serveClient: false,
-  allowRequest: (req, callback) => callback(null, LOCAL_HOST.test(req.headers.host ?? '')),
+  maxHttpBufferSize: 256 * 1024,
+  allowRequest: (req, callback) => callback(null, localAccess(req.headers.host, req.headers.origin, PORT)),
 })
 
 const bivio = new BivioRooms((key, state) => io.to(key).emit('bivio:state', state))
@@ -403,17 +473,28 @@ setInterval(() => {
 // Bivio, Incastro and Quizzland run on the server, so their triggers are applied here rather than in
 // the overlay. `origin` is the feed the event came from, `creator` that feed's account
 // ('tiktok:<username>'), '' when simulated.
-function broadcastEvent(key: string, event: LiveEvent, origin: EventOrigin = 'sim', creator = '') {
-  recordEvent(key, event)
+// Who followed during the live counts as a follower at once, for "Chi può giocare" (see follows.ts).
+const follows = new RecentFollows()
+
+function broadcastEvent(key: string, received: LiveEvent, origin: EventOrigin = 'sim', creator = '') {
+  const at = Date.now()
+  const event = follows.apply(key, received)
   const session = getSession(key)
-  if (event.type === 'gift') recordGift(key, creator, session.gameId, event)
+  void persistence.run('event', { key, creator, game: session.gameId, event, at }).then((ranking) => {
+    if (ranking) io.to(key).emit('ranking:update', ranking)
+  }).catch((error: unknown) => {
+    if (!persistenceIssue) {
+      app.log.error({ err: error, eventSeq: item.seq }, 'Evento live non salvato o non confermato')
+      persistenceIssue = { component: 'persistence', message: 'Alcuni eventi non sono stati salvati o non hanno ricevuto conferma. Controlla il registro prima di riprovare.', at: Date.now() }
+      io.to(dashboardRoom(key)).emit('runtime:issue', persistenceIssue)
+    }
+  })
   // A comment of someone the game's "Chi può giocare" leaves out stays in the dashboard's chat, but the game never sees it.
   const plays = event.type !== 'comment' || allowedToPlay(session.settings, event.user)
   if (plays) io.to(key).emit('live:event', event)
-  const item: FeedEvent = { seq: ++feedSeq, at: Date.now(), origin, event }
+  const item: FeedEvent = { seq: ++feedSeq, at, origin, event }
   feeds.set(key, [...(feeds.get(key) ?? []).slice(1 - FEED_KEPT), item])
   io.to(dashboardRoom(key)).emit('feed:events', [item])
-  if (event.type === 'gift') io.to(key).emit('ranking:update', getRanking(key))
   countEvent(key, event, origin)
   const room = bivio.get(key) ?? incastro.get(key) ?? quizzland.get(key)
   // "Aiuti dal pubblico" switched off: those triggers give no help (activeTriggers).
@@ -432,7 +513,7 @@ const roomSources = (key: string) => {
       },
       (status) => {
         io.to(key).emit('source:status', status)
-        if (status.state === 'connected') touchCreator(status.kind, status.username, getSession(key).gameId)
+        if (status.state === 'connected') saveCreator(status.kind, status.username, getSession(key).gameId)
       },
     )
     sources.set(key, room)
@@ -442,7 +523,9 @@ const roomSources = (key: string) => {
 
 // ZeroFollowerBot's event bridge, for this Zerocade's room: its events go where the direct feeds' go.
 const zfb = new ZfbBridge(
-  (event, kind, account, id) => {
+  (received, kind, account, id) => {
+    // A viewer who followed during the live is a follower for the voice too (see follows.ts).
+    const event = follows.apply(roomKey, received)
     // A ZeroWords guess that only repeats words the level already has: ZeroFollowerBot's voice need not read it.
     // Asked before the game plays the comment, so the one that finds a word is still read.
     const repeat =
@@ -452,12 +535,13 @@ const zfb = new ZfbBridge(
       incastro.get(roomKey)?.alreadyGuessed(event.text) === true
     // ZeroFollowerBot's voice does not read the comments the game ignores ("Chi può giocare"), nor, with "Voce solo
     // ai follower", the ones of viewers the bridge says do not follow (a viewer it says nothing about is read), and
-    // never ZeroWordle's guesses.
+    // never ZeroWordle's guesses, nor ZeroContext's single words from the word shown to the next round.
     const session = getSession(roomKey)
     const silent =
       id !== '' &&
       event.type === 'comment' &&
       (session.gameId === 'zerowordle' ||
+        (session.gameId === 'context' && roundOver(roomKey) && singleWord(event.text)) ||
         !allowedToPlay(session.settings, event.user) ||
         (session.settings.voiceFollowersOnly === true && event.user.follower === false && event.user.fan !== true))
     broadcastEvent(roomKey, event, kind, account ? `${kind}:${account}` : '')
@@ -465,7 +549,7 @@ const zfb = new ZfbBridge(
   },
   (status) => {
     io.to(dashboardRoom(roomKey)).emit('bridge:status', status)
-    for (const a of zfb.accounts()) touchCreator(a.kind, a.username, getSession(roomKey).gameId)
+    for (const a of zfb.accounts()) saveCreator(a.kind, a.username, getSession(roomKey).gameId)
     // Another account, or none: the viewers it counted are gone.
     pushStats(roomKey)
   },
@@ -495,8 +579,12 @@ const liveCreators = (): FeedCreator[] => {
 
 // Keeps each live creator's game, viewers and last time seen for the Recent list.
 setInterval(() => {
-  for (const c of liveCreators()) touchCreator(c.kind, c.username, c.gameId, c.viewers)
+  for (const c of liveCreators()) saveCreator(c.kind, c.username, c.gameId, c.viewers)
 }, 30_000).unref()
+
+function saveCreator(kind: 'tiktok' | 'twitch', username: string, game: string, viewers?: number) {
+  void persistence.run('creator', { kind, username, game, viewers }).catch((error: unknown) => app.log.error({ err: error }, 'Account live non salvato'))
+}
 
 io.use((socket, next) => {
   const { clientType, key } = socket.handshake.auth as Partial<HandshakeAuth>
@@ -510,6 +598,14 @@ io.use((socket, next) => {
 // The games that play one secret per room (ZeroContext's and ZeroWordle's word, ZeroReazioniACatena's chain).
 const SECRET_GAMES = ['context', 'zerowordle', 'zeroreazioniacatena']
 const roomSecrets = new Map<string, string>()
+// ZeroContext: the word an overlay of each room has shown at the end of its round (found, or "Termina round"). While it
+// is still the room's word the round is over and the next has not started: the chat's single words are no guesses,
+// and ZeroFollowerBot's voice need not read them.
+const revealedSecrets = new Map<string, string>()
+const roundOver = (key: string) => {
+  const revealed = revealedSecrets.get(key)
+  return revealed !== undefined && revealed === roomSecrets.get(key)
+}
 
 // Each overlay key is a room: the dashboard and every overlay opened with that key share it.
 io.on('connection', (socket) => {
@@ -535,7 +631,10 @@ io.on('connection', (socket) => {
   // Pause, restart or end the game in play (the dashboard's buttons). A restart draws a new secret.
   socket.on('game:control', (command: unknown) => {
     if (clientType !== 'dashboard' || typeof command !== 'string' || !['pause', 'resume', 'restart', 'end', 'start'].includes(command)) return
-    if (command === 'restart' || command === 'start') roomSecrets.delete(key)
+    if (command === 'restart' || command === 'start') {
+      roomSecrets.delete(key)
+      revealedSecrets.delete(key)
+    }
     io.to(key).emit('session:state', controlGame(key, command as GameControl))
   })
 
@@ -577,8 +676,16 @@ io.on('connection', (socket) => {
     const current = roomSecrets.get(key)
     if (current === undefined || current === (typeof prev === 'string' ? prev : null)) {
       roomSecrets.set(key, word)
+      revealedSecrets.delete(key)
       io.to(key).emit('secret:word', { word })
     } else socket.emit('secret:word', { word: current })
+  })
+
+  // ZeroContext: an overlay shows the round's word (see revealedSecrets); only the room's word counts.
+  socket.on('secret:revealed', (raw: unknown) => {
+    if (getSession(key).gameId !== 'context' || !raw || typeof raw !== 'object') return
+    const { word } = raw as { word?: unknown }
+    if (typeof word === 'string' && word === roomSecrets.get(key)) revealedSecrets.set(key, word)
   })
 
   // A click on ZeroWords' wheel shuffles it: in the dashboard's preview, the overlay page in a
@@ -614,12 +721,15 @@ io.on('connection', (socket) => {
   if (words) socket.emit('incastro:solution', words.solution())
   const quiz = quizzland.get(key)?.solution()
   if (quiz) socket.emit('quizzland:solution', quiz)
-  socket.emit('ranking:update', getRanking(key))
-  socket.emit('pads:state', padBoard(key))
+  void persistence.run('ranking', { key }).then((ranking) => { if (socket.connected) socket.emit('ranking:update', ranking) })
+    .catch((error: unknown) => app.log.error({ err: error }, 'Classifica donatori non disponibile'))
+  void persistence.run('padBoard', { key }).then((board) => { if (socket.connected) socket.emit('pads:state', board) })
+    .catch((error: unknown) => app.log.error({ err: error }, 'Pulsanti non disponibili'))
   for (const status of roomSources(key).statuses()) socket.emit('source:status', status)
   socket.emit('source:saved', savedSources(key))
   socket.emit('feed:events', feeds.get(key) ?? [])
   socket.emit('bridge:status', zfb.status())
+  if (persistenceIssue) socket.emit('runtime:issue', persistenceIssue)
   socket.emit('stats:update', liveStats(key))
 
   socket.on('bridge:set', (raw: unknown) => {
@@ -628,6 +738,7 @@ io.on('connection', (socket) => {
     saveBridgeConfig(config)
     zfb.configure(config)
   })
+  socket.on('bridge:retry', () => zfb.reconnect())
 
   // The name entered is saved for the next lives, whether this connection works or not.
   socket.on('source:connect', (raw: unknown) => {
@@ -729,17 +840,19 @@ io.on('connection', (socket) => {
 
   socket.on('pad:stop', () => io.to(key).emit('dj:stop'))
 
-  socket.on('pad:volume', (raw: unknown) => {
+  socket.on('pad:volume', async (raw: unknown) => {
     const volume = Number(raw)
     if (!Number.isFinite(volume)) return
-    setPadVolume(key, Math.min(1, Math.max(0, Math.round(volume * 100) / 100)))
-    io.to(key).emit('pads:state', padBoard(key))
+    try {
+      const board = await persistence.run('padVolume', { key, volume: Math.min(1, Math.max(0, Math.round(volume * 100) / 100)) })
+      io.to(key).emit('pads:state', board)
+    } catch (error) { app.log.error({ err: error }, 'Volume non salvato') }
   })
 
-  socket.on('pad:remove', (id: unknown) => {
+  socket.on('pad:remove', async (id: unknown) => {
     if (typeof id !== 'string') return
-    removePad(key, id)
-    io.to(key).emit('pads:state', padBoard(key))
+    try { io.to(key).emit('pads:state', await persistence.run('padRemove', { key, id })) }
+    catch (error) { app.log.error({ err: error }, 'Pulsante non eliminato') }
   })
 })
 
@@ -749,6 +862,7 @@ const openDashboard = () => {
   spawn('cmd', ['/c', 'start', '', LOCAL_URL], { detached: true, stdio: 'ignore', windowsHide: true }).unref()
 }
 
+await Promise.all([persistence.run('barrier', null), reports.run('barrier', null)])
 try {
   await app.listen({ port: PORT, host: '127.0.0.1' })
 } catch (err) {
@@ -759,24 +873,32 @@ try {
 }
 
 // Before the dashboard opens, so the link it shows already works.
-await ensureDomain(OVERLAY_URL)
+if (process.env.ZEROCADE_SKIP_HOSTS !== '1') await ensureDomain(OVERLAY_URL)
 
 // The leaderboards as static files on the Linux VM behind nginx (leaderboard-publish.ts); off unless configured.
 const leaderboardPublisher = await startLeaderboardPublisher(roomKey)
 
 // Ctrl+C or a kill: stop the live feeds and the servers, then fold the database log into its file.
 const shutdown = createShutdown({
+  timeoutMs: 20_000,
   steps: [
-    { name: 'live sources', run: () => sources.forEach((room) => room.disconnectAll()) },
+    { name: 'stop accepting work', run: () => { draining = true } },
+    { name: 'live sources', run: () => { zfb.close(); sources.forEach((room) => room.disconnectAll()) } },
     { name: 'sockets', run: () => new Promise<void>((resolve) => void io.close(() => resolve())) },
     { name: 'leaderboard publisher', run: () => leaderboardPublisher?.close() },
+    { name: 'persistence worker', run: () => persistence.close() },
     { name: 'server', run: () => app.close() },
+    { name: 'report worker', run: () => reports.close() },
     { name: 'database', run: closeDb },
   ],
   exit: (code) => process.exit(code),
   log: (message, err) => (err ? app.log.error({ err }, message) : app.log.info(message)),
 })
 for (const signal of ['SIGINT', 'SIGTERM'] as const) process.on(signal, () => void shutdown(signal))
+// The isolated smoke runner owns this IPC channel; no shutdown route is exposed.
+if (process.env.ZEROCADE_TEST_SHUTDOWN === '1' && process.send) {
+  process.on('message', (message) => { if (message === 'test:shutdown') void shutdown('isolated smoke') })
+}
 
 if (dashboardDir) {
   console.log(`\nZerocade è avviato: apri ${LOCAL_URL} (chiudi questa finestra per fermarlo)\n`)

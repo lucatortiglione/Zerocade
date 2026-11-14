@@ -12,5 +12,7 @@ export const setScoreGame = (id: string) => {
 
 export function reportScore(id: string, name: string, avatar: string | undefined, points: number) {
   if (PREVIEW || typeof window === 'undefined' || !game || !Number.isInteger(points) || points <= 0) return
-  void import('../socket').then(({ socket }) => socket.emit('score:add', { game, user: { id, nickname: name, avatar }, points }))
+  const gameId = game
+  void import('../socket').then(({ socket }) => socket.emit('score:add', { game: gameId, user: { id, nickname: name, avatar }, points }))
+    .catch(() => console.warn('[score-report] Invio dei punti non confermato.'))
 }

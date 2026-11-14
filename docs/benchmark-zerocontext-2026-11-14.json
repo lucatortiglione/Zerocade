@@ -1,0 +1,192 @@
+﻿{
+  "runtime": "v26.13.1",
+  "platform": "win32",
+  "results": [
+    {
+      "trial": 1,
+      "mode": "sync",
+      "words": 101304,
+      "setupMs": 162.7505,
+      "samples": 13,
+      "timerMs": {
+        "p50": 15.239099999999894,
+        "p95": 133.6377,
+        "p99": 133.6377,
+        "max": 133.6377
+      },
+      "rssMiB": 193.1015625,
+      "results": [
+        {
+          "word": "spiaggia",
+          "durationMs": 121.14139999999998,
+          "sha256": "d2b311d451921be4fa5a757e8f6c553e926e36f1af9de4b706aceb61193f0322"
+        },
+        {
+          "word": "mare",
+          "durationMs": 119.25080000000003,
+          "sha256": "4668ed5426c6efbbe22f8a53aae01e8e0f497dabef48ab01c1dc4ccb983c9305"
+        },
+        {
+          "word": "automobile",
+          "durationMs": 132.86810000000014,
+          "sha256": "cc488c8aead1be4c13dc92e0febe5f46e4613c486e5ad9d11229ba39f1cd879e"
+        }
+      ]
+    },
+    {
+      "trial": 1,
+      "mode": "worker",
+      "words": 101304,
+      "setupMs": 768.7978,
+      "samples": 40,
+      "timerMs": {
+        "p50": 15.39689999999996,
+        "p95": 16.75980000000004,
+        "p99": 17.796600000000126,
+        "max": 17.796600000000126
+      },
+      "rssMiB": 240.93359375,
+      "results": [
+        {
+          "word": "spiaggia",
+          "durationMs": 138.23489999999993,
+          "sha256": "d2b311d451921be4fa5a757e8f6c553e926e36f1af9de4b706aceb61193f0322"
+        },
+        {
+          "word": "mare",
+          "durationMs": 180.1878999999999,
+          "sha256": "4668ed5426c6efbbe22f8a53aae01e8e0f497dabef48ab01c1dc4ccb983c9305"
+        },
+        {
+          "word": "automobile",
+          "durationMs": 124.18720000000008,
+          "sha256": "cc488c8aead1be4c13dc92e0febe5f46e4613c486e5ad9d11229ba39f1cd879e"
+        }
+      ]
+    },
+    {
+      "trial": 2,
+      "mode": "sync",
+      "words": 101304,
+      "setupMs": 251.85439999999994,
+      "samples": 19,
+      "timerMs": {
+        "p50": 8.066900000000032,
+        "p95": 150.37480000000005,
+        "p99": 150.37480000000005,
+        "max": 150.37480000000005
+      },
+      "rssMiB": 186.44921875,
+      "results": [
+        {
+          "word": "spiaggia",
+          "durationMs": 143.52380000000005,
+          "sha256": "d2b311d451921be4fa5a757e8f6c553e926e36f1af9de4b706aceb61193f0322"
+        },
+        {
+          "word": "mare",
+          "durationMs": 132.2605000000001,
+          "sha256": "4668ed5426c6efbbe22f8a53aae01e8e0f497dabef48ab01c1dc4ccb983c9305"
+        },
+        {
+          "word": "automobile",
+          "durationMs": 149.69090000000006,
+          "sha256": "cc488c8aead1be4c13dc92e0febe5f46e4613c486e5ad9d11229ba39f1cd879e"
+        }
+      ]
+    },
+    {
+      "trial": 2,
+      "mode": "worker",
+      "words": 101304,
+      "setupMs": 903.7006,
+      "samples": 38,
+      "timerMs": {
+        "p50": 15.28729999999996,
+        "p95": 16.902199999999993,
+        "p99": 17.183300000000145,
+        "max": 17.183300000000145
+      },
+      "rssMiB": 250.0625,
+      "results": [
+        {
+          "word": "spiaggia",
+          "durationMs": 130.41660000000002,
+          "sha256": "d2b311d451921be4fa5a757e8f6c553e926e36f1af9de4b706aceb61193f0322"
+        },
+        {
+          "word": "mare",
+          "durationMs": 143.87450000000013,
+          "sha256": "4668ed5426c6efbbe22f8a53aae01e8e0f497dabef48ab01c1dc4ccb983c9305"
+        },
+        {
+          "word": "automobile",
+          "durationMs": 126.79269999999997,
+          "sha256": "cc488c8aead1be4c13dc92e0febe5f46e4613c486e5ad9d11229ba39f1cd879e"
+        }
+      ]
+    },
+    {
+      "trial": 3,
+      "mode": "sync",
+      "words": 101304,
+      "setupMs": 244.75480000000005,
+      "samples": 13,
+      "timerMs": {
+        "p50": 15.302500000000009,
+        "p95": 152.5063,
+        "p99": 152.5063,
+        "max": 152.5063
+      },
+      "rssMiB": 192.96875,
+      "results": [
+        {
+          "word": "spiaggia",
+          "durationMs": 116.79459999999995,
+          "sha256": "d2b311d451921be4fa5a757e8f6c553e926e36f1af9de4b706aceb61193f0322"
+        },
+        {
+          "word": "mare",
+          "durationMs": 151.76340000000005,
+          "sha256": "4668ed5426c6efbbe22f8a53aae01e8e0f497dabef48ab01c1dc4ccb983c9305"
+        },
+        {
+          "word": "automobile",
+          "durationMs": 129.02569999999992,
+          "sha256": "cc488c8aead1be4c13dc92e0febe5f46e4613c486e5ad9d11229ba39f1cd879e"
+        }
+      ]
+    },
+    {
+      "trial": 3,
+      "mode": "worker",
+      "words": 101304,
+      "setupMs": 867.7587999999998,
+      "samples": 35,
+      "timerMs": {
+        "p50": 15.279899999999998,
+        "p95": 16.17190000000005,
+        "p99": 16.49680000000012,
+        "max": 16.49680000000012
+      },
+      "rssMiB": 237.41015625,
+      "results": [
+        {
+          "word": "spiaggia",
+          "durationMs": 112.33570000000009,
+          "sha256": "d2b311d451921be4fa5a757e8f6c553e926e36f1af9de4b706aceb61193f0322"
+        },
+        {
+          "word": "mare",
+          "durationMs": 129.55899999999997,
+          "sha256": "4668ed5426c6efbbe22f8a53aae01e8e0f497dabef48ab01c1dc4ccb983c9305"
+        },
+        {
+          "word": "automobile",
+          "durationMs": 131.33940000000007,
+          "sha256": "cc488c8aead1be4c13dc92e0febe5f46e4613c486e5ad9d11229ba39f1cd879e"
+        }
+      ]
+    }
+  ]
+}

@@ -24,7 +24,7 @@ Le coppie fase-motivo, poche centinaia per milioni di righe, stanno una volta so
 in `discarded_reasons`; le righe, in `discarded_rows`, ne portano il numero.
 
 Gli scarti editoriali della revisione di Claude (candidati 7900–13245,
-`editorial_review_claude.py`, cartella `prompt-staging/reviews/completion_20261109_claude`)
+`script/editorial_review_claude.py`, cartella `prompt-staging/reviews/completion_20261109_claude`)
 usano anche il motivo «tema sensibile» (direttive §9) e rinviano a revisione umana
 le voci identitarie o discriminatorie delicate.
 
@@ -47,17 +47,17 @@ supera da solo eventuali altri motivi di esclusione automatica.
 
 ## Aggiornamento
 
-`filter_prompts.py build` aggiorna automaticamente candidati e scarti.
-`review_prompts.py import-decisions` aggiorna gli scarti dopo le decisioni del
-revisore; anche il comando `inventory_updates.py decide-term` aggiorna la copia
+`script/filter_prompts.py build` aggiorna automaticamente candidati e scarti.
+`script/review_prompts.py import-decisions` aggiorna gli scarti dopo le decisioni del
+revisore; anche il comando `script/inventory_updates.py decide-term` aggiorna la copia
 degli scarti della raccolta principale. Un errore nella copia viene segnalato;
 la decisione originale rimane salvata nella raccolta.
 
 Per ricostruire soltanto gli scarti o consultarne i conteggi:
 
 ```powershell
-.venv/Scripts/python.exe -B discarded_prompt_database.py sync
-.venv/Scripts/python.exe -B discarded_prompt_database.py status
+.venv/Scripts/python.exe -B script/discarded_prompt_database.py sync
+.venv/Scripts/python.exe -B script/discarded_prompt_database.py status
 ```
 
 In VS Code: **Prompt: aggiorna DB degli scarti** e **Prompt: stato degli scarti**.

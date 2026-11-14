@@ -49,8 +49,8 @@ Le istruzioni degli agenti sono in `ISTRUZIONI_AGENTI.md`, nella stessa cartella
 
 | Passo | Comando o task VS Code |
 |---|---|
-| Scheda dei prossimi prompt di una partizione | `final_associations.py sheet shard_NN` |
-| Foglio editoriale → lotto | `final_associations.py serialize shard_NN NNNN` |
+| Scheda dei prossimi prompt di una partizione | `script/final_associations.py sheet shard_NN` |
+| Foglio editoriale → lotto | `script/final_associations.py serialize shard_NN NNNN` |
 | Bozze Qwen da rivedere | task «Associazioni: continua con Qwen (bozze, poi revisione)» |
 | Solo Qwen, senza agenti | task «Associazioni: continua solo con Qwen (senza agenti)» |
 | Importazione dei lotti rivisti | task «Associazioni: importa i lotti rivisti dagli agenti» |
@@ -101,7 +101,7 @@ Dalla cartella `gioco-zeroassociations`:
 
 ```powershell
 # Coda congelata delle entry da elaborare e stato corrente nella raccolta.
-.venv/Scripts/python.exe -B association_catalog.py status
+.venv/Scripts/python.exe -B script/association_catalog.py status
 ```
 
 La fotografia è in `prompt-staging/associations/filtered_20261109/entries.jsonl`.
@@ -132,16 +132,16 @@ I comandi seguenti usano percorsi segnaposto da sostituire:
 
 ```powershell
 # Converte decisioni già revisionate; non effettua una revisione semantica.
-.venv/Scripts/python.exe -B association_catalog.py record-reviewed resources/NUOVO_LOTTO.txt --reviewer "NOME DEL REVISORE EFFETTIVO" --output resources/NUOVO_LOTTO.jsonl
+.venv/Scripts/python.exe -B script/association_catalog.py record-reviewed resources/NUOVO_LOTTO.txt --reviewer "NOME DEL REVISORE EFFETTIVO" --output resources/NUOVO_LOTTO.jsonl
 
 # Importa e aggiorna copia valida e copia di gioco.
-.venv/Scripts/python.exe -B association_catalog.py import-reviewed resources/NUOVO_LOTTO.jsonl
+.venv/Scripts/python.exe -B script/association_catalog.py import-reviewed resources/NUOVO_LOTTO.jsonl
 
 # Ricostruisce la fotografia dei filtrati e l'archivio degli scarti.
-.venv/Scripts/python.exe -B filter_prompts.py build
+.venv/Scripts/python.exe -B script/filter_prompts.py build
 
 # Ricalcola lo stato della coda.
-.venv/Scripts/python.exe -B association_catalog.py status
+.venv/Scripts/python.exe -B script/association_catalog.py status
 ```
 
 `record-reviewed` assegna limite uno a ogni gruppo. Per decisioni più articolate,
@@ -154,10 +154,10 @@ editorialmente; il nome del gruppo non è un classificatore semantico.
 Per importare un lotto di un agente già revisionato:
 
 ```powershell
-.venv/Scripts/python.exe -B ingest_agent_associations.py prompt-staging/associations/filtered_20261109/agent_outputs/shard_01/batch_0001.jsonl
+.venv/Scripts/python.exe -B script/ingest_agent_associations.py prompt-staging/associations/filtered_20261109/agent_outputs/shard_01/batch_0001.jsonl
 
 # Dopo gli aggiornamenti delle copie, rigenera il rapporto e controlla i bacini.
-.venv/Scripts/python.exe -B association_progress.py
+.venv/Scripts/python.exe -B script/association_progress.py
 ```
 
 L'importatore sceglie l'ultima correzione esplicita indirizzata a quel lotto,
@@ -173,7 +173,7 @@ Resta nel database e viene segnalato come non estraibile per Livecade; il
 campionatore lo salta. Si cercano ulteriori associazioni senza aggiungere
 riempitivi e senza indebolire i gruppi di equivalenti.
 
-[association_catalog.py](association_catalog.py) verifica il contratto del
+[script/association_catalog.py](script/association_catalog.py) verifica il contratto del
 bacino e il collegamento alle decisioni conservate: hash del foglio e delle
 annotazioni, identità di parole e vincoli, attribuzione del revisore,
 direttive e revisione corrente del prompt.

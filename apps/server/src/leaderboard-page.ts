@@ -136,14 +136,41 @@ export const leaderboardJs = `(() => {
     draw()
   }
 
+  let revision = 0
+  let reading = false
+  let stopped = false
+  let controller = null
   async function refresh() {
+    if (reading || stopped) return
+    reading = true
+    const expected = revision
+    controller = new AbortController()
+    const deadline = setTimeout(() => controller.abort(), 10000)
     try {
-      const res = await fetch('/api/leaderboard/' + encodeURIComponent(game) + '?limit=' + top, { cache: 'no-store' })
-      if (res.ok) boards = (await res.json()).boards
+      const res = await fetch('/api/leaderboard/' + encodeURIComponent(game) + '?limit=' + top, { cache: 'no-store', signal: controller.signal })
+      if (!res.ok || !res.body) return
+      const reader = res.body.getReader()
+      const bytes = new Uint8Array(1024 * 1024)
+      let length = 0
+      try {
+        if (Number(res.headers.get('content-length')) > bytes.length) throw new Error('Response too large')
+        for (;;) {
+          const part = await reader.read()
+          if (part.done) break
+          if (part.value.length > bytes.length - length) throw new Error('Response too large')
+          bytes.set(part.value, length)
+          length += part.value.length
+        }
+      } finally { void reader.cancel().catch(() => {}); reader.releaseLock() }
+      const next = JSON.parse(new TextDecoder().decode(bytes.subarray(0, length))).boards
+      if (!stopped && !controller.signal.aborted && revision === expected && next && PERIODS.every((p) => Array.isArray(next[p[0]]))) boards = next
     } catch {
       // The server is not there for a moment: the last boards stay.
+    } finally {
+      clearTimeout(deadline)
+      reading = false
     }
-    draw()
+    if (!stopped) draw()
   }
 
   // Live: on nginx (Nchan) /sub/<game> pushes the boards the moment they change. Where there is no such channel (the
@@ -151,14 +178,19 @@ export const leaderboardJs = `(() => {
   // every 30 seconds, in case a message was missed.
   let live = false
   let ticks = 0
+  let stream = null
   try {
-    const stream = new EventSource('/sub/' + encodeURIComponent(game))
+    stream = new EventSource('/sub/' + encodeURIComponent(game))
     stream.onopen = () => {
       live = true
     }
     stream.onmessage = (event) => {
       try {
-        boards = JSON.parse(event.data).boards
+        if (stopped || event.data.length > 512 * 1024) return
+        const next = JSON.parse(event.data).boards
+        if (!next || !PERIODS.every((p) => Array.isArray(next[p[0]]))) return
+        revision++
+        boards = next
         draw()
       } catch {
         // A message that is not the boards: the next one or the polling fixes it.
@@ -174,10 +206,17 @@ export const leaderboardJs = `(() => {
   }
 
   refresh()
-  setInterval(() => {
+  const polling = setInterval(() => {
     if (!live || ++ticks % 6 === 0) refresh()
   }, 5000)
-  if (rotate) setInterval(() => show(PERIODS[(PERIODS.findIndex((p) => p[0] === period) + 1) % PERIODS.length][0]), rotate * 1000)
+  const rotation = rotate ? setInterval(() => show(PERIODS[(PERIODS.findIndex((p) => p[0] === period) + 1) % PERIODS.length][0]), rotate * 1000) : null
+  addEventListener('pagehide', () => {
+    stopped = true
+    controller?.abort()
+    stream?.close()
+    clearInterval(polling)
+    clearInterval(rotation)
+  }, { once: true })
 })()
 `
 

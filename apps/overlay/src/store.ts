@@ -1,4 +1,5 @@
 import { useSyncExternalStore } from 'react'
+import { frameNotifications } from '@zerocade/browser-runtime'
 import {
   giftById,
   type BivioState,
@@ -58,10 +59,11 @@ let state: OverlayState = {
   gifSeq: 0,
 }
 const listeners = new Set<() => void>()
+const notifications = frameNotifications(() => { for (const listener of listeners) listener() })
 
 function update(patch: Partial<OverlayState>) {
   state = { ...state, ...patch }
-  for (const l of listeners) l()
+  notifications.notify()
 }
 
 socket.on('connect', () => update({ connected: true }))
@@ -84,19 +86,23 @@ socket.on('incastro:state', (incastro) => update({ incastro, incastroAt: perform
 socket.on('quizzland:state', (quizzland) => update({ quizzland, quizzlandAt: performance.now() }))
 
 const MESSAGE_MS = 8000
+let messageTimer: ReturnType<typeof setTimeout> | undefined
 socket.on('overlay:message', (message) => {
+  clearTimeout(messageTimer)
   const messageSeq = state.messageSeq + 1
   update({ message, messageSeq })
-  setTimeout(() => {
+  messageTimer = setTimeout(() => {
     if (state.messageSeq === messageSeq) update({ message: null })
   }, MESSAGE_MS)
 })
 
 const GIF_MS = 5000
+let gifTimer: ReturnType<typeof setTimeout> | undefined
 socket.on('gif:show', (gif) => {
+  clearTimeout(gifTimer)
   const gifSeq = state.gifSeq + 1
   update({ gif, gifSeq })
-  setTimeout(() => {
+  gifTimer = setTimeout(() => {
     if (state.gifSeq === gifSeq) update({ gif: null })
   }, GIF_MS)
 })
@@ -105,7 +111,9 @@ function subscribe(listener: () => void) {
   listeners.add(listener)
   return () => {
     listeners.delete(listener)
+    if (!listeners.size) notifications.cancel()
   }
 }
 
 export const useOverlay = () => useSyncExternalStore(subscribe, () => state)
+export const overlaySnapshot = () => state

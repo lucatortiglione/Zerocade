@@ -6,6 +6,8 @@ import { join } from 'node:path'
 import { GAMES } from '@zerocade/shared'
 import { leaderboardCss, leaderboardHtml, leaderboardIndexHtml, leaderboardJs } from './leaderboard-page.js'
 import { PERIODS, leaderboards, scoreEvents } from './scores.js'
+import { sessionSince } from './sessions.js'
+import { reports } from './infrastructureClient.js'
 
 // The leaderboards are published as static files on the Linux VM, where nginx serves them (deploy/nginx/zerocade.conf):
 // the pages and their CSS/JS once, then one JSON per game whenever its boards change. Nothing on this PC listens for
@@ -47,13 +49,14 @@ export interface Publisher {
   close(): Promise<void>
 }
 
-export async function startLeaderboardPublisher(roomKey: string): Promise<Publisher | null> {
-  const match = /^([^@\s]+@[^:\s]+):(\/\S+)$/.exec(TARGET)
+export async function startLeaderboardPublisher(roomKey: string, transfer: (args: string[]) => Promise<void> = (args) => run('sftp', args)): Promise<Publisher | null> {
+  const match = /^([^@:\s]+@[^:\s]+):(\/\S+)$/.exec(TARGET)
   if (!match) {
     if (TARGET) console.warn('[classifiche] ZEROCADE_PUBLISH_TARGET deve essere utente@host:/cartella: le classifiche non vengono pubblicate.')
     return null
   }
   const [, login, remoteDir] = match as unknown as [string, string, string]
+  const prepareSite = () => reports.run('site', { key: roomKey, at: Date.now(), starts: Object.fromEntries(GAMES.map((g) => [g.id, sessionSince(roomKey, g.id)])) })
   const sshArgs = ['-o', 'BatchMode=yes', '-o', 'ConnectTimeout=8', ...(KEY ? ['-i', KEY, '-o', 'IdentitiesOnly=yes'] : [])]
   const scratch = join(tmpdir(), `zerocade-classifiche-${process.pid}`)
 
@@ -61,9 +64,14 @@ export async function startLeaderboardPublisher(roomKey: string): Promise<Publis
   const sent = new Map<string, string>() // path -> hash of what the VM has
   const live = new Map<string, string>() // game -> hash of what the live channel last got
   let liveFailing = false
+  let stopped = false
+  const stopping = new AbortController()
+  const posts = new Map<string, Promise<void>>()
+  const latest = new Map<string, string>()
+  const changes = new Set<Promise<unknown>>()
 
   // One game's boards to the live channel. Quiet when they have not changed since the last post.
-  async function post(gameId: string, body: string): Promise<void> {
+  async function sendLive(gameId: string, body: string): Promise<void> {
     const hash = createHash('sha1').update(body).digest('hex')
     if (live.get(gameId) === hash) return
     try {
@@ -71,35 +79,59 @@ export async function startLeaderboardPublisher(roomKey: string): Promise<Publis
         method: 'POST',
         headers: { 'content-type': 'application/json' },
         body,
-        signal: AbortSignal.timeout(4_000),
+        signal: AbortSignal.any([stopping.signal, AbortSignal.timeout(4_000)]),
       })
+      await res.body?.cancel()
       if (!res.ok) throw new Error(`HTTP ${res.status}`)
       live.set(gameId, hash)
       if (liveFailing) console.log('[classifiche] aggiornamenti in tempo reale ripresi.')
       liveFailing = false
     } catch (err) {
-      if (!liveFailing) console.warn(`[classifiche] aggiornamento in tempo reale su ${base} non riuscito: ${err instanceof Error ? err.message : String(err)}`)
+      if (stopped) return
+      if (!liveFailing) console.warn(`[classifiche] aggiornamento del canale HTTP non riuscito: ${err instanceof Error ? err.message : String(err)}`)
       liveFailing = true
     }
+  }
+
+  // At most one request and one replacement body per game. Newer snapshots
+  // cannot be overtaken by an older request finishing later.
+  function post(gameId: string, body: string): Promise<void> {
+    if (stopped) return Promise.resolve()
+    latest.set(gameId, body)
+    const active = posts.get(gameId)
+    if (active) return active
+    const task = (async () => {
+      while (!stopped && latest.has(gameId)) {
+        const next = latest.get(gameId)!
+        latest.delete(gameId)
+        await sendLive(gameId, next)
+      }
+    })().finally(() => { posts.delete(gameId); latest.delete(gameId) })
+    posts.set(gameId, task)
+    return task
   }
 
   // A score or a reset: that game's boards go out within a moment (several points close together make one post).
   const pending = new Map<string, NodeJS.Timeout>()
   const onChange = (gameId: string) => {
-    if (stopped || pending.has(gameId)) return
+    if (stopped || pending.has(gameId) || !GAMES.some((game) => game.id === gameId)) return
     pending.set(
       gameId,
       setTimeout(() => {
-        pending.delete(gameId)
-        const body = leaderboardSite(roomKey).get(`api/leaderboard/${gameId}`)
-        if (body) void post(gameId, body)
+        const task = prepareSite().then((files) => {
+          if (stopped) return
+          const body = files.get(`api/leaderboard/${gameId}`)
+          if (body) return post(gameId, body)
+        }).catch((error: unknown) => console.warn('[classifiche] preparazione non riuscita', error))
+        changes.add(task)
+        void task.finally(() => { changes.delete(task); pending.delete(gameId) })
       }, 300),
     )
   }
   scoreEvents.on('change', onChange)
   let busy = false
   let failing = false
-  let stopped = false
+  let publication: Promise<void> | null = null
 
   async function publish(): Promise<void> {
     if (busy || stopped) return
@@ -107,7 +139,10 @@ export async function startLeaderboardPublisher(roomKey: string): Promise<Publis
     try {
       const changed: string[] = []
       const hashes = new Map<string, string>()
-      for (const [path, body] of leaderboardSite(roomKey)) {
+      const files = await prepareSite()
+      if (stopped) return
+      for (const [path, body] of files) {
+        if (stopped) return
         // The live channel also gets what no score announced (a new session or day starts a board over).
         if (path.startsWith('api/leaderboard/')) void post(path.slice('api/leaderboard/'.length), body)
         const hash = createHash('sha1').update(body).digest('hex')
@@ -118,7 +153,7 @@ export async function startLeaderboardPublisher(roomKey: string): Promise<Publis
         await writeFile(local, body)
         changed.push(path)
       }
-      if (changed.length) {
+      if (changed.length && !stopped) {
         // `-mkdir` and the dirs it names are allowed to exist already; every put overwrites in place.
         const batch = [
           '-mkdir classifica',
@@ -128,7 +163,7 @@ export async function startLeaderboardPublisher(roomKey: string): Promise<Publis
         ].join('\n')
         const batchFile = join(scratch, 'batch.txt')
         await writeFile(batchFile, batch + '\n')
-        await run('sftp', [...sshArgs, '-b', batchFile, `${login}:${remoteDir}`])
+        await transfer([...sshArgs, '-b', batchFile, `${login}:${remoteDir}`])
         for (const p of changed) sent.set(p, hashes.get(p)!)
         if (failing) console.log('[classifiche] pubblicazione ripresa.')
       }
@@ -144,16 +179,21 @@ export async function startLeaderboardPublisher(roomKey: string): Promise<Publis
   }
 
   await mkdir(scratch, { recursive: true })
-  void publish()
-  const timer = setInterval(() => void publish(), EVERY_MS)
+  const start = () => { if (!busy && !stopped) publication = publish() }
+  start()
+  const timer = setInterval(start, EVERY_MS)
   timer.unref()
-  console.log(`[classifiche] pubblicate su ${login}:${remoteDir} ogni ${EVERY_MS / 1000} s quando cambiano.`)
+  console.log(`[classifiche] pubblicazione configurata su ${login}:${remoteDir} ogni ${EVERY_MS / 1000} s quando cambiano.`)
   return {
     close: async () => {
       stopped = true
+      stopping.abort()
       clearInterval(timer)
       scoreEvents.off('change', onChange)
       for (const t of pending.values()) clearTimeout(t)
+      pending.clear()
+      await Promise.allSettled([publication, ...changes, ...posts.values()])
+      latest.clear()
       await rm(scratch, { recursive: true, force: true })
     },
   }

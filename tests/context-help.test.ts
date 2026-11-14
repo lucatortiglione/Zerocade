@@ -1,8 +1,10 @@
 import assert from 'node:assert/strict'
-import { before, test } from 'node:test'
+import { test } from 'node:test'
 import { createContext } from '../apps/overlay/src/games/context.ts'
 import { Engine, type GameInstance } from '../apps/overlay/src/games/engine.ts'
 import type { GameSettings, LiveEvent } from '../packages/shared/src/index.ts'
+import { parseContextData } from '../apps/overlay/src/games/contextRanking.ts'
+import { inlineContextComputer, settleContext } from './helpers/inlineContextComputer.ts'
 
 const gift: LiveEvent = { type: 'gift', giftId: 'rose', count: 1, user: { id: 'a', nickname: 'Anna' } }
 const settings: GameSettings = {
@@ -10,24 +12,11 @@ const settings: GameSettings = {
   starterWords: true, hintClosest: 2, showLeaderboard: true, roundCheer: false,
 }
 
-before(async () => {
-  const originalFetch = globalThis.fetch
-  globalThis.fetch = async (input) => {
-    const path = String(input)
-    if (path.endsWith('vectors.bin')) return new Response(new Int8Array([
+const fixture = parseContextData('proprieta\nproprietà\nmare\nonda\nsabbia\ncittà\nbarca\npesce\ncolombo\nspiaggia\n',
+  new Int8Array([
       95, 30, 100, 0, 50, 80, 80, 50, 30, 90, -100, 0, 10, 90, 70, 60, 60, 70, 20, 80,
-    ]))
-    if (path.endsWith('secrets.txt')) return new Response('proprietà\n')
-    if (path.endsWith('links.json')) return new Response(null, { status: 404 })
-    return new Response('proprieta\nproprietà\nmare\nonda\nsabbia\ncittà\nbarca\npesce\ncolombo\nspiaggia\n')
-  }
-  try {
-    createContext().reset({ disableAllHints: true }, 1080, 1920)
-    await new Promise<void>((resolve) => setImmediate(resolve))
-  } finally {
-    globalThis.fetch = originalFetch
-  }
-})
+  ]).buffer, 'proprietà\n')
+const context = () => createContext(() => inlineContextComputer(fixture))
 
 function screen(game: GameInstance) {
   const texts: string[] = []
@@ -40,10 +29,11 @@ function screen(game: GameInstance) {
   return { canvas, draw: () => { texts.length = 0; game.draw(canvas, performance.now()); return texts } }
 }
 
-test('master off for help: no initial words, automatic hints, rose hints or revealed letters; guesses still score', () => {
-  const game = createContext()
+test('master off for help: no initial words, automatic hints, rose hints or revealed letters; guesses still score', async () => {
+  const game = context()
   const blocked = { ...settings, disableAllHints: true }
   game.reset(blocked, 1080, 1920)
+  await settleContext()
   const view = screen(game)
   assert.ok(view.draw().includes('0 tentativi'))
   game.onAction('reveal_closer', gift, 0)
@@ -56,11 +46,13 @@ test('master off for help: no initial words, automatic hints, rose hints or reve
   game.onAction('guess', { type: 'comment', text: 'proprieta', user: gift.user }, 0)
   assert.match(view.draw().join('\n'), /Anna ha trovato: proprietà/)
   assert.match(view.draw().join('\n'), /100 pt/)
+  game.dispose?.()
 })
 
-test('enabling the block during a round hides old hints and letters but preserves player guesses', () => {
-  const game = createContext()
+test('enabling the block during a round hides old hints and letters but preserves player guesses', async () => {
+  const game = context()
   game.reset(settings, 1080, 1920)
+  await settleContext()
   const view = screen(game)
   assert.ok(view.draw().includes('✨ aiuto'))
   game.onAction('small_hint', gift, 0)
@@ -76,13 +68,15 @@ test('enabling the block during a round hides old hints and letters but preserve
   game.setSettings!({ ...settings, disableAllHints: false })
   game.onAction('small_hint', gift, 0)
   assert.ok(view.draw().includes('P'))
+  game.dispose?.()
 })
 
-test('a queued rose cannot reveal a word in the frame after the creator disables help', () => {
-  const game = createContext()
+test('a queued rose cannot reveal a word in the frame after the creator disables help', async () => {
+  const game = context()
   const view = screen(game)
   const engine = new Engine(view.canvas)
   engine.setGame(game, { ...settings, starterWords: false, startHintOn: false })
+  await settleContext()
   engine.pushAction('reveal_closer', gift)
   engine.setSettings({ ...settings, disableAllHints: true })
   const originalRaf = globalThis.requestAnimationFrame

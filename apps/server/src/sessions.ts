@@ -1,4 +1,4 @@
-import { DEFAULT_WIDGETS, GAMES, defaultSettings, type GameControl, type GameSettings, type SessionState, type Trigger, type WidgetConfig } from '@zerocade/shared'
+import { DEFAULT_WIDGETS, GAMES, defaultSettings, normalizeContextColors, type GameControl, type GameSettings, type SessionState, type Trigger, type WidgetConfig } from '@zerocade/shared'
 import { loadSession, saveSession, setAsideSession } from './db.js'
 
 // Games that changed id: a session saved under the old one continues under the new one.
@@ -57,11 +57,13 @@ function loadState(key: string): SessionState {
   if (row) {
     try {
       const game = GAMES.find((g) => g.id === (RENAMED[row.game_id] ?? row.game_id)) ?? GAMES[0]
+      const settings = { ...defaultSettings(game.settings), ...(JSON.parse(row.settings) as GameSettings) }
+      if (game.id === 'context') Object.assign(settings, normalizeContextColors(settings))
       return {
         gameId: game.id,
         triggers: JSON.parse(row.triggers) as Trigger[],
         // Settings added to a game after this session was saved start at their default.
-        settings: { ...defaultSettings(game.settings), ...(JSON.parse(row.settings) as GameSettings) },
+        settings,
         widgets: JSON.parse(row.widgets ?? '{}') as SessionState['widgets'],
         goal: typeof row.goal === 'number' ? row.goal : DEFAULT_WIDGETS.goal,
       }
@@ -105,6 +107,7 @@ export function setTriggers(key: string, triggers: Trigger[]) {
 
 export function setSettings(key: string, settings: GameSettings) {
   const state = { ...getSession(key), settings }
+  if (state.gameId === 'context') state.settings = { ...settings, ...normalizeContextColors(settings) }
   save(key, state)
   return state
 }

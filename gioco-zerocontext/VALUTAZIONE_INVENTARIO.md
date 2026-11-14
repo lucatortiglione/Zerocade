@@ -1,5 +1,10 @@
 # Valutazione completa di ZeroContext — 14 novembre 2026
 
+Questa valutazione fotografa il gioco **prima dell'ampliamento del vocabolario**.
+Il successivo aggiornamento del 14 novembre ha portato i tentativi a **101.304**
+(41.075 aggiunte), con 6.837 segrete. Conteggi, snapshot e hash dell'aggiornamento
+sono in [vocabulary_update.json](reports/vocabulary_update.json).
+
 Valutati **2.837.376 termini**: tutti i **2.833.072** presenti in
 `raw.inventory_terms`, più **4.304** termini ulteriori dalle banche, dal gioco,
 dalle frequenze e dalle cache dei vettori. Nessun termine dell'inventario è
