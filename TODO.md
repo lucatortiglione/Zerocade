@@ -2,6 +2,36 @@
 
 > Rilevazione: **23 ottobre 2026**, fuso Europe/Rome. Punto di partenza: <https://app.livecade.io/>. Destinazione progettuale: Zerocade, React 19 stabile. Questo documento contiene l'analisi e il backlog; le caselle non selezionate indicano lavoro di implementazione ancora da svolgere.
 
+## Ingegnerizzazione secondo DIRETTIVE.md — audit del 14 novembre 2026
+
+Audit del server (`apps/server/src`, circa 6.000 righe) con ricerca di pattern (SQL, `fetch`, timer, `catch`, `JSON.parse`,
+chiusura, crescita delle strutture). **Non coperti:** overlay, dashboard, `packages/shared`, `scripts/`, gli strumenti
+Python dei giochi e un'analisi riga per riga. Baseline: `typecheck` pulito, 41 test Node, 13 test Python del database,
+`npm audit --omit=dev` senza vulnerabilità.
+
+**Fatto** (commit «fix(twitch): EventSub con timeout…»): `twitch-eventsub.ts` con timeout di richiesta e di benvenuto,
+controllo dello stato HTTP, segreto fuori dall'URL, sottoscrizioni rifiutate segnalate, WebSocket chiuso in caso di
+errore, messaggi malformati ignorati; test in `tests/twitch-eventsub.test.ts`.
+
+**Da fare** (in ordine di priorità; i file indicati avevano modifiche non committate al momento dell'audit):
+
+- [ ] **P1 — Spegnimento ordinato** (`index.ts`, sezione 5): non c'è nessun gestore di `SIGINT`/`SIGTERM`. Alla chiusura
+  non si fermano Fastify, Socket.IO, i collegamenti TikTok/Twitch (`sources.ts`) né si chiude `better-sqlite3`. Serve una funzione unica che chiude nell'ordine inverso all'avvio, con tempo massimo.
+- [ ] **P1 — EventSub dopo il benvenuto** (`twitch-eventsub.ts`): non gestisce `session_keepalive` scaduto,
+  `session_reconnect` né la chiusura del socket a sessione avviata; dopo una caduta follow e raid si fermano senza
+  avvisi. Serve un riavvio con attesa crescente e uno stato visibile nella dashboard.
+- [ ] **P1 — Versione di `channel.follow`:** il codice usa la versione `1`. Da verificare sulla documentazione di Twitch
+  (credo sia stata dismessa); la versione attuale chiede un token utente e il permesso di moderatore, quindi cambia il
+  modo di collegare l'account. Finché non è deciso, il rifiuto compare nella nota di stato.
+- [ ] **P2 — Pragma del database** (`db.ts`): c'è `journal_mode = WAL` ma non `foreign_keys` né `busy_timeout`.
+  Valutare l'effetto sulle tabelle con riferimenti prima di attivarli (sezione 8), con una prova su un database copiato.
+- [ ] **P2 — Sessione salvata illeggibile** (`sessions.ts`, `loadState`): un JSON rovinato riporta la sessione ai valori
+  predefiniti senza dirlo. Registrare l'errore e conservare la riga originale prima di sovrascriverla.
+- [ ] **P2 — Versioning e CI:** tutti i `package.json` sono a `0.0.0`, non ci sono tag né pipeline; definire lo schema e
+  un controllo automatico di `typecheck`, test e `npm audit` (sezione 12).
+- [ ] **P2 — Audit del resto:** overlay e dashboard (aggiornamenti ad alta frequenza, listener e timer da chiudere),
+  `packages/shared`, `scripts/package-win.mjs` e gli strumenti Python.
+
 Accesso rapido: [architettura](#3-architettura-funzionale-rilevata) · [rotte](#4-mappa-completa-delle-rotte-applicative-dichiarate) · [frontend](#5-frontend-sistema-visivo-e-composizione) · [roadmap](#23-roadmap-operativa-con-dipendenze) · [API](#25-appendice-a--contratti-rest-del-client) · [eventi](#26-appendice-b--protocollo-socketio-e-iframe) · [tutti i giochi e i campi](#27-appendice-c--catalogo-completo-ricevuto) · [tutti i collegamenti](#28-appendice-d--copertura-dei-collegamenti-e-delle-risorse).
 
 ## 1. Risultato, attendibilità e limiti
