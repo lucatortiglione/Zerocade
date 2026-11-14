@@ -277,8 +277,10 @@ export class RoomSources {
       if (process.env.TWITCH_CLIENT_ID && process.env.TWITCH_CLIENT_SECRET) {
         try {
           const ev = new TwitchEventSub(ch, emit)
-          await ev.start()
+          const refused = await ev.start()
           this.twitchEv = ev
+          // Twitch refused some subscriptions: chat and the rest still work, but the streamer must be told.
+          if (refused.length) note = ` EventSub: ${refused.join('; ')}`
         } catch (err) {
           note = ` EventSub: ${err instanceof Error ? err.message : String(err)}`
         }
