@@ -64,6 +64,7 @@ export function createContext(): GameInstance {
   let height = 0
   let breakSecs = 8
   let finderPts = 100
+  let disableAllHints = false
   let autoHints = false
   let autoHintSecs = 45
   let maxHints = 5
@@ -82,19 +83,27 @@ export function createContext(): GameInstance {
   // The dashboard's settings, read again every frame so a change applies at once.
   const read = (settings: Record<string, number | boolean | string>) => {
     const num = (key: string, fallback: number) => (typeof settings[key] === 'number' ? (settings[key] as number) : fallback)
+    if (settings.disableAllHints === true && !disableAllHints) {
+      guesses = guesses.filter((g) => g.by !== null)
+      last = guesses.at(-1) ?? null
+      best = guesses.reduce((best, g) => Math.min(best, g.rank), Infinity)
+      lettersShown = 0
+      hintClock = 0
+    }
+    disableAllHints = settings.disableAllHints === true
     breakSecs = num('breakSeconds', 8)
     finderPts = num('finderPoints', 100)
-    autoHints = settings.autoHints === true // off unless the creator turns it on
+    autoHints = !disableAllHints && settings.autoHints === true // off unless the creator turns it on
     autoHintSecs = num('autoHintSeconds', 45)
     maxHints = num('maxHintsPerRound', 5)
     // The setting is a position (2 = the closest word, 1 being the secret); closerHint takes a rank.
     hintFloor = Math.max(1, num('hintClosest', 4) - 1)
     startHintAt = num('startHint', 30)
-    startHintOn = settings.startHintOn !== false // on unless the creator turns it off
+    startHintOn = !disableAllHints && settings.startHintOn !== false // on unless the creator turns it off
     greenRank = num('greenRank', 100)
     orangeRank = num('orangeRank', 1000)
     showBoard = settings.showLeaderboard !== false
-    starterWords = settings.starterWords === true
+    starterWords = !disableAllHints && settings.starterWords === true
     closestMult = { none: 0, low: 0.5, normal: 1, high: 2 }[String(settings.closestPoints ?? 'normal')] ?? 1
     matchWords = settings.matchEnds === 'words' ? num('matchWords', 10) : 0
   }
@@ -172,7 +181,7 @@ export function createContext(): GameInstance {
   }
 
   const hint = () => {
-    if (!data || !ranking || revealed || hintCount >= maxHints) return
+    if (disableAllHints || !data || !ranking || revealed || hintCount >= maxHints) return
     const r = closerHint(ranking, best, new Set(guesses.map((g) => data!.index.get(g.word)!)), hintFloor)
     if (r < 0) return
     place({ word: data.words[ranking.order[r]], rank: r, by: null, at: performance.now() })
@@ -190,6 +199,7 @@ export function createContext(): GameInstance {
   }
 
   return {
+    setSettings: read,
     reset(settings, w, h) {
       width = w
       height = h
@@ -219,6 +229,7 @@ export function createContext(): GameInstance {
       if (!data || !ranking || revealed) return
       if (action === 'reveal_closer') return hint()
       if (action === 'small_hint') {
+        if (disableAllHints) return
         lettersShown = Math.min(lettersShown + 1, Math.max(1, secretWord().length - 2))
         return
       }

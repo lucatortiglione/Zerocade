@@ -1284,6 +1284,7 @@ const GAME_DEFS: GameDef[] = [
       { id: 'small_hint', label: 'Piccolo aiuto', help: true },
     ],
     settings: [
+      { id: 'disableAllHints', label: 'Disabilita tutti gli aiuti', kind: 'toggle', default: false, hint: 'Blocca regali, comandi, suggerimenti automatici e iniziali e lettere rivelate. Nasconde gli aiuti già mostrati, conservando i tentativi dei giocatori.' },
       { id: 'starterWords', label: 'Parole iniziali', kind: 'toggle', default: false, hint: 'A inizio round mostra tre parole lontane, per dare alla chat un punto di partenza.' },
       { id: 'startHintOn', label: 'Suggerimento iniziale', kind: 'toggle', default: true, hint: 'Ogni round parte con una parola già sul tabellone. Spento, il tabellone parte vuoto (o con le parole iniziali).' },
       { id: 'startHint', label: 'Posizione del suggerimento iniziale', kind: 'number', min: 3, max: 1000, step: 1, default: 30, when: { id: 'startHintOn', value: true }, hint: 'La parola a questa posizione è già sul tabellone: un poco lontana dalla più vicina (la 2).' },
@@ -1944,7 +1945,7 @@ const HELP_SETTINGS: GameSetting[] = Object.values(HELP_FROM).map(({ id, label }
 // is on (a setting not saved yet counts as on, its default).
 export function triggerEnabled(game: Pick<GameDef, 'actions'> | undefined, settings: GameSettings, trigger: Trigger): boolean {
   const help = game?.actions.find((a) => a.id === trigger.action)?.help === true
-  return !help || settings[HELP_FROM[trigger.source.type].id] !== false
+  return !help || (settings.disableAllHints !== true && settings[HELP_FROM[trigger.source.type].id] !== false)
 }
 
 // The session's triggers that are in force, for the game it plays.

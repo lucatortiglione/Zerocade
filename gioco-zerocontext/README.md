@@ -1,5 +1,18 @@
 # 🎯 ZeroContext
 
+## Disabilitare tutti gli aiuti
+
+Nelle impostazioni di ZeroContext, **Disabilita tutti gli aiuti** blocca gli
+aiuti dei regali (compresa la rosa), degli altri trigger, i suggerimenti
+automatici e iniziali, le parole iniziali e le lettere del piccolo aiuto.
+Il blocco vale subito nel round in corso: gli aiuti già sul tabellone vengono
+nascosti, mentre tentativi e punti dei giocatori restano. Togliendo la spunta
+tornano a valere le impostazioni dei singoli aiuti.
+
+**Suggerimenti automatici** controlla soltanto il timer. Per fermare soltanto
+i regali si usa **Aiuti dai regali**; il blocco generale ha precedenza su tutti
+questi interruttori.
+
 C'è una parola segreta da trovare. Ogni parola che la chat scrive riceve una posizione secondo quanto il suo
 significato è vicino a quello della parola segreta: 1 è la parola segreta, 2 la più vicina, e così via. La chat si
 avvicina un tentativo dopo l'altro. «Rivela più vicino» mostra una parola più vicina di tutte quelle già trovate.

@@ -44,6 +44,25 @@ test('"Aiuti dai regali" off: a gift gives no help, the chat still guesses', () 
   )
 })
 
+test('ZeroContext master switch blocks all help triggers, including a rose, while guesses still work', () => {
+  const context = game('context')
+  assert.equal(defaultSettings(context.settings).disableAllHints, false)
+  const triggers: Trigger[] = [
+    ...context.defaultTriggers,
+    { source: { type: 'comment', match: '!aiuto' }, action: 'small_hint' },
+    { source: { type: 'like' }, action: 'reveal_closer' },
+    { source: { type: 'follow' }, action: 'small_hint' },
+    { source: { type: 'share' }, action: 'small_hint' },
+    { source: { type: 'join' }, action: 'small_hint' },
+  ]
+  const settings = { disableAllHints: true, ...Object.fromEntries(SWITCHES.map((id) => [id, true])) }
+  const active = activeTriggers({ gameId: 'context', triggers, settings })
+  assert.deepEqual(active, [context.defaultTriggers[0]])
+  assert.deepEqual(triggersFor(active, gift), [])
+  assert.deepEqual(triggersFor(active, comment).map((t) => t.action), ['guess'])
+  assert.deepEqual(activeTriggers({ gameId: 'context', triggers, settings: { disableAllHints: false } }), triggers)
+})
+
 test('each switch stops only its own kind of event', () => {
   const triggers: Trigger[] = [
     { source: { type: 'gift' }, action: 'reveal_letter' },

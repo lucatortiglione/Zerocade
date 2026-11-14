@@ -5,6 +5,8 @@ import type { GameCommand, GameSettings, LiveEvent } from '@zerocade/shared'
 
 export interface GameInstance {
   reset(settings: GameSettings, width: number, height: number): void
+  // Games that cache settings can apply changes before the next frame's queued actions.
+  setSettings?(settings: GameSettings): void
   onAction(action: string, event: LiveEvent, now: number): void
   // A command of the creator from the dashboard; a game without it ignores them.
   onCommand?(command: GameCommand): void
@@ -51,6 +53,7 @@ export class Engine {
 
   setSettings(settings: GameSettings) {
     this.settings = settings
+    this.instance?.setSettings?.(settings)
   }
 
   setPaused(paused: boolean) {
