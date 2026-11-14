@@ -5,9 +5,9 @@
 ## Ingegnerizzazione secondo DIRETTIVE.md — audit del 14 novembre 2026
 
 Audit del server (`apps/server/src`, circa 6.000 righe) con ricerca di pattern (SQL, `fetch`, timer, `catch`, `JSON.parse`,
-chiusura, crescita delle strutture). **Non coperti:** overlay, dashboard, `packages/shared`, `scripts/`, gli strumenti
-Python dei giochi e un'analisi riga per riga. Baseline: `typecheck` pulito, 41 test Node, 13 test Python del database,
-`npm audit --omit=dev` senza vulnerabilità.
+chiusura, crescita delle strutture), poi di overlay, dashboard, `scripts/` e strumenti Python dei giochi con le stesse
+ricerche. **Non coperti:** `packages/shared` e un'analisi riga per riga di tutto il codice. Baseline iniziale: `typecheck`
+pulito, 41 test Node, 13 test Python del database, `npm audit --omit=dev` senza vulnerabilità; dopo i lavori sotto: 50 test Node.
 
 **Fatto** (commit «fix(twitch): EventSub con timeout…»): `twitch-eventsub.ts` con timeout di richiesta e di benvenuto,
 controllo dello stato HTTP, segreto fuori dall'URL, sottoscrizioni rifiutate segnalate, WebSocket chiuso in caso di
@@ -23,17 +23,31 @@ errore, messaggi malformati ignorati; test in `tests/twitch-eventsub.test.ts`.
 - [ ] **P1 — EventSub dopo il benvenuto** (`twitch-eventsub.ts`): non gestisce `session_keepalive` scaduto,
   `session_reconnect` né la chiusura del socket a sessione avviata; dopo una caduta follow e raid si fermano senza
   avvisi. Serve un riavvio con attesa crescente e uno stato visibile nella dashboard.
-- [ ] **P1 — Versione di `channel.follow`:** il codice usa la versione `1`. Da verificare sulla documentazione di Twitch
-  (credo sia stata dismessa); la versione attuale chiede un token utente e il permesso di moderatore, quindi cambia il
-  modo di collegare l'account. Finché non è deciso, il rifiuto compare nella nota di stato.
+- [ ] **P0 — EventSub non può funzionare con un token d'app** (verificato sulla documentazione di Twitch il
+  14 novembre 2026): il trasporto WebSocket accetta **solo un token utente**, un token d'app fa fallire la richiesta, e
+  la versione 1 di `channel.follow` è stata rimossa (la 2 chiede lo scope `moderator:read:followers`). Il codice attuale
+  usa un token d'app e la versione 1, quindi follow e raid da Twitch non arrivano mai; dopo il fix del 14 novembre se ne
+  vede il motivo nella nota di stato. Serve un accesso dell'utente a Twitch (OAuth, per esempio il flusso a codice
+  dispositivo) con un'app registrata da Luca, la conservazione sicura del token e il suo rinnovo: **decisione di
+  prodotto, non provabile senza un account Twitch vero.** La gestione di `session_keepalive` e `session_reconnect`
+  (riga qui sopra) ha senso solo dopo.
 - [x] **P2 — Pragma del database** (fatto): aggiunto `busy_timeout = 5000`. `foreign_keys` non serve: nessuna tabella
   dichiara chiavi esterne.
 - [x] **P2 — Sessione salvata illeggibile** (fatto): `loadState` registra l'errore e copia la riga originale in
   `sessions_corrupt` prima di ripartire dai valori predefiniti; provato in `tests/shutdown.test.ts`.
-- [ ] **P2 — Versioning e CI:** tutti i `package.json` sono a `0.0.0`, non ci sono tag né pipeline; definire lo schema e
-  un controllo automatico di `typecheck`, test e `npm audit` (sezione 12).
-- [ ] **P2 — Audit del resto:** overlay e dashboard (aggiornamenti ad alta frequenza, listener e timer da chiudere),
-  `packages/shared`, `scripts/package-win.mjs` e gli strumenti Python.
+- [x] **P2 — Versioning e CI** (fatto): tutti i pacchetti sono alla `0.1.0` (SemVer, definita nel `package.json` radice)
+  e `.github/workflows/ci.yml` esegue `npm ci`, `typecheck`, test Node, test Python del database e `npm audit` su
+  Windows. **La pipeline non è mai stata eseguita su GitHub**; `npm ci --dry-run` è riuscito. Tag e rilascio restano da fare.
+- [x] **P2 — Overlay** (fatto): `content.ts` ritenta il caricamento (3 tentativi, 10 s l'uno) invece di restare vuoto
+  per sempre dopo un solo errore; il controllo di aggiornamento ogni 30 s in `main.tsx` ha un timeout.
+  Test in `tests/overlay-content.test.ts`. Timer e listener controllati: tutti puliti, tranne quelli a durata dell'app.
+- [x] **P2 — Pacchetto Windows** (fatto): `scripts/package-win.mjs` verifica lo SHA-256 di `node.exe` scaricato
+  (host non Windows x64) con `SHASUMS256.txt`; la logica è provata sulla release 26.13.1, non il ramo di download.
+- [x] **Strumenti Python dei giochi** (controllati): nessun `shell=True`, `eval`, `pickle`, richieste senza timeout né
+  `verify=False`. Le query con f-string sono negli strumenti offline di `database/` e interpolano solo nomi di tabella e
+  colonna presi dal database stesso, non input esterno.
+- [ ] **P2 — `packages/shared` e dashboard in profondità:** non letti riga per riga. Le chiamate `fetch` della dashboard
+  non hanno timeout (sono verso il server locale); aggiungerlo se emergono blocchi.
 
 Accesso rapido: [architettura](#3-architettura-funzionale-rilevata) · [rotte](#4-mappa-completa-delle-rotte-applicative-dichiarate) · [frontend](#5-frontend-sistema-visivo-e-composizione) · [roadmap](#23-roadmap-operativa-con-dipendenze) · [API](#25-appendice-a--contratti-rest-del-client) · [eventi](#26-appendice-b--protocollo-socketio-e-iframe) · [tutti i giochi e i campi](#27-appendice-c--catalogo-completo-ricevuto) · [tutti i collegamenti](#28-appendice-d--copertura-dei-collegamenti-e-delle-risorse).
 

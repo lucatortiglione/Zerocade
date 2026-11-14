@@ -753,9 +753,10 @@ Si eseguono dalla cartella radice e si riportano gli esiti reali (sezione 14):
 - `npm audit --omit=dev` per le dipendenze; con npm 12 gli script di installazione sono bloccati, e solo
   `better-sqlite3` ed `esbuild` sono consentiti in `allowScripts` del `package.json`
 
-Stato verificato il 14 novembre 2026 sul branch di lavoro (con modifiche non ancora committate): `typecheck` senza
-errori, 37 test Node superati, 13 test Python del database superati, `npm audit --omit=dev` senza vulnerabilità.
-Non c'è una pipeline automatica: i controlli sono manuali finché non ne viene aggiunta una (sezione 12).
+Stato verificato il 14 novembre 2026: `typecheck` senza errori, 50 test Node superati, 13 test Python del database
+superati, `npm audit --omit=dev` senza vulnerabilità. La pipeline `.github/workflows/ci.yml` esegue gli stessi controlli
+a ogni push su `main` e a ogni PR; al 14 novembre 2026 non era ancora stata eseguita su GitHub, quindi i controlli
+manuali restano obbligatori finché non ha un'esecuzione verde.
 
 ### Sicurezza e privacy
 
@@ -789,9 +790,10 @@ Vale la sezione 10 (note di rilascio, adeguamento, verifica, tracciabilità). Pe
 
 ### Versioning e flusso di lavoro
 
-- Oggi tutti i `package.json` sono alla versione `0.0.0` e non ci sono tag Git. Prima del primo rilascio si fissa
-  uno schema (per esempio SemVer sul `package.json` radice, con i pacchetti del workspace allineati) e un tag per
-  ogni pacchetto distribuito, come chiede la sezione 12.
+- Schema: SemVer, con la versione definita nel `package.json` radice e i pacchetti del workspace allineati
+  (`npm version <x.y.z> --workspaces --include-workspace-root --no-git-tag-version` li aggiorna insieme al lockfile).
+  Oggi è la `0.1.0`; non ci sono ancora tag Git. Ogni rilascio distribuito riceve un tag `vX.Y.Z` e una nota delle
+  modifiche, come chiede la sezione 12.
 - Ogni lavoro ha un branch e commit identificabili; se mancano prove o build la PR resta in bozza (sezione 14). Le
   modifiche non committate di un altro lavoro non si mescolano in un commit non pertinente.
 - `README.md` descrive il progetto, `TODO.md` il lavoro da fare, `ANALYSIS.md` l'analisi di Livecade da cui parte il
