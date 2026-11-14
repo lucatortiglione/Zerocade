@@ -1,5 +1,5 @@
 import { DEFAULT_WIDGETS, GAMES, defaultSettings, type GameControl, type GameSettings, type SessionState, type Trigger, type WidgetConfig } from '@zerocade/shared'
-import { loadSession, saveSession } from './db.js'
+import { loadSession, saveSession, setAsideSession } from './db.js'
 
 // Games that changed id: a session saved under the old one continues under the new one.
 const RENAMED: Record<string, string> = { 'five-letters': 'zerowordle', bivio: 'zerodubbi' }
@@ -65,8 +65,14 @@ function loadState(key: string): SessionState {
         widgets: JSON.parse(row.widgets ?? '{}') as SessionState['widgets'],
         goal: typeof row.goal === 'number' ? row.goal : DEFAULT_WIDGETS.goal,
       }
-    } catch {
-      // fall through to defaults below
+    } catch (err) {
+      // The saved row is unreadable: keep a copy (sessions_corrupt) and say so, then start from the defaults below.
+      console.error(`[sessioni] la sessione salvata di ${key} non si legge (${err instanceof Error ? err.message : err}): copia in sessions_corrupt`)
+      try {
+        setAsideSession(key, row)
+      } catch (copyErr) {
+        console.error('[sessioni] copia non riuscita', copyErr)
+      }
     }
   }
   const state = defaultState(GAMES[0].id)

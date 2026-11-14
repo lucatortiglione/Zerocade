@@ -34,6 +34,7 @@ import { BivioRooms, bivioCsv, bivioFlagsCsv, bivioStats } from './bivio.js'
 import { IncastroRooms, zerowordsCsv } from './incastro.js'
 import { QuizzlandRooms, quizzlandCsv, quizzlandStats } from './quizzland.js'
 import {
+  closeDb,
   dataDir,
   getPad,
   getRanking,
@@ -61,6 +62,7 @@ import { isWordleFile, wordleFile } from './wordle.js'
 import { chainKeys, chains } from './chains.js'
 import { nasaPhotos } from './nasa.js'
 import { publicBaseUrl, startPublicServer } from './public-server.js'
+import { createShutdown } from './shutdown.js'
 import { leaderboardCss, leaderboardHtml, leaderboardIndexHtml, leaderboardJs } from './leaderboard-page.js'
 import { PERIODS, isPeriod, leaderboardResetTimes, leaderboards, recordScore, resetLeaderboard } from './scores.js'
 import { toCsv } from './csv.js'
@@ -735,7 +737,21 @@ try {
 await ensureDomain(OVERLAY_URL)
 
 // The leaderboards for anyone who can reach this PC, on a port of their own (public-server.ts).
-await startPublicServer(roomKey)
+const publicApp = await startPublicServer(roomKey)
+
+// Ctrl+C or a kill: stop the live feeds and the servers, then fold the database log into its file.
+const shutdown = createShutdown({
+  steps: [
+    { name: 'live sources', run: () => sources.forEach((room) => room.disconnectAll()) },
+    { name: 'sockets', run: () => new Promise<void>((resolve) => void io.close(() => resolve())) },
+    { name: 'public server', run: () => publicApp?.close() },
+    { name: 'server', run: () => app.close() },
+    { name: 'database', run: closeDb },
+  ],
+  exit: (code) => process.exit(code),
+  log: (message, err) => (err ? app.log.error({ err }, message) : app.log.info(message)),
+})
+for (const signal of ['SIGINT', 'SIGTERM'] as const) process.on(signal, () => void shutdown(signal))
 
 if (dashboardDir) {
   console.log(`\nZerocade è avviato: apri ${LOCAL_URL} (chiudi questa finestra per fermarlo)\n`)

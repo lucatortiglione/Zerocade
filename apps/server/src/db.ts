@@ -29,6 +29,14 @@ mkdirSync(dataDir, { recursive: true })
 
 const db = new Database(dbPath)
 db.exec('PRAGMA journal_mode = WAL;')
+// Another process opening the file (a tool, a second copy) waits up to 5 s for the lock instead of failing at once.
+db.exec('PRAGMA busy_timeout = 5000;')
+
+/** Folds the write-ahead log into the main file and closes the database. For the shutdown only. */
+export function closeDb(): void {
+  db.pragma('wal_checkpoint(TRUNCATE)')
+  db.close()
+}
 db.exec(`
   CREATE TABLE IF NOT EXISTS sessions (
     key TEXT PRIMARY KEY,
@@ -377,6 +385,29 @@ export const saveSession = (
 ): void => {
   sessionUpsert.run(key, gameId, triggers, settings, widgets, goal)
 }
+
+// A saved session that can no longer be read is set aside here before the defaults overwrite it, so what the
+// streamer had configured can still be recovered by hand.
+db.exec(`
+  CREATE TABLE IF NOT EXISTS sessions_corrupt (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    key TEXT NOT NULL,
+    game_id TEXT NOT NULL,
+    triggers TEXT NOT NULL,
+    settings TEXT NOT NULL,
+    widgets TEXT,
+    goal INTEGER,
+    set_aside_at TEXT NOT NULL DEFAULT (datetime('now'))
+  );
+`)
+const corruptInsert = db.prepare(
+  'INSERT INTO sessions_corrupt (key, game_id, triggers, settings, widgets, goal) VALUES (?, ?, ?, ?, ?, ?)',
+)
+export const setAsideSession = (key: string, row: SessionRow): void => {
+  corruptInsert.run(key, row.game_id, row.triggers, row.settings, row.widgets ?? null, row.goal ?? null)
+}
+export const asideSessions = (key: string): SessionRow[] =>
+  db.prepare('SELECT game_id, triggers, settings, widgets, goal FROM sessions_corrupt WHERE key = ? ORDER BY id').all(key) as SessionRow[]
 
 // --- Gifters ---
 

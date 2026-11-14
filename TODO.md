@@ -23,10 +23,10 @@ errore, messaggi malformati ignorati; test in `tests/twitch-eventsub.test.ts`.
 - [ ] **P1 — Versione di `channel.follow`:** il codice usa la versione `1`. Da verificare sulla documentazione di Twitch
   (credo sia stata dismessa); la versione attuale chiede un token utente e il permesso di moderatore, quindi cambia il
   modo di collegare l'account. Finché non è deciso, il rifiuto compare nella nota di stato.
-- [ ] **P2 — Pragma del database** (`db.ts`): c'è `journal_mode = WAL` ma non `foreign_keys` né `busy_timeout`.
-  Valutare l'effetto sulle tabelle con riferimenti prima di attivarli (sezione 8), con una prova su un database copiato.
-- [ ] **P2 — Sessione salvata illeggibile** (`sessions.ts`, `loadState`): un JSON rovinato riporta la sessione ai valori
-  predefiniti senza dirlo. Registrare l'errore e conservare la riga originale prima di sovrascriverla.
+- [x] **P2 — Pragma del database** (fatto): aggiunto `busy_timeout = 5000`. `foreign_keys` non serve: nessuna tabella
+  dichiara chiavi esterne.
+- [x] **P2 — Sessione salvata illeggibile** (fatto): `loadState` registra l'errore e copia la riga originale in
+  `sessions_corrupt` prima di ripartire dai valori predefiniti; provato in `tests/shutdown.test.ts`.
 - [ ] **P2 — Versioning e CI:** tutti i `package.json` sono a `0.0.0`, non ci sono tag né pipeline; definire lo schema e
   un controllo automatico di `typecheck`, test e `npm audit` (sezione 12).
 - [ ] **P2 — Audit del resto:** overlay e dashboard (aggiornamenti ad alta frequenza, listener e timer da chiudere),
