@@ -10,20 +10,31 @@ const emit = () => {
   for (const l of listeners) l()
 }
 
-export async function loadContent(): Promise<void> {
+// The server may still be starting when the overlay opens: a failed request is tried again a few times, each one
+// cut off after a while, before the games start with no content.
+const ATTEMPTS = 3
+const ATTEMPT_TIMEOUT_MS = 10_000
+
+async function fetchContent(retryDelayMs: number): Promise<Record<string, unknown[]>> {
+  for (let attempt = 1; ; attempt++) {
+    try {
+      const res = await fetch('/api/content', { signal: AbortSignal.timeout(ATTEMPT_TIMEOUT_MS) })
+      if (res.ok) return ((await res.json()) as Record<string, unknown[]> | null) ?? {}
+    } catch {
+      // network error or timeout: counted as a failed attempt
+    }
+    if (attempt >= ATTEMPTS) return {}
+    await new Promise((resolve) => setTimeout(resolve, retryDelayMs * attempt))
+  }
+}
+
+export async function loadContent(retryDelayMs = 1000): Promise<void> {
   if (loading) return loading
-  loading = fetch('/api/content')
-    .then((res) => (res.ok ? res.json() : {}))
-    .then((json: Record<string, unknown[]>) => {
-      store = json ?? {}
-    })
-    .catch(() => {
-      store = {}
-    })
-    .finally(() => {
-      ready = true
-      emit()
-    })
+  loading = fetchContent(retryDelayMs).then((json) => {
+    store = json
+    ready = true
+    emit()
+  })
   return loading
 }
 

@@ -15,7 +15,10 @@ if (url.searchParams.has('scene')) {
   if (loaded) {
     setInterval(async () => {
       try {
-        const page = await (await fetch(window.location.pathname, { cache: 'no-store' })).text()
+        // Cut off like the rest: a request left hanging every 30 s would pile up while the server is stuck.
+        const page = await (
+          await fetch(window.location.pathname, { cache: 'no-store', signal: AbortSignal.timeout(10_000) })
+        ).text()
         const latest = /assets\/index-[\w-]+\.js/.exec(page)?.[0]
         if (latest && !loaded.endsWith(latest)) window.location.reload()
       } catch {
