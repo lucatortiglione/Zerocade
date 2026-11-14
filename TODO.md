@@ -15,8 +15,11 @@ errore, messaggi malformati ignorati; test in `tests/twitch-eventsub.test.ts`.
 
 **Da fare** (in ordine di priorità; i file indicati avevano modifiche non committate al momento dell'audit):
 
-- [ ] **P1 — Spegnimento ordinato** (`index.ts`, sezione 5): non c'è nessun gestore di `SIGINT`/`SIGTERM`. Alla chiusura
-  non si fermano Fastify, Socket.IO, i collegamenti TikTok/Twitch (`sources.ts`) né si chiude `better-sqlite3`. Serve una funzione unica che chiude nell'ordine inverso all'avvio, con tempo massimo.
+- [x] **P1 — Spegnimento ordinato** (fatto il 14 novembre 2026): `shutdown.ts` esegue in ordine fonti dal vivo, Socket.IO,
+  server pubblico, server e database (checkpoint del WAL), con tempo massimo di 5 s e codice d'uscita 1 se un passo
+  fallisce. Collegato a `SIGINT` e `SIGTERM` in `index.ts`; provato con passi finti, con Fastify e Socket.IO veri e con
+  la chiusura del database (`tests/shutdown.test.ts`). **Non provato** con un segnale reale sul processo del server:
+  su Windows `SIGINT` verso un processo figlio lo termina senza eseguire il gestore, serve Ctrl+C in un terminale.
 - [ ] **P1 — EventSub dopo il benvenuto** (`twitch-eventsub.ts`): non gestisce `session_keepalive` scaduto,
   `session_reconnect` né la chiusura del socket a sessione avviata; dopo una caduta follow e raid si fermano senza
   avvisi. Serve un riavvio con attesa crescente e uno stato visibile nella dashboard.
