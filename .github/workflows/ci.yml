@@ -1,0 +1,26 @@
+name: Controlli
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+# Stessi controlli di DIRETTIVE.md, sezione 16: typecheck, test Node, test Python del database, npm audit.
+jobs:
+  controlli:
+    runs-on: windows-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 26
+          cache: npm
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+      - run: npm ci
+      - run: npm run typecheck
+      - run: node --import tsx --test tests/*.test.ts
+      - run: python -I -m unittest discover -s database
+      - run: npm audit --omit=dev

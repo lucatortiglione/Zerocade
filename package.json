@@ -32,5 +32,6 @@
   "allowScripts": {
     "better-sqlite3@13.0.3": true,
     "esbuild@0.28.2": true
-  }
+  },
+  "version": "0.1.0"
 }
