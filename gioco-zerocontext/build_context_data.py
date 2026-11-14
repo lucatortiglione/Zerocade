@@ -51,18 +51,8 @@ def load_vectors() -> dict[str, np.ndarray]:
     return out, mat
 
 
-def main() -> None:
-    ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    ap.add_argument("--vocab", type=int, default=60_000, help="parole giocabili più frequenti (più la banca)")
-    ap.add_argument("--probe", nargs="*", default=["spiaggia", "pizza", "ospedale"])
-    args = ap.parse_args()
-
-    index, mat = load_vectors()
-    with BANK.open(encoding="utf-8-sig", newline="") as fh:
-        bank = [r["word"] for r in csv.DictReader(fh)]
-    with META.open(encoding="utf-8-sig", newline="") as fh:
-        tier = {r["word"]: r["tier"] for r in csv.DictReader(fh)}
-
+def build_vocab(index: dict[str, int], bank: list[str], size: int) -> list[str]:
+    """Le parole giocabili: le più frequenti che hanno un vettore fastText, più la banca delle segrete."""
     vocab: list[str] = []
     seen: set[str] = set()
 
@@ -75,13 +65,29 @@ def main() -> None:
         rows = csv.reader(fh)
         next(rows)
         for lemma, rank in rows:
-            if int(rank) > args.vocab * 2:
+            if int(rank) > size * 2:
                 break
-            if WORD.match(lemma) and len(vocab) < args.vocab:
+            if WORD.match(lemma) and len(vocab) < size:
                 add(lemma)
     for w in bank:  # ogni parola segreta deve essere anche giocabile
         add(w)
-    vocab.sort()
+    return sorted(vocab)
+
+
+def main() -> None:
+    ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
+    ap.add_argument("--vocab", type=int, default=60_000, help="parole giocabili più frequenti (più la banca)")
+    ap.add_argument("--probe", nargs="*", default=["spiaggia", "pizza", "ospedale"])
+    args = ap.parse_args()
+
+    index, mat = load_vectors()
+    with BANK.open(encoding="utf-8-sig", newline="") as fh:
+        bank = [r["word"] for r in csv.DictReader(fh)]
+    with META.open(encoding="utf-8-sig", newline="") as fh:
+        tier = {r["word"]: r["tier"] for r in csv.DictReader(fh)}
+
+    vocab = build_vocab(index, bank, args.vocab)
+    seen = set(vocab)
 
     vecs = mat[[index[w] for w in vocab]].astype(np.float32)
     vecs -= vecs.mean(axis=0)

@@ -39,6 +39,39 @@ Dalla cartella `gioco-zerocontext`, in quest'ordine:
 `build_context_data.py --probe spiaggia pizza` stampa le parole più vicine a quelle indicate, per controllare il
 risultato.
 
+## Valutare l'intero inventario
+
+`python evaluate_context_inventory.py` valuta tutti i termini di `raw.inventory_terms`,
+le banche esistenti e le ulteriori parole nelle frequenze e nelle cache dei vettori.
+Usa soltanto gli snapshot attivi delle fonti. Riconosce anche UniMorph, GLAFF-IT e
+Flex_it; GLAFF-IT e Wikizionario italiano contano come una famiglia, Flex_it e
+Morph-it! come un'altra. Hunspell fornisce una prova ortografica, non una categoria
+grammaticale. Non si usano predizioni NLP su parole isolate per approvarle.
+
+Per le segrete applica `decide` e le esclusioni editoriali: le fasce `base` e
+`comune` richiedono anche il vettore fastText disponibile; `esteso` rimane una
+riserva. Verifica anche le parole Livecade e segnala gli eventuali problemi,
+conservando separatamente la provenienza storica. Per i tentativi riproduce
+esattamente la selezione di `build_vocab`, compreso il limite numerico, e aggiunge
+la banca. Le esclusioni delle segrete non diventano automaticamente divieti per
+i tentativi: è il comportamento del generatore attuale.
+
+Gli esiti sono nel DB di lavoro `database/parole_ita_raw.sqlite3`, tabelle
+`raw__context_evaluation_runs`, `raw__context_evaluation_terms` e
+`raw__context_evaluation_codes`. La vista `raw__context_evaluation_results` espone
+parola, esiti, motivi, appartenenza alle banche attuali e copertura dei vettori.
+La chiave `(run, prompt)` impedisce duplicati. Ogni esecuzione conserva gli hash
+degli input e un riepilogo; lo stesso input identifica la stessa esecuzione.
+
+La cartella `reports/` contiene il riepilogo JSON e i CSV delle segrete candidate,
+dei tentativi nuovi, della riserva estesa, delle parole senza vettore e delle
+segrete attuali da rivedere. Si tratta di una valutazione automatica dei requisiti
+documentati: non sostituisce una verifica umana del significato e della qualità
+delle vicinanze. Il comando salva soltanto la valutazione: vocabolario, segrete e
+vettori del gioco restano allineati e non vengono riscritti.
+
+Test: `python -m unittest discover -s . -p test_evaluate_context_inventory.py`.
+
 ## Nel codice
 
 - Server: `apps/server/src/context.ts` serve parole e vettori. `ZEROCADE_CONTEXT_DATA` può indicare un'altra

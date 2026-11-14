@@ -147,9 +147,12 @@ def noun_dominant(f: dict, nouns: set[str], adjs: set[str]) -> bool:
     return len(adjs) * 2 <= len(nouns)
 
 
-def decide(word: str, f: dict) -> str:
+def decide(word: str, f: dict, *, dictionary_sources: set[str] | None = None,
+           morphology_sources: set[str] | None = None) -> str:
     """Restituisce la fascia ('base', 'comune', 'esteso') o '-motivo'."""
-    nouns, adjs = f["N"] & DICT, f["A"] & DICT
+    dictionaries = DICT if dictionary_sources is None else dictionary_sources
+    morphology = {MORPHIT} if morphology_sources is None else morphology_sources
+    nouns, adjs = f["N"] & dictionaries, f["A"] & dictionaries
     if not nouns:
         return "-non_sostantivo"
     if tagged(f, OFFENSIVE):
@@ -170,13 +173,13 @@ def decide(word: str, f: dict) -> str:
         return "-nome_proprio"
     if adjs and not noun_dominant(f, nouns, adjs):
         return "-uso_non_nominale"
-    if f["V"] & DICT and word.endswith(("are", "ere", "ire", "rre", "rsi")):
+    if f["V"] & dictionaries and word.endswith(("are", "ere", "ire", "rre", "rsi")):
         return "-uso_non_nominale"
     if "aoa" in f:
         return "base"
     # Omografi di forme verbali o lemmi marginali: serve il riscontro di
     # Morph-it!, oppure tre dizionari concordi senza omografia verbale.
-    if MORPHIT not in nouns and (f["inflO"] or len(nouns) < 3):
+    if not (morphology & nouns) and (f["inflO"] or len(nouns) < 3):
         return "-sostantivo_debole"
     wf, os_ = f.get("wf", 10**9), f.get("os", 0)
     if wf <= COMMON_WF_RANK and os_ >= COMMON_OS_FREQ:
