@@ -612,6 +612,11 @@ input[type='number']:focus { border-color: var(--accent); outline: none; }
 .side-message input { flex: 1; }
 .side-controls { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
 .side-flag { display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: 13px; }
+/* One row per leaderboard (Sessione … All Time): its name, the first and when it was reset, the reset button. */
+.leaderboard-resets { display: grid; gap: 6px; margin-top: 6px; }
+.leaderboard-reset { display: grid; grid-template-columns: 72px minmax(0, 1fr) auto; align-items: center; gap: 8px; font-size: 13px; }
+.leaderboard-reset__period { font-weight: 600; }
+.leaderboard-reset__info { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12px; }
 
 .switch-row { display: flex; align-items: center; gap: 10px; font-size: 14px; cursor: pointer; }
 .switch-row input[type='checkbox'] { margin-left: auto; }

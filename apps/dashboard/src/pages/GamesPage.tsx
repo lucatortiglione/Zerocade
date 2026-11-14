@@ -1,6 +1,7 @@
 import { GAMES, chainModeLabel, parseChainSecret, type SessionState } from '@zerocade/shared'
 import { BivioSidebar } from '../components/BivioSidebar'
 import { IncastroSidebar } from '../components/IncastroSidebar'
+import { LeaderboardPanel } from '../components/LeaderboardPanel'
 import { LiveColumn } from '../components/LiveColumn'
 import { GameControls } from '../components/GameControls'
 import { BridgeControl } from '../components/Regia'
@@ -10,7 +11,7 @@ import { Simulator } from '../components/Simulator'
 import { TopGifters } from '../components/TopGifters'
 import { TriggerEditor } from '../components/TriggerEditor'
 import { WidgetsPanel } from '../components/WidgetsPanel'
-import { overlayUrl, previewUrl, publicLeaderboardUrl } from '../overlayKey'
+import { overlayUrl, previewUrl } from '../overlayKey'
 import { socket } from '../socket'
 import { useDashboard } from '../store'
 
@@ -60,7 +61,12 @@ export function GamesPage() {
           </p>
           <BridgeControl label="Collegati a ZeroFollowerBot (Twitch e TikTok)" />
         </section>
-        {session && <LeaderboardLinks gameId={session.gameId} />}
+        {session && (
+          <section>
+            <h2 className="section-label">Classifica</h2>
+            <LeaderboardPanel gameId={session.gameId} />
+          </section>
+        )}
         <Simulator />
         {session && <TriggerEditor session={session} />}
         {session && <SettingsPanel session={session} />}
@@ -88,41 +94,6 @@ function describeSecret(gameId: string, secret: string): string {
 
 const BRAIN_CATEGORIES = new Set(['Quiz', 'Parole'])
 const BRAIN_GAMES = new Set(['memory-maestro', 'zerodubbi'])
-
-// The leaderboard page the server publishes for the game: Sessione, Giorno, Settimana, Mese and All Time. Open it,
-// or use the link as a browser source (add ?sfondo=trasparente) in the stream.
-function LeaderboardLinks({ gameId }: { gameId: string }) {
-  const base = new URL(`/classifica/${gameId}`, overlayUrl).href
-  return (
-    <section>
-      <h2 className="section-label">Classifica</h2>
-      <p className="text-muted small">
-        Sessione, Giorno, Settimana, Mese e All Time di questo gioco, in una pagina web del server: aprila o usala come sorgente browser
-        (aggiungi <code>?sfondo=trasparente</code>).
-      </p>
-      <a className="btn btn--small" href={base} target="_blank" rel="noreferrer">
-        Apri classifica ↗
-      </a>{' '}
-      <button type="button" className="btn btn--small" onClick={() => void navigator.clipboard?.writeText(`${base}?sfondo=trasparente`)}>
-        Copia link per OBS
-      </button>
-      {publicLeaderboardUrl && (
-        <>
-          <p className="text-muted small">
-            Link per gli spettatori (porta propria, sola lettura): raggiungibile da chi è in rete con questo PC; da internet serve
-            aprire la porta sul router o un tunnel.
-          </p>
-          <button type="button" className="btn btn--small" onClick={() => void navigator.clipboard?.writeText(`${publicLeaderboardUrl}${gameId}`)}>
-            Copia link pubblico
-          </button>{' '}
-          <a className="btn btn--small" href={`${publicLeaderboardUrl}${gameId}`} target="_blank" rel="noreferrer">
-            Apri ↗
-          </a>
-        </>
-      )}
-    </section>
-  )
-}
 
 // The games in a drop-down, in alphabetical order; the chosen game's description sits below it.
 function GamePicker({ session }: { session: SessionState | null }) {

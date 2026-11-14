@@ -6,7 +6,9 @@ import { test } from 'node:test'
 
 // The server's database, apart from the real one.
 process.env.ZEROCADE_DB = join(mkdtempSync(join(tmpdir(), 'zerocade-lb-')), 'test.db')
-const { PERIODS, leaderboards, periodStart, recordScore } = await import('../apps/server/src/scores.ts')
+const { PERIODS, isPeriod, leaderboardResetTimes, leaderboards, periodStart, recordScore, resetLeaderboard } = await import(
+  '../apps/server/src/scores.ts'
+)
 
 const at = (y: number, m: number, d: number, h = 12) => new Date(y, m - 1, d, h).getTime()
 // Thursday 12 November 2026, noon.
@@ -58,4 +60,37 @@ test('a viewer shows with the latest name and picture, and a tie goes to who sco
     [1, 'nuovo', 20, 'https://x/b.png'], // 'a' got to 20 on the 3rd, but started on the 1st: ahead on a tie, by its latest name
     [2, 'beta', 20, null],
   ])
+})
+
+test('one leaderboard is reset on its own: that period counts only the points after it, the others stay', () => {
+  const key = 'room3'
+  const luna = { id: 'l', nickname: 'luna' }
+  const marco = { id: 'm', nickname: 'marco' }
+  recordScore(key, 'context', luna, 40, at(2026, 11, 12, 9)) // today, before the reset
+  recordScore(key, 'context', marco, 25, at(2026, 11, 10, 9)) // this week
+  recordScore(key, 'zerowordle', luna, 99, at(2026, 11, 12, 9)) // another game
+  assert.equal(resetLeaderboard(key, 'context', 'settimana', at(2026, 11, 12, 10)), at(2026, 11, 12, 10))
+  recordScore(key, 'context', marco, 5, at(2026, 11, 12, 11)) // after the reset
+
+  const line = (rows: { rank: number; name: string; points: number }[]) => rows.map((r) => `${r.rank}.${r.name}:${r.points}`).join(' ')
+  let b = leaderboards(key, 'context', 10, now)
+  assert.equal(line(b.settimana), '1.marco:5') // only what came after the reset
+  assert.equal(line(b.giorno), '1.luna:40 2.marco:5') // the other periods as they were
+  assert.equal(line(b.mese), '1.luna:40 2.marco:30')
+  assert.equal(line(b.sempre), '1.luna:40 2.marco:30')
+  assert.equal(line(leaderboards(key, 'zerowordle', 10, now).settimana), '1.luna:99') // another game, untouched
+  assert.deepEqual(leaderboardResetTimes(key, 'context'), { settimana: at(2026, 11, 12, 10) })
+
+  // All Time on its own, at noon: empty, while the week keeps its new points; a later reset moves it on.
+  resetLeaderboard(key, 'context', 'sempre', at(2026, 11, 12, 12))
+  b = leaderboards(key, 'context', 10, now)
+  assert.equal(line(b.sempre), '')
+  assert.equal(line(b.settimana), '1.marco:5')
+  resetLeaderboard(key, 'context', 'settimana', at(2026, 11, 12, 12))
+  assert.equal(line(leaderboards(key, 'context', 10, now).settimana), '')
+  assert.deepEqual(leaderboardResetTimes(key, 'context'), { settimana: at(2026, 11, 12, 12), sempre: at(2026, 11, 12, 12) })
+  // nothing was deleted: the day still has every point
+  assert.equal(line(leaderboards(key, 'context', 10, now).giorno), '1.luna:40 2.marco:5')
+  assert.equal(isPeriod('mese'), true)
+  assert.equal(isPeriod('anno'), false)
 })

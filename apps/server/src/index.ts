@@ -62,7 +62,7 @@ import { chainKeys, chains } from './chains.js'
 import { nasaPhotos } from './nasa.js'
 import { publicBaseUrl, startPublicServer } from './public-server.js'
 import { leaderboardCss, leaderboardHtml, leaderboardIndexHtml, leaderboardJs } from './leaderboard-page.js'
-import { PERIODS, leaderboards, recordScore } from './scores.js'
+import { PERIODS, isPeriod, leaderboardResetTimes, leaderboards, recordScore, resetLeaderboard } from './scores.js'
 import { toCsv } from './csv.js'
 import { sanitizeRoundReport } from './word-association.js'
 import { HOSTS_LINE, LOCAL_DOMAIN, domainRegistered, ensureDomain } from './hosts.js'
@@ -146,9 +146,13 @@ app.get('/api/leaderboard/:game', async (req, reply) => {
   const game = GAMES.find((g) => g.id === (req.params as { game: string }).game)
   if (!game) return reply.code(404).send({ error: 'not found' })
   const limit = Math.min(50, Math.max(1, Math.floor(Number((req.query as { limit?: string }).limit)) || 10))
-  return reply
-    .header('cache-control', 'no-store')
-    .send({ game: { id: game.id, name: game.name, emoji: game.emoji }, periods: PERIODS, boards: leaderboards(roomKey, game.id, limit) })
+  return reply.header('cache-control', 'no-store').send({
+    game: { id: game.id, name: game.name, emoji: game.emoji },
+    periods: PERIODS,
+    boards: leaderboards(roomKey, game.id, limit),
+    // When each period was last reset from the dashboard (period -> time).
+    resets: leaderboardResetTimes(roomKey, game.id),
+  })
 })
 app.get('/classifica', async (_req, reply) => reply.type('text/html; charset=utf-8').send(leaderboardIndexHtml()))
 app.get('/classifica/classifica.css', async (_req, reply) => reply.type('text/css; charset=utf-8').send(leaderboardCss))
@@ -525,6 +529,17 @@ io.on('connection', (socket) => {
     if (typeof u.id !== 'string' || typeof u.nickname !== 'string' || typeof r.points !== 'number') return
     const avatar = typeof u.avatar === 'string' && /^https?:\/\//.test(u.avatar) ? u.avatar.slice(0, 512) : undefined
     recordScore(key, session.gameId, { id: u.id, nickname: u.nickname, avatar }, r.points)
+  })
+
+  // Reset one leaderboard (a game and a period) from the dashboard: from now on that period counts only the new
+  // points, the other periods stay as they were. The reply carries the moment of the reset.
+  socket.on('leaderboard:reset', (raw: unknown, ack?: unknown) => {
+    const r = raw && typeof raw === 'object' ? (raw as Record<string, unknown>) : null
+    if (clientType !== 'dashboard' || !r || !isPeriod(r.period)) return
+    const game = GAMES.find((g) => g.id === r.game)
+    if (!game) return
+    const at = resetLeaderboard(key, game.id, r.period)
+    if (typeof ack === 'function') ack({ at })
   })
 
   socket.on('secret:round', (raw: unknown) => {

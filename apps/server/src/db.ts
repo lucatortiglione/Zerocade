@@ -275,6 +275,30 @@ export interface BoardRow {
 export const gameBoard = (key: string, gameId: string, since: number, limit: number): BoardRow[] =>
   boardSelect.all({ key, game: gameId, since, limit }) as BoardRow[]
 
+// When each leaderboard of a game (one period: sessione, giorno, …) was last reset from the dashboard: from then on
+// that period counts only the points after it (scores.ts). The points stay in game_scores, so resetting one
+// period leaves the others as they were.
+db.exec(`
+  CREATE TABLE IF NOT EXISTS leaderboard_resets (
+    key TEXT NOT NULL,
+    game_id TEXT NOT NULL,
+    period TEXT NOT NULL,
+    at INTEGER NOT NULL,
+    PRIMARY KEY (key, game_id, period)
+  ) WITHOUT ROWID;
+`)
+const resetUpsert = db.prepare(
+  `INSERT INTO leaderboard_resets (key, game_id, period, at) VALUES (?, ?, ?, ?)
+   ON CONFLICT (key, game_id, period) DO UPDATE SET at = excluded.at`,
+)
+const resetSelect = db.prepare('SELECT period, at FROM leaderboard_resets WHERE key = ? AND game_id = ?')
+export const setLeaderboardReset = (key: string, gameId: string, period: string, at: number): void => {
+  resetUpsert.run(key, gameId, period, at)
+}
+// Period -> when it was last reset, for one game.
+export const leaderboardResets = (key: string, gameId: string): Record<string, number> =>
+  Object.fromEntries((resetSelect.all(key, gameId) as { period: string; at: number }[]).map((r) => [r.period, r.at]))
+
 // --- Room ---
 // This Zerocade's one room: the dashboard, the overlay link and every game use its key,
 // whatever browser opens them. A database from before keys were kept here carries on with

@@ -2178,6 +2178,9 @@ export interface ClientToServerEvents {
   'game:control': (command: GameControl) => void
   // An overlay: points a viewer has just earned in the game in play, for the leaderboards.
   'score:add': (score: { game: string; user: Viewer; points: number }) => void
+  // The dashboard: reset one leaderboard (a game and a period: sessione, giorno, settimana, mese, sempre). The reply
+  // carries the moment of the reset.
+  'leaderboard:reset': (reset: { game: string; period: string }, ack: (result: { at: number }) => void) => void
   'message:send': (text: string) => void
   'pad:play': (id: string) => void
   'pad:stop': () => void

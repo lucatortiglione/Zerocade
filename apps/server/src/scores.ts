@@ -1,4 +1,4 @@
-import { gameBoard, insertGameScore } from './db.js'
+import { gameBoard, insertGameScore, leaderboardResets, setLeaderboardReset } from './db.js'
 import { sessionSince } from './sessions.js'
 
 // The leaderboards of every game: session, day, week, month and all time. The points come from the overlays (a
@@ -56,11 +56,26 @@ export function recordScore(
   return true
 }
 
+export const isPeriod = (id: unknown): id is PeriodId => PERIODS.some((p) => p.id === id)
+
+// Resets one leaderboard of a game (one period) from `at`: that period counts only the points after it, the other
+// periods stay as they were. Nothing is deleted. Returns the moment of the reset.
+export function resetLeaderboard(key: string, gameId: string, period: PeriodId, at = Date.now()): number {
+  setLeaderboardReset(key, gameId, period, at)
+  return at
+}
+
+// When each period of a game was last reset (period -> time), for the dashboard.
+export const leaderboardResetTimes = (key: string, gameId: string): Partial<Record<PeriodId, number>> => leaderboardResets(key, gameId)
+
 export function leaderboards(key: string, gameId: string, limit = 10, now = new Date()): Boards {
   const start = sessionSince(key, gameId)
+  const resets = leaderboardResets(key, gameId)
   const out = {} as Boards
   for (const { id } of PERIODS) {
-    out[id] = gameBoard(key, gameId, periodStart(id, now, start), limit).map((row, i) => ({
+    // A period begins at its natural start, or later if it was reset since.
+    const since = Math.max(periodStart(id, now, start), resets[id] ?? 0)
+    out[id] = gameBoard(key, gameId, since, limit).map((row, i) => ({
       rank: i + 1,
       name: row.nickname,
       avatar: row.avatar,

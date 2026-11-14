@@ -26,6 +26,7 @@ import {
   simViewer,
 } from './Regia'
 import { EndSession } from './GameControls'
+import { LeaderboardPanel } from './LeaderboardPanel'
 import { Section } from './Section'
 import { SettingField, SettingsForm } from './SettingsForm'
 import { TriggerEditor } from './TriggerEditor'
@@ -76,6 +77,10 @@ export function IncastroSidebar({ session }: { session: SessionState }) {
 
       <Section title="Classifica della live">
         <Scores />
+      </Section>
+
+      <Section title="Classifiche" open={false}>
+        <LeaderboardPanel gameId={session.gameId} />
       </Section>
 
       <Section title="Trigger">
