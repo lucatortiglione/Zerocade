@@ -1,0 +1,4 @@
+# Opzionali: confronto NLP, non necessari al server o al lookup nel DB.
+# Installare nell'ambiente Python 3.13 già usato dalla generazione.
+stanza==1.15.1
+simplemma==2.0.0

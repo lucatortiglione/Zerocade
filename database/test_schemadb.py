@@ -179,6 +179,19 @@ class SchemaDbTest(unittest.TestCase):
         finally:
             del os.environ['TEST_SCHEMADB']
 
+    def test_a_folder_name_with_an_apostrophe_does_not_break_the_copy(self):
+        # Before, the path went into the SQL between apostrophes: "Documenti dell'utente" ended the string early.
+        d = Path(self.tmp.name) / "Documenti dell'utente"
+        d.mkdir()
+        src = d / 'domande.db'
+        make(src, [("INSERT INTO domande VALUES('q9','Monte?',1)", ())])
+        db = SchemaDb(d / 'giochi.sqlite3', {src: 'uno'}, 'TEST_SCHEMADB')
+        db.build({'uno': src})
+        self.assertEqual(db.verify({'uno': src}), [])
+        con = sqlite3.connect(db.file)
+        self.assertEqual(con.execute('SELECT testo FROM uno__domande').fetchall(), [('Monte?',)])
+        con.close()
+
     def test_rewrite_keeps_aliases_text_and_columns(self):
         names = {'domande', 'opzioni'}
         sql = "SELECT d.testo AS domande FROM domande d JOIN opzioni o ON o.domanda = d.id WHERE d.testo = 'domande'"

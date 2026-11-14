@@ -30,7 +30,9 @@ export function openSchema(file: string, schema: string): Database.Database {
     // Views too: a schema can keep a table's old name as a view over smaller tables (associazioni.associations).
     const tables = db.prepare("SELECT name FROM zerodb_objects WHERE schema = ? AND type IN ('table', 'view')").pluck().all(schema) as string[]
     if (!tables.length) throw new Error(`${file} has no schema ${schema}`)
-    for (const t of tables) db.exec(`CREATE TEMP VIEW "${t}" AS SELECT * FROM "${schema}__${t}"`)
+    // Names in double quotes, a quote inside doubled: they come from the file, not from the code.
+    const quoted = (name: string) => `"${name.replaceAll('"', '""')}"`
+    for (const t of tables) db.exec(`CREATE TEMP VIEW ${quoted(t)} AS SELECT * FROM ${quoted(`${schema}__${t}`)}`)
     return db
   } catch (err) {
     db.close()

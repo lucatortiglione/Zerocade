@@ -1,9 +1,13 @@
+import { EventEmitter } from 'node:events'
 import { gameBoard, insertGameScore, leaderboardResets, setLeaderboardReset } from './db.js'
 import { sessionSince } from './sessions.js'
 
 // The leaderboards of every game: session, day, week, month and all time. The points come from the overlays (a
 // canvas game reports each one it awards) and from the games the server runs (ZeroWords, ZeroQuizz); they are
 // stored one row each and summed per viewer for each period. The dates are the server's local time.
+
+// Emits the game's id whenever its leaderboards change (a score or a reset), for the live copy on nginx.
+export const scoreEvents = new EventEmitter<{ change: [gameId: string] }>()
 
 export const PERIODS = [
   { id: 'sessione', label: 'Sessione' },
@@ -53,6 +57,7 @@ export function recordScore(
   if (!Number.isInteger(points) || points <= 0 || points > MAX_POINTS) return false
   if (!user.id || !user.nickname || user.id.length > 64 || user.nickname.length > 32) return false
   insertGameScore(key, gameId, { id: user.id, nickname: user.nickname, avatar: user.avatar }, points, at)
+  scoreEvents.emit('change', gameId)
   return true
 }
 
@@ -62,6 +67,7 @@ export const isPeriod = (id: unknown): id is PeriodId => PERIODS.some((p) => p.i
 // periods stay as they were. Nothing is deleted. Returns the moment of the reset.
 export function resetLeaderboard(key: string, gameId: string, period: PeriodId, at = Date.now()): number {
   setLeaderboardReset(key, gameId, period, at)
+  scoreEvents.emit('change', gameId)
   return at
 }
 

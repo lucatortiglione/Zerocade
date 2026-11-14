@@ -50,6 +50,18 @@ export function GamesPage() {
             <p className="text-muted small">
               {session.gameId === 'zeroreazioniacatena' ? 'Le parole del round in corso: la chat non le vede.' : 'La parola segreta del round in corso: la chat non la vede.'}
             </p>
+            {/* ZeroContext has no time limit: a round ends when the chat finds the word, or from here. */}
+            {session.gameId === 'context' && (
+              <button
+                type="button"
+                className="btn btn--small"
+                title="Mostra la parola a tutti e, dopo la pausa, passa alla prossima"
+                disabled={session.paused || session.ended}
+                onClick={() => socket.emit('game:command', 'next-round')}
+              >
+                ⏭ Termina round
+              </button>
+            )}
           </section>
         )}
         {session && <GameControls session={session} />}

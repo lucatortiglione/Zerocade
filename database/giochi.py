@@ -2,8 +2,9 @@
 
   dubbi   ZeroDubbi: i dilemmi (era gioco-dilemmi/data/domande.db)
   wordle  ZeroWordle: soluzioni e parole ammesse, da 5 a 8 lettere (gioco-zerowordle/build_wordle_bank.py)
-  context ZeroContext: parole giocabili e parole segrete (gioco-zerocontext/build_context_data.py); i vettori,
-          18 MB, restano nel file gioco-zerocontext/data/vectors.bin, nello stesso ordine delle parole
+  context ZeroContext: parole giocabili, parole segrete e i loro collegamenti con ZeroAssociazioni
+          (gioco-zerocontext/build_context_data.py); i vettori, 36 MB, restano nel file
+          gioco-zerocontext/data/vectors.bin, nello stesso ordine delle parole
   associazioni  ZeroAssociazioni e ZeroReazioniACatena: prompt, parole uniche e collegamenti dei bacini verificati, dal DB di lavoro
           database/parole_ita_raw.sqlite3 (gioco-zeroassociations/unified_db.py: pesa gigabyte, fuori da Git)
   parole  ZeroWords: lessico, lista di esclusione, capitoli e curva di difficoltà (dai file di gioco-parole)
@@ -82,6 +83,8 @@ CREATE TABLE meta(name TEXT PRIMARY KEY, value TEXT NOT NULL) STRICT;
 CONTEXT_SCHEMA = '''
 CREATE TABLE vocab(idx INTEGER PRIMARY KEY, word TEXT NOT NULL UNIQUE) STRICT;
 CREATE TABLE secrets(word TEXT PRIMARY KEY REFERENCES vocab(word)) STRICT, WITHOUT ROWID;
+CREATE TABLE links(secret_idx INTEGER NOT NULL REFERENCES vocab(idx), word_idx INTEGER NOT NULL REFERENCES vocab(idx),
+  PRIMARY KEY(secret_idx, word_idx), CHECK(secret_idx <> word_idx)) STRICT, WITHOUT ROWID;
 CREATE TABLE meta(name TEXT PRIMARY KEY, value TEXT NOT NULL) STRICT;
 '''
 # Quello che ZeroAssociazioni e ZeroReazioniACatena usano, e nient'altro: i prompt, ogni parola una volta sola e i
@@ -153,12 +156,16 @@ def write_wordle(lists: dict[int, tuple[list[str], list[str]]], meta: dict) -> i
         path.unlink(missing_ok=True)
 
 
-def write_context(vocab: list[str], secrets: list[str], meta: dict) -> int:
-    """Le parole di ZeroContext (nell'ordine dei vettori) e le parole segrete diventano lo schema context."""
+def write_context(vocab: list[str], secrets: list[str], meta: dict, links: list[tuple[int, int]] = ()) -> int:
+    """Le parole di ZeroContext (nell'ordine dei vettori) e le parole segrete diventano lo schema context.
+
+    links: per ogni parola segreta, le parole che ZeroAssociazioni le associa (indici di vocab): nella classifica
+    di quel round salgono di meta['link_boost'] (gioco-zerocontext/build_context_data.py)."""
     path, con = _temp_db(CONTEXT_SCHEMA)
     try:
         con.executemany('INSERT INTO vocab VALUES(?,?)', list(enumerate(vocab)))
         con.executemany('INSERT INTO secrets VALUES(?)', [(w,) for w in sorted(set(secrets))])
+        con.executemany('INSERT INTO links VALUES(?,?)', sorted(set(links)))
         con.executemany('INSERT INTO meta VALUES(?,?)', [(k, json.dumps(v)) for k, v in meta.items()])
         con.commit()
         con.close()
@@ -225,7 +232,8 @@ def _digest(rows) -> str:
 def _source_rows(file: Path, prefix: str) -> dict[str, list[tuple]]:
     con = sqlite3.connect('file::memory:', uri=True)
     try:
-        con.execute(f"ATTACH DATABASE 'file:{file.as_posix()}?mode=ro' AS src")
+        # The path as a parameter, as a URI: an apostrophe or a # in a folder name does not break the SQL.
+        con.execute('ATTACH DATABASE ? AS src', (Path(file).resolve().as_uri() + '?mode=ro',))
         return _assoc_rows(con, prefix)
     finally:
         con.close()
@@ -299,6 +307,13 @@ def _schema_rows(schema: str, queries: dict[str, str]) -> dict[str, list[tuple]]
         return {name: con.execute(sql.replace('{s}', f'{schema}__')).fetchall() for name, sql in queries.items()}
     finally:
         con.close()
+
+
+def association_pairs() -> list[tuple[str, str]]:
+    """Ogni coppia (prompt, parola associata) dei bacini verificati; vuota se lo schema associazioni non c'è."""
+    rows = _schema_rows('associazioni', {'pairs': '''SELECT p.prompt, w.word FROM {s}prompt_words pw
+        JOIN {s}prompts p ON p.id = pw.prompt_id JOIN {s}words w ON w.id = pw.word_id ORDER BY 1, 2'''})
+    return rows['pairs'] if rows else []
 
 
 def verify_associazioni() -> list[str]:

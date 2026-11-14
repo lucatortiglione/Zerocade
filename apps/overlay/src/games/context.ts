@@ -1,15 +1,19 @@
 import type { Viewer } from '@zerocade/shared'
+import { retryDue } from './retry'
 import type { GameInstance } from './engine'
 import { drawAvatar, fillTextWithAvatar } from './avatar'
-import { addPoints, clamp, drawTimerBar, newScores, shuffled, topOf } from './common'
+import { addPoints, clamp, newScores, shuffled, topOf } from './common'
 import {
   bandColor,
   closeness,
   closerHint,
   lookup,
   parseContextData,
+  position,
   rankAgainst,
+  startHint,
   type ContextData,
+  type ContextLinks,
   type Ranking,
 } from './contextRanking'
 import { followSecret, reportSecret } from './roomSecret'
@@ -22,17 +26,26 @@ import { roundCheer } from '../audio'
 
 let loading: Promise<ContextData> | null = null
 let loaded: ContextData | null = null
-let failed = false
+// When the last download failed (performance.now()), null if none did: it is tried again after RETRY_MS.
+let failedAt: number | null = null
 
 function loadData(): Promise<ContextData> {
   loading ??= Promise.all([
     fetch('/api/context/vocab.txt').then((r) => (r.ok ? r.text() : Promise.reject(new Error('vocab')))),
     fetch('/api/context/vectors.bin').then((r) => (r.ok ? r.arrayBuffer() : Promise.reject(new Error('vectors')))),
     fetch('/api/context/secrets.txt').then((r) => (r.ok ? r.text() : Promise.reject(new Error('secrets')))),
+    // The words ZeroAssociazioni ties to each secret. A server whose data has none answers 404: no word rises. Any
+    // other failure fails the download, so two overlays never rank the same secret differently.
+    fetch('/api/context/links.json').then((r) =>
+      r.ok ? (r.json() as Promise<ContextLinks>) : r.status === 404 ? null : Promise.reject(new Error('links')),
+    ),
   ])
-    .then(([vocab, vectors, secrets]) => (loaded = parseContextData(vocab, vectors, secrets)))
+    .then(([vocab, vectors, secrets, links]) => {
+      failedAt = null
+      return (loaded = parseContextData(vocab, vectors, secrets, links))
+    })
     .catch((err) => {
-      failed = true
+      failedAt = performance.now()
       loading = null
       throw err
     })
@@ -54,10 +67,11 @@ export function createContext(): GameInstance {
   let autoHints = false
   let autoHintSecs = 45
   let maxHints = 5
-  let hintFloor = 3
+  let hintFloor = 3 // a rank: position 4
+  let startHintAt = 30 // a position
+  let startHintOn = true
   let greenRank = 100
   let orangeRank = 1000
-  let roundSecs = 300
   let showBoard = true
   let starterWords = false
   let closestMult = 1
@@ -73,10 +87,12 @@ export function createContext(): GameInstance {
     autoHints = settings.autoHints === true // off unless the creator turns it on
     autoHintSecs = num('autoHintSeconds', 45)
     maxHints = num('maxHintsPerRound', 5)
-    hintFloor = Math.max(1, num('hintClosest', 3))
+    // The setting is a position (2 = the closest word, 1 being the secret); closerHint takes a rank.
+    hintFloor = Math.max(1, num('hintClosest', 4) - 1)
+    startHintAt = num('startHint', 30)
+    startHintOn = settings.startHintOn !== false // on unless the creator turns it off
     greenRank = num('greenRank', 100)
     orangeRank = num('orangeRank', 1000)
-    roundSecs = num('roundSeconds', 300)
     showBoard = settings.showLeaderboard !== false
     starterWords = settings.starterWords === true
     closestMult = { none: 0, low: 0.5, normal: 1, high: 2 }[String(settings.closestPoints ?? 'normal')] ?? 1
@@ -87,7 +103,6 @@ export function createContext(): GameInstance {
   let ranking: Ranking | null = null
   let bag: number[] = []
   let timer = 0
-  let roundClock = 0
   let revealed = false
   let revealAt = 0
   let solver: Viewer | null = null
@@ -118,7 +133,6 @@ export function createContext(): GameInstance {
     solver = null
     hintCount = 0
     hintClock = 0
-    roundClock = 0
     lettersShown = 0
     best = Infinity
     guesses = []
@@ -131,18 +145,24 @@ export function createContext(): GameInstance {
         place({ word: data.words[ranking.order[r]], rank: r, by: null, at: performance.now() })
       }
     }
+    // A hint to start from (unless turned off), a little way from the closest word. It is not one of the round's hints
+    // (maxHints), but it is the best so far: "Rivela più vicino" goes closer than it.
+    const start = startHintOn ? startHint(ranking, startHintAt, hintFloor) : -1
+    const startWord = start > 0 ? data.words[ranking.order[start]] : ''
+    if (startWord && !guesses.some((g) => g.word === startWord)) place({ word: startWord, rank: start, by: null, at: performance.now() })
     if (forced === undefined) reportSecret(data.words[ranking.secret], prev)
   }
 
   // Wait for the words; the first round starts as soon as they are here.
   const ensureData = () => {
-    if (data || failed) return
+    if (data || !retryDue(failedAt, performance.now())) return
     void loadData()
       .then((d) => {
         data = d
         if (!ranking) pick()
       })
-      .catch(() => {})
+      // failedAt is set: update asks again after RETRY_MS, and the board says the words are missing.
+      .catch(() => undefined)
   }
 
   const place = (g: Guess) => {
@@ -190,6 +210,11 @@ export function createContext(): GameInstance {
       ensureData()
       pick()
     },
+    // "Termina round" in the dashboard: the word is shown as when nobody finds it, then the next round starts after
+    // the pause.
+    onCommand(command) {
+      if (command === 'next-round' && data && ranking && !revealed) finish(null)
+    },
     onAction(action, event) {
       if (!data || !ranking || revealed) return
       if (action === 'reveal_closer') return hint()
@@ -200,7 +225,7 @@ export function createContext(): GameInstance {
       if (event.type !== 'comment') return
       // "Chi può giocare": the server only sends the comments of who may play.
       const who = event.user
-      const i = lookup(data, event.text)
+      const i = lookup(data, event.text, ranking.secret)
       const text = event.text.trim().replace(/\s+/g, ' ').slice(0, 24)
       if (text) typed = [...typed, { text, user: who, rank: i >= 0 ? ranking.rankOf[i] : null }].slice(-6)
       if (i < 0) return
@@ -219,7 +244,8 @@ export function createContext(): GameInstance {
     },
     update(dt, _now, settings) {
       read(settings)
-      if (!data) return
+      // Without the words (still loading, or the last download failed) ask again: retryDue decides when.
+      if (!data) return ensureData()
       if (!ranking) return pick()
       if (revealed) {
         timer -= dt
@@ -234,8 +260,7 @@ export function createContext(): GameInstance {
         }
         return
       }
-      roundClock += dt
-      if (roundSecs > 0 && roundClock >= roundSecs) return finish(null)
+      // No time limit: a round ends when the chat finds the word, or when the creator ends it (onCommand).
       if (autoHints) {
         hintClock += dt
         if (hintClock >= autoHintSecs) {
@@ -252,7 +277,6 @@ export function createContext(): GameInstance {
       ctx.scale(k, k)
       paint(ctx, now, width / k, height / k, k)
       ctx.restore()
-      if (!revealed && roundSecs > 0 && data && ranking) drawTimerBar(ctx, width, height, 1 - roundClock / roundSecs, '#7c5cff')
     },
   }
 
@@ -296,7 +320,7 @@ export function createContext(): GameInstance {
         ctx.fillStyle = '#9aa0b8'
         ctx.font = '24px system-ui'
         const dots = '.'.repeat(1 + (Math.floor(now / 400) % 3))
-        ctx.fillText(failed ? 'Dati di ZeroContext non trovati (gioco-zerocontext/data)' : `Carico le parole${dots}`, cx, top + 130)
+        ctx.fillText(failedAt !== null ? 'Dati di ZeroContext non trovati (gioco-zerocontext/data)' : `Carico le parole${dots}`, cx, top + 130)
         return
       }
 
@@ -328,7 +352,7 @@ export function createContext(): GameInstance {
       }
 
       // Chips: tries, best rank and the scale.
-      const chips = [`${guesses.length} tentativi`, Number.isFinite(best) ? `migliore #${best}` : 'nessun tentativo', `su ${total().toLocaleString('it-IT')} parole`]
+      const chips = [`${guesses.length} tentativi`, Number.isFinite(best) ? `migliore #${position(best).toLocaleString('it-IT')}` : 'nessun tentativo', `su ${total().toLocaleString('it-IT')} parole`]
       ctx.font = '600 16px system-ui'
       const cw = chips.map((c) => ctx.measureText(c).width + 28)
       let cxp = cx - (cw.reduce((a, b) => a + b, 0) + (chips.length - 1) * 10) / 2
@@ -344,8 +368,11 @@ export function createContext(): GameInstance {
         cxp += cw[i] + 10
       })
 
-      const heat = (r: number) =>
-        r === 0 ? '🏆 Trovata!' : r <= 10 ? '🔥 Rovente' : r <= 100 ? '♨️ Caldissima' : r <= 300 ? '😀 Calda' : r <= 1500 ? '🙂 Tiepida' : r <= 5000 ? '❄️ Fredda' : '🧊 Gelida'
+      // By position, as the players see it: 1 is the secret.
+      const heat = (r: number) => {
+        const p = position(r)
+        return p === 1 ? '🏆 Trovata!' : p <= 10 ? '🔥 Rovente' : p <= 100 ? '♨️ Caldissima' : p <= 300 ? '😀 Calda' : p <= 1500 ? '🙂 Tiepida' : p <= 5000 ? '❄️ Fredda' : '🧊 Gelida'
+      }
       const ease = (g: Guess) => 1 - Math.pow(1 - clamp((now - g.at) / 380, 0, 1), 3)
 
       // A guess on its bar: the colour is its band, the fill is how close it is, and a new
@@ -387,7 +414,7 @@ export function createContext(): GameInstance {
         ctx.textAlign = 'right'
         ctx.fillStyle = '#ffffff'
         ctx.font = `800 ${big ? 38 : 22}px system-ui`
-        ctx.fillText(g.rank === 0 ? '★' : `#${g.rank.toLocaleString('it-IT')}`, x + panelW - 20, big ? y + h * 0.4 : mid)
+        ctx.fillText(`${g.rank === 0 ? '★ ' : ''}#${position(g.rank).toLocaleString('it-IT')}`, x + panelW - 20, big ? y + h * 0.4 : mid)
         // The viewer: picture beside the name.
         ctx.font = '600 16px system-ui'
         ctx.fillStyle = '#d6daf0'
@@ -439,7 +466,7 @@ export function createContext(): GameInstance {
         ctx.font = '800 26px system-ui'
         const my = (showBoard ? boardTop : bottom) - 14
         if (solver) fillTextWithAvatar(ctx, `${solver.nickname} ha trovato: ${word}`, cx, my, solver)
-        else ctx.fillText(`Tempo scaduto: era ${word}`, cx, my)
+        else ctx.fillText(`Round terminato: era ${word}`, cx, my)
         const champion = matchOver ? topOf(scores, 1)[0]?.[1] : undefined
         if (champion) {
           ctx.fillStyle = '#f5c542'

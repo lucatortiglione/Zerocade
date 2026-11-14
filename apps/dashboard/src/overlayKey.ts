@@ -19,7 +19,7 @@ async function loadRoom(): Promise<RoomInfo> {
 const room = await loadRoom()
 
 export const overlayKey = room.key
-// Where the leaderboards are public (the mini server's port), e.g. http://192.168.1.35:3002/classifica/
+// Where the leaderboards are public (nginx on the Linux VM, ZEROCADE_PUBLIC_URL), e.g. http://192.168.1.50/classifica/
 export const publicLeaderboardUrl = room.publicUrl
 
 // An overlay hosted on another origin can't ask this server for the room, so its link

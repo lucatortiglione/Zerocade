@@ -64,15 +64,23 @@ if (!bank) console.warn('[content] no schema contenuti in database/giochi.sqlite
 // ZeroAssociazioni reads its verified pools (word-association.ts).
 export const wordAssociation = loadWordAssociation()
 
+// How many rows of the bank are not valid JSON: they are left out, and said once in the log (again if it changes).
+let malformedReported = 0
+
 export function getContent(): Record<string, unknown[]> {
   const out: Record<string, unknown[]> = {}
+  let malformed = 0
   for (const row of rows()) {
     const items = (out[row.game_id] ??= [])
     try {
       items.push(JSON.parse(row.item))
     } catch {
-      // ignore malformed rows
+      malformed++
     }
+  }
+  if (malformed !== malformedReported) {
+    malformedReported = malformed
+    if (malformed) console.warn(`[content] ${malformed} rows of the game bank are not valid JSON and are left out`)
   }
   // The two other games still use the historical theme bank. An old content.db keeps
   // it under its old key; ZeroAssociazioni only uses its verified pools.

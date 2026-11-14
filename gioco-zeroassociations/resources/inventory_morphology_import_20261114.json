@@ -1,0 +1,52 @@
+{
+  "database": "C:\\Progetti\\Zerocade\\database\\parole_ita_raw.sqlite3",
+  "table": "raw__inventory_terms",
+  "started_at": "2026-11-14T11:38:57.279132+00:00",
+  "before_words": 2740419,
+  "sources": [
+    {
+      "source": "unimorph-ita",
+      "status": "IMPORTED",
+      "records": 1009153,
+      "sha256": "6347bb15b3d2c3dafcbe4adc0e7beaa97a8bc61bcccc345079afb154c03f1321",
+      "new_unique_words": 86162,
+      "words_after": 2826581,
+      "cache_path": "C:\\Users\\lucat\\AppData\\Local\\Zerocade\\word-association\\unimorph-ita\\ita"
+    },
+    {
+      "source": "glaffit",
+      "status": "IMPORTED",
+      "records": 926289,
+      "sha256": "9e42965e5b7a8f4594c0199bbce6b6890c4bdc31a72a65af1b683b2025bf527d",
+      "new_unique_words": 6491,
+      "words_after": 2833072,
+      "cache_path": "C:\\Users\\lucat\\AppData\\Local\\Zerocade\\word-association\\glaffit\\GLAFFIT.txt.bz2"
+    },
+    {
+      "source": "flex-it-nouns",
+      "status": "IMPORTED",
+      "records": 49160,
+      "sha256": "1b0a06e94949827476621cfd3a639837d28905b91521c77c7958331785cf8587",
+      "new_unique_words": 0,
+      "words_after": 2833072,
+      "cache_path": "C:\\Users\\lucat\\AppData\\Local\\Zerocade\\word-association\\flex-it-nouns\\Flex_it_nouns.csv"
+    },
+    {
+      "source": "flex-it-adjectives",
+      "status": "IMPORTED",
+      "records": 64651,
+      "sha256": "628a830f5d997d763d7522bd8e63589a4b98edd3189363f9a15b107b4418c97d",
+      "new_unique_words": 0,
+      "words_after": 2833072,
+      "cache_path": "C:\\Users\\lucat\\AppData\\Local\\Zerocade\\word-association\\flex-it-adjectives\\Flex_it_adj.csv"
+    }
+  ],
+  "completed": true,
+  "deduplication": "NFC + casefold + unique prompt primary key",
+  "after_words": 2833072,
+  "new_unique_words": 92653,
+  "duplicate_words": 0,
+  "protected_records_unchanged": true,
+  "completed_at": "2026-11-14T11:40:50.872785+00:00",
+  "reimport_idempotence_verified": true
+}

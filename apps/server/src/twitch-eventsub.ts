@@ -87,7 +87,7 @@ export class TwitchEventSub {
     try {
       this.ws?.close()
     } catch {
-      // noop
+      // A socket still connecting throws on close: it is dropped below and its events are no longer listened to.
     }
     this.ws = null
   }

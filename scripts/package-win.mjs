@@ -121,10 +121,15 @@ copyFileSync(join(sqliteDir, 'prebuilds', 'win32-x64.node'), join(sqliteOut, 'pr
 
 step(`Adding the Node.js ${process.version} runtime`)
 mkdirSync(runtime, { recursive: true })
-const download = async (url, dest) => {
-  const res = await fetch(url)
+// A connection that stalls must not hold the build forever: the runtime (tens of MB) gets 10 minutes, the list of
+// checksums one. An answer that is not 200 stops the build with its status.
+const fetchOk = async (url, timeoutMs) => {
+  const res = await fetch(url, { signal: AbortSignal.timeout(timeoutMs) })
   if (!res.ok) throw new Error(`${url}: HTTP ${res.status}`)
-  writeFileSync(dest, Buffer.from(await res.arrayBuffer()))
+  return res
+}
+const download = async (url, dest) => {
+  writeFileSync(dest, Buffer.from(await (await fetchOk(url, 10 * 60_000)).arrayBuffer()))
 }
 if (process.platform === 'win32' && process.arch === 'x64') copyFileSync(process.execPath, join(runtime, 'node.exe'))
 else {
@@ -133,7 +138,7 @@ else {
   const base = `https://nodejs.org/dist/${process.version}`
   const target = join(runtime, 'node.exe')
   await download(`${base}/win-x64/node.exe`, target)
-  const sums = await (await fetch(`${base}/SHASUMS256.txt`)).text()
+  const sums = await (await fetchOk(`${base}/SHASUMS256.txt`, 60_000)).text()
   const expected = /^([0-9a-f]{64})\s+win-x64\/node\.exe$/m.exec(sums)?.[1]
   const actual = createHash('sha256').update(readFileSync(target)).digest('hex')
   if (!expected || expected !== actual) {

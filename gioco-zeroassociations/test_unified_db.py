@@ -203,6 +203,21 @@ class UnifiedTest(unittest.TestCase):
             u.link_schema('game', 'raw', ['prompts', 'nessuna'], u.UNIFIED)
         self.assertEqual(len(u.objects_of('game')), 3)  # a refused link leaves the schema as it was
 
+    def test_a_folder_name_with_an_apostrophe_does_not_break_build_and_import(self):
+        # Before, the path went into the SQL between apostrophes: "Documenti dell'utente" ended the string early.
+        d = self.dir / "Documenti dell'utente"
+        d.mkdir()
+        raw = d / 'prompt_raw.sqlite3'
+        make(raw, SCHEMA_A, [('INSERT INTO prompts VALUES(1,?)', ('mare',))])
+        out = d / 'unico.sqlite3'
+        u.build(sources={'raw': raw}, output=out)
+        fresh = d / 'nuovo.sqlite3'
+        make(fresh, SCHEMA_A, [('INSERT INTO prompts VALUES(2,?)', ('sole',))])
+        u.import_schema(fresh, 'raw', out)
+        db = sqlite3.connect(out)
+        self.assertEqual(db.execute('SELECT lemma FROM raw__prompts').fetchall(), [('sole',)])
+        db.close()
+
     def test_export_gives_back_a_standalone_database_without_prefixes(self):
         self.build()
         out = self.dir/'esportato.sqlite3'

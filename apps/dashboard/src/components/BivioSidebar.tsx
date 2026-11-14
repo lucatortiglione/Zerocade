@@ -220,7 +220,8 @@ function CollectedAnswers({ lang }: { lang: 'it' | 'en' }) {
     fetch(`/api/bivio/stats?lang=${lang}`)
       .then((res) => (res.ok ? (res.json() as Promise<BivioStats>) : null))
       .then((next) => !cancelled && setStats(next))
-      .catch(() => {})
+      // Server unreachable: the figures already shown stay until the next reveal asks again.
+      .catch(() => undefined)
     return () => {
       cancelled = true
     }

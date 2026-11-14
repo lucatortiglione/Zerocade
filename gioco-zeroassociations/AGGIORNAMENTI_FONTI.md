@@ -97,6 +97,41 @@ versionabile per aggiungere fonti. Per registrare le modifiche nel DB:
 python -B inventory_updates.py register-sources
 ```
 
+La registrazione non acquisisce le parole né crea uno snapshot. Il primo
+`prompt_inventory.py collect` importa la fonte anche se era già registrata;
+soltanto le acquisizioni successive con dati diversi preparano un confronto.
+
+## Fonti di parole, lemmi e morfologia
+
+Il registro comprende queste risorse (oltre alle altre fonti già configurate):
+
+| Fonte | ID nel registro | Dati raccolti |
+|---|---|---|
+| [UniMorph italiano](https://github.com/unimorph/ita) | `unimorph-ita` | Forma, lemma esplicito e tratti UniMorph. |
+| [Kaikki.org](https://kaikki.org/) | `kaikki-itwiktionary`, `kaikki-enwiktionary-it`, `kaikki-frwiktionary-it`, `kaikki-dewiktionary-it`, `kaikki-eswiktionary-it` | Entrate italiane delle diverse edizioni di Wiktionary, lemmi e voci di forme flesse. Si importano solo entrate con `lang_code=it`. |
+| [GLÀFF-IT / GLAFF-IT](https://redac.univ-tlse2.fr/lexiques/glaffit.html) | `glaffit` | Tabella compressa BZip2: forme, lemmi, codici GRACE e campi fonologici della fonte. |
+| [Flex_it](https://github.com/franfranz/Flex_it) | `flex-it-nouns`, `flex-it-adjectives` | Forme e lemmi di nomi e aggettivi, genere, numero, classe flessiva e frequenze della forma. |
+| [Hunspell italiano, distribuzione LibreOffice](https://github.com/LibreOffice/dictionaries/tree/master/it_IT) | `libreoffice-it-dictionary` | Voci del dizionario `.dic`; i flag di affissione non sono espansi e non costituiscono una prova di lemma. |
+
+Kaikki e Hunspell erano già configurati e mantengono gli stessi ID, senza duplicare
+le attestazioni. UniMorph e Flex_it hanno download fissati a una revisione Git;
+GLAFF-IT ha un URL ufficiale mutabile, di cui si conserva l'hash a ogni acquisizione.
+Flex_it deriva da Morph-it! e ItWaC: le fonti restano distinte per provenienza,
+ma non vanno contate come prove morfologiche indipendenti. Licenze e attribuzioni
+sono conservate nel registro; i file di licenza si scaricano insieme alle fonti.
+
+Per scaricare e raccogliere soltanto le tre nuove risorse (Flex_it ha due file):
+
+```powershell
+python -B prompt_inventory.py collect --only unimorph-ita glaffit flex-it-nouns flex-it-adjectives
+```
+
+Le attestazioni esplicite dei lemmi vengono raccolte anche quando il file elenca
+soltanto forme flesse. Le frequenze rimangono associate alla forma osservata.
+La raccolta alimenta l'inventario grezzo e non approva automaticamente parole
+o associazioni per i giochi. Per le fonti già importate prepara il confronto
+previsto sopra.
+
 ## Conservazione del database unico
 
 **Database: backup completo con inventario e decisioni** crea una copia SQLite

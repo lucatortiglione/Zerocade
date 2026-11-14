@@ -550,7 +550,7 @@ pacchetti del workspace la seguono, senza duplicare le fonti della versione.
 ### Pipeline automatizzata
 
 - [ ] **Dati e account di prova isolati (Zerocade):** quando si verifica o avvia il server per test, usare un
-  database e una porta propri (`ZEROCADE_DB`, `PORT`, `ZEROCADE_PUBLIC_PORT`) e mai `apps/server/data/zerocade.db`
+  database e una porta propri (`ZEROCADE_DB`, `PORT`) e mai `apps/server/data/zerocade.db`
   della diretta vera, né account, chiavi o dirette reali. Script e istruzioni di prova devono impostare queste
   variabili; il pacchetto `release/` e l'installazione ordinaria non si usano per le prove.
 - [ ] **Build verificata:** compilare tutti i target e le configurazioni supportate.
@@ -763,8 +763,10 @@ manuali restano obbligatori finché non ha un'esecuzione verde.
 - Chat, nomi, eventi e regali arrivano da fuori: sono input non fidato (sezione 10). Si validano al confine
   (`apps/server/src/validate.ts`) con lunghezze, formati e conteggi limitati, e non entrano mai in query SQL,
   percorsi o HTML senza parametri o escape.
-- Il server principale con i comandi di regia resta sul PC; il server pubblico (`ZEROCADE_PUBLIC_PORT`) espone solo
-  le classifiche. Nuove rotte pubbliche richiedono una revisione esplicita dei dati che mostrano.
+- Il server principale con i comandi di regia resta sul PC (ascolta solo su 127.0.0.1); le classifiche pubbliche le
+  serve nginx sulla VM Linux (`ZEROCADE_PUBLIC_URL` è il suo indirizzo, mostrato in dashboard). Nginx deve esporre solo
+  le classifiche e la loro API in sola lettura. Nuove rotte pubbliche richiedono una revisione esplicita dei dati che
+  mostrano.
 - Segreti (per esempio `TWITCH_CLIENT_SECRET`) solo in variabili d'ambiente o file `.env`, che Git ignora; mai nel
   codice, nei log né nel pacchetto `release/`. Un segreto finito in Git va revocato, non solo cancellato.
 - Il server aggiunge una riga al file hosts di Windows chiedendo i privilegi di amministratore (`apps/server/src/hosts.ts`):

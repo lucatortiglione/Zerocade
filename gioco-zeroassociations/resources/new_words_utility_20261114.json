@@ -1,0 +1,557 @@
+{
+  "summary": {
+    "run_id": "d2b51efe7548d3bd4748ae218b52a7ffce8b7cb2adfa8fa0be8551a84231c389",
+    "evaluated_at": "2026-11-14T12:05:00.796596+00:00",
+    "new_words": 92653,
+    "single_words": 6423,
+    "invalid_format": 86230,
+    "format_issues": {
+      "apostrofo": 137,
+      "caratteri_non_ammessi": 129,
+      "locuzione_o_piu_token": 86074
+    },
+    "zero_frequency_single_words": 6423,
+    "single_source_single_words": 6423,
+    "counts": {
+      "zerowordle.soluzione": {
+        "ESCLUSA_FORMATO": 86230,
+        "ESCLUSA_LUNGHEZZA": 5149,
+        "NON_ADATTA_SOLUZIONE": 1274
+      },
+      "zerowordle.tentativo": {
+        "ESCLUSA_FORMATO": 86230,
+        "ESCLUSA_LUNGHEZZA": 5149,
+        "NON_AMMISSIBILE": 1274
+      },
+      "zerocontext.segreta": {
+        "ESCLUSA_FORMATO": 86230,
+        "NON_ADATTA_SEGRETA": 5952,
+        "ESCLUSA_LUNGHEZZA": 471
+      },
+      "zerocontext.tentativo": {
+        "ESCLUSA_FORMATO": 86230,
+        "NON_GIOCABILE": 6304,
+        "ESCLUSA_LUNGHEZZA": 118,
+        "NON_SELEZIONATA": 1
+      },
+      "zerowords.griglia": {
+        "ESCLUSA_FORMATO": 86230,
+        "ESCLUSA_LUNGHEZZA": 3265,
+        "SOLO_BONUS": 2195,
+        "NON_FORMABILE": 960,
+        "ESCLUSA_BLOCKLIST": 3
+      },
+      "zerowords.bonus": {
+        "ESCLUSA_FORMATO": 86230,
+        "ESCLUSA_LUNGHEZZA": 3265,
+        "NON_FORMABILE": 2322,
+        "DA_REVISIONARE_BONUS": 833,
+        "ESCLUSA_BLOCKLIST": 3
+      },
+      "zeroassociations.prompt": {
+        "ESCLUSA_FORMATO": 86230,
+        "NON_ADATTA_PROMPT": 6417,
+        "DA_REVISIONARE_SENSO": 4,
+        "ESCLUSA_LUNGHEZZA": 2
+      },
+      "zeroassociations.risposta": {
+        "ESCLUSA_FORMATO": 86230,
+        "SOLO_MORFOLOGIA": 5113,
+        "VERIFICARE_LESSICALIZZAZIONE": 1217,
+        "DA_REVISIONARE_IN_COPPIA": 93
+      },
+      "zerocatene.nodo": {
+        "ESCLUSA_FORMATO": 86230,
+        "NON_ADATTA_NODO": 6419,
+        "RICHIEDE_BACINO_VERIFICATO": 4
+      },
+      "zerocatene.indizio": {
+        "ESCLUSA_FORMATO": 86230,
+        "SOLO_MORFOLOGIA": 5113,
+        "VERIFICARE_LESSICALIZZAZIONE": 1217,
+        "DA_REVISIONARE_IN_COPPIA": 93
+      }
+    },
+    "reasons": {
+      "zerowordle.soluzione": {
+        "apostrofo": 27,
+        "caratteri_non_ammessi": 129,
+        "richieste_5_8_lettere": 5149,
+        "poco_attestata": 1274,
+        "locuzione_o_piu_token": 86074
+      },
+      "zerowordle.tentativo": {
+        "apostrofo": 27,
+        "caratteri_non_ammessi": 129,
+        "richieste_5_8_lettere": 5149,
+        "poco_attestata": 1274,
+        "locuzione_o_piu_token": 86074
+      },
+      "zerocontext.segreta": {
+        "apostrofo": 27,
+        "caratteri_non_ammessi": 129,
+        "-non_sostantivo": 5924,
+        "richieste_4_14_lettere": 471,
+        "-una_sola_fonte": 25,
+        "locuzione_o_piu_token": 86074,
+        "-forma_flessa": 3
+      },
+      "zerocontext.tentativo": {
+        "apostrofo": 27,
+        "caratteri_non_ammessi": 129,
+        "vettore_fasttext_assente": 6304,
+        "vocab_3_16_lettere": 118,
+        "locuzione_o_piu_token": 86074,
+        "fuori_fascia_frequenze_del_vocab": 1
+      },
+      "zerowords.griglia": {
+        "apostrofo": 27,
+        "caratteri_non_ammessi": 129,
+        "lessico_4_10_lettere": 3265,
+        "zipf_inferiore_2.5": 2195,
+        "ruota_massima_9": 960,
+        "locuzione_o_piu_token": 86074,
+        "blocklist_it": 3
+      },
+      "zerowords.bonus": {
+        "apostrofo": 27,
+        "caratteri_non_ammessi": 129,
+        "lessico_4_10_lettere": 3265,
+        "nessun_seme_del_lessico_puo_formarla": 1362,
+        "ruota_massima_9": 960,
+        "unica_fonte_senza_frequenza": 833,
+        "locuzione_o_piu_token": 86074,
+        "blocklist_it": 3
+      },
+      "zeroassociations.prompt": {
+        "apostrofo": 27,
+        "caratteri_non_ammessi": 129,
+        "nessuna_prova_di_lemma_di_contenuto": 6330,
+        "familiarita_inferiore_soglia": 87,
+        "locuzione_o_piu_token": 86074,
+        "mancano_senso_familiare_categoria_e_bacino": 4,
+        "prompt_2_15_lettere": 2
+      },
+      "zeroassociations.risposta": {
+        "apostrofo": 27,
+        "caratteri_non_ammessi": 129,
+        "forma_flessa_non_approvata_come_risposta": 6330,
+        "mancano_prompt_senso_e_relazione_revisionata": 93,
+        "locuzione_o_piu_token": 86074
+      },
+      "zerocatene.nodo": {
+        "apostrofo": 27,
+        "caratteri_non_ammessi": 129,
+        "non_supera_requisiti_del_prompt": 6419,
+        "locuzione_o_piu_token": 86074,
+        "ogni_nodo_deve_essere_un_prompt_con_bacino": 4
+      },
+      "zerocatene.indizio": {
+        "apostrofo": 27,
+        "caratteri_non_ammessi": 129,
+        "forma_flessa_non_approvata_come_risposta": 6330,
+        "mancano_prompt_senso_e_relazione_revisionata": 93,
+        "locuzione_o_piu_token": 86074
+      }
+    },
+    "distinct_candidate_game_keys": {
+      "zeroassociations.risposta": 93,
+      "zerocatene.indizio": 93,
+      "zerowords.bonus": 800,
+      "zeroassociations.prompt": 4,
+      "zerocatene.nodo": 4
+    },
+    "new_candidate_game_keys": {
+      "zeroassociations.risposta": 93,
+      "zerocatene.indizio": 93,
+      "zerowords.bonus": 784,
+      "zeroassociations.prompt": 4,
+      "zerocatene.nodo": 4
+    },
+    "examples": {
+      "zeroassociations.risposta": [
+        "aberlusconiana",
+        "alboricoltrice",
+        "anabolizzare",
+        "analist",
+        "ansioltico",
+        "anticemocratico",
+        "aplorrina",
+        "assettatrice",
+        "barometico",
+        "battina",
+        "bugnun",
+        "cabinotta",
+        "cacciatorina",
+        "caratterisitco",
+        "caretteristica",
+        "catostrofico",
+        "comparatrice",
+        "contenata",
+        "cugginone",
+        "disimporre"
+      ],
+      "zerocatene.indizio": [
+        "aberlusconiana",
+        "alboricoltrice",
+        "anabolizzare",
+        "analist",
+        "ansioltico",
+        "anticemocratico",
+        "aplorrina",
+        "assettatrice",
+        "barometico",
+        "battina",
+        "bugnun",
+        "cabinotta",
+        "cacciatorina",
+        "caratterisitco",
+        "caretteristica",
+        "catostrofico",
+        "comparatrice",
+        "contenata",
+        "cugginone",
+        "disimporre"
+      ],
+      "zerowords.bonus": [
+        "abrenca",
+        "abrencai",
+        "abrenci",
+        "abrenco",
+        "abrencò",
+        "abripi",
+        "abripo",
+        "abripò",
+        "abéti",
+        "accasca",
+        "accascai",
+        "accasco",
+        "accascò",
+        "acciaii",
+        "acconfa",
+        "acconfai",
+        "acconfi",
+        "acconfo",
+        "acconfò",
+        "accortai"
+      ],
+      "zeroassociations.prompt": [
+        "disordinàre",
+        "esuarire",
+        "fifendere",
+        "torrere"
+      ],
+      "zerocatene.nodo": [
+        "disordinàre",
+        "esuarire",
+        "fifendere",
+        "torrere"
+      ]
+    },
+    "non_applicable": {
+      "zerodubbi": "Richiede dilemmi completi A/B, non lemmi.",
+      "zeroquizz": "Richiede domande con opzioni e risposta verificata, non lemmi."
+    },
+    "automatic_gameplay_changes": 0
+  },
+  "manifest": {
+    "import_report": "C:\\Progetti\\Zerocade\\gioco-zeroassociations\\resources\\inventory_morphology_import_20261114.json",
+    "baseline": "C:\\Progetti\\Zerocade\\gioco-zeroassociations\\database-backups\\parole_ita_raw_prima_import_morfologia_20261114T113626_476696.sqlite3",
+    "new_words_sha256": "2c30457b0676b6d96ca563bca04dccdde42def551517329f73101d8000aee879",
+    "active_snapshots": [
+      [
+        "de-mauro-sitemaps",
+        "9eed858dc409679538c92b2813ed5e445b695983bdffaf91b3ea1da498eabc97",
+        "deb175cf7b938247b76e853f8cb8a99738fb3e21e46503516611e460d9c87976"
+      ],
+      [
+        "flex-it-adjectives",
+        "6f75c70786e2087ebe557926a93521322b4d4e70a0cebf4759aeddfd81a669d0",
+        "628a830f5d997d763d7522bd8e63589a4b98edd3189363f9a15b107b4418c97d"
+      ],
+      [
+        "flex-it-nouns",
+        "d993ea00882d27c20a0f500bf63a9badbf02d701a692ad25f87cbaf265d6139e",
+        "1b0a06e94949827476621cfd3a639837d28905b91521c77c7958331785cf8587"
+      ],
+      [
+        "freedict-ita-deu",
+        "77b4ff98d1cb45ae675f4dec5f15d058c7bd77b8abbae696edd8953ee55bde19",
+        "b364b906dea10213b47d27ad1a4d0631b1ad6da0400304fefb2597ef765d5884"
+      ],
+      [
+        "frequencywords-it-2018",
+        "100abcf8272e7a92a6432f71f98547931dc79bd0678d2c2e314b0891038f7a92",
+        "b23b0c6a3f59c1da1c7caa667b9df5699e95323fee20a05f343c7d7dae73c4be"
+      ],
+      [
+        "glaffit",
+        "3ea20ca80b679d0abc392ec9463896195875b557f033f1cc3a7d7ebee60cb260",
+        "9e42965e5b7a8f4594c0199bbce6b6890c4bdc31a72a65af1b683b2025bf527d"
+      ],
+      [
+        "itaoa-montefinese-2019",
+        "e7e7ee444f08cae360d5a7c6b6b51bc799e7b0f7d6261844f251cd47e470f605",
+        "026bcdba1c9544167829f19d7b0cd53fa21836fc7c24891a92eee75fbaf4aabc"
+      ],
+      [
+        "kaikki-dewiktionary-it",
+        "9fff6763755b58d67d1e8eb41a72a3867dd728f22555a2dc159760bc981e670e",
+        "e797f78d800f5a39e3874a5b1bb4ea0f804c5886badff20e21ad1029016b4840"
+      ],
+      [
+        "kaikki-enwiktionary-it",
+        "476addc4c7118fc79ae79e2815b169ef62d3072f3d9e5ab066e53c611f8fae08",
+        "f112deb9747b7f33f4247da4999dfba0aa739bb4aaff9dd42fdf0615918a9c11"
+      ],
+      [
+        "kaikki-eswiktionary-it",
+        "0deab9226eab98866f1476c0061f51b62684f3a188be2d906c6699d9d655aec6",
+        "7ddb5a16fabf553fb1335418a374bce6ba9c3a78e4cb34e62f387d8bacd5c9c8"
+      ],
+      [
+        "kaikki-frwiktionary-it",
+        "6aef94cf4cf98c8555d08b7e38fb54f68209983fca0ecf8c0a1a67eb73f73f51",
+        "f773ab4c9e25322271707638844748489d1f4d9ed745f738e8f6c4539d5f1c90"
+      ],
+      [
+        "kaikki-itwiktionary",
+        "bb039bab0c56cc7363f052ca53104866814e15cd4e5a2e7c8dfcd8b467531487",
+        "095df1665fde8e41bdf07250887d0cdacf570b543118aa09505f8628c9cf46e9"
+      ],
+      [
+        "libreoffice-it-dictionary",
+        "15faea46f272429258dc562f7bf7a9ac707212d14b548da30ed761cf488323b8",
+        "bae1e3501dcd2a923669592493b3fde6c02aae7c7aab83bf5e5b49077e73dd64"
+      ],
+      [
+        "libreoffice-it-thesaurus",
+        "0092ee47bf23b4edef87702d7400c047d85c1844fc83a205e2847c9d60081fde",
+        "96af44562d73ec56dbaacce04588f6a3b7569d581542d9518f64b7c5b1926bcf"
+      ],
+      [
+        "morphit-048-mirror",
+        "d64de8e0979b9fe5374b3faf40370fc1787532ad7a0d7e70a0d6f8227df9d31e",
+        "7375216351ee59cee4326b455503f3a6c4e9542cd63ecb86ff5cd58ca5c8e800"
+      ],
+      [
+        "napolux-paroleitaliane",
+        "12cc87982e623d171131b74f0fd42570a32d0448332cfc8459d5b10f8957dfbb",
+        "edd295a2e17d0c56e58e2f0e3936c0e8a331f591d47db8a1bd6d4ead4cc80d6e"
+      ],
+      [
+        "nvdb-de-mauro-2016",
+        "b6d2a71affe04806e59c865aed81d4fb583d6ca48b2da32c454a07080bf4e1cc",
+        "f053fa2dd393a105d9645a86aa3c3994fe360c3896d7720b1c6e87246e4e5098"
+      ],
+      [
+        "omw-multiwordnet-it",
+        "e1fbadd830b71ffa5e21c4c7d94c9a486bcc8412e35222a264c0a242b4303503",
+        "251ac0097ef81a7ed0d283f6852953106a37dbb8c1b9f93d87079641c271eafa"
+      ],
+      [
+        "ud-isdt-dev",
+        "79db4e8518f5630cfc6f78857cad76cfed8032af8bb5f208f36009b0645f2837",
+        "1bc7dda04c58a4d87e2e6607a0e612462b87e7da6dde56be610d3749521af744"
+      ],
+      [
+        "ud-isdt-test",
+        "4c8152fc678df9f18531197229b8cc12279eff44e41728fa3531ab18482ad0bd",
+        "cea8ca0e8d1ddf7ce509f10afff426d00e058982f49473e0744cd0ee477129e3"
+      ],
+      [
+        "ud-isdt-train",
+        "9cc35765f5fa15b9610e82eaf76bb1cdd762438c277b9ec6f4f945a6a2d6abf3",
+        "7c3e32d7f296c877387a0c805c3ae8c471e2b5e8df97f5e3da810834b50566ab"
+      ],
+      [
+        "ud-markit-dev",
+        "3f4b58a91c14e2684a8d044c54b86c1061d31ac66f969a2fabf9295f52d4144f",
+        "633b6186f47ecfebfcff4ff9c7e19a0cbffd1f655f14fc1e9265b12bda597f97"
+      ],
+      [
+        "ud-markit-test",
+        "710780a89c1ef0bdc1edd51e527047fb1514a2f722a04193540571c5f81249b5",
+        "9048ed0064e3989e2c37377755a28c25c7e462b1ad916e5808dc0a7ce95fc3fc"
+      ],
+      [
+        "ud-markit-train",
+        "8251dbc4249270ae8e4bacdeb8cf1c1a7d0612aa009dbe0b52c6dc485fd732c2",
+        "4f6fc3423acb00d49e1e167bd21b11ebbc23e22275fd6f5eeb4d75cfbbccc5c6"
+      ],
+      [
+        "ud-partut-dev",
+        "705d73c79e7de8615e7acfadc59042c9147b1ee7b67ad4b8d0862de9ecfde5b0",
+        "c6542e547447df403e54f314a61ec9f4a5e1e0d770dbcbdedb5ea8edcb6758fc"
+      ],
+      [
+        "ud-partut-test",
+        "aa96dd15fff106287eddc88b6cd982f3a5a6d6b4489e1b14cf4db34b6008dca7",
+        "6a3f3437fd3ab383ba37122ec84cc1bd53662512f5ff1e80ed306c6b668eb6a2"
+      ],
+      [
+        "ud-partut-train",
+        "c9f994e0aaff032b00f27b1d8cd6ff571cf85c63912f583206322ef5cf38363e",
+        "576ecef59bedbd740c6c8744af25726d5d279afac3555fa6a37c50ec7db1324d"
+      ],
+      [
+        "ud-postwita-dev",
+        "d2fbd0004bfc2cfe191807678ae470bf58ccfa344df8ec9239bdcf85298aff67",
+        "ba359dae18bce28208945004cf75a100d72e667fb724f917cd6f405aef150142"
+      ],
+      [
+        "ud-postwita-test",
+        "d76258956a7800e9d0a0e263d37004ba2a120f9e7aec56b0a94378af18c6488d",
+        "5db5e37ed8dc904595ac7d5bc3f746e6232a9fec0689948ffd17219c082a77c4"
+      ],
+      [
+        "ud-postwita-train",
+        "a0aa52617156cfef61903ae1a4a2aa1868256bd7d37cfc2c0973cb938443690d",
+        "1cd7c0bdce31c1f9768e9a95befd69ffe2246b98b42446ab8912fe7ec665d2d9"
+      ],
+      [
+        "ud-twittiro-dev",
+        "7228f774a6ccc2c9020a9055424bd18aa3bbf263e51214753a61d6aa0d55884b",
+        "1f16040ae17395d2910784742e6b3344620a67937524d47ed96fd56f811a8c99"
+      ],
+      [
+        "ud-twittiro-test",
+        "ce5fb7e377afa333274d714532185807f80f2edfa64a2f3140731a9b3af5fc86",
+        "ae8560ce8471d20fda2e242dc45b3be7d2e0e8f0ccec323a7750fe7511f8b9d4"
+      ],
+      [
+        "ud-twittiro-train",
+        "0135d8c97b765f94359426e94e850f598b5fbfb1231e5dc5e44b95a71d95b1e8",
+        "a470b66a73d2d489113de4f0591b1c61cf3848c6a94cedf33a8379d7e39a24f2"
+      ],
+      [
+        "ud-valico-test",
+        "589690bbf22a4494ead396c9cc4b1e81ad19e69bcce5bd84ca65900acf4e1c4f",
+        "a9f026703c1f3321eeba060460a1dac9d49677a641a7f03e78bcf8103667815a"
+      ],
+      [
+        "ud-vit-dev",
+        "c5fc97b8a0e3707aea599472bfe9e4b66c589b2a328a0aabf826d87cc145eb73",
+        "d6e076afb639b4bee82f8caaaaed467cbd2c4f6ec2762aa0108ca865f97e0f3c"
+      ],
+      [
+        "ud-vit-test",
+        "94816cb2ee4fc8b467476a1062cd4c19ff6fdeec928cb6440366e9b872886bab",
+        "1569c1c28727e1f99d8246c57b0ffa61ae0442747599051bfbd0e63d7081503f"
+      ],
+      [
+        "ud-vit-train",
+        "90c9e5a77d6085e8688d286e13446fa4eaeefad4f68a0dfeab737b8e72883537",
+        "678e41cc9771c8dec6a2b2a21489d549dd4d715bda582d3890b162b1c80ea33a"
+      ],
+      [
+        "unimorph-ita",
+        "acc8ca2917dd51fd7b93d27b3bdd2f5898db3a873dc974dcf921d2c3d68fe9fb",
+        "6347bb15b3d2c3dafcbe4adc0e7beaa97a8bc61bcccc345079afb154c03f1321"
+      ],
+      [
+        "wikinews-it",
+        "e841cbe1956121dbbb8942bb1db64f9191040a0468c252bb33cc66c868478766",
+        "28b6781297c89da632d1ff85c8bbb79322405e9fee894afa5311bdb4b81e3ef7"
+      ],
+      [
+        "wikipedia-it",
+        "dcab5929dea97b255086479e5a97a0e9a76a691b4d208ab6fd3819bee12ec42a",
+        "fe0f1f8777b487d3e26caecf84e59e1ba46c540b347aa2646e837c45391ad756"
+      ],
+      [
+        "wikiquote-it",
+        "be64c8f45a5d1221986d668829ebbe34a44b1d19ab35d5df46e478cbda77d862",
+        "72938f2bf3e3ef1c2c56ee5e0da64125f9386ef70929c1ae5ba574af5986cc96"
+      ],
+      [
+        "wikisource-it",
+        "cb63f7bfde73bd3bc466f1ce815def3f0364918e0fe4d4e072000d61373b5775",
+        "6291ca4f4ef778eb4252bdccbbdeb9a09cb91f673df50f0f87229c9a021d58bc"
+      ],
+      [
+        "wikiversity-it",
+        "4bbb52d1ccdded3e80c6c53b2233a15eef4a45626065487ce1b76e0d30d5c1c5",
+        "7880d0da365c92350a1102029507b65ff1e97875898bbffd1ca86ac25307c6ea"
+      ],
+      [
+        "wikivoyage-it",
+        "913120deef26a7e6c0a08adb10c0db26f5807f4d0bb502f69e453efe260682f6",
+        "72244f42f8736e63dee6a0d8e30962503729c8eb61a47d0db832ea92b24d118d"
+      ],
+      [
+        "wiktionary-it-titles",
+        "01b0db594d9e31cab764947ca14c6c7ca442c400d4892a728e17e5da758d843b",
+        "b3f1a61cfd6b6f5cc10b0b7b50a30693042bad1353e619fe41f35c8dd1a15f1d"
+      ],
+      [
+        "wordfreq-it-local",
+        "eec38f085070e19ecd70c710111aecd73f4ec4e6d633f2d11d23349d54927a65",
+        "e4e4fc0d8af8f4e6d853670a9bf5f5ef43d315d29e1a65765d476f1f44bf7aa1"
+      ]
+    ],
+    "wordfreq_version": "3.1.1",
+    "evaluation_version": 1,
+    "directives": {
+      "zerowordle": {
+        "gioco-zerowordle/README.md": "ddb4dadc4db4f536e0b296bad3ba09c07c0b96d1a7f6a48c35ec2e224b6cac9e",
+        "gioco-zerowordle/build_wordle_bank.py": "75648c0742e1a51d06f0597db6f1f60237702acc602d51f52440ea2adaea81b5",
+        "gioco-zerowordle/wordle_exclusions.txt": "9c6542c447d4f197e7325b81c6d24bee50bec50fad4c013b193c64716df0c564"
+      },
+      "zerocontext": {
+        "gioco-zerocontext/README.md": "4f0db103853c3cd18acb47b3d47c249641de047fb5c32ced8b7ece53fea096a0",
+        "gioco-zerocontext/build_context_bank.py": "3a7abc3993c79f9926062a69960859334d1ecc71566f75bdb8ac246eea5f16ec",
+        "gioco-zerocontext/build_context_data.py": "3933bffb996faff44b6e4b35821e36a248c3dd0f67c2e26d95e475abc43cfa01",
+        "gioco-zerocontext/context_bank_exclusions.txt": "1c44aef46556c8bd753d4932d824d1ef346fa68b6907c277817cdc068ade6595"
+      },
+      "zerowords": {
+        "gioco-parole/README.md": "b15fe4058158afea4d8ad35e7dc08f81ba08a7f09bfd8167735a5bf31529ff13",
+        "gioco-parole/ALGORITMO.md": "1f78d83412faa740227ccaa3ba3742c21459e47d87ccb8816b4fad83988d646a",
+        "gioco-parole/tools/build_lexicon.py": "91f4aa4136b477c6d0633b8bbaaed9a2cc9a7ae4237929857ca5ec1a96b88608",
+        "gioco-parole/tools/common.py": "3acb5146a9de706b5396b5de743badfc8a27224ec9c4375a70f570c121fc4866",
+        "gioco-parole/tools/curve.json": "69bfd4e7d6bfdcdc251347b4fda7a8c19f88923843ccec33960a6342d8002170",
+        "gioco-parole/lexicon/blocklist_it.txt": "375afb946ee2adca772cf95ec66fbf026f124028e5fc5ed37d50fce07bbbf841",
+        "gioco-parole/lexicon/it/not_in_grid.txt": "c207eb7fab3d6f4f340c08b9216cff4253104dc46278057eb14f66cac0c1cd6a"
+      },
+      "zeroassociations": {
+        "gioco-zeroassociations/REGOLE.md": "ef3c15171bfbfd9dac332179458718f3e4cdfcf910a70a44396c5e919e518c23",
+        "gioco-zeroassociations/DIRETTIVA_INDIZI.md": "027f5afc8a93d7f6efc38be854454f70fbca9a5ccef012785f91c05049288aa8",
+        "gioco-zeroassociations/direttive_word_association_it_v3_6_0.md": "a8e7fb0c1650ec54512ef945c177da4a7a3a9ed58b2dcdeeb573cb588d8e90a8",
+        "gioco-zeroassociations/resources/prompt_policy.json": "54ee9866fe75f5822c35ed32e9d2624af337e817ec33d14400cdac91c08dceef",
+        "gioco-zeroassociations/filter_prompts.py": "2b06d04bf5a5c2e67fa5ea50296425bdab7170e155d98edad4111cedaae432d2"
+      },
+      "zerocatene": {
+        "gioco-zerocatene/README.md": "fa5115f3028fcf8880effaa3b15c7aee20c4a5f5f183982dd0b036d8e3c000d9",
+        "apps/server/src/chains.ts": "668d227c094a85717465a5b7cf032490203ded57a95089231de31070501179b2"
+      },
+      "zerodubbi": {
+        "gioco-dilemmi/README.md": "f0c7e2f8a68856b822b294f30b89c1ebdef771b581acf235f7737f06a6526146"
+      },
+      "zeroquizz": {
+        "gioco-quizzland/README.md": "a0491b4ab2fc7ae88902bc837a7a8ae4cae9542267d5499c25558f99cf37ab37",
+        "gioco-quizzland/GUIDA-DOMANDE.md": "088b79a300684701026dc61e17dcb2c37c5af3973b04be2362de1796543083cf"
+      }
+    },
+    "evaluation_code_sha256": "45abce8051f964d223f51c9b205e639ad8b01254529269003c51696e2e41acf1",
+    "normalization_code_sha256": "87237cce75b595561820aaefd18b502899bbff0c66e1fa681493f944a0bd5ecc",
+    "pos_mapping_code_sha256": "409e2771eccf4f6497f17c56e159469403ce227a6d24b973012fcd434d1a72df",
+    "resources": {
+      "gioco-zeroassociations\\resources\\frequency_ranks_it.csv": "e4e4fc0d8af8f4e6d853670a9bf5f5ef43d315d29e1a65765d476f1f44bf7aa1",
+      "gioco-zerocontext\\.cache\\fasttext_it_words.txt": "48de8df0ec945d91a7de9e16db432ce997b80d2b0d53472f1843d684ac7c5094",
+      "gioco-zerocontext\\.cache\\numberbatch_it_words.txt": "f72958f6d3d6dcb9e09598c18740d6f01f6b4156203eb3311d05171167b621d1"
+    },
+    "active_game_word_sets": {
+      "active_wordle": "a7e7fdc799e585b87ed0d644f62bfd1b02ded3c14b43671f363d729ff5c1881c",
+      "active_context": "4badc5d9d88eff42de75c55471299533236e98b9e21466ef708d745ad074c1af",
+      "active_words": "457ad3b13ba9a1a5b5bab5d83bb09bba052d6a87f58f6962902d1951e2984f37",
+      "active_answers": "726398ca2933fe3282fe2e34678a4892804a69bf52145dfb0c2145e41806627a"
+    },
+    "seed_words_sha256": "b8465307b3fa466b35231684560585c71280e82b74864ba22c6649891a367781",
+    "raw_morphology_sha256": "e43f03a0b317c971fcdfd8741fdfb2700b82defa2b3161cba1fef6443eea4011",
+    "policy": "Technical suitability; no automatic semantic or gameplay approval",
+    "non_applicable": {
+      "zerodubbi": "Richiede dilemmi completi A/B, non lemmi.",
+      "zeroquizz": "Richiede domande con opzioni e risposta verificata, non lemmi."
+    }
+  }
+}

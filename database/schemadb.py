@@ -312,7 +312,8 @@ class SchemaDb:
             self._registry(con)
             if new:
                 con.execute("INSERT OR IGNORE INTO zerodb_meta VALUES('verified','0')")
-            con.execute(f"ATTACH DATABASE 'file:{Path(source).as_posix()}?mode=ro' AS src")
+            # The path as a parameter, as a URI: an apostrophe or a # in a folder name does not break the SQL.
+            con.execute('ATTACH DATABASE ? AS src', (Path(source).resolve().as_uri() + '?mode=ro',))
             con.execute('BEGIN IMMEDIATE')
             try:
                 rows = self._copy_in(con, schema, source)

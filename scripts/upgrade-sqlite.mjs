@@ -38,7 +38,8 @@ const extractDir = join(depsDir, `sqlite-amalgamation-${TAG}`)
 const url = `https://www.sqlite.org/${YEAR}/sqlite-amalgamation-${TAG}.zip`
 
 console.log(`→ Downloading ${url}`)
-const res = await fetch(url)
+// A connection that stalls must not hold the upgrade forever: 10 minutes for the amalgamation (a few MB).
+const res = await fetch(url, { signal: AbortSignal.timeout(10 * 60_000) })
 if (!res.ok) {
   console.error(`✗ Download failed (${res.status}). Check version/year.`)
   process.exit(1)

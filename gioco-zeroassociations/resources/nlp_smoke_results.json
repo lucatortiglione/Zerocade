@@ -1,0 +1,563 @@
+{
+  "gold_sha256": "1a4df10032b3a10be12e04d8895d0afdd3ee139d0712de1e41b8708ee83d5c96",
+  "documents": 12,
+  "results": [
+    {
+      "status": "OK",
+      "engine": "spacy",
+      "model": {
+        "engine": "spacy",
+        "language": "it",
+        "adapter_version": 1,
+        "capabilities": [
+          "lemma",
+          "upos",
+          "xpos",
+          "morph"
+        ],
+        "library_version": "3.8.18",
+        "model": "it_core_news_md",
+        "model_version": "3.8.0",
+        "pipeline": [
+          "tok2vec",
+          "morphologizer",
+          "tagger",
+          "parser",
+          "lemmatizer",
+          "attribute_ruler"
+        ],
+        "artifacts": {
+          "accuracy.json": "384f5e3d8496868fae5a914f13a15e5760430c2a5e5ba9df7fd301d1a27576e2",
+          "attribute_ruler/patterns": "6241300d1efc3b0263997a4a429ce4692f85a7c71470394c6b07371186ea93ba",
+          "config.cfg": "f27f6fe74a49b625079cb176f1ea226a712781b6b2ee02301303088c1c67c75f",
+          "lemmatizer/cfg": "a275b533c83a472d3a8e8cc94219c921459f26424079dd2663afa51c6715a68c",
+          "lemmatizer/model": "a7acf70687190adf298496658a3471336c317eda51ea43ceb7cb9bb5e1a0a09d",
+          "lemmatizer/trees": "e83cbe175dcd0ae49b6f52786199462bdb1b7973e2ef53291d5be99f7515307e",
+          "LICENSE": "8812f83442fd0eca14eb0208988e190fdcbfebec58fa5459d3218edfdfdc5a32",
+          "LICENSES_SOURCES": "847038ac65cec688f9ee2dcf6d1c8cf1e5b8ecfcb82163b156559966ba90906a",
+          "meta.json": "a682589c2cc25d9523434505ad8e290d1107201b20d675c43cfd0e498b7d7bc2",
+          "morphologizer/cfg": "8a0e0b83ce98e04649946a96bc79f20df6f3c995f9d5bac11c166c7b9178036d",
+          "morphologizer/model": "96e180995cfb3e024893348e4eb3663a16c76f12c9e01572d32db4cd6f80a17a",
+          "ner/cfg": "a7172edadafba9f472e9ac0f2660eec04b6405e471be9e20267b79c67288d22d",
+          "ner/model": "5549212d8a30f6acad1b7529989e8d0e0b8733066703295965763fe1aba3ffa4",
+          "ner/moves": "0601b7e8848f0745a8af0968b4328a4923cc1142648b6022e8c19cef8d9dc574",
+          "parser/cfg": "e2a240ef01f95e58f5dd4c9d6e90d61f597b8d998966570d3009dd81e8879780",
+          "parser/model": "534aa5bc982cec704050808c7b67c2018e8b37e435c7d6b056272e5a46f10c41",
+          "parser/moves": "927e9bdf97ced442e65fec25a6dbf80a23be73e79447f692ef0a3310431c954e",
+          "README.md": "96049186cd9d3722aceb5d5d4122b5fb06efd6891308134cf964e7a7840ed64e",
+          "senter/cfg": "2a4db4a729b6469da1f87d71cc7cd3ed2a73360cc85326821e850836c4671103",
+          "senter/model": "bea5d2658eff79f13494ea2c61bc294af45c1b769ccc1fe30eda8419a0316723",
+          "tagger/cfg": "41f20f4a57632523838d7216737f20da48771b68334c93b1f7a6485bc842d2be",
+          "tagger/model": "28923bd6918c9f1154d4b94b81f45be62088e66e75da9c23d3e5f19b4c489faf",
+          "tok2vec/cfg": "f8a5a26e3056eb6fb06deeb3dbccfd88ae74900200c98c70b5966bbb7ec9d4de",
+          "tok2vec/model": "3913a518cf385d5f2a69ddf38de7896888fb2902d49d74fd2b40272df638b295",
+          "tokenizer": "1ba4ca6ea64d364089b97fc1d578b1d8adb7d5e0563bc87360e33ddfffb27cd5",
+          "vocab/key2row": "c6b65ca3d219f28c0ab2104f6f8e65eec213c4060c4593685d7f73e49fde602d",
+          "vocab/lookups.bin": "76be8b528d0075f7aae98d6fa57a6d3c83ae480a8469e668d7b0af968995ac71",
+          "vocab/strings.json": "c7814eeab2da9b6950f2c15d5f9d967c75e824e581e98709f89a2ce31f2ab8d5",
+          "vocab/vectors": "0f544f5753c5fd1f3b77b68d8aa0aea7fd8aa9dff437f524bdd965ce3134a41a",
+          "vocab/vectors.cfg": "ff4359091952c8cd16f1f0482f5770fb82d1707368d5cca3c46aa501f552e3c5"
+        }
+      },
+      "model_id": "ff27f74218ea5973cf446a72585eb8c09af9d75e64b5c3815ba73f70506149c4",
+      "load_seconds": 7.293539999999666,
+      "analysis_seconds": 0.057404500000302505,
+      "documents_per_second": 209.04284507201984,
+      "peak_process_memory_bytes": 503328768,
+      "targets": 12,
+      "aligned_targets": 12,
+      "metrics": {
+        "lemma": {
+          "supported": true,
+          "correct": 12,
+          "total": 12,
+          "accuracy": 1.0
+        },
+        "upos": {
+          "supported": true,
+          "correct": 11,
+          "total": 12,
+          "accuracy": 0.9166666666666666
+        },
+        "morph": {
+          "supported": true,
+          "correct": 9,
+          "total": 11,
+          "accuracy": 0.8181818181818182
+        }
+      },
+      "errors": [
+        {
+          "id": "ancora-nome",
+          "surface": "ancora",
+          "expected": {
+            "start": 16,
+            "end": 22,
+            "lemma": "ancora",
+            "upos": "NOUN",
+            "morph": {
+              "Gender": "Fem",
+              "Number": "Sing"
+            },
+            "surface": "ancora"
+          },
+          "predicted": {
+            "text": "ancora",
+            "lemma": "ancora",
+            "upos": "ADV",
+            "xpos": "S",
+            "morph": {},
+            "start": 16,
+            "end": 22,
+            "expanded_multiword": false
+          },
+          "failed": [
+            "upos",
+            "morph"
+          ]
+        },
+        {
+          "id": "accento",
+          "surface": "caffè",
+          "expected": {
+            "start": 12,
+            "end": 17,
+            "lemma": "caffè",
+            "upos": "NOUN",
+            "morph": {
+              "Gender": "Masc",
+              "Number": "Sing"
+            },
+            "surface": "caffè"
+          },
+          "predicted": {
+            "text": "caffè",
+            "lemma": "caffè",
+            "upos": "NOUN",
+            "xpos": "S",
+            "morph": {
+              "Gender": "Masc"
+            },
+            "start": 12,
+            "end": 17,
+            "expanded_multiword": false
+          },
+          "failed": [
+            "morph"
+          ]
+        }
+      ]
+    },
+    {
+      "status": "OK",
+      "engine": "stanza",
+      "model": {
+        "engine": "stanza",
+        "language": "it",
+        "adapter_version": 1,
+        "capabilities": [
+          "lemma",
+          "upos",
+          "xpos",
+          "morph"
+        ],
+        "library_version": "1.15.1",
+        "model": "default_fast",
+        "pipeline": [
+          "tokenize",
+          "mwt",
+          "pos",
+          "lemma"
+        ],
+        "device": "cpu",
+        "artifacts": {
+          "it/lemma/combined_nocharlm.pt": "640b77e70640e4af25ac906b535c8fcb2aa13e73e93d16ca51cdd1d0904a80f4",
+          "it/mwt/combined.pt": "a84d793205153ce470229f743a91daf102ab709c9902bb35f5a1cf8dbef7cbdb",
+          "it/pos/combined_nocharlm.pt": "d75b6357bdaa07ba20ac6c43124454e4026b04f4c7306a40079daddef7efb4e1",
+          "it/pretrain/conll17.pt": "51b6fd964a87048c9bc734256b84d38fd51877231b6f61125754c26588eeb5e9",
+          "it/tokenize/combined_nocharlm.pt": "99146209c444c01f6f0a636284fc5667ce398cbcd09000b6df2eca69aab07397",
+          "resources.json": "61f64512b30f22d47f392df49fcd0a90995b5892ae1c16fa366f1781e4694b51"
+        }
+      },
+      "model_id": "8d3e7be4e89fb56abeb505535eaa81e369803b03949604cbb7779848a027da0a",
+      "load_seconds": 10.191039500000443,
+      "analysis_seconds": 0.7885062999994261,
+      "documents_per_second": 15.218648221337906,
+      "peak_process_memory_bytes": 539709440,
+      "targets": 12,
+      "aligned_targets": 12,
+      "metrics": {
+        "lemma": {
+          "supported": true,
+          "correct": 12,
+          "total": 12,
+          "accuracy": 1.0
+        },
+        "upos": {
+          "supported": true,
+          "correct": 11,
+          "total": 12,
+          "accuracy": 0.9166666666666666
+        },
+        "morph": {
+          "supported": true,
+          "correct": 9,
+          "total": 11,
+          "accuracy": 0.8181818181818182
+        }
+      },
+      "errors": [
+        {
+          "id": "ancora-nome",
+          "surface": "ancora",
+          "expected": {
+            "start": 16,
+            "end": 22,
+            "lemma": "ancora",
+            "upos": "NOUN",
+            "morph": {
+              "Gender": "Fem",
+              "Number": "Sing"
+            },
+            "surface": "ancora"
+          },
+          "predicted": {
+            "text": "ancora",
+            "lemma": "ancora",
+            "upos": "ADV",
+            "xpos": "B",
+            "morph": {},
+            "start": 16,
+            "end": 22,
+            "expanded_multiword": false
+          },
+          "failed": [
+            "upos",
+            "morph"
+          ]
+        },
+        {
+          "id": "accento",
+          "surface": "caffè",
+          "expected": {
+            "start": 12,
+            "end": 17,
+            "lemma": "caffè",
+            "upos": "NOUN",
+            "morph": {
+              "Gender": "Masc",
+              "Number": "Sing"
+            },
+            "surface": "caffè"
+          },
+          "predicted": {
+            "text": "caffè",
+            "lemma": "caffè",
+            "upos": "NOUN",
+            "xpos": "S",
+            "morph": {
+              "Gender": "Masc"
+            },
+            "start": 12,
+            "end": 17,
+            "expanded_multiword": false
+          },
+          "failed": [
+            "morph"
+          ]
+        }
+      ]
+    },
+    {
+      "status": "OK",
+      "engine": "simplemma",
+      "model": {
+        "engine": "simplemma",
+        "language": "it",
+        "adapter_version": 1,
+        "capabilities": [
+          "lemma"
+        ],
+        "library_version": "2.0.0",
+        "model": "it",
+        "pipeline": [
+          "tokenizer",
+          "dictionary_lemmatizer"
+        ],
+        "artifacts": {
+          "__init__.py": "95c8cff9bcac74586472135f0e6438a7ebfb7b57188b339f62e488a8d6f95988",
+          "__metadata__.py": "a9d3a4a2c6cbc0c125dac880ebe747db3af3bab303d4c554ea6da45ac454240f",
+          "casing.py": "0e652c27a006d6e50564ccdc03f2870efb32a8cb828ebe9e4b49e4398a980d56",
+          "language_detector.py": "b04c51101d44f9cba15c662a6ab711ef4d48d707cd0452a2633cbc5c4fb94927",
+          "lemmatizer.py": "90065f644483a66b68f9e8f5aa5a8e04db14b34d944a0051fe681f8876359847",
+          "py.typed": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+          "sentences.py": "87cfd244136e160980ce24a19cf03023483b9aa3b307869b8e2cc50abda5d3e7",
+          "strategies/__init__.py": "6a32bbbe0bbf1232f05dd38e6205ef2428779eff59ecc3f12956d1544de43ca7",
+          "strategies/affix_decomposition.py": "be112bdf39ddc848d77aaad9dd0d9664fb9cd25ada4e55087dfe355441ce73d8",
+          "strategies/apostrophe_boundary.py": "4d36ae3cca0e88e4db51904b4fd6201fcd963d233008a4a88fb8e2162a54551c",
+          "strategies/clitic_decomposition.py": "e122aa3d2de2bd677b3850c087e249be2414e658d85fd052ac51f351f01f1828",
+          "strategies/default.py": "c71a2da22fcde566da29cc496045a7e37b671eb90f9d674ef05d3ae28218d101",
+          "strategies/defaultprefixes.py": "92b684ed042f2abbfb9af3a1fe638d8d1d0e6e2cd7284a5d3d1f28dc0ea6738f",
+          "strategies/defaultrules/__init__.py": "a63bf98ae6c8f000de87749323d766ddc3cfaaf12583781dcf70b8ae5f75c3ef",
+          "strategies/defaultrules/cs.py": "e1c785f2a8c10b4482f3556dcd71e15963e820c838aecd7ed8be769b000e8b1e",
+          "strategies/defaultrules/de.py": "db581c069309f7dab42b2b29289eca7620e5fefb1cce64852b0ac80ee0e35754",
+          "strategies/defaultrules/en.py": "d96e95e04dd8b98d755d1090f915ac2836935cce7544091ad0f4dc15b1345acb",
+          "strategies/defaultrules/eo.py": "52615763695073cb82bad909764e1f13d0678ceb05f128f566416bc481404e59",
+          "strategies/defaultrules/es.py": "6611de869ddabc78e120b572af8ffaaafe05e0c04a1329a6afe5c426daae7fd4",
+          "strategies/defaultrules/et.py": "06c9f9d33d459fb21c487759ae8e5b76108d75b270476c8b507878ffb145bc2d",
+          "strategies/defaultrules/fi.py": "29d1e4011305661cff4222a041f626df28b2518a8928c98a62d7b118f7edea2b",
+          "strategies/defaultrules/generic.py": "211e583b99c243514edf9dbc037d9746d55a6264e9b0e72d22fc8e491c241561",
+          "strategies/defaultrules/is_.py": "528f2fda14083a6bf3315f46ae75017ba25f855cb3e59976cd5e132e56819c86",
+          "strategies/defaultrules/ka.py": "b554d3e817cc30ac332f5362c9f2a87aee72923b551559605ad7fc06695df45e",
+          "strategies/defaultrules/la.py": "16915ca9216a4c2bddfa89a40cd9dd4446293832f3f5af7cb4a4d2336dc84735",
+          "strategies/defaultrules/lv.py": "3208aa26a07b4e17d962593ca8e53ff383aba83fe2ff39e7a635ca26371f8ee6",
+          "strategies/defaultrules/ms.py": "91923676f159d13397013dafd56bf0d1d275ecd6d2e49bbcdedf48686ec4e858",
+          "strategies/defaultrules/nl.py": "f55f817fa4b9f93e1388bed4b18bb984f0e6232fb360658ae99f3c4224163bcd",
+          "strategies/defaultrules/nn.py": "f468547fd13f1b35459eac93c2405ec66676a8cf2e2adee463203e92f5a40220",
+          "strategies/defaultrules/pt.py": "a03b5b1c9ff722126c814c2feba54c252e9f0cc2568221c57179c3bdc69d58c6",
+          "strategies/defaultrules/ro.py": "196cd72e7d9b8f820720d0674c91242d5b8142aa5c69ff62b42e87afba022141",
+          "strategies/defaultrules/ru.py": "e51d877e4018d03ac1da104cf2db499bcdd54a468cb0b903269bdfd0775bf919",
+          "strategies/defaultrules/sk.py": "6b5554e0f16958333a81d7c99091894d06a10cf738a60547cb337654377b03ce",
+          "strategies/defaultrules/sl.py": "4f4b551ef711875e111249570719a8f8d695729fc92761d0364b0912ce361089",
+          "strategies/defaultrules/sv.py": "af3a702a4b5e998af83faf1052187dfd73e66ab58048a2964c12269f54d6f609",
+          "strategies/defaultrules/uk.py": "62119d6c7a2c0a435c6f4f687e4286e994438546992379cb37d7f7a706993f25",
+          "strategies/dictionaries/__init__.py": "6afaeed57286b0bdded2d6c68950353b7f14497b7e2d30f88c75997b4bb8e716",
+          "strategies/dictionaries/data/ar.plzma": "96a568474325eeef3f739756a684539141f488d0c3ceaa22482c9f3a96c55f5e",
+          "strategies/dictionaries/data/ast.plzma": "addcdd680deba7cccfe621c9c58a6c76fb897c54cc3426d369f12ef75d53297f",
+          "strategies/dictionaries/data/bg.plzma": "4a23294a25a4896b780949f591c22462d39c2e3e826715ecbaa0df38b35e6606",
+          "strategies/dictionaries/data/ca.plzma": "511af21f89a27637b290a5dd6c228a99baad9b34bb4f00d3b88f7e70f57b6600",
+          "strategies/dictionaries/data/cs.plzma": "1c36d9db67219fc1ddc90ff977552c66397ba500c989910f9bf727c2b836df77",
+          "strategies/dictionaries/data/cy.plzma": "c1576e81c9b612d492f8e4eeeca0bc303f8ff75378d60476547095b0363afac9",
+          "strategies/dictionaries/data/da.plzma": "27ca3c49e037bf62e167f073a3e0f9c30fa46dae9046c69cb0d507c06d7fff43",
+          "strategies/dictionaries/data/de.plzma": "8ce447b5f013467de6cfd66132c3ea4fb3d27b96adae39059b15759c7b505353",
+          "strategies/dictionaries/data/el.plzma": "4c3d94d500442cff8ec384308037b0b8db033d483f7fd14ba2ad9c1121fc718d",
+          "strategies/dictionaries/data/en.plzma": "e6aa79e80b22d64f98e2bddaacdd8b65286cf5152a1b2c9f6242750b95dcb898",
+          "strategies/dictionaries/data/enm.plzma": "784841e24ae1b5e15c6dc5b53641d9778d3136d8eda3e3d7797e445eb4e92740",
+          "strategies/dictionaries/data/eo.plzma": "e31620c29b8b4fcaeebe671627526406ca53825d563ecec92b0f87c71a9598ec",
+          "strategies/dictionaries/data/es.plzma": "60b1f842463430307e8f8ac54a032e8a415a3d2133e383d18e08c6d9032b177e",
+          "strategies/dictionaries/data/et.plzma": "22db6e1f368435597eb1648ee05d9618a714c282dc2caaad126ebd0c37d8e852",
+          "strategies/dictionaries/data/fa.plzma": "d3d7af5855645c8d5e36d907ea4847fb896c9d9a0b4c78c069639b5b356bb549",
+          "strategies/dictionaries/data/fi.plzma": "6041a8dd3fad6a52f2d25d9571e3417c3d7b9f3c39f30164222c5fd5181ddbd3",
+          "strategies/dictionaries/data/fr.plzma": "5ca8360b1b95054a955bcc614cd543c9f2c39084ed89d6859c1ccd8f97c1d689",
+          "strategies/dictionaries/data/ga.plzma": "8b999e387f67f961d26004fced15aeee7c27f97e637b099c356760fc1f0cce05",
+          "strategies/dictionaries/data/gd.plzma": "c7f6b18665f15989aacf1b2cf5ff9fed3db6dc1f2c7bb8ffd6735ef27571c8a3",
+          "strategies/dictionaries/data/gl.plzma": "da26b3f976784190b5b329e4d0b6c81df7fcaa7698653306a713f378fa8e9122",
+          "strategies/dictionaries/data/grc.plzma": "eaadee14f769a1974de6640cd6a0eda57a5f019929782fc3cca50845cfa07ecd",
+          "strategies/dictionaries/data/gv.plzma": "f6b343215c01d2479cd6db920606abb0f13c5524aa274e95e103be00a5c7036a",
+          "strategies/dictionaries/data/hbs.plzma": "36dc330c1c2a0a2a1b23f821d0cf3c4678817b533e5a0b09aa10c65e51b290d6",
+          "strategies/dictionaries/data/he.plzma": "3387feba003f746dd5bf79ae2ff946ca339eca395790c07212b3d0382f141df1",
+          "strategies/dictionaries/data/hi.plzma": "305b7fa177bdef287e97563d51b2bef3fd1745253537f889924c6182e6daeaba",
+          "strategies/dictionaries/data/hu.plzma": "0ebc6a84a326b81bc3774fa04ee2aff4394139357c8c9f5781eb80c648acb6dd",
+          "strategies/dictionaries/data/hy.plzma": "0e4a681e069f9d9ecbea36603bf397d2edfba4b60e0853781fe3ab225a403b0f",
+          "strategies/dictionaries/data/id.plzma": "6d40203a8929e83e4496ae4465c4738bb87bcee21e030fabfe63df38748a1a11",
+          "strategies/dictionaries/data/is.plzma": "8239a403c0b7fe711cbdf142554277efa65486d86c46b66fbb0bc56099c7b2ce",
+          "strategies/dictionaries/data/it.plzma": "14e78b154292bfb540a5c2bd910c60b272f357cd9cb6f8f60c7ad579a9ff7d0f",
+          "strategies/dictionaries/data/ka.plzma": "82141620752524878ffe20c20e639ee8770a10c05074009c23ad88d8e4199bb5",
+          "strategies/dictionaries/data/la.plzma": "3988054c3fdacd3205d6d8d7d0f8fcf57836d997b23d3a87a0ba75796360071c",
+          "strategies/dictionaries/data/lb.plzma": "de6b95e242e9c8b7b5212b9744f16bae9d0244cf3be38a8142577e7f56385d50",
+          "strategies/dictionaries/data/lt.plzma": "cced3469fb8883ccaac4e51af63ba95eed786cb8e71951cdae3f8f284048f633",
+          "strategies/dictionaries/data/lv.plzma": "950f93d6507fd03d8e2cf6fc947aee5db2268da69142f83aa1b416d343b8ca7d",
+          "strategies/dictionaries/data/mk.plzma": "1b63c88ca408d1c3ace847e6604f014ae789ca642378818a5654761f6f2bb5d2",
+          "strategies/dictionaries/data/ml.plzma": "d2fcbe176b39482140fe4d2df9505deff8ad3e6b1553515858221026fee46ff5",
+          "strategies/dictionaries/data/ms.plzma": "cca8863fd7c7937a8d1529ea9b36aa7ad5576c10dcd0f6eaf298bb2b2efdf960",
+          "strategies/dictionaries/data/nb.plzma": "e5c2d92e51a44286d717d17f30c04f80a86588341eef122961d544975c7d308d",
+          "strategies/dictionaries/data/nl.plzma": "9ea15bb330051d363bc4e32142134c360b1472b433f2ed15974db6a56c425ed1",
+          "strategies/dictionaries/data/nn.plzma": "c12de10f8537799edae274e9cec6fb0f37a5a9afb351cdf10076b2cf6e8023ae",
+          "strategies/dictionaries/data/pl.plzma": "c1289648973342d30a02c9715134dee64b07c3439fd23b3a54812c4b613c19f6",
+          "strategies/dictionaries/data/pt.plzma": "68676afde17e44a8e7f9939457a73565cf905ebdb33655034457a7f1e808acca",
+          "strategies/dictionaries/data/ro.plzma": "af651fd000fefb61641499fbcada725c4152c1eb0c1100ee52f6b50e0464dc4f",
+          "strategies/dictionaries/data/ru.plzma": "74d3424071e85cdadc63cab5ec89fed5c9142123e95c6247e9c2275586a84903",
+          "strategies/dictionaries/data/se.plzma": "d25d62f8f10bd5305eb4be099463dc1a71d8500deb42d7238efb49ddb6eec439",
+          "strategies/dictionaries/data/sk.plzma": "cda6e8f5eb0caf70ec42fb95e94432310152bc6b64b9f82eaa9b49870c2d2d5f",
+          "strategies/dictionaries/data/sl.plzma": "f67fca11a732a221587d3a774b34df48ae0d77dccbce8675405ee8c6f3393dbc",
+          "strategies/dictionaries/data/sq.plzma": "d111ab003e94f7abb41431699cbb890dc4e037a52f790faa81b6ef987a222462",
+          "strategies/dictionaries/data/sv.plzma": "dcdbefc77e5bd93c4722dd30e2d5e54d979fe8e294717289f3bce51d0f931900",
+          "strategies/dictionaries/data/sw.plzma": "1de9ccf89a5b13a6d1a5717a6bab71106a5ab63a9475370947ce5b915b7829d7",
+          "strategies/dictionaries/data/tl.plzma": "92c1983152069753a5559370adc0a9ecc216a968fceca821e6d785e1904584e0",
+          "strategies/dictionaries/data/tr.plzma": "65f6c09de952c34884f93184bb049058de163c11affb7d5f05c6ea196f8d5171",
+          "strategies/dictionaries/data/uk.plzma": "2bffd0e7040f022dc12574bf2cf567b678250ec8de37c38aa0c065d302373337",
+          "strategies/dictionaries/dictionary_factory.py": "e3732b7f8b721f1d84ee04d7db7849c110db6797a0431e5008e4e20c059b1311",
+          "strategies/dictionaries/frontcode.py": "8f8ccb4910082d2e0b691f3ae2866b27ae66c0826dc83bf1daa30fe8c766754d",
+          "strategies/dictionaries/stream_dictionary_factory.py": "0dde34f7a45caf7e6b6cfcbcb98c5c3d6f8f8c698ae07a7944bcd8845583dadf",
+          "strategies/dictionaries/trie_dictionary_factory.py": "5c3e794d19c60117f2b48c137f469d63ad97069eb4a2bc0058b949e509d8cd30",
+          "strategies/dictionary_lookup.py": "c6173d08b916e4a57377ab0bad31031a4b16a37ed2ab9e9ac432552e29a12fa2",
+          "strategies/fallback/__init__.py": "7a0c1dbf35055c9f072a83c097f1dc37d800c3d67152c16bccb8e581cf18db21",
+          "strategies/fallback/lemmatization_fallback_strategy.py": "8965c71c5c744f650573c999e398d86db31d847ff073b7a8877c1c0d7fd3977f",
+          "strategies/fallback/raise_error.py": "9bb4c50a3a144ead8023984ccd4de9426e78bd8145cff0c20cf8e81381bfcb10",
+          "strategies/fallback/to_lowercase.py": "8f8e11863d9903e52ebec9d39a7066f7bdbe41aad607d12bca4c966f1d6ca666",
+          "strategies/greedy_dictionary_lookup.py": "c28d1e344f68453d4a36ebe3ca235dd32c6abd4421e3c9698453ca25c491aecb",
+          "strategies/hyphen_removal.py": "b391ea4757680d5c2dea80e5adf1eb49bac45da4db4061a4fcf4f6072da50339",
+          "strategies/lemmatization_strategy.py": "7903d8766a7b0e803d8f6beba6cc5d86956296c19bce82f635e4ca3f02a9c9f9",
+          "strategies/morpheme_decomposition.py": "f77b6145682bb83ed53505965d77b79302ae90d1659e8333c933fd56720675a0",
+          "strategies/prefix_decomposition.py": "de6eb2376d025bf88e26b92805ab76251053055ffb8d7fad3f142e8310756e54",
+          "strategies/rules.py": "8cea509a2bf8a880cfee16f225d6e2cfe8c130664b5956600e2a233a7228bfc4",
+          "token_sampler.py": "a57d11842e7c93838ebd2a6b915ac35c38ed53bd4ab80dfa0849dfe381baa214",
+          "tokenizer.py": "9ff3ebd0e8a34bcefdefa6f32ec89d3eec955d214c76b9090f95fbaf972f7094",
+          "utils.py": "be0d16233d8e9ab27f24e2490bcbcaa4ea409c565ff842d9928c00e60b2de01b"
+        }
+      },
+      "model_id": "53c485a4c2d14204bfb949c003d21f7412ed6071803de70c1a77e307b6bc02b4",
+      "load_seconds": 0.277755299999626,
+      "analysis_seconds": 0.0002578000003268244,
+      "documents_per_second": 46547.711345178715,
+      "peak_process_memory_bytes": 81879040,
+      "targets": 12,
+      "aligned_targets": 11,
+      "metrics": {
+        "lemma": {
+          "supported": true,
+          "correct": 7,
+          "total": 12,
+          "accuracy": 0.5833333333333334
+        },
+        "upos": {
+          "supported": false,
+          "correct": 0,
+          "total": 12,
+          "accuracy": null
+        },
+        "morph": {
+          "supported": false,
+          "correct": 0,
+          "total": 11,
+          "accuracy": null
+        }
+      },
+      "errors": [
+        {
+          "id": "porta-nome",
+          "surface": "porta",
+          "expected": {
+            "start": 10,
+            "end": 15,
+            "lemma": "porta",
+            "upos": "NOUN",
+            "morph": {
+              "Gender": "Fem",
+              "Number": "Sing"
+            },
+            "surface": "porta"
+          },
+          "predicted": {
+            "text": "porta",
+            "lemma": "porto",
+            "upos": "",
+            "xpos": "",
+            "morph": {},
+            "start": 10,
+            "end": 15,
+            "expanded_multiword": false
+          },
+          "failed": [
+            "lemma"
+          ]
+        },
+        {
+          "id": "porta-verbo",
+          "surface": "porta",
+          "expected": {
+            "start": 5,
+            "end": 10,
+            "lemma": "portare",
+            "upos": "VERB",
+            "morph": {
+              "Number": "Sing",
+              "Person": "3"
+            },
+            "surface": "porta"
+          },
+          "predicted": {
+            "text": "porta",
+            "lemma": "porto",
+            "upos": "",
+            "xpos": "",
+            "morph": {},
+            "start": 5,
+            "end": 10,
+            "expanded_multiword": false
+          },
+          "failed": [
+            "lemma"
+          ]
+        },
+        {
+          "id": "pesca-verbo",
+          "surface": "pesca",
+          "expected": {
+            "start": 6,
+            "end": 11,
+            "lemma": "pescare",
+            "upos": "VERB",
+            "morph": {
+              "Number": "Sing",
+              "Person": "3"
+            },
+            "surface": "pesca"
+          },
+          "predicted": {
+            "text": "pesca",
+            "lemma": "pesca",
+            "upos": "",
+            "xpos": "",
+            "morph": {},
+            "start": 6,
+            "end": 11,
+            "expanded_multiword": false
+          },
+          "failed": [
+            "lemma"
+          ]
+        },
+        {
+          "id": "legge-verbo",
+          "surface": "legge",
+          "expected": {
+            "start": 5,
+            "end": 10,
+            "lemma": "leggere",
+            "upos": "VERB",
+            "morph": {
+              "Number": "Sing",
+              "Person": "3"
+            },
+            "surface": "legge"
+          },
+          "predicted": {
+            "text": "legge",
+            "lemma": "legge",
+            "upos": "",
+            "xpos": "",
+            "morph": {},
+            "start": 5,
+            "end": 10,
+            "expanded_multiword": false
+          },
+          "failed": [
+            "lemma"
+          ]
+        },
+        {
+          "id": "ancora-nome",
+          "surface": "ancora",
+          "expected": {
+            "start": 16,
+            "end": 22,
+            "lemma": "ancora",
+            "upos": "NOUN",
+            "morph": {
+              "Gender": "Fem",
+              "Number": "Sing"
+            },
+            "surface": "ancora"
+          },
+          "predicted": null,
+          "failed": [
+            "lemma"
+          ]
+        }
+      ]
+    }
+  ],
+  "protocol": "same_character_spans_isolated_processes_v1",
+  "created_at": "2026-11-14T11:07:27.950086+00:00"
+}

@@ -1,4 +1,5 @@
 import { CHAIN_MODES, chainModeFor, chainModeLabel, chainSecret, type ChainMode, type ChainRound, parseChainSecret, type Viewer } from '@zerocade/shared'
+import { retryDue } from './retry'
 import type { GameInstance } from './engine'
 import { drawAvatar, fillTextWithAvatar } from './avatar'
 import { addPoints, clamp, drawTimerBar, newScores, topOf } from './common'
@@ -20,18 +21,22 @@ import { roundCheer } from '../audio'
 
 type ListKind = 'walks' | 'keys'
 const URLS: Record<ListKind, string> = { walks: '/api/chains', keys: '/api/chains/keys' }
-const lists: Record<ListKind, { data: string[][] | null; loading: Promise<string[][]> | null; failed: boolean }> = {
-  walks: { data: null, loading: null, failed: false },
-  keys: { data: null, loading: null, failed: false },
+// failedAt: when the last download failed (performance.now()), null if none did; it is tried again after RETRY_MS.
+const lists: Record<ListKind, { data: string[][] | null; loading: Promise<string[][]> | null; failedAt: number | null }> = {
+  walks: { data: null, loading: null, failedAt: null },
+  keys: { data: null, loading: null, failedAt: null },
 }
 
 function load(kind: ListKind): Promise<string[][]> {
   const list = lists[kind]
   list.loading ??= fetch(URLS[kind])
     .then((r) => (r.ok ? (r.json() as Promise<string[][]>) : Promise.reject(new Error(kind))))
-    .then((data) => (list.data = data))
+    .then((data) => {
+      list.failedAt = null
+      return (list.data = data)
+    })
     .catch((err) => {
-      list.failed = true
+      list.failedAt = performance.now()
       list.loading = null
       throw err
     })
@@ -114,11 +119,13 @@ export function createChainReaction(): GameInstance {
     if (waiting) return
     const nextRound = forced ? forced.round : round + 1
     let nextMode = forced ? forced.mode : chainModeFor(modeSetting, nextRound, perMode)
-    // Without the clues (the server could not build them) a "Parola chiave" round plays a chain.
-    if (!forced && nextMode === 'chiave' && lists.keys.failed) nextMode = 'catena'
+    // Without the clues (the server could not build them) a "Parola chiave" round plays a chain, until they can be
+    // asked for again.
+    if (!forced && nextMode === 'chiave' && !retryDue(lists.keys.failedAt, performance.now())) nextMode = 'catena'
     const kind: ListKind = nextMode === 'chiave' ? 'keys' : 'walks'
     if (!forced && !lists[kind].data) {
-      if (lists[kind].failed) return
+      // update calls again every frame: retryDue spaces the downloads after a failure.
+      if (!retryDue(lists[kind].failedAt, performance.now())) return
       waiting = true
       void load(kind)
         .then(() => {
@@ -321,7 +328,7 @@ export function createChainReaction(): GameInstance {
       ctx.fillStyle = '#9aa0b8'
       ctx.font = '24px system-ui'
       const dots = '.'.repeat(1 + (Math.floor(now / 400) % 3))
-      ctx.fillText(lists.walks.failed ? 'Nessuna catena disponibile (schema associazioni)' : `Carico le catene${dots}`, cx, top + 130)
+      ctx.fillText(lists.walks.failedAt !== null ? 'Nessuna catena disponibile (schema associazioni)' : `Carico le catene${dots}`, cx, top + 130)
       return
     }
 

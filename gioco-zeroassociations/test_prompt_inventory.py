@@ -1,4 +1,5 @@
 """Il primo step raccoglie attestazioni senza generare né approvare associazioni."""
+import bz2
 import gzip
 import json
 from pathlib import Path
@@ -52,6 +53,69 @@ class ParserTests(unittest.TestCase):
             rows=list(records(path,source('morphit')))
         self.assertEqual(rows[0]['prompt'],'roma')
         self.assertEqual(rows[0]['role'],'proper_name')
+
+    def test_unimorph_imports_explicit_lemma_and_all_analyses(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path=Path(directory)/'ita'
+            path.write_text('\nandare\tandai\tV;IND;PST;1;SG;PFV\nandare\tandare\tV;NFIN\n'
+                            'andare\tandai\tV;OTHER\n',encoding='utf-8')
+            rows=list(records(path,source('unimorph')))
+            self.assertEqual([r['prompt'] for r in rows],['andai','andare','andare','andai','andare'])
+            self.assertEqual(rows[0]['role'],'inflected_form')
+            self.assertEqual(rows[1]['role'],'lemma')
+            self.assertEqual(rows[0]['details']['features'],'V;IND;PST;1;SG;PFV')
+            self.assertNotEqual(rows[0]['locator'],rows[3]['locator'])
+            path.write_text('andare\tandai\n',encoding='utf-8')
+            with self.assertRaises(ValueError):list(records(path,source('unimorph')))
+
+    def test_glaffit_reads_bzip2_grace_and_preserves_proper_names(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path=Path(directory)/'GLAFFIT.txt.bz2'
+            with bz2.open(path,'wt',encoding='utf-8') as stream:
+                stream.write('FORM\tFCODE\tLEMMA\tLCODE\tBESTPHON\n'
+                             'città\tNcfp---\tcittà\tNcfs---\ttʃitˈta\n'
+                             'andarono\tVmis3p-\tandare\tVmn----\t\n'
+                             'Roma\tNpfs---\tRoma\tNpfs---\t\n')
+            rows=list(records(path,source('glaffit')))
+        self.assertEqual([r['prompt'] for r in rows],['città','andarono','andare','roma'])
+        self.assertEqual(rows[1]['role'],'inflected_form')
+        self.assertEqual(rows[2]['pos'],'Vmn----')
+        self.assertEqual(rows[0]['details']['lexical_fields']['BESTPHON'],'tʃitˈta')
+        self.assertEqual(rows[3]['role'],'proper_name')
+
+    def test_flex_it_adjective_codes_are_not_pos_and_frequency_stays_with_form(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path=Path(directory)/'adj.csv'
+            path.write_text('"","Form","Lemma","Freq","POS","Gender","Number","Inf_class"\n'
+                            '"1","belle","bello","42","fp","femm","plur","a_e o_i"\n',encoding='utf-8')
+            config={**source('flex_it'),'pos':'ADJ'}
+            rows=list(records(path,config))
+            self.assertEqual([r['prompt'] for r in rows],['belle','bello'])
+            self.assertEqual(rows[0]['pos'],'ADJ')
+            self.assertEqual(rows[0]['details']['source_pos'],'fp')
+            self.assertEqual(rows[0]['details']['frequency'],42)
+            self.assertEqual(rows[1]['details']['source_scope'],'explicit_lemma')
+            self.assertNotIn('frequency',rows[1]['details'])
+            with self.assertRaises(ValueError):list(records(path,source('flex_it')))
+
+    def test_new_morphology_rejects_missing_headers_or_lemmas(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path=Path(directory)/'invalid'
+            for kind,text in [('glaffit','FORM\tLEMMA\ncase\tcasa\n'),
+                              ('flex_it','Form,Lemma\ncase,casa\n'),
+                              ('unimorph','\tcase\tN;PL\n')]:
+                if kind=='glaffit':
+                    with bz2.open(path,'wt',encoding='utf-8') as stream:stream.write(text)
+                else:path.write_text(text,encoding='utf-8')
+                with self.subTest(kind=kind),self.assertRaises(ValueError):list(records(path,source(kind)))
+
+    def test_hunspell_flags_never_become_lemmas_or_words(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path=Path(directory)/'it_IT.dic'
+            path.write_text('2\ncasa/AB\npoeta/C\n',encoding='utf-8')
+            rows=list(records(path,source('hunspell')))
+        self.assertEqual([r['prompt'] for r in rows],['casa','poeta'])
+        self.assertTrue(all(r['role']=='listed_form' and r['lemma']=='' for r in rows))
 
     def test_wikipedia_titles_are_not_language_proof_or_fragments(self):
         with tempfile.TemporaryDirectory() as directory:
@@ -108,6 +172,49 @@ class InventoryTests(unittest.TestCase):
         self.db=SQLite(self.directory/'inventory.sqlite3');initialize_inventory(self.db)
 
     def tearDown(self):self.temporary.cleanup()
+
+    def test_registered_source_first_import_merges_words_and_later_versions_are_staged(self):
+        from inventory_updates import register_sources
+        existing=self.directory/'existing.txt'
+        existing.write_text('casa\n',encoding='utf-8')
+        import_source(self.db,source(key='existing'),existing)
+        config=source('morphit','registered-morphology')
+        register_sources(self.db,[config])
+        self.db.run("UPDATE inventory_registered_sources SET enabled=0 WHERE source_key='registered-morphology';")
+        path=self.directory/'morph.txt'
+        path.write_text('casa\tcasa\tNOUN-F:s\ncasa\tcasa\tNOUN-F:s\ncase\tcasa\tNOUN-F:p\n',encoding='latin-1')
+        self.assertEqual(import_source(self.db,config,path)['status'],'IMPORTED')
+        self.assertEqual(import_source(self.db,config,path)['status'],'ALREADY_IMPORTED')
+        self.assertEqual(self.db.run('SELECT prompt FROM inventory_terms ORDER BY prompt;',rows=True),
+                         [{'prompt':'casa'},{'prompt':'case'}])
+        self.assertEqual(self.db.run('SELECT count(*) AS n FROM inventory_updates;',rows=True)[0]['n'],0)
+        self.assertEqual(self.db.run("SELECT enabled FROM inventory_registered_sources WHERE source_key='registered-morphology';",
+                                     rows=True)[0]['enabled'],0)
+        path.write_text('gatto\tgatto\tNOUN-M:s\n',encoding='latin-1')
+        self.assertEqual(import_source(self.db,config,path)['status'],'PENDING')
+        self.assertEqual(self.db.run("SELECT prompt FROM inventory_terms WHERE prompt='gatto';",rows=True),[])
+
+    def test_new_morphology_imports_keep_provenance_and_evidence_flags(self):
+        unimorph=self.directory/'ita'
+        unimorph.write_text('andare\tandarono\tV;IND;PST;3;PL\n',encoding='utf-8')
+        glaffit=self.directory/'glaffit.bz2'
+        with bz2.open(glaffit,'wt',encoding='utf-8') as stream:
+            stream.write('FORM\tFCODE\tLEMMA\tLCODE\nandarono\tVmis3p-\tandare\tVmn----\n')
+        flex=self.directory/'nouns.csv'
+        flex.write_text('Form,Lemma,POS,Freq,Gender,Number,Inf_class\n'
+                        'case,casa,NOUN-F:p,12,femm,plur,a_e\n',encoding='utf-8')
+        for kind,path in [('unimorph',unimorph),('glaffit',glaffit),('flex_it',flex)]:
+            config={**source(kind,kind),'pos':'NOUN'}
+            self.assertEqual(import_source(self.db,config,path)['status'],'IMPORTED')
+            self.assertEqual(import_source(self.db,config,path)['status'],'ALREADY_IMPORTED')
+        rows=self.db.run('SELECT prompt,has_lemma_evidence,has_inflected_evidence,has_it_dictionary_evidence '
+                         'FROM inventory_terms ORDER BY prompt;',rows=True)
+        self.assertEqual(rows,[{'prompt':word,'has_lemma_evidence':lemma,'has_inflected_evidence':1-lemma,
+                               'has_it_dictionary_evidence':1}
+                              for word,lemma in [('andare',1),('andarono',0),('casa',1),('case',0)]])
+        self.assertEqual(self.db.run("SELECT count(DISTINCT snapshot_id) AS n FROM inventory_attestations "
+                                     "WHERE prompt='andarono';",rows=True)[0]['n'],2)
+        self.assertEqual(self.db.run('SELECT count(*) AS n FROM inventory_term_decisions;',rows=True)[0]['n'],0)
 
     def test_distinct_prompts_multiple_sources_idempotence_and_safe_text(self):
         first=self.directory/'one.txt';second=self.directory/'two.txt'

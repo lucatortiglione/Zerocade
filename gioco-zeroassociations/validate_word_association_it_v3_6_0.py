@@ -65,19 +65,8 @@ def normalize_dictionary_form(s: str, *, source: str, allow_historical: bool = F
 
 
 def load_italian_nlp(model: str = "it_core_news_md"):
-    try:
-        import spacy
-    except ImportError as e:
-        raise RuntimeError("spaCy non installato: pip install spacy") from e
-    try:
-        nlp = spacy.load(model, disable=["ner", "textcat"])
-    except OSError as e:
-        raise RuntimeError(f"Modello {model!r} non installato: python -m spacy download {model}") from e
-    if "tagger" not in nlp.pipe_names and "morphologizer" not in nlp.pipe_names:
-        raise RuntimeError("Serve un modello italiano con POS e lemmatizzatore; spacy.blank('it') non basta")
-    if "lemmatizer" not in nlp.pipe_names:
-        raise RuntimeError("Il modello non ha il lemmatizzatore, necessario per bloccare le forme flesse")
-    return nlp
+    from italian_nlp import load_spacy
+    return load_spacy(model)
 
 
 @dataclass
@@ -209,8 +198,15 @@ def filter_definition(prompt: str, definition: str, nlp,
     Restituisce audit di tutti i token, inclusi quelli esclusi, per tracciabilita'."""
     output = []
     seen = set()
+    model = getattr(nlp, 'meta', {}).get('zerocade_nlp')
     for tok in nlp(definition):
         item = check_token(prompt, tok, resources, definition_id=definition_id)
+        item['provenance'].update(analysis_kind='model_prediction', context=definition)
+        if model:
+            from italian_nlp import digest
+            item['provenance']['model'] = {key: model[key] for key in
+                                           ('engine', 'library_version', 'model', 'model_version')}
+            item['provenance']['model_id'] = digest(model)
         attachment = adjective_attachment(prompt, tok)
         if attachment is not None:
             item['adjective_attachment'] = attachment

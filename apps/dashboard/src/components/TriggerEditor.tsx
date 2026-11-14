@@ -3,6 +3,7 @@ import {
   GIFTS,
   MAX_TRIGGERS,
   describeSource,
+  triggerEnabled,
   type SessionState,
   type Trigger,
   type TriggerSource,
@@ -69,6 +70,11 @@ export function TriggerEditor({ session, titled = true }: { session: SessionStat
             >
               ×
             </button>
+            {!triggerEnabled(game, session.settings, trigger) && (
+              <span className="text-muted small" style={{ gridColumn: '1 / -1' }}>
+                Spento: «{describeSource(trigger.source).label}» non dà aiuti (Live settings, Aiuti dal pubblico).
+              </span>
+            )}
           </li>
         ))}
       </ul>

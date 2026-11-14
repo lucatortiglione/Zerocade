@@ -18,7 +18,7 @@ Il DB che i giochi leggono, in sola lettura. Sta in Git e va nel pacchetto Windo
 | --- | --- |
 | `dubbi` | ZeroDubbi |
 | `wordle` | ZeroWordle |
-| `context` | ZeroContext (le parole; i vettori sono in `gioco-zerocontext/data/vectors.bin`) |
+| `context` | ZeroContext (le parole e i collegamenti con ZeroAssociazioni; i vettori sono in `gioco-zerocontext/data/vectors.bin`) |
 | `associazioni` | ZeroAssociazioni e ZeroReazioniACatena: solo i prompt, le parole (ognuna una volta) e i collegamenti |
 | `parole` | ZeroWords |
 | `contenuti` | gli altri giochi dell'overlay |

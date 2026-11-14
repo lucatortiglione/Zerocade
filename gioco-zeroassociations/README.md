@@ -50,6 +50,8 @@ Dalla cartella `gioco-zeroassociations`, con `.venv/Scripts/python.exe -B`:
 | `prompt_database.py livecade --count N` | CSV per Livecade: N prompt, 7 risposte ciascuno |
 | `prompt_database.py register-directives` | Dopo un ritocco al testo delle direttive che non cambia le regole |
 | `inventory_updates.py …` | Aggiornamenti delle fonti e decisioni sulle voci (task «Fonti: …» e «Voci: …») |
+| `nlp_tools.py lookup / analyze / benchmark` | Analisi lessicali di parole isolate, previsioni contestuali e confronto spaCy/Stanza/Simplemma ([guida](ANALISI_NLP.md)) |
+| `evaluate_imported_words.py` | Valuta le nuove parole per ogni gioco, con esiti nella raccolta e rapporto per ruolo ([risultati del lotto](VALUTAZIONE_NUOVE_PAROLE.md)) |
 | `validated_prompt_database.py sync` | Rigenera lo schema `validi` dai verbali correnti |
 | `analyze_telemetry.py --guesses T.csv --rounds R.csv --output rapporto.json --proposals proposte.jsonl` | Analisi della chat |
 | `free_association_llm.py --output r.json recall` | Giocatori simulati sui bacini (LLM locale) |

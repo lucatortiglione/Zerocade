@@ -1,0 +1,340 @@
+{
+  "run_id": "10a5b1ce84e0a2c27d3e73e83a2d2360eccaa55e5322422e9289223901406ffb",
+  "status": "COMPLETE",
+  "manifest": {
+    "selected_rows_sha256": "a9c95f81f2088a46299a41ba9fab81b4e2b62b3e7c4cc21edc5c08270c4aa296",
+    "active_snapshots": [
+      [
+        "de-mauro-sitemaps",
+        "9eed858dc409679538c92b2813ed5e445b695983bdffaf91b3ea1da498eabc97",
+        "deb175cf7b938247b76e853f8cb8a99738fb3e21e46503516611e460d9c87976"
+      ],
+      [
+        "freedict-ita-deu",
+        "77b4ff98d1cb45ae675f4dec5f15d058c7bd77b8abbae696edd8953ee55bde19",
+        "b364b906dea10213b47d27ad1a4d0631b1ad6da0400304fefb2597ef765d5884"
+      ],
+      [
+        "frequencywords-it-2018",
+        "100abcf8272e7a92a6432f71f98547931dc79bd0678d2c2e314b0891038f7a92",
+        "b23b0c6a3f59c1da1c7caa667b9df5699e95323fee20a05f343c7d7dae73c4be"
+      ],
+      [
+        "itaoa-montefinese-2019",
+        "e7e7ee444f08cae360d5a7c6b6b51bc799e7b0f7d6261844f251cd47e470f605",
+        "026bcdba1c9544167829f19d7b0cd53fa21836fc7c24891a92eee75fbaf4aabc"
+      ],
+      [
+        "kaikki-dewiktionary-it",
+        "9fff6763755b58d67d1e8eb41a72a3867dd728f22555a2dc159760bc981e670e",
+        "e797f78d800f5a39e3874a5b1bb4ea0f804c5886badff20e21ad1029016b4840"
+      ],
+      [
+        "kaikki-enwiktionary-it",
+        "476addc4c7118fc79ae79e2815b169ef62d3072f3d9e5ab066e53c611f8fae08",
+        "f112deb9747b7f33f4247da4999dfba0aa739bb4aaff9dd42fdf0615918a9c11"
+      ],
+      [
+        "kaikki-eswiktionary-it",
+        "0deab9226eab98866f1476c0061f51b62684f3a188be2d906c6699d9d655aec6",
+        "7ddb5a16fabf553fb1335418a374bce6ba9c3a78e4cb34e62f387d8bacd5c9c8"
+      ],
+      [
+        "kaikki-frwiktionary-it",
+        "6aef94cf4cf98c8555d08b7e38fb54f68209983fca0ecf8c0a1a67eb73f73f51",
+        "f773ab4c9e25322271707638844748489d1f4d9ed745f738e8f6c4539d5f1c90"
+      ],
+      [
+        "kaikki-itwiktionary",
+        "bb039bab0c56cc7363f052ca53104866814e15cd4e5a2e7c8dfcd8b467531487",
+        "095df1665fde8e41bdf07250887d0cdacf570b543118aa09505f8628c9cf46e9"
+      ],
+      [
+        "libreoffice-it-dictionary",
+        "15faea46f272429258dc562f7bf7a9ac707212d14b548da30ed761cf488323b8",
+        "bae1e3501dcd2a923669592493b3fde6c02aae7c7aab83bf5e5b49077e73dd64"
+      ],
+      [
+        "libreoffice-it-thesaurus",
+        "0092ee47bf23b4edef87702d7400c047d85c1844fc83a205e2847c9d60081fde",
+        "96af44562d73ec56dbaacce04588f6a3b7569d581542d9518f64b7c5b1926bcf"
+      ],
+      [
+        "morphit-048-mirror",
+        "d64de8e0979b9fe5374b3faf40370fc1787532ad7a0d7e70a0d6f8227df9d31e",
+        "7375216351ee59cee4326b455503f3a6c4e9542cd63ecb86ff5cd58ca5c8e800"
+      ],
+      [
+        "napolux-paroleitaliane",
+        "12cc87982e623d171131b74f0fd42570a32d0448332cfc8459d5b10f8957dfbb",
+        "edd295a2e17d0c56e58e2f0e3936c0e8a331f591d47db8a1bd6d4ead4cc80d6e"
+      ],
+      [
+        "nvdb-de-mauro-2016",
+        "b6d2a71affe04806e59c865aed81d4fb583d6ca48b2da32c454a07080bf4e1cc",
+        "f053fa2dd393a105d9645a86aa3c3994fe360c3896d7720b1c6e87246e4e5098"
+      ],
+      [
+        "omw-multiwordnet-it",
+        "e1fbadd830b71ffa5e21c4c7d94c9a486bcc8412e35222a264c0a242b4303503",
+        "251ac0097ef81a7ed0d283f6852953106a37dbb8c1b9f93d87079641c271eafa"
+      ],
+      [
+        "ud-isdt-dev",
+        "79db4e8518f5630cfc6f78857cad76cfed8032af8bb5f208f36009b0645f2837",
+        "1bc7dda04c58a4d87e2e6607a0e612462b87e7da6dde56be610d3749521af744"
+      ],
+      [
+        "ud-isdt-test",
+        "4c8152fc678df9f18531197229b8cc12279eff44e41728fa3531ab18482ad0bd",
+        "cea8ca0e8d1ddf7ce509f10afff426d00e058982f49473e0744cd0ee477129e3"
+      ],
+      [
+        "ud-isdt-train",
+        "9cc35765f5fa15b9610e82eaf76bb1cdd762438c277b9ec6f4f945a6a2d6abf3",
+        "7c3e32d7f296c877387a0c805c3ae8c471e2b5e8df97f5e3da810834b50566ab"
+      ],
+      [
+        "ud-markit-dev",
+        "3f4b58a91c14e2684a8d044c54b86c1061d31ac66f969a2fabf9295f52d4144f",
+        "633b6186f47ecfebfcff4ff9c7e19a0cbffd1f655f14fc1e9265b12bda597f97"
+      ],
+      [
+        "ud-markit-test",
+        "710780a89c1ef0bdc1edd51e527047fb1514a2f722a04193540571c5f81249b5",
+        "9048ed0064e3989e2c37377755a28c25c7e462b1ad916e5808dc0a7ce95fc3fc"
+      ],
+      [
+        "ud-markit-train",
+        "8251dbc4249270ae8e4bacdeb8cf1c1a7d0612aa009dbe0b52c6dc485fd732c2",
+        "4f6fc3423acb00d49e1e167bd21b11ebbc23e22275fd6f5eeb4d75cfbbccc5c6"
+      ],
+      [
+        "ud-partut-dev",
+        "705d73c79e7de8615e7acfadc59042c9147b1ee7b67ad4b8d0862de9ecfde5b0",
+        "c6542e547447df403e54f314a61ec9f4a5e1e0d770dbcbdedb5ea8edcb6758fc"
+      ],
+      [
+        "ud-partut-test",
+        "aa96dd15fff106287eddc88b6cd982f3a5a6d6b4489e1b14cf4db34b6008dca7",
+        "6a3f3437fd3ab383ba37122ec84cc1bd53662512f5ff1e80ed306c6b668eb6a2"
+      ],
+      [
+        "ud-partut-train",
+        "c9f994e0aaff032b00f27b1d8cd6ff571cf85c63912f583206322ef5cf38363e",
+        "576ecef59bedbd740c6c8744af25726d5d279afac3555fa6a37c50ec7db1324d"
+      ],
+      [
+        "ud-postwita-dev",
+        "d2fbd0004bfc2cfe191807678ae470bf58ccfa344df8ec9239bdcf85298aff67",
+        "ba359dae18bce28208945004cf75a100d72e667fb724f917cd6f405aef150142"
+      ],
+      [
+        "ud-postwita-test",
+        "d76258956a7800e9d0a0e263d37004ba2a120f9e7aec56b0a94378af18c6488d",
+        "5db5e37ed8dc904595ac7d5bc3f746e6232a9fec0689948ffd17219c082a77c4"
+      ],
+      [
+        "ud-postwita-train",
+        "a0aa52617156cfef61903ae1a4a2aa1868256bd7d37cfc2c0973cb938443690d",
+        "1cd7c0bdce31c1f9768e9a95befd69ffe2246b98b42446ab8912fe7ec665d2d9"
+      ],
+      [
+        "ud-twittiro-dev",
+        "7228f774a6ccc2c9020a9055424bd18aa3bbf263e51214753a61d6aa0d55884b",
+        "1f16040ae17395d2910784742e6b3344620a67937524d47ed96fd56f811a8c99"
+      ],
+      [
+        "ud-twittiro-test",
+        "ce5fb7e377afa333274d714532185807f80f2edfa64a2f3140731a9b3af5fc86",
+        "ae8560ce8471d20fda2e242dc45b3be7d2e0e8f0ccec323a7750fe7511f8b9d4"
+      ],
+      [
+        "ud-twittiro-train",
+        "0135d8c97b765f94359426e94e850f598b5fbfb1231e5dc5e44b95a71d95b1e8",
+        "a470b66a73d2d489113de4f0591b1c61cf3848c6a94cedf33a8379d7e39a24f2"
+      ],
+      [
+        "ud-valico-test",
+        "589690bbf22a4494ead396c9cc4b1e81ad19e69bcce5bd84ca65900acf4e1c4f",
+        "a9f026703c1f3321eeba060460a1dac9d49677a641a7f03e78bcf8103667815a"
+      ],
+      [
+        "ud-vit-dev",
+        "c5fc97b8a0e3707aea599472bfe9e4b66c589b2a328a0aabf826d87cc145eb73",
+        "d6e076afb639b4bee82f8caaaaed467cbd2c4f6ec2762aa0108ca865f97e0f3c"
+      ],
+      [
+        "ud-vit-test",
+        "94816cb2ee4fc8b467476a1062cd4c19ff6fdeec928cb6440366e9b872886bab",
+        "1569c1c28727e1f99d8246c57b0ffa61ae0442747599051bfbd0e63d7081503f"
+      ],
+      [
+        "ud-vit-train",
+        "90c9e5a77d6085e8688d286e13446fa4eaeefad4f68a0dfeab737b8e72883537",
+        "678e41cc9771c8dec6a2b2a21489d549dd4d715bda582d3890b162b1c80ea33a"
+      ],
+      [
+        "wikinews-it",
+        "e841cbe1956121dbbb8942bb1db64f9191040a0468c252bb33cc66c868478766",
+        "28b6781297c89da632d1ff85c8bbb79322405e9fee894afa5311bdb4b81e3ef7"
+      ],
+      [
+        "wikipedia-it",
+        "dcab5929dea97b255086479e5a97a0e9a76a691b4d208ab6fd3819bee12ec42a",
+        "fe0f1f8777b487d3e26caecf84e59e1ba46c540b347aa2646e837c45391ad756"
+      ],
+      [
+        "wikiquote-it",
+        "be64c8f45a5d1221986d668829ebbe34a44b1d19ab35d5df46e478cbda77d862",
+        "72938f2bf3e3ef1c2c56ee5e0da64125f9386ef70929c1ae5ba574af5986cc96"
+      ],
+      [
+        "wikisource-it",
+        "cb63f7bfde73bd3bc466f1ce815def3f0364918e0fe4d4e072000d61373b5775",
+        "6291ca4f4ef778eb4252bdccbbdeb9a09cb91f673df50f0f87229c9a021d58bc"
+      ],
+      [
+        "wikiversity-it",
+        "4bbb52d1ccdded3e80c6c53b2233a15eef4a45626065487ce1b76e0d30d5c1c5",
+        "7880d0da365c92350a1102029507b65ff1e97875898bbffd1ca86ac25307c6ea"
+      ],
+      [
+        "wikivoyage-it",
+        "913120deef26a7e6c0a08adb10c0db26f5807f4d0bb502f69e453efe260682f6",
+        "72244f42f8736e63dee6a0d8e30962503729c8eb61a47d0db832ea92b24d118d"
+      ],
+      [
+        "wiktionary-it-titles",
+        "01b0db594d9e31cab764947ca14c6c7ca442c400d4892a728e17e5da758d843b",
+        "b3f1a61cfd6b6f5cc10b0b7b50a30693042bad1353e619fe41f35c8dd1a15f1d"
+      ],
+      [
+        "wordfreq-it-local",
+        "eec38f085070e19ecd70c710111aecd73f4ec4e6d633f2d11d23349d54927a65",
+        "e4e4fc0d8af8f4e6d853670a9bf5f5ef43d315d29e1a65765d476f1f44bf7aa1"
+      ]
+    ],
+    "raw_database": "C:\\Progetti\\Zerocade\\database\\parole_ita_raw.sqlite3",
+    "games_database": "C:\\Progetti\\Zerocade\\database\\giochi.sqlite3"
+  },
+  "coverage": {
+    "parole_ita_raw#raw.prompts": {
+      "checked": 3941,
+      "flagged": 13
+    },
+    "parole_ita_raw#raw.associations": {
+      "checked": 58551,
+      "flagged": 488
+    },
+    "parole_ita_raw#game.prompts": {
+      "checked": 3941,
+      "flagged": 13
+    },
+    "parole_ita_raw#game.associations": {
+      "checked": 58551,
+      "flagged": 488
+    },
+    "parole_ita_raw#validi.prompts": {
+      "checked": 3941,
+      "flagged": 13
+    },
+    "parole_ita_raw#validi.associations": {
+      "checked": 58551,
+      "flagged": 488
+    },
+    "parole_ita_raw#filtrati.filtered_prompts": {
+      "checked": 6617,
+      "flagged": 32
+    },
+    "parole_ita_raw#filtrati.validated_prompts": {
+      "checked": 6618,
+      "flagged": 20
+    },
+    "parole_ita_raw#candidati.prompts": {
+      "checked": 6586,
+      "flagged": 19
+    },
+    "parole_ita_raw#validi.validated_prompts": {
+      "checked": 3941,
+      "flagged": 13
+    },
+    "parole_ita_raw#finale.prompts": {
+      "checked": 3941,
+      "flagged": 13
+    },
+    "parole_ita_raw#finale.words": {
+      "checked": 11752,
+      "flagged": 59
+    },
+    "parole_ita_raw#finale.prompt_words": {
+      "checked": 58551,
+      "flagged": 488
+    },
+    "giochi#associazioni.prompts": {
+      "checked": 3941,
+      "flagged": 13
+    },
+    "giochi#associazioni.words": {
+      "checked": 11752,
+      "flagged": 59
+    },
+    "giochi#wordle.solutions": {
+      "checked": 8630,
+      "flagged": 0
+    },
+    "giochi#wordle.words": {
+      "checked": 105310,
+      "flagged": 0
+    },
+    "giochi#context.vocab": {
+      "checked": 60229,
+      "flagged": 3685
+    },
+    "giochi#context.secrets": {
+      "checked": 6837,
+      "flagged": 18
+    },
+    "giochi#parole.words": {
+      "checked": 185540,
+      "flagged": 8439
+    }
+  },
+  "selected_uses": 667721,
+  "distinct_selected_words": 248343,
+  "lexical_words_with_evidence": 234434,
+  "lexical_flags": {
+    "POS_NOT_ATTESTED": 10,
+    "NO_LEXICAL_EVIDENCE": 12513,
+    "POS_UNRESOLVED": 5,
+    "NO_LEMMA_EVIDENCE": 13
+  },
+  "flagged_uses": 14361,
+  "distinct_flagged_words": 12512,
+  "context_documents": 72028,
+  "uses_with_target_in_context": 207068,
+  "context_flagged_uses": 1823,
+  "models": {
+    "spacy": {
+      "analyzed": 0,
+      "reused": 72028,
+      "model_id": "ff27f74218ea5973cf446a72585eb8c09af9d75e64b5c3815ba73f70506149c4"
+    },
+    "stanza": {
+      "analyzed": 0,
+      "reused": 476,
+      "model_id": "8d3e7be4e89fb56abeb505535eaa81e369803b03949604cbb7779848a027da0a"
+    }
+  },
+  "simplemma_model_id": "53c485a4c2d14204bfb949c003d21f7412ed6071803de70c1a77e307b6bc02b4",
+  "unselected_inventory_terms": 2481941,
+  "unselected_inventory_policy": "Raw titles and source lists are preserved; NLP does not certify isolated entries.",
+  "games_quick_check": [
+    [
+      "ok"
+    ]
+  ],
+  "automatic_gameplay_changes": 0,
+  "elapsed_seconds": 130.77849109999988,
+  "completed_at": "2026-11-14T11:30:11.379532+00:00"
+}

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type CSSProperties, type FormEvent, type ReactNode } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type FormEvent, type ReactNode } from 'react'
 import {
   GAMES,
   TIER_COLORS,
@@ -97,7 +97,7 @@ function LiveStatsBar() {
     {
       icon: <EyeIcon />,
       value: stats.viewers ?? 0,
-      label: stats.viewers === null ? 'Spettatori (nessuna diretta collegata)' : 'Spettatori presenti ora',
+      label: stats.viewers === null ? 'Spettatori: non noti (nessuna diretta collegata, o un ZeroFollowerBot che ancora non li manda)' : 'Spettatori presenti ora',
     },
     { icon: <CommentIcon />, value: stats.comments, label: 'Commenti della sessione' },
     { icon: <HeartIcon />, value: stats.likes, label: 'Like della sessione' },
@@ -143,7 +143,7 @@ const MARKS: Record<FeedMark, { icon: string; label: string }> = {
   repeat: { icon: '↺', label: 'Parola già trovata' },
 }
 
-// Newest first. TikTok sends likes in small bursts: one viewer's likes in a row make one line.
+// Oldest first, with the newest at the bottom. Consecutive likes from one viewer make one line.
 function chatRows(feed: FeedItem[], filter: ChatFilter): FeedItem[] {
   const rows: FeedItem[] = []
   for (const item of feed) {
@@ -159,7 +159,7 @@ function chatRows(feed: FeedItem[], filter: ChatFilter): FeedItem[] {
       rows[rows.length - 1] = { ...item, event: { ...item.event, count: last.event.count + item.event.count } }
     } else rows.push(item)
   }
-  return rows.reverse()
+  return rows
 }
 
 const FILTERS: { id: ChatFilter; label: string }[] = [
@@ -171,10 +171,22 @@ const FILTERS: { id: ChatFilter; label: string }[] = [
 function ChatFeed({ now }: { now: number }) {
   const { feed } = useDashboard()
   const [filter, setFilter] = useState<ChatFilter>('all')
+  const scrollArea = useRef<HTMLDivElement>(null)
   const rows = chatRows(feed, filter)
+  useLayoutEffect(() => {
+    const area = scrollArea.current
+    if (!area) return
+    const showLatest = () => { area.scrollTop = area.scrollHeight }
+    showLatest()
+    // Keep the last message visible after resizing, folding the section or wrapping text.
+    const observer = new ResizeObserver(showLatest)
+    observer.observe(area)
+    if (area.firstElementChild) observer.observe(area.firstElementChild)
+    return () => observer.disconnect()
+  }, [feed, filter])
   return (
     <Section title="Chat" className="side-section--grow side-section--chat" extra={<FilterMenu value={filter} onChange={setFilter} />}>
-      <div className="scroll-area">
+      <div className="scroll-area" ref={scrollArea}>
         {rows.length ? (
           <ul className="feed-list">
             {rows.map((item) => (

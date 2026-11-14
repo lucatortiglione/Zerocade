@@ -68,8 +68,9 @@ const toViewer = (id: unknown, nickname: unknown, avatar?: unknown): Viewer => (
 // always leaves null; the picture itself is put there by PushConnection).
 // followRole is TikTok's follow status (1 follows the host, 2 is a friend); isSubscriber is the
 // subscription badge, which is what the fan club shows as.
-const tiktokViewer = (d: Record<string, unknown>): Viewer => {
-  const viewer = toViewer(d.userId, d.uniqueId ?? d.nickname, d.profilePictureUrl ?? rec(d.userDetails).profilePictureUrls)
+export const tiktokViewer = (d: Record<string, unknown>): Viewer => {
+  const shown = typeof d.nickname === 'string' && d.nickname.trim() ? d.nickname : d.uniqueId
+  const viewer = toViewer(String(d.userId ?? '').trim() || d.uniqueId, shown, d.profilePictureUrl ?? rec(d.userDetails).profilePictureUrls)
   if (Number(d.followRole) >= 1) viewer.follower = true
   if (d.isSubscriber === true) viewer.fan = true
   return viewer
@@ -211,7 +212,8 @@ export class RoomSources {
       await conn.connect()
       // Disconnected, or replaced by another account, while connecting: close this one.
       if (this.tiktok !== conn) {
-        void Promise.resolve(conn.disconnect()).catch(() => {})
+        // Closing what was just opened: a failure here only means there was nothing left to close.
+        void Promise.resolve(conn.disconnect()).catch(() => undefined)
         return
       }
       this.tiktokSince = Date.now()
@@ -231,10 +233,11 @@ export class RoomSources {
       const conn = this.tiktok
       this.tiktok = null
       try {
-        // A promise in version 2 of the connector; it rejects when the connection never opened.
-        void Promise.resolve(conn.disconnect()).catch(() => {})
+        // A promise in version 2 of the connector; it rejects when the connection never opened, and an older
+        // connector can throw at once instead. Either way there is nothing left to close: the state below is reset.
+        void Promise.resolve(conn.disconnect()).catch(() => undefined)
       } catch {
-        // noop
+        // As above: a connection that never opened has nothing to close.
       }
     }
     if (this.tiktokUser) {
@@ -260,14 +263,14 @@ export class RoomSources {
         if (self) return
         emit({
           type: 'comment',
-          user: toViewer(tags['user-id'], tags['display-name'] ?? tags.username),
+          user: toViewer(tags['user-id'], tags['display-name'] || tags.username),
           text: message.slice(0, 140),
         })
       })
       client.on('cheer', (_channel, tags, _message) => {
         emit({
           type: 'like',
-          user: toViewer(tags['user-id'], tags['display-name'] ?? tags.username),
+          user: toViewer(tags['user-id'], tags['display-name'] || tags.username),
           count: clampCount(tags.bits, 1),
         })
       })
@@ -303,10 +306,10 @@ export class RoomSources {
   private disconnectTwitch(): void {
     if (this.twitch) {
       try {
-        // Rejects when the chat never connected.
-        void this.twitch.disconnect().catch(() => {})
+        // Rejects (or throws, in an older tmi.js) when the chat never connected: there is nothing left to close.
+        void this.twitch.disconnect().catch(() => undefined)
       } catch {
-        // noop
+        // As above: a chat that never connected has nothing to close.
       }
       this.twitch = null
     }

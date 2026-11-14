@@ -11,6 +11,7 @@ import {
   GAMES,
   ROOM_SECRET,
   ROOM_SECRET_MAX,
+  activeTriggers,
   allowedToPlay,
   backgroundPath,
   giftById,
@@ -21,6 +22,7 @@ import {
   type ClientToServerEvents,
   type EventOrigin,
   type GameControl,
+  isGameCommand,
   type Feed,
   type FeedCreator,
   type FeedEvent,
@@ -61,8 +63,8 @@ import { contextFile, isContextFile } from './context.js'
 import { isWordleFile, wordleFile } from './wordle.js'
 import { chainKeys, chains } from './chains.js'
 import { nasaPhotos } from './nasa.js'
-import { publicBaseUrl, startPublicServer } from './public-server.js'
 import { createShutdown } from './shutdown.js'
+import { startLeaderboardPublisher } from './leaderboard-publish.js'
 import { leaderboardCss, leaderboardHtml, leaderboardIndexHtml, leaderboardJs } from './leaderboard-page.js'
 import { PERIODS, isPeriod, leaderboardResetTimes, leaderboards, recordScore, resetLeaderboard } from './scores.js'
 import { toCsv } from './csv.js'
@@ -120,6 +122,9 @@ await app.register(helmet, {
 // Only pages that reach this PC by its own name, or by zerocade.test (which no real site can
 // own), get an answer. A website that points one of its names at 127.0.0.1 (DNS rebinding)
 // would otherwise be same-origin with Zerocade and could read the room key.
+const PUBLIC_URL = /^https?:\/\//.test(process.env.ZEROCADE_PUBLIC_URL ?? '')
+  ? process.env.ZEROCADE_PUBLIC_URL!.replace(/\/*$/, '/')
+  : undefined
 const LOCAL_HOST = /^(localhost|127\.0\.0\.1|\[::1\]|zerocade\.test)(:\d+)?$/
 app.addHook('onRequest', async (req, reply) => {
   if (!LOCAL_HOST.test(req.headers.host ?? '')) return reply.code(403).send({ error: 'forbidden' })
@@ -130,7 +135,8 @@ app.get('/api/room', async (): Promise<RoomInfo> => ({
   key: roomKey,
   overlayUrl: OVERLAY_URL,
   hostsLine: domainRegistered() ? undefined : HOSTS_LINE,
-  publicUrl: publicBaseUrl() ?? undefined,
+  // Where the leaderboards are published (nginx on the Linux VM): ZEROCADE_PUBLIC_URL, e.g. http://192.168.1.50/classifica/
+  publicUrl: PUBLIC_URL,
 }))
 app.get('/api/games', async () => GAMES)
 app.get('/api/content', async () => getContent())
@@ -349,7 +355,8 @@ const feeds = new Map<string, FeedEvent[]>()
 let feedSeq = 0
 
 // The live's counters of each key since this Zerocade started, for the dashboard's right column.
-// The viewers are read from the connected lives each time they are sent.
+// The viewers are read from the connected lives each time they are sent: the direct feeds and, for this Zerocade's
+// room, the accounts ZeroFollowerBot's bridge reads (one read both ways counts once).
 type Counters = Omit<LiveStats, 'viewers'>
 const counters = new Map<string, Counters>()
 const NO_COUNTS: Counters = { comments: 0, likes: 0, gifts: 0, coins: 0, follows: 0 }
@@ -357,7 +364,9 @@ const STATS_EVERY_MS = 500
 const statsTimers = new Map<string, NodeJS.Timeout>()
 
 function liveStats(key: string): LiveStats {
-  const watching = (sources.get(key)?.live() ?? []).flatMap((s) => (s.viewers === undefined ? [] : [s.viewers]))
+  const direct = sources.get(key)?.live() ?? []
+  const bridged = key === roomKey ? zfb.accounts().filter((a) => !direct.some((s) => s.kind === a.kind && s.username === a.username)) : []
+  const watching = [...direct, ...bridged].flatMap((s) => (s.viewers === undefined ? [] : [s.viewers]))
   return {
     ...(counters.get(key) ?? NO_COUNTS),
     viewers: watching.length ? watching.reduce((a, b) => a + b, 0) : null,
@@ -407,7 +416,8 @@ function broadcastEvent(key: string, event: LiveEvent, origin: EventOrigin = 'si
   if (event.type === 'gift') io.to(key).emit('ranking:update', getRanking(key))
   countEvent(key, event, origin)
   const room = bivio.get(key) ?? incastro.get(key) ?? quizzland.get(key)
-  if (room && plays && !session.ended) for (const t of triggersFor(session.triggers, event)) room.action(t.action, event)
+  // "Aiuti dal pubblico" switched off: those triggers give no help (activeTriggers).
+  if (room && plays && !session.ended) for (const t of triggersFor(activeTriggers(session), event)) room.action(t.action, event)
 }
 
 // One RoomSources per overlay key: real TikTok/Twitch feeds are relayed as live events.
@@ -456,7 +466,11 @@ const zfb = new ZfbBridge(
   (status) => {
     io.to(dashboardRoom(roomKey)).emit('bridge:status', status)
     for (const a of zfb.accounts()) touchCreator(a.kind, a.username, getSession(roomKey).gameId)
+    // Another account, or none: the viewers it counted are gone.
+    pushStats(roomKey)
   },
+  // The viewers of a live read by the bridge changed.
+  () => pushStats(roomKey),
 )
 zfb.configure(bridgeConfig())
 
@@ -471,7 +485,10 @@ const liveCreators = (): FeedCreator[] => {
   }
   for (const a of zfb.accounts()) {
     const id = `${a.kind}:${a.username}`
-    if (!seen.has(id)) seen.set(id, { kind: a.kind, username: a.username, gameId: getSession(roomKey).gameId, at: a.since })
+    if (seen.has(id)) continue
+    const creator: FeedCreator = { kind: a.kind, username: a.username, gameId: getSession(roomKey).gameId, at: a.since }
+    if (a.viewers !== undefined) creator.viewers = a.viewers
+    seen.set(id, creator)
   }
   return [...seen.values()].sort((a, b) => (b.viewers ?? -1) - (a.viewers ?? -1) || a.at - b.at)
 }
@@ -520,6 +537,14 @@ io.on('connection', (socket) => {
     if (clientType !== 'dashboard' || typeof command !== 'string' || !['pause', 'resume', 'restart', 'end', 'start'].includes(command)) return
     if (command === 'restart' || command === 'start') roomSecrets.delete(key)
     io.to(key).emit('session:state', controlGame(key, command as GameControl))
+  })
+
+  // A command of the creator to the game in play (the dashboard's "Termina round"): the overlays of the room carry it
+  // out. Not while the game is paused or ended, as for the chat's actions.
+  socket.on('game:command', (command: unknown) => {
+    const session = getSession(key)
+    if (clientType !== 'dashboard' || !isGameCommand(command) || session.paused || session.ended) return
+    io.to(key).emit('game:command', command)
   })
 
   // Points a viewer has just earned, from the overlay of the game in play (never the dashboard's preview).
@@ -736,15 +761,15 @@ try {
 // Before the dashboard opens, so the link it shows already works.
 await ensureDomain(OVERLAY_URL)
 
-// The leaderboards for anyone who can reach this PC, on a port of their own (public-server.ts).
-const publicApp = await startPublicServer(roomKey)
+// The leaderboards as static files on the Linux VM behind nginx (leaderboard-publish.ts); off unless configured.
+const leaderboardPublisher = await startLeaderboardPublisher(roomKey)
 
 // Ctrl+C or a kill: stop the live feeds and the servers, then fold the database log into its file.
 const shutdown = createShutdown({
   steps: [
     { name: 'live sources', run: () => sources.forEach((room) => room.disconnectAll()) },
     { name: 'sockets', run: () => new Promise<void>((resolve) => void io.close(() => resolve())) },
-    { name: 'public server', run: () => publicApp?.close() },
+    { name: 'leaderboard publisher', run: () => leaderboardPublisher?.close() },
     { name: 'server', run: () => app.close() },
     { name: 'database', run: closeDb },
   ],

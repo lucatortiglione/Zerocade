@@ -16,7 +16,7 @@ errore, messaggi malformati ignorati; test in `tests/twitch-eventsub.test.ts`.
 **Da fare** (in ordine di priorità; i file indicati avevano modifiche non committate al momento dell'audit):
 
 - [x] **P1 — Spegnimento ordinato** (fatto il 14 novembre 2026): `shutdown.ts` esegue in ordine fonti dal vivo, Socket.IO,
-  server pubblico, server e database (checkpoint del WAL), con tempo massimo di 5 s e codice d'uscita 1 se un passo
+  server e database (checkpoint del WAL), con tempo massimo di 5 s e codice d'uscita 1 se un passo
   fallisce. Collegato a `SIGINT` e `SIGTERM` in `index.ts`; provato con passi finti, con Fastify e Socket.IO veri e con
   la chiusura del database (`tests/shutdown.test.ts`). **Non provato** con un segnale reale sul processo del server:
   su Windows `SIGINT` verso un processo figlio lo termina senza eseguire il gestore, serve Ctrl+C in un terminale.

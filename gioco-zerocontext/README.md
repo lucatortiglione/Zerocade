@@ -4,19 +4,49 @@ C'è una parola segreta da trovare. Ogni parola che la chat scrive riceve una po
 significato è vicino a quello della parola segreta: 1 è la parola segreta, 2 la più vicina, e così via. La chat si
 avvicina un tentativo dopo l'altro. «Rivela più vicino» mostra una parola più vicina di tutte quelle già trovate.
 
+Ogni round parte con un suggerimento già sul tabellone: la parola alla posizione 30, un poco lontana dalla più
+vicina (si cambia in «Posizione del suggerimento iniziale»). Non conta tra gli aiuti del round, ma è il punto da
+battere: i punti per un nuovo miglior tentativo e «Rivela più vicino» partono da lì.
+
+Un round non ha un tempo limite: finisce quando qualcuno scrive la parola segreta, oppure quando la regia preme
+**⏭ Termina round** nella dashboard (sezione «Soluzione»). In quel caso la parola si mostra a tutti, senza punti, e
+dopo la pausa («Secondi prima della prossima parola») parte il round successivo.
+
 ## Come funziona
 
-Ogni parola giocabile ha un vettore (fastText italiano, `cc.it.300`) che ne rappresenta il significato. L'overlay
-scarica una volta dal server parole e vettori (`/api/context/…`). A ogni round ordina tutte le parole giocabili per
-vicinanza alla parola segreta, e la posizione in quella classifica è il punteggio di ogni tentativo. Non c'è una
-lista di parole «vicine» da imparare. Una parola che non è tra quelle giocabili non vale.
+Ogni parola giocabile ha un vettore che ne rappresenta il significato. L'overlay scarica una volta dal server
+parole, vettori e collegamenti (`/api/context/…`). A ogni round ordina tutte le parole giocabili per vicinanza alla
+parola segreta, e la posizione in quella classifica è il punteggio di ogni tentativo. Una parola che non è tra
+quelle giocabili non vale.
+
+La parola segreta si indovina anche senza accenti: `proprieta` trova `proprietà`.
+Questa corrispondenza ha precedenza anche quando entrambe le grafie sono nel
+vocabolario con vettori diversi: il tentativo conclude il round e assegna i
+punti di chi trova la soluzione.
+
+La vicinanza nasce da tre cose, tutte preparate da `build_context_data.py`:
+
+1. **Due fonti di vettori.** fastText italiano (`cc.it.300`), che impara dai testi, e ConceptNet Numberbatch, che
+   aggiunge un grafo di conoscenza. La vicinanza di due parole è la media pesata dei due coseni: 0,7 fastText e 0,3
+   Numberbatch (`--numberbatch-weight`). Numberbatch ha l'84% delle parole giocabili; alle altre va un vettore
+   stimato dal loro fastText.
+2. **Senza le direzioni comuni.** A ogni fonte si tolgono la media e le prime 2 direzioni principali (`--top-pcs`),
+   quelle che rendono ogni parola un poco vicina a tutte le altre.
+3. **I collegamenti di ZeroAssociazioni.** Le parole che i bacini verificati associano alla parola segreta (in un
+   senso o nell'altro: «spiaggia» → «ombrellone», «bagnino») salgono di 0,15 in unità di coseno (`--link-boost`).
+   Li ha l'80% delle parole segrete, in media 14 ciascuna. Non vanno in cima d'ufficio: una parola associata ma
+   lontana per i vettori sale, senza scavalcare i sinonimi.
+
+I pesi vengono da una misura: quanto in alto finiscono le parole associate da ZeroAssociazioni, prima di farle
+salire. Con il solo fastText la loro posizione mediana era 383 e il 65% stava entro la 1000; con le due fonti e
+senza le direzioni comuni 261 e 71%; con i collegamenti 32 e 98%.
 
 ## I dati
 
 | Dove | Contenuto | In Git |
 | --- | --- | :---: |
-| schema `context` di [`database/giochi.sqlite3`](../database/README.md) | `context__vocab`, le parole giocabili; `context__secrets`, quelle che possono essere segrete; `context__meta`, i conteggi | sì |
-| `data/vectors.bin` | Un vettore per ogni parola giocabile (int8, già normalizzati), 18 MB | no |
+| schema `context` di [`database/giochi.sqlite3`](../database/README.md) | `context__vocab`, le parole giocabili; `context__secrets`, quelle che possono essere segrete; `context__links`, per ogni parola segreta le parole che ZeroAssociazioni le associa; `context__meta`, i conteggi e `link_boost` | sì |
+| `data/vectors.bin` | Una riga per ogni parola giocabile: i vettori delle due fonti uno dopo l'altro (600 int8, già normalizzati), 36 MB | no |
 | `livecade-context-it-bank.csv` | L'esportazione della banca di Livecade, il punto di partenza: non si modifica mai | sì |
 | `zerocontext-it-bank-aggiunte.csv` | Le parole nuove: sostantivi italiani comuni presi dall'inventario di ZeroAssociazioni | sì |
 | `zerocontext-it-bank.csv` | La banca delle parole segrete: Livecade più le aggiunte | sì |
@@ -33,11 +63,13 @@ Dalla cartella `gioco-zerocontext`, in quest'ordine:
 | Comando | Cosa fa |
 | --- | --- |
 | `python fetch_vectors.py` | Scarica i vettori fastText solo per le 300.000 parole più frequenti: legge l'inizio del file di Hugging Face (7 GB in tutto) e si ferma lì. Li mette in `.cache/`, fuori da Git |
+| `python fetch_numberbatch.py` | Scarica i vettori italiani di ConceptNet Numberbatch 19.08: legge in streaming il file multilingue (3,2 GB) e si ferma alla fine del blocco italiano (circa 185.000 parole, un paio di minuti). Li mette in `.cache/` |
 | `python build_context_bank.py` | Ricostruisce le aggiunte e la banca dall'inventario di ZeroAssociazioni (schema `raw` di `database/parole_ita_raw.sqlite3`, fuori da Git) |
-| `python build_context_data.py` | Scrive le parole nello schema `context` e i vettori in `data/vectors.bin` (di base 60.000 parole giocabili più la banca) |
+| `python build_context_data.py` | Scrive parole e collegamenti nello schema `context` e i vettori in `data/vectors.bin` (di base 60.000 parole giocabili più la banca) |
 
-`build_context_data.py --probe spiaggia pizza` stampa le parole più vicine a quelle indicate, per controllare il
-risultato.
+`build_context_data.py --probe spiaggia pizza` stampa le 20 parole più vicine a quelle indicate, con `*` quelle
+salite per un collegamento. Con `--dry-run` non scrive nulla: serve a provare altri pesi. Dopo un aggiornamento dei
+bacini (`giochi.py aggiorna associazioni`) i collegamenti si rifanno rilanciando `build_context_data.py`.
 
 ## Valutare l'intero inventario
 
@@ -74,7 +106,7 @@ Test: `python -m unittest discover -s . -p test_evaluate_context_inventory.py`.
 
 ## Nel codice
 
-- Server: `apps/server/src/context.ts` serve parole e vettori. `ZEROCADE_CONTEXT_DATA` può indicare un'altra
+- Server: `apps/server/src/context.ts` serve parole, vettori e collegamenti (`links.json`). `ZEROCADE_CONTEXT_DATA` può indicare un'altra
   cartella per `vectors.bin`.
 - Overlay: `apps/overlay/src/games/context.ts` (la partita) e `apps/overlay/src/games/contextRanking.ts` (la
   classifica per vicinanza).

@@ -1,7 +1,7 @@
 import { GAMES, type GameDef } from '@zerocade/shared'
 import { PERIODS } from './scores.js'
 
-// The leaderboard page the mini server publishes for each game: /classifica/<gioco>. A browser source for the
+// The leaderboard page the server publishes for each game: /classifica/<gioco>. A browser source for the
 // stream or a link to share. It asks /api/leaderboard/<gioco> every few seconds and draws the five boards (session,
 // day, week, month, all time) with the CSS of /classifica/classifica.css.
 //
@@ -108,7 +108,8 @@ export const leaderboardJs = `(() => {
   function draw() {
     for (const button of tabs.children) button.classList.toggle('lb__tab--on', button.dataset.period === period)
     name.textContent = label(period)
-    const rows = (boards && boards[period]) || []
+    // The static copy on nginx always holds the top 50: the page cuts it to ?top.
+    const rows = ((boards && boards[period]) || []).slice(0, top)
     list.replaceChildren(
       ...rows.map((entry) => {
         const item = document.createElement('li')
@@ -145,8 +146,37 @@ export const leaderboardJs = `(() => {
     draw()
   }
 
+  // Live: on nginx (Nchan) /sub/<game> pushes the boards the moment they change. Where there is no such channel (the
+  // PC's own server) the stream never opens and the polling below does the work; with the stream open it only checks
+  // every 30 seconds, in case a message was missed.
+  let live = false
+  let ticks = 0
+  try {
+    const stream = new EventSource('/sub/' + encodeURIComponent(game))
+    stream.onopen = () => {
+      live = true
+    }
+    stream.onmessage = (event) => {
+      try {
+        boards = JSON.parse(event.data).boards
+        draw()
+      } catch {
+        // A message that is not the boards: the next one or the polling fixes it.
+      }
+    }
+    stream.onerror = () => {
+      live = false
+      // Not there at all (404): stop asking. A dropped connection is retried by the browser.
+      if (stream.readyState === EventSource.CLOSED) stream.close()
+    }
+  } catch {
+    // No EventSource: polling only.
+  }
+
   refresh()
-  setInterval(refresh, 5000)
+  setInterval(() => {
+    if (!live || ++ticks % 6 === 0) refresh()
+  }, 5000)
   if (rotate) setInterval(() => show(PERIODS[(PERIODS.findIndex((p) => p[0] === period) + 1) % PERIODS.length][0]), rotate * 1000)
 })()
 `

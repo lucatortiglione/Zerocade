@@ -1,9 +1,10 @@
 import { useEffect, useRef, useSyncExternalStore } from 'react'
-import { GAMES, describeSource, sharesPhotoBackground, triggersFor } from '@zerocade/shared'
+import { GAMES, activeTriggers, describeSource, sharesPhotoBackground, triggersFor, type GameCommand } from '@zerocade/shared'
 import { setRoundCheer } from './audio'
 import { NasaBackdrop } from './NasaBackdrop'
 import { Engine } from './games/engine'
 import { createGame } from './games/registry'
+import { socket } from './socket'
 import { useOverlay } from './store'
 import { Widgets } from './Widgets'
 import { Bivio } from './Bivio'
@@ -41,6 +42,15 @@ export function App() {
     }
   }, [])
 
+  // The creator's commands to the game in play ("Termina round" in the dashboard).
+  useEffect(() => {
+    const onCommand = (command: GameCommand) => engineRef.current?.pushCommand(command)
+    socket.on('game:command', onCommand)
+    return () => {
+      socket.off('game:command', onCommand)
+    }
+  }, [])
+
   // Swap the game when the selection changes (only once content is loaded).
   // Games without a canvas instance (Bivio, Incastro, Quizzland) leave the canvas blank.
   // A restart (`run`) starts the game afresh; an ended session shows nothing until it is started again.
@@ -72,7 +82,8 @@ export function App() {
     if (!event || !session || session.paused || session.ended) return
     const game = GAMES.find((g) => g.id === session.gameId)
     if (game) {
-      for (const t of triggersFor(session.triggers, event)) engineRef.current?.pushAction(t.action, event)
+      // Without the triggers whose help the creator switched off ("Aiuti dal pubblico").
+      for (const t of triggersFor(activeTriggers(session), event)) engineRef.current?.pushAction(t.action, event)
     }
   }, [seq])
 
@@ -114,7 +125,7 @@ export function App() {
 
       {session && game && (
         <footer className="overlay__guide">
-          {session.triggers.map((t, i) => {
+          {activeTriggers(session).map((t, i) => {
             const s = describeSource(t.source)
             const a = game.actions.find((x) => x.id === t.action)
             return (

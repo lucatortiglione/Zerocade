@@ -85,13 +85,14 @@
   },
   {
     "id": "libreoffice-it-dictionary",
-    "name": "Dizionario ortografico italiano LibreOffice",
+    "name": "Hunspell, dizionario ortografico italiano LibreOffice",
     "kind": "hunspell",
     "url": "https://raw.githubusercontent.com/LibreOffice/dictionaries/c0865a85eb67dc377f2cf8e8fe2c4fa9e53f0dcb/it_IT/it_IT.dic",
     "license": "GPL-3.0; vedere README_it_IT.txt della medesima revisione",
     "license_url": "https://raw.githubusercontent.com/LibreOffice/dictionaries/c0865a85eb67dc377f2cf8e8fe2c4fa9e53f0dcb/it_IT/README_it_IT.txt",
     "attribution": "LibreItalia, Marina Latini e autori precedenti elencati nel README",
-    "revision": "c0865a85eb67dc377f2cf8e8fe2c4fa9e53f0dcb"
+    "revision": "c0865a85eb67dc377f2cf8e8fe2c4fa9e53f0dcb",
+    "distribution_note": "Importa le voci del file .dic; i flag di affissione non sono espansi e le voci non sono considerate automaticamente lemmi."
   },
   {
     "id": "libreoffice-it-thesaurus",
@@ -449,5 +450,56 @@
       "SD_AoA": "aoa_sd"
     },
     "language_claim": "it_from_norms"
+  },
+  {
+    "id": "unimorph-ita",
+    "name": "UniMorph, paradigmi morfologici italiani",
+    "kind": "unimorph",
+    "url": "https://raw.githubusercontent.com/unimorph/ita/fa2cc6ce173643e748bd8f4162709365bdc98805/ita",
+    "license": "CC BY-SA 3.0, secondo README del corpus italiano",
+    "license_url": "https://raw.githubusercontent.com/unimorph/ita/fa2cc6ce173643e748bd8f4162709365bdc98805/README.md",
+    "attribution": "UniMorph e contributori Wikipedia, secondo README del corpus italiano",
+    "revision": "fa2cc6ce173643e748bd8f4162709365bdc98805",
+    "source_group": "unimorph-italian",
+    "primary_reference": "https://github.com/unimorph/ita"
+  },
+  {
+    "id": "glaffit",
+    "name": "GLÀFF-IT (GLAFF-IT), lessico morfofonologico italiano",
+    "kind": "glaffit",
+    "url": "https://redac.univ-tlse2.fr/lexiques/glaffit/GLAFFIT.txt.bz2",
+    "license": "CC BY-SA 3.0, secondo la pagina ufficiale GLAFF-IT",
+    "license_url": "https://redac.univ-tlse2.fr/lexiques/glaffit.html",
+    "attribution": "Basilio Calderone, Matteo Pascoli, Nabil Hathout e Franck Sajous; contributori Wikizionario",
+    "source_group": "glaffit",
+    "primary_reference": "https://redac.univ-tlse2.fr/lexiques/glaffit.html"
+  },
+  {
+    "id": "flex-it-nouns",
+    "name": "Flex_it, forme flesse e frequenze dei nomi",
+    "kind": "flex_it",
+    "url": "https://raw.githubusercontent.com/franfranz/Flex_it/d97ddf57ddb209afbf4fc960eb5931b33244632d/Flex_it_nouns.csv",
+    "license": "Repository MIT; dati derivati da Morph-it! e ItWaC, come da README",
+    "license_url": "https://raw.githubusercontent.com/franfranz/Flex_it/d97ddf57ddb209afbf4fc960eb5931b33244632d/LICENSE",
+    "attribution": "Valentina N. Pescuma, Chiara Zanini, Davide Crepaldi e Francesca Franzon (2021); Morph-it! e ItWaC",
+    "revision": "d97ddf57ddb209afbf4fc960eb5931b33244632d",
+    "source_group": "flex-it",
+    "pos": "NOUN",
+    "primary_reference": "https://github.com/franfranz/Flex_it",
+    "provenance_note": "Flex_it deriva da Morph-it! e ItWaC: non rappresenta una fonte morfologica indipendente da Morph-it!."
+  },
+  {
+    "id": "flex-it-adjectives",
+    "name": "Flex_it, forme flesse e frequenze degli aggettivi",
+    "kind": "flex_it",
+    "url": "https://raw.githubusercontent.com/franfranz/Flex_it/d97ddf57ddb209afbf4fc960eb5931b33244632d/Flex_it_adj.csv",
+    "license": "Repository MIT; dati derivati da Morph-it! e ItWaC, come da README",
+    "license_url": "https://raw.githubusercontent.com/franfranz/Flex_it/d97ddf57ddb209afbf4fc960eb5931b33244632d/LICENSE",
+    "attribution": "Valentina N. Pescuma, Chiara Zanini, Davide Crepaldi e Francesca Franzon (2021); Morph-it! e ItWaC",
+    "revision": "d97ddf57ddb209afbf4fc960eb5931b33244632d",
+    "source_group": "flex-it",
+    "pos": "ADJ",
+    "primary_reference": "https://github.com/franfranz/Flex_it",
+    "provenance_note": "Flex_it deriva da Morph-it! e ItWaC: non rappresenta una fonte morfologica indipendente da Morph-it!."
   }
 ]

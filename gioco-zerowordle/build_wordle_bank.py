@@ -109,10 +109,11 @@ def families(f: dict, names: set[str]) -> set[str]:
     return f["lemma"] & names
 
 
-def verdict(word: str, f: dict) -> tuple[bool, str]:
+def verdict(word: str, f: dict, *, dictionary_sources: set[str] | None = None,
+            form_sources: set[str] | None = None) -> tuple[bool, str]:
     """(ammessa come tentativo, motivo o 'soluzione' / 'tentativo')."""
-    dict_lemma = f["lemma"] & bank.DICT
-    dict_any = (f["lemma"] | f["infl"]) & FORMS
+    dict_lemma = f["lemma"] & (bank.DICT if dictionary_sources is None else dictionary_sources)
+    dict_any = (f["lemma"] | f["infl"]) & (FORMS if form_sources is None else form_sources)
     if f["prop"] and len(f["prop"]) >= len(dict_any | f["lemma"]) and not dict_lemma:
         return False, "nome_proprio"
     attested = len(dict_any) >= 2 or ("wf" in f and f["wf"] <= 250_000 and len(dict_any) >= 1)

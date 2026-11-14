@@ -9,14 +9,14 @@ indici, viste e trigger. Gli altri file `.sqlite3` di questa cartella, a che cos
 | --- | --- | --- | --- |
 | `dubbi` | ZeroDubbi | `dilemmi`, `testi` | `gioco-dilemmi/tools/domande.py` (e `from_livecade.py`) |
 | `wordle` | ZeroWordle | `solutions`, `words` (5-8 lettere), `meta` | `gioco-zerowordle/build_wordle_bank.py` |
-| `context` | ZeroContext | `vocab` (nell'ordine dei vettori), `secrets`, `meta` | `gioco-zerocontext/build_context_data.py` |
+| `context` | ZeroContext | `vocab` (nell'ordine dei vettori), `secrets`, `links` (per ogni parola segreta, le parole che ZeroAssociazioni le associa), `meta` | `gioco-zerocontext/build_context_data.py` |
 | `associazioni` | ZeroAssociazioni, ZeroReazioniACatena | `prompts`, `words` (ogni parola una volta sola), `prompt_words` (i collegamenti), `meaning_groups`, `difficulties`, `conflicts`, `meta`: i bacini verificati, vedi sotto | `giochi.py aggiorna associazioni`, dal DB di lavoro `parole_ita_raw.sqlite3` |
 | `parole` | ZeroWords | `words` (parola, Zipf, livello), `blocklist`, `meta` (capitoli e curva di difficoltà) | `giochi.py aggiorna parole`, dai file di `gioco-parole` |
 | `contenuti` | gli altri giochi dell'overlay | `items` (gioco, posizione, elemento JSON) | `giochi.py aggiorna contenuti`, da `apps/server/src/content.seed.json` |
 
 Restano fuori: le domande di ZeroQuizz, un gioco di domande e risposte e non di parole, che hanno un DB a sé
-(`database/ZeroQuizz.sqlite3`, vedi sotto); i vettori di ZeroContext (`gioco-zerocontext/data/vectors.bin`, 18 MB, si rigenerano con
-`fetch_vectors.py` e `build_context_data.py`) e i dati della diretta (`apps/server/data/zerocade.db`: sessioni,
+(`database/ZeroQuizz.sqlite3`, vedi sotto); i vettori di ZeroContext (`gioco-zerocontext/data/vectors.bin`, 36 MB, si rigenerano con
+`fetch_vectors.py`, `fetch_numberbatch.py` e `build_context_data.py`) e i dati della diretta (`apps/server/data/zerocade.db`: sessioni,
 eventi, classifiche).
 
 ## Come sono fatte le tabelle

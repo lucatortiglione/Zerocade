@@ -272,7 +272,9 @@ def prepare_sql(sql: str, schema: str | None, aliases: dict[str, str] | None = N
         if main_is_unified:
             return ''  # lo stesso file: i nomi con l'alias vengono prefissati e basta
         mode = '?mode=ro' if 'mode=ro' in target else ''
-        return f"ATTACH DATABASE '{'file:' + UNIFIED.as_posix() + mode if mode else UNIFIED.as_posix()}' AS {alias};"
+        # Text for sqlite3.exe, which has no parameters: an apostrophe in the path is doubled.
+        path = (UNIFIED.resolve().as_uri() + mode if mode else UNIFIED.as_posix()).replace("'", "''")
+        return f"ATTACH DATABASE '{path}' AS {alias};"
 
     sql = ATTACH.sub(attach, sql)
     return riscrivi(sql, schema, names, aliases, in_unified=main_is_unified), aliases
@@ -387,7 +389,8 @@ def build(replace: bool = False, sources: dict[str, Path] | None = None, output:
             for _, name, tbl, sql in by_type['table']:
                 out.execute(rewrite(sql))
             out.execute('COMMIT')
-            out.execute(f"ATTACH DATABASE 'file:{src_path.as_posix()}?mode=ro' AS src")
+            # The path as a parameter, as a URI: an apostrophe or a # in a folder name does not break the SQL.
+            out.execute('ATTACH DATABASE ? AS src', (Path(src_path).resolve().as_uri() + '?mode=ro',))
             out.execute('BEGIN')
             for _, name, *_r in by_type['table']:
                 cols = insertable(out, prefixed(schema, name))
@@ -483,7 +486,8 @@ def import_schema(source: Path, schema: str, unified: Path = UNIFIED) -> dict:
     names = {n for t, n, *_ in objs}
     con = sqlite3.connect(unified, isolation_level=None, uri=True)
     con.execute('PRAGMA foreign_keys=OFF')
-    con.execute(f"ATTACH DATABASE 'file:{Path(source).as_posix()}?mode=ro' AS src")
+    # The path as a parameter, as a URI: an apostrophe or a # in a folder name does not break the SQL.
+    con.execute('ATTACH DATABASE ? AS src', (Path(source).resolve().as_uri() + '?mode=ro',))
     counts = {}
     try:
         con.execute('BEGIN IMMEDIATE')

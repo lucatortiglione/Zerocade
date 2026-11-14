@@ -6,6 +6,7 @@ esclusivamente i bacini verificati, mai queste tabelle di inventario.
 from __future__ import annotations
 
 import argparse
+import bz2
 import csv
 from datetime import datetime,timezone
 import gzip
@@ -23,10 +24,11 @@ import zipfile
 from collect_prompt_sources import CACHE,checksum,download
 from prompt_database import ROOT,DEFAULT_DB,insert
 from sqlite_prompt_runtime import SQLite,literal
+from inventory_evidence import source_family
 
 REGISTRY=ROOT/'resources/prompt_inventory_sources.json'
 SINGLE_WORD=re.compile(r'[a-zàèéìòù]+')
-KINDS={'wiktextract','wiki_titles','hunspell','mythes','wordnet_tab','wordlist','frequency_csv','frequency_text','morphit','sitemap_index','conllu','tei_headwords','nvdb_text','xlsx_table'}
+KINDS={'wiktextract','wiki_titles','hunspell','mythes','wordnet_tab','wordlist','frequency_csv','frequency_text','morphit','unimorph','glaffit','flex_it','sitemap_index','conllu','tei_headwords','nvdb_text','xlsx_table'}
 FIELD_SEPARATOR='\x1f'
 RECORD_SEPARATOR='\x1e'
 
@@ -43,6 +45,22 @@ def observation(word,locator,role='listed_form',pos='',lemma='',details=None):
     if not prompt or any(ord(c)<32 for c in word):return None
     return {'prompt':prompt,'source_form':word,'locator':str(locator),'role':role,
             'pos':str(pos),'lemma':normalize(lemma) or '', 'details':details or {}}
+
+
+def morphology_observations(form,lemma,pos,locator,details,lemma_pos=None,proper=False):
+    """Conserva la forma e il lemma esplicito della fonte, senza dedurlo dalla flessione."""
+    if not normalize(form) or not normalize(lemma):
+        raise ValueError(f'Forma o lemma assente, riga {locator}')
+    same=normalize(form)==normalize(lemma)
+    row=observation(form,f'{locator}:form','proper_name' if proper else
+                    'lemma' if same else 'inflected_form',pos,lemma,details)
+    if row:yield row
+    if not same:
+        row=observation(lemma,f'{locator}:lemma','proper_name' if proper else 'lemma',
+                        lemma_pos if lemma_pos is not None else pos,lemma,
+                        {'language_claim':details['language_claim'],'source_scope':'explicit_lemma',
+                         'observed_form':form})
+        if row:yield row
 
 
 def xlsx_rows(path,sheet):
@@ -86,6 +104,44 @@ def records(path,source):
                 row=observation(entry.get('word',''),number,'proper_name' if proper else 'inflected_form' if inflected else 'lemma',
                     entry.get('pos',''),form_of[0] if form_of else entry.get('word',''),details)
                 if row:yield row
+    elif kind=='unimorph':
+        with path.open(encoding=encoding) as stream:
+            for number,line in enumerate(stream,1):
+                if not line.strip() or line.startswith('#'):continue
+                cells=line.rstrip('\r\n').split('\t')
+                if len(cells)!=3 or not cells[2].strip():
+                    raise ValueError(f'Riga UniMorph non valida: {number}')
+                lemma,form,features=cells
+                pos=features.split(';',1)[0]
+                yield from morphology_observations(form,lemma,pos,number,{
+                    'language_claim':'it_from_morphology','features':features,
+                    'feature_schema':'UniMorph'})
+    elif kind in {'glaffit','flex_it'}:
+        opener=bz2.open if kind=='glaffit' else open
+        with opener(path,'rt',encoding=encoding,newline='') as stream:
+            reader=csv.DictReader(stream,delimiter='\t' if kind=='glaffit' else ',')
+            required=({'FORM','FCODE','LEMMA','LCODE'} if kind=='glaffit' else
+                      {'Form','Lemma','POS','Freq','Gender','Number','Inf_class'})
+            if not required<=set(reader.fieldnames or []):
+                raise ValueError(f'Colonne mancanti per {kind}: '+', '.join(sorted(required-set(reader.fieldnames or []))))
+            for number,entry in enumerate(reader,2):
+                if any(entry.get(key) is None for key in required) or None in entry:
+                    raise ValueError(f'Riga {kind} non valida: {number}')
+                if kind=='glaffit':
+                    yield from morphology_observations(entry['FORM'],entry['LEMMA'],entry['FCODE'],number,{
+                        'language_claim':'it_from_morphology','feature_schema':'GRACE',
+                        'features':entry['FCODE'],'lemma_features':entry['LCODE'],
+                        'lexical_fields':{key:value for key,value in entry.items() if value}},
+                        lemma_pos=entry['LCODE'],proper=entry['FCODE'].startswith('Np'))
+                else:
+                    pos=source.get('pos')
+                    if pos not in {'NOUN','ADJ'}:raise ValueError('Flex_it richiede pos NOUN o ADJ nel registro')
+                    if not entry['Freq'].isdigit():raise ValueError(f'Frequenza Flex_it non valida, riga {number}')
+                    yield from morphology_observations(entry['Form'],entry['Lemma'],pos,number,{
+                        'language_claim':'it_from_morphology','frequency':int(entry['Freq']),
+                        'gender':entry['Gender'],'number':entry['Number'],
+                        'inflection_class':entry['Inf_class'],'source_pos':entry['POS'],
+                        'lexical_fields':{key:value for key,value in entry.items() if key and value}})
     elif kind=='wiki_titles':
         with gzip.open(path,'rt',encoding='utf-8') as stream:
             for number,line in enumerate(stream,1):
@@ -342,7 +398,9 @@ def import_source(db,source,path):
     snapshot_id=hashlib.sha256((source['id']+'\0'+source_hash).encode('utf-8')).hexdigest()
     if db.run('SELECT id FROM inventory_snapshots WHERE id='+literal(snapshot_id)+';',rows=True):
         return {'source':source['id'],'status':'ALREADY_IMPORTED','sha256':source_hash}
-    if db.run('SELECT source_key FROM inventory_sources WHERE source_key='+literal(source['id'])+';',rows=True):
+    # Una fonte può essere registrata prima del primo download: solo uno snapshot
+    # già acquisito rende questa raccolta un aggiornamento da confrontare.
+    if db.run('SELECT id FROM inventory_snapshots WHERE source_key='+literal(source['id'])+' LIMIT 1;',rows=True):
         from inventory_updates import stage_update
         return stage_update(db,source,path)
     with tempfile.TemporaryDirectory(prefix='zerocade-inventory-') as directory:
@@ -368,8 +426,9 @@ def import_source(db,source,path):
             'has_it_dictionary_evidence=max(inventory_terms.has_it_dictionary_evidence,excluded.has_it_dictionary_evidence);\n',
             'INSERT INTO inventory_attestations SELECT word,'+literal(snapshot_id)+',locator,role,pos,surface,lemma,details FROM inventory_incoming;\n',
             insert('inventory_source_heads',{'source_key':source['id'],'snapshot_id':snapshot_id}),
-            insert('inventory_registered_sources',{'source_key':source['id'],
-                'config_json':json.dumps(source,ensure_ascii=False),'enabled':1}),
+            'INSERT INTO inventory_registered_sources(source_key,config_json,enabled) VALUES ('+
+            ','.join(literal(v) for v in [source['id'],json.dumps(source,ensure_ascii=False),1])+
+            ') ON CONFLICT(source_key) DO UPDATE SET config_json=excluded.config_json;\n',
             'COMMIT;\n']
         db.run(''.join(sql))
     return {'source':source['id'],'status':'IMPORTED','records':count,'sha256':source_hash}

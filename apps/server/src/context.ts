@@ -5,14 +5,29 @@ import { giochiDb, openSchema } from './schema-db.js'
 
 // ZeroContext's data: the playable words (vocab.txt), their vectors (vectors.bin, int8, one row per word, in the
 // words' order) and the words that can be secret (secrets.txt). The words live in the games' database, schema
-// context (database/giochi.sqlite3); the vectors, 18 MB, in a file of their own. gioco-zerocontext/build_context_data.py
+// context (database/giochi.sqlite3), with the words ZeroAssociazioni ties to each secret (links.json); the vectors,
+// 36 MB, in a file of their own. gioco-zerocontext/build_context_data.py
 // writes both; the overlay downloads them once and ranks every guess by closeness to the secret.
 // The vectors' folder (and, without the schema, the old text files): ZEROCADE_CONTEXT_DATA, zerocontext/ next to
 // the server (the Windows package's copy), then gioco-zerocontext/data of the repository.
 
 const here = dirname(fileURLToPath(import.meta.url))
-const FILES = ['vocab.txt', 'vectors.bin', 'secrets.txt', 'meta.json'] as const
+const FILES = ['vocab.txt', 'vectors.bin', 'secrets.txt', 'meta.json', 'links.json'] as const
 export type ContextFile = (typeof FILES)[number]
+
+// The words ZeroAssociazioni ties to each secret (table links, indices into the vocabulary) and how much they rise
+// in that secret's ranking (meta.link_boost, in the vectors' own scale): { boost, links: { secretIdx: [wordIdx…] } }.
+// A database built before the table existed has none: no word rises.
+function linksOf(db: ReturnType<typeof openSchema>, boost: number): { boost: number; links: Record<string, number[]> } {
+  const links: Record<string, number[]> = {}
+  try {
+    const rows = db.prepare('SELECT secret_idx, word_idx FROM links ORDER BY 1, 2').raw().all() as [number, number][]
+    for (const [secret, word] of rows) (links[secret] ??= []).push(word)
+  } catch {
+    return { boost: 0, links: {} }
+  }
+  return { boost, links }
+}
 
 function fromDatabase(): Map<string, Buffer> | null {
   if (!giochiDb) return null
@@ -26,6 +41,7 @@ function fromDatabase(): Map<string, Buffer> | null {
         ['vocab.txt', Buffer.from(vocab.join('\n') + '\n', 'utf-8')],
         ['secrets.txt', Buffer.from(secrets.join('\n') + '\n', 'utf-8')],
         ['meta.json', Buffer.from(JSON.stringify(meta, null, 2) + '\n', 'utf-8')],
+        ['links.json', Buffer.from(JSON.stringify(linksOf(db, Number(meta.link_boost) || 0)), 'utf-8')],
       ])
     } finally {
       db.close()

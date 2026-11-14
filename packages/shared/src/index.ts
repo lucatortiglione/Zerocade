@@ -268,7 +268,9 @@ export interface GameDef {
   category: string
   emoji: string
   gradient: [string, string]
-  actions: { id: string; label: string }[]
+  // `help`: the action helps the players (a letter, a closer word, a 50:50, more time…), so the "Aiuti dal pubblico"
+  // switches can stop the live's gifts, likes, follows… from triggering it.
+  actions: { id: string; label: string; help?: boolean }[]
   settings: GameSetting[]
   defaultTriggers: Trigger[]
 }
@@ -902,9 +904,9 @@ const GAME_DEFS: GameDef[] = [
     gradient: ['#3e8bff', '#0a1a3a'],
     actions: [
       { id: 'guess', label: 'Guess' },
-      { id: 'reveal_letter', label: 'Rivela lettera' },
-      { id: 'find_letter', label: 'Trova lettera' },
-      { id: 'rule_out', label: 'Escludi lettera' },
+      { id: 'reveal_letter', label: 'Rivela lettera', help: true },
+      { id: 'find_letter', label: 'Trova lettera', help: true },
+      { id: 'rule_out', label: 'Escludi lettera', help: true },
     ],
     settings: [
       {
@@ -947,8 +949,8 @@ const GAME_DEFS: GameDef[] = [
     gradient: ['#ff9a3c', '#3a0a2a'],
     actions: [
       { id: 'guess', label: 'Guess' },
-      { id: 'reveal_letter', label: 'Rivela lettera o indizio' },
-      { id: 'reveal_word', label: 'Rivela parola' },
+      { id: 'reveal_letter', label: 'Rivela lettera o indizio', help: true },
+      { id: 'reveal_word', label: 'Rivela parola', help: true },
     ],
     settings: [
       {
@@ -1001,7 +1003,7 @@ const GAME_DEFS: GameDef[] = [
     gradient: ['#4cc3ff', '#0a1a3a'],
     actions: [
       { id: 'guess', label: 'Guess' },
-      { id: 'reveal_letter', label: 'Rivela lettera' },
+      { id: 'reveal_letter', label: 'Rivela lettera', help: true },
     ],
     settings: [
       { id: 'roundSeconds', label: 'Secondi per parola', kind: 'number', min: 10, max: 60, step: 1, default: 24 },
@@ -1025,7 +1027,7 @@ const GAME_DEFS: GameDef[] = [
     actions: [
       { id: 'answer', label: 'Answer' },
       { id: 'skip_statement', label: 'Salta' },
-      { id: 'extra_time', label: 'Tempo extra' },
+      { id: 'extra_time', label: 'Tempo extra', help: true },
       { id: 'spotlight', label: 'Riflettore' },
     ],
     settings: [
@@ -1050,7 +1052,7 @@ const GAME_DEFS: GameDef[] = [
     gradient: ['#f6c945', '#3a2a0a'],
     actions: [
       { id: 'answer', label: 'Answer' },
-      { id: 'fifty_fifty', label: '50/50' },
+      { id: 'fifty_fifty', label: '50/50', help: true },
       { id: 'skip_question', label: 'Salta domanda' },
     ],
     settings: [
@@ -1076,8 +1078,8 @@ const GAME_DEFS: GameDef[] = [
     gradient: ['#8b5cf6', '#1a0a3a'],
     actions: [
       { id: 'answer', label: 'Answer' },
-      { id: 'show_again', label: 'Rimostra' },
-      { id: 'extra_time', label: 'Tempo extra' },
+      { id: 'show_again', label: 'Rimostra', help: true },
+      { id: 'extra_time', label: 'Tempo extra', help: true },
     ],
     settings: [
       { id: 'memorySeconds', label: 'Secondi di memoria', kind: 'number', min: 0.4, max: 6, step: 0.1, default: 1.5 },
@@ -1101,7 +1103,7 @@ const GAME_DEFS: GameDef[] = [
     gradient: ['#3258d4', '#0a1a3a'],
     actions: [
       { id: 'guess', label: 'Guess' },
-      { id: 'reveal_letter', label: 'Rivela lettere' },
+      { id: 'reveal_letter', label: 'Rivela lettere', help: true },
       { id: 'next_round', label: 'Round successivo' },
     ],
     settings: [
@@ -1152,7 +1154,7 @@ const GAME_DEFS: GameDef[] = [
     gradient: ['#3ccf7a', '#0a2a1a'],
     actions: [
       { id: 'guess', label: 'Guess' },
-      { id: 'reveal_word', label: 'Rivela parola' },
+      { id: 'reveal_word', label: 'Rivela parola', help: true },
       { id: 'new_board', label: 'Nuova griglia' },
     ],
     settings: [
@@ -1178,7 +1180,7 @@ const GAME_DEFS: GameDef[] = [
     gradient: ['#4cc3ff', '#0a1a3a'],
     actions: [
       { id: 'guess', label: 'Find word' },
-      { id: 'hint', label: 'Aiuto' },
+      { id: 'hint', label: 'Aiuto', help: true },
       { id: 'shuffle', label: 'Mescola' },
     ],
     settings: [
@@ -1200,7 +1202,7 @@ const GAME_DEFS: GameDef[] = [
     gradient: ['#6b8aff', '#1a0a3a'],
     actions: [
       { id: 'guess', label: 'Guess' },
-      { id: 'reveal_hint', label: 'Aiuto' },
+      { id: 'reveal_hint', label: 'Aiuto', help: true },
     ],
     settings: [
       { id: 'roundSeconds', label: 'Secondi per logo', kind: 'number', min: 5, max: 120, step: 1, default: 20 },
@@ -1225,9 +1227,9 @@ const GAME_DEFS: GameDef[] = [
     gradient: ['#ffc02e', '#1a1a0a'],
     actions: [
       { id: 'guess', label: 'Guess' },
-      { id: 'reveal_letter', label: 'Rivela lettera' },
-      { id: 'show_continent', label: 'Mostra continente' },
-      { id: 'add_time', label: 'Tempo extra' },
+      { id: 'reveal_letter', label: 'Rivela lettera', help: true },
+      { id: 'show_continent', label: 'Mostra continente', help: true },
+      { id: 'add_time', label: 'Tempo extra', help: true },
     ],
     settings: [
       { id: 'roundSeconds', label: 'Secondi per località', kind: 'number', min: 20, max: 120, step: 5, default: 45 },
@@ -1254,7 +1256,7 @@ const GAME_DEFS: GameDef[] = [
     gradient: ['#17b7a8', '#0a1a1a'],
     actions: [
       { id: 'guess', label: 'Guess' },
-      { id: 'reveal_letter', label: 'Rivela lettera' },
+      { id: 'reveal_letter', label: 'Rivela lettera', help: true },
     ],
     settings: [
       { id: 'drawSeconds', label: 'Secondi di disegno', kind: 'number', min: 10, max: 120, step: 5, default: 30 },
@@ -1273,23 +1275,24 @@ const GAME_DEFS: GameDef[] = [
     id: 'context',
     name: 'ZeroContext',
     category: 'Quiz',
-    description: 'Trova la parola segreta: ogni parola in chat riceve una posizione per vicinanza di significato (1 = la più vicina).',
+    description: 'Trova la parola segreta: ogni parola in chat riceve una posizione per vicinanza di significato (1 = la parola segreta, 2 = la più vicina).',
     emoji: '🎯',
     gradient: ['#ffffff', '#2d3642'],
     actions: [
       { id: 'guess', label: 'Guess' },
-      { id: 'reveal_closer', label: 'Rivela più vicino' },
-      { id: 'small_hint', label: 'Piccolo aiuto' },
+      { id: 'reveal_closer', label: 'Rivela più vicino', help: true },
+      { id: 'small_hint', label: 'Piccolo aiuto', help: true },
     ],
     settings: [
       { id: 'starterWords', label: 'Parole iniziali', kind: 'toggle', default: false, hint: 'A inizio round mostra tre parole lontane, per dare alla chat un punto di partenza.' },
+      { id: 'startHintOn', label: 'Suggerimento iniziale', kind: 'toggle', default: true, hint: 'Ogni round parte con una parola già sul tabellone. Spento, il tabellone parte vuoto (o con le parole iniziali).' },
+      { id: 'startHint', label: 'Posizione del suggerimento iniziale', kind: 'number', min: 3, max: 1000, step: 1, default: 30, when: { id: 'startHintOn', value: true }, hint: 'La parola a questa posizione è già sul tabellone: un poco lontana dalla più vicina (la 2).' },
       { id: 'autoHints', label: 'Suggerimenti automatici', kind: 'toggle', default: false },
       { id: 'autoHintSeconds', label: 'Secondi tra aiuti', kind: 'number', min: 15, max: 180, step: 5, default: 45, when: { id: 'autoHints', value: true } },
-      { id: 'hintClosest', label: 'Posizione più vicina di un aiuto', kind: 'number', min: 1, max: 100, step: 1, default: 3, hint: 'Un aiuto non rivela mai una parola più vicina di questa posizione (1 = la più vicina di tutte).' },
+      { id: 'hintClosest', label: 'Posizione più vicina di un aiuto', kind: 'number', min: 2, max: 100, step: 1, default: 4, hint: 'Un aiuto non rivela mai una parola più vicina di questa posizione (2 = la più vicina di tutte: la 1 è la parola segreta).' },
       { id: 'maxHintsPerRound', label: 'Aiuti massimi per parola', kind: 'number', min: 1, max: 30, step: 1, default: 5 },
       { id: 'greenRank', label: 'Verde fino alla posizione', kind: 'number', min: 2, max: 1000, step: 1, default: 100 },
       { id: 'orangeRank', label: 'Arancione fino alla posizione', kind: 'number', min: 10, max: 20000, step: 10, default: 1000, hint: 'Oltre questa posizione il tentativo è rosso.' },
-      { id: 'roundSeconds', label: 'Secondi per round (0 = senza limite)', kind: 'number', min: 0, max: 1800, step: 30, default: 300 },
       { id: 'breakSeconds', label: 'Secondi prima della prossima parola', kind: 'number', min: 3, max: 30, step: 1, default: 8 },
       { id: 'finderPoints', label: 'Punti per la parola trovata', kind: 'number', min: 0, max: 10000, step: 10, default: 100 },
       {
@@ -1333,7 +1336,7 @@ const GAME_DEFS: GameDef[] = [
     gradient: ['#f5b14c', '#1a0a3a'],
     actions: [
       { id: 'vote', label: 'Vote' },
-      { id: 'fifty_fifty', label: '50/50' },
+      { id: 'fifty_fifty', label: '50/50', help: true },
       { id: 'skip_question', label: 'Salta domanda' },
     ],
     settings: [
@@ -1514,8 +1517,8 @@ const GAME_DEFS: GameDef[] = [
     gradient: ['#8b5cf6', '#1a0a3a'],
     actions: [
       { id: 'answer', label: 'Rispondi' },
-      { id: 'fifty', label: '50:50' },
-      { id: 'extra_time', label: 'Tempo extra' },
+      { id: 'fifty', label: '50:50', help: true },
+      { id: 'extra_time', label: 'Tempo extra', help: true },
       { id: 'next', label: 'Prossima domanda' },
     ],
     settings: [
@@ -1810,10 +1813,10 @@ const GAME_DEFS: GameDef[] = [
     gradient: ['#8bd17c', '#1f5f3a'],
     actions: [
       { id: 'guess', label: 'Parola' },
-      { id: 'hint', label: 'Rivela una lettera' },
-      { id: 'reveal_word', label: 'Rivela una parola' },
+      { id: 'hint', label: 'Rivela una lettera', help: true },
+      { id: 'reveal_word', label: 'Rivela una parola', help: true },
       { id: 'shuffle', label: 'Mescola la ruota' },
-      { id: 'extra_time', label: 'Tempo extra' },
+      { id: 'extra_time', label: 'Tempo extra', help: true },
     ],
     settings: [
       {
@@ -1917,10 +1920,44 @@ const ROUND_CHEER: GameSetting = {
 }
 const WITHOUT_ROUNDS = new Set(['gift-drop', 'lunar-dash'])
 
+// "Aiuti dal pubblico", in every game with help actions (`help: true`): one switch per kind of live event. Off, the
+// triggers of that kind no longer give help (and the overlay stops showing them); their other actions still work.
+// A comment trigger with a keyword ("!aiuto") is the chat's kind.
+const HELP_FROM: Record<LiveEvent['type'], { id: string; label: string }> = {
+  gift: { id: 'helpFromGifts', label: 'Aiuti dai regali' },
+  like: { id: 'helpFromLikes', label: 'Aiuti dai like' },
+  follow: { id: 'helpFromFollows', label: 'Aiuti dai follow' },
+  share: { id: 'helpFromShares', label: 'Aiuti dalle condivisioni' },
+  join: { id: 'helpFromJoins', label: 'Aiuti da chi entra in diretta' },
+  comment: { id: 'helpFromComments', label: 'Aiuti dai comandi in chat' },
+}
+const HELP_SETTINGS: GameSetting[] = Object.values(HELP_FROM).map(({ id, label }) => ({
+  id,
+  label,
+  group: 'Aiuti dal pubblico',
+  kind: 'toggle',
+  default: true,
+  hint: 'Spento: questi eventi non danno più aiuti ai giocatori (lettere, parole più vicine, 50:50, tempo extra…). Gli altri trigger continuano a funzionare.',
+}))
+
+// Whether a trigger is in force: an action that helps the players only while its kind's "Aiuti dal pubblico" switch
+// is on (a setting not saved yet counts as on, its default).
+export function triggerEnabled(game: Pick<GameDef, 'actions'> | undefined, settings: GameSettings, trigger: Trigger): boolean {
+  const help = game?.actions.find((a) => a.id === trigger.action)?.help === true
+  return !help || settings[HELP_FROM[trigger.source.type].id] !== false
+}
+
+// The session's triggers that are in force, for the game it plays.
+export const activeTriggers = (session: Pick<SessionState, 'gameId' | 'triggers' | 'settings'>) => {
+  const game = GAMES.find((g) => g.id === session.gameId)
+  return session.triggers.filter((t) => triggerEnabled(game, session.settings, t))
+}
+
 export const GAMES: GameDef[] = GAME_DEFS.map((g) => ({
   ...g,
   settings: [
     ...g.settings,
+    ...(g.actions.some((a) => a.help) ? HELP_SETTINGS : []),
     ...COMMON_SETTINGS.filter((c) => !g.settings.some((x) => x.id === c.id)),
     ...(OWN_BACKGROUND.has(g.id) ? [] : PHOTO_BACKGROUND.filter((c) => !g.settings.some((x) => x.id === c.id))),
     ...(WITHOUT_ROUNDS.has(g.id) ? [] : [ROUND_CHEER]),
@@ -2094,6 +2131,14 @@ export interface Feed {
 // What the creator can do to the game in play, from the dashboard.
 export type GameControl = 'pause' | 'resume' | 'restart' | 'end' | 'start'
 
+// A command of the creator to the game in play, apart from the chat's actions: the overlays that run the game carry
+// it out. next-round: end the round in progress and go on to the next (ZeroContext: the word is shown, then a new
+// one after the pause).
+export const GAME_COMMANDS = ['next-round'] as const
+export type GameCommand = (typeof GAME_COMMANDS)[number]
+export const isGameCommand = (value: unknown): value is GameCommand =>
+  typeof value === 'string' && (GAME_COMMANDS as readonly string[]).includes(value)
+
 export interface SessionState {
   gameId: string
   triggers: Trigger[]
@@ -2147,6 +2192,8 @@ export interface ServerToClientEvents {
   'secret:word': (secret: { word: string }) => void
   // A short text the creator shows on the overlay ("Invia messaggio").
   'overlay:message': (text: string) => void
+  // A command of the creator to the game in play, sent on to every overlay of the room.
+  'game:command': (command: GameCommand) => void
   'pads:state': (board: PadBoard) => void
   'gif:show': (gif: GifShow) => void
   // Stops every sound and GIF the pads started.
@@ -2176,6 +2223,8 @@ export interface ClientToServerEvents {
   'secret:round': (round: { word: string; prev: string | null }) => void
   // Pause, restart or end (and start again) the game in play.
   'game:control': (command: GameControl) => void
+  // The dashboard: a command to the game in play ("Termina round").
+  'game:command': (command: GameCommand) => void
   // An overlay: points a viewer has just earned in the game in play, for the leaderboards.
   'score:add': (score: { game: string; user: Viewer; points: number }) => void
   // The dashboard: reset one leaderboard (a game and a period: sessione, giorno, settimana, mese, sempre). The reply
@@ -2205,6 +2254,6 @@ export interface RoomInfo {
   overlayUrl: string
   // Set while this PC's hosts file lacks the overlay link's domain: the line it needs.
   hostsLine?: string
-  // The address other devices can use for the leaderboards (the public mini server), when it runs.
+  // Where the leaderboards are published (nginx on the Linux VM), from ZEROCADE_PUBLIC_URL, when set.
   publicUrl?: string
 }

@@ -1,4 +1,4 @@
-import type { GameSettings, LiveEvent } from '@zerocade/shared'
+import type { GameCommand, GameSettings, LiveEvent } from '@zerocade/shared'
 
 // A small, dependency-free game loop. Games implement GameInstance and are swapped
 // in when the dashboard selects a new game, without ever reloading the overlay.
@@ -6,6 +6,8 @@ import type { GameSettings, LiveEvent } from '@zerocade/shared'
 export interface GameInstance {
   reset(settings: GameSettings, width: number, height: number): void
   onAction(action: string, event: LiveEvent, now: number): void
+  // A command of the creator from the dashboard; a game without it ignores them.
+  onCommand?(command: GameCommand): void
   update(dt: number, now: number, settings: GameSettings): void
   draw(ctx: CanvasRenderingContext2D, now: number): void
 }
@@ -20,6 +22,7 @@ export class Engine {
   private ctx: CanvasRenderingContext2D
   private instance: GameInstance | null = null
   private actions: PendingAction[] = []
+  private commands: GameCommand[] = []
   private settings: GameSettings = {}
   private raf = 0
   private last = 0
@@ -34,6 +37,7 @@ export class Engine {
     this.instance = instance
     this.settings = settings
     this.actions.length = 0
+    this.commands.length = 0
     instance.reset(settings, this.ctx.canvas.width, this.ctx.canvas.height)
   }
 
@@ -41,6 +45,7 @@ export class Engine {
   clear() {
     this.instance = null
     this.actions.length = 0
+    this.commands.length = 0
     this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height)
   }
 
@@ -50,13 +55,23 @@ export class Engine {
 
   setPaused(paused: boolean) {
     this.paused = paused
-    if (paused) this.actions.length = 0
+    if (paused) {
+      this.actions.length = 0
+      this.commands.length = 0
+    }
   }
 
   pushAction(action: string, event: LiveEvent) {
     if (!this.instance || this.paused) return
     this.actions.push({ action, event, now: performance.now() })
     if (this.actions.length > 300) this.actions.shift()
+  }
+
+  // Like the actions, carried out in the next frame and dropped while paused.
+  pushCommand(command: GameCommand) {
+    if (!this.instance || this.paused) return
+    this.commands.push(command)
+    if (this.commands.length > 10) this.commands.shift()
   }
 
   start() {
@@ -66,6 +81,8 @@ export class Engine {
       this.last = now
       if (this.instance) {
         if (!this.paused) {
+          for (const c of this.commands) this.instance.onCommand?.(c)
+          this.commands.length = 0
           for (const a of this.actions) this.instance.onAction(a.action, a.event, a.now)
           this.actions.length = 0
           this.instance.update(dt, now, this.settings)

@@ -330,7 +330,8 @@ function CollectedAnswers() {
     fetch('/api/quizzland/stats')
       .then((res) => (res.ok ? (res.json() as Promise<QuizzlandStats>) : null))
       .then((next) => !cancelled && setStats(next))
-      .catch(() => {})
+      // Server unreachable: the figures already shown stay until the next reveal asks again.
+      .catch(() => undefined)
     return () => {
       cancelled = true
     }

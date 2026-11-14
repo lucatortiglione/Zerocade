@@ -18,8 +18,6 @@ lexicon/it/not_in_grid.txt (names, loanwords, interjections) are extras at most.
 """
 import sys
 
-from wordfreq import zipf_frequency
-
 from common import LANG, MAX_LEN, MIN_LEN, fold, is_blocked, load_blocklist, path
 
 # Zipf 3 = about once per million words. A grid word needs at least MAIN_ZIPF; the first
@@ -36,6 +34,7 @@ CLITICS = {"mi", "ti", "ci", "vi", "si", "lo", "la", "li", "le", "ne", "gli",
 def english_noise(form):
     """wordfreq's Italian counts include English text from the web: ARE, HOME, BLUE…
     A form clearly more common in English than in Italian is not trusted as a grid word."""
+    from wordfreq import zipf_frequency
     en, it = zipf_frequency(form, "en"), zipf_frequency(form, "it")
     return en >= 3.5 and en - it >= 1.0
 
@@ -63,6 +62,7 @@ def italian_shape(key):
 
 def italian(source):
     """key -> [best zipf, main?] from Morph-it! (Latin-1, form<TAB>lemma<TAB>tag)."""
+    from wordfreq import zipf_frequency
     forms = {}  # key -> {'zipf', 'plain', 'accented', 'main', 'content', 'name'}
     with open(source, encoding="latin-1") as fh:
         for line in fh:

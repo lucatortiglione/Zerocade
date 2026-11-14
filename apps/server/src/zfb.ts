@@ -8,7 +8,8 @@ import { giftIdForTiktok, type BridgeConfig, type BridgeStatus, type LiveEvent, 
 // Protocol 1: {"type":"hello","protocol":1,"requests":["skip","words"]}, {"type":"status","tiktok":"","twitch":""},
 // then {"type":"comment"|"gift"|"like"|"follow"|"share"|"join"|"bits","platform":"tiktok"|"twitch","user":{"id",
 // "name","nickname","avatar"?},"id", ...}: "text" for a comment, "gift"/"count"/"coins" for a gift, "count" for likes
-// and bits. Zerocade can answer:
+// and bits; {"type":"viewers","platform","count"} with the viewers watching now, at each change (ZeroFollowerBot
+// from 14 November 2026: an older one never sends it, and the count stays unknown). Zerocade can answer:
 // - {"type":"skip","id"} for a comment its voice need not read (a word the game already has): ZeroFollowerBot takes
 //   it out of the speech queue if it is still waiting. An older one ignores it.
 // - {"type":"words","words":[...]} with the right answers of the ZeroWords level in play ([] = no game): of the
@@ -34,16 +35,21 @@ const count = (x: unknown) => {
   const n = Math.floor(Number(x))
   return Number.isFinite(n) && n > 0 ? Math.min(n, 100_000) : 1
 }
+// A viewer count: 0 is one; anything that is not a number is none.
+const viewerCount = (x: unknown) => {
+  const n = Math.floor(Number(x))
+  return Number.isFinite(n) && n >= 0 ? Math.min(n, 100_000_000) : undefined
+}
 
 // A boolean the bridge sends under one of these names, or undefined.
 const flag = (u: Record<string, unknown>, ...names: string[]): boolean | undefined =>
   names.map((n) => u[n]).find((v): v is boolean => typeof v === 'boolean')
 
-// TikTok viewers go by their @name (as the direct TikTok feed does), Twitch ones by their display name.
+// Show the profile's display name on both platforms; the account name remains the identity fallback.
 function viewerOf(raw: unknown, kind: SourceKind): Viewer {
   const u = rec(raw)
   const name = str(u.name, 64)
-  const shown = kind === 'tiktok' ? name || str(u.nickname, 32) : str(u.nickname, 32) || name
+  const shown = str(u.nickname, 32).trim() || name
   const avatar = str(u.avatar, 1024)
   return {
     // TikTok and Twitch have independent user IDs. The same ID on the two
@@ -98,6 +104,8 @@ export class ZfbBridge {
   private twitch = ''
   // When each account appeared, for the Creators list.
   private since: Record<SourceKind, number> = { tiktok: 0, twitch: 0 }
+  // The viewers watching each account's live now, as the bridge last said; undefined until it says.
+  private viewers: Record<SourceKind, number | undefined> = { tiktok: undefined, twitch: undefined }
   // The right answers of the ZeroWords level in play ([] = none), and whether this ZeroFollowerBot takes them.
   private words: string[] = []
   private takesWords = false
@@ -105,6 +113,8 @@ export class ZfbBridge {
   constructor(
     private emit: Emit,
     private onStatus: (status: BridgeStatus) => void,
+    // The viewer count of an account changed (accounts() has it).
+    private onViewers: () => void = () => undefined,
   ) {}
 
   status(): BridgeStatus {
@@ -117,12 +127,15 @@ export class ZfbBridge {
     }
   }
 
-  // The accounts ZeroFollowerBot is reading now, with when they appeared.
-  accounts(): { kind: SourceKind; username: string; since: number }[] {
+  // The accounts ZeroFollowerBot is reading now, with when they appeared and, when the bridge says, the viewers.
+  accounts(): { kind: SourceKind; username: string; since: number; viewers?: number }[] {
     if (this.state !== 'connected') return []
     return (['tiktok', 'twitch'] as const)
       .filter((kind) => this[kind])
-      .map((kind) => ({ kind, username: this[kind], since: this.since[kind] }))
+      .map((kind) => {
+        const viewers = this.viewers[kind]
+        return { kind, username: this[kind], since: this.since[kind], ...(viewers !== undefined && { viewers }) }
+      })
   }
 
   configure(config: BridgeConfig): void {
@@ -220,15 +233,32 @@ export class ZfbBridge {
     if (m.type === 'status') return this.setAccounts(str(m.tiktok, 64), str(m.twitch, 64))
     if (m.type === 'lost') return console.warn(`[zfb] ${String(m.count)} eventi persi dal ponte: Zerocade era rimasto indietro`)
     if (this.state !== 'connected') return
+    if (m.type === 'viewers') return this.setViewers(m)
     const live = bridgeEvent(m)
     if (live) this.emit(live.event, live.kind, live.kind === 'tiktok' ? this.tiktok : this.twitch, live.id)
+  }
+
+  // The viewers of the account the bridge reads on that platform; one it reads none on keeps none.
+  private setViewers(m: Record<string, unknown>): void {
+    const kind = m.platform === 'tiktok' || m.platform === 'twitch' ? m.platform : null
+    const viewers = viewerCount(m.count)
+    if (!kind || !this[kind] || viewers === undefined || viewers === this.viewers[kind]) return
+    this.viewers[kind] = viewers
+    this.onViewers()
   }
 
   private setAccounts(tiktok: string, twitch: string): void {
     if (tiktok === this.tiktok && twitch === this.twitch) return
     const now = Date.now()
-    if (tiktok !== this.tiktok) this.since.tiktok = tiktok ? now : 0
-    if (twitch !== this.twitch) this.since.twitch = twitch ? now : 0
+    // Another account (or none): its viewers are not known yet.
+    if (tiktok !== this.tiktok) {
+      this.since.tiktok = tiktok ? now : 0
+      this.viewers.tiktok = undefined
+    }
+    if (twitch !== this.twitch) {
+      this.since.twitch = twitch ? now : 0
+      this.viewers.twitch = undefined
+    }
     this.tiktok = tiktok
     this.twitch = twitch
     this.onStatus(this.status())

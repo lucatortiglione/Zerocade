@@ -44,7 +44,8 @@ class LevelSource {
   }
 
   prefetch(n: number): void {
-    this.get(n).catch(() => {})
+    // A failed generation is reported by fail() above and again by the get() that needs the level: nothing to add.
+    this.get(n).catch(() => undefined)
   }
 
   private thread(): Worker {

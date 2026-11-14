@@ -209,27 +209,26 @@ db.exec(`
   CREATE INDEX IF NOT EXISTS word_association_guesses_round ON word_association_guesses (round);
 `)
 
-// Migrate databases created before the widgets/goal columns existed.
-try {
-  db.exec("ALTER TABLE sessions ADD COLUMN widgets TEXT NOT NULL DEFAULT '{}'")
-} catch {
-  // column already present on fresh schema
-}
-try {
-  db.exec('ALTER TABLE gifts ADD COLUMN avatar TEXT')
-} catch {
-  // column already present
-}
-try {
-  db.exec('ALTER TABLE sessions ADD COLUMN goal INTEGER NOT NULL DEFAULT 1000')
-} catch {
-  // column already present on fresh schema
-}
-// The gifter's profile picture, for the Top donatori widget.
-try {
-  db.exec('ALTER TABLE gifters ADD COLUMN avatar TEXT')
-} catch {
-  // column already present
+// Migrate databases created before these columns existed. A column is added only when it is missing, so any
+// other failure (a locked or read-only file, a full disk) stops the start instead of passing unnoticed.
+const hasColumn = (table: string, column: string): boolean =>
+  db.prepare<[], { name: string }>(`PRAGMA table_info(${table})`).all().some((c) => c.name === column)
+const ADDED_COLUMNS: [table: string, column: string, definition: string][] = [
+  ['sessions', 'widgets', "TEXT NOT NULL DEFAULT '{}'"],
+  ['gifts', 'avatar', 'TEXT'],
+  ['sessions', 'goal', 'INTEGER NOT NULL DEFAULT 1000'],
+  // The gifter's profile picture, for the Top donatori widget.
+  ['gifters', 'avatar', 'TEXT'],
+]
+for (const [table, column, definition] of ADDED_COLUMNS) {
+  if (hasColumn(table, column)) continue
+  try {
+    db.exec(`ALTER TABLE ${table} ADD COLUMN ${column} ${definition}`)
+  } catch (err) {
+    throw new Error(`[db] cannot add the column ${table}.${column} to ${dbPath}: ${err instanceof Error ? err.message : String(err)}`, {
+      cause: err,
+    })
+  }
 }
 
 // Games that changed id: the saved sessions, gifts and creators follow them.
@@ -418,20 +417,21 @@ const gifterUpsert = db.prepare(`
     avatar = coalesce(excluded.avatar, gifters.avatar),
     coins = gifters.coins + excluded.coins
 `)
-const gifterSelect = db.prepare(`
+type GifterRow = Omit<Gifter, 'avatar'> & { avatar: string | null }
+const gifterSelect = db.prepare<[string], GifterRow>(`
   SELECT user_id AS id, nickname, avatar, coins FROM gifters WHERE key = ? ORDER BY coins DESC, nickname ASC LIMIT 50
 `)
 
 // Gifters without a picture (Twitch, or saved before pictures were) leave the field out.
 export const getRanking = (key: string): Gifter[] =>
-  (gifterSelect.all(key) as unknown as (Omit<Gifter, 'avatar'> & { avatar: string | null })[]).map(({ avatar, ...g }) =>
+  gifterSelect.all(key).map(({ avatar, ...g }) =>
     avatar ? { ...g, avatar } : g,
   )
 
 // --- Events ---
 
 const eventInsert = db.prepare('INSERT INTO events (key, type, payload) VALUES (?, ?, ?)')
-const eventSelect = db.prepare('SELECT id, type, payload, created_at FROM events WHERE key = ? ORDER BY id DESC LIMIT ?')
+const eventSelect = db.prepare<[string, number], EventRow>('SELECT id, type, payload, created_at FROM events WHERE key = ? ORDER BY id DESC LIMIT ?')
 const eventPrune = db.prepare(`
   DELETE FROM events WHERE key = ? AND id NOT IN (
     SELECT id FROM events WHERE key = ? ORDER BY id DESC LIMIT 2000
@@ -446,7 +446,7 @@ export interface EventRow {
 }
 
 export const listEvents = (key: string, limit: number): EventRow[] =>
-  eventSelect.all(key, limit) as unknown as EventRow[]
+  eventSelect.all(key, limit)
 
 export const recordEvent = (key: string, event: LiveEvent): void => {
   eventInsert.run(key, event.type, JSON.stringify(event))
@@ -469,7 +469,7 @@ const bivioVoteUpsert = db.prepare(`
 const bivioQuestionTotals = db.prepare(`
   SELECT COALESCE(SUM(choice = 'a'), 0) AS a, COALESCE(SUM(choice = 'b'), 0) AS b FROM bivio_votes WHERE question_id = ?
 `)
-const bivioAllTotals = db.prepare(`
+const bivioAllTotals = db.prepare<[], BivioTotalsRow>(`
   SELECT question_id AS id, SUM(choice = 'a') AS a, SUM(choice = 'b') AS b, COUNT(DISTINCT round_id) AS rounds
   FROM bivio_votes GROUP BY question_id
 `)
@@ -495,7 +495,7 @@ export const recordBivioVote = (v: BivioVote): void => {
 
 export const bivioTotals = (questionId: string): BivioTally => bivioQuestionTotals.get(questionId) as BivioTally
 
-export const bivioTotalsByQuestion = (): BivioTotalsRow[] => bivioAllTotals.all() as unknown as BivioTotalsRow[]
+export const bivioTotalsByQuestion = (): BivioTotalsRow[] => bivioAllTotals.all()
 
 // --- Bivio questions marked as wrong from the dashboard ---
 // For every overlay key; they stay out of the game until unmarked.
@@ -508,9 +508,9 @@ export interface BivioFlag {
 
 const bivioFlagInsert = db.prepare(`INSERT OR IGNORE INTO bivio_flags (question_id, lang) VALUES (?, ?)`)
 const bivioFlagDelete = db.prepare(`DELETE FROM bivio_flags WHERE question_id = ?`)
-const bivioFlagAll = db.prepare(`SELECT question_id, lang, flagged_at FROM bivio_flags ORDER BY flagged_at, question_id`)
+const bivioFlagAll = db.prepare<[], BivioFlag>(`SELECT question_id, lang, flagged_at FROM bivio_flags ORDER BY flagged_at, question_id`)
 
-export const bivioFlags = (): BivioFlag[] => bivioFlagAll.all() as unknown as BivioFlag[]
+export const bivioFlags = (): BivioFlag[] => bivioFlagAll.all()
 export const flagBivio = (questionId: string, lang: string): void => void bivioFlagInsert.run(questionId, lang)
 export const unflagBivio = (questionId: string): void => void bivioFlagDelete.run(questionId)
 
@@ -547,7 +547,7 @@ const quizzlandAnswerInsert = db.prepare(`
   INSERT OR IGNORE INTO quizzland_answers (round_id, key, question_id, user_id, nickname, choice, correct, ms)
   VALUES (?, ?, ?, ?, ?, ?, ?, ?)
 `)
-const quizzlandAllTotals = db.prepare(`
+const quizzlandAllTotals = db.prepare<[], QuizzlandTotalsRow>(`
   SELECT question_id AS id, COUNT(DISTINCT round_id) AS rounds, COUNT(*) AS answers, SUM(correct) AS correct,
     SUM(choice = 0) AS c0, SUM(choice = 1) AS c1, SUM(choice = 2) AS c2, SUM(choice = 3) AS c3,
     AVG(CASE WHEN correct = 1 THEN ms END) AS avgMs
@@ -558,7 +558,7 @@ export const recordQuizzlandAnswer = (a: QuizzlandAnswer): void => {
   quizzlandAnswerInsert.run(a.roundId, a.key, a.questionId, a.userId, a.nickname, a.choice, a.correct ? 1 : 0, Math.round(a.ms))
 }
 
-export const quizzlandTotalsByQuestion = (): QuizzlandTotalsRow[] => quizzlandAllTotals.all() as unknown as QuizzlandTotalsRow[]
+export const quizzlandTotalsByQuestion = (): QuizzlandTotalsRow[] => quizzlandAllTotals.all()
 
 // Questions marked as wrong from the dashboard, for every overlay key, until unmarked.
 
@@ -569,9 +569,9 @@ export interface QuizzlandFlag {
 
 const quizzlandFlagInsert = db.prepare('INSERT OR IGNORE INTO quizzland_flags (question_id) VALUES (?)')
 const quizzlandFlagDelete = db.prepare('DELETE FROM quizzland_flags WHERE question_id = ?')
-const quizzlandFlagAll = db.prepare('SELECT question_id, flagged_at FROM quizzland_flags ORDER BY flagged_at, question_id')
+const quizzlandFlagAll = db.prepare<[], QuizzlandFlag>('SELECT question_id, flagged_at FROM quizzland_flags ORDER BY flagged_at, question_id')
 
-export const quizzlandFlags = (): QuizzlandFlag[] => quizzlandFlagAll.all() as unknown as QuizzlandFlag[]
+export const quizzlandFlags = (): QuizzlandFlag[] => quizzlandFlagAll.all()
 export const flagQuizzland = (questionId: string): void => void quizzlandFlagInsert.run(questionId)
 export const unflagQuizzland = (questionId: string): void => void quizzlandFlagDelete.run(questionId)
 
@@ -777,7 +777,7 @@ const padBoardGet = db.prepare('SELECT volume FROM pad_boards WHERE key = ?')
 const padBoardInsert = db.prepare('INSERT INTO pad_boards (key) VALUES (?)')
 const padBoardVolume = db.prepare('UPDATE pad_boards SET volume = ? WHERE key = ?')
 const PAD_COLUMNS = 'SELECT id, kind, slot, label, color, sound_id AS soundId, file FROM pads'
-const padSelect = db.prepare(`${PAD_COLUMNS} WHERE key = ? ORDER BY kind, slot`)
+const padSelect = db.prepare<[string], PadRow>(`${PAD_COLUMNS} WHERE key = ? ORDER BY kind, slot`)
 const padGet = db.prepare(`${PAD_COLUMNS} WHERE key = ? AND id = ?`)
 const padInSlot = db.prepare(`${PAD_COLUMNS} WHERE key = ? AND kind = ? AND slot = ?`)
 const padUpsert = db.prepare(`
@@ -806,7 +806,7 @@ export const setPadVolume = (key: string, volume: number): void => {
   padBoardVolume.run(volume, key)
 }
 
-export const listPads = (key: string): Pad[] => (padSelect.all(key) as unknown as PadRow[]).map(toPad)
+export const listPads = (key: string): Pad[] => padSelect.all(key).map(toPad)
 
 export const getPad = (key: string, id: string): Pad | undefined => {
   const row = padGet.get(key, id) as PadRow | undefined

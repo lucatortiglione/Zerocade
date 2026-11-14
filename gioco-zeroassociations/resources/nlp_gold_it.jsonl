@@ -1,0 +1,12 @@
+{"id":"porta-nome","text":"Chiudi la porta.","targets":[{"start":10,"end":15,"lemma":"porta","upos":"NOUN","morph":{"Gender":"Fem","Number":"Sing"},"surface":"porta"}]}
+{"id":"porta-verbo","text":"Luca porta il pane.","targets":[{"start":5,"end":10,"lemma":"portare","upos":"VERB","morph":{"Number":"Sing","Person":"3"},"surface":"porta"}]}
+{"id":"pesca-nome","text":"La pesca è matura.","targets":[{"start":3,"end":8,"lemma":"pesca","upos":"NOUN","morph":{"Gender":"Fem","Number":"Sing"},"surface":"pesca"}]}
+{"id":"pesca-verbo","text":"Marco pesca nel lago.","targets":[{"start":6,"end":11,"lemma":"pescare","upos":"VERB","morph":{"Number":"Sing","Person":"3"},"surface":"pesca"}]}
+{"id":"legge-nome","text":"La legge è chiara.","targets":[{"start":3,"end":8,"lemma":"legge","upos":"NOUN","morph":{"Gender":"Fem","Number":"Sing"},"surface":"legge"}]}
+{"id":"legge-verbo","text":"Anna legge un libro.","targets":[{"start":5,"end":10,"lemma":"leggere","upos":"VERB","morph":{"Number":"Sing","Person":"3"},"surface":"legge"}]}
+{"id":"ancora-avverbio","text":"Non sono ancora pronto.","targets":[{"start":9,"end":15,"lemma":"ancora","upos":"ADV","surface":"ancora"}]}
+{"id":"ancora-nome","text":"La nave getta l'ancora.","targets":[{"start":16,"end":22,"lemma":"ancora","upos":"NOUN","morph":{"Gender":"Fem","Number":"Sing"},"surface":"ancora"}]}
+{"id":"plurale","text":"I bambini corrono.","targets":[{"start":2,"end":9,"lemma":"bambino","upos":"NOUN","morph":{"Gender":"Masc","Number":"Plur"},"surface":"bambini"}]}
+{"id":"aggettivo","text":"Le bambine sono belle.","targets":[{"start":16,"end":21,"lemma":"bello","upos":"ADJ","morph":{"Gender":"Fem","Number":"Plur"},"surface":"belle"}]}
+{"id":"accento","text":"Mi piace il caffè.","targets":[{"start":12,"end":17,"lemma":"caffè","upos":"NOUN","morph":{"Gender":"Masc","Number":"Sing"},"surface":"caffè"}]}
+{"id":"chat","text":"ragazzi scrivete le risposte!","targets":[{"start":8,"end":16,"lemma":"scrivere","upos":"VERB","morph":{"Number":"Plur","Person":"2"},"surface":"scrivete"}]}
