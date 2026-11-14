@@ -23,7 +23,8 @@
 // data/ is never deleted by a rebuild, and is left out of the zip.
 
 import { execFileSync, execSync } from 'node:child_process'
-import { copyFileSync, cpSync, existsSync, mkdirSync, rmSync, statSync, writeFileSync } from 'node:fs'
+import { createHash } from 'node:crypto'
+import { copyFileSync, cpSync, existsSync, mkdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs'
 import { createRequire } from 'node:module'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -126,7 +127,20 @@ const download = async (url, dest) => {
   writeFileSync(dest, Buffer.from(await res.arrayBuffer()))
 }
 if (process.platform === 'win32' && process.arch === 'x64') copyFileSync(process.execPath, join(runtime, 'node.exe'))
-else await download(`https://nodejs.org/dist/${process.version}/win-x64/node.exe`, join(runtime, 'node.exe'))
+else {
+  // The runtime ships inside the package: it must be the file Node.js published, so its SHA-256 is checked
+  // against SHASUMS256.txt of the same release before it is kept.
+  const base = `https://nodejs.org/dist/${process.version}`
+  const target = join(runtime, 'node.exe')
+  await download(`${base}/win-x64/node.exe`, target)
+  const sums = await (await fetch(`${base}/SHASUMS256.txt`)).text()
+  const expected = /^([0-9a-f]{64})\s+win-x64\/node\.exe$/m.exec(sums)?.[1]
+  const actual = createHash('sha256').update(readFileSync(target)).digest('hex')
+  if (!expected || expected !== actual) {
+    rmSync(target, { force: true })
+    throw new Error(`node.exe of ${process.version} does not match SHASUMS256.txt (expected ${expected ?? 'none'}, got ${actual})`)
+  }
+}
 try {
   await download(`https://raw.githubusercontent.com/nodejs/node/${process.version}/LICENSE`, join(runtime, 'LICENSE'))
 } catch (err) {
