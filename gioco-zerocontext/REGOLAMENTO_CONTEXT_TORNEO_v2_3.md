@@ -492,7 +492,7 @@ context:tournament-finish       {tournamentId,expectedVersion}        -> ack sta
 
 ```text
 context:tournament-state    {version,tournamentId,phase,roundNumber,totalRounds,windowIndex,
-                             windowRemainingMs,secretLength,visibleGuesses,top10,updatedAt,...}
+                             windowRemainingMs,visibleGuesses,top10,updatedAt,...}
 context:tournament-window   {version,phase,windowIndex,serverNow,remainingMs}
 context:tournament-results  {roundId,windowIndex,guesses:[{word,publicRank,band,author,...}],...}
 context:tournament-leaderboard {tournamentId,roundNumber,top10:[{place,displayName,points,delta,...}],final}

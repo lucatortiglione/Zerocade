@@ -6,12 +6,12 @@ del dilemma. Nel codice il gioco si chiama ancora **Bivio**, il suo titolo provv
 
 ## Le domande
 
-Stanno nello schema `dubbi` di [`database/giochi.sqlite3`](../database/README.md):
+Stanno nel loro DB, [`database/ZeroDubbi.sqlite3`](../database/README.md) (un gioco a sé, come ZeroQuizz):
 
 | Tabella | Contenuto |
 | --- | --- |
-| `dubbi__dilemmi` | id, categoria, difficoltà (`light` o `tough`), `esplicita`, ordine |
-| `dubbi__testi` | per ogni dilemma e lingua, il testo di A e quello di B |
+| `dilemmi` | id, categoria, difficoltà (`light` o `tough`), `esplicita`, ordine |
+| `testi` | per ogni dilemma e lingua, il testo di A e quello di B |
 
 Ci sono 120 dilemmi, in italiano e in inglese, 10 per ognuna di 12 categorie: amici e famiglia, assurde, cibo,
 dilemmi, fantasia, scuola e lavoro, social e tecnologia, soldi, sopravvivenza, sport, tempo e viaggi.
@@ -25,7 +25,7 @@ Dalla cartella `gioco-dilemmi`:
 | Comando | Cosa fa |
 | --- | --- |
 | `python script/domande.py export domande.csv` | Scrive tutte le domande in un CSV, da modificare in un foglio di calcolo |
-| `python script/domande.py import domande.csv` | Sostituisce tutte le domande dello schema con quelle del CSV |
+| `python script/domande.py import domande.csv` | Sostituisce tutte le domande del DB con quelle del CSV |
 | `python script/domande.py stats` | Conteggi per categoria, difficoltà e lingua |
 | `python script/to_livecade.py … --lang it --out wyr_it.csv` | Le domande nel CSV di importazione di Livecade («Would You Rather»), una lingua per file |
 | `python script/from_livecade.py export_it.csv --dry-run` | Il contrario: importa un CSV di Livecade e dà id nuovi; salta le domande già presenti, anche con A e B invertite |
@@ -39,11 +39,11 @@ due colonne).
 | Percorso | Contenuto |
 | --- | --- |
 | `assets/` | Icone, card e sfondi delle 12 categorie, l'icona del gioco e `anteprima.html` per vederli tutti |
-| `tools/` | Gli strumenti qui sopra |
+| `script/` | Gli strumenti qui sopra |
 | [`TODO.md`](TODO.md) | Il piano del gioco come app per telefono, con le decisioni ancora aperte |
 
 ## Nel codice
 
-- Server: `apps/server/src/bivio.ts` legge lo schema `dubbi`. `ZEROCADE_BIVIO_DB` può indicare un altro DB
-  (`file` oppure `file#schema`).
+- Server: `apps/server/src/bivio.ts` legge `database/ZeroDubbi.sqlite3` (nel pacchetto Windows `app\ZeroDubbi.sqlite3`).
+  `ZEROCADE_BIVIO_DB` può indicare un altro file; la usano anche gli strumenti.
 - Overlay: `apps/overlay/src/Bivio.tsx`.

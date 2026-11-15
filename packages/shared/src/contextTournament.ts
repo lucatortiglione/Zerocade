@@ -111,7 +111,6 @@ export interface ContextTournamentState {
   serverNow: number
   // Valid words received in the open window (their ranks stay hidden until it closes).
   submissions: number
-  secretLength: number
   // The secret, only once the round is over.
   solution: string | null
   solvedBy: string | null

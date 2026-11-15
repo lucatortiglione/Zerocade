@@ -106,7 +106,7 @@ test('the public state never carries the secret before the round is over; the da
   const secret = s.tournaments.admin(ROOM)!.secret!
   assert.match(secret, /^[a-z]{3}$/)
   assert.equal(JSON.stringify(s.state()).includes(`"${secret}"`), false)
-  assert.equal(s.state().secretLength, 3)
+  assert.equal('secretLength' in s.state(), false) // not even how many letters it has
   s.say('anna', secret)
   closeWindow(s)
   assert.equal(s.state().solution, secret)

@@ -3,7 +3,7 @@
 **Versione:** 1.0 · 14 novembre 2026  
 **Regolamento di riferimento:** `REGOLAMENTO_CONTEXT_TORNEO_v2_3.md` (regole funzionali §§1–13 e Allegato A).  
 **Repository esaminato:** [`lucatortiglione/Zerocade`](https://github.com/lucatortiglione/Zerocade), ramo `main`, al tree SHA `3a70b2774ec6d7e54357b1b3d4c8ff4575fcad23`.  
-**Stato del documento:** specifica di modifica, **non** codice già implementato, testato o distribuito. Le citazioni dei percorsi indicano file realmente individuati nel repository; i nuovi moduli qui suggeriti non esistono ancora alla revisione.
+**Stato del documento:** specifica di modifica scritta il 14 novembre 2026, prima del codice. Il 15 novembre 2026 è stata implementata: i moduli suggeriti esistono (`context-tournament*.ts`, `packages/shared/src/contextTournament.ts`) e il [README del gioco](README.md) dice come si usa. Dove l'implementazione si scosta da questo progetto vale il paragrafo «Scostamenti dall'implementazione» in fondo; le citazioni dei percorsi e il tree SHA qui sotto sono quelli della revisione di partenza.
 
 ## 0. Obiettivo, confini, criteri architetturali
 
@@ -262,7 +262,7 @@ context:tournament-finish       {tournamentId,expectedVersion}        -> ack sta
 
 ```text
 context:tournament-state    {version,tournamentId,phase,roundNumber,totalRounds,windowIndex,
-                             windowRemainingMs,secretLength,visibleGuesses,top10,updatedAt,...}
+                             windowRemainingMs,visibleGuesses,top10,updatedAt,...}
 context:tournament-window   {version,phase,windowIndex,serverNow,remainingMs}
 context:tournament-results  {roundId,windowIndex,guesses:[{word,publicRank,band,author,...}],...}
 context:tournament-leaderboard {tournamentId,roundNumber,top10:[{place,displayName,points,delta,...}],final}
@@ -373,3 +373,13 @@ Comandi di progetto da rieseguire nel repository (come verifiche **da svolgere**
 ## 15. Definizione di completamento (DoD)
 
 L'implementazione è completa soltanto quando: un utente partecipa via chat TikTok/Twitch, un torneo da 5/7 manche si svolge con finestre globali da 6 s e punteggi verificati lato server, ogni manche aggiorna in transazione la classifica del torneo, la Top 10 appare per almeno 15 s con avvio manuale della successiva, la classifica finale/storico sopravvive al riavvio, preview e regali non possono alterare il risultato, e tutte le regressioni di ZeroContext classico e degli altri giochi sono superate. Senza test su traffico reale e sincronizzazione video/chat non dichiarare verificata l'equità temporale.
+
+## Scostamenti dall'implementazione (15 novembre 2026)
+
+- **Manche:** oltre a 5 e 7 si può scegliere «infinite» (`totalRounds` null, `total_rounds` NULL): il torneo finisce con «Concludi torneo». Un `zerocade.db` con la tabella vecchia (`NOT NULL`) viene ricostruito al primo avvio.
+- **Azzera classifica:** comando `reset-standings` (con motivo), tra una manche e l'altra: le manche giocate diventano annullate, la classifica si svuota e si riparte dalla manche 1. Resta nel registro (`standings-reset`) con la classifica di prima.
+- **Decisioni dell'organizzatore (§14 del regolamento):** iscrizione al primo tentativo valido; contano solo i messaggi di ZeroFollowerBot; «Chiudi manche» vale come non risolta; parità finale ex aequo.
+- **Parole segrete:** ogni parola segreta conta quante volte è uscita (`context_secret_uses`) e si scelgono sempre quelle meno uscite, in classica e in torneo.
+- **Eventi:** il torneo usa un solo evento di comando `context:tournament` (con `type`) e lo stato `context:tournament` / `context:tournament-admin`, non gli eventi `context:tournament-*` separati elencati nel §9.
+- **Vocabolario:** dal 15 novembre 2026 senza i plurali puri (`script/prune_context_vocab.py`); il torneo salva l'hash del corpus e si sospende se cambia.
+- **Lunghezza della parola:** su richiesta dell'organizzatore lo stato pubblico non ha `secretLength` e l'overlay non mostra le caselle delle lettere: nel torneo non si sa quante lettere ha la parola segreta (nemmeno il numero).

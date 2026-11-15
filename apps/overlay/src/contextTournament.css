@@ -39,8 +39,6 @@ body.tournament-on .overlay__guide { display: none; }
 .tournament__meta { font-size: 2.2vmin; color: rgb(255 255 255 / 0.8); }
 @keyframes tournament-pop { from { transform: scale(1.25); opacity: 0.6; } to { transform: scale(1); opacity: 1; } }
 
-.tournament__secret { display: flex; gap: 1vmin; }
-.tournament__slot { width: 4.6vmin; height: 5.6vmin; border-radius: 1vmin; background: rgb(255 255 255 / 0.14); box-shadow: inset 0 -0.5vmin 0 rgb(255 255 255 / 0.3); }
 
 .tournament__label { display: block; margin-bottom: 0.6vmin; font-size: 2vmin; text-transform: uppercase; letter-spacing: 0.08em; color: rgb(255 255 255 / 0.65); }
 .tournament__buoy, .tournament__last, .tournament__board { width: 100%; }

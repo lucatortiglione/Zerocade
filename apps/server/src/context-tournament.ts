@@ -566,7 +566,6 @@ export class ContextTournaments {
   private publicState(l: Live): ContextTournamentState {
     const now = this.now()
     const { top10, tieAtTen } = topTen(l.rows)
-    const secret = l.plan ? this.deps.corpus()?.data.words[l.plan.secret] : undefined
     const intermissionEnd = l.t.intermissionSince === null ? 0 : l.t.intermissionSince + l.t.intermissionMs
     return {
       version: l.version,
@@ -580,7 +579,6 @@ export class ContextTournaments {
       remainingMs: l.phase === 'window-open' || l.phase === 'window-processing' ? Math.max(0, l.deadline - now) : 0,
       serverNow: now,
       submissions: l.phase === 'window-open' ? l.submissions : 0,
-      secretLength: secret ? [...secret].length : 0,
       solution: l.round ? null : l.solution,
       solvedBy: l.round ? null : l.solvedBy,
       board: l.board,

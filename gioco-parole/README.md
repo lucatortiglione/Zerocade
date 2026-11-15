@@ -61,7 +61,8 @@ Dalla cartella `gioco-parole`:
 | [`TODO.md`](TODO.md) | Il piano del gioco e le decisioni prese |
 | `assets/backgrounds/` | Gli sfondi dei capitoli (SVG 1080 × 1920); `assets/anteprima.html` li mostra tutti |
 | `lexicon/` | Il lessico, con fonti e licenze |
-| `tools/` | Gli strumenti qui sopra e la curva di difficoltà |
+| `script/` | Gli strumenti qui sopra |
+| `tools/` | La curva di difficoltà (`curve.json`) |
 
 ## Nel codice
 

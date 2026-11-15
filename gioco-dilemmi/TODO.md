@@ -22,11 +22,11 @@ Questo piano nasce dal reverse engineering di Dilemmaly 1.4.1 (`com.vanilla.woul
 
 | Percorso | Contenuto |
 |---|---|
-| schema `dubbi` di `database/giochi.sqlite3` | 120 dilemmi originali, in italiano e inglese, divisi in 12 categorie da 10 (lo legge il server di Zerocade; `data/domande.db` è la vecchia copia, non più aggiornata) |
-| `script/domande.py` | Importa le domande da un CSV nello schema `dubbi` e le esporta in CSV, per chi le modifica in un foglio di calcolo |
+| `database/ZeroDubbi.sqlite3` | 120 dilemmi originali, in italiano e inglese, divisi in 12 categorie da 10 (lo legge il server di Zerocade; `data/domande.db` è la vecchia copia, non più usata) |
+| `script/domande.py` | Importa le domande da un CSV in `ZeroDubbi.sqlite3` e le esporta in CSV, per chi le modifica in un foglio di calcolo |
 | `data/livecade/wyr_it.csv`, `wyr_en.csv` | Gli stessi dilemmi nel formato di importazione Livecade (intestazione provvisoria, vedi sezione 3, M11) |
-| `script/to_livecade.py` | Convertitore dallo schema `dubbi` al CSV Livecade, con mappatura automatica sull'intestazione di un export reale |
-| `script/from_livecade.py` | Il contrario: importa nello schema `dubbi` un CSV Livecade (un export della dashboard o un file di `to_livecade.py`). Riconosce le colonne allo stesso modo, riporta categorie e difficoltà ai nostri valori, dà id nuovi (b0121…) e salta le domande già presenti, anche con A e B invertite. `--dry-run` mostra cosa importerebbe |
+| `script/to_livecade.py` | Convertitore da `ZeroDubbi.sqlite3` al CSV Livecade, con mappatura automatica sull'intestazione di un export reale |
+| `script/from_livecade.py` | Il contrario: importa in `ZeroDubbi.sqlite3` un CSV Livecade (un export della dashboard o un file di `to_livecade.py`). Riconosce le colonne allo stesso modo, riporta categorie e difficoltà ai nostri valori, dà id nuovi (b0121…) e salta le domande già presenti, anche con A e B invertite. `--dry-run` mostra cosa importerebbe |
 | `script/make_category_assets.py` | Genera icone, card e sfondi delle categorie |
 | `assets/icon/` | Icona dell'app (SVG 1024) e icona adattiva Android (primo piano e sfondo) |
 | `assets/category-icons/` | 12 icone bianche 100×100 |
@@ -35,7 +35,7 @@ Questo piano nasce dal reverse engineering di Dilemmaly 1.4.1 (`com.vanilla.woul
 | `assets/backgrounds/` | Sfondi delle opzioni A e B (1125×1395) e sfondo scuro dell'app (1500×1800) |
 | `assets/anteprima.html` | Pagina che mostra tutte le grafiche insieme |
 
-Tabelle dello schema `dubbi` (in `giochi.sqlite3` hanno il prefisso `dubbi__`):
+Tabelle di `ZeroDubbi.sqlite3`:
 
 | Tabella.colonna | Valori |
 |---|---|
@@ -107,7 +107,7 @@ Le stime valgono per uno sviluppatore che conosce Flutter e sono indicative.
 - [ ] Flavor `dev` e `prod` (package id diversi)
 
 ### M1 · Pipeline dei contenuti (2–3 giorni)
-- [ ] `script/build_bundle.py`: dallo schema `dubbi` a `assets/data/questions_<lingua>.json`, **un file per lingua**. Il riferimento usa un unico JSON da 24 MB con 22 lingue, che pesa in memoria e all'avvio.
+- [ ] `script/build_bundle.py`: da `ZeroDubbi.sqlite3` a `assets/data/questions_<lingua>.json`, **un file per lingua**. Il riferimento usa un unico JSON da 24 MB con 22 lingue, che pesa in memoria e all'avvio.
   ```json
   { "version": 1, "generatedAt": "2026-11-01", "language": "it",
     "categories": [{ "id": "cibo", "title": "Cibo", "premium": false, "explicit": false }],
@@ -141,7 +141,7 @@ Le stime valgono per uno sviluppatore che conosce Flutter e sono indicative.
 - [ ] Testi dell'interfaccia con `flutter gen-l10n` (file ARB), all'inizio solo `it` ed `en`
 - [ ] Scelta della lingua nelle impostazioni, con quella di sistema come predefinita
 - [ ] Bandiere da `flag-icons` (licenza MIT), non quelle del riferimento
-- [ ] Processo di traduzione dei contenuti: bozza automatica, revisione di un madrelingua, colonna `revisionato` nella tabella `testi` dello schema `dubbi`
+- [ ] Processo di traduzione dei contenuti: bozza automatica, revisione di un madrelingua, colonna `revisionato` nella tabella `testi` di `ZeroDubbi.sqlite3`
 - [ ] Se l'obiettivo è anche lo streaming, dare priorità alle 13 lingue di Livecade: en, es, pt, fr, de, it, id, ar, tr, ru, hi, ro, fil. L'arabo richiede la gestione della scrittura da destra a sinistra.
 
 ### M5 · Voti globali (v2, 1–2 settimane)
@@ -199,7 +199,7 @@ Livecade ha già un gioco Would You Rather con oltre 4900 domande per lingua, it
 Livecade non pubblica i nomi delle colonne del gioco Would You Rather. Il processo affidabile è questo:
 
 1. [ ] Nella dashboard: Would You Rather → Your question bank → lingua `it` → **Export** → CSV. L'export è gratuito su tutti i piani.
-2. [ ] `python script/to_livecade.py --lang it --template <export>.csv --out data/livecade/wyr_it.csv` (legge lo schema `dubbi`)
+2. [ ] `python script/to_livecade.py --lang it --template <export>.csv --out data/livecade/wyr_it.csv` (legge `ZeroDubbi.sqlite3`)
    - Il convertitore copia l'intestazione dell'export e mappa automaticamente lingua, opzione A, opzione B, categoria e difficoltà.
    - Avvisa se i nostri valori di categoria o difficoltà non esistono nel banco di Livecade. In quel caso si correggono con `--map`:
      ```json

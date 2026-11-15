@@ -22,6 +22,8 @@ I conteggi aggiornati sono in [stato e ripresa](ASSOCIAZIONI_FILTRATI.md) e nel
    [PROMPT_INVENTORY.md](PROMPT_INVENTORY.md)) e integrare, scartare o rimandare
    gli aggiornamenti e le singole voci (`script/inventory_updates.py`,
    [AGGIORNAMENTI_FONTI.md](AGGIORNAMENTI_FONTI.md)). Nessuna associazione.
+   **Normalizzazione** (task «1a»): `script/normalize_words.py apply` registra i plurali puri come scartati
+   (si tiene il singolare); poi il task 3 li toglie da filtrati e validi.
 2. **Bacini**: per un prompt scelto, fissare il senso familiare e proporre le
    associazioni partendo dal concetto, non dalle definizioni (bozze:
    `script/free_association_llm.py propose`). Ogni parola si verifica con le [regole](REGOLE.md).
@@ -50,6 +52,7 @@ Dalla cartella `gioco-zeroassociations`, con `.venv/Scripts/python.exe -B`:
 | Comando | Cosa fa |
 |---|---|
 | `script/prompt_inventory.py collect` | Raccoglie l'inventario dei prompt (task «1. Prompt: raccogli…») |
+| `script/normalize_words.py plan` / `apply` | Normalizzazione: conta / registra i plurali puri come DISCARDED, con il singolare nel motivo (task «1a)Parole: normalizza…»); non tocca le decisioni di altri |
 | `script/prompt_database.py import-reviewed FILE.jsonl` | Importa bacini già revisionati, tutto o niente |
 | `script/prompt_database.py status` | Conteggi e integrità del DB |
 | `script/prompt_database.py dump` | Ricrea lo schema `game`, viste sui bacini della raccolta (senza inventario); con `--output FILE` scrive i bacini in un DB a sé |

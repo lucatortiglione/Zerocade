@@ -93,7 +93,9 @@ finale       3.941 prompt, 11.752 parole uniche, 58.551 collegamenti
 | `finale` | Gli stessi dati di `validi`, organizzati per parola: ogni parola compare una volta sola, collegata a tutti i prompt in cui è una risposta. Serve per vedere quali parole ricorrono tra più prompt | `final_associations.py build` |
 
 Fuori dalla fila restano:
-- `scartati`: le voci respinte, con il motivo; quasi tutte dai filtri automatici;
+- `scartati`: le voci respinte, con il motivo; quasi tutte dai filtri automatici; anche i plurali puri, che il task 1a
+  (`normalize_words.py`) registra come DISCARDED in `raw.inventory_term_decisions` («Plurale puro di X»), perché si
+  tiene il singolare;
 - `game`: i soli bacini verificati, come viste sulle tabelle di `raw` (sempre aggiornate, nessuna copia). Il gioco
   legge la copia nello schema `associazioni` di `giochi.sqlite3`, presa da `validi`.
 

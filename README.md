@@ -39,7 +39,7 @@ Sette giochi hanno una cartella propria, con i dati e gli strumenti per preparar
 | --- | --- | --- |
 | 🔗 **ZeroAssociazioni** | [gioco-zeroassociations](gioco-zeroassociations/README.md) | Una parola in vista e 7 o 8 parole collegate nascoste: la chat le indovina una a una |
 | ⛓️ **ZeroReazioniACatena** | [gioco-zerocatene](gioco-zerocatene/README.md) | Catene di parole associate, in tre modalità che si danno il cambio |
-| 🎯 **ZeroContext** | [gioco-zerocontext](gioco-zerocontext/README.md) | Ogni parola in chat riceve una posizione per vicinanza di significato a quella segreta |
+| 🎯 **ZeroContext** | [gioco-zerocontext](gioco-zerocontext/README.md) | Ogni parola in chat riceve una posizione per vicinanza di significato a quella segreta; c'è anche la modalità Torneo (5, 7 o infinite manche) |
 | 🟩 **ZeroWordle** | [gioco-zerowordle](gioco-zerowordle/README.md) | La chat indovina insieme una parola di 5–8 lettere, con le tessere verdi, oro e grigie |
 | 🌱 **ZeroWords** | [gioco-parole](gioco-parole/README.md) | Ruota di lettere e schema a incastro, livelli senza fine generati durante la partita |
 | 🧠 **ZeroQuizz** | [gioco-quizzland](gioco-quizzland/README.md) | Quiz di scienze, curiosità e cultura su 26.000 domande, risposta A, B, C o D |
@@ -99,7 +99,8 @@ Lunar Dash e Guess the Location ne restano senza, perché la loro scena occupa t
 
 - **`database/giochi.sqlite3`**, in Git: i contenuti dei giochi di parole e degli altri giochi dell'overlay, uno
   schema per gioco. Vedi [database/README.md](database/README.md).
-- **`database/ZeroQuizz.sqlite3`**, in Git: le domande e le risposte di ZeroQuizz, un DB a sé.
+- **`database/ZeroQuizz.sqlite3`** e **`database/ZeroDubbi.sqlite3`**, in Git: le domande di ZeroQuizz e i dilemmi di
+  ZeroDubbi, un DB a sé ciascuno.
 - **`database/parole_ita_raw.sqlite3`**, fuori da Git (2,3 GB): il DB di lavoro di ZeroAssociazioni, con la
   raccolta delle parole italiane da cui nascono anche le parole di ZeroWordle e ZeroContext.
 - [database/DB.md](database/DB.md) spiega ogni file e il percorso di una parola dalla raccolta al gioco.

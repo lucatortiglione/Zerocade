@@ -87,9 +87,6 @@ function Round({ t, remaining }: { t: ContextTournamentState; remaining: number 
           <span className="tournament__meta">{UI.window(t.window, t.windowsPerRound)}</span>
         </section>
       )}
-      <div className="tournament__secret" aria-label="parola segreta">
-        {Array.from({ length: t.secretLength }, (_, i) => <span key={i} className="tournament__slot" />)}
-      </div>
       {t.buoy && (
         <div className="tournament__buoy">
           <span className="tournament__label">{UI.buoy}</span>
