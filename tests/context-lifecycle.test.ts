@@ -5,7 +5,7 @@ import { Engine } from '../apps/overlay/src/games/engine.ts'
 import { parseContextData, rankAgainst, type ContextData, type Ranking } from '../apps/overlay/src/games/contextRanking.ts'
 import type { ContextComputer } from '../apps/overlay/src/games/contextProtocol.ts'
 import { inlineContextComputer, settleContext } from './helpers/inlineContextComputer.ts'
-import { ContextError } from '@zerocade/shared'
+import { CONTEXT_LIMITS, ContextError } from '@zerocade/shared'
 
 const cat = parseContextData('gatto\ngatti\nmare\n', new Int8Array([100, 0, 95, 30, 0, 100]).buffer, 'gatto\n')
 const sea = parseContextData('mare\nonda\n', new Int8Array([100, 0, 95, 30]).buffer, 'mare\n')
@@ -234,23 +234,35 @@ test('the end of a round reveals its word once, found or ended by the creator', 
   }
 })
 
-test('network load failures have a finite retry budget; invalid data does not enter a retry loop', async (t) => {
+test('an unreachable server is asked again with growing waits, never given up on; invalid data does not enter a retry loop', async (t) => {
   t.mock.method(console, 'warn', () => {})
   let clock = 0
   t.mock.method(performance, 'now', () => clock)
   let attempts = 0
+  let online = false
   const game = createContext(() => ({
-    async load() { attempts++; throw new ContextError('network', 'offline') },
-    async rank() { throw new Error('must not rank') }, dispose() {},
+    async load() { attempts++; if (!online) throw new ContextError(attempts % 2 ? 'network' : 'timeout', 'offline'); return cat },
+    async rank(secret) { return rankAgainst(cat, secret) }, dispose() {},
   }))
   game.reset(settings, 1080, 1920)
+  // Waits of 10, 20, 40 s, then 60 s: in 88 s the server is asked at 0, 11, 33 and 77 s.
   for (let i = 0; i < 8; i++) {
     await settleContext()
     clock += 11000
     game.update(.01, clock, settings)
   }
-  assert.equal(attempts, 3)
-  assert.match(screen(game).draw(), /Riavvia dopo averli verificati/)
+  assert.equal(attempts, 4)
+  const view = screen(game)
+  assert.match(view.draw(), /Continuo a riprovare/)
+  assert.doesNotMatch(view.draw(), /Riavvia/)
+  // The server is back: the next attempt loads the words and the first round starts.
+  online = true
+  clock += 60_000
+  game.update(.01, clock, settings)
+  await settleContext()
+  await settleContext()
+  assert.equal(attempts, 5)
+  assert.match(view.draw(), /0 tentativi/)
   game.dispose?.()
   let invalidAttempts = 0
   const invalid = createContext(() => ({
@@ -261,5 +273,71 @@ test('network load failures have a finite retry budget; invalid data does not en
   await settleContext()
   for (let i = 0; i < 100; i++) { clock += 11000; invalid.update(.01, clock, settings) }
   assert.equal(invalidAttempts, 1)
+  assert.match(screen(invalid).draw(), /Riavvia dopo averli verificati/)
   invalid.dispose?.()
+})
+
+test('a failed ranking restarts the worker once and the round starts afresh; a second failure stops the game', async (t) => {
+  t.mock.method(console, 'warn', () => {})
+  let clients = 0
+  let failing = 2
+  const game = createContext(() => {
+    clients++
+    return {
+      async load() { return cat },
+      async rank(secret) { if (failing-- > 0) throw new ContextError('timeout', 'slow'); return rankAgainst(cat, secret) },
+      dispose() {},
+    }
+  })
+  const view = screen(game)
+  game.reset(settings, 1080, 1920)
+  for (let i = 0; i < 4; i++) { await settleContext(); game.update(.01, performance.now(), settings) }
+  assert.equal(clients, 2, 'one automatic restart of the worker')
+  assert.match(view.draw(), /Riavvia il gioco/)
+  game.dispose?.()
+  // Two failures in two different rounds are each forgiven: the retry is per round.
+  clients = 0
+  failing = 1
+  const second = createContext(() => {
+    clients++
+    return {
+      async load() { return cat },
+      async rank(secret) { if (failing-- > 0) throw new ContextError('timeout', 'slow'); return rankAgainst(cat, secret) },
+      dispose() {},
+    }
+  })
+  const screen2 = screen(second)
+  second.reset(settings, 1080, 1920)
+  for (let i = 0; i < 4; i++) { await settleContext(); second.update(.01, performance.now(), settings) }
+  assert.equal(clients, 2)
+  assert.match(screen2.draw(), /0 tentativi/)
+  second.onAction('guess', guess, 0)
+  assert.match(screen2.draw(), /100 pt/)
+  second.dispose?.()
+})
+
+test('a board full of guesses ends the round instead of stopping the game; newcomers past the player cap play without points', async (t) => {
+  t.mock.method(console, 'warn', () => {})
+  // A vocabulary larger than the board: CONTEXT_LIMITS.guesses words plus the secret.
+  const letters = 'abcdefghijklmnopqrstuvwxyz'
+  const words = ['zzzz']
+  for (let i = 0; words.length <= CONTEXT_LIMITS.guesses; i++)
+    words.push(`${letters[Math.floor(i / 676) % 26]}${letters[Math.floor(i / 26) % 26]}${letters[i % 26]}q`)
+  const vectors = new Int8Array(words.length * 2)
+  for (let i = 0; i < words.length; i++) { vectors[2 * i] = 100 - (i % 100); vectors[2 * i + 1] = i % 100 }
+  const big = parseContextData(words.join('\n'), vectors.buffer, 'zzzz\n')
+  const revealed: string[] = []
+  const game = createContext(() => inlineContextComputer(big), { follow() { return () => {} }, report() {}, reveal(word) { revealed.push(word) } })
+  game.reset(settings, 1080, 1920)
+  await settleContext(); await settleContext()
+  const view = screen(game)
+  assert.match(view.draw(), /0 tentativi/)
+  for (let i = 1; i <= CONTEXT_LIMITS.guesses; i++) game.onAction('guess', { ...guess, text: words[i], user: { id: `p${i}`, nickname: `P${i}` } }, 0)
+  assert.deepEqual(revealed, [], 'the board holds exactly CONTEXT_LIMITS.guesses words')
+  game.onAction('guess', { ...guess, text: words[1], user: { id: 'late', nickname: 'Late' } }, 0) // a word already on the board: ignored
+  assert.deepEqual(revealed, [])
+  game.onAction('guess', { ...guess, text: 'zzzz', user: { id: 'late', nickname: 'Late' } }, 0)
+  assert.deepEqual(revealed, ['zzzz'], 'the guess that does not fit ends the round unsolved')
+  assert.doesNotMatch(view.draw(), /Riavvia/)
+  game.dispose?.()
 })

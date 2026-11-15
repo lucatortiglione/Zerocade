@@ -75,6 +75,8 @@ interface Live {
   achievements: string[]
   rows: TournamentRow[]
   players: Set<string>
+  // How many rounds are settled, kept here: every publish asks for it, and the rounds change only on a few commands.
+  settled: number
   version: number
   publishTimer: unknown
 }
@@ -319,6 +321,7 @@ export class ContextTournaments {
     this.stopTimer(l)
     if (!this.deps.store.voidRound(target.id, reason, this.now(), actor)) return fail('La manche è già stata annullata.')
     l.t = this.deps.store.tournament(l.t.id)!
+    l.settled = this.countSettled(l.t.id)
     l.round = null
     l.plan = null
     this.clearRound(l)
@@ -353,6 +356,7 @@ export class ContextTournaments {
     this.deps.store.resetStandings(l.t.id, reason, this.now(), actor,
       l.rows.map((r) => ({ place: r.place, nickname: r.nickname, points: r.points })))
     l.t = this.deps.store.tournament(l.t.id)!
+    l.settled = this.countSettled(l.t.id)
     this.clearRound(l)
     l.achievements = []
     l.overflow = 0
@@ -373,6 +377,7 @@ export class ContextTournaments {
       this.stopTimer(l)
       this.deps.store.restoreFromBackup(l.t.id, snapshotId, this.now(), actor)
       l.t = this.deps.store.tournament(l.t.id)!
+      l.settled = this.countSettled(l.t.id)
       this.clearRound(l)
       l.achievements = []
       l.overflow = 0
@@ -433,9 +438,8 @@ export class ContextTournaments {
     }
     const guess: GuessRecord = { roundId: l.round.id, seq: l.seq + 1, window, messageKey, player: user.id, word,
       position: positionOf(l.plan, word), receivedAt: this.now() }
-    if (!this.deps.store.addGuess(guess)) return false
+    if (!this.deps.store.acceptGuess(guess, l.t.id, user.nickname, user.avatar ?? null)) return false
     l.seq = guess.seq
-    this.deps.store.enrol(l.t.id, user.id, user.nickname, user.avatar ?? null, guess.receivedAt)
     l.players.add(user.id)
     l.thisWindow.add(user.id)
     l.usedWords.add(word)
@@ -567,6 +571,7 @@ export class ContextTournaments {
       return
     }
     l.t = this.deps.store.tournament(l.t.id)!
+    l.settled = this.countSettled(l.t.id)
     l.solution = this.deps.corpus()?.data.words[round.secret] ?? null
     l.solvedBy = outcome.solvedBy ? name(outcome.solvedBy) : null
     l.achievements = achievements
@@ -608,7 +613,11 @@ export class ContextTournaments {
     return { t, phase: 'ready', round: null, plan: null, window: 0, deadline: 0, timer: null, seq: 0, thisWindow: new Set(), pending: null,
       usedWords: new Set(), messages: new Set(), submissions: 0, overflow: 0, board: [], lastWindow: [], typed: [], buoy: null, best: null,
       solution: null, solvedBy: null, achievements: [], rows: [], players: new Set(this.deps.store.players(t.id).map((p) => p.player)),
-      version: 0, publishTimer: null }
+      settled: this.countSettled(t.id), version: 0, publishTimer: null }
+  }
+
+  private countSettled(tournamentId: string): number {
+    return this.deps.store.rounds(tournamentId).filter((r) => r.status === 'settled').length
   }
 
   private clearRound(l: Live) {
@@ -658,7 +667,7 @@ export class ContextTournaments {
   }
 
   private settledRounds(l: Live): number {
-    return this.deps.store.rounds(l.t.id).filter((r) => r.status === 'settled').length
+    return l.settled
   }
 
   private refreshStandings(l: Live) {

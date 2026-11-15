@@ -8,8 +8,9 @@ import { contextFile, type ContextFile } from './context.js'
 // corpus is identified by a hash of its files, saved with the tournament: if it changes, a tournament in progress is
 // suspended rather than played on other words.
 //
-// Ranking a secret takes about 100 ms (101 304 words, 600 dimensions): it runs when a round is prepared, while no
-// window is open, so it never delays a guess.
+// Ranking a secret takes about 150 ms (89 380 words, 768 dimensions, measured 15/11/2026): it runs when a round is
+// prepared, while no window is open, so it never delays a guess. Reading, hashing and parsing the corpus takes a few
+// hundred ms more: the server does it at start-up when ZeroContext is selected (index.ts), not at the first tournament.
 
 export interface Corpus {
   data: ContextData

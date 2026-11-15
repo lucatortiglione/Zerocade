@@ -92,6 +92,8 @@ export function createContext(createComputer: () => ContextComputer = () => new 
   let generation = 0
   let roundRevision = 0
   let requestedSecret: number | null = null
+  // The ranking worker is restarted once per round when it fails; a second failure stops the game.
+  let rankRetried = false
   let lastSecret: string | null = null
   let readyRound: (() => void) | null = null
   let unfollow: (() => void) | null = null
@@ -136,6 +138,23 @@ export function createContext(createComputer: () => ContextComputer = () => new 
     computer?.dispose()
     computer = null
     clearInputs()
+    console.warn('[zerocontext]', message)
+  }
+  // The worker failed (a timeout, a crash, the browser reclaiming its memory): a new one, with the words loaded
+  // again, and a fresh round. The queued guesses are kept for it.
+  const restartEngine = (message: string) => {
+    generation++
+    roundRevision++
+    computer?.dispose()
+    computer = null
+    data = null
+    ranking = null
+    readyRound = null
+    loading = false
+    preparing = false
+    failedAt = null
+    attempts = 0
+    problem = message
     console.warn('[zerocontext]', message)
   }
   const enqueue = (input: Input) => {
@@ -185,6 +204,7 @@ export function createContext(createComputer: () => ContextComputer = () => new 
         if (!active || frozen || generation !== life || roundRevision !== ticket || !data) return
         preparing = false
         problem = null
+        rankRetried = false
         ranking = result
         lastSecret = data.words[result.secret]
         beginRound(forced === undefined ? { word: lastSecret, prev } : null)
@@ -194,7 +214,12 @@ export function createContext(createComputer: () => ContextComputer = () => new 
     }).catch((error: unknown) => {
       if (!active || generation !== life || roundRevision !== ticket) return
       if (error instanceof ContextError && (error.kind === 'closed' || error.kind === 'superseded')) return
-      freeze('Calcolo di ZeroContext non riuscito. Riavvia il gioco.');
+      if (!rankRetried) {
+        rankRetried = true
+        restartEngine('Calcolo di ZeroContext non riuscito: riavvio il motore del gioco.')
+        return
+      }
+      freeze('Calcolo di ZeroContext non riuscito. Riavvia il gioco.')
     })
   }
 
@@ -234,9 +259,11 @@ export function createContext(createComputer: () => ContextComputer = () => new 
     }
   }
 
-  // Wait for the words; the first round starts as soon as they are here.
+  // Wait for the words; the first round starts as soon as they are here. A server that cannot be reached (restarting,
+  // a lost connection, a slow download) is asked again for as long as the game is on screen, with retryDue's waits:
+  // only data that is there but invalid stops the game.
   const ensureData = () => {
-    if (data || loading || !active || frozen || attempts >= 3 || !retryDue(failedAt, performance.now())) return
+    if (data || loading || !active || frozen || !retryDue(failedAt, performance.now(), attempts)) return
     const life = generation
     loading = true
     attempts++
@@ -248,6 +275,7 @@ export function createContext(createComputer: () => ContextComputer = () => new 
         loading = false
         data = d
         failedAt = null
+        attempts = 0
         problem = null
         if (!ranking) pick()
       })
@@ -257,10 +285,11 @@ export function createContext(createComputer: () => ContextComputer = () => new 
         failedAt = performance.now()
         computer?.dispose()
         computer = null
-        if (error instanceof ContextError && error.kind === 'network' && attempts < 3) {
-          problem = 'Connessione ai dati interrotta. Riprovo tra pochi secondi.'
+        if (error instanceof ContextError && (error.kind === 'network' || error.kind === 'timeout')) {
+          problem = attempts < 3 ? 'Connessione ai dati interrotta. Riprovo tra pochi secondi.'
+            : `Server di ZeroContext non raggiungibile (${attempts} tentativi). Continuo a riprovare.`
           console.warn('[zerocontext]', problem)
-        } else freeze('Dati di ZeroContext non disponibili o non validi. Riavvia dopo averli verificati.')
+        } else freeze('Dati di ZeroContext non validi. Riavvia dopo averli verificati.')
       })
   }
 
@@ -275,7 +304,7 @@ export function createContext(createComputer: () => ContextComputer = () => new 
 
   const hint = () => {
     if (disableAllHints || !data || !ranking || revealed || hintCount >= maxHints) return
-    if (guesses.length >= CONTEXT_LIMITS.guesses) { freeze('Limite dei tentativi raggiunto. Riavvia il gioco.'); return }
+    if (guesses.length >= CONTEXT_LIMITS.guesses) return // the board is full: the next guess ends the round (act)
     const r = closerHint(ranking, best, taken, hintFloor)
     if (r < 0) return
     place({ word: data.words[ranking.order[r]], rank: r, by: null, at: performance.now() })
@@ -309,17 +338,18 @@ export function createContext(createComputer: () => ContextComputer = () => new 
     const text = event.text.trim().replace(/\s+/g, ' ').slice(0, 24)
     if (text) typed = [...typed, { text, user: who, rank: i >= 0 ? ranking.rankOf[i] : null }].slice(-6)
     if (i < 0 || taken.has(i)) return
-    if (guesses.length >= CONTEXT_LIMITS.guesses || (!scores.has(who.id) && scores.size >= CONTEXT_LIMITS.players)) {
-      freeze('Limite dei tentativi o dei giocatori raggiunto. Riavvia il gioco.'); return
-    }
+    // A round with as many guesses as the board can hold ends unsolved, and the next one starts: the game never stops.
+    if (guesses.length >= CONTEXT_LIMITS.guesses) { finish(null); return }
+    // Beyond the players the leaderboard can hold, a newcomer plays without points rather than stopping the game.
+    const scoring = scores.has(who.id) || scores.size < CONTEXT_LIMITS.players
     const word = data.words[i]
     const rank = ranking.rankOf[i]
     const improved = rank < best
     place({ word, rank, by: who, at: performance.now() })
     if (rank === 0) {
-      award(who, finderPts)
+      if (scoring) award(who, finderPts)
       finish(who)
-    } else if (improved && closestMult > 0) {
+    } else if (improved && closestMult > 0 && scoring) {
       award(who, Math.max(1, Math.round((closestMult * finderPts) / (rank + 1))))
     }
   }
@@ -366,6 +396,7 @@ export function createContext(createComputer: () => ContextComputer = () => new 
       failedAt = null
       attempts = 0
       requestedSecret = null
+      rankRetried = false
       lastSecret = null
       readyRound = null
       data = null

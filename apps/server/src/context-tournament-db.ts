@@ -344,6 +344,16 @@ export class ContextTournamentStore {
     return r.changes === 1
   }
 
+  // A guess and its player's enrolment (the nickname follows the latest seen) in one transaction: one commit, not two,
+  // for each of the hundreds of words a busy window brings to the main thread.
+  acceptGuess(g: GuessRecord, tournamentId: string, nickname: string, avatar: string | null): boolean {
+    return this.db.transaction(() => {
+      if (!this.addGuess(g)) return false
+      this.enrol(tournamentId, g.player, nickname, avatar, g.receivedAt)
+      return true
+    })()
+  }
+
   guesses(roundId: string): GuessRecord[] {
     return (this.db.prepare('SELECT * FROM context_tournament_guesses WHERE round_id = ? ORDER BY ingress_seq').all(roundId) as Row[]).map(guessOf)
   }

@@ -34,6 +34,10 @@ mkdirSync(dataDir, { recursive: true })
 const db = new Database(dbPath)
 export const databaseSnapshot = <T>(read: () => T): T => db.transaction(read)()
 db.exec('PRAGMA journal_mode = WAL;')
+// With WAL, NORMAL is safe against a crash of Zerocade (only a power cut can lose the last commits) and spares an fsync
+// per commit: the tournament writes every accepted guess from the main thread, hundreds in a busy window, and FULL
+// would stop the whole server for each of them.
+db.pragma('synchronous = NORMAL')
 db.pragma('foreign_keys = ON')
 // Another process opening the file (a tool, a second copy) waits up to 5 s for the lock instead of failing at once.
 db.exec('PRAGMA busy_timeout = 5000;')

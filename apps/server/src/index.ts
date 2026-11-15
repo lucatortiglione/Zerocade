@@ -602,6 +602,9 @@ const zfb = new ZfbBridge(
 zfb.configure(bridgeConfig())
 // A tournament open when the server stopped comes back; one in the middle of a round waits suspended for its organiser.
 tournaments.restore()
+// The tournament's corpus (68 MB read, hashed and parsed in one go, a few hundred ms with the server stopped) is
+// prepared now, with nobody playing, rather than at the first «Crea torneo» of a live.
+setTimeout(() => { if (getSession(roomKey).gameId === 'context') serverCorpus() }, 1000).unref()
 
 const liveCreators = (): FeedCreator[] => {
   const seen = new Map<string, FeedCreator>()
