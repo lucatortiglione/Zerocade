@@ -40,6 +40,7 @@ import { QuizzlandRooms, quizzlandStats } from './quizzland.js'
 import {
   closeDb,
   contextTournamentStore,
+  contextSecretLast,
   contextSecretUses,
   recordContextSecretUse,
   dataDir,
@@ -533,10 +534,13 @@ const roomSources = (key: string) => {
 // ZeroContext: how many times each secret word has come out, kept here too (a new round looks up thousands of words).
 // A new round, classic or tournament, counts once and goes to every client of the room.
 const secretUseCounts = new Map<string, number>(Object.entries(contextSecretUses()))
+const secretLastAt = new Map<string, number>(Object.entries(contextSecretLast()))
 const noteSecretUse = (key: string, word: string) => {
-  const uses = recordContextSecretUse(word)
+  const at = Date.now()
+  const uses = recordContextSecretUse(word, at)
   secretUseCounts.set(word, uses)
-  io.to(key).emit('context:secret-used', { word, uses })
+  secretLastAt.set(word, at)
+  io.to(key).emit('context:secret-used', { word, uses, at })
 }
 
 // ZeroContext's tournament, run by the server (context-tournament.ts): its public state to every client of the room,
@@ -551,7 +555,9 @@ const tournaments = new ContextTournaments({
     return key === roomKey && status.state === 'connected' && Boolean(status.tiktok || status.twitch)
   },
   secretUses: (word) => secretUseCounts.get(word) ?? 0,
+  secretLastAt: (word) => secretLastAt.get(word) ?? 0,
   recordSecretUse: noteSecretUse,
+  typedWords: (key) => getSession(key).settings.tournamentTypedWords === true,
 })
 
 // ZeroFollowerBot's event bridge, for this Zerocade's room: its events go where the direct feeds' go.
@@ -660,6 +666,7 @@ io.on('connection', (socket) => {
   const tournament = tournaments.state(key)
   if (tournament) socket.emit('context:tournament', tournament)
   socket.emit('context:secret-uses', Object.fromEntries(secretUseCounts))
+  socket.emit('context:secret-last', Object.fromEntries(secretLastAt))
   // While a ZeroContext tournament is open, the generic controls cannot replace or restart it (specifica §3.2).
   const tournamentLocks = (what: string) => {
     if (!tournaments.isOpen(key)) return false
@@ -803,6 +810,15 @@ io.on('connection', (socket) => {
   socket.on('context:tournament-history-delete', (id: unknown, ack?: unknown) => {
     const deleted = contextTournamentStore.deleteFinished(key, typeof id === 'string' ? id : null, tournaments.state(key)?.tournamentId ?? null)
     if (typeof ack === 'function') ack(deleted)
+  })
+  // The copies of the standings kept after every round (a separate SQLite file), and the restore from one of them.
+  socket.on('context:tournament-backups', (ack?: unknown) => {
+    const id = tournaments.state(key)?.tournamentId
+    if (typeof ack === 'function') ack(id ? contextTournamentStore.backups(id) : [])
+  })
+  socket.on('context:tournament-restore', (snapshotId: unknown, ack?: unknown) => {
+    const reply = tournaments.restoreFromBackup(key, typeof snapshotId === 'number' && Number.isInteger(snapshotId) ? snapshotId : null)
+    if (typeof ack === 'function') ack(reply)
   })
   // A tournament's full standings, only for one of this room.
   socket.on('context:tournament-standings', (id: unknown, ack?: unknown) => {

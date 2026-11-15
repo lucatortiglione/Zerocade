@@ -2,6 +2,7 @@ import { randomUUID } from 'node:crypto'
 import {
   TOURNAMENT_RULES,
   allowedToPlay,
+  BAND_STRENGTH,
   tournamentBand,
   type ContextTournamentAdmin,
   type ContextTournamentState,
@@ -9,6 +10,7 @@ import {
   type TournamentGuessView,
   type TournamentPhase,
   type TournamentReply,
+  type TournamentTypedView,
   type TournamentRow,
   type Viewer,
 } from '@zerocade/shared'
@@ -27,6 +29,10 @@ import { scoreRound, standings, topTen, type RoundOutcome } from './context-tour
 
 export interface TournamentDeps {
   store: ContextTournamentStore
+  // The 3-2-1 before each window; 0 turns it off (tests).
+  countdownMs?: number
+  // The setting "Parole scritte a schermo" of the room.
+  typedWords?: (key: string) => boolean
   corpus: () => Corpus | null
   now?: () => number
   setTimer?: (fn: () => void, ms: number) => unknown
@@ -38,6 +44,7 @@ export interface TournamentDeps {
   bridgeReady: (key: string) => boolean
   // How many times a secret word has come out in ZeroContext (classic and tournament), and a new round with it.
   secretUses?: (word: string) => number
+  secretLastAt?: (word: string) => number
   recordSecretUse?: (key: string, word: string) => void
 }
 
@@ -52,6 +59,9 @@ interface Live {
   timer: unknown
   seq: number
   thisWindow: Set<string>
+  typed: TournamentTypedView[]
+  // The window the words of the 3-2-1 count for (it is not open yet), null outside of it.
+  pending: number | null
   usedWords: Set<number>
   messages: Set<string>
   submissions: number
@@ -106,6 +116,7 @@ export class ContextTournaments {
       live.phase = record.status === 'suspended' ? 'suspended' : this.idlePhase(live)
       this.refreshStandings(live)
       this.live.set(t.roomKey, live)
+      this.publishWhenStartable(live)
     }
   }
 
@@ -223,7 +234,7 @@ export class ContextTournaments {
     if (why) return fail(why)
     const corpus = this.corpusFor(l)
     if (!corpus) return fail('Le parole di ZeroContext sono cambiate o non sono disponibili: il torneo non può continuare su altri dati.')
-    const plan = planRound(corpus, this.deps.store.usedSecrets(l.t.id), this.random, this.deps.secretUses)
+    const plan = planRound(corpus, this.deps.store.usedSecrets(l.t.id), this.random, this.deps.secretUses, this.deps.secretLastAt)
     if (!plan) return fail('Non ci sono più parole segrete da giocare.')
     const number = this.settledRounds(l) + 1
     const round = this.deps.store.startRound(l.t.id, number, plan.secret, plan.buoy, this.now(), actor)
@@ -232,8 +243,31 @@ export class ContextTournaments {
     l.round = round
     l.plan = plan
     this.clearRound(l)
-    this.openWindow(l, 1, TOURNAMENT_RULES.windowMs)
+    this.countdownThen(l, 1)
     return { ok: true }
+  }
+
+  // The 3-2-1 before a window: the round is in play but no word is taken until the window opens.
+  private countdownThen(l: Live, index: number) {
+    const ms = this.countdownMs
+    if (ms <= 0) return this.openWindow(l, index, TOURNAMENT_RULES.windowMs)
+    l.phase = 'window-processing'
+    l.window = index
+    l.pending = index
+    l.thisWindow.clear()
+    l.typed = []
+    l.submissions = 0
+    l.deadline = this.now() + ms
+    this.stopTimer(l)
+    l.timer = this.setTimer(() => {
+      l.timer = null
+      if (l.phase === 'window-processing') this.openWindow(l, index, TOURNAMENT_RULES.windowMs)
+    }, ms)
+    this.publish(l)
+  }
+
+  private get countdownMs(): number {
+    return this.deps.countdownMs ?? TOURNAMENT_RULES.countdownMs
   }
 
   private pause(l: Live, actor: string): TournamentReply {
@@ -260,7 +294,7 @@ export class ContextTournaments {
     this.deps.store.setStatus(l.t.id, 'active', this.now())
     this.deps.store.audit(l.t.id, round.id, 'resume', actor, { window: round.window, remainingMs: round.remainingMs }, this.now())
     l.t = this.deps.store.tournament(l.t.id)!
-    this.openWindow(l, Math.max(1, round.window), round.remainingMs > 0 ? round.remainingMs : TOURNAMENT_RULES.windowMs, false)
+    this.openWindow(l, Math.max(1, round.window), round.remainingMs > 0 ? round.remainingMs : TOURNAMENT_RULES.windowMs)
     return { ok: true }
   }
 
@@ -292,6 +326,7 @@ export class ContextTournaments {
     this.refreshStandings(l)
     l.phase = this.idlePhase(l)
     this.publish(l)
+    this.publishWhenStartable(l)
     return { ok: true }
   }
 
@@ -327,6 +362,30 @@ export class ContextTournaments {
     return { ok: true }
   }
 
+  // "Ripristina classifica": between rounds, the standings come back from a snapshot of the backup file (the latest one
+  // when `snapshotId` is null); see ContextTournamentStore.restoreFromBackup.
+  restoreFromBackup(key: string, snapshotId: number | null, actor = 'dashboard'): TournamentReply {
+    try {
+      const l = this.live.get(key)
+      if (!l) return fail('Nessun torneo in questa stanza.')
+      if (l.round || (l.phase !== 'ready' && l.phase !== 'intermission' && l.phase !== 'suspended' && l.phase !== 'completed'))
+        return fail('Si ripristina la classifica tra una manche e l\'altra: chiudi o annulla prima la manche in corso.')
+      this.stopTimer(l)
+      this.deps.store.restoreFromBackup(l.t.id, snapshotId, this.now(), actor)
+      l.t = this.deps.store.tournament(l.t.id)!
+      this.clearRound(l)
+      l.achievements = []
+      l.overflow = 0
+      this.refreshStandings(l)
+      l.phase = l.t.status === 'completed' ? 'completed' : this.idlePhase(l)
+      this.publish(l)
+      this.publishWhenStartable(l)
+      return { ok: true }
+    } catch (err) {
+      return fail(err instanceof Error ? err.message : 'Ripristino non riuscito.')
+    }
+  }
+
   private cancel(l: Live, reason: string, actor: string): TournamentReply {
     if (l.phase === 'completed' || l.phase === 'cancelled') return fail('Il torneo è già finito.')
     if (!reason) return fail('Scrivi il motivo dell\'annullamento del torneo: resta nello storico.')
@@ -354,14 +413,17 @@ export class ContextTournaments {
 
   offer(key: string, user: Viewer, text: string, messageId: string, platform: string): boolean {
     const l = this.live.get(key)
-    if (!l || l.phase !== 'window-open' || !l.round || !l.plan) return false
+    if (!l || !l.round || !l.plan) return false
+    const window = this.acceptingWindow(l)
+    if (window === null) return false
     if (!user.id || user.id === 'anonymous' || user.id.endsWith(':anonymous')) return false
     if (!allowedToPlay({ audience: l.t.audience }, user)) return false
     const messageKey = messageId ? `${platform}:${messageId}` : null
     if (messageKey && l.messages.has(messageKey)) return false
-    if (l.thisWindow.has(user.id)) return false
     const corpus = this.deps.corpus()
     if (!corpus) return false
+    if (this.deps.typedWords?.(key)) this.noteTyped(l, user, text, corpus)
+    if (l.thisWindow.has(user.id)) return false
     const word = readGuess(corpus, text, l.plan.secret)
     if (word < 0 || l.usedWords.has(word)) return false
     if (l.submissions >= TOURNAMENT_RULES.maxPerWindow) {
@@ -369,7 +431,7 @@ export class ContextTournaments {
       this.publishSoon(l)
       return false
     }
-    const guess: GuessRecord = { roundId: l.round.id, seq: l.seq + 1, window: l.window, messageKey, player: user.id, word,
+    const guess: GuessRecord = { roundId: l.round.id, seq: l.seq + 1, window, messageKey, player: user.id, word,
       position: positionOf(l.plan, word), receivedAt: this.now() }
     if (!this.deps.store.addGuess(guess)) return false
     l.seq = guess.seq
@@ -381,6 +443,26 @@ export class ContextTournaments {
     l.submissions++
     this.publishSoon(l)
     return true
+  }
+
+  // The words written, shown on screen like the classic game does: any single word, valid or not, even one that does
+  // not count (a second one of the player, a word already used). Cleared when the window closes.
+  private noteTyped(l: Live, user: Viewer, text: string, corpus: Corpus) {
+    const word = text.trim()
+    if (!word || word.length > 40 || /\s/.test(word) || !l.plan) return
+    const index = readGuess(corpus, word, l.plan.secret)
+    l.typed = [...l.typed, { text: word, nickname: user.nickname.slice(0, 32), ...(user.avatar ? { avatar: user.avatar } : {}),
+      position: index >= 0 ? positionOf(l.plan, index) : null }].slice(-6)
+    this.publishSoon(l)
+  }
+
+  // The window a word written now counts for: the open one, or the next one during its 3-2-1 (decided 15/11/2026: the
+  // words are collected from the countdown on, one attempt per player per window). The results' second before the
+  // countdown takes none.
+  private acceptingWindow(l: Live): number | null {
+    if (l.phase === 'window-open') return l.window
+    if (l.phase === 'window-processing' && l.pending !== null && this.now() >= l.deadline - this.countdownMs) return l.pending
+    return null
   }
 
   // ZeroFollowerBot's bridge connected or lost: a round in play without it is suspended.
@@ -395,12 +477,12 @@ export class ContextTournaments {
   // ---------------------------------------------------------------------------------------------------------------
   // Windows.
 
-  private openWindow(l: Live, index: number, ms: number, fresh = true) {
+  private openWindow(l: Live, index: number, ms: number) {
     if (!l.round) return
     l.phase = 'window-open'
     l.window = index
     l.deadline = this.now() + ms
-    if (fresh) l.thisWindow.clear()
+    l.pending = null
     l.submissions = this.deps.store.guesses(l.round.id).filter((g) => g.window === index).length
     this.deps.store.saveWindow(l.round.id, index, ms)
     this.stopTimer(l)
@@ -417,12 +499,17 @@ export class ContextTournaments {
     // The next window is the current one from now on: after a restart it opens afresh, without this one's guesses.
     this.deps.store.saveWindow(l.round.id, l.window + 1, TOURNAMENT_RULES.windowMs)
     l.phase = 'window-processing'
-    l.deadline = this.now() + TOURNAMENT_RULES.processingMs
+    l.pending = l.window + 1
+    l.thisWindow.clear()
+    l.typed = []
+    l.submissions = 0
+    const wait = TOURNAMENT_RULES.processingMs + this.countdownMs
+    l.deadline = this.now() + wait
     const next = l.window + 1
     l.timer = this.setTimer(() => {
       l.timer = null
       if (l.phase === 'window-processing') this.openWindow(l, next, TOURNAMENT_RULES.windowMs)
-    }, TOURNAMENT_RULES.processingMs)
+    }, wait)
     this.publish(l)
   }
 
@@ -438,7 +525,13 @@ export class ContextTournaments {
     const counted = (g: GuessRecord) => outcome.solvedSeq === null || g.seq <= outcome.solvedSeq
     const revealed = guesses.filter((g) => g.window <= l.window && counted(g))
     l.lastWindow = revealed.filter((g) => g.window === l.window).map(view)
-    l.board = revealed.map(view).sort((a, b) => a.position - b.position).slice(0, TOURNAMENT_RULES.boardSize)
+    // Only cyan and blue words leave the board, and only once warmer ones (yellow or hotter) are on it; the first word
+    // each player guessed stays. Every other word stays.
+    const warm = revealed.some((g) => BAND_STRENGTH[tournamentBand(g.position)] >= BAND_STRENGTH.yellow)
+    const firstOf = new Map<string, number>()
+    for (const g of revealed) if (!firstOf.has(g.player) || g.seq < firstOf.get(g.player)!) firstOf.set(g.player, g.seq)
+    l.board = revealed.filter((g) => !warm || BAND_STRENGTH[tournamentBand(g.position)] >= BAND_STRENGTH.yellow || firstOf.get(g.player) === g.seq)
+      .map(view).sort((a, b) => a.position - b.position).slice(0, TOURNAMENT_RULES.boardSize)
     l.best = outcome.best
     const round = l.round!
     if (!outcome.solved && l.plan?.buoy != null && !l.buoy &&
@@ -482,6 +575,20 @@ export class ContextTournaments {
     this.refreshStandings(l)
     l.phase = l.t.status === 'completed' ? 'completed' : 'intermission'
     this.publish(l)
+    this.publishWhenStartable(l)
+  }
+
+  // «Avvia manche» is disabled while the Top 10 must stay on screen; when that time is over the dashboard must be told,
+  // or its button stays disabled until a refresh.
+  private publishWhenStartable(l: Live) {
+    if (l.phase !== 'intermission' || l.t.intermissionSince === null) return
+    const wait = l.t.intermissionSince + l.t.intermissionMs - this.now()
+    if (wait <= 0) return
+    this.stopTimer(l)
+    l.timer = this.setTimer(() => {
+      l.timer = null
+      if (l.phase === 'intermission' && this.live.get(l.t.roomKey) === l) this.publish(l, false)
+    }, wait + 50)
   }
 
   private suspend(l: Live, reason: string, actor: string) {
@@ -498,8 +605,8 @@ export class ContextTournaments {
   // ---------------------------------------------------------------------------------------------------------------
 
   private fresh(t: TournamentRecord): Live {
-    return { t, phase: 'ready', round: null, plan: null, window: 0, deadline: 0, timer: null, seq: 0, thisWindow: new Set(),
-      usedWords: new Set(), messages: new Set(), submissions: 0, overflow: 0, board: [], lastWindow: [], buoy: null, best: null,
+    return { t, phase: 'ready', round: null, plan: null, window: 0, deadline: 0, timer: null, seq: 0, thisWindow: new Set(), pending: null,
+      usedWords: new Set(), messages: new Set(), submissions: 0, overflow: 0, board: [], lastWindow: [], typed: [], buoy: null, best: null,
       solution: null, solvedBy: null, achievements: [], rows: [], players: new Set(this.deps.store.players(t.id).map((p) => p.player)),
       version: 0, publishTimer: null }
   }
@@ -511,6 +618,7 @@ export class ContextTournaments {
     l.usedWords.clear()
     l.messages.clear()
     l.submissions = 0
+    l.typed = []
     l.board = []
     l.lastWindow = []
     l.buoy = null
@@ -576,11 +684,14 @@ export class ContextTournaments {
       totalRounds: l.t.totalRounds,
       window: l.window,
       windowsPerRound: TOURNAMENT_RULES.windowsPerRound,
+      countdownMs: this.countdownMs,
       remainingMs: l.phase === 'window-open' || l.phase === 'window-processing' ? Math.max(0, l.deadline - now) : 0,
       serverNow: now,
       submissions: l.phase === 'window-open' ? l.submissions : 0,
       solution: l.round ? null : l.solution,
       solvedBy: l.round ? null : l.solvedBy,
+      corpusSize: this.deps.corpus()?.data.words.length ?? 0,
+      typed: l.typed,
       board: l.board,
       lastWindow: l.lastWindow,
       buoy: l.buoy,

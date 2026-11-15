@@ -4,6 +4,7 @@ import { setRoundCheer } from './audio'
 import { NasaBackdrop } from './NasaBackdrop'
 import { Engine } from './games/engine'
 import { createGame } from './games/registry'
+import { createContextTournament } from './games/contextTournamentGame'
 import { socket } from './socket'
 import { overlaySnapshot, useOverlay } from './store'
 import { Widgets } from './Widgets'
@@ -59,8 +60,12 @@ export function App() {
   // A restart (`run`) starts the game afresh; an ended session shows nothing until it is started again.
   useEffect(() => {
     if (!session || !contentReady) return
-    if (session.ended || tournamentOn) {
+    if (session.ended) {
       engineRef.current?.clear()
+      return
+    }
+    if (tournamentOn) {
+      engineRef.current?.setGame(createContextTournament(), session.settings)
       return
     }
     const game = GAMES.find((g) => g.id === session.gameId)
@@ -128,7 +133,12 @@ export function App() {
       {gif && <img key={gifSeq} className="overlay-gif" src={gif.url} alt={gif.label} />}
 
       {message && (
-        <div key={messageSeq} className="overlay-message" role="status">
+        <div
+          key={messageSeq}
+          className={`overlay-message${session?.ticker?.messagePos ? ' placed' : ''}`}
+          style={session?.ticker?.messagePos ? { left: `${session.ticker.messagePos.x}%`, top: `${session.ticker.messagePos.y}%` } : undefined}
+          role="status"
+        >
           {message}
         </div>
       )}

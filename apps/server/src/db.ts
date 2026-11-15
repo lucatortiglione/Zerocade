@@ -21,6 +21,7 @@ import {
 } from '@zerocade/shared'
 import { REPORT_MAX_BYTES } from './csv.js'
 import { ContextTournamentStore } from './context-tournament-db.js'
+import { TournamentBackup } from './context-tournament-backup.js'
 
 // Local persistence via better-sqlite3 (latest stable SQLite engine). The DB file
 // lives in apps/server/data and is gitignored; set ZEROCADE_DB to override the path.
@@ -224,6 +225,8 @@ const ADDED_COLUMNS: [table: string, column: string, definition: string][] = [
   ['sessions', 'goal', 'INTEGER NOT NULL DEFAULT 1000'],
   // The gifter's profile picture, for the Top donatori widget.
   ['gifters', 'avatar', 'TEXT'],
+  // The overlay's rotating messages (enabled, interval, texts) as JSON.
+  ['sessions', 'ticker', "TEXT NOT NULL DEFAULT '{}'"],
 ]
 const migrateColumns = db.transaction(() => {
   db.exec(`CREATE TABLE IF NOT EXISTS infrastructure_migrations (
@@ -369,15 +372,16 @@ export const saveBridgeConfig = (config: BridgeConfig): void => void bridgeSet.r
 
 // --- Sessions ---
 
-const sessionGet = db.prepare('SELECT game_id, triggers, settings, widgets, goal FROM sessions WHERE key = ?')
+const sessionGet = db.prepare('SELECT game_id, triggers, settings, widgets, goal, ticker FROM sessions WHERE key = ?')
 const sessionUpsert = db.prepare(`
-  INSERT INTO sessions (key, game_id, triggers, settings, widgets, goal) VALUES (?, ?, ?, ?, ?, ?)
+  INSERT INTO sessions (key, game_id, triggers, settings, widgets, goal, ticker) VALUES (?, ?, ?, ?, ?, ?, ?)
   ON CONFLICT(key) DO UPDATE SET
     game_id = excluded.game_id,
     triggers = excluded.triggers,
     settings = excluded.settings,
     widgets = excluded.widgets,
-    goal = excluded.goal
+    goal = excluded.goal,
+    ticker = excluded.ticker
 `)
 
 export interface SessionRow {
@@ -386,6 +390,7 @@ export interface SessionRow {
   settings: string
   widgets: string
   goal: number
+  ticker?: string
 }
 
 export const loadSession = (key: string): SessionRow | undefined =>
@@ -398,8 +403,9 @@ export const saveSession = (
   settings: string,
   widgets: string,
   goal: number,
+  ticker = '{}',
 ): void => {
-  sessionUpsert.run(key, gameId, triggers, settings, widgets, goal)
+  sessionUpsert.run(key, gameId, triggers, settings, widgets, goal, ticker)
 }
 
 // A saved session that can no longer be read is set aside here before the defaults overwrite it, so what the
@@ -923,7 +929,16 @@ export const recentCreators = (limit: number): FeedCreator[] =>
   )
 
 // ZeroContext's tournaments (context-tournament-db.ts): their own tables here, apart from the ordinary leaderboards.
-export const contextTournamentStore = new ContextTournamentStore(db)
+// After every round their standings are also copied to a SQLite file apart (context-tournament-backup.ts), next to
+// zerocade.db (so ZEROCADE_DB in a test moves it too): ZEROCADE_TOURNAMENT_BACKUP_DB overrides the path.
+export const tournamentBackupPath = process.env.ZEROCADE_TOURNAMENT_BACKUP_DB ?? join(dataDir, 'context-tournament-backup.db')
+let tournamentBackup: TournamentBackup | null = null
+try {
+  tournamentBackup = TournamentBackup.open(tournamentBackupPath)
+} catch (err) {
+  console.warn(`[db] backup della classifica dei tornei non attivo (${tournamentBackupPath}): ${err instanceof Error ? err.message : String(err)}`)
+}
+export const contextTournamentStore = new ContextTournamentStore(db, tournamentBackup)
 
 // ZeroContext: how many times each secret word has come out (a classic round or a tournament round), so new rounds
 // choose words never played (decided 15/11/2026).
@@ -936,5 +951,8 @@ const secretUse = db.prepare(`INSERT INTO context_secret_uses (word, uses, last_
   ON CONFLICT (word) DO UPDATE SET uses = uses + 1, last_used_at = excluded.last_used_at RETURNING uses`)
 // One more round with `word`; the new count.
 export const recordContextSecretUse = (word: string, at = Date.now()): number => (secretUse.get(word, at) as { uses: number }).uses
-export const contextSecretUses = (): Record<string, number> =>
-  Object.fromEntries((db.prepare('SELECT word, uses FROM context_secret_uses').all() as { word: string; uses: number }[]).map((r) => [r.word, r.uses]))
+const secretRows = (): { word: string; uses: number; last_used_at: number }[] =>
+  db.prepare('SELECT word, uses, last_used_at FROM context_secret_uses').all() as { word: string; uses: number; last_used_at: number }[]
+export const contextSecretUses = (): Record<string, number> => Object.fromEntries(secretRows().map((r) => [r.word, r.uses]))
+// When each word last came out (ms epoch).
+export const contextSecretLast = (): Record<string, number> => Object.fromEntries(secretRows().map((r) => [r.word, r.last_used_at]))

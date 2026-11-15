@@ -302,7 +302,7 @@ function eventText(item: FeedItem): { icon: string; text: string } | null {
         ? { icon: '💎', text: `${e.count} bit` }
         : { icon: '❤️', text: `${e.count} like` }
     case 'follow':
-      return { icon: '➕', text: 'ti segue' }
+      return { icon: '➕', text: 'ha messo segui!' }
     case 'share':
       return { icon: '🔁', text: 'ha condiviso la diretta' }
     case 'join':
@@ -315,7 +315,7 @@ function ChatRow({ item, now }: { item: FeedItem; now: number }) {
   const ev = eventText(item)
   const mark = item.mark ? MARKS[item.mark] : null
   return (
-    <li className={`chat-row${ev ? ' chat-row--event' : ''}`}>
+    <li className={`chat-row${ev ? ' chat-row--event' : ''}${e.type === 'follow' ? ' chat-row--follow' : ''}`}>
       <ChatAvatar user={e.user} />
       <span className="chat-row__body">
         <span className="chat-row__head">

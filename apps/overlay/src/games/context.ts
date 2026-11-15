@@ -117,7 +117,7 @@ export function createContext(createComputer: () => ContextComputer = () => new 
   let leaders: Score[] = []
   const award = (user: Viewer, points: number) => {
     addPoints(scores, user.id, user.nickname, user.avatar, points)
-    leaders = topOf(scores, 5).map(([, score]) => score)
+    leaders = topOf(scores, 10).map(([, score]) => score)
   }
 
   const total = () => data?.words.length ?? 0
@@ -157,8 +157,8 @@ export function createContext(createComputer: () => ContextComputer = () => new 
     }
     if (preparing && forced === requestedSecret) return
     if (preparing) clearInputs() // A different room word supersedes an unannounced round.
-    // A word that never came out in this Zerocade while there is one (secretUses), counted here at once so the next
-    // round does not take it again before the server's count arrives.
+    // A word that never came out in this Zerocade, else the one that came out the longest ago (secretUses), counted
+    // here at once so the next round does not take it again before the server's count arrives.
     const secret = forced ?? freshSecret(data.secrets, data.words, lastSecret)
     if (forced === undefined) noteSecretUse(data.words[secret])
     requestedSecret = secret

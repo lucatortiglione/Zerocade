@@ -1,4 +1,4 @@
-import { DEFAULT_WIDGETS, GAMES, defaultSettings, normalizeContextColors, type GameControl, type GameSettings, type SessionState, type Trigger, type WidgetConfig } from '@zerocade/shared'
+import { DEFAULT_TICKER, DEFAULT_WIDGETS, GAMES, defaultSettings, normalizeContextColors, type GameControl, type GameSettings, type SessionState, type TickerConfig, type Trigger, type WidgetConfig } from '@zerocade/shared'
 import { loadSession, saveSession, setAsideSession } from './db.js'
 
 // Games that changed id: a session saved under the old one continues under the new one.
@@ -12,6 +12,7 @@ function defaultState(gameId: string): SessionState {
     settings: defaultSettings(game.settings),
     widgets: { ...DEFAULT_WIDGETS.widgets },
     goal: DEFAULT_WIDGETS.goal,
+    ticker: DEFAULT_TICKER,
   }
 }
 
@@ -23,6 +24,7 @@ const save = (key: string, state: SessionState) =>
     JSON.stringify(state.settings),
     JSON.stringify(state.widgets),
     state.goal,
+    JSON.stringify(state.ticker),
   )
 
 // Run state of each room's game: not saved, a restart of Zerocade starts it afresh.
@@ -66,6 +68,7 @@ function loadState(key: string): SessionState {
         settings,
         widgets: JSON.parse(row.widgets ?? '{}') as SessionState['widgets'],
         goal: typeof row.goal === 'number' ? row.goal : DEFAULT_WIDGETS.goal,
+        ticker: { ...DEFAULT_TICKER, ...(JSON.parse(row.ticker ?? '{}') as Partial<TickerConfig>) },
       }
     } catch (err) {
       // The saved row is unreadable: keep a copy (sessions_corrupt) and say so, then start from the defaults below.
@@ -94,6 +97,7 @@ export function selectGame(key: string, gameId: unknown) {
     settings: defaultSettings(game.settings),
     widgets: prev.widgets,
     goal: prev.goal,
+    ticker: prev.ticker,
   }
   save(key, state)
   return getSession(key)
@@ -118,6 +122,8 @@ export function setScene(key: string, scene: Partial<WidgetConfig>) {
     ...cur,
     widgets: scene.widgets ? { ...cur.widgets, ...scene.widgets } : cur.widgets,
     goal: typeof scene.goal === 'number' ? scene.goal : cur.goal,
+    // A save of the texts alone keeps the positions the creator chose, and the other way round.
+    ticker: scene.ticker ? { ...cur.ticker, ...scene.ticker } : cur.ticker,
   }
   save(key, state)
   return state

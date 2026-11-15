@@ -10,6 +10,8 @@ export const TOURNAMENT_RULES = Object.freeze({
   windowMs: 6000,
   // After a window, results are shown before the next one opens ("ELABORAZIONE", "NUOVA FINESTRA").
   processingMs: 1000,
+  // Before each window of 6 s, a countdown of 3 s (3, 2, 1) tells the players it is about to open (decided 15/11/2026).
+  countdownMs: 3000,
   windowsPerRound: 70,
   // The rounds of a tournament: 5 or 7, or no limit (totalRounds null: the organiser ends it with «Concludi torneo»,
   // decided 15/11/2026).
@@ -96,6 +98,14 @@ export interface TournamentRow {
 }
 
 // The public state (spec §9): never the secret word, its index or the ranking before the round is over.
+// A word just written in chat, for the "Parole scritte a schermo" setting: its position when it is a word (null: not one).
+export interface TournamentTypedView {
+  text: string
+  nickname: string
+  avatar?: string
+  position: number | null
+}
+
 export interface ContextTournamentState {
   version: number
   tournamentId: string
@@ -108,12 +118,18 @@ export interface ContextTournamentState {
   windowsPerRound: number
   // Milliseconds left in the open window (or before the next opens), measured at `serverNow`.
   remainingMs: number
+  // Of the wait before a window, the last countdownMs are the visible 3-2-1; the rest is the results' time.
+  countdownMs: number
   serverNow: number
   // Valid words received in the open window (their ranks stay hidden until it closes).
   submissions: number
   // The secret, only once the round is over.
   solution: string | null
   solvedBy: string | null
+  // The corpus size, to draw the closeness bars like the classic game. Not the secret's length: the tournament never says it.
+  corpusSize: number
+  // The newest words written, only with that setting on (else empty): as in the classic game, coloured at once.
+  typed: TournamentTypedView[]
   board: TournamentGuessView[]
   lastWindow: TournamentGuessView[]
   buoy: TournamentGuessView | null

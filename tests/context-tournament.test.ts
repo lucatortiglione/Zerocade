@@ -4,6 +4,7 @@ import Database from 'better-sqlite3'
 import { TOURNAMENT_RULES, type ContextTournamentAdmin, type ContextTournamentState, type TournamentCommand, type Viewer } from '../packages/shared/src/index.ts'
 import { parseContextData } from '../packages/shared/src/contextRanking.ts'
 import { ContextTournamentStore } from '../apps/server/src/context-tournament-db.ts'
+import { TournamentBackup } from '../apps/server/src/context-tournament-backup.ts'
 import { ContextTournaments, sanitizeTournamentCommand } from '../apps/server/src/context-tournament.ts'
 import type { Corpus } from '../apps/server/src/context-tournament-ranking.ts'
 
@@ -18,7 +19,7 @@ const corpus: Corpus = { data: parseContextData(words.join('\n'), vectors.buffer
 const at = (position: number) => words[position - 1] // the word at a position (positions 8 and beyond)
 const ROOM = 'room-1'
 
-function setup(opts: { bridge?: boolean; store?: ContextTournamentStore; clock?: Clock; uses?: Record<string, number> } = {}) {
+function setup(opts: { typed?: boolean; countdown?: number; bridge?: boolean; store?: ContextTournamentStore; clock?: Clock; uses?: Record<string, number> } = {}) {
   const clock = opts.clock ?? new Clock()
   const store = opts.store ?? new ContextTournamentStore(new Database(':memory:'))
   const published: (ContextTournamentState | null)[] = []
@@ -27,7 +28,7 @@ function setup(opts: { bridge?: boolean; store?: ContextTournamentStore; clock?:
   const uses = new Map<string, number>(Object.entries(opts.uses ?? {}))
   const recorded: string[] = []
   const tournaments = new ContextTournaments({
-    store, corpus: () => corpus, now: () => clock.now, setTimer: (fn, ms) => clock.add(fn, ms), clearTimer: (h) => clock.cancel(h as number),
+    store, countdownMs: opts.countdown ?? 0, typedWords: () => opts.typed ?? false, corpus: () => corpus, now: () => clock.now, setTimer: (fn, ms) => clock.add(fn, ms), clearTimer: (h) => clock.cancel(h as number),
     random: () => 0, emitPublic: (_k, s) => published.push(s), emitAdmin: (_k, a) => admins.push(a), bridgeReady: () => bridge,
     secretUses: (w) => uses.get(w) ?? 0, recordSecretUse: (_k, w) => { recorded.push(w); uses.set(w, (uses.get(w) ?? 0) + 1) },
   })
@@ -409,4 +410,111 @@ test('stopping Zerocade in the middle of a round suspends it with the restart as
   s.tournaments.shutdown()
   assert.equal(s.state().phase, 'suspended')
   assert.match(s.state().suspendedReason!, /riavviato/)
+})
+
+test('backup: every settled round copies the standings to a separate DB; a wrong score is restored from it', () => {
+  const backup = new TournamentBackup(new Database(':memory:'))
+  const s = setup({ store: new ContextTournamentStore(new Database(':memory:'), backup) })
+  create(s)
+  const id = s.state().tournamentId
+  s.cmd({ type: 'start-round' })
+  s.say('anna', at(100))
+  s.say('bruno', at(200), 'm2')
+  closeWindow(s)
+  s.cmd({ type: 'close-round', reason: 'prova' })
+  assert.equal(backup.list(id).length, 1)
+  const first = backup.snapshot(id)!
+  assert.equal(first.event, 'round-settled')
+  assert.equal(first.roundsSettled, 1)
+  const before = s.store.totals(id).map((p) => [p.nickname, p.points]).sort()
+  assert.deepEqual(first.standings.map((p) => [p.nickname, p.points]).sort(), before)
+  // The standings are damaged in the main DB, then put back from the copy.
+  ;(s.store as unknown as { db: Database.Database }).db.prepare('UPDATE context_tournament_round_scores SET pioneer_points = 999').run()
+  assert.notDeepEqual(s.store.totals(id).map((p) => [p.nickname, p.points]).sort(), before)
+  assert.deepEqual(s.tournaments.restoreFromBackup(ROOM, null), { ok: true })
+  assert.deepEqual(s.store.totals(id).map((p) => [p.nickname, p.points]).sort(), before)
+  assert.ok(backup.list(id).some((b) => b.event === 'before-restore'))
+})
+
+test('the board drops only cyan and blue words once yellow or hotter ones are found; the first word of each player stays', () => {
+  const s = setup()
+  create(s)
+  s.cmd({ type: 'start-round' })
+  s.say('anna', at(8000), 'a1') // blue, anna's first
+  s.say('bruno', at(5000), 'b1') // cyan, bruno's first
+  s.say('carla', at(1500), 'c1') // yellow
+  closeWindow(s)
+  s.clock.advance(TOURNAMENT_RULES.processingMs)
+  s.say('anna', at(8200), 'a2') // blue, not her first
+  s.say('bruno', at(5200), 'b2') // cyan, not his first
+  s.say('dino', at(400), 'd1') // orange
+  closeWindow(s)
+  const words = s.state().board.map((g) => g.word)
+  assert.equal(words.includes(at(8200)) || words.includes(at(5200)), false) // cold and not a first word: gone
+  for (const p of [8000, 5000, 1500, 400]) assert.equal(words.includes(at(p)), true) // firsts and warm ones stay
+})
+
+test('a countdown of 3 s comes before every window of 6 s; its words count for the window, one per player', () => {
+  const s = setup({ countdown: TOURNAMENT_RULES.countdownMs })
+  create(s)
+  s.cmd({ type: 'start-round' })
+  assert.equal(s.state().phase, 'window-processing')
+  assert.equal(s.state().countdownMs, TOURNAMENT_RULES.countdownMs)
+  assert.equal(s.state().remainingMs, TOURNAMENT_RULES.countdownMs)
+  const round = () => s.store.playing(s.state().tournamentId)!.id
+  s.say('anna', at(100), 'early') // written during the countdown: counts for window 1
+  assert.equal(s.store.guesses(round()).length, 1)
+  assert.equal(s.store.guesses(round())[0].window, 1)
+  s.clock.advance(TOURNAMENT_RULES.countdownMs)
+  assert.equal(s.state().phase, 'window-open')
+  assert.equal(s.state().remainingMs, TOURNAMENT_RULES.windowMs)
+  s.say('anna', at(200), 'second') // one attempt per player per window: refused
+  s.say('bruno', at(300), 'in-time')
+  assert.equal(s.store.guesses(round()).length, 2)
+  closeWindow(s)
+  // The results' second takes no word; the 3-2-1 does, for window 2.
+  s.say('anna', at(400), 'too-soon')
+  assert.equal(s.store.guesses(round()).length, 2)
+  s.clock.advance(TOURNAMENT_RULES.processingMs)
+  s.say('anna', at(500), 'next')
+  assert.deepEqual(s.store.guesses(round()).map((g) => [g.player, g.window]).slice(-1), [['tiktok:anna', 2]])
+  s.say('anna', at(600), 'again')
+  assert.equal(s.store.guesses(round()).length, 3)
+  s.clock.advance(TOURNAMENT_RULES.countdownMs - 1)
+  assert.equal(s.state().phase, 'window-processing')
+  s.clock.advance(1)
+  assert.equal(s.state().phase, 'window-open')
+  assert.equal(s.state().window, 2)
+  assert.equal(s.state().submissions, 1) // the word written in the countdown is in this window
+})
+
+test('when the Top 10 time is over the dashboard is told: «Avvia manche» does not wait for a refresh', () => {
+  const s = setup()
+  create(s)
+  s.cmd({ type: 'start-round' })
+  s.say('anna', s.tournaments.admin(ROOM)!.secret!)
+  closeWindow(s)
+  assert.equal(s.tournaments.admin(ROOM)!.canStartRound, false)
+  const before = s.admins.length
+  s.clock.advance(15_000 + 100)
+  assert.ok(s.admins.length > before)
+  assert.equal(s.admins.at(-1)!.canStartRound, true)
+})
+
+test('the written words, with their band at once, only with the setting on; a word that is not one has no position', () => {
+  const off = setup()
+  create(off)
+  off.cmd({ type: 'start-round' })
+  off.say('anna', at(300), 'o1')
+  assert.deepEqual(off.state().typed, [])
+  const s = setup({ typed: true })
+  create(s)
+  s.cmd({ type: 'start-round' })
+  s.say('anna', at(300), 't1')
+  s.say('anna', at(400), 't2') // her second: not counted, but written on screen like in the classic game
+  s.say('bruno', 'zzzzzzzz', 't3')
+  s.clock.advance(300)
+  assert.deepEqual(s.state().typed.map((w) => [w.nickname, w.text, w.position]), [['anna', at(300), 300], ['anna', at(400), 400], ['bruno', 'zzzzzzzz', null]])
+  closeWindow(s)
+  assert.deepEqual(s.state().typed, []) // cleared when the window closes
 })

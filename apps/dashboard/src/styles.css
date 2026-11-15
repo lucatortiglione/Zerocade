@@ -239,6 +239,28 @@ ul, ol { list-style: none; }
   background: repeating-conic-gradient(#17171c 0 25%, #111115 0 50%) 0 0 / 24px 24px;
 }
 .preview__frame iframe { display: block; width: 100%; height: 100%; border: 0; }
+.preview__frame { position: relative; }
+.preview__actions { display: flex; align-items: center; gap: 8px; }
+
+/* "Sposta box": handles over the preview, one per message box, dragged where it should appear on stream. */
+.place-layer { position: absolute; inset: 0; }
+.place-box {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  padding: 8px 14px;
+  border: 2px dashed var(--accent-hover);
+  border-radius: 12px;
+  background: rgba(139, 92, 246, 0.35);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  white-space: nowrap;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+}
+.place-box--drag { cursor: grabbing; background: rgba(139, 92, 246, 0.6); }
+.place-reset { position: absolute; left: 50%; bottom: 10px; transform: translateX(-50%); }
 
 /* ================================ Controls ================================ */
 
@@ -1014,6 +1036,14 @@ input[type='number']:focus { border-color: var(--accent); outline: none; }
 .chat-row__origin--twitch { background: rgba(145, 70, 255, 0.18); color: #b996ff; }
 .chat-row__text { font-size: 13px; line-height: 1.35; overflow-wrap: anywhere; }
 .chat-row__text--event { color: var(--text-muted); }
+/* A new follower: the line stands out from the other events. */
+.chat-row--follow {
+  background: var(--accent-soft);
+  border-left: 3px solid var(--accent);
+  border-radius: 8px;
+}
+.chat-row--follow .chat-row__name { color: var(--accent-hover); }
+.chat-row--follow .chat-row__text--event { color: var(--text); font-weight: 700; }
 .chat-row__end { display: inline-flex; align-items: center; gap: 6px; flex: none; padding-top: 1px; font-size: 12px; font-variant-numeric: tabular-nums; }
 .chat-row__mark {
   display: grid;
@@ -1139,3 +1169,6 @@ input[type='number']:focus { border-color: var(--accent); outline: none; }
 .tournament-panel__table th:nth-child(2), .tournament-panel__table td:nth-child(2) { text-align: left; }
 .tournament-panel__history ul { list-style: none; margin: 6px 0 0; padding: 0; display: grid; gap: 4px; }
 .tournament-panel__history button { text-align: left; white-space: normal; }
+
+.ticker-panel { display: grid; gap: 6px; margin-top: 12px; }
+.ticker-panel textarea { width: 100%; resize: vertical; font: inherit; }

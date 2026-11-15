@@ -13,10 +13,14 @@ test('a classic round picks a word that never came out, at random among them', (
   assert.deepEqual([...picked].sort(), ['luna', 'mare'])
 })
 
-test('never the word just played; when every word came out, the least used ones', () => {
-  assert.equal(words[freshSecret([0, 1, 2, 4], words, 'mare', () => 0, usesOf)], 'luna')
-  assert.equal(words[freshSecret([0, 1, 3], words, null, () => 0, usesOf)], 'gatto')
-  assert.equal(words[freshSecret([0], words, 'casa', () => 0, usesOf)], 'casa') // the only word left
+const last: Record<string, number> = { casa: 100, gatto: 300, mare: 0, sole: 200, luna: 0 }
+const lastAtOf = (w: string) => last[w] ?? 0
+
+test('never the word just played; when every word came out, the one that came out the longest ago', () => {
+  assert.equal(words[freshSecret([0, 1, 2, 4], words, 'mare', () => 0, usesOf, lastAtOf)], 'luna')
+  // casa (3 uses, at 100), gatto (1 use, at 300), sole (2 uses, at 200): the oldest wins, not the least used
+  assert.equal(words[freshSecret([0, 1, 3], words, null, () => 0, usesOf, lastAtOf)], 'casa')
+  assert.equal(words[freshSecret([0], words, 'casa', () => 0, usesOf, lastAtOf)], 'casa') // the only word left
 })
 
 test('the counts follow the server; a word picked here counts at once', () => {
@@ -39,4 +43,8 @@ test('a tournament round picks a word never played, among those not yet in the t
     const plan = planRound(corpus, new Set([index('mare')]), () => r, usesOf)!
     assert.equal(corpus.data.words[plan.secret], 'luna', String(r))
   }
+  // Every word played: the one that came out the longest ago (casa), whatever its count.
+  const all = new Set([index('mare'), index('luna')])
+  const plan = planRound(corpus, all, () => 0, usesOf, lastAtOf)!
+  assert.equal(corpus.data.words[plan.secret], 'casa')
 })

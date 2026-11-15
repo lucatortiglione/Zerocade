@@ -1,5 +1,5 @@
 import { createHash } from 'node:crypto'
-import { TOURNAMENT_RULES } from '@zerocade/shared'
+import { TOURNAMENT_RULES, pickSecret } from '@zerocade/shared'
 import { lookup, parseContextData, rankAgainst, type ContextData, type Ranking } from '@zerocade/shared/contextRanking'
 import { contextFile, type ContextFile } from './context.js'
 
@@ -54,16 +54,13 @@ export function serverCorpus(): Corpus | null {
   return cached
 }
 
-// A secret not yet played in this tournament, its ranking and the lifeline word. Among those, one of the words that
-// came out the fewest times in every ZeroContext game (`uses`, by word): a word never played while there is one.
+// A secret not yet played in this tournament, its ranking and the lifeline word. Among those, a word that never came
+// out in any ZeroContext game (`uses`, by word); with none left, the one that came out the longest ago (`lastAt`).
 export function planRound(corpus: Corpus, used: ReadonlySet<number>, random: () => number = Math.random,
-  uses: (word: string) => number = () => 0): RoundPlan | null {
+  uses: (word: string) => number = () => 0, lastAt: (word: string) => number = () => 0): RoundPlan | null {
   const free = corpus.data.secrets.filter((s) => !used.has(s))
   if (!free.length) return null
-  const counts = free.map((s) => uses(corpus.data.words[s]))
-  const fewest = counts.reduce((a, b) => Math.min(a, b), Infinity)
-  const pool = free.filter((_, i) => counts[i] === fewest)
-  const secret = pool[Math.floor(random() * pool.length)]
+  const secret = pickSecret(free, (s) => uses(corpus.data.words[s]), (s) => lastAt(corpus.data.words[s]), random)
   const ranking = rankAgainst(corpus.data, secret)
   return { secret, ranking, buoy: buoyOf(ranking, random) }
 }

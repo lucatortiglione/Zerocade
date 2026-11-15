@@ -137,6 +137,24 @@ body.scene-host #root { display: grid; place-items: center; }
 }
 .widget-alert__icon { font-size: 34px; }
 
+/* Rotating messages: a band near the bottom, fading in at each new message. */
+.widget-ticker {
+  position: absolute;
+  left: 50%;
+  bottom: 56px;
+  transform: translateX(-50%);
+  max-width: 80%;
+  padding: 12px 24px;
+  border-radius: 14px;
+  background: #1b1b21ee;
+  border: 1px solid #26262e;
+  color: #f0f0f2;
+  font-size: 22px;
+  font-weight: 600;
+  text-align: center;
+  animation: alert-in 0.3s ease-out;
+}
+
 .widget-goal__label { margin-bottom: 6px; font-weight: 600; }
 .widget-goal__bar { height: 12px; border-radius: 6px; background: #00000055; overflow: hidden; }
 .widget-goal__fill { height: 100%; background: #7c5cff; transition: width 0.3s ease; }
@@ -445,6 +463,17 @@ body.bivio-see-through { background: transparent; }
   overflow-wrap: anywhere;
   transform: translateX(-50%);
   animation: message-in 0.3s ease-out;
+}
+/* A box the creator dragged elsewhere: left/top (inline) are its centre. */
+.overlay-message.placed, .widget-ticker.placed {
+  bottom: auto;
+  transform: translate(-50%, -50%);
+  animation: placed-in 0.3s ease-out;
+}
+.overlay-message.placed { max-width: 86vw; }
+@keyframes placed-in {
+  from { opacity: 0; transform: translate(-50%, -50%) scale(0.92); }
+  to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
 }
 @keyframes message-in {
   from { opacity: 0; transform: translateX(-50%) scale(0.92); }

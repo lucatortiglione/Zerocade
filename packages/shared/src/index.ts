@@ -5,6 +5,7 @@ export { CONTEXT_LIMITS, CONTEXT_COLORS, CONTEXT_COLOR_STOPS, CONTEXT_COLOR_MAX,
 export { payloadBytes } from './threadBudget.js'
 export { BodyLimitError, readBoundedBytes } from './httpBody.js'
 export * from './contextTournament.js'
+export { pickSecret } from './secretPick.js'
 import type { ContextTournamentAdmin, ContextTournamentState, TournamentCommand, TournamentReply, TournamentRow, TournamentSummary } from './contextTournament.js'
 
 export {
@@ -199,9 +200,31 @@ export function giftIdForTiktok(name: string, coins: number): string {
 
 export type WidgetId = 'alerts' | 'joins' | 'follower' | 'goal' | 'gifters'
 
+// Messages shown one at a time on the overlay, in turn, one every `intervalSec` seconds (decided 15/11/2026).
+// Centre of a box on the overlay, in % of its width (x) and height (y).
+export interface BoxPos {
+  x: number
+  y: number
+}
+
+export interface TickerConfig {
+  enabled: boolean
+  intervalSec: number
+  messages: string[]
+  // Where the creator dragged the rotating-message box and the dashboard's message box in the preview.
+  // Missing or null: the default place.
+  tickerPos?: BoxPos | null
+  messagePos?: BoxPos | null
+}
+
+export const TICKER_LIMITS = { intervalMin: 5, intervalMax: 3600, maxMessages: 20, maxLength: 140, showSec: 8 } as const
+
+export const DEFAULT_TICKER: TickerConfig = { enabled: false, intervalSec: 30, messages: [] }
+
 export interface WidgetConfig {
   widgets: Record<WidgetId, boolean>
   goal: number
+  ticker: TickerConfig
 }
 
 export const DEFAULT_WIDGETS: WidgetConfig = {
@@ -209,6 +232,7 @@ export const DEFAULT_WIDGETS: WidgetConfig = {
   // `joins` adds the "X joined" ones (a busy live fills the screen with them).
   widgets: { alerts: false, joins: false, follower: false, goal: false, gifters: false },
   goal: 1000,
+  ticker: DEFAULT_TICKER,
 }
 
 // A gift source without giftId matches any gift; a comment source without match
@@ -1330,6 +1354,7 @@ const GAME_DEFS: GameDef[] = [
       },
       { id: 'matchWords', label: 'Parole per partita', kind: 'number', min: 2, max: 100, step: 1, default: 10, when: { id: 'matchEnds', value: 'words' } },
       { id: 'showLeaderboard', label: 'Classifica', kind: 'toggle', default: true },
+      { id: 'tournamentTypedWords', label: 'Parole scritte a schermo', kind: 'toggle', default: false, group: 'Torneo', hint: 'Nel torneo, mostra sotto il pannello le parole che gli utenti scrivono mentre la finestra è aperta, come nel gioco normale (senza colore: la vicinanza si scopre a finestra chiusa).' },
       { id: 'voiceFollowersOnly', label: 'Voce solo ai follower', kind: 'toggle', default: true, group: 'Chat', hint: VOICE_HINT },
     ],
     defaultTriggers: [
@@ -2156,6 +2181,7 @@ export interface SessionState {
   settings: GameSettings
   widgets: Record<WidgetId, boolean>
   goal: number
+  ticker: TickerConfig
   // Not saved: the game's run state. `run` goes up at each restart; a paused game stops, an ended session
   // shows nothing until it is started again.
   paused?: boolean
@@ -2218,7 +2244,10 @@ export interface ServerToClientEvents {
   // ZeroContext: how many times each secret word has come out (classic games and tournaments), all of them on
   // connecting and one at each new round, so a new round picks a word never played.
   'context:secret-uses': (uses: Record<string, number>) => void
-  'context:secret-used': (used: { word: string; uses: number }) => void
+  'context:secret-used': (used: { word: string; uses: number; at: number }) => void
+  // When each secret word last came out (ms epoch), on connecting: with no word left that never came out, a new round
+  // takes the one that came out the longest ago.
+  'context:secret-last': (last: Record<string, number>) => void
 }
 
 export interface ClientToServerEvents {
@@ -2264,6 +2293,10 @@ export interface ClientToServerEvents {
   'context:tournament': (command: TournamentCommand, ack: (reply: TournamentReply) => void) => void
   'context:tournament-history': (ack: (history: TournamentSummary[]) => void) => void
   'context:tournament-standings': (id: string, ack: (rows: TournamentRow[] | null) => void) => void
+  // The copies of the standings saved after every round in a separate SQLite file (latest first), and the restore
+  // from one of them (snapshot id; null = the latest).
+  'context:tournament-backups': (ack: (backups: { id: number; event: string; roundNumber: number | null; roundsSettled: number; at: number }[]) => void) => void
+  'context:tournament-restore': (snapshotId: number | null, ack: (reply: TournamentReply) => void) => void
   // Deletes the finished tournaments from the history: one (id) or all (null). Answers how many were deleted.
   'context:tournament-history-delete': (id: string | null, ack: (deleted: number) => void) => void
 }

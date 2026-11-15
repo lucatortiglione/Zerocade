@@ -14,7 +14,7 @@ import {
 } from '@zerocade/shared'
 import { socket } from './socket'
 import { playSound, stopSounds } from './audio'
-import { noteSecretUse, setSecretUses } from './games/secretUses'
+import { noteSecretUse, setSecretLast, setSecretUses } from './games/secretUses'
 
 interface OverlayState {
   connected: boolean
@@ -94,7 +94,8 @@ socket.on('incastro:state', (incastro) => update({ incastro, incastroAt: perform
 socket.on('quizzland:state', (quizzland) => update({ quizzland, quizzlandAt: performance.now() }))
 socket.on('context:tournament', (contextTournament) => update({ contextTournament, contextTournamentAt: performance.now() }))
 socket.on('context:secret-uses', (uses) => setSecretUses(uses))
-socket.on('context:secret-used', ({ word, uses }) => noteSecretUse(word, uses))
+socket.on('context:secret-used', ({ word, uses, at }) => noteSecretUse(word, uses, at))
+socket.on('context:secret-last', (last) => setSecretLast(last))
 
 const MESSAGE_MS = 8000
 let messageTimer: ReturnType<typeof setTimeout> | undefined

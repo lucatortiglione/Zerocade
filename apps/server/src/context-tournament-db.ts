@@ -1,6 +1,7 @@
 import type Database from 'better-sqlite3'
 import { OPEN_STATUSES, TOURNAMENT_RULES, type TournamentStatus, type TournamentSummary } from '@zerocade/shared'
-import { netPoints, standings, type PlayerTotals, type RoundOutcome } from './context-tournament-scoring.js'
+import { compareTotals, netPoints, standings, type PlayerTotals, type RoundOutcome } from './context-tournament-scoring.js'
+import type { BackupEvent, BackupSnapshot, TournamentBackup } from './context-tournament-backup.js'
 
 // ZeroContext tournament: what is saved (specifica §8), in the server's working database (zerocade.db), apart from
 // the ordinary leaderboards (game_scores): a tournament may have negative points, and its points never go there.
@@ -187,9 +188,80 @@ function allowEndless(db: Database.Database) {
 }
 
 export class ContextTournamentStore {
-  constructor(private readonly db: Database.Database) {
+  // `backup`: the separate file where the standings are copied after every round (context-tournament-backup.ts).
+  constructor(private readonly db: Database.Database, private readonly backup: TournamentBackup | null = null) {
     allowEndless(db)
     db.exec(SCHEMA)
+  }
+
+  // A copy of the standings and of the settled rounds' points. It never stops the game: a failure is only logged.
+  private backupNow(tournamentId: string, event: BackupEvent, roundNumber: number | null, at: number) {
+    if (!this.backup) return
+    try {
+      const t = this.tournament(tournamentId)
+      if (!t) return
+      const totals = this.totals(tournamentId)
+      const sorted = [...totals].sort((a, b) => compareTotals(a, b) || a.nickname.localeCompare(b.nickname, 'it') || a.player.localeCompare(b.player))
+      const avatars = new Map(this.players(tournamentId).map((p) => [p.player, p.avatar]))
+      const standing = sorted.map((p, i) => {
+        let place = i + 1
+        for (let j = i; j > 0 && compareTotals(sorted[j - 1], p) === 0; j--) place = j
+        return { player: p.player, place, nickname: p.nickname, avatar: avatars.get(p.player) ?? null, points: p.points, solved: p.solved,
+          redOrange: p.redOrange, bluePenalty: p.bluePenalty }
+      })
+      const scores = (this.db.prepare(`SELECT s.*, r.round_number FROM context_tournament_round_scores s
+        JOIN context_tournament_rounds r ON r.id = s.round_id WHERE r.tournament_id = ? AND r.status = 'settled'`).all(tournamentId) as Row[])
+        .map((r) => ({ roundId: r.round_id as string, roundNumber: r.round_number as number, player: r.player_id as string,
+          pioneer: r.pioneer_points as number, jackpot: r.jackpot_points as number, blueCount: r.blue_count as number,
+          bluePenalty: r.blue_penalty as number, redOrange: r.red_orange_count as number, solved: r.solved as number }))
+      this.backup.record({ tournamentId, roomKey: t.roomKey, event, roundNumber, at, standings: standing, scores })
+    } catch (err) {
+      console.warn(`[context-tournament] backup della classifica non riuscito: ${err instanceof Error ? err.message : String(err)}`)
+    }
+  }
+
+  backups(tournamentId: string) {
+    return this.backup?.list(tournamentId) ?? []
+  }
+
+  // Puts the standings back as they were in a snapshot of the backup file (the latest one when `snapshotId` is null):
+  // the points of the rounds it holds are written again, the rounds settled after it stop counting (voided), the players
+  // it lists are enrolled again. Needs the tournament and its rounds in this database (guesses and rounds are not in
+  // the backup) and no round in play. The standings as they are now are copied to the backup first, so a restore can
+  // be undone. Returns the snapshot used.
+  restoreFromBackup(tournamentId: string, snapshotId: number | null, at: number, actor: string): BackupSnapshot {
+    if (!this.backup) throw new Error('Il backup della classifica non è attivo.')
+    const snap = this.backup.snapshot(tournamentId, snapshotId)
+    if (!snap) throw new Error('Nessuna copia della classifica per questo torneo.')
+    const scores = this.backup.scores(snap.id)
+    const t = this.tournament(tournamentId)
+    if (!t) throw new Error('Il torneo non è più nel database: la copia non basta a ricrearlo.')
+    if (this.playing(tournamentId)) throw new Error('C\'è una manche in corso: chiudila o annullala prima.')
+    const known = new Set((this.db.prepare('SELECT id FROM context_tournament_rounds WHERE tournament_id = ?').all(tournamentId) as Row[]).map((r) => r.id as string))
+    const missing = [...new Set(scores.map((s) => s.roundId))].filter((id) => !known.has(id))
+    if (missing.length) throw new Error(`Mancano nel database le manche ${missing.join(', ')}: la copia non può essere applicata.`)
+    this.backupNow(tournamentId, 'before-restore', null, at)
+    this.db.transaction(() => {
+      const kept = new Set(scores.map((s) => s.roundId))
+      this.db.prepare(`DELETE FROM context_tournament_round_scores WHERE round_id IN
+        (SELECT id FROM context_tournament_rounds WHERE tournament_id = ?)`).run(tournamentId)
+      const voidStmt = this.db.prepare("UPDATE context_tournament_rounds SET status = 'voided', close_reason = ? WHERE id = ?")
+      const settleStmt = this.db.prepare("UPDATE context_tournament_rounds SET status = 'settled', close_reason = NULL WHERE id = ?")
+      for (const r of this.rounds(tournamentId)) {
+        if (kept.has(r.id)) settleStmt.run(r.id)
+        else if (r.status === 'settled') voidStmt.run('Classifica ripristinata da una copia', r.id)
+      }
+      const insert = this.db.prepare(`INSERT INTO context_tournament_round_scores (round_id, player_id, pioneer_points, jackpot_points,
+        blue_count, blue_penalty, red_orange_count, solved) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`)
+      for (const s of scores) insert.run(s.roundId, s.player, s.pioneer, s.jackpot, s.blueCount, s.bluePenalty, s.redOrange, s.solved)
+      this.db.prepare('DELETE FROM context_tournament_players WHERE tournament_id = ?').run(tournamentId)
+      for (const p of snap.standings) this.enrol(tournamentId, p.player, p.nickname, p.avatar, at)
+      const last = t.totalRounds !== null && snap.roundsSettled >= t.totalRounds
+      this.db.prepare(`UPDATE context_tournaments SET status = ?, intermission_since = ?, suspended_reason = NULL,
+        finished_at = CASE WHEN ? THEN ? ELSE NULL END WHERE id = ?`).run(last ? 'completed' : 'intermission', at, last ? 1 : 0, at, tournamentId)
+      this.audit(tournamentId, null, 'standings-restored', actor, { snapshot: snap.id, snapshotAt: snap.at, rounds: snap.roundsSettled }, at)
+    })()
+    return snap
   }
 
   openIn(roomKey: string): TournamentRecord | null {
@@ -295,9 +367,16 @@ export class ContextTournamentStore {
   // The round's points, once: from the outcome of its saved guesses. A round already settled (a retry) is left as it
   // is and false is returned. The tournament moves on (intermission, or completed after its last round).
   settle(roundId: string, outcome: RoundOutcome, at: number, actor: string, closeReason: string | null, achievements: string[]): boolean {
+    const done = this.settleInDb(roundId, outcome, at, actor, closeReason, achievements)
+    if (done) this.backupNow(done.tournament, 'round-settled', done.number, at)
+    return done !== null
+  }
+
+  private settleInDb(roundId: string, outcome: RoundOutcome, at: number, actor: string, closeReason: string | null,
+    achievements: string[]): { tournament: string; number: number } | null {
     return this.db.transaction(() => {
       const round = this.db.prepare("SELECT * FROM context_tournament_rounds WHERE id = ? AND status = 'playing'").get(roundId) as Row | undefined
-      if (!round) return false
+      if (!round) return null
       const insert = this.db.prepare(`INSERT INTO context_tournament_round_scores (round_id, player_id, pioneer_points, jackpot_points,
         blue_count, blue_penalty, red_orange_count, solved) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`)
       for (const [player, p] of outcome.players) {
@@ -313,23 +392,26 @@ export class ContextTournamentStore {
         solvedBy: outcome.solvedBy, pioneerTotal: outcome.pioneerTotal, jackpot: outcome.jackpot, closeReason,
         points: Object.fromEntries([...outcome.players].map(([id, p]) => [id, netPoints(p)])),
       }, at)
-      return true
+      return { tournament: t.id, number: round.round_number as number }
     })()
   }
 
   // A round that does not count (§10, §13.3.5): in play or the last one settled. Its points, if written, are removed;
   // the same round number is played again with another secret.
   voidRound(roundId: string, reason: string, at: number, actor: string): boolean {
-    return this.db.transaction(() => {
+    const round = this.db.transaction(() => {
       const round = this.db.prepare("SELECT * FROM context_tournament_rounds WHERE id = ? AND status IN ('playing','settled')").get(roundId) as Row | undefined
-      if (!round) return false
+      if (!round) return null
       const removed = this.db.prepare('DELETE FROM context_tournament_round_scores WHERE round_id = ?').run(roundId).changes
       this.db.prepare("UPDATE context_tournament_rounds SET status = 'voided', close_reason = ? WHERE id = ?").run(reason, roundId)
       this.db.prepare(`UPDATE context_tournaments SET status = 'intermission', intermission_since = ?, suspended_reason = NULL, finished_at = NULL
         WHERE id = ?`).run(at, round.tournament_id)
       this.audit(round.tournament_id as string, roundId, 'round-voided', actor, { reason, removedScores: removed, wasSettled: round.status === 'settled' }, at)
-      return true
+      return round
     })()
+    if (!round) return false
+    this.backupNow(round.tournament_id as string, 'round-voided', round.round_number as number, at)
+    return true
   }
 
   // "Azzera classifica" (asked 15/11/2026): every round settled so far stops counting, as if voided (its points are
@@ -337,6 +419,8 @@ export class ContextTournamentStore {
   // with the same settings, on secrets not yet played. Guesses, rounds and history stay: the audit keeps the standings
   // as they were. Refused while a round is in play. Returns how many rounds were voided.
   resetStandings(tournamentId: string, reason: string, at: number, actor: string, before: unknown): number {
+    // The standings as they were go to the backup first: a reset by mistake can be undone from that copy.
+    this.backupNow(tournamentId, 'standings-reset', null, at)
     return this.db.transaction(() => {
       if (this.playing(tournamentId)) throw new Error('C\'è una manche in corso: chiudila o annullala prima.')
       const removed = this.db.prepare(`DELETE FROM context_tournament_round_scores WHERE round_id IN

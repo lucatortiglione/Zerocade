@@ -39,8 +39,8 @@ export interface RoundOutcome {
   achievements: { holeInOne: string | null; supremePioneers: string[]; fireUnderIce: string | null }
 }
 
-export const bluePenalty = (blueCount: number) =>
-  Math.min(TOURNAMENT_RULES.bluePenaltyMax, Math.max(0, blueCount - TOURNAMENT_RULES.blueFree))
+// Blue attempts are counted but never cost points (decided 15/11/2026): the Ice filter's penalty is always 0.
+export const bluePenalty = (_blueCount: number) => 0
 
 export const netPoints = (p: Pick<PlayerRound, 'pioneer' | 'jackpot' | 'bluePenalty'>) => p.pioneer + p.jackpot - p.bluePenalty
 

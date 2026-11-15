@@ -15,6 +15,7 @@ import {
   type TriggerSource,
   type Viewer,
   type WidgetConfig,
+  TICKER_LIMITS,
   type WidgetId,
 } from '@zerocade/shared'
 
@@ -174,6 +175,27 @@ export function sanitizeScene(raw: unknown): Partial<WidgetConfig> | null {
   if (r.goal !== undefined) {
     if (typeof r.goal !== 'number' || !Number.isFinite(r.goal) || r.goal < 1) return null
     out.goal = Math.min(1_000_000, Math.floor(r.goal))
+  }
+  if (r.ticker !== undefined) {
+    const t = asRecord(r.ticker)
+    if (!t || typeof t.enabled !== 'boolean' || typeof t.intervalSec !== 'number' || !Number.isFinite(t.intervalSec) || !Array.isArray(t.messages)) return null
+    if (t.messages.some((m) => typeof m !== 'string')) return null
+    out.ticker = {
+      enabled: t.enabled,
+      intervalSec: Math.min(TICKER_LIMITS.intervalMax, Math.max(TICKER_LIMITS.intervalMin, Math.round(t.intervalSec))),
+      messages: (t.messages as string[]).map((m) => m.trim().slice(0, TICKER_LIMITS.maxLength)).filter(Boolean).slice(0, TICKER_LIMITS.maxMessages),
+    }
+    for (const k of ['tickerPos', 'messagePos'] as const) {
+      if (t[k] === undefined) continue
+      if (t[k] === null) {
+        out.ticker[k] = null
+        continue
+      }
+      const p = asRecord(t[k])
+      if (!p || typeof p.x !== 'number' || typeof p.y !== 'number' || !Number.isFinite(p.x) || !Number.isFinite(p.y)) return null
+      const clamp = (n: number) => Math.round(Math.min(100, Math.max(0, n)) * 10) / 10
+      out.ticker[k] = { x: clamp(p.x), y: clamp(p.y) }
+    }
   }
   return out
 }

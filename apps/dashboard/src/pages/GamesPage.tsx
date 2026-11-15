@@ -1,4 +1,6 @@
+import { useState } from 'react'
 import { GAMES, chainModeLabel, parseChainSecret, type SessionState } from '@zerocade/shared'
+import { PlaceBoxes } from '../components/PlaceBoxes'
 import { BivioSidebar } from '../components/BivioSidebar'
 import { ContextTournamentPanel } from '../components/ContextTournamentPanel'
 import { IncastroSidebar } from '../components/IncastroSidebar'
@@ -160,6 +162,7 @@ function WordAssociationData() {
 }
 
 function Preview({ session }: { session: SessionState | null }) {
+  const [placing, setPlacing] = useState(false)
   return (
     <main className="preview">
       <div className="preview__head">
@@ -168,12 +171,20 @@ function Preview({ session }: { session: SessionState | null }) {
           Live preview
           {session && <span className="preview__game">{GAMES.find((g) => g.id === session.gameId)?.name}</span>}
         </div>
-        <a className="btn btn--ghost btn--small" href={overlayUrl} target="_blank" rel="noreferrer">
-          Open ↗
-        </a>
+        <div className="preview__actions">
+          {session && (
+            <button className={`btn btn--small ${placing ? '' : 'btn--ghost'}`} onClick={() => setPlacing(!placing)}>
+              {placing ? 'Fatto' : 'Sposta box'}
+            </button>
+          )}
+          <a className="btn btn--ghost btn--small" href={overlayUrl} target="_blank" rel="noreferrer">
+            Open ↗
+          </a>
+        </div>
       </div>
       <div className="preview__frame">
         <iframe title="Overlay preview" src={previewUrl} />
+        {placing && session && <PlaceBoxes session={session} />}
       </div>
       <p className="text-muted small">This is exactly what your viewers see on stream.</p>
     </main>

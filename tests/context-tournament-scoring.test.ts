@@ -58,11 +58,12 @@ test('C: an unsolved round keeps the pioneers and pays no jackpot (T11)', () => 
   assert.equal(positive(o), 20)
 })
 
-test('the blue filter: 0,0,-1,-1,-1,-1 then nothing more, -4 at most (T12)', () => {
-  assert.deepEqual([1, 2, 3, 4, 5, 6, 7, 8].map(bluePenalty), [0, 0, 1, 2, 3, 4, 4, 4])
+test('blue attempts are counted but never cost points (decided 15/11/2026, replaces T12)', () => {
+  assert.deepEqual([1, 2, 3, 4, 5, 6, 7, 8].map(bluePenalty), [0, 0, 0, 0, 0, 0, 0, 0])
   const o = scoreRound(Array.from({ length: 7 }, (_, i) => g('mario', 9000 + i)))
-  assert.equal(o.players.get('mario')!.bluePenalty, 4)
-  assert.equal(net(o, 'mario'), -4)
+  assert.equal(o.players.get('mario')!.blueCount, 7)
+  assert.equal(o.players.get('mario')!.bluePenalty, 0)
+  assert.equal(net(o, 'mario'), 0)
 })
 
 test('in a window with the target, the guesses before it count and those after do not (T07)', () => {
@@ -73,11 +74,11 @@ test('in a window with the target, the guesses before it count and those after d
   assert.equal(o.players.has('d'), false)
 })
 
-test('achievements: Pioniere Supremo, Fuoco sotto il Ghiaccio', () => {
+test('achievements: Pioniere Supremo; Fuoco sotto il Ghiaccio never, as blue has no penalty', () => {
   const blue = Array.from({ length: 5 }, (_, i) => g('ice', 8000 + i))
   const o = scoreRound([g('sup', 7000), g('sup', 2000), g('sup', 400), ...blue, g('ice', 1)])
   assert.deepEqual(o.achievements.supremePioneers, ['sup'])
-  assert.equal(o.achievements.fireUnderIce, 'ice')
+  assert.equal(o.achievements.fireUnderIce, null)
 })
 
 const t = (player: string, points: number, solved = 0, redOrange = 0, blue = 0): PlayerTotals =>
