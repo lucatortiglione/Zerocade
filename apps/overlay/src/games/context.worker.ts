@@ -13,7 +13,7 @@ globalThis.addEventListener('message', (event: MessageEvent<ContextRequest>) => 
     if (loading || source) { send({ type: 'error', id: request.id, kind: 'saturated', message: 'Dati già caricati o in caricamento.' }); return }
     loading = true
     void loadContextData(request.origin, new AbortController().signal).then((data) => {
-      source = { wordCount: data.words.length, vectors: data.vectors, dim: data.dim, links: data.links, linkBoost: data.linkBoost }
+      source = { wordCount: data.words.length, vectors: data.vectors, dim: data.dim, links: data.links, linkBoost: data.linkBoost, hubs: data.hubs }
       send({ type: 'ready', id: request.id, vocabulary: { words: data.words, secrets: data.secrets, index: data.index, folded: data.folded } })
       // After this callback, word maps belong only to the UI. This thread keeps
       // its dense vectors and links; no second copy of vectors crosses the port.

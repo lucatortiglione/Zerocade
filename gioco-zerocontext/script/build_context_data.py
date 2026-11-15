@@ -46,6 +46,7 @@ import numpy as np
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent / "database" / "script"))
 import giochi  # noqa: E402
 from context_vocabulary import WORD, inventory_vocab, pure_plurals
+from hubness import STRENGTH as HUB_STRENGTH, hub_penalties
 
 HERE = Path(__file__).resolve().parent.parent
 CACHE = HERE / ".cache"
@@ -161,6 +162,7 @@ def main() -> None:
     ap.add_argument("--numberbatch-weight", type=float, default=0.3, help="peso di Numberbatch nella media dei coseni (0-1)")
     ap.add_argument("--top-pcs", type=int, default=2, help="direzioni principali tolte a ogni fonte")
     ap.add_argument("--link-boost", type=float, default=0.15, help="quanto sale una parola associata, in unità di coseno")
+    ap.add_argument("--hub-strength", type=float, default=HUB_STRENGTH, help="forza della penalità di genericità (0 = nessuna)")
     ap.add_argument("--probe", nargs="*", default=["spiaggia", "pizza", "ospedale"])
     ap.add_argument("--dry-run", action="store_true", help="stampa le prove senza scrivere nulla")
     args = ap.parse_args()
@@ -196,6 +198,8 @@ def main() -> None:
         raise ValueError('Parole con vettore nullo')
     links = association_links(vocab, secrets)
     boost = int(round(args.link_boost * scale * scale))
+    # Penalità di genericità (hubness.py): le parole vicine a tutto scendono in ogni classifica.
+    hubs = hub_penalties(q, args.hub_strength)
     print(f"vocab {len(vocab)}  segrete {len(secrets)}  in Numberbatch {int(have.sum())} ({have.mean():.1%})")
     print(f"collegamenti {len(links)} per {len({s for s, _ in links})} segrete  link_boost {boost}  vectors.bin {q.nbytes / 1e6:.1f} MB")
 
@@ -213,8 +217,8 @@ def main() -> None:
         (DATA / "vectors.bin.part").write_bytes(q.tobytes())
         # Le parole (nell'ordine dei vettori), le segrete e i collegamenti vanno nel DB dei giochi, schema context
         # (database/giochi.sqlite3); i vettori restano in data/vectors.bin.
-        meta = {"words": len(vocab), "dim": int(q.shape[1]), "secrets": len(secrets), "links": len(links), "link_boost": boost}
-        giochi.write_context(vocab, secrets, meta, links)
+        meta = {"words": len(vocab), "dim": int(q.shape[1]), "secrets": len(secrets), "links": len(links), "link_boost": boost, "hub_strength": args.hub_strength}
+        giochi.write_context(vocab, secrets, meta, links, hubs.tolist())
         (DATA / 'vectors.bin.part').replace(DATA / 'vectors.bin')
         (DATA / 'vocab.txt').write_text('\n'.join(vocab)+'\n', encoding='utf-8', newline='\n')
         (DATA / 'secrets.txt').write_text('\n'.join(secrets)+'\n', encoding='utf-8', newline='\n')
@@ -222,7 +226,7 @@ def main() -> None:
         linked_export: dict[str, list[int]] = {}
         for s, w in links:
             linked_export.setdefault(str(s), []).append(w)
-        (DATA / 'links.json').write_text(json.dumps({'boost': boost, 'links': linked_export})+'\n', encoding='utf-8')
+        (DATA / 'links.json').write_text(json.dumps({'boost': boost, 'links': linked_export, 'hubs': hubs.tolist()})+'\n', encoding='utf-8')
         report = {'updated_at': datetime.now(timezone.utc).isoformat(),
                   'previous_words': len(previous_vocab), 'words': len(vocab),
                   'added': len(set(vocab)-previous_vocab), 'removed': len(previous_vocab-set(vocab)),

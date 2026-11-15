@@ -799,6 +799,11 @@ io.on('connection', (socket) => {
   socket.on('context:tournament-history', (ack?: unknown) => {
     if (typeof ack === 'function') ack(contextTournamentStore.history(key))
   })
+  // "Elimina storico": finished tournaments of this room, one or all; the one on screen is kept.
+  socket.on('context:tournament-history-delete', (id: unknown, ack?: unknown) => {
+    const deleted = contextTournamentStore.deleteFinished(key, typeof id === 'string' ? id : null, tournaments.state(key)?.tournamentId ?? null)
+    if (typeof ack === 'function') ack(deleted)
+  })
   // A tournament's full standings, only for one of this room.
   socket.on('context:tournament-standings', (id: unknown, ack?: unknown) => {
     if (typeof ack !== 'function') return

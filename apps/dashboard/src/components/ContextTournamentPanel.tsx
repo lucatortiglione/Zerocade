@@ -209,6 +209,11 @@ function History() {
   const [list, setList] = useState<TournamentSummary[] | null>(null)
   const [rows, setRows] = useState<{ id: string; rows: TournamentRow[] } | null>(null)
   const load = () => socket.emit('context:tournament-history', (history) => setList(history))
+  const remove = (id: string | null, question: string) => {
+    if (!window.confirm(question)) return
+    socket.emit('context:tournament-history-delete', id, () => { setRows(null); load() })
+  }
+  const finished = list?.filter((t) => t.status === 'completed' || t.status === 'cancelled') ?? []
   const status = { active: 'in corso', intermission: 'in corso', suspended: 'sospeso', completed: 'concluso', cancelled: 'annullato' }
   return (
     <details className="tournament-panel__history" onToggle={(e) => { if ((e.target as HTMLDetailsElement).open) load() }}>
@@ -217,6 +222,10 @@ function History() {
         <ul>
           {list.map((t) => (
             <li key={t.id}>
+              {(t.status === 'completed' || t.status === 'cancelled') && (
+                <button type="button" className="btn btn--small btn--ghost" title="Elimina questo torneo dallo storico" aria-label="Elimina questo torneo dallo storico"
+                  onClick={() => remove(t.id, 'Eliminare questo torneo dallo storico? Classifica, manche e tentativi vengono cancellati e non si recuperano.')}>🗑</button>
+              )}
               <button type="button" className="btn btn--small btn--ghost" onClick={() =>
                 socket.emit('context:tournament-standings', t.id, (r) => setRows(r ? { id: t.id, rows: r } : null))}>
                 {new Date(t.createdAt).toLocaleString('it')} · {status[t.status]} · {t.totalRounds === null ? `${t.roundsPlayed} manche (infinite)` : `${t.roundsPlayed}/${t.totalRounds} manche`} · {t.players} giocatori
@@ -226,6 +235,12 @@ function History() {
             </li>
           ))}
         </ul>
+      )}
+      {finished.length > 0 && (
+        <button type="button" className="btn btn--small" onClick={() => remove(null,
+          `Eliminare dallo storico tutti i ${finished.length} tornei finiti? Classifiche, manche e tentativi vengono cancellati e non si recuperano. Un torneo in corso resta.`)}>
+          🗑 Elimina lo storico
+        </button>
       )}
     </details>
   )

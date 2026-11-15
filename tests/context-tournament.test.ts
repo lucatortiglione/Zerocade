@@ -318,6 +318,34 @@ test('a database from before the endless rounds keeps its tournaments and accept
   assert.equal(store.tournament('old')!.totalRounds, 7)
 })
 
+test('deleting the history: finished tournaments go with everything they hold; the open one and other rooms stay', () => {
+  const s = setup()
+  const finishOne = () => {
+    create(s)
+    s.cmd({ type: 'start-round' })
+    s.say('anna', s.tournaments.admin(ROOM)!.secret!)
+    closeWindow(s)
+    s.cmd({ type: 'finish' })
+    const id = s.state().tournamentId
+    s.cmd({ type: 'dismiss' })
+    return id
+  }
+  const first = finishOne()
+  const second = finishOne()
+  create(s) // open
+  const open = s.state().tournamentId
+  assert.equal(s.store.history(ROOM).length, 3)
+  assert.equal(s.store.deleteFinished('other-room', null, null), 0)
+  assert.equal(s.store.deleteFinished(ROOM, first, null), 1)
+  assert.equal(s.store.history(ROOM).some((t) => t.id === first), false)
+  assert.equal(s.store.deleteFinished(ROOM, open, null), 0) // an open one is not history
+  assert.equal(s.store.deleteFinished(ROOM, null, null), 1) // the rest of the finished ones
+  assert.deepEqual(s.store.history(ROOM).map((t) => t.id), [open])
+  assert.equal(s.store.tournament(second), null)
+  assert.deepEqual(s.store.auditLog(first), [])
+  assert.equal(s.store.rounds(first).length, 0)
+})
+
 test('a round is settled once, even if asked twice (T19)', () => {
   const s = setup()
   create(s)

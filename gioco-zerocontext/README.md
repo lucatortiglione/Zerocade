@@ -112,6 +112,20 @@ le parole uscite meno volte, quindi sempre una parola mai uscita finché ce ne s
 riparte dalle meno usate, mai la stessa della manche appena giocata. La dashboard mostra accanto alla soluzione quante
 volte è uscita.
 
+## Penalità di genericità
+
+Alcune parole (autista, guidatore, medico...) sono vicine a quasi tutto nei vettori, e per ogni segreta finivano in
+alto anche con poca attinenza. Dal 15/11/2026 ogni parola ha una penalità, `hubs` nel DB (e `hubs` in `links.json`),
+calcolata da `script/hubness.py`: la media del suo coseno con le 10 parole più vicine, per la forza 0,5, nella scala dei
+vettori. Nella classifica di qualsiasi segreta il suo punteggio scende di quella penalità; il bonus dei collegamenti
+si somma dopo. Per «fotografo» autista passa dal #272 al #455 e medico dal #631 al #2.214, mentre fotoreporter e
+pittore restano in testa. Vale per la partita classica e per il torneo (stesso codice, `packages/shared/src/contextRanking.ts`).
+
+- `build_context_data.py` la calcola a ogni generazione (`--hub-strength`, 0 = nessuna).
+- `script/apply_context_hubs.py [--strength 0.5]` la aggiunge ai dati già pubblicati senza rigenerare i vettori.
+- `prune_context_vocab.py` conserva le penalità delle parole rimaste.
+- Cambia il ranking, quindi un torneo già aperto si sospende (l'impronta dei dati è cambiata): si annulla e se ne avvia uno nuovo.
+
 ## Torneo ZeroContext
 
 Le regole sono in [REGOLAMENTO_CONTEXT_TORNEO_v2_3.md](REGOLAMENTO_CONTEXT_TORNEO_v2_3.md), il progetto tecnico in
@@ -270,3 +284,7 @@ Test: `python -m unittest discover -s . -p script/test_evaluate_context_inventor
   cartella per `vectors.bin`.
 - Overlay: `apps/overlay/src/games/context.ts` (la partita) e `apps/overlay/src/games/contextRanking.ts` (la
   classifica per vicinanza).
+
+**Elimina lo storico.** Nello «Storico dei tornei» della dashboard, «🗑 Elimina lo storico» cancella (dopo conferma) tutti
+i tornei finiti, concordi o annullati, con manche, tentativi, punti e registro; il cestino accanto a un torneo cancella
+solo quello. Non si recupera. Un torneo in corso, o ancora a schermo, resta.

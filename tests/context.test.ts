@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
+import { ContextError } from '@zerocade/shared'
 import { bandColor, closerHint, lookup, maskedWord, parseContextData, position, rankAgainst, startHint } from '../apps/overlay/src/games/contextRanking.ts'
 import { inlineContextComputer, settleContext } from './helpers/inlineContextComputer.ts'
 
@@ -92,6 +93,22 @@ test('a word ZeroAssociazioni ties to the secret rises by the boost, for that se
   assert.equal(data.links.size, 0)
 })
 
+test('a generic word (a genericity penalty) falls in every ranking, a pertinent one keeps its place', () => {
+  const idx = (w: string) => data.index.get(w)!
+  // "onda" is close to "mare" (9500) but close to everything: its penalty of 4000 puts it behind "sabbia" (6000).
+  const penalised = parseContextData(vocab, vectors, 'mare\nsabbia\n', { boost: 0, links: {}, hubs: data.words.map((w) => (w === 'onda' ? 4000 : 0)) })
+  assert.deepEqual([...rankAgainst(penalised, idx('mare')).order].map((i) => penalised.words[i]), ['mare', 'sabbia', 'onda', 'città'])
+  // The penalty does not depend on the secret: it also lowers "onda" in the ranking of "sabbia".
+  assert.equal(penalised.words[rankAgainst(penalised, idx('sabbia')).order[1]], 'mare')
+  // A link's boost still comes on top of the penalty.
+  const both = parseContextData(vocab, vectors, 'mare\n', { boost: 5000, links: { [idx('mare')]: [idx('onda')] }, hubs: data.words.map((w) => (w === 'onda' ? 4000 : 0)) })
+  assert.equal(both.words[rankAgainst(both, idx('mare')).order[1]], 'onda')
+  // Penalties that are not one integer per word are refused; without them nothing is penalised.
+  assert.throws(() => parseContextData(vocab, vectors, 'mare\n', { boost: 0, links: {}, hubs: [1, 2] }), ContextError)
+  assert.throws(() => parseContextData(vocab, vectors, 'mare\n', { boost: 0, links: {}, hubs: data.words.map(() => -1) }), ContextError)
+  assert.equal(data.hubs, null)
+})
+
 test('on screen the secret is always position 1 and the closest word position 2', () => {
   const r = rankAgainst(data, data.index.get('mare')!)
   const shown = (w: string) => position(r.rankOf[data.index.get(w)!])
@@ -151,6 +168,12 @@ test('the shipped data is consistent: vectors match the vocabulary and neighbour
     assert.notEqual(lookup(real, word), -1, `new playable word: ${word}`)
   // Most secrets have words tied to them, and every link names a secret and a playable word.
   assert.ok(real.linkBoost > 0 && real.links.size > 4000, `links for ${real.links.size} secrets`)
+  // Genericity penalty (15/11/2026): one per word, and a generic word falls for "fotografo" where a pertinent one stays.
+  assert.equal(real.hubs?.length, real.words.length)
+  const photo = rankAgainst(real, real.index.get('fotografo')!)
+  const place = (w: string) => photo.rankOf[real.index.get(w)!]
+  assert.ok(place('fotoreporter') < 5 && place('pittore') < 150, `pertinent words stay: ${place('fotoreporter')}, ${place('pittore')}`)
+  assert.ok(place('autista') > 350 && place('medico') > 1500, `generic words fall: ${place('autista')}, ${place('medico')}`)
   const secret = new Set(real.secrets)
   assert.ok([...real.links.keys()].every((s) => secret.has(s)))
   assert.ok(real.links.get(real.index.get('spiaggia')!)!.includes(real.index.get('ombrellone')!))

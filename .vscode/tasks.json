@@ -75,6 +75,86 @@
       "detail": "Cerca nel DB di lavoro i plurali puri (singolare presente nella raccolta, prova di plurale in GLAFF, Morph-it, Flex-it, UD o Kaikki, nessun'altra lettura) e li registra come DISCARDED in raw.inventory_term_decisions, con il singolare nel motivo e nello storico. Non tocca le decisioni prese da una persona o da una revisione; ritira le proprie se la parola non è più un plurale puro. Rilanciabile. Poi il task 3 li porta nello schema scartati e toglie le voci da filtrati e validi. Solo conteggio, senza scrivere: python script/normalize_words.py plan."
     },
     {
+      "label": "ZeroContext 1)Vettori: scarica fastText, Numberbatch e Morph-it",
+      "dependsOrder": "sequence",
+      "dependsOn": [
+        "ZeroContext: scarica i vettori fastText",
+        "ZeroContext: scarica i vettori Numberbatch",
+        "ZeroContext: scarica Morph-it"
+      ],
+      "problemMatcher": [],
+      "detail": "Passi 1-3 della costruzione dei dati di ZeroContext: i tre ingressi scaricati in gioco-zerocontext/.cache (fuori da Git). Pesante la prima volta (fastText legge l'inizio di un file da 7 GB, Numberbatch uno da 3,2 GB); poi si salta."
+    },
+    {
+      "label": "ZeroContext: scarica i vettori fastText",
+      "type": "process",
+      "command": "${workspaceFolder}/gioco-zeroassociations/.venv/Scripts/python.exe",
+      "args": ["-B", "script/fetch_vectors.py"],
+      "options": { "cwd": "${workspaceFolder}/gioco-zerocontext" },
+      "problemMatcher": []
+    },
+    {
+      "label": "ZeroContext: scarica i vettori Numberbatch",
+      "type": "process",
+      "command": "${workspaceFolder}/gioco-zeroassociations/.venv/Scripts/python.exe",
+      "args": ["-B", "script/fetch_numberbatch.py"],
+      "options": { "cwd": "${workspaceFolder}/gioco-zerocontext" },
+      "problemMatcher": []
+    },
+    {
+      "label": "ZeroContext: scarica Morph-it",
+      "type": "process",
+      "command": "${workspaceFolder}/gioco-zeroassociations/.venv/Scripts/python.exe",
+      "args": ["-B", "script/fetch_morphit.py"],
+      "options": { "cwd": "${workspaceFolder}/gioco-zerocontext" },
+      "problemMatcher": []
+    },
+    {
+      "label": "ZeroContext 4)Banca: costruisci le parole segrete",
+      "type": "process",
+      "command": "${workspaceFolder}/gioco-zeroassociations/.venv/Scripts/python.exe",
+      "args": ["-B", "script/build_context_bank.py"],
+      "options": { "cwd": "${workspaceFolder}/gioco-zerocontext" },
+      "problemMatcher": [],
+      "detail": "Passo 4: la banca delle parole segrete (export Livecade più i sostantivi comuni dell'inventario, schema raw di parole_ita_raw.sqlite3). Scrive zerocontext-it-bank.csv e -meta.csv."
+    },
+    {
+      "label": "ZeroContext 5)Dati: genera il DB con il ranking delle parole generiche",
+      "type": "process",
+      "command": "${workspaceFolder}/gioco-zeroassociations/.venv/Scripts/python.exe",
+      "args": ["-B", "script/build_context_data.py"],
+      "options": { "cwd": "${workspaceFolder}/gioco-zerocontext" },
+      "problemMatcher": [],
+      "detail": "Passo 5: vocabolario (frequenze, banca, inventario attestato, senza plurali puri), vettori int8, collegamenti con ZeroAssociazioni e penalità di genericità (hubs, forza 0,5: le parole vicine a tutto scendono in ogni classifica). Scrive lo schema context di giochi.sqlite3 e data/vectors.bin, con backup in .cache/backups. Servono gli ingressi dei passi 1-4 e gioco-zeroassociations/resources/frequency_ranks_it.csv. Poi riavviare Zerocade. Provare senza scrivere: --dry-run; altra forza: --hub-strength."
+    },
+    {
+      "label": "ZeroContext 5a)Dati: aggiungi il ranking delle parole generiche ai dati pubblicati",
+      "type": "process",
+      "command": "${workspaceFolder}/gioco-zeroassociations/.venv/Scripts/python.exe",
+      "args": ["-B", "script/apply_context_hubs.py"],
+      "options": { "cwd": "${workspaceFolder}/gioco-zerocontext" },
+      "problemMatcher": [],
+      "detail": "Calcola la penalità di genericità (forza 0,5) sui vettori già pubblicati e la scrive nel DB (tabella hubs) e in data/links.json, senza rigenerare vocabolario e vettori. Utile quando gli ingressi del passo 5 non ci sono. Backup in .cache/backups. Poi riavviare Zerocade."
+    },
+    {
+      "label": "ZeroContext 6)Verifica: DB dei giochi e test di ZeroContext",
+      "dependsOrder": "sequence",
+      "dependsOn": [
+        "DB dei giochi: verifica giochi.sqlite3",
+        "ZeroContext: test Python"
+      ],
+      "problemMatcher": [],
+      "detail": "Passo 6: giochi.py verify (ogni schema contro la sua origine) e i test Python di ZeroContext (ranking, penalità, plurali, potatura)."
+    },
+    {
+      "label": "ZeroContext: test Python",
+      "type": "process",
+      "command": "${workspaceFolder}/gioco-zeroassociations/.venv/Scripts/python.exe",
+      "args": ["-B", "-m", "unittest", "discover", "-s", "script", "-p", "test_*.py"],
+      "options": { "cwd": "${workspaceFolder}/gioco-zerocontext" },
+      "problemMatcher": []
+    },
+    {
       "label": "Parole: audit lessicale e NLP dei DB",
       "type": "process",
       "command": "${workspaceFolder}/gioco-zeroassociations/.venv/Scripts/python.exe",

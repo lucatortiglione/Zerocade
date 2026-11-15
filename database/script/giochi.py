@@ -78,6 +78,7 @@ CREATE TABLE vocab(idx INTEGER PRIMARY KEY, word TEXT NOT NULL UNIQUE) STRICT;
 CREATE TABLE secrets(word TEXT PRIMARY KEY REFERENCES vocab(word)) STRICT, WITHOUT ROWID;
 CREATE TABLE links(secret_idx INTEGER NOT NULL REFERENCES vocab(idx), word_idx INTEGER NOT NULL REFERENCES vocab(idx),
   PRIMARY KEY(secret_idx, word_idx), CHECK(secret_idx <> word_idx)) STRICT, WITHOUT ROWID;
+CREATE TABLE hubs(idx INTEGER PRIMARY KEY REFERENCES vocab(idx), penalty INTEGER NOT NULL CHECK(penalty >= 0)) STRICT;
 CREATE TABLE meta(name TEXT PRIMARY KEY, value TEXT NOT NULL) STRICT;
 '''
 # Quello che ZeroAssociazioni e ZeroReazioniACatena usano, e nient'altro: i prompt, ogni parola una volta sola e i
@@ -149,16 +150,23 @@ def write_wordle(lists: dict[int, tuple[list[str], list[str]]], meta: dict) -> i
         path.unlink(missing_ok=True)
 
 
-def write_context(vocab: list[str], secrets: list[str], meta: dict, links: list[tuple[int, int]] = ()) -> int:
+def write_context(vocab: list[str], secrets: list[str], meta: dict, links: list[tuple[int, int]] = (),
+                  hubs: list[int] | None = None) -> int:
     """Le parole di ZeroContext (nell'ordine dei vettori) e le parole segrete diventano lo schema context.
 
     links: per ogni parola segreta, le parole che ZeroAssociazioni le associa (indici di vocab): nella classifica
-    di quel round salgono di meta['link_boost'] (gioco-zerocontext/script/build_context_data.py)."""
+    di quel round salgono di meta['link_boost'] (gioco-zerocontext/script/build_context_data.py).
+    hubs: per ogni parola (nell'ordine di vocab) la penalità di genericità, sottratta dal suo punteggio in ogni
+    classifica (gioco-zerocontext/script/hubness.py); senza, nessuna parola è penalizzata."""
     path, con = _temp_db(CONTEXT_SCHEMA)
     try:
         con.executemany('INSERT INTO vocab VALUES(?,?)', list(enumerate(vocab)))
         con.executemany('INSERT INTO secrets VALUES(?)', [(w,) for w in sorted(set(secrets))])
         con.executemany('INSERT INTO links VALUES(?,?)', sorted(set(links)))
+        if hubs is not None:
+            if len(hubs) != len(vocab):
+                raise ValueError('Una penalità per ogni parola del vocabolario')
+            con.executemany('INSERT INTO hubs VALUES(?,?)', [(i, int(p)) for i, p in enumerate(hubs)])
         con.executemany('INSERT INTO meta VALUES(?,?)', [(k, json.dumps(v)) for k, v in meta.items()])
         con.commit()
         con.close()

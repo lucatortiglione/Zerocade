@@ -2264,6 +2264,8 @@ export interface ClientToServerEvents {
   'context:tournament': (command: TournamentCommand, ack: (reply: TournamentReply) => void) => void
   'context:tournament-history': (ack: (history: TournamentSummary[]) => void) => void
   'context:tournament-standings': (id: string, ack: (rows: TournamentRow[] | null) => void) => void
+  // Deletes the finished tournaments from the history: one (id) or all (null). Answers how many were deleted.
+  'context:tournament-history-delete': (id: string | null, ack: (deleted: number) => void) => void
 }
 
 export type ClientType = 'dashboard' | 'overlay'

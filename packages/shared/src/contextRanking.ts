@@ -30,6 +30,9 @@ export interface ContextRankSource {
   // rise by `linkBoost`, in the scale of the vectors' dot product. Empty when the server has no links.
   links: Map<number, number[]>
   linkBoost: number
+  // Each word's "genericity" penalty, in the scale of the dot product (gioco-zerocontext/script/hubness.py): words that
+  // are close to almost everything (autista, medico...) lose it in every ranking. null: no word is penalised.
+  hubs?: Int32Array | null
 }
 export interface ContextData extends ContextVocabulary, Omit<ContextRankSource, 'wordCount'> {}
 
@@ -37,6 +40,7 @@ export interface ContextData extends ContextVocabulary, Omit<ContextRankSource, 
 export interface ContextLinks {
   boost: number
   links: Record<string, number[]>
+  hubs?: number[]
 }
 
 export const fold = (s: string) => s.normalize('NFD').replace(/[\u0300-\u036f]/g, '')
@@ -99,7 +103,16 @@ export function parseContextData(vocab: string, vectors: ArrayBuffer, secrets: s
       if (linkBoost && inside(s)) links.set(s, [...new Set(list.filter((i): i is number => inside(i) && i !== s))])
     }
   }
-  return { words, dim, vectors: flat, secrets: secretIdx, index, folded, links, linkBoost }
+  let hubs: Int32Array | null = null
+  const given = linked && typeof linked === 'object' && !Array.isArray(linked) ? Reflect.get(linked, 'hubs') : undefined
+  if (given !== undefined) {
+    // One non-negative integer per word; anything else is a build of other data, not to be trusted.
+    if (!Array.isArray(given) || given.length !== words.length ||
+        given.some((p) => !Number.isInteger(p) || p < 0 || p > CONTEXT_LIMITS.maxBoost))
+      throw new ContextError('data', 'Penalità di ZeroContext non valide.')
+    hubs = Int32Array.from(given as number[])
+  }
+  return { words, dim, vectors: flat, secrets: secretIdx, index, folded, links, linkBoost, hubs }
 }
 
 // The word a chat comment names, or -1: one word only, in any case, with or without accents.
@@ -141,7 +154,13 @@ export function rankAgainst(data: ContextData | ContextRankSource, secret: numbe
     for (let d = 0; d < dim; d++) dot += vectors[o + d] * vectors[s0 + d]
     sims[i] = dot
   }
-  // The words people associate with the secret count as closer than their vectors alone say.
+  // Words close to almost everything count as less close (the same for every secret), then the words people
+  // associate with the secret count as closer than their vectors alone say.
+  const hubs = data.hubs ?? null
+  if (hubs) {
+    if (hubs.length !== n) throw new ContextError('data', 'Penalità e vocabolario ZeroContext non corrispondono.')
+    for (let i = 0; i < n; i++) sims[i] -= hubs[i]
+  }
   for (const i of data.links.get(secret) ?? []) sims[i] += data.linkBoost
   sims[secret] = Infinity
   const order = new Uint32Array(n)

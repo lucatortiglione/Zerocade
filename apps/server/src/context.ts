@@ -36,6 +36,19 @@ function linksOf(db: ReturnType<typeof openSchema>, boost: number, wordCount: nu
   return { boost, links }
 }
 
+// Each word's genericity penalty (table hubs, in the order of the vocabulary), or none: a database built before it
+// existed has no such table, and no word is penalised.
+function hubsOf(db: ReturnType<typeof openSchema>, wordCount: number): number[] | undefined {
+  if (!db.prepare("SELECT 1 FROM sqlite_temp_master WHERE name = 'hubs'").get()) return undefined
+  const hubs: number[] = []
+  for (const { idx, penalty } of db.prepare<[], { idx: number; penalty: number }>('SELECT idx, penalty FROM hubs ORDER BY idx').iterate()) {
+    if (idx !== hubs.length || !Number.isInteger(penalty) || penalty < 0 || penalty > CONTEXT_LIMITS.maxBoost) throw new Error('invalid hubs')
+    hubs.push(penalty)
+  }
+  if (hubs.length !== wordCount) throw new Error('hubs do not match vocabulary')
+  return hubs
+}
+
 function fromDatabase(): Map<string, Buffer> | null {
   if (!giochiDb) return null
   try {
@@ -70,7 +83,7 @@ function fromDatabase(): Map<string, Buffer> | null {
           ['vocab.txt', Buffer.from(vocab.join('\n') + '\n', 'utf-8')],
           ['secrets.txt', Buffer.from(secrets.join('\n') + '\n', 'utf-8')],
           ['meta.json', Buffer.from(JSON.stringify(meta, null, 2) + '\n', 'utf-8')],
-          ['links.json', Buffer.from(JSON.stringify(linksOf(db, boost, vocab.length)), 'utf-8')],
+          ['links.json', Buffer.from(JSON.stringify({ ...linksOf(db, boost, vocab.length), hubs: hubsOf(db, vocab.length) }), 'utf-8')],
         ])
         for (const [name, buffer] of files) if (buffer.byteLength > budgets[name]) throw new Error(`${name} too large`)
         return files

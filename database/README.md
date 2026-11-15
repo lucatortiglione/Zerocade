@@ -8,7 +8,7 @@ indici, viste e trigger. Gli altri file `.sqlite3` di questa cartella, a che cos
 | Schema | Gioco | Contenuto | Chi lo scrive |
 | --- | --- | --- | --- |
 | `wordle` | ZeroWordle | `solutions`, `words` (5-8 lettere), `meta` | `gioco-zerowordle/script/build_wordle_bank.py` |
-| `context` | ZeroContext | `vocab` (nell'ordine dei vettori), `secrets`, `links` (per ogni parola segreta, le parole che ZeroAssociazioni le associa), `meta` | `gioco-zerocontext/script/build_context_data.py` |
+| `context` | ZeroContext | `vocab` (nell'ordine dei vettori), `secrets`, `links` (per ogni parola segreta, le parole che ZeroAssociazioni le associa), `hubs` (la penalità di genericità di ogni parola), `meta` | `gioco-zerocontext/script/build_context_data.py` |
 | `associazioni` | ZeroAssociazioni, ZeroReazioniACatena | `prompts`, `words` (ogni parola una volta sola), `prompt_words` (i collegamenti), `meaning_groups`, `difficulties`, `conflicts`, `meta`: i bacini verificati, vedi sotto | `script/giochi.py aggiorna associazioni`, dal DB di lavoro `parole_ita_raw.sqlite3` |
 | `parole` | ZeroWords | `words` (parola, Zipf, livello), `blocklist`, `meta` (capitoli e curva di difficoltà) | `script/giochi.py aggiorna parole`, dai file di `gioco-parole` |
 | `contenuti` | gli altri giochi dell'overlay | `items` (gioco, posizione, elemento JSON) | `script/giochi.py aggiorna contenuti`, da `apps/server/src/content.seed.json` |

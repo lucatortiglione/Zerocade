@@ -382,6 +382,24 @@ export class ContextTournamentStore {
         roundId: (r.round_id as string | null) ?? null }))
   }
 
+  // "Elimina storico" (asked 15/11/2026): finished tournaments (completed or cancelled) of the room, with their rounds,
+  // guesses, points, players and registry: all of them, or just `id`. One still shown on screen (`keep`) and any
+  // open one stay. Returns how many were deleted.
+  deleteFinished(roomKey: string, id: string | null, keep: string | null): number {
+    return this.db.transaction(() => {
+      const ids = (this.db.prepare(`SELECT id FROM context_tournaments WHERE room_key = ? AND status IN ('completed','cancelled')
+        AND (? IS NULL OR id = ?) AND id IS NOT ?`).all(roomKey, id, id, keep) as Row[]).map((r) => r.id as string)
+      for (const t of ids) {
+        for (const table of ['context_tournament_guesses', 'context_tournament_round_scores'])
+          this.db.prepare(`DELETE FROM ${table} WHERE round_id IN (SELECT id FROM context_tournament_rounds WHERE tournament_id = ?)`).run(t)
+        for (const table of ['context_tournament_rounds', 'context_tournament_players', 'context_tournament_audit'])
+          this.db.prepare(`DELETE FROM ${table} WHERE tournament_id = ?`).run(t)
+        this.db.prepare('DELETE FROM context_tournaments WHERE id = ?').run(t)
+      }
+      return ids.length
+    })()
+  }
+
   // The room's tournaments, latest first (§13.2: the history stays available).
   history(roomKey: string, limit = 50): TournamentSummary[] {
     const list = (this.db.prepare('SELECT * FROM context_tournaments WHERE room_key = ? ORDER BY created_at DESC LIMIT ?').all(roomKey, limit) as Row[])

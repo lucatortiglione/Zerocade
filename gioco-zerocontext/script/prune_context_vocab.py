@@ -40,6 +40,14 @@ def prune(vocab: list[str], vectors: np.ndarray, secrets: list[str], links: list
             sorted((renumber[s], renumber[w]) for s, w in links if s in renumber and w in renumber))
 
 
+def current_hubs() -> list[int] | None:
+    """Le penalità di genericità pubblicate, nell'ordine del vocabolario (None se il DB non le ha)."""
+    with closing(sqlite3.connect(giochi.FILE.resolve().as_uri() + '?mode=ro', uri=True)) as con:
+        if not con.execute("SELECT 1 FROM sqlite_schema WHERE name = 'context__hubs'").fetchone():
+            return None
+        return [p for p, in con.execute('SELECT penalty FROM context__hubs ORDER BY idx')]
+
+
 def current() -> tuple[list[str], list[str], list[tuple[int, int]], dict]:
     with closing(sqlite3.connect(giochi.FILE.resolve().as_uri() + '?mode=ro', uri=True)) as con:
         vocab = [w for w, in con.execute('SELECT word FROM context__vocab ORDER BY idx')]
@@ -61,6 +69,9 @@ def main() -> None:
     vectors = raw.reshape(len(vocab), dim)
     excluded = pure_plurals(vocab, RAW)
     new_vocab, new_vectors, new_secrets, new_links = prune(vocab, vectors, secrets, links, set(excluded))
+    hubs = current_hubs()
+    # Le penalità restano quelle delle parole rimaste, come i vettori (non si ricalcolano per un vicinato un po' più piccolo).
+    new_hubs = None if hubs is None else [h for w, h in zip(vocab, hubs) if w not in excluded]
     removed_secrets = sorted(set(secrets) - set(new_secrets))
     print(f'parole {len(vocab)} -> {len(new_vocab)} (-{len(vocab) - len(new_vocab)} plurali puri)')
     print(f'segrete {len(secrets)} -> {len(new_secrets)} (tolte: {", ".join(removed_secrets) or "nessuna"})')
@@ -76,7 +87,7 @@ def main() -> None:
             shutil.copy2(DATA / name, backup / name)
     new_meta = {**meta, 'words': len(new_vocab), 'secrets': len(new_secrets), 'links': len(new_links)}
     (DATA / 'vectors.bin.part').write_bytes(np.ascontiguousarray(new_vectors).tobytes())
-    giochi.write_context(new_vocab, new_secrets, new_meta, new_links)
+    giochi.write_context(new_vocab, new_secrets, new_meta, new_links, new_hubs)
     (DATA / 'vectors.bin.part').replace(DATA / 'vectors.bin')
     (DATA / 'vocab.txt').write_text('\n'.join(new_vocab) + '\n', encoding='utf-8', newline='\n')
     (DATA / 'secrets.txt').write_text('\n'.join(new_secrets) + '\n', encoding='utf-8', newline='\n')
@@ -84,7 +95,8 @@ def main() -> None:
     grouped: dict[str, list[int]] = {}
     for s, w in new_links:
         grouped.setdefault(str(s), []).append(w)
-    (DATA / 'links.json').write_text(json.dumps({'boost': meta.get('link_boost', 0), 'links': grouped}) + '\n', encoding='utf-8')
+    (DATA / 'links.json').write_text(json.dumps({'boost': meta.get('link_boost', 0), 'links': grouped,
+                                                **({'hubs': new_hubs} if new_hubs is not None else {})}) + '\n', encoding='utf-8')
     report = {'updated_at': datetime.now(timezone.utc).isoformat(), 'kind': 'pruned', 'previous_words': len(vocab),
               'words': len(new_vocab), 'removed_pure_plurals': len(excluded), 'removed_secrets': removed_secrets,
               'secrets': len(new_secrets), 'links': len(new_links), 'dim': dim,
