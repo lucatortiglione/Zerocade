@@ -146,8 +146,9 @@ export function paintContext(ctx: CanvasRenderingContext2D, now: number, width: 
 
       // Chips: tries, best rank and the scale.
       const chips = T?.chips ?? [`${attempts} tentativi`, Number.isFinite(best) ? `migliore #${position(best).toLocaleString('it-IT')}` : 'nessun tentativo', `su ${total.toLocaleString('it-IT')} parole`]
-      ctx.font = '600 16px system-ui'
-      const cw = chips.map((c) => ctx.measureText(c).width + 28)
+      const chipFont = '600 13px system-ui'
+      ctx.font = chipFont
+      const cw = chips.map((c) => ctx.measureText(c).width + 24)
       let cxp = cx - (cw.reduce((a, b) => a + b, 0) + (chips.length - 1) * 10) / 2
       // The tournament shows no tiles until the word is found: how many letters it has is not said.
       // In the tournament the finder's name goes right under the secret word, and the chips and the standings follow.
@@ -161,13 +162,16 @@ export function paintContext(ctx: CanvasRenderingContext2D, now: number, width: 
         else ctx.fillText('Nessuno ha trovato la parola', cx, finderY)
       }
       chips.forEach((c, i) => {
+      // The font is set again: the finder's line above (round over) left the large one, and the chips, measured at the
+      // small size, would be drawn wider than their pills and run into each other.
+      ctx.font = chipFont
         ctx.fillStyle = 'rgba(255,255,255,0.08)'
         ctx.beginPath()
-        ctx.roundRect(cxp, cy, cw[i], 30, 15)
+        ctx.roundRect(cxp, cy, cw[i], 28, 14)
         ctx.fill()
         ctx.fillStyle = '#c4c9e0'
         ctx.textAlign = 'center'
-        ctx.fillText(c, cxp + cw[i] / 2, cy + 20)
+        ctx.fillText(c, cxp + cw[i] / 2, cy + 19)
         cxp += cw[i] + 10
       })
 
