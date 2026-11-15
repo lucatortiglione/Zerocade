@@ -98,6 +98,7 @@ export function createContext(createComputer: () => ContextComputer = () => new 
   type Input = { kind: 'action'; action: string; event: LiveEvent } | { kind: 'finish' }
   let inputs: Input[] = []
   let inputBytes = 0
+  let droppedWarned = false
   let ranking: Ranking | null = null
   let timer = 0
   let revealed = false
@@ -139,9 +140,20 @@ export function createContext(createComputer: () => ContextComputer = () => new 
   }
   const enqueue = (input: Input) => {
     const bytes = 3 * payloadBytes(input, CONTEXT_LIMITS.pendingBytes)
-    if (inputs.length >= CONTEXT_LIMITS.pendingActions || inputBytes + bytes > CONTEXT_LIMITS.pendingBytes) {
-      freeze('Troppi eventi in attesa: round interrotto. Riavvia ZeroContext.'); return
+    if (input.kind === 'finish' && inputs.some((i) => i.kind === 'finish')) return
+    // While the words or the ranking are being prepared the queue is only a courtesy: when it is full the oldest
+    // guesses are dropped (the newest matter more) instead of stopping the game. A real stall is still caught by the
+    // load/rank timeouts, which freeze the game.
+    let dropped = 0
+    while (inputs.length && (inputs.length >= CONTEXT_LIMITS.pendingActions || inputBytes + bytes > CONTEXT_LIMITS.pendingBytes)) {
+      const at = inputs.findIndex((i) => i.kind === 'action')
+      if (at < 0) return // only round-ending commands are queued: nothing worth dropping
+      const [gone] = inputs.splice(at, 1)
+      inputBytes -= 3 * payloadBytes(gone, CONTEXT_LIMITS.pendingBytes)
+      dropped++
     }
+    if (inputBytes + bytes > CONTEXT_LIMITS.pendingBytes) return // a single oversized event
+    if (dropped && !droppedWarned) { droppedWarned = true; console.warn('[zerocontext]', 'Coda piena in attesa del round: scartati i tentativi più vecchi.') }
     inputs.push(structuredClone(input))
     inputBytes += bytes
   }
@@ -318,7 +330,8 @@ export function createContext(createComputer: () => ContextComputer = () => new 
       paused = value
       if (paused) clearInputs()
     },
-    onOverload() { if (active && !frozen) freeze('Troppi eventi in attesa: round interrotto. Riavvia ZeroContext.') },
+    // A burst of chat events (e.g. after a throttled frame) drops the oldest guesses instead of stopping the round.
+    dropOldestOnOverflow: true,
     dispose() {
       active = false
       generation++

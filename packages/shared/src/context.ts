@@ -5,7 +5,7 @@ export const CONTEXT_LIMITS = Object.freeze({
   vocab: 4 * 1024 * 1024, secrets: 512 * 1024, links: 4 * 1024 * 1024,
   linkCount: 500_000, linksPerSecret: 4096, maxBoost: 10_000_000,
   loadMs: 30_000, rankMs: 15_000,
-  pendingActions: 300, pendingBytes: 256 * 1024,
+  pendingActions: 1000, pendingBytes: 1024 * 1024,
   guesses: 10_000, players: 10_000,
 })
 

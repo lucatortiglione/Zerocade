@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import { test, type TestContext } from 'node:test'
-import { Engine, ENGINE_LIMITS, type GameInstance } from '../apps/overlay/src/games/engine.ts'
+import { Engine, ENGINE_HIDDEN_STEP_MS, ENGINE_LIMITS, type GameInstance } from '../apps/overlay/src/games/engine.ts'
 
 function harness(t: TestContext) {
   let next = 0
@@ -73,6 +73,16 @@ test('changing games within a callback cannot deliver the previous frame to its 
   h.engine.pushAction('guess', comment()); h.engine.pushAction('guess', comment())
   h.tick()
   assert.equal(successorActions, 0)
+})
+
+test('without animation frames (a browser source off screen) a timer still steps the game, so the queue never saturates', async (t) => {
+  const h = harness(t)
+  for (let i = 0; i < 10; i++) h.engine.pushAction('guess', comment())
+  await new Promise((resolve) => setTimeout(resolve, ENGINE_HIDDEN_STEP_MS * 3))
+  assert.equal(h.received(), 10)
+  assert.equal(h.disposed(), 0)
+  assert.doesNotMatch(h.messages.join(' '), /Troppi eventi/)
+  assert.equal(h.frames.size, 1, 'the next animation frame is still awaited')
 })
 
 test('participant storage is bounded even when no round ends and the queue is drained each frame', (t) => {
