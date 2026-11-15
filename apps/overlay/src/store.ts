@@ -3,6 +3,7 @@ import { frameNotifications } from '@zerocade/browser-runtime'
 import {
   giftById,
   type BivioState,
+  type ContextTournamentState,
   type GifShow,
   type Gifter,
   type IncastroState,
@@ -13,6 +14,7 @@ import {
 } from '@zerocade/shared'
 import { socket } from './socket'
 import { playSound, stopSounds } from './audio'
+import { noteSecretUse, setSecretUses } from './games/secretUses'
 
 interface OverlayState {
   connected: boolean
@@ -31,6 +33,10 @@ interface OverlayState {
   quizzland: QuizzlandState | null
   // performance.now() when `quizzland` arrived, to count its remainingMs down locally.
   quizzlandAt: number
+  // ZeroContext's tournament, as the server runs it (null: none to show, the classic game plays).
+  contextTournament: ContextTournamentState | null
+  // performance.now() when `contextTournament` arrived, to count its remainingMs down locally.
+  contextTournamentAt: number
   // The creator's latest message, shown for a few seconds; messageSeq keys each one.
   message: string | null
   messageSeq: number
@@ -53,6 +59,8 @@ let state: OverlayState = {
   incastroAt: 0,
   quizzland: null,
   quizzlandAt: 0,
+  contextTournament: null,
+  contextTournamentAt: 0,
   message: null,
   messageSeq: 0,
   gif: null,
@@ -84,6 +92,9 @@ socket.on('dj:stop', () => {
 socket.on('bivio:state', (bivio) => update({ bivio, bivioAt: performance.now() }))
 socket.on('incastro:state', (incastro) => update({ incastro, incastroAt: performance.now() }))
 socket.on('quizzland:state', (quizzland) => update({ quizzland, quizzlandAt: performance.now() }))
+socket.on('context:tournament', (contextTournament) => update({ contextTournament, contextTournamentAt: performance.now() }))
+socket.on('context:secret-uses', (uses) => setSecretUses(uses))
+socket.on('context:secret-used', ({ word, uses }) => noteSecretUse(word, uses))
 
 const MESSAGE_MS = 8000
 let messageTimer: ReturnType<typeof setTimeout> | undefined

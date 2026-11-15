@@ -1,3 +1,4 @@
+import { disposeGameRooms, RoomParticipants } from './gameRooms.js'
 import type {
   GameSettings,
   IncastroChapter,
@@ -145,6 +146,7 @@ type Tally = Omit<IncastroScore, 'levelLongest'>
 type NewMoment = IncastroMoment extends infer M ? (M extends unknown ? Omit<M, 'seq'> : never) : never
 
 class IncastroRoom {
+  private participants = new RoomParticipants()
   // Level number - 1.
   private index = 0
   private level: Level | null = null
@@ -225,6 +227,7 @@ class IncastroRoom {
     private emitSolution: (solution: IncastroSolution) => void,
     // The level's right answers whenever they change (see answers()); `fresh` for a new level.
     private emitAnswers: (answers: string[], fresh: boolean) => void,
+    private issue: (message: string) => void,
   ) {
     // From where this overlay key stopped last time.
     this.startLevel((incastroLevel(this.key) ?? 1) - 1)
@@ -262,6 +265,7 @@ class IncastroRoom {
 
   action(action: string, event: LiveEvent): void {
     if (!this.watched || this.paused) return
+    if (!this.participants.accept(event.user.id, this.issue)) return
     const by: IncastroPlayer = { id: event.user.id, nickname: event.user.nickname, avatar: event.user.avatar }
     if (action === 'guess') return this.guess(event)
     if (action === 'shuffle') {
@@ -380,12 +384,16 @@ class IncastroRoom {
   }
 
   dispose(): void {
-    if (this.phase === 'playing') this.endPlay('left', null)
-    this.emitAnswers([], false)
+    this.watched = false
+    this.participants.clear()
     this.loading++
     clearTimeout(this.timer)
     clearTimeout(this.hintTimer)
     clearTimeout(this.emitTimer)
+    // Callbacks/persistence may fail; owned timers and late loads are already
+    // invalidated before invoking anything outside the room.
+    if (this.phase === 'playing') this.endPlay('left', null)
+    this.emitAnswers([], false)
   }
 
   snapshot(): IncastroState {
@@ -490,8 +498,10 @@ class IncastroRoom {
       (level) => {
         if (ticket === this.loading) this.begin(level)
       },
-      () => {
+      (error: unknown) => {
         if (ticket !== this.loading) return
+        console.warn('[zerowords] Preparazione del livello fallita', error)
+        this.issue('Impossibile preparare il livello di ZeroWords. Seleziona nuovamente il gioco per riprovare.')
         this.phase = 'empty'
         this.emitNow()
       },
@@ -954,6 +964,7 @@ export class IncastroRooms {
     private emit: (key: string, state: IncastroState) => void,
     private emitSolution: (key: string, solution: IncastroSolution) => void,
     private emitAnswers: (key: string, answers: string[], fresh: boolean) => void,
+    private issue: (key: string, message: string) => void = (_key, message) => console.warn('[zerowords]', message),
   ) {}
 
   // Starts the game for a key if needed and wakes it up if it was suspended.
@@ -966,6 +977,7 @@ export class IncastroRooms {
         (state) => this.emit(key, state),
         (solution) => this.emitSolution(key, solution),
         (answers, fresh) => this.emitAnswers(key, answers, fresh),
+        (message) => this.issue(key, message),
       )
       this.rooms.set(key, room)
     }
@@ -977,7 +989,10 @@ export class IncastroRooms {
   }
 
   close(key: string): void {
-    this.rooms.get(key)?.dispose()
+    const room = this.rooms.get(key)
     this.rooms.delete(key)
+    room?.dispose()
   }
+
+  closeAll(): void { disposeGameRooms(this.rooms) }
 }

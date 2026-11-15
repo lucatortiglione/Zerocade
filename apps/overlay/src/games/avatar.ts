@@ -1,5 +1,6 @@
 // Shared circular avatar renderer, used by the quiz/picture games.
 const avatarCache = new Map<string, HTMLImageElement>()
+const AVATAR_CACHE_LIMIT = 256
 
 // The viewer's picture in a ringed disc. Without one (Twitch), or until it loads, a grey
 // disc, with the viewer's initial when `name` is given.
@@ -9,12 +10,22 @@ export function drawAvatar(ctx: CanvasRenderingContext2D, url: string | undefine
   ctx.arc(x, y, r, 0, Math.PI * 2)
   ctx.clip()
   let img = url ? avatarCache.get(url) : undefined
-  if (url && !img) {
+  if (url && url.length <= 4096 && !img) {
+    if (avatarCache.size >= AVATAR_CACHE_LIMIT) {
+      const oldest = avatarCache.entries().next().value
+      if (oldest) {
+        oldest[1].src = '' // Cancel an in-flight image before evicting it.
+        avatarCache.delete(oldest[0])
+      }
+    }
     img = new Image()
     // Like the pictures in the page (referrerPolicy="no-referrer"): TikTok's picture server
     // can turn away a request that comes with another site's address.
     img.referrerPolicy = 'no-referrer'
     img.src = url
+    avatarCache.set(url, img)
+  } else if (url && img) {
+    avatarCache.delete(url)
     avatarCache.set(url, img)
   }
   if (img && img.complete && img.naturalWidth > 0) {

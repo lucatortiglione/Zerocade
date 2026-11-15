@@ -9,7 +9,7 @@ const root = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const files = []
 async function collect(path) {
   for (const item of await readdir(path, { withFileTypes: true })) {
-    if (['node_modules', 'dist', 'data', 'games'].includes(item.name)) continue
+    if (['node_modules', 'dist', 'data'].includes(item.name)) continue
     const target = join(path, item.name)
     if (item.isDirectory()) await collect(target)
     else if (/\.(tsx?|m?js)$/.test(item.name)) files.push(target)

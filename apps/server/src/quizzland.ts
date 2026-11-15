@@ -1,4 +1,5 @@
 import { randomUUID } from 'node:crypto'
+import { disposeGameRooms, RoomParticipants } from './gameRooms.js'
 import { openSource, sourceReady, zeroQuizzDb } from './schema-db.js'
 import Database from 'better-sqlite3'
 import {
@@ -172,6 +173,7 @@ interface Ballot {
 }
 
 class QuizzlandRoom {
+  private participants = new RoomParticipants()
   private deck: Question[] = []
   private current: Question | null = null
   // Position on screen -> index of the current question's options.
@@ -206,6 +208,7 @@ class QuizzlandRoom {
     private settings: GameSettings,
     private emit: (state: QuizzlandState) => void,
     private emitSolution: (solution: QuizzlandSolution) => void,
+    private issue: (message: string) => void,
   ) {
     this.buildDeck()
     this.startRound()
@@ -213,6 +216,7 @@ class QuizzlandRoom {
 
   action(action: string, event: LiveEvent): void {
     if (!this.watched) return
+    if (!this.participants.accept(event.user.id, this.issue)) return
     if (action === 'answer') this.answer(event)
     else if (action === 'fifty') this.fifty(playerOf(event.user))
     else if (action === 'extra_time') this.addTime(EXTRA_TIME_MS)
@@ -284,6 +288,8 @@ class QuizzlandRoom {
   }
 
   dispose(): void {
+    this.watched = false
+    this.participants.clear()
     clearTimeout(this.timer)
     clearTimeout(this.emitTimer)
   }
@@ -522,6 +528,7 @@ export class QuizzlandRooms {
   constructor(
     private emit: (key: string, state: QuizzlandState) => void,
     private emitSolution: (key: string, solution: QuizzlandSolution) => void,
+    private issue: (key: string, message: string) => void = (_key, message) => console.warn('[zeroquizz]', message),
   ) {}
 
   // Starts the game for a key if needed and wakes it up if it was suspended.
@@ -533,6 +540,7 @@ export class QuizzlandRooms {
         settings,
         (state) => this.emit(key, state),
         (solution) => this.emitSolution(key, solution),
+        (message) => this.issue(key, message),
       )
       this.rooms.set(key, room)
     }
@@ -544,9 +552,12 @@ export class QuizzlandRooms {
   }
 
   close(key: string): void {
-    this.rooms.get(key)?.dispose()
+    const room = this.rooms.get(key)
     this.rooms.delete(key)
+    room?.dispose()
   }
+
+  closeAll(): void { disposeGameRooms(this.rooms) }
 }
 
 // --- Collected answers ---

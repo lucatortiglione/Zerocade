@@ -142,7 +142,11 @@ test('the shipped data is consistent: vectors match the vocabulary and neighbour
     JSON.parse(contextFile('links.json')!.toString('utf-8')),
   )
   assert.ok(real.secrets.length > 5000)
-  assert.ok(real.words.length > 100_000, `expanded vocabulary: ${real.words.length}`)
+  // About 101 000 words before the pure plurals left the vocabulary (15/11/2026: 11 924 of them, gatti, case, ...).
+  assert.ok(real.words.length > 85_000, `expanded vocabulary: ${real.words.length}`)
+  for (const plural of ['gatti', 'case', 'abati']) assert.equal(lookup(real, plural), -1, `pure plural out: ${plural}`)
+  // The secret's plural still wins, without a row of its own.
+  assert.equal(lookup(real, 'gatti', real.index.get('gatto')!), real.index.get('gatto'))
   for (const word of ['zuccheriera', 'videochiamare', 'mostriciattolo'])
     assert.notEqual(lookup(real, word), -1, `new playable word: ${word}`)
   // Most secrets have words tied to them, and every link names a secret and a playable word.

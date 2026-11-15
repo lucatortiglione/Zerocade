@@ -26,15 +26,15 @@ export const zeroDubbiDb = [join(here, 'ZeroDubbi.sqlite3'), join(here, '..', '.
   (p) => existsSync(p),
 )
 
-export function openSchema(file: string, schema: string): Database.Database {
+export function openOptionalSchema(file: string, schema: string): Database.Database | null {
   const db = new Database(file, { readonly: true, fileMustExist: true })
-  db.pragma('busy_timeout = 5000')
   try {
+    db.pragma('busy_timeout = 5000')
     const verified = db.prepare("SELECT value FROM zerodb_meta WHERE name = 'verified'").pluck().get()
     if (verified !== '1') throw new Error(`${file} not verified`)
     // Views too: a schema can keep a table's old name as a view over smaller tables (associazioni.associations).
     const tables = db.prepare("SELECT name FROM zerodb_objects WHERE schema = ? AND type IN ('table', 'view')").pluck().all(schema) as string[]
-    if (!tables.length) throw new Error(`${file} has no schema ${schema}`)
+    if (!tables.length) { db.close(); return null }
     // Names in double quotes, a quote inside doubled: they come from the file, not from the code.
     const quoted = (name: string) => `"${name.replaceAll('"', '""')}"`
     for (const t of tables) db.exec(`CREATE TEMP VIEW ${quoted(t)} AS SELECT * FROM ${quoted(`${schema}__${t}`)}`)
@@ -45,16 +45,26 @@ export function openSchema(file: string, schema: string): Database.Database {
   }
 }
 
+export function openSchema(file: string, schema: string): Database.Database {
+  const db = openOptionalSchema(file, schema)
+  if (!db) throw new Error(`${file} has no schema ${schema}`)
+  return db
+}
+
 // A plain database file, or `file#schema`.
 export const openSource = (source: string): Database.Database => {
-  if (!source.includes('#')) return new Database(source, { readonly: true, fileMustExist: true })
-  const [file, schema] = source.split('#')
+  if (!source.includes('#') || existsSync(source)) return new Database(source, { readonly: true, fileMustExist: true })
+  const separator = source.lastIndexOf('#')
+  const file = source.slice(0, separator), schema = source.slice(separator + 1)
   return openSchema(file, schema)
 }
 
 // Whether the source can be opened: the file is there and, for a schema, has it.
 export function sourceReady(source: string): boolean {
-  const [file, schema] = source.split('#')
+  if (existsSync(source)) return true
+  const separator = source.lastIndexOf('#')
+  const file = separator < 0 ? source : source.slice(0, separator)
+  const schema = separator < 0 ? '' : source.slice(separator + 1)
   if (!existsSync(file)) return false
   if (!schema) return true
   try {

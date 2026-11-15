@@ -2,6 +2,7 @@ import gc
 import sqlite3
 import tempfile
 import unittest
+from contextlib import closing
 from pathlib import Path
 
 from schemadb import SchemaDb, rewrite
@@ -73,8 +74,11 @@ class SchemaDbTest(unittest.TestCase):
         ro = db.connect(f'file:{self.b.as_posix()}?mode=ro', uri=True)
         self.assertEqual(ro.execute('SELECT id FROM domande').fetchall(), [('x1',)])
         # the old files are untouched, another file is an ordinary database
-        self.assertEqual(sqlite3.connect(self.a).execute('SELECT count(*) FROM domande').fetchone(), (1,))
-        self.assertIsInstance(db.connect(self.a.parent / 'altro.db'), sqlite3.Connection)
+        with closing(sqlite3.connect(self.a)) as original, closing(db.connect(self.a.parent / 'altro.db')) as other:
+            self.assertEqual(original.execute('SELECT count(*) FROM domande').fetchone(), (1,))
+            self.assertIsInstance(other, sqlite3.Connection)
+        ro.close()
+        con.close()
 
     def test_a_table_a_tool_creates_joins_the_schema(self):
         db = self.built()
@@ -86,6 +90,7 @@ class SchemaDbTest(unittest.TestCase):
         again = db.connect(self.a)
         self.assertEqual(again.execute('SELECT testo FROM note').fetchall(), [('ciao',)])
         self.assertIn('note', db.names_of('uno'))
+        again.close()
 
     def test_legacy_switch_and_unverified_file(self):
         self.db.build({'uno': self.a, 'due': self.b})
@@ -201,6 +206,45 @@ class SchemaDbTest(unittest.TestCase):
         self.assertIn("d.testo = 'domande'", out)
         self.assertEqual(rewrite("SELECT 1 FROM sqlite_schema WHERE name = 'opzioni'", 'uno', names),
                          "SELECT 1 FROM sqlite_schema WHERE name = 'uno__opzioni'")
+
+    def test_paths_with_uri_characters_still_address_the_unified_schema(self):
+        folder = Path(self.tmp.name) / "dati #20% dell'utente"
+        folder.mkdir()
+        source = folder / 'domande.db'
+        make(source, [("INSERT INTO domande VALUES('q1','Prima',1)", ())])
+        db = SchemaDb(folder / 'giochi.sqlite3', {source: 'uno'}, 'TEST_SCHEMADB')
+        db.build({'uno': source})
+        self.assertEqual(db.verify({'uno': source}), [])
+        with closing(db.connect(source)) as con, con:
+            con.execute("INSERT INTO domande VALUES('q2','Seconda',2)")
+        with closing(db.connect(Path(db.address('uno')).as_uri() + '?mode=ro', uri=True)) as con:
+            self.assertEqual(con.execute('SELECT count(*) FROM domande').fetchone(), (2,))
+        with closing(sqlite3.connect(source)) as con:
+            self.assertEqual(con.execute('SELECT count(*) FROM domande').fetchone(), (1,))
+        self.assertEqual(db.export_schema('uno', folder / 'export.db')['domande'], 2)
+
+    def test_failed_exports_never_publish_a_partial_database(self):
+        db = self.built()
+        target = Path(self.tmp.name) / 'export.db'
+        with self.assertRaises(SystemExit):
+            db.export_schema('unknown', target)
+        self.assertFalse(target.exists())
+        with closing(sqlite3.connect(db.file)) as con, con:
+            con.execute('DROP TABLE uno__opzioni')
+        with self.assertRaises(KeyError):
+            db.export_schema('uno', target)
+        self.assertFalse(target.exists())
+        self.assertEqual(list(target.parent.glob(target.name + '.*.part')), [])
+
+    def test_unsupported_object_names_fail_before_replacing_a_schema(self):
+        db = self.built()
+        source = Path(self.tmp.name) / 'invalid.db'
+        with closing(sqlite3.connect(source)) as con:
+            con.execute('CREATE TABLE "bad name"(id INTEGER)')
+        with self.assertRaisesRegex(ValueError, 'nomi'):
+            db.import_schema(source, 'uno')
+        with closing(db.connect(self.a)) as con:
+            self.assertEqual(con.execute('SELECT testo FROM domande').fetchall(), [('Capitale?',)])
 
 
 if __name__ == '__main__':

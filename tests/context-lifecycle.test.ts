@@ -5,7 +5,7 @@ import { Engine } from '../apps/overlay/src/games/engine.ts'
 import { parseContextData, rankAgainst, type ContextData, type Ranking } from '../apps/overlay/src/games/contextRanking.ts'
 import type { ContextComputer } from '../apps/overlay/src/games/contextProtocol.ts'
 import { inlineContextComputer, settleContext } from './helpers/inlineContextComputer.ts'
-import { ContextError } from '../packages/shared/src/context.ts'
+import { ContextError } from '@zerocade/shared'
 
 const cat = parseContextData('gatto\ngatti\nmare\n', new Int8Array([100, 0, 95, 30, 0, 100]).buffer, 'gatto\n')
 const sea = parseContextData('mare\nonda\n', new Int8Array([100, 0, 95, 30]).buffer, 'mare\n')

@@ -52,3 +52,28 @@ test('after the attempts the games start with no content instead of waiting fore
     assert.deepEqual(c.wordsFor('quiz'), [])
   })
 })
+
+test('oversized and malformed banks never enter game state', async () => {
+  for (const answer of [() => new Response('small', { headers: { 'content-length': '99999999' } }), () => new Response('{"quiz":{}}')]) {
+    let calls = 0
+    await withFetch(async () => { calls++; return answer() }, async () => {
+      const c = await fresh()
+      await c.loadContent(1)
+      assert.equal(calls, 3)
+      assert.deepEqual(c.wordsFor('quiz'), [])
+    })
+  }
+})
+
+test('one failing subscriber cannot turn a successful bank load into a failed request for all games', async (t) => {
+  t.mock.method(console, 'warn', () => {})
+  await withFetch(async () => new Response('{"quiz":["x"]}'), async () => {
+    const c = await fresh()
+    let notified = false
+    c.subscribeContent(() => { throw new Error('render failure') })
+    c.subscribeContent(() => { notified = true })
+    await c.loadContent(1)
+    assert.equal(notified, true)
+    assert.deepEqual(c.wordsFor('quiz'), ['x'])
+  })
+})

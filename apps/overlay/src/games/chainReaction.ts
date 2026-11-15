@@ -5,7 +5,8 @@ import { drawAvatar, fillTextWithAvatar } from './avatar'
 import { addPoints, clamp, drawTimerBar, newScores, topOf } from './common'
 import { KEY_START_CLUES, dominoOpen, keyValue, nextHint, pickChain, pickKey, readWord, wordValue } from './chainLogic'
 import { fold } from './contextRanking'
-import { followSecret, reportSecret } from './roomSecret'
+import { followSecret, reportSecret, type RoomSecret } from './roomSecret'
+import { GAME_BANK_LIMITS, loadChainBank, type ChainBankKind } from './gameBanks'
 import { roundCheer } from '../audio'
 
 // ZeroReazioniACatena: words linked by verified associations, in three modes that take turns (by default
@@ -19,29 +20,6 @@ import { roundCheer } from '../audio'
 // ZeroAssociazioni's verified pools); the round in play, with its mode and number, is shared by the room's
 // overlays (roomSecret.ts) and shown to the creator.
 
-type ListKind = 'walks' | 'keys'
-const URLS: Record<ListKind, string> = { walks: '/api/chains', keys: '/api/chains/keys' }
-// failedAt: when the last download failed (performance.now()), null if none did; it is tried again after RETRY_MS.
-const lists: Record<ListKind, { data: string[][] | null; loading: Promise<string[][]> | null; failedAt: number | null }> = {
-  walks: { data: null, loading: null, failedAt: null },
-  keys: { data: null, loading: null, failedAt: null },
-}
-
-function load(kind: ListKind): Promise<string[][]> {
-  const list = lists[kind]
-  list.loading ??= fetch(URLS[kind])
-    .then((r) => (r.ok ? (r.json() as Promise<string[][]>) : Promise.reject(new Error(kind))))
-    .then((data) => {
-      list.failedAt = null
-      return (list.data = data)
-    })
-    .catch((err) => {
-      list.failedAt = performance.now()
-      list.loading = null
-      throw err
-    })
-  return list.loading
-}
 
 // Seconds the new mode's card stays up before its first round starts.
 const INTRO_SECS = 4
@@ -59,7 +37,16 @@ interface Slot {
   at: number // when it was solved (performance.now), for its entrance
 }
 
-export function createChainReaction(): GameInstance {
+export function createChainReaction(secret: RoomSecret = { follow: followSecret, report: reportSecret }, loadBank = loadChainBank): GameInstance {
+  const lists: Record<ChainBankKind, { data: string[][] | null; failedAt: number | null; attempts: number }> = {
+    walks: { data: null, failedAt: null, attempts: 0 }, keys: { data: null, failedAt: null, attempts: 0 },
+  }
+  let revision = 0
+  let disposed = false
+  let request: AbortController | null = null
+  let detach: (() => void) | undefined
+  let paused = false
+  let deferred: (() => void) | undefined
   let width = 0
   let height = 0
   let modeSetting = 'rotate'
@@ -116,24 +103,40 @@ export function createChainReaction(): GameInstance {
   // A new round: the one the room is playing (`forced`), or the next of this overlay's count in the mode
   // the settings give it, reported to the server.
   const startRound = (forced?: ChainRound) => {
-    if (waiting) return
+    if (disposed) return
+    if (forced) { revision++; request?.abort(); waiting = false; deferred = undefined }
+    else if (waiting) return
+    if (paused) { deferred = () => startRound(forced); return }
     const nextRound = forced ? forced.round : round + 1
     let nextMode = forced ? forced.mode : chainModeFor(modeSetting, nextRound, perMode)
     // Without the clues (the server could not build them) a "Parola chiave" round plays a chain, until they can be
     // asked for again.
-    if (!forced && nextMode === 'chiave' && !retryDue(lists.keys.failedAt, performance.now())) nextMode = 'catena'
-    const kind: ListKind = nextMode === 'chiave' ? 'keys' : 'walks'
+    if (!forced && nextMode === 'chiave' && (lists.keys.data?.length === 0 || lists.keys.attempts >= GAME_BANK_LIMITS.attempts || !retryDue(lists.keys.failedAt, performance.now()))) nextMode = 'catena'
+    const kind: ChainBankKind = nextMode === 'chiave' ? 'keys' : 'walks'
     if (!forced && !lists[kind].data) {
       // update calls again every frame: retryDue spaces the downloads after a failure.
-      if (!retryDue(lists[kind].failedAt, performance.now())) return
+      if (lists[kind].attempts >= GAME_BANK_LIMITS.attempts || !retryDue(lists[kind].failedAt, performance.now())) return
+      const ticket = ++revision
+      const controller = new AbortController()
+      request = controller
+      lists[kind].attempts++
       waiting = true
-      void load(kind)
-        .then(() => {
-          waiting = false
-          startRound()
+      void loadBank(kind, controller.signal)
+        .then((bank) => {
+          if (disposed || ticket !== revision || controller.signal.aborted) return
+          lists[kind].data = bank
+          lists[kind].failedAt = null
+          lists[kind].attempts = 0
+          const apply = () => { waiting = false; startRound() }
+          if (paused) deferred = apply
+          else apply()
         })
-        .catch(() => {
+        .catch((error: unknown) => {
+          if (disposed || ticket !== revision || controller.signal.aborted) return
+          controller.abort()
+          lists[kind].failedAt = performance.now()
           waiting = false
+          console.warn('[catene] Caricamento della banca fallito', error)
         })
       return
     }
@@ -166,7 +169,7 @@ export function createChainReaction(): GameInstance {
     roundClock = 0
     hintClock = 0
     intro = switched ? INTRO_SECS : 0
-    if (!forced) reportSecret(id, prev)
+    if (!forced) secret.report(id, prev)
   }
 
   // The words a guess or a letter can go to: in "Effetto domino" only the next one of the chain.
@@ -214,7 +217,27 @@ export function createChainReaction(): GameInstance {
   }
 
   return {
+    dispose() {
+      disposed = true
+      revision++
+      request?.abort()
+      detach?.()
+      detach = undefined
+      deferred = undefined
+      lists.walks.data = null
+      lists.keys.data = null
+    },
+    setPaused(value) {
+      paused = value
+      if (!paused && !disposed) { const apply = deferred; deferred = undefined; apply?.() }
+    },
     reset(settings, w, h) {
+      revision++
+      request?.abort()
+      detach?.()
+      disposed = false
+      deferred = undefined
+      for (const list of Object.values(lists)) { list.attempts = 0; list.failedAt = null }
       width = w
       height = h
       read(settings)
@@ -223,7 +246,7 @@ export function createChainReaction(): GameInstance {
       id = ''
       round = 0
       waiting = false
-      followSecret({
+      detach = secret.follow({
         adopt(adopted) {
           const r = adopted !== id ? parseChainSecret(adopted) : null
           if (r) startRound(r)
@@ -232,7 +255,7 @@ export function createChainReaction(): GameInstance {
       startRound()
     },
     onAction(action, event) {
-      if (!slots.length || finished) return
+      if (disposed || paused || !slots.length || finished) return
       if (action === 'reveal_letter') return hint()
       if (action === 'reveal_word') return revealWord()
       // Nobody can read the words while the new mode's card covers them.
@@ -252,6 +275,7 @@ export function createChainReaction(): GameInstance {
       if (complete) finish(user, false, mode === 'chiave' ? pts : bonus)
     },
     update(dt, _now, settings) {
+      if (disposed || paused) return
       read(settings)
       if (!slots.length) return startRound()
       if (finished) {
@@ -328,7 +352,7 @@ export function createChainReaction(): GameInstance {
       ctx.fillStyle = '#9aa0b8'
       ctx.font = '24px system-ui'
       const dots = '.'.repeat(1 + (Math.floor(now / 400) % 3))
-      ctx.fillText(lists.walks.failedAt !== null ? 'Nessuna catena disponibile (schema associazioni)' : `Carico le catene${dots}`, cx, top + 130)
+      ctx.fillText(lists.walks.data?.length === 0 ? 'Nessuna catena disponibile.' : lists.walks.failedAt !== null ? 'Caricamento delle catene non riuscito.' : `Carico le catene${dots}`, cx, top + 130)
       return
     }
 

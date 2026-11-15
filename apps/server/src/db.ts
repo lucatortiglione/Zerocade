@@ -20,6 +20,7 @@ import {
   type SourceKind,
 } from '@zerocade/shared'
 import { REPORT_MAX_BYTES } from './csv.js'
+import { ContextTournamentStore } from './context-tournament-db.js'
 
 // Local persistence via better-sqlite3 (latest stable SQLite engine). The DB file
 // lives in apps/server/data and is gitignored; set ZEROCADE_DB to override the path.
@@ -920,3 +921,20 @@ export const recentCreators = (limit: number): FeedCreator[] =>
   (creatorsRecent.all(limit) as (Omit<FeedCreator, 'viewers'> & { viewers: number | null })[]).map(({ viewers, ...c }) =>
     viewers === null ? c : { ...c, viewers },
   )
+
+// ZeroContext's tournaments (context-tournament-db.ts): their own tables here, apart from the ordinary leaderboards.
+export const contextTournamentStore = new ContextTournamentStore(db)
+
+// ZeroContext: how many times each secret word has come out (a classic round or a tournament round), so new rounds
+// choose words never played (decided 15/11/2026).
+db.exec(`CREATE TABLE IF NOT EXISTS context_secret_uses (
+  word TEXT PRIMARY KEY,
+  uses INTEGER NOT NULL CHECK (uses >= 1),
+  last_used_at INTEGER NOT NULL
+) WITHOUT ROWID`)
+const secretUse = db.prepare(`INSERT INTO context_secret_uses (word, uses, last_used_at) VALUES (?, 1, ?)
+  ON CONFLICT (word) DO UPDATE SET uses = uses + 1, last_used_at = excluded.last_used_at RETURNING uses`)
+// One more round with `word`; the new count.
+export const recordContextSecretUse = (word: string, at = Date.now()): number => (secretUse.get(word, at) as { uses: number }).uses
+export const contextSecretUses = (): Record<string, number> =>
+  Object.fromEntries((db.prepare('SELECT word, uses FROM context_secret_uses').all() as { word: string; uses: number }[]).map((r) => [r.word, r.uses]))

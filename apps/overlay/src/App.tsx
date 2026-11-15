@@ -10,12 +10,15 @@ import { Widgets } from './Widgets'
 import { Bivio } from './Bivio'
 import { Incastro } from './Incastro'
 import { Quizzland } from './Quizzland'
+import { ContextTournament } from './ContextTournament'
 import { isContentReady, loadContent, subscribeContent } from './content'
 import { ScoreTicker } from './ScoreTicker'
 
 
 export function App() {
-  const { connected, session, message, messageSeq, gif, gifSeq, incastro, quizzland } = useOverlay()
+  const { connected, session, message, messageSeq, gif, gifSeq, incastro, quizzland, contextTournament } = useOverlay()
+  // ZeroContext's tournament is the server's (ContextTournament): the classic game does not run under it.
+  const tournamentOn = session?.gameId === 'context' && Boolean(contextTournament)
   const contentReady = useSyncExternalStore(subscribeContent, isContentReady)
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const engineRef = useRef<Engine | null>(null)
@@ -56,7 +59,7 @@ export function App() {
   // A restart (`run`) starts the game afresh; an ended session shows nothing until it is started again.
   useEffect(() => {
     if (!session || !contentReady) return
-    if (session.ended) {
+    if (session.ended || tournamentOn) {
       engineRef.current?.clear()
       return
     }
@@ -64,7 +67,7 @@ export function App() {
     const instance = game ? createGame(game.id) : null
     if (game && instance) engineRef.current?.setGame(instance, session.settings)
     else engineRef.current?.clear()
-  }, [session?.gameId, session?.run, session?.ended, contentReady])
+  }, [session?.gameId, session?.run, session?.ended, contentReady, tournamentOn])
 
   useEffect(() => {
     engineRef.current?.setPaused(Boolean(session?.paused))
@@ -80,8 +83,9 @@ export function App() {
   // joins) shows over the game by itself: the Alerts widget does that, when the creator turns it on.
   useEffect(() => {
     const dispatch = (event: LiveEvent) => {
-      const { session } = overlaySnapshot()
+      const { session, contextTournament } = overlaySnapshot()
       if (!session || session.paused || session.ended) return
+      if (session.gameId === 'context' && contextTournament) return // the tournament takes no actions from here
       if (GAMES.some((g) => g.id === session.gameId)) {
         for (const t of triggersFor(activeTriggers(session), event)) engineRef.current?.pushAction(t.action, event)
       }
@@ -109,6 +113,7 @@ export function App() {
       {session?.gameId === 'zerodubbi' && <Bivio />}
       {session?.gameId === 'incastro' && <Incastro />}
       {session?.gameId === 'quizzland' && <Quizzland />}
+      {tournamentOn && <ContextTournament />}
       <header className="overlay__top">
         <span className="overlay__brand">{game?.emoji ?? '🎮'}</span>
         <span className="overlay__title">{game?.name ?? 'Zerocade'}</span>
@@ -128,7 +133,7 @@ export function App() {
         </div>
       )}
 
-      {session && game && (
+      {session && game && !tournamentOn && (
         <footer className="overlay__guide">
           {activeTriggers(session).map((t, i) => {
             const s = describeSource(t.source)

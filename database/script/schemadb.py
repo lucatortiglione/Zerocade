@@ -12,6 +12,7 @@ import os
 import re
 import sqlite3
 import tempfile
+from contextlib import closing
 from datetime import datetime, timezone
 from pathlib import Path
 from urllib.parse import unquote
@@ -72,9 +73,11 @@ def deprefix(text: str, schema: str) -> str:
     return re.sub(rf'\b{re.escape(schema)}{SEP}(?=[A-Za-z_])', '', text)
 
 
-def _objects(con: sqlite3.Connection) -> list[tuple[str, str, str, str]]:
+def _objects(con: sqlite3.Connection, database: str = 'main') -> list[tuple[str, str, str, str]]:
+    if database not in ('main', 'src'):
+        raise ValueError('Database di introspezione sconosciuto')
     return con.execute(
-        "SELECT type,name,tbl_name,sql FROM sqlite_schema WHERE name NOT LIKE 'sqlite_%' AND sql IS NOT NULL"
+        f"SELECT type,name,tbl_name,sql FROM {database}.sqlite_schema WHERE name NOT LIKE 'sqlite_%' AND sql IS NOT NULL"
     ).fetchall()
 
 
@@ -174,10 +177,13 @@ class SchemaDb:
         (gioco-dilemmi/data/domande.db, …), che vale ancora."""
         _, text, _ = self._split_uri(path)
         try:
+            legacy = self.schemas.get(Path(text).resolve())
+            if legacy is not None:
+                return legacy
             if '#' in text:
                 file, _, schema = text.rpartition('#')
                 return schema if Path(file).resolve() == self.file.resolve() and schema in self.schemas.values() else None
-            return self.schemas.get(Path(text).resolve())
+            return None
         except OSError:
             return None
 
@@ -188,7 +194,7 @@ class SchemaDb:
         if '#' in text:
             file, _, schema = text.rpartition('#')
             legacy = {s: p for p, s in self.schemas.items()}.get(schema)
-            if legacy is not None and Path(file).name == self.file.name:
+            if legacy is not None and Path(file).resolve() == self.file.resolve():
                 return prefix + (legacy.as_posix() if prefix else str(legacy)) + query
         return str(path)
 
@@ -196,7 +202,7 @@ class SchemaDb:
         if os.environ.get(self.legacy_env, '').lower() == 'legacy' or not self.file.exists():
             return False
         try:
-            con = sqlite3.connect(f'file:{self.file.as_posix()}?mode=ro', uri=True)
+            con = sqlite3.connect(self.file.resolve().as_uri() + '?mode=ro', uri=True)
             try:
                 row = con.execute("SELECT value FROM zerodb_meta WHERE name='verified'").fetchone()
             finally:
@@ -206,7 +212,7 @@ class SchemaDb:
         return bool(row) and row[0] == '1'
 
     def names_of(self, schema: str) -> set[str]:
-        con = sqlite3.connect(f'file:{self.file.as_posix()}?mode=ro', uri=True)
+        con = sqlite3.connect(self.file.resolve().as_uri() + '?mode=ro', uri=True)
         try:
             return {n for (n,) in con.execute('SELECT name FROM zerodb_objects WHERE schema=?', (schema,))}
         finally:
@@ -218,9 +224,10 @@ class SchemaDb:
         if schema is None:
             return sqlite3.connect(self.file_of(path), uri=uri, **kwargs)
         readonly = 'mode=ro' in str(path)
-        con = sqlite3.connect(f'file:{self.file.as_posix()}' + ('?mode=ro' if readonly else ''), uri=True, factory=_Connection, **kwargs)
+        names = self.names_of(schema)
+        con = sqlite3.connect(self.file.resolve().as_uri() + ('?mode=ro' if readonly else ''), uri=True, factory=_Connection, **kwargs)
         con.schema = schema
-        con.names = self.names_of(schema)
+        con.names = names
         return con
 
     def exists(self, path) -> bool:
@@ -270,15 +277,16 @@ class SchemaDb:
 
     def _copy_in(self, con: sqlite3.Connection, schema: str, source: Path) -> int:
         """Lo schema `schema` diventa il contenuto del DB `source` (dentro una transazione già aperta)."""
-        src = sqlite3.connect(f'file:{Path(source).as_posix()}?mode=ro', uri=True)
-        objs = _objects(src)
+        # Introspect the attached snapshot used for the copy, not a second connection.
+        objs = _objects(con, 'src')
         names = {n for _, n, *_ in objs}
+        if not re.fullmatch(IDENT, schema) or any(not re.fullmatch(IDENT, n) for n in names):
+            raise ValueError('Schema o nomi degli oggetti SQLite non supportati')
         for t, table, *_ in objs:
             if t == 'table':
-                clash = {r[1] for r in src.execute(f'PRAGMA table_info("{table}")')} & names
+                clash = {r[1] for r in con.execute(f'PRAGMA src.table_info("{table}")')} & names
                 if clash:
                     raise SystemExit(f'{source}: la tabella {table} ha colonne che si chiamano come oggetti: {sorted(clash)}')
-        src.close()
         for kind in ('trigger', 'view', 'index', 'table'):
             for (name,) in con.execute('SELECT name FROM zerodb_objects WHERE schema=? AND type=?', (schema, kind)).fetchall():
                 con.execute(f'DROP {kind.upper()} IF EXISTS "{prefixed(schema, name)}"')
@@ -336,12 +344,11 @@ class SchemaDb:
         target, self.file = self.file, Path(tmp)
         try:
             counts = {schema: self.import_schema(src, schema) for schema, src in sources.items()}
-            con = sqlite3.connect(self.file)
-            con.execute("INSERT OR REPLACE INTO zerodb_meta VALUES('built_at',?)", (datetime.now(timezone.utc).isoformat(),))
-            con.execute("INSERT OR REPLACE INTO zerodb_meta VALUES('verified','0')")
-            con.commit()
-            con.execute('VACUUM')
-            con.close()
+            with closing(sqlite3.connect(self.file)) as con:
+                con.execute("INSERT OR REPLACE INTO zerodb_meta VALUES('built_at',?)", (datetime.now(timezone.utc).isoformat(),))
+                con.execute("INSERT OR REPLACE INTO zerodb_meta VALUES('verified','0')")
+                con.commit()
+                con.execute('VACUUM')
             os.replace(self.file, target)
         finally:
             self.file = target
@@ -351,66 +358,68 @@ class SchemaDb:
     def verify(self, sources: dict[str, Path], mark: bool = True) -> list[str]:
         """Ogni tabella deve avere lo stesso contenuto del vecchio DB d'origine."""
         problems = []
-        con = sqlite3.connect(f'file:{self.file.as_posix()}?mode=ro', uri=True)
-        for schema, path in sources.items():
-            src = sqlite3.connect(f'file:{Path(path).as_posix()}?mode=ro', uri=True)
-            tables = [n for t, n, *_ in _objects(src) if t == 'table']
-            for table in tables:
-                if _digest(src, table) != _digest(con, prefixed(schema, table)):
-                    problems.append(f'{schema}.{table}: contenuto diverso')
-            src.close()
-        if con.execute('PRAGMA foreign_key_check').fetchall():
-            problems.append('foreign_key_check: violazioni')
-        con.close()
+        with closing(sqlite3.connect(self.file.resolve().as_uri() + '?mode=ro', uri=True)) as con:
+            for schema, path in sources.items():
+                with closing(sqlite3.connect(Path(path).resolve().as_uri() + '?mode=ro', uri=True)) as src:
+                    tables = [n for t, n, *_ in _objects(src) if t == 'table']
+                    for table in tables:
+                        if _digest(src, table) != _digest(con, prefixed(schema, table)):
+                            problems.append(f'{schema}.{table}: contenuto diverso')
+            if con.execute('PRAGMA foreign_key_check').fetchall():
+                problems.append('foreign_key_check: violazioni')
         if mark and not problems:
             self.mark_verified()
         return problems
 
     def mark_verified(self) -> None:
-        rw = sqlite3.connect(self.file)
-        rw.execute("INSERT OR REPLACE INTO zerodb_meta VALUES('verified','1')")
-        rw.execute("INSERT OR REPLACE INTO zerodb_meta VALUES('verified_at',?)", (datetime.now(timezone.utc).isoformat(),))
-        rw.commit()
-        rw.close()
+        with closing(sqlite3.connect(self.file)) as rw, rw:
+            rw.execute("INSERT OR REPLACE INTO zerodb_meta VALUES('verified','1')")
+            rw.execute("INSERT OR REPLACE INTO zerodb_meta VALUES('verified_at',?)", (datetime.now(timezone.utc).isoformat(),))
 
     def export_schema(self, schema: str, output: Path) -> dict[str, int]:
         """Uno schema come DB a sé, senza prefissi (com'era il vecchio file)."""
         output = Path(output)
         if output.exists():
             raise SystemExit(f'{output} esiste già')
-        con = sqlite3.connect(f'file:{self.file.as_posix()}?mode=ro', uri=True)
-        rows = con.execute('SELECT name,type FROM zerodb_objects WHERE schema=?', (schema,)).fetchall()
-        if not rows:
-            raise SystemExit(f'Schema sconosciuto: {schema}')
-        sql_of = dict(con.execute("SELECT name,sql FROM sqlite_schema WHERE name LIKE ? ESCAPE '\\'", (schema + '\\_\\_%',)))
-        out = sqlite3.connect(output, isolation_level=None)
-        counts = {}
-        out.execute('BEGIN')
-        for name, t in rows:
-            if t == 'table':
-                out.execute(deprefix(sql_of[prefixed(schema, name)], schema))
-        for name, t in rows:
-            if t == 'table':
-                cols = insertable(con, prefixed(schema, name))
-                marks = ','.join('?' * (cols.count(',') + 1))
-                cur = con.execute(f'SELECT {cols} FROM "{prefixed(schema, name)}"')
-                while batch := cur.fetchmany(5000):
-                    out.executemany(f'INSERT INTO "{name}"({cols}) VALUES({marks})', batch)
-                counts[name] = out.execute(f'SELECT count(*) FROM "{name}"').fetchone()[0]
-        for kind in ('index', 'view', 'trigger'):
-            for name, t in rows:
-                if t == kind:
-                    out.execute(deprefix(sql_of[prefixed(schema, name)], schema))
-        out.execute('COMMIT')
-        out.close()
-        con.close()
-        return counts
+        fd, tmp = tempfile.mkstemp(prefix=output.name + '.', suffix='.part', dir=output.parent)
+        os.close(fd)
+        try:
+            with closing(sqlite3.connect(self.file.resolve().as_uri() + '?mode=ro', uri=True)) as con:
+                rows = con.execute('SELECT name,type FROM zerodb_objects WHERE schema=?', (schema,)).fetchall()
+                if not rows:
+                    raise SystemExit(f'Schema sconosciuto: {schema}')
+                sql_of = dict(con.execute("SELECT name,sql FROM sqlite_schema WHERE name LIKE ? ESCAPE '\\'", (schema + '\\_\\_%',)))
+                counts = {}
+                with closing(sqlite3.connect(tmp)) as out, out:
+                    out.execute('BEGIN')
+                    for name, t in rows:
+                        if t == 'table':
+                            out.execute(deprefix(sql_of[prefixed(schema, name)], schema))
+                    for name, t in rows:
+                        if t == 'table':
+                            cols = insertable(con, prefixed(schema, name))
+                            marks = ','.join('?' * (cols.count(',') + 1))
+                            cur = con.execute(f'SELECT {cols} FROM "{prefixed(schema, name)}"')
+                            while batch := cur.fetchmany(5000):
+                                out.executemany(f'INSERT INTO "{name}"({cols}) VALUES({marks})', batch)
+                            counts[name] = out.execute(f'SELECT count(*) FROM "{name}"').fetchone()[0]
+                    for kind in ('index', 'view', 'trigger'):
+                        for name, t in rows:
+                            if t == kind:
+                                out.execute(deprefix(sql_of[prefixed(schema, name)], schema))
+                    if out.execute('PRAGMA integrity_check').fetchall() != [('ok',)]:
+                        raise sqlite3.DatabaseError('Export SQLite non integro')
+                    if out.execute('PRAGMA foreign_key_check').fetchall():
+                        raise sqlite3.IntegrityError('Export SQLite con riferimenti non validi')
+            os.link(tmp, output)  # Never replace an existing output, including a concurrent export.
+            return counts
+        finally:
+            Path(tmp).unlink(missing_ok=True)
 
     def status(self) -> dict:
-        con = sqlite3.connect(f'file:{self.file.as_posix()}?mode=ro', uri=True)
-        info = {'file': str(self.file), 'bytes': self.file.stat().st_size, 'meta': dict(con.execute('SELECT name,value FROM zerodb_meta')), 'schemas': {}}
-        for schema, source, copied in con.execute('SELECT name,source_file,copied_at FROM zerodb_schemas ORDER BY name'):
-            tables = con.execute("SELECT name,rows FROM zerodb_objects WHERE schema=? AND type='table' ORDER BY name", (schema,)).fetchall()
-            info['schemas'][schema] = {'source': source, 'copied_at': copied, 'tables': dict(tables)}
-        con.close()
-        return info
+        with closing(sqlite3.connect(self.file.resolve().as_uri() + '?mode=ro', uri=True)) as con:
+            info = {'file': str(self.file), 'bytes': self.file.stat().st_size, 'meta': dict(con.execute('SELECT name,value FROM zerodb_meta')), 'schemas': {}}
+            for schema, source, copied in con.execute('SELECT name,source_file,copied_at FROM zerodb_schemas ORDER BY name'):
+                tables = con.execute("SELECT name,rows FROM zerodb_objects WHERE schema=? AND type='table' ORDER BY name", (schema,)).fetchall()
+                info['schemas'][schema] = {'source': source, 'copied_at': copied, 'tables': dict(tables)}
+            return info

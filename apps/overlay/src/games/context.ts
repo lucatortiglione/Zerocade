@@ -5,7 +5,8 @@ import { ContextWorkerClient } from './contextWorkerClient'
 import type { ContextComputer } from './contextProtocol'
 import type { GameInstance } from './engine'
 import { paintContext, type ContextGuess as Guess, type ContextTypedGuess } from './contextView'
-import { addPoints, clamp, newScores, shuffled, topOf, type Score } from './common'
+import { addPoints, clamp, newScores, topOf, type Score } from './common'
+import { freshSecret, noteSecretUse } from './secretUses'
 import {
   closerHint,
   lookup,
@@ -98,7 +99,6 @@ export function createContext(createComputer: () => ContextComputer = () => new 
   let inputs: Input[] = []
   let inputBytes = 0
   let ranking: Ranking | null = null
-  let bag: number[] = []
   let timer = 0
   let revealed = false
   let revealAt = 0
@@ -157,8 +157,10 @@ export function createContext(createComputer: () => ContextComputer = () => new 
     }
     if (preparing && forced === requestedSecret) return
     if (preparing) clearInputs() // A different room word supersedes an unannounced round.
-    if (forced === undefined && bag.length === 0) bag = shuffled(data.secrets)
-    const secret = forced ?? bag.pop()!
+    // A word that never came out in this Zerocade while there is one (secretUses), counted here at once so the next
+    // round does not take it again before the server's count arrives.
+    const secret = forced ?? freshSecret(data.secrets, data.words, lastSecret)
+    if (forced === undefined) noteSecretUse(data.words[secret])
     requestedSecret = secret
     const ticket = ++roundRevision
     const life = generation
@@ -332,7 +334,6 @@ export function createContext(createComputer: () => ContextComputer = () => new 
       closest = []
       taken.clear()
       typed = []
-      bag = []
       scores.clear()
       leaders = []
       clearInputs()
@@ -368,7 +369,6 @@ export function createContext(createComputer: () => ContextComputer = () => new 
       matchOver = false
       scores.clear()
       leaders = []
-      bag = []
       ranking = null
       pending = null
       unfollow = room.follow({

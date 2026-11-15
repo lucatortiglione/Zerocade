@@ -4,6 +4,9 @@
 
 ## Ingegnerizzazione secondo DIRETTIVE.md — audit del 14 novembre 2026
 
+Prosecuzione del 15 novembre, estesa anche ai sorgenti dei giochi:
+[correzioni, limiti e verifiche eseguite](docs/DIRETTIVE-sorgenti-giochi-2026-11-15.md).
+
 Aggiornamento infrastrutturale successivo: [rapporto con evidenze e limiti](docs/DIRETTIVE-audit-2026-11-14.md).
 Implementati worker di persistenza/report, trasporto browser in worker, limiti/cancellazione, media atomici,
 retry ZFB, readiness e correzione EventSub con token utente, follow v2, keepalive e reconnect.

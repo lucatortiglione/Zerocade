@@ -11,6 +11,21 @@ const { InfrastructureClient } = await import('../apps/server/src/infrastructure
 const { closeDb, insertGameScore } = await import('../apps/server/src/db.ts')
 after(() => closeDb())
 
+test('concurrent infrastructure close calls share one drain of all accepted writes', async () => {
+  const writer = new InfrastructureClient('close-once', 64)
+  await writer.run('barrier', null)
+  const accepted = Array.from({ length: 12 }, (_, n) => writer.run('event', {
+    key: 'close-once', creator: '', game: 'context', event: { type: 'comment', user: { id: 'a', nickname: 'Tester' }, text: String(n) },
+  }))
+  const closing = writer.close()
+  assert.equal(writer.close(), closing)
+  await Promise.all(accepted)
+  await closing
+  assert.equal(writer.metrics().queued, 0)
+  assert.equal(writer.metrics().unknownOutcomes, 0)
+  assert.equal(writer.close(), closing)
+})
+
 test('live persistence and reports run on separate real threads, with ordered commits and read barriers', async () => {
   const writer = new InfrastructureClient('test-writer', 256)
   const reader = new InfrastructureClient('test-reader', 16)

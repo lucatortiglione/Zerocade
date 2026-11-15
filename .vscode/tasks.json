@@ -60,6 +60,21 @@
       "detail": "1) fonti nuove: parole in raw.inventory_terms e inventory_attestations; 2) fonti già importate: confronto in raw.inventory_updates; 3) elenco da decidere. Poi 'Fonti: integra, scarta o rimanda un aggiornamento' (APPLY) porta le parole nuove nell'inventario e rinfresca filtrati e validi."
     },
     {
+      "label": "1a)Parole: normalizza (plurali puri: si tiene il singolare)",
+      "type": "process",
+      "command": "${workspaceFolder}/gioco-zeroassociations/.venv/Scripts/python.exe",
+      "args": [
+        "-B",
+        "script/normalize_words.py",
+        "apply"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}/gioco-zeroassociations"
+      },
+      "problemMatcher": [],
+      "detail": "Cerca nel DB di lavoro i plurali puri (singolare presente nella raccolta, prova di plurale in GLAFF, Morph-it, Flex-it, UD o Kaikki, nessun'altra lettura) e li registra come DISCARDED in raw.inventory_term_decisions, con il singolare nel motivo e nello storico. Non tocca le decisioni prese da una persona o da una revisione; ritira le proprie se la parola non è più un plurale puro. Rilanciabile. Poi il task 3 li porta nello schema scartati e toglie le voci da filtrati e validi. Solo conteggio, senza scrivere: python script/normalize_words.py plan."
+    },
+    {
       "label": "Parole: audit lessicale e NLP dei DB",
       "type": "process",
       "command": "${workspaceFolder}/gioco-zeroassociations/.venv/Scripts/python.exe",

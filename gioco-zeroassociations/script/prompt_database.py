@@ -22,6 +22,7 @@ import tempfile
 from prompt_policy import load_prompt_policy
 from semantic_rules import SEMANTIC_POLICY, SOURCE_ONLY_REASON, WORD_CHECKS
 from sqlite_prompt_runtime import SQLite, VERSION, literal, publish_database
+from taxonomy_source import DEFAULT_TAXONOMY, read_taxonomy_rows
 
 ROOT = Path(__file__).resolve().parent.parent
 # La raccolta: inventario, fonti, aggiornamenti, decisioni e bacini (gigabyte, fuori da Git).
@@ -74,8 +75,7 @@ def required_text(value, minimum=1):
 
 
 def load_categories():
-    with (ROOT/'tassonomia_word_association_it_172_categorie_v3_6_0.csv').open(encoding='utf-8',newline='') as stream:
-        rows=list(csv.DictReader(stream))
+    rows=read_taxonomy_rows(DEFAULT_TAXONOMY)
     rows+=json.loads((ROOT/'resources/prompt_category_extensions.json').read_text(encoding='utf-8'))
     result={row['category_id']:{k:row[k] for k in ('category_id','category_name','cluster_id','cluster_name')} for row in rows}
     if len(result)!=len(rows):raise ValueError('ID categoria duplicati')

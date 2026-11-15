@@ -90,6 +90,21 @@ test('JSON boundaries reject malformed widgets; arbitrary JSON inputs do not thr
   assert.ok(payloadBytes('è'.repeat(1000)) >= 2000)
 })
 
+test('queue budgets count binary backing stores, maps and sets before cloning', () => {
+  const buffer = new ArrayBuffer(32_768)
+  assert.ok(payloadBytes(buffer, 1024) > 1024)
+  const weight = payloadBytes({ a: new Uint8Array(buffer, 0, 1), b: new DataView(buffer) })
+  assert.ok(weight >= buffer.byteLength)
+  assert.ok(weight < buffer.byteLength + 512, 'shared backing stores count once')
+  assert.ok(payloadBytes(new Map([['key', 'x'.repeat(2000)]]), 512) > 512)
+  assert.ok(payloadBytes(new Set(['x'.repeat(2000)]), 512) > 512)
+  let reads = 0
+  const wide = {}
+  for (let i = 0; i < 1000; i++) Object.defineProperty(wide, String(i), { enumerable: true, get() { reads++; return 'value' } })
+  assert.ok(payloadBytes(wide, 512) > 512)
+  assert.ok(reads < 20, 'stop before visiting every property of a wide object')
+})
+
 test('external image metadata is bounded and malformed code points cannot crash parsing; CSV cannot start a formula', () => {
   const item = '<item><enclosure url="https://www.nasa.gov/a.jpg" type="image/jpeg"/><title>&#99999999999999999;</title><link>javascript:alert(1)</link></item>'
   const parsed = parseFeed(item.repeat(1000))

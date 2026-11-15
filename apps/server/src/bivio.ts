@@ -1,4 +1,5 @@
 import { randomUUID } from 'node:crypto'
+import { disposeGameRooms, RoomParticipants } from './gameRooms.js'
 import { openSource, sourceReady, zeroDubbiDb } from './schema-db.js'
 import { writeFileSync } from 'node:fs'
 import { join } from 'node:path'
@@ -140,6 +141,7 @@ const CROWD_KEPT = BIVIO_CROWD_SIZE * 4
 const MAX_PHASE_MS = 600_000
 
 class BivioRoom {
+  private participants = new RoomParticipants()
   private deck: Dilemma[] = []
   private current: Dilemma | null = null
   private roundId = ''
@@ -164,6 +166,7 @@ class BivioRoom {
     private key: string,
     private settings: GameSettings,
     private emit: (state: BivioState) => void,
+    private issue: (message: string) => void,
   ) {
     this.buildDeck()
     this.startRound()
@@ -171,6 +174,7 @@ class BivioRoom {
 
   action(action: string, event: LiveEvent): void {
     if (!this.watched) return
+    if (!this.participants.accept(event.user.id, this.issue)) return
     if (action === 'vote') this.vote(event)
     else if (action === 'extra_time') this.addTime(EXTRA_TIME_MS)
     else if (action === 'next') this.startRound()
@@ -235,6 +239,8 @@ class BivioRoom {
   }
 
   dispose(): void {
+    this.watched = false
+    this.participants.clear()
     clearTimeout(this.timer)
     clearTimeout(this.emitTimer)
   }
@@ -396,13 +402,14 @@ class BivioRoom {
 export class BivioRooms {
   private rooms = new Map<string, BivioRoom>()
 
-  constructor(private emit: (key: string, state: BivioState) => void) {}
+  constructor(private emit: (key: string, state: BivioState) => void,
+    private issue: (key: string, message: string) => void = (_key, message) => console.warn('[zerodubbi]', message)) {}
 
   // Starts the game for a key if needed and wakes it up if it was suspended.
   open(key: string, settings: GameSettings): BivioState {
     let room = this.rooms.get(key)
     if (!room) {
-      room = new BivioRoom(key, settings, (state) => this.emit(key, state))
+      room = new BivioRoom(key, settings, (state) => this.emit(key, state), (message) => this.issue(key, message))
       this.rooms.set(key, room)
     }
     return room.watch()
@@ -413,9 +420,12 @@ export class BivioRooms {
   }
 
   close(key: string): void {
-    this.rooms.get(key)?.dispose()
+    const room = this.rooms.get(key)
     this.rooms.delete(key)
+    room?.dispose()
   }
+
+  closeAll(): void { disposeGameRooms(this.rooms) }
 }
 
 // --- Collected answers ---

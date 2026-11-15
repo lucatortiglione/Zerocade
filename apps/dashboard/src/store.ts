@@ -4,6 +4,7 @@ import {
   EMPTY_LIVE_STATS,
   type BivioState,
   type BridgeStatus,
+  type ContextTournamentAdmin,
   type FeedEvent,
   type Gifter,
   type IncastroMoment,
@@ -48,6 +49,12 @@ interface DashboardState {
   quizzlandSolution: QuizzlandSolution | null
   // ZeroContext's secret word of the round in play.
   gameSecret: string | null
+  // ZeroContext's tournament as its organiser sees it (secret, full standings), and the last refused command.
+  tournament: ContextTournamentAdmin | null
+  tournamentAt: number
+  tournamentError: string | null
+  // ZeroContext: how many times each secret word has come out (classic and tournament rounds).
+  secretUses: Record<string, number>
   pads: PadBoard | null
   // The live events of this room, oldest first.
   feed: FeedItem[]
@@ -69,6 +76,10 @@ let state: DashboardState = {
   quizzland: null,
   quizzlandSolution: null,
   gameSecret: null,
+  tournament: null,
+  tournamentAt: 0,
+  tournamentError: null,
+  secretUses: {},
   pads: null,
   feed: [],
   stats: EMPTY_LIVE_STATS,
@@ -138,6 +149,10 @@ socket.on('incastro:solution', (incastroSolution) => update({ incastroSolution }
 socket.on('quizzland:state', (quizzland) => update({ quizzland }))
 socket.on('quizzland:solution', (quizzlandSolution) => update({ quizzlandSolution }))
 socket.on('pads:state', (pads) => update({ pads }))
+socket.on('context:tournament-admin', (tournament) => update({ tournament, tournamentAt: performance.now() }))
+socket.on('context:tournament-error', ({ message }) => update({ tournamentError: message }))
+socket.on('context:secret-uses', (secretUses) => update({ secretUses }))
+socket.on('context:secret-used', ({ word, uses }) => update({ secretUses: { ...state.secretUses, [word]: uses } }))
 
 function subscribe(listener: () => void) {
   listeners.add(listener)
@@ -148,3 +163,6 @@ function subscribe(listener: () => void) {
 }
 
 export const useDashboard = () => useSyncExternalStore(subscribe, () => state)
+
+// The organiser has read the tournament's error: it goes away.
+export const clearTournamentError = () => update({ tournamentError: null })

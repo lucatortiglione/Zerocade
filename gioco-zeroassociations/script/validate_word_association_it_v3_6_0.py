@@ -21,6 +21,7 @@ import unicodedata
 from typing import Any, Mapping
 from semantic_rules import (SEMANTIC_POLICY, WORD_CHECKS, SET_CHECKS,
                             qa_word_checks_valid, screen_set, SOURCE_ONLY_REASON, adjective_attachment)
+from taxonomy_source import TAXONOMY_COLUMNS, TAXONOMY_FILENAME, LEGACY_TAXONOMY_FILENAME, read_taxonomy_rows
 
 TOKEN_PATTERN = re.compile(r"[a-zàèéìòù]+\Z")
 FUNCTION_POS = frozenset({"DET", "PRON", "ADP", "CCONJ", "SCONJ", "AUX", "PART", "INTJ", "SYM", "PUNCT", "X", "NUM"})
@@ -294,36 +295,28 @@ def norm(s: str) -> str:
 
 
 
-TAXONOMY_COLUMNS = ['category_id','cluster_id','cluster_name','category_name','example_prompts','quota_status']
-TAXONOMY_FILENAME = 'tassonomia_word_association_it_172_categorie_v3_6_0.csv'
-
-
 def load_taxonomy(path: Path) -> dict[str, dict[str, str]]:
     """Verifica il catalogo ufficiale e restituisce category_id => record."""
-    with path.open(encoding='utf-8-sig', newline='') as f:
-        rdr = csv.DictReader(f)
-        if list(rdr.fieldnames or []) != TAXONOMY_COLUMNS:
-            raise ValueError(f'Intestazione tassonomia non valida: {rdr.fieldnames!r}')
-        entries = {}
-        categories = set()
-        clusters = {}
-        for line, row in enumerate(rdr, 2):
-            cid=row['category_id']
-            if not re.fullmatch(r'[0-9]{3}', cid):
-                raise ValueError(f'Riga {line}: category_id deve essere a 3 cifre: {cid!r}')
-            if cid in entries:
-                raise ValueError(f'Riga {line}: category_id duplicato: {cid}')
-            title=row['category_name'].strip()
-            if not title or title.casefold() in categories:
-                raise ValueError(f'Riga {line}: nome categoria vuoto o duplicato: {title!r}')
-            categories.add(title.casefold())
-            cluster=row['cluster_id'].strip()
-            if not re.fullmatch(r'[A-P]',cluster):
-                raise ValueError(f'Riga {line}: cluster_id non valido: {cluster!r}')
-            if cluster in clusters and clusters[cluster]!=row['cluster_name']:
-                raise ValueError(f'Riga {line}: nome cluster incoerente')
-            clusters[cluster]=row['cluster_name']
-            entries[cid]=row
+    entries = {}
+    categories = set()
+    clusters = {}
+    for line, row in enumerate(read_taxonomy_rows(path), 2):
+        cid=row['category_id']
+        if not re.fullmatch(r'[0-9]{3}', cid):
+            raise ValueError(f'Riga {line}: category_id deve essere a 3 cifre: {cid!r}')
+        if cid in entries:
+            raise ValueError(f'Riga {line}: category_id duplicato: {cid}')
+        title=row['category_name'].strip()
+        if not title or title.casefold() in categories:
+            raise ValueError(f'Riga {line}: nome categoria vuoto o duplicato: {title!r}')
+        categories.add(title.casefold())
+        cluster=row['cluster_id'].strip()
+        if not re.fullmatch(r'[A-P]',cluster):
+            raise ValueError(f'Riga {line}: cluster_id non valido: {cluster!r}')
+        if cluster in clusters and clusters[cluster]!=row['cluster_name']:
+            raise ValueError(f'Riga {line}: nome cluster incoerente')
+        clusters[cluster]=row['cluster_name']
+        entries[cid]=row
     expected={f'{i:03d}' for i in range(1,173)}
     if set(entries)!=expected:
         missing=sorted(expected-set(entries))
@@ -338,7 +331,9 @@ def find_taxonomy(explicit:Path|None) -> Path|None:
     if explicit is not None:
         return explicit
     for path in (Path(__file__).resolve().parent.parent / TAXONOMY_FILENAME,
-                 Path.cwd()/TAXONOMY_FILENAME):
+                 Path.cwd()/TAXONOMY_FILENAME,
+                 Path(__file__).resolve().parent.parent / LEGACY_TAXONOMY_FILENAME,
+                 Path.cwd()/LEGACY_TAXONOMY_FILENAME):
         if path.is_file():
             return path
     return None

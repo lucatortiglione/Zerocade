@@ -1,0 +1,20 @@
+{
+  "updated_at": "2026-11-15T02:34:40.297431+00:00",
+  "kind": "pruned",
+  "previous_words": 101304,
+  "words": 89380,
+  "removed_pure_plurals": 11924,
+  "removed_secrets": [
+    "broccoli",
+    "gnocchi",
+    "penne",
+    "tagliatelle"
+  ],
+  "secrets": 6833,
+  "links": 78245,
+  "dim": 600,
+  "policy": "Plurali puri fuori dal vocabolario (context_vocabulary.pure_plurals), vettori invariati.",
+  "vocab_sha256": "c7cb39268b7fd10a32893ff828df037843a83093419a9e53e9b465912a62146b",
+  "vectors_sha256": "770a7cc59d193d041f89ffffd73a9a58b4aac01448daff48062c5c69391865c2",
+  "backup": "C:\\Progetti\\Zerocade\\gioco-zerocontext\\.cache\\backups\\20261115T023439638935Z"
+}

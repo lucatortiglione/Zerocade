@@ -1,13 +1,23 @@
 {
-  "run_id": "10a5b1ce84e0a2c27d3e73e83a2d2360eccaa55e5322422e9289223901406ffb",
+  "run_id": "eb4e246c2c24732fdee39d9a09327fef251a5131a858973b13821f9ed9858ba8",
   "status": "COMPLETE",
   "manifest": {
-    "selected_rows_sha256": "a9c95f81f2088a46299a41ba9fab81b4e2b62b3e7c4cc21edc5c08270c4aa296",
+    "selected_rows_sha256": "a14acca33f0713661f5ab6d936b330c794e82d72e40da35b470ad0de55466b9f",
     "active_snapshots": [
       [
         "de-mauro-sitemaps",
         "9eed858dc409679538c92b2813ed5e445b695983bdffaf91b3ea1da498eabc97",
         "deb175cf7b938247b76e853f8cb8a99738fb3e21e46503516611e460d9c87976"
+      ],
+      [
+        "flex-it-adjectives",
+        "6f75c70786e2087ebe557926a93521322b4d4e70a0cebf4759aeddfd81a669d0",
+        "628a830f5d997d763d7522bd8e63589a4b98edd3189363f9a15b107b4418c97d"
+      ],
+      [
+        "flex-it-nouns",
+        "d993ea00882d27c20a0f500bf63a9badbf02d701a692ad25f87cbaf265d6139e",
+        "1b0a06e94949827476621cfd3a639837d28905b91521c77c7958331785cf8587"
       ],
       [
         "freedict-ita-deu",
@@ -18,6 +28,11 @@
         "frequencywords-it-2018",
         "100abcf8272e7a92a6432f71f98547931dc79bd0678d2c2e314b0891038f7a92",
         "b23b0c6a3f59c1da1c7caa667b9df5699e95323fee20a05f343c7d7dae73c4be"
+      ],
+      [
+        "glaffit",
+        "3ea20ca80b679d0abc392ec9463896195875b557f033f1cc3a7d7ebee60cb260",
+        "9e42965e5b7a8f4594c0199bbce6b6890c4bdc31a72a65af1b683b2025bf527d"
       ],
       [
         "itaoa-montefinese-2019",
@@ -175,6 +190,11 @@
         "678e41cc9771c8dec6a2b2a21489d549dd4d715bda582d3890b162b1c80ea33a"
       ],
       [
+        "unimorph-ita",
+        "acc8ca2917dd51fd7b93d27b3bdd2f5898db3a873dc974dcf921d2c3d68fe9fb",
+        "6347bb15b3d2c3dafcbe4adc0e7beaa97a8bc61bcccc345079afb154c03f1321"
+      ],
+      [
         "wikinews-it",
         "e841cbe1956121dbbb8942bb1db64f9191040a0468c252bb33cc66c868478766",
         "28b6781297c89da632d1ff85c8bbb79322405e9fee894afa5311bdb4b81e3ef7"
@@ -225,7 +245,7 @@
     },
     "parole_ita_raw#raw.associations": {
       "checked": 58551,
-      "flagged": 488
+      "flagged": 483
     },
     "parole_ita_raw#game.prompts": {
       "checked": 3941,
@@ -233,7 +253,7 @@
     },
     "parole_ita_raw#game.associations": {
       "checked": 58551,
-      "flagged": 488
+      "flagged": 483
     },
     "parole_ita_raw#validi.prompts": {
       "checked": 3941,
@@ -241,7 +261,7 @@
     },
     "parole_ita_raw#validi.associations": {
       "checked": 58551,
-      "flagged": 488
+      "flagged": 483
     },
     "parole_ita_raw#filtrati.filtered_prompts": {
       "checked": 6617,
@@ -269,7 +289,7 @@
     },
     "parole_ita_raw#finale.prompt_words": {
       "checked": 58551,
-      "flagged": 488
+      "flagged": 483
     },
     "giochi#associazioni.prompts": {
       "checked": 3941,
@@ -288,32 +308,32 @@
       "flagged": 0
     },
     "giochi#context.vocab": {
-      "checked": 60229,
-      "flagged": 3685
+      "checked": 89380,
+      "flagged": 3681
     },
     "giochi#context.secrets": {
-      "checked": 6837,
-      "flagged": 18
+      "checked": 6833,
+      "flagged": 14
     },
     "giochi#parole.words": {
       "checked": 185540,
-      "flagged": 8439
+      "flagged": 8436
     }
   },
-  "selected_uses": 667721,
-  "distinct_selected_words": 248343,
-  "lexical_words_with_evidence": 234434,
+  "selected_uses": 696868,
+  "distinct_selected_words": 263792,
+  "lexical_words_with_evidence": 249891,
   "lexical_flags": {
     "POS_NOT_ATTESTED": 10,
-    "NO_LEXICAL_EVIDENCE": 12513,
+    "NO_LEXICAL_EVIDENCE": 12506,
     "POS_UNRESOLVED": 5,
-    "NO_LEMMA_EVIDENCE": 13
+    "NO_LEMMA_EVIDENCE": 9
   },
-  "flagged_uses": 14361,
-  "distinct_flagged_words": 12512,
+  "flagged_uses": 14330,
+  "distinct_flagged_words": 12496,
   "context_documents": 72028,
   "uses_with_target_in_context": 207068,
-  "context_flagged_uses": 1823,
+  "context_flagged_uses": 1803,
   "models": {
     "spacy": {
       "analyzed": 0,
@@ -322,12 +342,12 @@
     },
     "stanza": {
       "analyzed": 0,
-      "reused": 476,
+      "reused": 471,
       "model_id": "8d3e7be4e89fb56abeb505535eaa81e369803b03949604cbb7779848a027da0a"
     }
   },
   "simplemma_model_id": "53c485a4c2d14204bfb949c003d21f7412ed6071803de70c1a77e307b6bc02b4",
-  "unselected_inventory_terms": 2481941,
+  "unselected_inventory_terms": 2560025,
   "unselected_inventory_policy": "Raw titles and source lists are preserved; NLP does not certify isolated entries.",
   "games_quick_check": [
     [
@@ -335,6 +355,6 @@
     ]
   ],
   "automatic_gameplay_changes": 0,
-  "elapsed_seconds": 130.77849109999988,
-  "completed_at": "2026-11-14T11:30:11.379532+00:00"
+  "elapsed_seconds": 175.93483060000017,
+  "completed_at": "2026-11-15T03:14:20.361319+00:00"
 }

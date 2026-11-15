@@ -4,6 +4,8 @@ import { CONTEXT_COLOR_STOPS, CONTEXT_COLOR_MAX } from './context.js'
 export { CONTEXT_LIMITS, CONTEXT_COLORS, CONTEXT_COLOR_STOPS, CONTEXT_COLOR_MAX, normalizeContextColors, ContextError, type ContextErrorKind } from './context.js'
 export { payloadBytes } from './threadBudget.js'
 export { BodyLimitError, readBoundedBytes } from './httpBody.js'
+export * from './contextTournament.js'
+import type { ContextTournamentAdmin, ContextTournamentState, TournamentCommand, TournamentReply, TournamentRow, TournamentSummary } from './contextTournament.js'
 
 export {
   WORD_ASSOCIATION_MAX_WORDS,
@@ -2176,7 +2178,7 @@ export interface LiveStats {
 export const EMPTY_LIVE_STATS: LiveStats = { viewers: null, comments: 0, likes: 0, gifts: 0, coins: 0, follows: 0 }
 
 export interface ServerToClientEvents {
-  'runtime:issue': (issue: { component: 'persistence' | 'transport'; message: string; at: number }) => void
+  'runtime:issue': (issue: { component: 'persistence' | 'transport' | 'game'; message: string; at: number }) => void
   // Dashboards only: the live's counters, on connecting and as they change.
   'stats:update': (stats: LiveStats) => void
   'session:state': (state: SessionState) => void
@@ -2208,6 +2210,15 @@ export interface ServerToClientEvents {
   'gif:show': (gif: GifShow) => void
   // Stops every sound and GIF the pads started.
   'dj:stop': () => void
+  // ZeroContext's tournament (contextTournament.ts): the public state for every client of the room, null when the room
+  // has none to show; the organiser's view (secret, full standings) and command errors to dashboards only.
+  'context:tournament': (state: ContextTournamentState | null) => void
+  'context:tournament-admin': (admin: ContextTournamentAdmin | null) => void
+  'context:tournament-error': (error: { message: string }) => void
+  // ZeroContext: how many times each secret word has come out (classic games and tournaments), all of them on
+  // connecting and one at each new round, so a new round picks a word never played.
+  'context:secret-uses': (uses: Record<string, number>) => void
+  'context:secret-used': (used: { word: string; uses: number }) => void
 }
 
 export interface ClientToServerEvents {
@@ -2249,6 +2260,10 @@ export interface ClientToServerEvents {
   'pad:stop': () => void
   'pad:volume': (volume: number) => void
   'pad:remove': (id: string) => void
+  // The dashboard: ZeroContext's tournament commands (checked on the server), its history and a tournament's standings.
+  'context:tournament': (command: TournamentCommand, ack: (reply: TournamentReply) => void) => void
+  'context:tournament-history': (ack: (history: TournamentSummary[]) => void) => void
+  'context:tournament-standings': (id: string, ack: (rows: TournamentRow[] | null) => void) => void
 }
 
 export type ClientType = 'dashboard' | 'overlay'

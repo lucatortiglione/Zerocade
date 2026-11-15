@@ -1,0 +1,1394 @@
+{
+  "format": "taxonomy-1",
+  "source": {
+    "git_commit": "20660a0726e5798c4bcaed691bbf294620d5abf4",
+    "path": "gioco-zeroassociations/tassonomia_word_association_it_172_categorie_v3_6_0.csv",
+    "git_blob_sha256": "943c4b233238eeb50d9844eba9e386ab924aa0e430746fbb44bbf95b3ee0849a"
+  },
+  "columns": [
+    "category_id",
+    "cluster_id",
+    "cluster_name",
+    "category_name",
+    "example_prompts",
+    "quota_status"
+  ],
+  "categories": [
+    {
+      "category_id": "001",
+      "cluster_id": "A",
+      "cluster_name": "Alimentazione e cucina",
+      "category_name": "Ingredienti, dispensa e prodotti di base",
+      "example_prompts": "farina, zucchero, spezia",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "002",
+      "cluster_id": "A",
+      "cluster_name": "Alimentazione e cucina",
+      "category_name": "Carni, tagli, salumi e norcineria",
+      "example_prompts": "guanciale, prosciutto, brasato",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "003",
+      "cluster_id": "A",
+      "cluster_name": "Alimentazione e cucina",
+      "category_name": "Pesce e prodotti ittici alimentari",
+      "example_prompts": "baccalà, alici, mollusco",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "004",
+      "cluster_id": "A",
+      "cluster_name": "Alimentazione e cucina",
+      "category_name": "Latte, latticini e formaggi",
+      "example_prompts": "cagliata, ricotta, stagionatura",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "005",
+      "cluster_id": "A",
+      "cluster_name": "Alimentazione e cucina",
+      "category_name": "Frutta, ortaggi e aromi culinari",
+      "example_prompts": "basilico, carciofo, albicocca",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "006",
+      "cluster_id": "A",
+      "cluster_name": "Alimentazione e cucina",
+      "category_name": "Tecniche di cottura e preparazione",
+      "example_prompts": "soffritto, rosolare, lessare",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "007",
+      "cluster_id": "A",
+      "cluster_name": "Alimentazione e cucina",
+      "category_name": "Utensili, pentole e attrezzatura da cucina",
+      "example_prompts": "colino, setaccio, mestolo",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "008",
+      "cluster_id": "A",
+      "cluster_name": "Alimentazione e cucina",
+      "category_name": "Panificazione, farine e lievitazioni",
+      "example_prompts": "lievito, impastare, crosta",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "009",
+      "cluster_id": "A",
+      "cluster_name": "Alimentazione e cucina",
+      "category_name": "Pasticceria, dolci e gelateria",
+      "example_prompts": "meringa, glassare, sorbetto",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "010",
+      "cluster_id": "A",
+      "cluster_name": "Alimentazione e cucina",
+      "category_name": "Conservazione, fermentazione e trasformazioni alimentari",
+      "example_prompts": "salamoia, sottolio, affumicare",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "011",
+      "cluster_id": "B",
+      "cluster_name": "Bevande, locali e ospitalità",
+      "category_name": "Viticoltura e vendemmia",
+      "example_prompts": "vigneto, vendemmia, grappolo",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "012",
+      "cluster_id": "B",
+      "cluster_name": "Bevande, locali e ospitalità",
+      "category_name": "Enologia, vini e degustazione",
+      "example_prompts": "tannino, mosto, decantare",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "013",
+      "cluster_id": "B",
+      "cluster_name": "Bevande, locali e ospitalità",
+      "category_name": "Birra e birrificazione",
+      "example_prompts": "luppolo, malto, schiuma",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "014",
+      "cluster_id": "B",
+      "cluster_name": "Bevande, locali e ospitalità",
+      "category_name": "Distillati, liquori e amari",
+      "example_prompts": "alambicco, grappa, infusione",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "015",
+      "cluster_id": "B",
+      "cluster_name": "Bevande, locali e ospitalità",
+      "category_name": "Cocktail, miscelazione e aperitivi",
+      "example_prompts": "shaker, guarnizione, aperitivo",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "016",
+      "cluster_id": "B",
+      "cluster_name": "Bevande, locali e ospitalità",
+      "category_name": "Caffè, torrefazione ed estrazione",
+      "example_prompts": "torrefazione, macinare, espresso",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "017",
+      "cluster_id": "B",
+      "cluster_name": "Bevande, locali e ospitalità",
+      "category_name": "Tè, tisane e bevande analcoliche",
+      "example_prompts": "infuso, decotto, dissetare",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "018",
+      "cluster_id": "B",
+      "cluster_name": "Bevande, locali e ospitalità",
+      "category_name": "Servizio di sala e ristorazione",
+      "example_prompts": "cameriere, comanda, vassoio",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "019",
+      "cluster_id": "B",
+      "cluster_name": "Bevande, locali e ospitalità",
+      "category_name": "Bar, tavole calde e cultura del bancone",
+      "example_prompts": "bancone, consumazione, scontrino",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "020",
+      "cluster_id": "B",
+      "cluster_name": "Bevande, locali e ospitalità",
+      "category_name": "Ospitalità professionale e ricevimento",
+      "example_prompts": "reception, accoglienza, prenotazione",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "021",
+      "cluster_id": "C",
+      "cluster_name": "Casa, abitare e manutenzione",
+      "category_name": "Strutture domestiche e tipologie abitative",
+      "example_prompts": "mansarda, soppalco, abbaino",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "022",
+      "cluster_id": "C",
+      "cluster_name": "Casa, abitare e manutenzione",
+      "category_name": "Edilizia, materiali e isolamento",
+      "example_prompts": "intonaco, massetto, intercapedine",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "023",
+      "cluster_id": "C",
+      "cluster_name": "Casa, abitare e manutenzione",
+      "category_name": "Impianti idraulici e sanitari",
+      "example_prompts": "rubinetto, scarico, sifone",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "024",
+      "cluster_id": "C",
+      "cluster_name": "Casa, abitare e manutenzione",
+      "category_name": "Impianti elettrici e illuminazione domestica",
+      "example_prompts": "presa, interruttore, lampadario",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "025",
+      "cluster_id": "C",
+      "cluster_name": "Casa, abitare e manutenzione",
+      "category_name": "Riscaldamento, climatizzazione ed efficienza",
+      "example_prompts": "caldaia, radiatore, termostato",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "026",
+      "cluster_id": "C",
+      "cluster_name": "Casa, abitare e manutenzione",
+      "category_name": "Arredamento, complementi e design interno",
+      "example_prompts": "credenza, mensola, abatjour",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "027",
+      "cluster_id": "C",
+      "cluster_name": "Casa, abitare e manutenzione",
+      "category_name": "Elettrodomestici e apparecchi domestici",
+      "example_prompts": "frigorifero, lavatrice, aspirapolvere",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "028",
+      "cluster_id": "C",
+      "cluster_name": "Casa, abitare e manutenzione",
+      "category_name": "Bucato, stiro e trattamento dei tessuti",
+      "example_prompts": "candeggina, smacchiare, strizzare",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "029",
+      "cluster_id": "C",
+      "cluster_name": "Casa, abitare e manutenzione",
+      "category_name": "Condominio, vicinato e locazioni",
+      "example_prompts": "portineria, inquilino, millesimo",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "030",
+      "cluster_id": "C",
+      "cluster_name": "Casa, abitare e manutenzione",
+      "category_name": "Orto domestico, siepi e attrezzi da giardino",
+      "example_prompts": "cesoia, potare, scartavetrare",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "031",
+      "cluster_id": "D",
+      "cluster_name": "Geografia, territorio e ambiente",
+      "category_name": "Geografia fisica, rilievi e forme del paesaggio",
+      "example_prompts": "promontorio, altopiano, vallata",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "032",
+      "cluster_id": "D",
+      "cluster_name": "Geografia, territorio e ambiente",
+      "category_name": "Fiumi, laghi, sorgenti e idrografia",
+      "example_prompts": "affluente, bacino, foce",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "033",
+      "cluster_id": "D",
+      "cluster_name": "Geografia, territorio e ambiente",
+      "category_name": "Mari, coste, isole e litorali",
+      "example_prompts": "battigia, laguna, scogliera",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "034",
+      "cluster_id": "D",
+      "cluster_name": "Geografia, territorio e ambiente",
+      "category_name": "Geografia amministrativa e territorio italiano",
+      "example_prompts": "provincia, capoluogo, frazione",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "035",
+      "cluster_id": "D",
+      "cluster_name": "Geografia, territorio e ambiente",
+      "category_name": "Meteorologia e fenomeni atmosferici",
+      "example_prompts": "scirocco, grandine, nebbia",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "036",
+      "cluster_id": "D",
+      "cluster_name": "Geografia, territorio e ambiente",
+      "category_name": "Clima, stagioni e cicli naturali",
+      "example_prompts": "siccità, afoso, equinozio",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "037",
+      "cluster_id": "D",
+      "cluster_name": "Geografia, territorio e ambiente",
+      "category_name": "Geologia, rocce e minerali",
+      "example_prompts": "faglia, calcare, quarzo",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "038",
+      "cluster_id": "D",
+      "cluster_name": "Geografia, territorio e ambiente",
+      "category_name": "Vulcani, terremoti e rischi naturali",
+      "example_prompts": "cratere, eruzione, sisma",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "039",
+      "cluster_id": "D",
+      "cluster_name": "Geografia, territorio e ambiente",
+      "category_name": "Ecologia, rifiuti, riciclo e bonifiche",
+      "example_prompts": "discarica, riciclare, bonifica",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "040",
+      "cluster_id": "D",
+      "cluster_name": "Geografia, territorio e ambiente",
+      "category_name": "Energia, risorse e sostenibilità ambientale",
+      "example_prompts": "turbina, rinnovabile, biomassa",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "041",
+      "cluster_id": "E",
+      "cluster_name": "Piante, animali e agricoltura",
+      "category_name": "Botanica e anatomia vegetale",
+      "example_prompts": "radice, linfa, germoglio",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "042",
+      "cluster_id": "E",
+      "cluster_name": "Piante, animali e agricoltura",
+      "category_name": "Alberi, boschi, foreste e legname",
+      "example_prompts": "corteccia, quercia, tronco",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "043",
+      "cluster_id": "E",
+      "cluster_name": "Piante, animali e agricoltura",
+      "category_name": "Fiori, impollinazione e riproduzione vegetale",
+      "example_prompts": "polline, pistillo, impollinare",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "044",
+      "cluster_id": "E",
+      "cluster_name": "Piante, animali e agricoltura",
+      "category_name": "Coltivazioni, semina e lavorazioni agricole",
+      "example_prompts": "semina, mietere, maggese",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "045",
+      "cluster_id": "E",
+      "cluster_name": "Piante, animali e agricoltura",
+      "category_name": "Zootecnia, stalle e allevamento animale",
+      "example_prompts": "stalla, pascolo, mungere",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "046",
+      "cluster_id": "E",
+      "cluster_name": "Piante, animali e agricoltura",
+      "category_name": "Animali domestici e cura degli animali",
+      "example_prompts": "guinzaglio, cuccia, veterinario",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "047",
+      "cluster_id": "E",
+      "cluster_name": "Piante, animali e agricoltura",
+      "category_name": "Fauna selvatica terrestre",
+      "example_prompts": "volpe, cinghiale, cervo",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "048",
+      "cluster_id": "E",
+      "cluster_name": "Piante, animali e agricoltura",
+      "category_name": "Fauna acquatica, anfibi e ambienti umidi",
+      "example_prompts": "lontra, rana, medusa",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "049",
+      "cluster_id": "E",
+      "cluster_name": "Piante, animali e agricoltura",
+      "category_name": "Insetti, ragni e piccoli invertebrati",
+      "example_prompts": "formica, ragnatela, coleottero",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "050",
+      "cluster_id": "E",
+      "cluster_name": "Piante, animali e agricoltura",
+      "category_name": "Etologia, migrazioni e adattamenti",
+      "example_prompts": "letargo, mimetismo, migrare",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "051",
+      "cluster_id": "F",
+      "cluster_name": "Corpo, medicina e benessere",
+      "category_name": "Anatomia ossea e muscolare",
+      "example_prompts": "tendine, vertebra, cartilagine",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "052",
+      "cluster_id": "F",
+      "cluster_name": "Corpo, medicina e benessere",
+      "category_name": "Organi, apparati e sistemi corporei",
+      "example_prompts": "polmone, fegato, arteria",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "053",
+      "cluster_id": "F",
+      "cluster_name": "Corpo, medicina e benessere",
+      "category_name": "Fisiologia, sensi e riflessi",
+      "example_prompts": "pupilla, deglutire, starnuto",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "054",
+      "cluster_id": "F",
+      "cluster_name": "Corpo, medicina e benessere",
+      "category_name": "Sintomi, patologie comuni e disturbi",
+      "example_prompts": "vertigine, febbre, emicrania",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "055",
+      "cluster_id": "F",
+      "cluster_name": "Corpo, medicina e benessere",
+      "category_name": "Diagnostica, analisi ed esami medici",
+      "example_prompts": "radiografia, tampone, referto",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "056",
+      "cluster_id": "F",
+      "cluster_name": "Corpo, medicina e benessere",
+      "category_name": "Farmaci, terapie e farmacologia quotidiana",
+      "example_prompts": "collirio, pomata, placebo",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "057",
+      "cluster_id": "F",
+      "cluster_name": "Corpo, medicina e benessere",
+      "category_name": "Igiene personale e prevenzione",
+      "example_prompts": "disinfettare, lavarsi, igienico",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "058",
+      "cluster_id": "F",
+      "cluster_name": "Corpo, medicina e benessere",
+      "category_name": "Nutrizione, metabolismo e alimentazione",
+      "example_prompts": "digestione, sazietà, nutriente",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "059",
+      "cluster_id": "F",
+      "cluster_name": "Corpo, medicina e benessere",
+      "category_name": "Sonno, riposo e recupero",
+      "example_prompts": "insonnia, russare, sonnolenza",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "060",
+      "cluster_id": "F",
+      "cluster_name": "Corpo, medicina e benessere",
+      "category_name": "Assistenza, riabilitazione e convalescenza",
+      "example_prompts": "fisioterapia, cicatrice, deambulare",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "061",
+      "cluster_id": "G",
+      "cluster_name": "Psicologia, comportamento e relazioni",
+      "category_name": "Emozioni e stati d'animo",
+      "example_prompts": "nostalgia, rimorso, malinconia",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "062",
+      "cluster_id": "G",
+      "cluster_name": "Psicologia, comportamento e relazioni",
+      "category_name": "Memoria, attenzione e apprendimento mentale",
+      "example_prompts": "ricordare, dimenticare, distrazione",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "063",
+      "cluster_id": "G",
+      "cluster_name": "Psicologia, comportamento e relazioni",
+      "category_name": "Personalità, carattere e temperamento",
+      "example_prompts": "ostinato, timido, carisma",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "064",
+      "cluster_id": "G",
+      "cluster_name": "Psicologia, comportamento e relazioni",
+      "category_name": "Percezione, giudizio e decisioni",
+      "example_prompts": "intuizione, pregiudizio, esitazione",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "065",
+      "cluster_id": "G",
+      "cluster_name": "Psicologia, comportamento e relazioni",
+      "category_name": "Etica quotidiana, valori e virtù",
+      "example_prompts": "lealtà, onestà, coraggio",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "066",
+      "cluster_id": "G",
+      "cluster_name": "Psicologia, comportamento e relazioni",
+      "category_name": "Vizi, atteggiamenti e difetti caratteriali",
+      "example_prompts": "ipocrisia, invidia, rancore",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "067",
+      "cluster_id": "G",
+      "cluster_name": "Psicologia, comportamento e relazioni",
+      "category_name": "Comunicazione interpersonale e linguaggio del corpo",
+      "example_prompts": "gesticolare, sguardo, ascolto",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "068",
+      "cluster_id": "G",
+      "cluster_name": "Psicologia, comportamento e relazioni",
+      "category_name": "Amicizia, socialità e rapporti fra pari",
+      "example_prompts": "complicità, fiducia, solidarietà",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "069",
+      "cluster_id": "G",
+      "cluster_name": "Psicologia, comportamento e relazioni",
+      "category_name": "Amore, corteggiamento e vita di coppia",
+      "example_prompts": "corteggiamento, gelosia, intesa",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "070",
+      "cluster_id": "G",
+      "cluster_name": "Psicologia, comportamento e relazioni",
+      "category_name": "Famiglia, parentele e fasi della vita",
+      "example_prompts": "parentela, nonno, accudire",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "071",
+      "cluster_id": "H",
+      "cluster_name": "Lavoro, commercio ed economia",
+      "category_name": "Mestieri artigiani, botteghe e officine",
+      "example_prompts": "incudine, tornio, forgiare",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "072",
+      "cluster_id": "H",
+      "cluster_name": "Lavoro, commercio ed economia",
+      "category_name": "Industria manifatturiera, fabbriche e produzione",
+      "example_prompts": "catena, assemblare, collaudo",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "073",
+      "cluster_id": "H",
+      "cluster_name": "Lavoro, commercio ed economia",
+      "category_name": "Ufficio, organizzazione aziendale e gestione",
+      "example_prompts": "delegare, riunione, scadenza",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "074",
+      "cluster_id": "H",
+      "cluster_name": "Lavoro, commercio ed economia",
+      "category_name": "Carriera, contratti, sindacati e occupazione",
+      "example_prompts": "tirocinio, sciopero, licenziare",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "075",
+      "cluster_id": "H",
+      "cluster_name": "Lavoro, commercio ed economia",
+      "category_name": "Commercio, negozi, vendita e clienti",
+      "example_prompts": "saldo, vetrina, commerciante",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "076",
+      "cluster_id": "H",
+      "cluster_name": "Lavoro, commercio ed economia",
+      "category_name": "Banche, credito, mutui e risparmio",
+      "example_prompts": "ipoteca, mutuo, interessi",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "077",
+      "cluster_id": "H",
+      "cluster_name": "Lavoro, commercio ed economia",
+      "category_name": "Assicurazioni, previdenza e pensioni",
+      "example_prompts": "polizza, indennizzo, pensione",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "078",
+      "cluster_id": "H",
+      "cluster_name": "Lavoro, commercio ed economia",
+      "category_name": "Fisco, imposte, contabilità e bilanci",
+      "example_prompts": "imposta, fattura, conguaglio",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "079",
+      "cluster_id": "H",
+      "cluster_name": "Lavoro, commercio ed economia",
+      "category_name": "Economia, mercati, prezzi e inflazione",
+      "example_prompts": "rincaro, inflazione, domanda",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "080",
+      "cluster_id": "H",
+      "cluster_name": "Lavoro, commercio ed economia",
+      "category_name": "Burocrazia, anagrafe e servizi pubblici",
+      "example_prompts": "certificato, protocollo, delega",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "081",
+      "cluster_id": "I",
+      "cluster_name": "Diritto, istituzioni e storia",
+      "category_name": "Diritto civile, proprietà e contratti",
+      "example_prompts": "caparra, eredità, usufrutto",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "082",
+      "cluster_id": "I",
+      "cluster_name": "Diritto, istituzioni e storia",
+      "category_name": "Diritto penale, reati e indagini",
+      "example_prompts": "alibi, movente, sequestro",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "083",
+      "cluster_id": "I",
+      "cluster_name": "Diritto, istituzioni e storia",
+      "category_name": "Giustizia, tribunali e procedure",
+      "example_prompts": "imputato, udienza, testimonianza",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "084",
+      "cluster_id": "I",
+      "cluster_name": "Diritto, istituzioni e storia",
+      "category_name": "Diritti, doveri e cittadinanza",
+      "example_prompts": "cittadino, cittadinanza, tutela",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "085",
+      "cluster_id": "I",
+      "cluster_name": "Diritto, istituzioni e storia",
+      "category_name": "Elezioni, costituzione e istituzioni nazionali",
+      "example_prompts": "referendum, parlamento, elettore",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "086",
+      "cluster_id": "I",
+      "cluster_name": "Diritto, istituzioni e storia",
+      "category_name": "Diplomazia, confini e cooperazione internazionale",
+      "example_prompts": "ambasciata, trattato, frontiera",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "087",
+      "cluster_id": "I",
+      "cluster_name": "Diritto, istituzioni e storia",
+      "category_name": "Civiltà antiche, imperi e storia politica",
+      "example_prompts": "dinastia, impero, conquista",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "088",
+      "cluster_id": "I",
+      "cluster_name": "Diritto, istituzioni e storia",
+      "category_name": "Medioevo, feudi e società medievale",
+      "example_prompts": "feudo, castello, vassallo",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "089",
+      "cluster_id": "I",
+      "cluster_name": "Diritto, istituzioni e storia",
+      "category_name": "Età moderna, esplorazioni e rivoluzioni",
+      "example_prompts": "navigatore, rivolta, monarchia",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "090",
+      "cluster_id": "I",
+      "cluster_name": "Diritto, istituzioni e storia",
+      "category_name": "Storia contemporanea e trasformazioni sociali",
+      "example_prompts": "armistizio, emigrazione, ricostruzione",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "091",
+      "cluster_id": "J",
+      "cluster_name": "Istruzione, lingua e tradizioni",
+      "category_name": "Scuola, insegnamento e didattica",
+      "example_prompts": "cattedra, verifica, bocciatura",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "092",
+      "cluster_id": "J",
+      "cluster_name": "Istruzione, lingua e tradizioni",
+      "category_name": "Università, esami e titoli di studio",
+      "example_prompts": "matricola, laurea, fuoricorso",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "093",
+      "cluster_id": "J",
+      "cluster_name": "Istruzione, lingua e tradizioni",
+      "category_name": "Biblioteche, studio e ricerca documentale",
+      "example_prompts": "archivio, catalogo, consultare",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "094",
+      "cluster_id": "J",
+      "cluster_name": "Istruzione, lingua e tradizioni",
+      "category_name": "Grammatica, ortografia e punteggiatura",
+      "example_prompts": "sintassi, virgola, congiuntivo",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "095",
+      "cluster_id": "J",
+      "cluster_name": "Istruzione, lingua e tradizioni",
+      "category_name": "Retorica, stile e figure linguistiche",
+      "example_prompts": "metafora, ironia, iperbole",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "096",
+      "cluster_id": "J",
+      "cluster_name": "Istruzione, lingua e tradizioni",
+      "category_name": "Lessico, etimologia e variazione linguistica",
+      "example_prompts": "sinonimo, dialetto, neologismo",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "097",
+      "cluster_id": "J",
+      "cluster_name": "Istruzione, lingua e tradizioni",
+      "category_name": "Proverbi, modi di dire e linguaggio figurato",
+      "example_prompts": "proverbio, allusione, malinteso",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "098",
+      "cluster_id": "J",
+      "cluster_name": "Istruzione, lingua e tradizioni",
+      "category_name": "Feste civili, calendario e ricorrenze",
+      "example_prompts": "ferragosto, carnevale, anniversario",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "099",
+      "cluster_id": "J",
+      "cluster_name": "Istruzione, lingua e tradizioni",
+      "category_name": "Storia delle religioni, culto e riti",
+      "example_prompts": "pellegrinaggio, eremo, processione",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "100",
+      "cluster_id": "J",
+      "cluster_name": "Istruzione, lingua e tradizioni",
+      "category_name": "Mitologia, fiabe e leggende popolari",
+      "example_prompts": "oracolo, leggenda, sortilegio",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "101",
+      "cluster_id": "K",
+      "cluster_name": "Musica, spettacoli e informazione",
+      "category_name": "Teoria musicale, ritmo e armonia",
+      "example_prompts": "melodia, battuta, accordo",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "102",
+      "cluster_id": "K",
+      "cluster_name": "Musica, spettacoli e informazione",
+      "category_name": "Strumenti musicali e orchestre",
+      "example_prompts": "violino, timpano, spartito",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "103",
+      "cluster_id": "K",
+      "cluster_name": "Musica, spettacoli e informazione",
+      "category_name": "Canto, vocalità e opera lirica",
+      "example_prompts": "falsetto, soprano, intonare",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "104",
+      "cluster_id": "K",
+      "cluster_name": "Musica, spettacoli e informazione",
+      "category_name": "Teatro, recitazione e palcoscenico",
+      "example_prompts": "sipario, copione, suggeritore",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "105",
+      "cluster_id": "K",
+      "cluster_name": "Musica, spettacoli e informazione",
+      "category_name": "Danza, balletto e coreografia",
+      "example_prompts": "passo, coreografia, piroetta",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "106",
+      "cluster_id": "K",
+      "cluster_name": "Musica, spettacoli e informazione",
+      "category_name": "Cinema, regia e montaggio",
+      "example_prompts": "sceneggiatura, doppiaggio, inquadratura",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "107",
+      "cluster_id": "K",
+      "cluster_name": "Musica, spettacoli e informazione",
+      "category_name": "Televisione, programmi e format",
+      "example_prompts": "palinsesto, telecomando, puntata",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "108",
+      "cluster_id": "K",
+      "cluster_name": "Musica, spettacoli e informazione",
+      "category_name": "Radio, podcast e comunicazione audio",
+      "example_prompts": "frequenza, microfono, radiocronaca",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "109",
+      "cluster_id": "K",
+      "cluster_name": "Musica, spettacoli e informazione",
+      "category_name": "Giornalismo, cronaca e informazione",
+      "example_prompts": "redazione, notizia, esclusiva",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "110",
+      "cluster_id": "K",
+      "cluster_name": "Musica, spettacoli e informazione",
+      "category_name": "Letteratura, narrativa e generi letterari",
+      "example_prompts": "epilogo, romanzo, narratore",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "111",
+      "cluster_id": "L",
+      "cluster_name": "Arti visive, design e moda",
+      "category_name": "Pittura, disegno e tecniche pittoriche",
+      "example_prompts": "affresco, pennello, chiaroscuro",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "112",
+      "cluster_id": "L",
+      "cluster_name": "Arti visive, design e moda",
+      "category_name": "Scultura, ceramica e lavorazione artistica",
+      "example_prompts": "bassorilievo, argilla, scolpire",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "113",
+      "cluster_id": "L",
+      "cluster_name": "Arti visive, design e moda",
+      "category_name": "Architettura monumentale e storia dell'arte",
+      "example_prompts": "facciata, capitello, colonna",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "114",
+      "cluster_id": "L",
+      "cluster_name": "Arti visive, design e moda",
+      "category_name": "Fotografia tecnica, ottiche ed esposizione",
+      "example_prompts": "diaframma, controluce, obiettivo",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "115",
+      "cluster_id": "L",
+      "cluster_name": "Arti visive, design e moda",
+      "category_name": "Musei, restauro e conservazione",
+      "example_prompts": "patina, restaurare, reperto",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "116",
+      "cluster_id": "L",
+      "cluster_name": "Arti visive, design e moda",
+      "category_name": "Grafica, tipografia e comunicazione visiva",
+      "example_prompts": "carattere, impaginare, manifesto",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "117",
+      "cluster_id": "L",
+      "cluster_name": "Arti visive, design e moda",
+      "category_name": "Moda, abbigliamento e tendenze",
+      "example_prompts": "passerella, cappotto, elegante",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "118",
+      "cluster_id": "L",
+      "cluster_name": "Arti visive, design e moda",
+      "category_name": "Sartoria, tessuti e lavorazioni",
+      "example_prompts": "imbastitura, velluto, cucire",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "119",
+      "cluster_id": "L",
+      "cluster_name": "Arti visive, design e moda",
+      "category_name": "Calzature, borse e accessori",
+      "example_prompts": "suola, fibbia, tracolla",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "120",
+      "cluster_id": "L",
+      "cluster_name": "Arti visive, design e moda",
+      "category_name": "Gioielleria, oreficeria e gemme",
+      "example_prompts": "carato, filigrana, diamante",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "121",
+      "cluster_id": "M",
+      "cluster_name": "Mobilità, trasporti e turismo",
+      "category_name": "Automobili, motori e meccanica di guida",
+      "example_prompts": "frizione, marmitta, sterzare",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "122",
+      "cluster_id": "M",
+      "cluster_name": "Mobilità, trasporti e turismo",
+      "category_name": "Moto, biciclette e micromobilità",
+      "example_prompts": "pedale, manubrio, monopattino",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "123",
+      "cluster_id": "M",
+      "cluster_name": "Mobilità, trasporti e turismo",
+      "category_name": "Strade, segnaletica e regole di circolazione",
+      "example_prompts": "carreggiata, casello, precedenza",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "124",
+      "cluster_id": "M",
+      "cluster_name": "Mobilità, trasporti e turismo",
+      "category_name": "Autobus, metropolitane e mobilità urbana",
+      "example_prompts": "fermata, convalida, capolinea",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "125",
+      "cluster_id": "M",
+      "cluster_name": "Mobilità, trasporti e turismo",
+      "category_name": "Ferrovie, treni e stazioni",
+      "example_prompts": "binario, convoglio, deragliare",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "126",
+      "cluster_id": "M",
+      "cluster_name": "Mobilità, trasporti e turismo",
+      "category_name": "Logistica, spedizioni e trasporto merci",
+      "example_prompts": "magazzino, consegna, imballaggio",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "127",
+      "cluster_id": "M",
+      "cluster_name": "Mobilità, trasporti e turismo",
+      "category_name": "Nautica, navigazione e vita portuale",
+      "example_prompts": "zavorra, chiglia, ormeggio",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "128",
+      "cluster_id": "M",
+      "cluster_name": "Mobilità, trasporti e turismo",
+      "category_name": "Aviazione, aeromobili e aeroporti",
+      "example_prompts": "fusoliera, decollo, scalo",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "129",
+      "cluster_id": "M",
+      "cluster_name": "Mobilità, trasporti e turismo",
+      "category_name": "Turismo, itinerari e visita dei luoghi",
+      "example_prompts": "escursione, turista, itinerario",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "130",
+      "cluster_id": "M",
+      "cluster_name": "Mobilità, trasporti e turismo",
+      "category_name": "Viaggi, alloggi e vacanze dal lato del viaggiatore",
+      "example_prompts": "valigia, ostello, pernottamento",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "131",
+      "cluster_id": "N",
+      "cluster_name": "Sport e competizioni",
+      "category_name": "Calcio, tattica e regolamenti",
+      "example_prompts": "fuorigioco, rigore, portiere",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "132",
+      "cluster_id": "N",
+      "cluster_name": "Sport e competizioni",
+      "category_name": "Pallavolo, pallacanestro e sport collettivi",
+      "example_prompts": "schiacciata, canestro, palleggiare",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "133",
+      "cluster_id": "N",
+      "cluster_name": "Sport e competizioni",
+      "category_name": "Atletica leggera, gare e corsa",
+      "example_prompts": "staffetta, ostacolo, traguardo",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "134",
+      "cluster_id": "N",
+      "cluster_name": "Sport e competizioni",
+      "category_name": "Ginnastica sportiva e tecnica di allenamento",
+      "example_prompts": "flessione, addominale, allenarsi",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "135",
+      "cluster_id": "N",
+      "cluster_name": "Sport e competizioni",
+      "category_name": "Ciclismo sportivo e competizioni su strada",
+      "example_prompts": "gregario, volata, tappa",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "136",
+      "cluster_id": "N",
+      "cluster_name": "Sport e competizioni",
+      "category_name": "Tennis, badminton e sport di racchetta",
+      "example_prompts": "rovescio, servizio, racchetta",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "137",
+      "cluster_id": "N",
+      "cluster_name": "Sport e competizioni",
+      "category_name": "Nuoto, pallanuoto e sport acquatici",
+      "example_prompts": "virata, nuotare, corsia",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "138",
+      "cluster_id": "N",
+      "cluster_name": "Sport e competizioni",
+      "category_name": "Sci, sport invernali e competizioni sulla neve",
+      "example_prompts": "slalom, pista, discesa",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "139",
+      "cluster_id": "N",
+      "cluster_name": "Sport e competizioni",
+      "category_name": "Scherma, arti marziali e sport da combattimento",
+      "example_prompts": "stoccata, fioretto, schivare",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "140",
+      "cluster_id": "N",
+      "cluster_name": "Sport e competizioni",
+      "category_name": "Automobilismo, motociclismo e competizioni motoristiche",
+      "example_prompts": "sorpasso, circuito, podio",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "141",
+      "cluster_id": "O",
+      "cluster_name": "Giochi, hobby e vita ricreativa",
+      "category_name": "Scacchi e giochi strategici astratti",
+      "example_prompts": "arrocco, scacco, pedone",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "142",
+      "cluster_id": "O",
+      "cluster_name": "Giochi, hobby e vita ricreativa",
+      "category_name": "Carte tradizionali, prese e combinazioni",
+      "example_prompts": "briscola, mazzo, scartare",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "143",
+      "cluster_id": "O",
+      "cluster_name": "Giochi, hobby e vita ricreativa",
+      "category_name": "Giochi da tavolo, dadi e società",
+      "example_prompts": "pedina, tabellone, dado",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "144",
+      "cluster_id": "O",
+      "cluster_name": "Giochi, hobby e vita ricreativa",
+      "category_name": "Cruciverba, enigmistica e indovinelli",
+      "example_prompts": "rebus, anagramma, definizione",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "145",
+      "cluster_id": "O",
+      "cluster_name": "Giochi, hobby e vita ricreativa",
+      "category_name": "Logica ricreativa, rompicapi e problemi",
+      "example_prompts": "deduzione, paradosso, enigma",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "146",
+      "cluster_id": "O",
+      "cluster_name": "Giochi, hobby e vita ricreativa",
+      "category_name": "E-sport, streaming e competizioni videoludiche",
+      "example_prompts": "joystick, avatar, livello",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "147",
+      "cluster_id": "O",
+      "cluster_name": "Giochi, hobby e vita ricreativa",
+      "category_name": "Collezionismo, modellismo e hobby creativi",
+      "example_prompts": "francobollo, miniatura, raccolta",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "148",
+      "cluster_id": "O",
+      "cluster_name": "Giochi, hobby e vita ricreativa",
+      "category_name": "Campeggio, escursionismo e outdoor",
+      "example_prompts": "tenda, sentiero, bivacco",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "149",
+      "cluster_id": "O",
+      "cluster_name": "Giochi, hobby e vita ricreativa",
+      "category_name": "Circo, illusionismo e spettacoli di abilità",
+      "example_prompts": "prestigiatore, giocoliere, trapezio",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "150",
+      "cluster_id": "O",
+      "cluster_name": "Giochi, hobby e vita ricreativa",
+      "category_name": "Feste private, eventi e intrattenimento",
+      "example_prompts": "invito, brindisi, festeggiare",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "151",
+      "cluster_id": "P",
+      "cluster_name": "Scienze, matematica e digitale",
+      "category_name": "Matematica, calcolo e geometria",
+      "example_prompts": "frazione, teorema, triangolo",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "152",
+      "cluster_id": "P",
+      "cluster_name": "Scienze, matematica e digitale",
+      "category_name": "Fisica, meccanica e forze",
+      "example_prompts": "inerzia, attrito, accelerazione",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "153",
+      "cluster_id": "P",
+      "cluster_name": "Scienze, matematica e digitale",
+      "category_name": "Chimica, elementi e trasformazioni",
+      "example_prompts": "reagente, miscela, molecola",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "154",
+      "cluster_id": "P",
+      "cluster_name": "Scienze, matematica e digitale",
+      "category_name": "Astronomia, cielo e corpi celesti",
+      "example_prompts": "eclissi, orbita, costellazione",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "155",
+      "cluster_id": "P",
+      "cluster_name": "Scienze, matematica e digitale",
+      "category_name": "Astronautica, satelliti ed esplorazione spaziale",
+      "example_prompts": "razzo, astronauta, satellite",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "156",
+      "cluster_id": "P",
+      "cluster_name": "Scienze, matematica e digitale",
+      "category_name": "Software, sistemi operativi e programmazione",
+      "example_prompts": "algoritmo, applicazione, programma",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "157",
+      "cluster_id": "P",
+      "cluster_name": "Scienze, matematica e digitale",
+      "category_name": "Web, protocolli e servizi internet",
+      "example_prompts": "browser, router, connessione",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "158",
+      "cluster_id": "P",
+      "cluster_name": "Scienze, matematica e digitale",
+      "category_name": "Sicurezza informatica tecnica e protezione dati",
+      "example_prompts": "password, cifratura, autenticare",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "159",
+      "cluster_id": "P",
+      "cluster_name": "Scienze, matematica e digitale",
+      "category_name": "Elettronica, sensori e automazione",
+      "example_prompts": "circuito, sensore, microchip",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "160",
+      "cluster_id": "P",
+      "cluster_name": "Scienze, matematica e digitale",
+      "category_name": "Intelligenza artificiale, modelli e dati",
+      "example_prompts": "neurale, apprendimento, classificare",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "161",
+      "cluster_id": "C",
+      "cluster_name": "Casa, abitare e manutenzione",
+      "category_name": "Giardinaggio e piante da interno",
+      "example_prompts": "ficus, rinvasare, terriccio",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "162",
+      "cluster_id": "C",
+      "cluster_name": "Casa, abitare e manutenzione",
+      "category_name": "Bricolage e fai-da-te",
+      "example_prompts": "trapano, tassello, avvitare",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "163",
+      "cluster_id": "C",
+      "cluster_name": "Casa, abitare e manutenzione",
+      "category_name": "Pulizia e organizzazione domestica",
+      "example_prompts": "spolverare, riordinare, scaffale",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "164",
+      "cluster_id": "E",
+      "cluster_name": "Piante, animali e agricoltura",
+      "category_name": "Agricoltura, allevamento e pesca",
+      "example_prompts": "filiera, pescatore, raccolto",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "165",
+      "cluster_id": "L",
+      "cluster_name": "Arti visive, design e moda",
+      "category_name": "Fotografia, fumetto e illustrazione",
+      "example_prompts": "vignetta, storyboard, illustrare",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "166",
+      "cluster_id": "I",
+      "cluster_name": "Diritto, istituzioni e storia",
+      "category_name": "Archeologia",
+      "example_prompts": "scavo, reperto, restauro",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "167",
+      "cluster_id": "I",
+      "cluster_name": "Diritto, istituzioni e storia",
+      "category_name": "Filosofia",
+      "example_prompts": "dubbio, ragionare, paradosso",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "168",
+      "cluster_id": "I",
+      "cluster_name": "Diritto, istituzioni e storia",
+      "category_name": "Sociologia, antropologia e politica",
+      "example_prompts": "comunità, consenso, consuetudine",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "169",
+      "cluster_id": "P",
+      "cluster_name": "Scienze, matematica e digitale",
+      "category_name": "Informatica e tecnologia digitale",
+      "example_prompts": "interfaccia, dispositivo, touchscreen",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "170",
+      "cluster_id": "P",
+      "cluster_name": "Scienze, matematica e digitale",
+      "category_name": "Internet, social e cybersecurity",
+      "example_prompts": "profilo, condivisione, phishing",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "171",
+      "cluster_id": "F",
+      "cluster_name": "Corpo, medicina e benessere",
+      "category_name": "Benessere, fitness e stile di vita",
+      "example_prompts": "abitudine, postura, allenarsi",
+      "quota_status": "da_calibrare_su_pilota"
+    },
+    {
+      "category_id": "172",
+      "cluster_id": "O",
+      "cluster_name": "Giochi, hobby e vita ricreativa",
+      "category_name": "Videogiochi",
+      "example_prompts": "videogioco, avatar, salvataggio",
+      "quota_status": "da_calibrare_su_pilota"
+    }
+  ]
+}

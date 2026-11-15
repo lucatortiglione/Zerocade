@@ -3,6 +3,7 @@ import json
 import sqlite3
 import tempfile
 import unittest
+from contextlib import closing
 from pathlib import Path
 from unittest import mock
 
@@ -66,6 +67,7 @@ class UnifiedTest(unittest.TestCase):
         # the same object name in two schemas does not clash, and the generated column is rebuilt
         self.assertEqual(db.execute('SELECT extra FROM game__prompts').fetchone(), ('sole!',))
         self.assertEqual(db.execute('SELECT lemma,n FROM raw__pool_sizes').fetchone(), ('mare', 2))
+        db.close()
 
     def test_verify_notices_a_changed_table(self):
         self.build()
@@ -127,8 +129,11 @@ class UnifiedTest(unittest.TestCase):
         cursor.execute('SELECT count(*) FROM associations')
         self.assertEqual(cursor.fetchone(), (3,))
         # the other schema is untouched, and a file with another name is an ordinary database
-        self.assertEqual(sqlite3.connect(u.UNIFIED).execute('SELECT count(*) FROM game__prompts').fetchone(), (1,))
-        self.assertNotIsInstance(u.connect(self.dir/'altro.sqlite3'), u.Connection)
+        with closing(sqlite3.connect(u.UNIFIED)) as other, closing(u.connect(self.dir/'altro.sqlite3')) as standalone:
+            self.assertEqual(other.execute('SELECT count(*) FROM game__prompts').fetchone(), (1,))
+            self.assertNotIsInstance(standalone, u.Connection)
+        cursor.close()
+        con.close()
 
     def test_attach_of_an_old_file_becomes_the_schema_and_not_a_second_connection(self):
         self.build()
@@ -152,6 +157,7 @@ class UnifiedTest(unittest.TestCase):
         self.assertEqual(db.execute('SELECT lemma FROM game__prompts ORDER BY id').fetchall(), [('luna',), ('stella',)])
         self.assertEqual(db.execute('SELECT count(*) FROM raw__associations').fetchone(), (2,))
         self.assertEqual(db.execute("SELECT rows FROM zerodb_objects WHERE schema='game' AND name='prompts'").fetchone(), (2,))
+        db.close()
 
     def test_an_address_names_a_schema_like_the_old_file_name(self):
         self.build()
@@ -227,6 +233,7 @@ class UnifiedTest(unittest.TestCase):
         self.assertEqual(db.execute('SELECT lemma,n FROM pool_sizes').fetchone(), ('mare', 2))
         names = {n for (n,) in db.execute("SELECT name FROM sqlite_schema")}
         self.assertFalse(any('__' in n for n in names), names)
+        db.close()
 
     def test_status_reports_schemas(self):
         self.build()

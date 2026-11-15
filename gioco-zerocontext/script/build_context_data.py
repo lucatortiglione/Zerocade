@@ -10,7 +10,8 @@ Ingressi:
 
 Uscite (le legge il server di Zerocade, senza Python a runtime):
   schema context di database/giochi.sqlite3
-    vocab    base per frequenza, banca e inventario attestato: le parole giocabili, nell'ordine dei vettori: ogni tentativo in chat è valido solo se è qui
+    vocab    base per frequenza, banca e inventario attestato, senza i plurali puri (context_vocabulary.pure_plurals):
+           le parole giocabili, nell'ordine dei vettori: ogni tentativo in chat è valido solo se è qui
     secrets  le parole che possono essere segrete (fascia base/comune/Livecade)
     links    per ogni parola segreta, le parole che ZeroAssociazioni le associa
     meta     numero di parole, dimensioni, link_boost
@@ -44,7 +45,7 @@ import numpy as np
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent / "database" / "script"))
 import giochi  # noqa: E402
-from context_vocabulary import WORD, inventory_vocab
+from context_vocabulary import WORD, inventory_vocab, pure_plurals
 
 HERE = Path(__file__).resolve().parent.parent
 CACHE = HERE / ".cache"
@@ -181,6 +182,9 @@ def main() -> None:
     print('Selezione delle attestazioni lessicali correnti...', flush=True)
     attested, snapshots = inventory_vocab(index, HERE.parent / 'database/parole_ita_raw.sqlite3')
     vocab = sorted(set(base_vocab) | set(attested) | previous_vocab)
+    # I plurali puri restano fuori (15/11/2026): vale il singolare; il plurale della segreta vince comunque.
+    plurals = pure_plurals(vocab, HERE.parent / 'database/parole_ita_raw.sqlite3')
+    vocab = [w for w in vocab if w not in plurals]
     seen = set(vocab)
     secrets = sorted(w for w in bank if w in seen and tier.get(w) in SECRET_TIERS)
 
@@ -223,7 +227,7 @@ def main() -> None:
                   'previous_words': len(previous_vocab), 'words': len(vocab),
                   'added': len(set(vocab)-previous_vocab), 'removed': len(previous_vocab-set(vocab)),
                   'secrets': len(secrets), 'dim': int(q.shape[1]),
-                  'frequency_limit': args.vocab, 'attested_words': len(attested),
+                  'frequency_limit': args.vocab, 'attested_words': len(attested), 'excluded_pure_plurals': len(plurals),
                   'lexical_snapshots': snapshots,
                   'policy': 'Vocabolario per frequenza e banca, più lemmi e forme flesse con vettore: '
                             'Morph-it!/Flex_it, UniMorph o NVdB; altrimenti due famiglie lessicali indipendenti.',

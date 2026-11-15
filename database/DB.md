@@ -149,6 +149,6 @@ poi i file sono stati cancellati:
 
 | File | Serve ancora? |
 | --- | --- |
-| `apps/server/data/zerocade.db` | **Sì**: sessioni, eventi, classifiche, voti e progressi della diretta |
+| `apps/server/data/zerocade.db` | **Sì**: sessioni, eventi, classifiche, voti e progressi della diretta; i tornei ZeroContext (tabelle `context_tournament_*`) e le uscite delle parole segrete (`context_secret_uses`) |
 | `apps/server/data/content.db` | No: la banca dei giochi ora è lo schema `contenuti`. Il server lo crea solo se quello schema manca |
 | `gioco-dilemmi/data/domande.db` | No: era il DB di ZeroDubbi, ora `ZeroDubbi.sqlite3`. Non serve più a nessuno strumento |

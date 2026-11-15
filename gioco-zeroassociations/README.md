@@ -1,5 +1,11 @@
 # ZeroAssociazioni: prompt e associazioni verificate
 
+La tassonomia canonica è ora in [JSON](resources/taxonomy_it_v3_6_0.json), così
+il checkout non dipende dai CSV locali ignorati da Git. Conserva le stesse 172
+categorie e i 16 cluster, con provenienza e impronta del CSV originale. Archivio
+e validatore condividono il lettore; l'opzione `--taxonomy` accetta ancora un CSV
+esplicito, oltre al JSON.
+
 Il gioco mostra una parola (il **prompt**) e la chat indovina **7 o 8 parole
 collegate nascoste**. Questa cartella produce e verifica quei dati; il gioco è in
 `apps/overlay/src/games/wordAssociation.ts` e li legge dal server.

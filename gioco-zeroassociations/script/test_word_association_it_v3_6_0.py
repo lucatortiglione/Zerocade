@@ -7,6 +7,7 @@ import csv
 import tempfile
 import unittest
 from semantic_rules import SEMANTIC_POLICY, WORD_CHECKS, SET_CHECKS
+from taxonomy_source import DEFAULT_TAXONOMY
 
 from validate_word_association_it_v3_6_0 import (
     load_taxonomy,check_csv,check_candidates_jsonl,check_qa_register,
@@ -15,7 +16,7 @@ from validate_word_association_it_v3_6_0 import (
 )
 
 ROOT=Path(__file__).parent.parent
-TAX=ROOT/'tassonomia_word_association_it_172_categorie_v3_6_0.csv'
+TAX=DEFAULT_TAXONOMY
 ANSWERS=['forno','mozzarella','pomodoro','impasto','lievito','basilico','margherita']
 
 

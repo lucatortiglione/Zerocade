@@ -2,8 +2,10 @@ import type { Viewer } from '@zerocade/shared'
 import type { GameInstance } from './engine'
 import { drawAvatar, fillTextWithAvatar } from './avatar'
 import { addPoints, clamp, drawTimerBar, newScores, shuffled, topOf } from './common'
-import { followSecret, reportSecret } from './roomSecret'
-import { feedback, keyStates, newInfo, parseWordleData, readGuess, type Row, type Tile, type WordleData } from './wordleLogic'
+import { followSecret, reportSecret, type RoomSecret } from './roomSecret'
+import { feedback, keyStates, newInfo, readGuess, type Row, type Tile, type WordleData } from './wordleLogic'
+import { GAME_BANK_LIMITS, loadWordleBank } from './gameBanks'
+import { retryDue } from './retry'
 import { roundCheer } from '../audio'
 
 // ZeroWordle: the chat plays one word together, of 5 to 8 letters (the creator's choice, or random). Every valid word written in chat is a row
@@ -12,32 +14,6 @@ import { roundCheer } from '../audio'
 // the room's overlays (roomSecret.ts) and shown to the creator in the dashboard.
 
 const LENGTHS = [5, 6, 7, 8]
-const lists = new Map<number, WordleData>()
-const loading = new Map<number, Promise<WordleData>>()
-let failed = false
-
-// The lists of one length, downloaded once.
-function loadData(length: number): Promise<WordleData> {
-  let promise = loading.get(length)
-  if (!promise) {
-    promise = Promise.all([
-      fetch(`/api/wordle/solutions-${length}.txt`).then((r) => (r.ok ? r.text() : Promise.reject(new Error('solutions')))),
-      fetch(`/api/wordle/words-${length}.txt`).then((r) => (r.ok ? r.text() : Promise.reject(new Error('words')))),
-    ])
-      .then(([solutions, words]) => {
-        const data = parseWordleData(solutions, words)
-        lists.set(length, data)
-        return data
-      })
-      .catch((err) => {
-        failed = true
-        loading.delete(length)
-        throw err
-      })
-    loading.set(length, promise)
-  }
-  return promise
-}
 
 interface Guess extends Row {
   by: Viewer
@@ -49,7 +25,17 @@ const KEYS = ['qwertyuiop', 'asdfghjkl', 'zxcvbnm']
 const FLIP_MS = 380
 const STAGGER_MS = 150
 
-export function createFiveLetters(): GameInstance {
+export function createFiveLetters(secret: RoomSecret = { follow: followSecret, report: reportSecret }, loadBank = loadWordleBank): GameInstance {
+  const lists = new Map<number, WordleData>()
+  const failures = new Map<number, { at: number; count: number }>()
+  let failed = false
+  let disposed = false
+  let revision = 0
+  let request: AbortController | null = null
+  let detach: (() => void) | undefined
+  let paused = false
+  let deferred: (() => void) | undefined
+  let pendingWord: string | undefined
   let width = 0
   let height = 0
   let timed = false
@@ -105,19 +91,46 @@ export function createFiveLetters(): GameInstance {
   // A new round: with the word the room is playing (`forced`) or a random one of the chosen length,
   // reported to the server. The lists of that length are downloaded first, the first time.
   const startRound = (forced?: string) => {
-    if (waiting) return
+    if (disposed) return
+    if (forced !== undefined) {
+      revision++
+      request?.abort()
+      waiting = false
+      deferred = undefined
+      // A different room secret invalidates the old round immediately, even
+      // while the new length's bank is still in flight.
+      data = null
+      target = ''
+    } else if (waiting) return
+    if (paused) { deferred = () => startRound(forced); return }
     const length = forced ? forced.length : roundLength()
     const lists_ = lists.get(length)
     if (!lists_) {
-      if (failed) return
+      const failure = failures.get(length)
+      if (failure && (failure.count >= GAME_BANK_LIMITS.attempts || !retryDue(failure.at, performance.now()))) return
+      const ticket = ++revision
+      const controller = new AbortController()
+      request = controller
+      pendingWord = forced
       waiting = true
-      void loadData(length)
-        .then(() => {
-          waiting = false
-          startRound(forced)
+      void loadBank(length, controller.signal)
+        .then((bank) => {
+          if (disposed || revision !== ticket || controller.signal.aborted) return
+          lists.set(length, bank)
+          failures.delete(length)
+          failed = false
+          const apply = () => { waiting = false; startRound(forced) }
+          if (paused) deferred = apply
+          else apply()
         })
-        .catch(() => {
+        .catch((error: unknown) => {
+          if (disposed || revision !== ticket || controller.signal.aborted) return
+          controller.abort()
+          failed = true
+          pendingWord = undefined
+          failures.set(length, { at: performance.now(), count: (failure?.count ?? 0) + 1 })
           waiting = false
+          console.warn('[zerowordle] Caricamento della banca fallito', error)
         })
       return
     }
@@ -128,6 +141,7 @@ export function createFiveLetters(): GameInstance {
     if (forced === undefined && bag.length === 0) bag = shuffled(lists_.solutions)
     if (forced === undefined) bags.set(length, bag)
     data = lists_
+    pendingWord = undefined
     target = forced ?? bag.pop()!
     guesses = []
     revealedIdx = []
@@ -138,7 +152,7 @@ export function createFiveLetters(): GameInstance {
     timer = seconds
     roundClock = 0
     hintClock = 0
-    if (forced === undefined) reportSecret(target, prev)
+    if (forced === undefined) secret.report(target, prev)
   }
 
   const finish = (by: Viewer | null) => {
@@ -164,7 +178,29 @@ export function createFiveLetters(): GameInstance {
   }
 
   return {
+    dispose() {
+      disposed = true
+      revision++
+      request?.abort()
+      detach?.()
+      detach = undefined
+      deferred = undefined
+      lists.clear()
+      bags.clear()
+    },
+    setPaused(value) {
+      paused = value
+      if (!paused && !disposed) { const apply = deferred; deferred = undefined; apply?.() }
+    },
     reset(settings, w, h) {
+      revision++
+      request?.abort()
+      detach?.()
+      disposed = false
+      failed = false
+      failures.clear()
+      deferred = undefined
+      pendingWord = undefined
       width = w
       height = h
       read(settings)
@@ -173,15 +209,15 @@ export function createFiveLetters(): GameInstance {
       target = ''
       data = null
       waiting = false
-      followSecret({
+      detach = secret.follow({
         adopt(word) {
-          if (word !== target) startRound(word)
+          if (word !== target && word !== pendingWord) startRound(word)
         },
       })
       startRound()
     },
     onAction(action, event) {
-      if (!data || !target || revealed) return
+      if (disposed || paused || !data || !target || revealed) return
       if (action === 'reveal_letter') return revealLetter(true)
       if (action === 'find_letter') return revealLetter(false)
       if (action === 'rule_out') return ruleOut()
@@ -199,6 +235,7 @@ export function createFiveLetters(): GameInstance {
       else if (maxGuesses > 0 && guesses.length >= maxGuesses) finish(null)
     },
     update(dt, _now, settings) {
+      if (disposed || paused) return
       read(settings)
       if (!target) return startRound()
       if (revealed) {
@@ -268,7 +305,7 @@ export function createFiveLetters(): GameInstance {
       ctx.fillStyle = '#9aa0b8'
       ctx.font = '24px system-ui'
       const dots = '.'.repeat(1 + (Math.floor(now / 400) % 3))
-      ctx.fillText(failed ? 'Dati di ZeroWordle non trovati (gioco-zerowordle/data)' : `Carico le parole${dots}`, cx, top + 130)
+      ctx.fillText(failed ? 'Caricamento delle parole non riuscito.' : `Carico le parole${dots}`, cx, top + 130)
       return
     }
 

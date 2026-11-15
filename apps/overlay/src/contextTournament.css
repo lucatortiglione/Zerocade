@@ -1,0 +1,91 @@
+/* ZeroContext's tournament: sizes in vmin within the 9:16 frame, so the preview and the browser source match.
+   Band colours are the official ones (regolamento §2), set inline from the shared table. */
+
+.tournament {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.6vmin;
+  padding: 7vmin 3.5vmin 4vmin;
+  color: #fff;
+  font-family: 'Nunito Variable', system-ui, sans-serif;
+  background: radial-gradient(circle at 50% 0%, #1b2a4a, #0b1020 70%);
+  overflow: hidden;
+}
+body.tournament-on .overlay__guide { display: none; }
+
+.tournament__head { display: flex; flex-direction: column; align-items: center; gap: 0.4vmin; }
+.tournament__mode { font: 700 3.2vmin 'Fredoka Variable', system-ui, sans-serif; letter-spacing: 0.04em; color: #ffd166; }
+.tournament__round { font: 600 2.6vmin 'Fredoka Variable', system-ui, sans-serif; color: rgb(255 255 255 / 0.85); }
+
+.tournament__banner {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6vmin;
+  padding: 1.6vmin;
+  border-radius: 2vmin;
+  background: rgb(255 255 255 / 0.08);
+}
+.tournament__banner--open { box-shadow: inset 0 0 0 0.5vmin #2e7d32; }
+.tournament__banner--processing { box-shadow: inset 0 0 0 0.5vmin #fdd835; }
+.tournament__banner--paused { box-shadow: inset 0 0 0 0.5vmin #c62828; text-align: center; font-size: 2.4vmin; }
+.tournament__banner--paused strong { font: 700 3.4vmin 'Fredoka Variable', system-ui, sans-serif; }
+.tournament__phase { font: 700 3.6vmin 'Fredoka Variable', system-ui, sans-serif; letter-spacing: 0.06em; }
+.tournament__count { font: 700 12vmin/1 'Fredoka Variable', system-ui, sans-serif; animation: tournament-pop 0.3s ease-out; }
+.tournament__meta { font-size: 2.2vmin; color: rgb(255 255 255 / 0.8); }
+@keyframes tournament-pop { from { transform: scale(1.25); opacity: 0.6; } to { transform: scale(1); opacity: 1; } }
+
+.tournament__secret { display: flex; gap: 1vmin; }
+.tournament__slot { width: 4.6vmin; height: 5.6vmin; border-radius: 1vmin; background: rgb(255 255 255 / 0.14); box-shadow: inset 0 -0.5vmin 0 rgb(255 255 255 / 0.3); }
+
+.tournament__label { display: block; margin-bottom: 0.6vmin; font-size: 2vmin; text-transform: uppercase; letter-spacing: 0.08em; color: rgb(255 255 255 / 0.65); }
+.tournament__buoy, .tournament__last, .tournament__board { width: 100%; }
+.tournament__chips { display: flex; flex-wrap: wrap; gap: 0.8vmin; }
+.tournament__board { display: flex; flex-direction: column; gap: 0.7vmin; min-height: 0; }
+
+.tournament__guess {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  column-gap: 1.6vmin;
+  padding: 0.9vmin 1.8vmin;
+  border-radius: 1.4vmin;
+  font-weight: 700;
+}
+.tournament__guess--compact { display: inline-flex; gap: 1vmin; padding: 0.6vmin 1.2vmin; font-size: 2.2vmin; }
+.tournament__word { font-size: 2.9vmin; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tournament__guess--compact .tournament__word { font-size: 2.2vmin; }
+.tournament__pos { font: 700 2.9vmin 'Fredoka Variable', system-ui, sans-serif; }
+.tournament__author { grid-column: 1 / -1; font-size: 1.9vmin; font-weight: 600; opacity: 0.85; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.tournament__center { margin: auto 0; display: flex; flex-direction: column; align-items: center; gap: 2vmin; text-align: center; }
+.tournament__big { margin: 0; font: 700 5vmin 'Fredoka Variable', system-ui, sans-serif; text-align: center; }
+.tournament__hint { margin: 0; font-size: 2.3vmin; color: rgb(255 255 255 / 0.8); text-align: center; }
+
+.tournament__standings { width: 100%; display: flex; flex-direction: column; align-items: center; gap: 1.4vmin; }
+.tournament__title { margin: 0.6vmin 0 0; font: 700 3.4vmin 'Fredoka Variable', system-ui, sans-serif; text-align: center; color: #ffd166; }
+.tournament__result { margin: 0; font-size: 2.6vmin; text-align: center; }
+.tournament__achievements { margin: 0; font-size: 2.1vmin; color: #ffd166; text-align: center; }
+.tournament__rows { width: 100%; margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 0.8vmin; }
+.tournament__row {
+  display: grid;
+  grid-template-columns: 6vmin 1fr auto 8vmin;
+  align-items: center;
+  gap: 1.4vmin;
+  padding: 1.1vmin 1.8vmin;
+  border-radius: 1.4vmin;
+  background: rgb(255 255 255 / 0.1);
+  font-size: 3vmin;
+}
+.tournament__row--p1 { background: rgb(255 209 102 / 0.32); }
+.tournament__row--p2 { background: rgb(213 221 232 / 0.26); }
+.tournament__row--p3 { background: rgb(240 164 107 / 0.26); }
+.tournament__place { font: 700 3.2vmin 'Fredoka Variable', system-ui, sans-serif; text-align: center; }
+.tournament__name { font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tournament__points { font: 700 3.2vmin 'Fredoka Variable', system-ui, sans-serif; }
+.tournament__delta { font-size: 2.4vmin; text-align: right; color: #7ee2a8; }
+.tournament__delta--down { color: #ff8a80; }

@@ -104,6 +104,76 @@ I pesi vengono da una misura: quanto in alto finiscono le parole associate da Ze
 salire. Con il solo fastText la loro posizione mediana era 383 e il 65% stava entro la 1000; con le due fonti e
 senza le direzioni comuni 261 e 71%; con i collegamenti 32 e 98%.
 
+## Parole mai uscite
+
+Ogni parola segreta che esce, in una partita classica o in una manche del torneo, viene contata nella tabella
+`context_secret_uses` del database della diretta (`apps/server/data/zerocade.db`). Una nuova manche sceglie a caso tra
+le parole uscite meno volte, quindi sempre una parola mai uscita finché ce ne sono (6.837 in tutto). Quando sono finite
+riparte dalle meno usate, mai la stessa della manche appena giocata. La dashboard mostra accanto alla soluzione quante
+volte è uscita.
+
+## Torneo ZeroContext
+
+Le regole sono in [REGOLAMENTO_CONTEXT_TORNEO_v2_3.md](REGOLAMENTO_CONTEXT_TORNEO_v2_3.md), il progetto tecnico in
+[ZEROCONTEXT_TORNEO_SPECIFICA_TECNICA.md](ZEROCONTEXT_TORNEO_SPECIFICA_TECNICA.md). In breve: finestre globali da 6 s,
+una parola valida per persona e finestra, 70 finestre per manche, 5 o 7 manche, punti Pioniere + Jackpot − Filtro
+Ghiaccio, la Top 10 a schermo tra le manche (almeno 15 s, poi la manche successiva parte solo a comando).
+
+**Come si usa.** In dashboard, con ZeroContext selezionato e ZeroFollowerBot collegato, il pannello «Torneo
+ZeroContext» permette di scegliere le manche (5, 7 o infinite) e la durata minima della Top 10, poi «Avvia torneo
+ZeroContext». Con le manche infinite il torneo non finisce da solo: va avanti finché non premi «Concludi torneo». Lo
+stesso pannello avvia le manche, le mette in pausa, le chiude o le annulla, e mostra la parola segreta (solo
+all'organizzatore), la classifica completa e lo storico dei tornei. Durante il torneo non si cambia gioco e i
+controlli della partita classica sono bloccati.
+
+**Azzera classifica.** Tra una manche e l'altra (mai a manche in corso: prima va chiusa o annullata) il tasto «⟲ Azzera
+classifica» chiede un motivo e riporta il torneo all'inizio: le manche giocate finora diventano annullate e i loro punti
+spariscono, la classifica si svuota (si rientra con il primo tentativo valido) e si riparte dalla manche 1, subito,
+con le stesse impostazioni e parole segrete mai giocate nel torneo. Tentativi, manche e storico restano nel database;
+il registro (`context_tournament_audit`, evento `standings-reset`) conserva la classifica com'era. Un torneo già
+concluso o annullato non si azzera: se ne avvia uno nuovo.
+
+**Decisioni prese con l'organizzatore (15/11/2026)**, dove regolamento e specifica lasciavano aperto (§14):
+- si entra in classifica con il primo tentativo valido, anche a torneo iniziato;
+- contano solo i messaggi di ZeroFollowerBot. Senza il ponte il torneo non parte, e se il ponte cade durante una
+  manche il torneo si sospende;
+- chiudere una manche prima del tempo la conta come non risolta: restano Pionieri e malus, niente jackpot. La finestra
+  aperta viene comunque valutata, e un target arrivato in tempo vince. Annullare una manche (la manche in corso o
+  l'ultima giocata) toglie i suoi punti e la fa rigiocare con un'altra parola;
+- la parità rimasta dopo gli spareggi del §9 è ex aequo;
+- «Chi può giocare» resta quello impostato alla creazione del torneo;
+- oltre alle 5 o 7 manche del regolamento si può scegliere «Infinite» (`total_rounds` NULL nel database): si gioca
+  finché l'organizzatore conclude il torneo, o finché finiscono le parole segrete mai giocate nel torneo. Un
+  `zerocade.db` con la tabella dei tornei già creata viene adattato da solo al primo avvio.
+
+**Come è fatto.** Tutto si decide sul server; overlay e anteprima della dashboard mostrano solo lo stato che ricevono,
+e non ricevono mai la parola segreta prima della fine della manche.
+
+| File | Cosa fa |
+| --- | --- |
+| `packages/shared/src/contextTournament.ts` | regole in numeri, fasce e colori ufficiali, tipi dello stato e dei comandi |
+| `packages/shared/src/contextRanking.ts` | il ranking, lo stesso codice per il browser (classica) e per il server (torneo) |
+| `apps/server/src/context-tournament-scoring.ts` | punteggio puro: Pionieri, jackpot, Filtro Ghiaccio, spareggi, Top 10 |
+| `apps/server/src/context-tournament-ranking.ts` | corpus del server con la sua impronta, scelta della parola, parola guida |
+| `apps/server/src/context-tournament-db.ts` | tabelle `context_tournament_*` in `zerocade.db`, transazioni, storno, storico |
+| `apps/server/src/context-tournament.ts` | stati, finestre, comandi, ripristino dopo un riavvio |
+| `apps/overlay/src/ContextTournament.tsx` | la vista del torneo nell'overlay |
+| `apps/dashboard/src/components/ContextTournamentPanel.tsx` | il pannello dell'organizzatore |
+
+I punti del torneo non entrano nelle classifiche ordinarie. Un riavvio di Zerocade a metà manche la sospende: alla
+ripresa la finestra interrotta riparte da capo con i tentativi già registrati, e nulla viene contato due volte.
+
+**Scostamenti dalla specifica, motivati.**
+- Il ranking di una manche (circa 100 ms) gira nel thread principale e non in un worker, ma solo quando nessuna
+  finestra è aperta, cioè alla preparazione della manche. Un worker separato complicherebbe il pacchetto Windows.
+- I messaggi Socket.IO sono tre per il server (`context:tournament`, `-admin`, `-error`) e tre per la dashboard
+  (`context:tournament`, `-history`, `-standings`), invece dei sette della specifica.
+- Tra due finestre c'è 1 s di «ELABORAZIONE» per mostrare i risultati: non conta nei 6 s.
+
+**Non fatto e da verificare prima di tornei con premi:** misurare la latenza reale di video e chat di TikTok e
+Twitch (specifica §4 e §14.2): i 6 s sono quelli del server; adeguare la partita classica al suo regolamento v2.0, che
+la specifica indica come lavoro distinto; provare il torneo in una diretta vera.
+
 ## I dati
 
 | Dove | Contenuto | In Git |

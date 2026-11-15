@@ -11,30 +11,53 @@ import type { GeneratedLevel } from './generator.js'
 const here = dirname(fileURLToPath(import.meta.url))
 // The Windows package bundles the worker next to the server; in the repository it runs from
 // source (tsx hands its loader on to the thread).
-const workerFile = [join(here, 'wordgen-worker.mjs'), join(here, 'worker.ts')].find((f) => existsSync(f))
 const KEEP = 24
 
-type Reply = { n: number; level: GeneratedLevel } | { n: number; error: string }
+export type LevelReply = { n: number; level: GeneratedLevel } | { n: number; error: string }
+export interface LevelWorker {
+  postMessage(n: number): void
+  on(type: 'message', listener: (reply: LevelReply) => void): void
+  on(type: 'error', listener: (error: Error) => void): void
+  on(type: 'exit', listener: (code: number) => void): void
+  terminate(): Promise<number>
+  unref(): void
+}
 
-class LevelSource {
-  private worker: Worker | null = null
+function spawnWorker(): LevelWorker {
+  const bundled = join(here, 'wordgen-worker.mjs')
+  const resourceLimits = { maxOldGenerationSizeMb: 512, maxYoungGenerationSizeMb: 32, stackSizeMb: 4 }
+  return existsSync(bundled) ? new Worker(bundled, { resourceLimits }) : new Worker(new URL('../infrastructure-bootstrap.mjs', import.meta.url), {
+    workerData: { entry: new URL('./worker.ts', import.meta.url).href }, resourceLimits,
+  })
+}
+
+export class LevelSource {
+  private worker: LevelWorker | null = null
   private made = new Map<number, GeneratedLevel>()
-  private asked = new Map<number, { promise: Promise<GeneratedLevel>; settle: (r: Reply) => void }>()
+  private asked = new Map<number, { promise: Promise<GeneratedLevel>; settle: (r: LevelReply) => void; timer: ReturnType<typeof setTimeout> }>()
+  private closed = false
+  private closing: Promise<void> | null = null
+
+  constructor(private spawn = spawnWorker, private capacity = 8, private timeoutMs = 30_000) {}
 
   ready(n: number): GeneratedLevel | undefined {
     return this.made.get(n)
   }
 
   get(n: number): Promise<GeneratedLevel> {
+    if (this.closed) return Promise.reject(new Error('Generatore di livelli chiuso'))
+    if (!Number.isSafeInteger(n) || n < 1) return Promise.reject(new RangeError('Numero di livello non valido'))
     const made = this.made.get(n)
     if (made) return Promise.resolve(made)
     const asked = this.asked.get(n)
     if (asked) return asked.promise
-    let settle!: (r: Reply) => void
+    if (this.asked.size >= this.capacity) return Promise.reject(new Error('Generatore occupato: coda dei livelli piena'))
+    let settle!: (r: LevelReply) => void
     const promise = new Promise<GeneratedLevel>((resolve, reject) => {
       settle = (r) => ('level' in r ? resolve(r.level) : reject(new Error(r.error)))
     })
-    this.asked.set(n, { promise, settle })
+    const timer = setTimeout(() => this.fail('Tempo massimo di generazione superato'), this.timeoutMs)
+    this.asked.set(n, { promise, settle, timer })
     try {
       this.thread().postMessage(n)
     } catch (err) {
@@ -48,36 +71,54 @@ class LevelSource {
     this.get(n).catch(() => undefined)
   }
 
-  private thread(): Worker {
+  private thread(): LevelWorker {
     if (this.worker) return this.worker
-    if (!workerFile) throw new Error('the level generator is missing')
-    const worker = new Worker(workerFile)
-    worker.on('message', (reply: Reply) => {
+    const worker = this.spawn()
+    this.worker = worker
+    worker.on('message', (reply: LevelReply) => {
+      if (this.worker !== worker) return
+      const request = this.asked.get(reply.n)
+      if (!request) return
       if ('level' in reply) {
         this.made.set(reply.n, reply.level)
         if (this.made.size > KEEP) this.made.delete(this.made.keys().next().value!)
       }
-      this.asked.get(reply.n)?.settle(reply)
+      clearTimeout(request.timer)
+      request.settle(reply)
       this.asked.delete(reply.n)
     })
-    worker.on('error', (err: Error) => this.fail(err.message))
+    worker.on('error', (err: Error) => { if (this.worker === worker) this.fail(err.message) })
     worker.on('exit', (code) => {
-      this.worker = null
-      if (code !== 0) this.fail(`the level generator stopped (${code})`)
+      if (this.worker === worker) this.fail(`the level generator stopped (${code})`)
     })
     // The server keeps the process alive; the idle generator should not.
     worker.unref()
-    this.worker = worker
     return worker
   }
 
   // Everything still asked for fails; the next request starts a new thread.
   private fail(error: string): void {
     console.warn(`[zerowords] ${error}`)
-    for (const [n, { settle }] of this.asked) settle({ n, error })
+    for (const [n, { settle, timer }] of this.asked) { clearTimeout(timer); settle({ n, error }) }
     this.asked.clear()
-    void this.worker?.terminate()
+    const worker = this.worker
     this.worker = null
+    void worker?.terminate().catch((err: unknown) => console.warn('[zerowords] Chiusura worker fallita', err))
+  }
+
+  close(): Promise<void> {
+    if (this.closing) return this.closing
+    this.closed = true
+    for (const [n, { settle, timer }] of this.asked) {
+      clearTimeout(timer)
+      settle({ n, error: 'Generatore di livelli chiuso' })
+    }
+    this.asked.clear()
+    this.made.clear()
+    const worker = this.worker
+    this.worker = null
+    this.closing = worker ? worker.terminate().then(() => undefined) : Promise.resolve()
+    return this.closing
   }
 }
 

@@ -1,5 +1,5 @@
 import type { ContextComputer } from '../../apps/overlay/src/games/contextProtocol.ts'
-import { ContextError } from '../../packages/shared/src/context.ts'
+import { ContextError } from '@zerocade/shared'
 import { rankAgainst, type ContextData } from '../../apps/overlay/src/games/contextRanking.ts'
 
 // Domain tests use the same pure ranker with an explicit, immutable fixture.

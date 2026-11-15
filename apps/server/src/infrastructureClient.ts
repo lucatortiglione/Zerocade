@@ -27,6 +27,7 @@ export class InfrastructureClient {
   private unknown = 0
   private latencies: number[] = []
   private lastFailure: string | null = null
+  private closePromise: Promise<void> | null = null
   constructor(private name: string, private capacity = 256, private database = dbPath, private byteBudget = 64 * 1024 * 1024) {}
 
   run<K extends JobName>(kind: K, args: InfrastructureJobs[K]['args']): Promise<InfrastructureJobs[K]['result']> {
@@ -120,14 +121,17 @@ export class InfrastructureClient {
       samples: times.length, latencyMs: { p50: quantile(0.5), p95: quantile(0.95), p99: quantile(0.99) }, lastFailure: this.lastFailure }
   }
 
-  async close(): Promise<void> {
+  close(): Promise<void> {
     this.closing = true
-    if (!this.worker) return
-    // Posted after all preceding jobs; the dispatcher processes it last.
-    await this.request('close', null)
-    const worker = this.worker
-    this.worker = null
-    await worker?.terminate()
+    this.closePromise ??= (async () => {
+      if (!this.worker) return
+      // Posted after all preceding jobs; concurrent callers share one drain.
+      await this.request('close', null)
+      const worker = this.worker
+      this.worker = null
+      await worker?.terminate()
+    })()
+    return this.closePromise
   }
 }
 

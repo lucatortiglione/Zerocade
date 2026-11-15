@@ -1,5 +1,6 @@
 import { GAMES, chainModeLabel, parseChainSecret, type SessionState } from '@zerocade/shared'
 import { BivioSidebar } from '../components/BivioSidebar'
+import { ContextTournamentPanel } from '../components/ContextTournamentPanel'
 import { IncastroSidebar } from '../components/IncastroSidebar'
 import { LeaderboardPanel } from '../components/LeaderboardPanel'
 import { LiveColumn } from '../components/LiveColumn'
@@ -13,10 +14,14 @@ import { TriggerEditor } from '../components/TriggerEditor'
 import { WidgetsPanel } from '../components/WidgetsPanel'
 import { overlayUrl, previewUrl } from '../overlayKey'
 import { socket } from '../socket'
+import { timesOut } from '../format'
 import { useDashboard } from '../store'
 
 export function GamesPage() {
-  const { session, gameSecret } = useDashboard()
+  const { session, gameSecret, tournament, secretUses } = useDashboard()
+  // ZeroContext's tournament (shown, or still running): the classic round controls step aside.
+  const tournamentShown = session?.gameId === 'context' && Boolean(tournament)
+  const tournamentOpen = tournamentShown && tournament?.state.phase !== 'completed' && tournament?.state.phase !== 'cancelled'
 
   // Bivio, Incastro and Quizzland have their own control column (game switcher included) next
   // to the preview. Every game gets the same right column: pads, creators and latest gifts.
@@ -41,14 +46,16 @@ export function GamesPage() {
       <aside className="panel left-panel">
         <section>
           <h2 className="section-label">Games</h2>
-          <GamePicker session={session} />
+          <GamePicker session={session} locked={tournamentOpen} />
         </section>
-        {(session?.gameId === 'context' || session?.gameId === 'zerowordle' || session?.gameId === 'zeroreazioniacatena') && (
+        {session?.gameId === 'context' && <ContextTournamentPanel />}
+        {!tournamentShown && (session?.gameId === 'context' || session?.gameId === 'zerowordle' || session?.gameId === 'zeroreazioniacatena') && (
           <section>
             <h2 className="section-label">Soluzione</h2>
             <div className="context-solution">{gameSecret ? describeSecret(session.gameId, gameSecret) : '…'}</div>
             <p className="text-muted small">
               {session.gameId === 'zeroreazioniacatena' ? 'Le parole del round in corso: la chat non le vede.' : 'La parola segreta del round in corso: la chat non la vede.'}
+              {session.gameId === 'context' && gameSecret && ` Uscita ${timesOut(secretUses[gameSecret] ?? 1)}: si scelgono sempre parole mai uscite finché ce ne sono.`}
             </p>
             {/* ZeroContext has no time limit: a round ends when the chat finds the word, or from here. */}
             {session.gameId === 'context' && (
@@ -64,7 +71,7 @@ export function GamesPage() {
             )}
           </section>
         )}
-        {session && <GameControls session={session} />}
+        {session && !tournamentOpen && <GameControls session={session} />}
         <section>
           <h2 className="section-label">Chat Twitch e TikTok</h2>
           <p className="text-muted small">
@@ -105,7 +112,7 @@ function describeSecret(gameId: string, secret: string): string {
 }
 
 // The games in a drop-down, in alphabetical order; the chosen game's description sits below it.
-function GamePicker({ session }: { session: SessionState | null }) {
+function GamePicker({ session, locked = false }: { session: SessionState | null; locked?: boolean }) {
   const current = GAMES.find((g) => g.id === session?.gameId)
   // The same list as every other game menu (listedGames): quiz and brain games, in alphabetical order.
   const sorted = listedGames(current?.id)
@@ -113,6 +120,8 @@ function GamePicker({ session }: { session: SessionState | null }) {
     <div className="game-picker">
       <select
         aria-label="Gioco"
+        disabled={locked}
+        title={locked ? 'Durante il torneo ZeroContext non si cambia gioco' : undefined}
         value={current?.id ?? ''}
         onChange={(e) => socket.emit('game:select', e.target.value)}
       >

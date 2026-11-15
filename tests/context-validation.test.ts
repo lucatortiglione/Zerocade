@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
-import { CONTEXT_LIMITS, ContextError } from '../packages/shared/src/context.ts'
+import { CONTEXT_LIMITS, ContextError } from '@zerocade/shared'
 import { loadContextData } from '../apps/overlay/src/games/contextLoader.ts'
 import { lookup, parseContextData, rankAgainst } from '../apps/overlay/src/games/contextRanking.ts'
 

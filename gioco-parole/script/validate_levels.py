@@ -36,7 +36,7 @@ from collections import Counter, defaultdict
 
 from common import LANG, MIN_LEN, is_blocked, load_blocklist, load_lexicon, path
 
-with open(path("tools", "curve.json"), encoding="utf-8") as fh:
+with open(path("script", "curve.json"), encoding="utf-8") as fh:
     CURVE = json.load(fh)
 
 REPEAT_GAP = 50
