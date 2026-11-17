@@ -2,7 +2,7 @@ import { contextProfile, isContextProfile } from '@zerocade/shared'
 import { spawn } from 'node:child_process'
 import { createReadStream } from 'node:fs'
 import { mkdir, rename, rm, stat, writeFile } from 'node:fs/promises'
-import { existsSync } from 'node:fs'
+import { existsSync, readFileSync } from 'node:fs'
 import { randomUUID } from 'node:crypto'
 import { dirname, join, resolve } from 'node:path'
 import { monitorEventLoopDelay } from 'node:perf_hooks'
@@ -44,6 +44,7 @@ import {
   closeDb,
   contextTournamentStore,
   tabooStore,
+  wordHuntStore,
   contextSecretLast,
   contextSecretUses,
   recordContextSecretUse,
@@ -77,6 +78,9 @@ import { RecentFollows } from './follows.js'
 import { ContextTournaments, sanitizeTournamentCommand } from './context-tournament.js'
 import { TabooRooms } from './taboo.js'
 import { loadDeck } from './taboo-deck.js'
+import { WordHuntRooms } from './wordhunt.js'
+import { loadWordHuntDictionary } from './wordhunt-dictionary.js'
+import type { FixtureFile } from './wordhunt-domain.js'
 import { invalidateContextCorpus, serverCorpus } from './context-tournament-ranking.js'
 import { ContextSemanticGame } from './context-semantic.js'
 import { persistence, reports, WorkerJobError } from './infrastructureClient.js'
@@ -91,6 +95,7 @@ import {
   sanitizeMessage,
   sanitizeQuizzlandCommand,
   sanitizeTabooCommand,
+  sanitizeWordHuntCommand,
   sanitizeScene,
   sanitizeSettings,
   sanitizeBridgeConfig,
@@ -551,6 +556,9 @@ function broadcastEvent(key: string, received: LiveEvent, origin: EventOrigin = 
   const room = bivio.get(key) ?? incastro.get(key) ?? quizzland.get(key)
   // "Aiuti dal pubblico" switched off: those triggers give no help (activeTriggers).
   if (room && plays && !session.ended) for (const t of triggersFor(activeTriggers(session), event)) room.action(t.action, event)
+  // ZeroWordHunt takes the chat's comments from every source: the first one that arrives here wins the word (the room orders them).
+  if (event.type === 'comment' && plays && !session.ended && session.gameId === 'zerowordhunt')
+    wordhunt.get(key)?.offer({ user: event.user, text: event.text, messageId: '', platform: origin === 'sim' ? 'local' : origin })
   if (session.gameId === 'context' && plays && !session.paused && !session.ended) {
     const semantic = ensureSemantic(key)
     if (semantic) for (const t of triggersFor(activeTriggers(session), event)) semantic.action(t.action, event)
@@ -630,6 +638,28 @@ const taboo = new TabooRooms({
   log: (level, message, fields) => app.log[level](fields ?? {}, message),
 })
 
+// ZeroWordHunt (wordhunt.ts): the round is the server's own. Its answers are the chat's comments, from the bridge, the direct
+// feeds and the simulator alike: the first one that arrives here takes the word. The public state goes to every client of the
+// room; the targets and their paths to the dashboards only.
+const wordhuntFixture = JSON.parse(readFileSync(join(dirname(fileURLToPath(import.meta.url)), 'wordhunt-fixture.json'), 'utf-8')) as FixtureFile
+const wordhunt = new WordHuntRooms({
+  store: wordHuntStore,
+  dictionary: loadWordHuntDictionary,
+  fixture: () => wordhuntFixture,
+  monotonicNow: () => performance.now(),
+  wallNow: () => Date.now(),
+  setTimer: (fn, ms) => setTimeout(fn, ms),
+  clearTimer: (handle) => clearTimeout(handle as NodeJS.Timeout),
+  newId: randomUUID,
+  newSeed: () => randomUUID().slice(0, 8),
+  emitPublic: (key, state) => io.to(key).emit('wordhunt:state', state),
+  emitAdmin: (key, admin) => io.to(dashboardRoom(key)).emit('wordhunt:admin', admin),
+  allowed: (key, user) => allowedToPlay(getSession(key).settings, user),
+  settings: (key) => getSession(key).settings,
+  issue: gameIssue,
+  log: (level, message, fields) => app.log[level](fields ?? {}, message),
+})
+
 // ZeroFollowerBot's event bridge, for this Zerocade's room: its events go where the direct feeds' go.
 const zfb = new ZfbBridge(
   (received, kind, account, id, at) => {
@@ -654,6 +684,7 @@ const zfb = new ZfbBridge(
         (session.gameId === 'context' && !tournaments.has(roomKey) && roundOver(roomKey) && singleWord(event.text)) ||
         !allowedToPlay(session.settings, event.user) ||
         (session.gameId === 'zerotaboo' && taboo.get(roomKey)?.listening() === true) ||
+        (session.gameId === 'zerowordhunt' && wordhunt.get(roomKey)?.listening() === true) ||
         (session.settings.voiceFollowersOnly === true && event.user.follower === false && event.user.fan !== true))
     broadcastEvent(roomKey, event, kind, account ? `${kind}:${account}` : '')
     if (repeat || silent) zfb.skip(id)
@@ -684,6 +715,15 @@ try {
 } catch (error) {
   app.log.warn({ err: error }, 'ZeroTaboo: pulizia all\'avvio non riuscita')
 }
+// ZeroWordHunt: a round left open when the server stopped is closed as abandoned; the data older than 90 days is purged, now.
+try {
+  wordHuntStore.abandonOpenRounds(Date.now())
+  wordHuntStore.purgeExpired(Date.now())
+} catch (error) {
+  app.log.warn({ err: error }, 'ZeroWordHunt: pulizia all\'avvio non riuscita')
+}
+// ZeroWordHunt's dictionary (about a second to read) is prepared now, with nobody playing, not at the first generated round of a live.
+setTimeout(() => { if (getSession(roomKey).gameId === 'zerowordhunt') loadWordHuntDictionary() }, 3000).unref()
 // The tournament's corpus (68 MB read, hashed and parsed in one go, a few hundred ms with the server stopped) is
 // prepared now, with nobody playing, rather than at the first «Crea torneo» of a live.
 setTimeout(() => { if (getSession(roomKey).gameId === 'context') serverCorpus(contextProfile(getSession(roomKey).settings.associationSource)) }, 1000).unref()
@@ -821,6 +861,7 @@ io.on('connection', (socket) => {
   if (session.gameId === 'incastro') socket.emit('incastro:state', incastro.open(key, session.settings))
   if (session.gameId === 'quizzland') socket.emit('quizzland:state', quizzland.open(key, session.settings))
   if (session.gameId === 'zerotaboo') socket.emit('taboo:state', taboo.open(key).state())
+  if (session.gameId === 'zerowordhunt') socket.emit('wordhunt:state', wordhunt.open(key).state())
   const tournament = tournaments.state(key)
   if (tournament) socket.emit('context:tournament', tournament)
   if (clientType === 'dashboard' || !semantic) {
@@ -864,6 +905,17 @@ io.on('connection', (socket) => {
         }
       }
     }
+    if (getSession(key).gameId === 'zerowordhunt') {
+      if (command === 'pause' || command === 'resume') wordhunt.get(key)?.pause(command === 'pause')
+      else if (command === 'end' || command === 'restart') {
+        wordhunt.close(key)
+        if (command === 'restart') {
+          const room = wordhunt.open(key)
+          io.to(key).emit('wordhunt:state', room.state())
+          io.to(dashboardRoom(key)).emit('wordhunt:admin', room.admin())
+        }
+      }
+    }
     if (command === 'end') clearSemantic(key)
     else ensureSemantic(key)?.pause(command === 'pause')
   })
@@ -887,6 +939,7 @@ io.on('connection', (socket) => {
     // The tournament's points are the server's own, never an overlay's (and never in the ordinary leaderboards).
     if (session.gameId === 'context' && (tournaments.has(key) || ensureSemantic(key))) return
     if (session.gameId === 'zerotaboo') return // its standings are the server's own (D17)
+    if (session.gameId === 'zerowordhunt') return // its claims are the server's own
     if (typeof u.id !== 'string' || typeof u.nickname !== 'string' || typeof r.points !== 'number') return
     const avatar = typeof u.avatar === 'string' && /^https?:\/\//.test(u.avatar) ? u.avatar.slice(0, 512) : undefined
     recordScore(key, session.gameId, { id: u.id, nickname: u.nickname, avatar }, r.points)
@@ -960,6 +1013,7 @@ io.on('connection', (socket) => {
   if (quiz) socket.emit('quizzland:solution', quiz)
   // The card in play and the director's tools: to a dashboard only, never to an overlay.
   if (session.gameId === 'zerotaboo') socket.emit('taboo:admin', taboo.open(key).admin())
+  if (session.gameId === 'zerowordhunt') socket.emit('wordhunt:admin', wordhunt.open(key).admin())
   void persistence.run('ranking', { key }).then((ranking) => { if (socket.connected) socket.emit('ranking:update', ranking) })
     .catch((error: unknown) => app.log.error({ err: error }, 'Classifica donatori non disponibile'))
   void persistence.run('padBoard', { key }).then((board) => { if (socket.connected) socket.emit('pads:state', board) })
@@ -1051,6 +1105,7 @@ io.on('connection', (socket) => {
     incastro.close(key)
     quizzland.close(key)
     taboo.close(key)
+    wordhunt.close(key)
     if (state.gameId === 'zerodubbi') bivio.open(key, state.settings)
     if (state.gameId === 'incastro') incastro.open(key, state.settings)
     if (state.gameId === 'quizzland') quizzland.open(key, state.settings)
@@ -1058,6 +1113,11 @@ io.on('connection', (socket) => {
       const room = taboo.open(key)
       io.to(key).emit('taboo:state', room.state())
       io.to(dashboardRoom(key)).emit('taboo:admin', room.admin())
+    }
+    if (state.gameId === 'zerowordhunt') {
+      const room = wordhunt.open(key)
+      io.to(key).emit('wordhunt:state', room.state())
+      io.to(dashboardRoom(key)).emit('wordhunt:admin', room.admin())
     }
     ensureSemantic(key)
   })
@@ -1118,6 +1178,17 @@ io.on('connection', (socket) => {
       : getSession(key).gameId !== 'zerotaboo'
         ? ({ ok: false, error: 'wrong-phase', message: 'ZeroTaboo non è il gioco selezionato.' } as const)
         : taboo.open(key).control(command)
+    if (typeof ack === 'function') ack(reply)
+  })
+
+  // ZeroWordHunt: every command is checked here, carries the version the director saw, and is answered with a typed reply.
+  socket.on('wordhunt:control', (raw: unknown, ack?: unknown) => {
+    const command = clientType === 'dashboard' ? sanitizeWordHuntCommand(raw) : null
+    const reply = !command
+      ? ({ ok: false, error: 'bad-input', message: 'Comando non valido.' } as const)
+      : getSession(key).gameId !== 'zerowordhunt'
+        ? ({ ok: false, error: 'wrong-phase', message: 'ZeroWordHunt non è il gioco selezionato.' } as const)
+        : wordhunt.open(key).control(command)
     if (typeof ack === 'function') ack(reply)
   })
 
@@ -1203,6 +1274,7 @@ const shutdown = createShutdown({
     { name: 'ZeroWords rooms', run: () => incastro.closeAll() },
     { name: 'ZeroQuizz rooms', run: () => quizzland.closeAll() },
     { name: 'ZeroTaboo rooms', run: () => taboo.closeAll() },
+    { name: 'ZeroWordHunt rooms', run: () => wordhunt.closeAll() },
     { name: 'level generator', run: () => levels.close() },
     { name: 'sockets', run: () => new Promise<void>((resolve) => void io.close(() => resolve())) },
     { name: 'leaderboard publisher', run: () => leaderboardPublisher?.close() },

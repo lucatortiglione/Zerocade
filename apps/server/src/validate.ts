@@ -12,6 +12,8 @@ import {
   type QuizzlandCommand,
   type TabooCommand,
   TABOO_RULES,
+  WORDHUNT_RULES,
+  type WordHuntCommand,
   type SourceConfig,
   type Trigger,
   type TriggerSource,
@@ -286,6 +288,35 @@ export function sanitizeTabooCommand(raw: unknown): TabooCommand | null {
       if (report === null || typeof r.verifiable !== 'boolean' || typeof r.reason !== 'string') return null
       const reason = r.reason.replace(/\s+/g, ' ').trim().slice(0, TABOO_RULES.maxReasonChars)
       return reason ? { type: 'decide', expectedVersion, report, verifiable: r.verifiable, reason } : null
+    }
+    default:
+      return null
+  }
+}
+
+// ZeroWordHunt's commands from the dashboard (wordhunt.ts): the shape, the types and the limits are checked here, at the boundary.
+// Each carries the version the director saw (DIRETTIVE §13). Anything else is null.
+export function sanitizeWordHuntCommand(raw: unknown): WordHuntCommand | null {
+  if (!raw || typeof raw !== 'object') return null
+  const r = raw as Record<string, unknown>
+  const expectedVersion = int(r.expectedVersion, 0, Number.MAX_SAFE_INTEGER)
+  if (expectedVersion === null || typeof r.type !== 'string') return null
+  switch (r.type) {
+    case 'start': case 'finish': case 'reset':
+      return { type: r.type, expectedVersion }
+    case 'create-round': {
+      if (r.mode !== 'fixture' && r.mode !== 'generated') return null
+      const seed = r.seed === undefined ? undefined : typeof r.seed === 'string' ? r.seed.trim().slice(0, WORDHUNT_RULES.maxSeedChars) : null
+      const seconds = r.durationSeconds === undefined ? undefined : int(r.durationSeconds, WORDHUNT_RULES.roundSecondsMin, WORDHUNT_RULES.roundSecondsMax)
+      const count = r.targetCount === undefined ? undefined : int(r.targetCount, WORDHUNT_RULES.targetMin, WORDHUNT_RULES.targetMax)
+      if (seed === null || seconds === null || count === null) return null
+      return { type: 'create-round', expectedVersion, mode: r.mode, ...(seed ? { seed } : {}), ...(seconds !== undefined && { durationSeconds: seconds }), ...(count !== undefined && { targetCount: count }) }
+    }
+    case 'revoke': {
+      const target = int(r.target, 1, WORDHUNT_RULES.targetMax)
+      if (target === null || typeof r.reason !== 'string') return null
+      const reason = r.reason.replace(/\s+/g, ' ').trim().slice(0, WORDHUNT_RULES.maxReasonChars)
+      return reason ? { type: 'revoke', expectedVersion, target, reason } : null
     }
     default:
       return null

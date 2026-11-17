@@ -8,10 +8,12 @@ export * from './contextTournament.js'
 export * from './contextSemantic.js'
 export * from './contextProfiles.js'
 export * from './taboo.js'
+export * from './wordhunt.js'
 import type { ContextSemanticState } from './contextSemantic.js'
 export { pickSecret } from './secretPick.js'
 import type { ContextTournamentAdmin, ContextTournamentState, TournamentCommand, TournamentReply, TournamentRow, TournamentSummary } from './contextTournament.js'
 import { TABOO_RULES, type TabooAdminState, type TabooCommand, type TabooPublicState, type TabooReply } from './taboo.js'
+import { WORDHUNT_RULES, type WordHuntAdminState, type WordHuntCommand, type WordHuntPublicState, type WordHuntReply } from './wordhunt.js'
 
 export {
   WORD_ASSOCIATION_MAX_WORDS,
@@ -1718,6 +1720,42 @@ const GAME_DEFS: GameDef[] = [
     defaultTriggers: [{ source: { type: 'comment' }, action: 'guess' }],
   },
   {
+    id: 'zerowordhunt',
+    name: 'ZeroWordHunt',
+    category: 'Parole',
+    description:
+      'Cerca-parole per la diretta: una griglia 20×15, la chat scrive le parole nascoste e il primo messaggio valido le conquista. La parola prende un colore e nella casella accanto compare l’avatar di chi l’ha trovata.',
+    emoji: '🔎',
+    gradient: ['#22d3ee', '#0a1f2a'],
+    // Le risposte sono i commenti della chat: il server li legge direttamente, senza trigger né aiuti del pubblico.
+    actions: [{ id: 'guess', label: 'Risposta' }],
+    settings: [
+      {
+        id: 'wordhuntSeconds',
+        label: 'Secondi per round',
+        hint: `Da ${WORDHUNT_RULES.roundSecondsMin} a ${WORDHUNT_RULES.roundSecondsMax}. Vale dal round successivo.`,
+        kind: 'number',
+        min: WORDHUNT_RULES.roundSecondsMin,
+        max: WORDHUNT_RULES.roundSecondsMax,
+        step: 10,
+        default: WORDHUNT_RULES.roundSecondsDefault,
+      },
+      {
+        id: 'wordhuntCountdown',
+        label: 'Conto alla rovescia',
+        hint: 'Secondi di preparazione prima che il round si apra.',
+        kind: 'number',
+        min: 0,
+        max: WORDHUNT_RULES.countdownSecondsMax,
+        step: 1,
+        default: WORDHUNT_RULES.countdownSecondsDefault,
+      },
+      { id: 'wordhuntAnimations', label: 'Animazioni', hint: 'Brevi e silenziabili: nessuna nella vista di riferimento.', kind: 'toggle', default: true },
+      { id: 'showLeaderboard', label: 'Classifica', kind: 'toggle', default: true },
+    ],
+    defaultTriggers: [{ source: { type: 'comment' }, action: 'guess' }],
+  },
+  {
     id: 'ruzzle',
     name: 'Ruzzle',
     category: 'Quiz',
@@ -2285,6 +2323,9 @@ export interface ServerToClientEvents {
   // warnings to dashboards only. Never a target, a Taboo word or an alias in the public one before the card is closed.
   'taboo:state': (state: TabooPublicState | null) => void
   'taboo:admin': (admin: TabooAdminState | null) => void
+  // ZeroWordHunt (wordhunt.ts): the public state (letters, found words, avatars) for every client; targets and paths to dashboards only.
+  'wordhunt:state': (state: WordHuntPublicState | null) => void
+  'wordhunt:admin': (admin: WordHuntAdminState | null) => void
   // ZeroContext's secret word of the room: dashboards show it to the creator, and every overlay
   // (the preview too) plays the same one.
   'secret:word': (secret: { word: string }) => void
@@ -2354,6 +2395,8 @@ export interface ClientToServerEvents {
   'context:tournament': (command: TournamentCommand, ack: (reply: TournamentReply) => void) => void
   // The dashboard: ZeroTaboo's commands (checked on the server; each carries the version the director saw).
   'taboo:control': (command: TabooCommand, ack: (reply: TabooReply) => void) => void
+  // The dashboard: ZeroWordHunt's commands (checked on the server; each carries the version the director saw).
+  'wordhunt:control': (command: WordHuntCommand, ack: (reply: WordHuntReply) => void) => void
   'context:tournament-history': (ack: (history: TournamentSummary[]) => void) => void
   'context:tournament-standings': (id: string, ack: (rows: TournamentRow[] | null) => void) => void
   // The copies of the standings saved after every round in a separate SQLite file (latest first), and the restore

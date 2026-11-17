@@ -22,6 +22,7 @@ import {
 import { REPORT_MAX_BYTES } from './csv.js'
 import { ContextTournamentStore } from './context-tournament-db.js'
 import { TabooStore } from './taboo-db.js'
+import { WordHuntStore } from './wordhunt-db.js'
 import { TournamentBackup } from './context-tournament-backup.js'
 
 // Local persistence via better-sqlite3 (latest stable SQLite engine). The DB file
@@ -948,6 +949,8 @@ export const contextTournamentStore = new ContextTournamentStore(db, tournamentB
 // ZeroTaboo's matches, exposures, winners and score events (the deck is a file of its own, database/ZeroTaboo.sqlite3).
 // The schema is created here with IF NOT EXISTS: the infrastructure worker imports this module too, so it must stay idempotent.
 export const tabooStore = new TabooStore(db)
+// ZeroWordHunt's rounds, targets, claims and event log (wordhunt-db.ts), created here with IF NOT EXISTS like the others.
+export const wordHuntStore = new WordHuntStore(db)
 
 // ZeroContext: how many times each secret word has come out (a classic round or a tournament round), so new rounds
 // choose words never played (decided 15/11/2026).

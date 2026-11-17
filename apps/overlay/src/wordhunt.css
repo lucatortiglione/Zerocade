@@ -1,0 +1,107 @@
+/* ZeroWordHunt's scene: the board is the 570 x 769 reference surface scaled by one factor (WordHunt.tsx), the rest is in vmin within
+   the 9:16 frame main.tsx keeps. The board has no bar, ranking or decoration over it (spec §1.1): the HUD is above and below. */
+.wordhunt {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1.6vmin;
+  padding: 9vmin 3vmin 11vmin; /* the overlay's own title is above, its trigger guide below */
+  box-sizing: border-box;
+  font-family: 'Nunito Variable', system-ui, sans-serif;
+  color: #fff;
+  background: #0e0e16;
+  overflow: hidden;
+}
+/* With NASA's picture as the background it shows through, in the margins while a round is on and whole before it. */
+.wordhunt[data-nasa='true'] { background: transparent; }
+/* Before a round: the picture alone, without the veil the games put over it; only a caption at the bottom. */
+.overlay:has(.wordhunt--photo[data-nasa='true']) .nasa__veil { display: none; }
+.wordhunt--photo { justify-content: flex-end; align-items: center; background: transparent; }
+.wordhunt--photo[data-nasa='false'] { background: #0e0e16; }
+.wordhunt-caption {
+  margin: 0; padding: 1.2vmin 3vmin; border-radius: 99vmin; font-size: 3.6vmin; font-weight: 800;
+  background: rgb(0 0 0 / 0.5); text-shadow: none;
+}
+.wordhunt-caption strong { font-size: 5vmin; font-family: 'Fredoka Variable', system-ui, sans-serif; }
+.wordhunt h1, .wordhunt-timer, .wordhunt-count { font-family: 'Fredoka Variable', system-ui, sans-serif; margin: 0; }
+.wordhunt--wait { align-items: center; justify-content: center; font-size: 6vmin; }
+.wordhunt-head { display: flex; align-items: center; justify-content: space-between; gap: 2vmin; flex: none; }
+.wordhunt-head h1 { font-size: 3.6vmin; letter-spacing: 0.1vmin; text-transform: uppercase; }
+.wordhunt-timer { font-size: 5vmin; font-weight: 700; font-variant-numeric: tabular-nums; }
+.wordhunt-timer[data-low='true'] { color: #fecaca; }
+.wordhunt-count { font-size: 4vmin; font-weight: 700; }
+.wordhunt-count strong { font-size: 5vmin; }
+.wordhunt-center { flex: 1; display: flex; align-items: center; justify-content: center; font-size: 4vmin; text-align: center; }
+.wordhunt-notice { margin: 0; text-align: center; font-size: 2.4vmin; opacity: 0.85; flex: none; }
+
+/* The box the board must fit; the frame inside has the exact scaled size, so nothing is deformed. */
+.wordhunt-fit { flex: 1; min-height: 0; display: flex; align-items: center; justify-content: center; }
+.wordhunt-frame { position: relative; overflow: hidden; flex: none; }
+.wordhunt-board {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 570px;
+  height: 769px;
+  transform-origin: top left;
+  background: #0e0e16;
+  isolation: isolate;
+  font-family: 'Nunito Variable', 'Segoe UI', system-ui, sans-serif;
+  user-select: none;
+}
+.wordhunt-tile {
+  position: absolute;
+  box-sizing: border-box;
+  width: 34px;
+  height: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid #1e1e25;
+  border-radius: 4px;
+  background: #16161c;
+  color: #fff;
+  font-size: 21px;
+  font-weight: 800;
+  line-height: 1;
+  text-shadow: none;
+}
+.wordhunt-tile[data-found='true'] { background: var(--word-color); color: #000; border-color: var(--word-color); }
+.wordhunt-board--anim .wordhunt-tile { transition: background-color 180ms ease-out, color 180ms ease-out; }
+.wordhunt-coord { position: absolute; color: #f2f2fb; font-weight: 800; text-align: center; pointer-events: none; text-shadow: none; }
+.wordhunt-coord--col { font-size: 15px; }
+.wordhunt-coord--row { font-size: 18px; }
+.wordhunt-avatar {
+  position: absolute;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 4px;
+  overflow: hidden;
+  background: var(--tint, #3a3a44);
+  color: #fff;
+  font-size: 21px;
+  font-weight: 800;
+  text-shadow: none;
+}
+.wordhunt-avatar img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center; }
+.wordhunt-board--anim .wordhunt-avatar { animation: wordhunt-pop 160ms ease-out; }
+@keyframes wordhunt-pop { from { opacity: 0; } to { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) {
+  .wordhunt-board--anim .wordhunt-tile { transition: none; }
+  .wordhunt-board--anim .wordhunt-avatar { animation: none; }
+}
+
+.wordhunt-last {
+  flex: none; display: flex; align-items: center; justify-content: center; gap: 1.2vmin; font-size: 2.8vmin; padding: 1vmin 2vmin;
+  border-left: 1vmin solid var(--word-color, #fff); background: rgba(255, 255, 255, 0.08); border-radius: 1vmin;
+}
+.wordhunt-last strong { color: var(--word-color, #fff); }
+.wordhunt-name { display: inline-flex; align-items: center; gap: 0.8vmin; }
+.wordhunt-leaders { flex: none; list-style: none; margin: 0; padding: 0; display: flex; justify-content: center; gap: 3vmin; font-size: 2.6vmin; }
+.wordhunt-leaders li { display: flex; align-items: center; gap: 1vmin; }
+.wordhunt-leaders__place { font-weight: 800; opacity: 0.7; }
+.wordhunt-leaders__points { font-weight: 800; }

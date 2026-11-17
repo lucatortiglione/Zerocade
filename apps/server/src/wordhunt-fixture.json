@@ -1,0 +1,85 @@
+{
+  "version": 1,
+  "rows": 20,
+  "cols": 15,
+  "grid": [
+    "XPENSIEROEFFALM",
+    "XLEEMARINAREXRC",
+    "SETLITOBBLIGOXO",
+    "TNRRABBIAOHARAR",
+    "ASAAXMURATOREAO",
+    "GNSDLRNOOPASSSN",
+    "NESIEATTCOVRENA",
+    "OVORMANTEASRSZX",
+    "LRSEEBEGEMAAECS",
+    "IIOTFAOEETPTOEI",
+    "SFTTASILISEORAO",
+    "CLSOOSCSODEAAEE",
+    "IEORIVIAERSBTOA",
+    "OSCEOVTSFIRIGGS",
+    "NSSXORCECFISSRI",
+    "TOOANOCESHASAIC",
+    "FXMGTRRBCRELLDR",
+    "EPNTRPEACOFNEOO",
+    "OTLPECCATOAITTC",
+    "FINANZASBMIIIAE"
+  ],
+  "words": [
+    {
+      "word": "PENSIERO",
+      "start": "A2",
+      "direction": "RIGHT",
+      "color": "#F97316",
+      "avatar": "A1"
+    },
+    {
+      "word": "MARINARE",
+      "start": "B5",
+      "direction": "RIGHT",
+      "color": "#F472B6",
+      "avatar": "B13"
+    },
+    {
+      "word": "OBBLIGO",
+      "start": "C7",
+      "direction": "RIGHT",
+      "color": "#22C55E",
+      "avatar": "C14"
+    },
+    {
+      "word": "MURATORE",
+      "start": "E6",
+      "direction": "RIGHT",
+      "color": "#FF2D78",
+      "avatar": "E5"
+    },
+    {
+      "word": "STAGNO",
+      "start": "C1",
+      "direction": "DOWN",
+      "color": "#A855F7",
+      "avatar": "B1"
+    },
+    {
+      "word": "DIRETTORE",
+      "start": "F4",
+      "direction": "DOWN",
+      "color": "#4ADE80",
+      "avatar": "O4"
+    },
+    {
+      "word": "RIFLESSO",
+      "start": "I2",
+      "direction": "DOWN",
+      "color": "#FACC15",
+      "avatar": "Q2"
+    },
+    {
+      "word": "CORONA",
+      "start": "B15",
+      "direction": "DOWN",
+      "color": "#22D3EE",
+      "avatar": "H15"
+    }
+  ]
+}

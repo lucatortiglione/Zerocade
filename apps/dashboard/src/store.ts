@@ -16,6 +16,8 @@ import {
   type QuizzlandState,
   type TabooAdminState,
   type TabooPublicState,
+  type WordHuntAdminState,
+  type WordHuntPublicState,
   type SavedSources,
   type SessionState,
   type SourceKind,
@@ -52,6 +54,9 @@ interface DashboardState {
   // ZeroTaboo: the public state, and the director's view (the card in play with its Taboo words and aliases), for dashboards only.
   taboo: TabooPublicState | null
   tabooAdmin: TabooAdminState | null
+  // ZeroWordHunt: the public state, and the director's view (every word with its path and its avatar cell), for dashboards only.
+  wordhunt: WordHuntPublicState | null
+  wordhuntAdmin: WordHuntAdminState | null
   // ZeroContext's secret word of the round in play.
   gameSecret: string | null
   // ZeroContext's tournament as its organiser sees it (secret, full standings), and the last refused command.
@@ -82,6 +87,8 @@ let state: DashboardState = {
   quizzlandSolution: null,
   taboo: null,
   tabooAdmin: null,
+  wordhunt: null,
+  wordhuntAdmin: null,
   gameSecret: null,
   tournament: null,
   tournamentAt: 0,
@@ -157,6 +164,8 @@ socket.on('quizzland:state', (quizzland) => update({ quizzland }))
 socket.on('quizzland:solution', (quizzlandSolution) => update({ quizzlandSolution }))
 socket.on('taboo:state', (taboo) => update({ taboo }))
 socket.on('taboo:admin', (tabooAdmin) => update({ tabooAdmin }))
+socket.on('wordhunt:state', (wordhunt) => update({ wordhunt }))
+socket.on('wordhunt:admin', (wordhuntAdmin) => update({ wordhuntAdmin }))
 socket.on('pads:state', (pads) => update({ pads }))
 socket.on('context:tournament-admin', (tournament) => update({ tournament, tournamentAt: performance.now() }))
 socket.on('context:tournament-error', ({ message }) => update({ tournamentError: message }))

@@ -11,6 +11,7 @@ import { GameControls } from '../components/GameControls'
 import { BridgeControl, listedGames } from '../components/Regia'
 import { QuizzlandSidebar } from '../components/QuizzlandSidebar'
 import { TabooSidebar } from '../components/TabooSidebar'
+import { WordHuntSidebar } from '../components/WordHuntSidebar'
 import { SettingsPanel } from '../components/SettingsPanel'
 import { Simulator } from '../components/Simulator'
 import { TopGifters } from '../components/TopGifters'
@@ -29,7 +30,7 @@ export function GamesPage() {
 
   // Bivio, Incastro and Quizzland have their own control column (game switcher included) next
   // to the preview. Every game gets the same right column: pads, creators and latest gifts.
-  if (session?.gameId === 'zerodubbi' || session?.gameId === 'incastro' || session?.gameId === 'quizzland' || session?.gameId === 'zerotaboo') {
+  if (session?.gameId === 'zerodubbi' || session?.gameId === 'incastro' || session?.gameId === 'quizzland' || session?.gameId === 'zerotaboo' || session?.gameId === 'zerowordhunt') {
     return (
       <div className="games games--bivio">
         {session.gameId === 'zerodubbi' ? (
@@ -38,6 +39,8 @@ export function GamesPage() {
           <IncastroSidebar session={session} />
         ) : session.gameId === 'zerotaboo' ? (
           <TabooSidebar session={session} />
+        ) : session.gameId === 'zerowordhunt' ? (
+          <WordHuntSidebar session={session} />
         ) : (
           <QuizzlandSidebar session={session} />
         )}

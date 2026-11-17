@@ -7,6 +7,7 @@ import { createGame } from './games/registry'
 import { createContextTournament } from './games/contextTournamentGame'
 import { createSemanticContext } from './games/contextSemanticGame'
 import { Taboo } from './Taboo'
+import { WordHunt } from './WordHunt'
 import { socket } from './socket'
 import { overlaySnapshot, useOverlay } from './store'
 import { Widgets } from './Widgets'
@@ -123,6 +124,7 @@ export function App() {
       {session?.gameId === 'incastro' && <Incastro />}
       {session?.gameId === 'quizzland' && <Quizzland />}
       {session?.gameId === 'zerotaboo' && <Taboo />}
+      {session?.gameId === 'zerowordhunt' && <WordHunt />}
       {tournamentOn && <ContextTournament />}
       <header className="overlay__top">
         <span className="overlay__brand">{game?.emoji ?? '🎮'}</span>

@@ -6,6 +6,7 @@ import {
   type ContextTournamentState,
   type ContextSemanticState,
   type TabooPublicState,
+  type WordHuntPublicState,
   type GifShow,
   type Gifter,
   type IncastroState,
@@ -44,6 +45,9 @@ interface OverlayState {
   // ZeroTaboo, as the server runs it: only the public state (never the card in play), and when it arrived, to count the round down.
   taboo: TabooPublicState | null
   tabooAt: number
+  // ZeroWordHunt, as the server runs it: only the public state (never a word that is not found), and when it arrived, to count down.
+  wordhunt: WordHuntPublicState | null
+  wordhuntAt: number
   // The creator's latest message, shown for a few seconds; messageSeq keys each one.
   message: string | null
   messageSeq: number
@@ -72,6 +76,8 @@ let state: OverlayState = {
   contextSemanticAt: 0,
   taboo: null,
   tabooAt: 0,
+  wordhunt: null,
+  wordhuntAt: 0,
   message: null,
   messageSeq: 0,
   gif: null,
@@ -106,6 +112,7 @@ socket.on('quizzland:state', (quizzland) => update({ quizzland, quizzlandAt: per
 socket.on('context:tournament', (contextTournament) => update({ contextTournament, contextTournamentAt: performance.now() }))
 socket.on('context:semantic', (contextSemantic) => update({ contextSemantic, contextSemanticAt: performance.now() }))
 socket.on('taboo:state', (taboo) => update({ taboo, tabooAt: performance.now() }))
+socket.on('wordhunt:state', (wordhunt) => update({ wordhunt, wordhuntAt: performance.now() }))
 socket.on('context:secret-uses', (uses) => setSecretUses(uses))
 socket.on('context:secret-used', ({ word, uses, at }) => noteSecretUse(word, uses, at))
 socket.on('context:secret-last', (last) => setSecretLast(last))
