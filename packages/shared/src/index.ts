@@ -13,7 +13,7 @@ import type { ContextSemanticState } from './contextSemantic.js'
 export { pickSecret } from './secretPick.js'
 import type { ContextTournamentAdmin, ContextTournamentState, TournamentCommand, TournamentReply, TournamentRow, TournamentSummary } from './contextTournament.js'
 import { TABOO_RULES, type TabooAdminState, type TabooCommand, type TabooPublicState, type TabooReply } from './taboo.js'
-import { WORDHUNT_RULES, type WordHuntAdminState, type WordHuntCommand, type WordHuntPublicState, type WordHuntReply } from './wordhunt.js'
+import { WORDHUNT_RULES, WORDHUNT_SIZES, WORDHUNT_SIZE_DEFAULT, type WordHuntSize, type WordHuntAdminState, type WordHuntCommand, type WordHuntPublicState, type WordHuntReply } from './wordhunt.js'
 
 export {
   WORD_ASSOCIATION_MAX_WORDS,
@@ -697,7 +697,17 @@ export const COMMON_SETTINGS: GameSetting[] = [
     hint: 'I commenti di chi non rientra vengono ignorati dal gioco. Conta chi scrive dopo il collegamento TikTok, che dice se segue il profilo o ha il badge del fan club (abbonamento): se non lo sa, il commento non vale. Chi segue durante la diretta vale subito come follower, anche prima che TikTok lo dica. Lo streamer gioca sempre.',
   },
   { id: 'voiceFollowersOnly', label: 'Voce solo ai follower', kind: 'toggle', default: false, group: 'Chat', hint: VOICE_HINT },
+  {
+    id: 'voiceSkipAnswers',
+    label: 'Voce: non leggere le risposte',
+    kind: 'toggle',
+    default: false,
+    group: 'Chat',
+    hint: 'La voce di ZeroFollowerBot non legge i commenti che il gioco prende come risposte. ZeroWordle: tutti i tentativi. ZeroContext: le parole singole a round finito. ZeroTaboo: i commenti con una carta aperta. ZeroWordHunt: i commenti a round in corso. Gli altri giochi: i commenti che attivano un’azione “risposta”. Spento, la voce legge anche le risposte.',
+  },
 ]
+// The games whose answers the voice never read before this was a setting: they keep that, on, until it is switched off.
+const VOICE_SKIPS_ANSWERS = new Set(['zerowordle', 'context', 'zerotaboo'])
 
 // NASA's Image of the Day behind a game (GET /api/nasa: the latest few dozen pictures of the feed). The picture
 // in view comes from the clock and that list, so the dashboard preview and the stream show the same one, and it
@@ -1750,6 +1760,46 @@ const GAME_DEFS: GameDef[] = [
         step: 1,
         default: WORDHUNT_RULES.countdownSecondsDefault,
       },
+      {
+        id: 'wordhuntSize',
+        label: 'Dimensione tabellone',
+        hint: 'Colonne × righe e parole da trovare. Il tempo del round si adatta in proporzione alle parole (il valore sotto è per 24). Vale dal round successivo; la griglia di riferimento è sempre 15 × 20.',
+        kind: 'select',
+        default: WORDHUNT_SIZE_DEFAULT,
+        options: (Object.keys(WORDHUNT_SIZES) as WordHuntSize[]).map((value) => ({
+          value,
+          label: `${WORDHUNT_SIZES[value].label} (${WORDHUNT_SIZES[value].cols} × ${WORDHUNT_SIZES[value].rows}, ${WORDHUNT_SIZES[value].words} parole)`,
+        })),
+      },
+      {
+        id: 'wordhuntAuto',
+        label: 'Round automatici',
+        hint: 'Il primo round parte da solo alla scelta del gioco e un nuovo round parte dopo ogni round, con un “Tabellone Grande” da 24 parole. “Chiudi” in regia ferma l’automatismo.',
+        kind: 'toggle',
+        default: true,
+      },
+      {
+        id: 'wordhuntPauseSeconds',
+        label: 'Pausa tra i round',
+        hint: `Da ${WORDHUNT_RULES.pauseSecondsMin} a ${WORDHUNT_RULES.pauseSecondsMax} secondi: la griglia finita resta in vista prima del round successivo.`,
+        kind: 'number',
+        min: WORDHUNT_RULES.pauseSecondsMin,
+        max: WORDHUNT_RULES.pauseSecondsMax,
+        step: 5,
+        default: WORDHUNT_RULES.pauseSecondsDefault,
+      },
+      {
+        id: 'wordhuntTheme',
+        label: 'Colori della griglia',
+        hint: 'Automatico: carta chiara con lettere scure dalle 7 alle 19, ardesia scura con lettere morbide la sera e la notte. Le parole trovate tengono i loro colori.',
+        kind: 'select',
+        default: 'auto',
+        options: [
+          { value: 'auto', label: 'Automatico (giorno/sera)' },
+          { value: 'day', label: 'Giorno (carta chiara)' },
+          { value: 'night', label: 'Sera (ardesia scura)' },
+        ],
+      },
       { id: 'wordhuntAnimations', label: 'Animazioni', hint: 'Brevi e silenziabili: nessuna nella vista di riferimento.', kind: 'toggle', default: true },
       { id: 'showLeaderboard', label: 'Classifica', kind: 'toggle', default: true },
     ],
@@ -2087,7 +2137,7 @@ export const GAMES: GameDef[] = GAME_DEFS.map((g) => ({
   settings: [
     ...g.settings,
     ...(g.actions.some((a) => a.help) ? HELP_SETTINGS : []),
-    ...COMMON_SETTINGS.filter((c) => !g.settings.some((x) => x.id === c.id)),
+    ...COMMON_SETTINGS.filter((c) => !g.settings.some((x) => x.id === c.id)).map((c): GameSetting => (c.id === 'voiceSkipAnswers' && c.kind === 'toggle' && VOICE_SKIPS_ANSWERS.has(g.id) ? { ...c, default: true } : c)),
     ...(OWN_BACKGROUND.has(g.id) ? [] : PHOTO_BACKGROUND.filter((c) => !g.settings.some((x) => x.id === c.id))),
     ...(WITHOUT_ROUNDS.has(g.id) ? [] : [ROUND_CHEER]),
   ],

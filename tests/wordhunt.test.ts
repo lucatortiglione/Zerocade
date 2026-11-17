@@ -3,7 +3,7 @@ import { readFileSync } from 'node:fs'
 import { test } from 'node:test'
 import Database from 'better-sqlite3'
 import {
-  WORDHUNT_RULES, wordHuntPoints, type GameSettings, type Viewer, type WordHuntAdminState, type WordHuntCommand, type WordHuntPublicState,
+  WORDHUNT_RULES, WORDHUNT_SIZES, isWordHuntSize, wordHuntCanvas, wordHuntPoints, type GameSettings, type Viewer, type WordHuntAdminState, type WordHuntCommand, type WordHuntPublicState,
 } from '../packages/shared/src/index.ts'
 import { WordHuntRoom, type WordHuntDeps } from '../apps/server/src/wordhunt.ts'
 import { WordHuntStore } from '../apps/server/src/wordhunt-db.ts'
@@ -14,6 +14,13 @@ import {
 import { Clock } from './helpers/tabooHarness.ts'
 
 const fixtureFile = JSON.parse(readFileSync(new URL('../apps/server/src/wordhunt-fixture.json', import.meta.url), 'utf-8')) as FixtureFile
+// A larger list for the boards of 24 words (the real one has about 16,700).
+const DICTIONARY_BIG: string[] = Array.from({ length: 400 }, (_, i) => {
+  const r = seededRandom(`w${i}`)
+  const letters = 'AEIOUNRTSLCDPMBGFV'
+  const n = 5 + Math.floor(r() * 4)
+  return Array.from({ length: n }, (_, k) => letters[Math.floor(r() * letters.length)]!).join('')
+}).map((w, i) => w + String.fromCharCode(65 + (i % 26)))
 const DICTIONARY = [
   'CASTELLO', 'FINESTRA', 'MONTAGNA', 'BOTTIGLIA', 'CAMMINO', 'GIARDINO', 'LIBRERIA', 'PIANETA', 'SPECCHIO', 'TAVOLINO', 'VIOLINO', 'CANDELA',
   'FIORAIO', 'LAVAGNA', 'MARTELLO', 'NUVOLA', 'OROLOGIO', 'PALLONE', 'RUBINETTO', 'SCARPONE', 'TELEFONO', 'UMBRELLA', 'VALIGIA', 'ZUCCHERO',
@@ -129,7 +136,7 @@ test('points: longer words are worth more (§8.2)', () => {
 
 const viewer = (id: string, over: Partial<Viewer> = {}): Viewer => ({ id: `tiktok:${id}`, nickname: id, avatar: `https://img.test/${id}.png`, ...over })
 
-function setup(opts: { settings?: GameSettings; dictionary?: readonly string[] | null; store?: WordHuntStore; allow?: (u: Viewer) => boolean } = {}) {
+function setup(opts: { auto?: boolean; settings?: GameSettings; dictionary?: readonly string[] | null; store?: WordHuntStore; allow?: (u: Viewer) => boolean } = {}) {
   const clock = new Clock()
   const db = new Database(':memory:')
   const store = opts.store ?? new WordHuntStore(db)
@@ -144,7 +151,7 @@ function setup(opts: { settings?: GameSettings; dictionary?: readonly string[] |
     setTimer: (fn, ms) => clock.add(fn, ms), clearTimer: (h) => clock.cancel(h),
     newId: () => `round-${++ids}`, newSeed: () => `seed-${ids}`,
     emitPublic: (_k, s) => publics.push(s), emitAdmin: (_k, a) => admins.push(a),
-    allowed: (_k, u) => (opts.allow ? opts.allow(u) : true), settings: () => settings, issue: (_k, m) => issues.push(m), log: () => undefined,
+    allowed: (_k, u) => (opts.allow ? opts.allow(u) : true), settings: () => settings, autoplay: () => opts.auto ?? false, issue: (_k, m) => issues.push(m), log: () => undefined,
   }
   const room = new WordHuntRoom('room', deps)
   const cmd = (c: Omit<WordHuntCommand, 'expectedVersion'>) => room.control({ ...c, expectedVersion: room.state().version } as WordHuntCommand)
@@ -153,7 +160,7 @@ function setup(opts: { settings?: GameSettings; dictionary?: readonly string[] |
     assert.deepEqual(cmd({ type: 'create-round', mode, ...extra } as never), { ok: true })
     assert.deepEqual(cmd({ type: 'start' }), { ok: true })
   }
-  return { room, clock, store, db, publics, admins, issues, cmd, say, begin, state: () => room.state(), admin: () => room.admin() }
+  return { room, deps, clock, store, db, publics, admins, issues, cmd, say, begin, state: () => room.state(), admin: () => room.admin() }
 }
 
 test('a round: create, start (no countdown), the first valid message takes the word, colour and avatar come with it', () => {
@@ -357,7 +364,7 @@ test('a generated round needs the dictionary; without it only the reference boar
 
 test('a generated round plays like the fixture one, with colours given as the words are found', () => {
   const h = setup()
-  h.begin('generated', { seed: 'prova' })
+  h.begin('generated', { seed: 'prova', targetCount: 8 })
   const words = h.admin().targets.map((t) => t.word)
   assert.equal(words.length, 8)
   h.say(viewer('a'), words[0]!)
@@ -421,7 +428,8 @@ test('the store: the same message cannot be saved twice, and the schema is creat
 
 test('decoys: 6 for 8 targets, real words, off every word and avatar cell, and the chat cannot take them', () => {
   assert.equal(decoyCountFor(8), 6)
-  assert.equal(decoyCountFor(12), 9)
+  assert.equal(decoyCountFor(12), 6)
+  assert.equal(decoyCountFor(24), 6)
   assert.equal(decoyCountFor(1), 1)
   const board = generateBoard(DICTIONARY, { seed: 'esche', targetCount: 8, minWordLength: 5, maxWordLength: 12, directions: DEFAULT_DIRECTIONS })
   assert.deepEqual(auditBoard(board), [])
@@ -432,7 +440,7 @@ test('decoys: 6 for 8 targets, real words, off every word and avatar cell, and t
     assert.equal(d.cells.map((c) => board.letters[c.row]![c.col]).join(''), d.word)
   }
   const h = setup()
-  h.begin('generated', { seed: 'esche' })
+  h.begin('generated', { seed: 'esche', targetCount: 8 })
   const admin = h.admin()
   assert.equal(admin.decoys.length, 6)
   h.say(viewer('anna'), admin.decoys[0]!.word)
@@ -459,4 +467,152 @@ test('decoys: many seeds keep every invariant, and the decoys are always found i
     assert.deepEqual(auditBoard(board), [], `seed e${i}`)
     assert.ok(board.decoys.length >= 5, `seed e${i}: ${board.decoys.length} esche`)
   }
+})
+
+// ---- The Tabellone Grande and the rounds that start by themselves ----
+
+test('the Tabellone Grande: 24 words on the 20 x 15 grid, short enough to fit, every invariant held', () => {
+  assert.equal(WORDHUNT_RULES.targetCount, 24)
+  for (let i = 0; i < 25; i++) {
+    const board = generateBoard(DICTIONARY_BIG, { seed: `g${i}`, targetCount: 24, minWordLength: 5, maxWordLength: WORDHUNT_RULES.denseMaxWordLength, directions: DEFAULT_DIRECTIONS })
+    assert.equal(board.targets.length, 24, `seed g${i}`)
+    assert.equal(board.rows * board.cols, 300)
+    assert.deepEqual(auditBoard(board), [], `seed g${i}`)
+    assert.ok(board.targets.every((t) => t.word.length <= 8))
+  }
+})
+
+test('the Tabellone Grande in a room: 24 words, 24 avatar cells and room for all the colours', () => {
+  const h = setup({ dictionary: DICTIONARY_BIG })
+  h.begin('generated', { seed: 'grande' })
+  const admin = h.admin()
+  assert.equal(admin.targets.length, 24)
+  assert.equal(new Set(admin.targets.map((t) => t.avatarCell)).size, 24)
+  assert.equal(h.state().total, 24)
+  assert.equal(h.state().rows, 20)
+  assert.equal(h.state().cols, 15)
+  const colors = admin.targets.slice(0, 14).map((t, i) => { h.say(viewer(`u${i}`), t.word); return h.state().claims.at(-1)!.color })
+  assert.equal(new Set(colors).size, 14) // a colour is not repeated while the palette lasts
+})
+
+test('automatic rounds: the first one starts by itself, the next after every round, with the pause in between', () => {
+  const h = setup({ auto: true, dictionary: DICTIONARY_BIG, settings: { wordhuntCountdown: 5, wordhuntPauseSeconds: 10, wordhuntSeconds: 60 } })
+  h.room.kick()
+  assert.equal(h.state().phase, 'idle')
+  assert.equal(h.state().nextRoundMs, WORDHUNT_RULES.autoStartDelayMs)
+  h.clock.advance(WORDHUNT_RULES.autoStartDelayMs)
+  assert.equal(h.state().phase, 'countdown') // made and started: the photo is shown during the countdown
+  assert.equal(h.state().mode, 'generated')
+  assert.equal(h.state().total, 24)
+  h.clock.advance(5000)
+  assert.equal(h.state().phase, 'active')
+  h.clock.advance(60_000)
+  assert.equal(h.state().phase, 'finished')
+  assert.equal(h.state().nextRoundMs, 10_000)
+  h.clock.advance(9_999)
+  assert.equal(h.state().phase, 'finished')
+  h.clock.advance(1)
+  assert.equal(h.state().phase, 'countdown') // a new round, a new board
+  assert.equal(h.state().roundId, 'round-2')
+  assert.equal(h.state().found, 0)
+})
+
+test('automatic rounds: "Chiudi" stops them, the setting off or a pause holds them, a round made by hand brings them back', () => {
+  let on = true
+  const h = setup({ dictionary: DICTIONARY_BIG, settings: { wordhuntCountdown: 0, wordhuntPauseSeconds: 5 } })
+  const room = new WordHuntRoom('room', { ...(h.deps as WordHuntDeps), autoplay: () => on })
+  room.kick()
+  h.clock.advance(WORDHUNT_RULES.autoStartDelayMs)
+  assert.equal(room.state().phase, 'active')
+  assert.deepEqual(room.control({ type: 'finish', expectedVersion: room.state().version }), { ok: true })
+  assert.equal(room.state().nextRoundMs, 5000)
+  on = false // the setting is switched off during the pause
+  h.clock.advance(5000)
+  assert.equal(room.state().phase, 'finished')
+  on = true
+  room.settingsChanged() // switched on again: it looks again soon
+  h.clock.advance(1000)
+  assert.equal(room.state().phase, 'active')
+  room.control({ type: 'finish', expectedVersion: room.state().version })
+  assert.deepEqual(room.control({ type: 'reset', expectedVersion: room.state().version }), { ok: true })
+  assert.equal(room.admin().auto, false)
+  h.clock.advance(60_000)
+  assert.equal(room.state().phase, 'idle') // closed by the director: nothing starts
+  assert.deepEqual(room.control({ type: 'create-round', mode: 'fixture', expectedVersion: room.state().version }), { ok: true })
+  assert.equal(room.admin().auto, true)
+  room.dispose()
+})
+
+test('automatic rounds: without a dictionary the reference board is used, and a closed room starts nothing', () => {
+  const h = setup({ auto: true, dictionary: null, settings: { wordhuntCountdown: 0 } })
+  h.room.kick()
+  h.clock.advance(WORDHUNT_RULES.autoStartDelayMs)
+  assert.equal(h.state().mode, 'fixture')
+  assert.equal(h.state().phase, 'active')
+  h.room.dispose()
+  assert.equal(h.clock.pending, 0)
+})
+
+test('the dictionary is read off the main thread: until it is there a manual round is refused, the automatic one waits and then plays', () => {
+  let words: readonly string[] | null | undefined
+  const h = setup({ dictionary: undefined })
+  const room = new WordHuntRoom('room', { ...(h.deps as WordHuntDeps), dictionary: () => words, autoplay: () => true, settings: () => ({ wordhuntCountdown: 0 }) })
+  assert.equal((room.control({ type: 'create-round', mode: 'generated', expectedVersion: 0 }) as { error: string }).error, 'no-dictionary')
+  assert.equal(room.admin().dictionaryReady, false)
+  room.kick()
+  h.clock.advance(WORDHUNT_RULES.autoStartDelayMs + 2_000) // still being read: it waits, it does not fall back at once
+  assert.equal(room.state().phase, 'idle')
+  words = DICTIONARY_BIG
+  h.clock.advance(600)
+  assert.equal(room.state().phase, 'active')
+  assert.equal(room.state().mode, 'generated')
+  room.dispose()
+  words = undefined
+  const gone = new WordHuntRoom('room', { ...(h.deps as WordHuntDeps), dictionary: () => words, autoplay: () => true, settings: () => ({ wordhuntCountdown: 0 }) })
+  gone.kick()
+  h.clock.advance(WORDHUNT_RULES.autoStartDelayMs + 31_000) // never read: after about 30 s the reference board is used
+  assert.equal(gone.state().mode, 'fixture')
+  gone.dispose()
+})
+
+// ---- The sizes of the board ----
+
+test('sizes: quick 13 x 15 with 14 words, standard 15 x 17 with 20, large 15 x 20 with 24 (the real dictionary words are 5 to 8 letters)', () => {
+  assert.deepEqual(Object.entries(WORDHUNT_SIZES).map(([k, v]) => [k, v.cols, v.rows, v.words]), [['quick', 13, 15, 14], ['standard', 15, 17, 20], ['large', 15, 20, 24]])
+  for (const [name, size] of Object.entries(WORDHUNT_SIZES)) {
+    for (let i = 0; i < 15; i++) {
+      const board = generateBoard(DICTIONARY_BIG, { seed: `${name}${i}`, targetCount: size.words, minWordLength: 5, maxWordLength: 8, directions: DEFAULT_DIRECTIONS, rows: size.rows, cols: size.cols })
+      assert.equal(board.rows, size.rows)
+      assert.equal(board.cols, size.cols)
+      assert.equal(board.targets.length, size.words, `${name} ${i}`)
+      assert.deepEqual(auditBoard(board), [], `${name} ${i}`)
+    }
+  }
+})
+
+test('sizes: the room takes the size from the command, else the setting, else large; the round time follows the words', () => {
+  const small = setup({ dictionary: DICTIONARY_BIG, settings: { wordhuntCountdown: 0, wordhuntSize: 'quick', wordhuntSeconds: 360 } })
+  small.begin('generated', { seed: 'q' })
+  assert.equal(small.state().cols, 13)
+  assert.equal(small.state().rows, 15)
+  assert.equal(small.state().total, 14)
+  assert.equal(small.state().remainingMs, 210_000) // 360 s for 24 words, 14 words: 210 s
+  const asked = setup({ dictionary: DICTIONARY_BIG, settings: { wordhuntCountdown: 0, wordhuntSize: 'quick' } })
+  asked.begin('generated', { seed: 'q', size: 'standard' })
+  assert.equal(asked.state().rows, 17)
+  assert.equal(asked.state().total, 20)
+  const dflt = setup({ dictionary: DICTIONARY_BIG, settings: { wordhuntCountdown: 0 } })
+  dflt.begin('generated', { seed: 'q' })
+  assert.equal(dflt.state().rows, 20)
+  assert.equal(dflt.state().total, 24)
+  assert.equal(dflt.state().remainingMs, 360_000)
+  const fixed = setup({ settings: { wordhuntCountdown: 0, wordhuntSize: 'quick' } })
+  fixed.begin('fixture')
+  assert.equal(fixed.state().rows, 20) // the reference board is always 15 x 20
+})
+
+test('sizes: the surface of the board grows with its cells, and is 570 x 769 for the screenshot', () => {
+  assert.deepEqual(wordHuntCanvas(15, 20), { width: 570, height: 769 })
+  assert.deepEqual(wordHuntCanvas(13, 15), { width: 498, height: 589 })
+  assert.ok(isWordHuntSize('standard') && !isWordHuntSize('huge') && !isWordHuntSize('toString'))
 })

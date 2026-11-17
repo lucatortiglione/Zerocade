@@ -1,7 +1,7 @@
 import '@fontsource-variable/fredoka'
 import '@fontsource-variable/nunito'
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties } from 'react'
-import { WORDHUNT_REFERENCE as REF, parseWordHuntCell, type WordHuntClaim, type WordHuntPublicState, type WordHuntWinner } from '@zerocade/shared'
+import { WORDHUNT_REFERENCE as REF, parseWordHuntCell, wordHuntCanvas, type WordHuntClaim, type WordHuntPublicState, type WordHuntWinner } from '@zerocade/shared'
 import { useOverlay } from './store'
 import { ViewerAvatar } from './ViewerAvatar'
 import './wordhunt.css'
@@ -22,7 +22,7 @@ const px = (c: number) => REF.gridX + c * REF.step
 const py = (r: number) => REF.gridY + r * REF.step
 
 // The scale that fits the 570 × 769 surface in the box it is given, never different on the two axes (§5.3).
-function useFit<T extends HTMLElement>(): [React.RefObject<T | null>, number] {
+function useFit<T extends HTMLElement>(width: number, height: number): [React.RefObject<T | null>, number] {
   const ref = useRef<T | null>(null)
   const [scale, setScale] = useState(1)
   useLayoutEffect(() => {
@@ -30,14 +30,14 @@ function useFit<T extends HTMLElement>(): [React.RefObject<T | null>, number] {
     if (!el) return
     const measure = () => {
       const box = el.getBoundingClientRect()
-      const next = Math.min(box.width / REF.canvasWidth, box.height / REF.canvasHeight)
+      const next = Math.min(box.width / width, box.height / height)
       if (Number.isFinite(next) && next > 0) setScale(next)
     }
     measure()
     const observer = new ResizeObserver(measure)
     observer.observe(el)
     return () => observer.disconnect()
-  }, [])
+  }, [width, height])
   return [ref, scale]
 }
 
@@ -54,8 +54,24 @@ function Avatar({ winner, style }: { winner: WordHuntWinner; style: CSSPropertie
   )
 }
 
-function Board({ state, animated }: { state: WordHuntPublicState; animated: boolean }) {
-  const [ref, scale] = useFit<HTMLDivElement>()
+// The scheme of the board: by the setting, or ("auto") by the hour of the machine: day from 7:00 to 18:59, evening and night otherwise.
+export type WordHuntTheme = 'day' | 'night'
+export const themeFor = (setting: unknown, hour: number): WordHuntTheme =>
+  setting === 'day' || setting === 'night' ? setting : hour >= 7 && hour < 19 ? 'day' : 'night'
+
+function useTheme(setting: unknown): WordHuntTheme {
+  const [hour, setHour] = useState(() => new Date().getHours())
+  useEffect(() => {
+    const id = window.setInterval(() => setHour(new Date().getHours()), 60_000)
+    return () => window.clearInterval(id)
+  }, [])
+  return themeFor(setting, hour)
+}
+
+function Board({ state, animated, theme }: { state: WordHuntPublicState; animated: boolean; theme: WordHuntTheme }) {
+  // The surface grows with the cells: 570 x 769 for 15 x 20 (the screenshot), the same margins for the smaller boards.
+  const canvas = wordHuntCanvas(state.cols, state.rows)
+  const [ref, scale] = useFit<HTMLDivElement>(canvas.width, canvas.height)
   // Derived from the claims only: a new message of the chat changes nothing here, only a claim does.
   const found = useMemo(() => {
     const colors = new Map<string, string>()
@@ -66,8 +82,8 @@ function Board({ state, animated }: { state: WordHuntPublicState; animated: bool
   const cols = Array.from({ length: state.cols }, (_, c) => c)
   return (
     <div className="wordhunt-fit" ref={ref}>
-      <div className="wordhunt-frame" style={{ width: REF.canvasWidth * scale, height: REF.canvasHeight * scale }}>
-        <div className={`wordhunt-board${animated ? ' wordhunt-board--anim' : ''}`} style={{ transform: `scale(${scale})` }} role="grid" aria-label="Griglia di lettere">
+      <div className="wordhunt-frame" style={{ width: canvas.width * scale, height: canvas.height * scale }}>
+        <div className={`wordhunt-board${animated ? ' wordhunt-board--anim' : ''}`} data-theme={theme} style={{ width: canvas.width, height: canvas.height, transform: `scale(${scale})` }} role="grid" aria-label="Griglia di lettere">
           {cols.map((c) => (
             <span key={`c${c}`} className="wordhunt-coord wordhunt-coord--col" style={{ left: px(c), top: 22, width: REF.tile }}>{c + 1}</span>
           ))}
@@ -114,7 +130,8 @@ function Last({ claim }: { claim: WordHuntClaim }) {
 export function WordHunt() {
   const { wordhunt, wordhuntAt, session } = useOverlay()
   const [now, setNow] = useState(() => performance.now())
-  const counting = wordhunt !== null && (wordhunt.phase === 'countdown' || (wordhunt.phase === 'active' && !wordhunt.paused))
+  const theme = useTheme(session?.settings.wordhuntTheme)
+  const counting = wordhunt !== null && (wordhunt.phase === 'countdown' || (wordhunt.phase === 'active' && !wordhunt.paused) || (wordhunt.phase === 'finished' && wordhunt.nextRoundMs !== null))
   useEffect(() => {
     if (!counting) return
     const id = window.setInterval(() => setNow(performance.now()), 250)
@@ -144,11 +161,16 @@ export function WordHunt() {
       <header className="wordhunt-head">
         {wordhunt.phase === 'countdown' && <div className="wordhunt-timer">Si parte tra {Math.max(1, Math.ceil(leftMs / 1000))}</div>}
         {wordhunt.phase === 'active' && <div className="wordhunt-timer" data-low={leftMs < 15_000 && !wordhunt.paused}>{wordhunt.paused ? 'In pausa' : clock(leftMs)}</div>}
-        {wordhunt.phase === 'finished' && <div className="wordhunt-timer">{wordhunt.end ? END_LABEL[wordhunt.end] : 'Round concluso'}</div>}
+        {wordhunt.phase === 'finished' && (
+          <div className="wordhunt-timer">
+            {wordhunt.end ? END_LABEL[wordhunt.end] : 'Round concluso'}
+            {wordhunt.nextRoundMs !== null && <small className="wordhunt-next"> · nuovo round tra {Math.max(1, Math.ceil(Math.max(0, wordhunt.nextRoundMs - (now - wordhuntAt)) / 1000))}</small>}
+          </div>
+        )}
         {wordhunt.total > 0 && <div className="wordhunt-count" aria-label="Parole trovate"><strong>{wordhunt.found}</strong>/{wordhunt.total}</div>}
       </header>
       {wordhunt.letters.length > 0 ? (
-        <Board state={wordhunt} animated={animated} />
+        <Board state={wordhunt} animated={animated} theme={theme} />
       ) : (
         <div className="wordhunt-center"><p>{wordhunt.notice ?? 'Il prossimo round sta per iniziare.'}</p></div>
       )}

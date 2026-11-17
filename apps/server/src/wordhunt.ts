@@ -4,7 +4,7 @@
 // The public state never holds a target that is not found, its path or its avatar cell (§10.3): only the admin state has them.
 // Nothing here awaits: every write is a short synchronous transaction.
 import {
-  WORDHUNT_RULES, wordHuntPoints,
+  WORDHUNT_RULES, WORDHUNT_SIZES, WORDHUNT_SIZE_DEFAULT, isWordHuntSize, wordHuntPoints,
   type GameSettings, type Viewer, type WordHuntAdminState, type WordHuntAdminTarget, type WordHuntClaim, type WordHuntCommand, type WordHuntEnd,
   type WordHuntErrorCode, type WordHuntLeader, type WordHuntMode, type WordHuntPhase, type WordHuntPublicState, type WordHuntReply, type WordHuntWinner,
 } from '@zerocade/shared'
@@ -17,7 +17,8 @@ import type { WordHuntStore } from './wordhunt-db.js'
 
 export interface WordHuntDeps {
   store: WordHuntStore
-  dictionary(): readonly string[] | null // the words a generated board draws from; null when there are none
+  // The words a generated board draws from: undefined while they are still being read (in a worker), null when there are none.
+  dictionary(): readonly string[] | null | undefined
   fixture(): FixtureFile // the board of the reference screenshot
   monotonicNow(): number // durations and deadlines: never the civil clock (DIRETTIVE §6)
   wallNow(): number // the instants saved in the records
@@ -29,6 +30,7 @@ export interface WordHuntDeps {
   emitAdmin(key: string, admin: WordHuntAdminState): void
   allowed(key: string, user: Viewer): boolean // "Chi può giocare"
   settings(key: string): GameSettings
+  autoplay(key: string): boolean // rounds start by themselves: the setting is on, the game is not paused or ended
   issue(key: string, message: string): void // the dashboard's runtime:issue
   log(level: 'info' | 'warn' | 'error', message: string, fields?: Record<string, unknown>): void
 }
@@ -77,6 +79,10 @@ export class WordHuntRoom {
   private emitTimer: unknown = null
   private lastEmit = -Infinity
   private notice: string | null = null
+  private autoTimer: unknown = null
+  private autoHold = false // "Chiudi" stops the automatic rounds until the game is chosen again or a round is made by hand
+  private dictionaryWaits = 0 // times the automatic round waited for the dictionary to be read
+  private nextAt = 0 // monotonic: when the automatic round starts, 0 when none is waiting
   private sequence = 0
   private readonly held = new Map<number, Held>()
   private readonly byWord = new Map<string, BoardTarget>()
@@ -130,7 +136,7 @@ export class WordHuntRoom {
       letters: board ? board.letters.map((line) => line.join('')) : [],
       total: board?.targets.length ?? 0, found: this.held.size, claims, paused: this.paused,
       remainingMs: this.remaining(this.deps.monotonicNow()), serverNow: this.deps.wallNow(), end: this.end,
-      leaders: this.leaders(), lastClaim: this.lastClaim ? { ...this.lastClaim, cells: [...this.lastClaim.cells], winner: copyWinner(this.lastClaim.winner) } : null,
+      leaders: this.leaders(), nextRoundMs: this.autoTimer !== null ? Math.max(0, this.nextAt - this.deps.monotonicNow()) : null, lastClaim: this.lastClaim ? { ...this.lastClaim, cells: [...this.lastClaim.cells], winner: copyWinner(this.lastClaim.winner) } : null,
       notice: this.notice,
     }
   }
@@ -144,7 +150,7 @@ export class WordHuntRoom {
     return {
       state: this.state(), seed: board?.seed ?? null, checksum: board?.checksum ?? null, targets,
       decoys: (board?.decoys ?? []).map((d) => ({ word: d.word, cells: d.cells.map(cellName) })),
-      dictionaryReady: (this.deps.dictionary()?.length ?? 0) > 0,
+      dictionaryReady: (this.deps.dictionary()?.length ?? 0) > 0, auto: !this.autoHold && this.deps.autoplay(this.key),
       metrics: { received: this.metrics.received, ignored: { ...this.metrics.ignored }, guesses: this.metrics.guesses, overflow: this.metrics.overflow },
     }
   }
@@ -240,7 +246,9 @@ export class WordHuntRoom {
     if (this.disposed) return fail('unavailable', 'La stanza è chiusa.')
     if (command.expectedVersion !== this.version) return fail('stale-version', 'Il comando si riferisce a uno stato vecchio: riprova.')
     switch (command.type) {
-      case 'create-round': return this.createRound(command)
+      case 'create-round':
+        this.autoHold = false
+        return this.createRound(command)
       case 'start': return this.start()
       case 'finish':
         if (this.phase !== 'active' && this.phase !== 'countdown') return fail('wrong-phase', 'Nessun round in corso.')
@@ -248,6 +256,7 @@ export class WordHuntRoom {
         return ok
       case 'reset':
         if (this.phase === 'active' || this.phase === 'countdown') return fail('wrong-phase', 'Termina prima il round in corso.')
+        this.autoHold = true
         this.discard()
         this.emitAll()
         return ok
@@ -258,17 +267,26 @@ export class WordHuntRoom {
   private createRound(command: Extract<WordHuntCommand, { type: 'create-round' }>): WordHuntReply {
     if (this.phase === 'active' || this.phase === 'countdown') return fail('wrong-phase', 'Termina prima il round in corso.')
     const settings = this.deps.settings(this.key)
-    const durationMs = clampInt(command.durationSeconds ?? settings.wordhuntSeconds, WORDHUNT_RULES.roundSecondsMin, WORDHUNT_RULES.roundSecondsMax, WORDHUNT_RULES.roundSecondsDefault) * 1000
+    // The size of the board: the command's, else the setting, else the large one. A smaller board has fewer words and, unless the director
+    // gives the time, a proportionally shorter round (the setting is the time for 24 words).
+    const size = WORDHUNT_SIZES[command.size ?? (isWordHuntSize(settings.wordhuntSize) ? settings.wordhuntSize : WORDHUNT_SIZE_DEFAULT)]
+    const targets = clampInt(command.targetCount, WORDHUNT_RULES.targetMin, WORDHUNT_RULES.targetMax, size.words)
+    const baseSeconds = clampInt(settings.wordhuntSeconds, WORDHUNT_RULES.roundSecondsMin, WORDHUNT_RULES.roundSecondsMax, WORDHUNT_RULES.roundSecondsDefault)
+    const scaled = command.mode === 'generated' ? Math.round((baseSeconds * targets) / WORDHUNT_RULES.targetCount / 10) * 10 : baseSeconds
+    const durationMs = clampInt(command.durationSeconds ?? scaled, WORDHUNT_RULES.roundSecondsMin, WORDHUNT_RULES.roundSecondsMax, WORDHUNT_RULES.roundSecondsDefault) * 1000
     let board: Board
     try {
       if (command.mode === 'fixture') board = fixtureBoard(this.deps.fixture())
       else {
         const words = this.deps.dictionary()
+        if (words === undefined) return fail('no-dictionary', 'Il dizionario si sta caricando: riprova tra un momento.')
         if (!words || words.length === 0) return fail('no-dictionary', 'Il dizionario delle parole non è disponibile: usa la griglia di riferimento.')
         board = generateBoard(words, {
           seed: command.seed ?? this.deps.newSeed(),
-          targetCount: clampInt(command.targetCount, WORDHUNT_RULES.targetMin, WORDHUNT_RULES.targetMax, WORDHUNT_RULES.targetCount),
-          minWordLength: WORDHUNT_RULES.minWordLength, maxWordLength: WORDHUNT_RULES.maxWordLength, directions: DEFAULT_DIRECTIONS,
+          targetCount: targets, rows: size.rows, cols: size.cols,
+          minWordLength: WORDHUNT_RULES.minWordLength, directions: DEFAULT_DIRECTIONS,
+          // The Tabellone Grande: with many words they are kept short so that all of them, and the avatars, fit.
+          maxWordLength: targets > WORDHUNT_RULES.denseTargets ? WORDHUNT_RULES.denseMaxWordLength : WORDHUNT_RULES.maxWordLength,
         })
       }
     } catch (error) {
@@ -321,7 +339,56 @@ export class WordHuntRoom {
     this.end = end
     this.store((s, row) => s.setStatus(row, 'finished', this.deps.wallNow(), end))
     this.eventSeq++
+    // The next round starts by itself after the pause, which is the time to look at the board that is over.
+    const pause = clampInt(this.deps.settings(this.key).wordhuntPauseSeconds, WORDHUNT_RULES.pauseSecondsMin, WORDHUNT_RULES.pauseSecondsMax, WORDHUNT_RULES.pauseSecondsDefault)
+    this.scheduleAuto(pause * 1000)
     this.emitAll()
+  }
+
+  // ---- The rounds that start by themselves ----
+
+  // Called when the room is opened (the game is chosen): the first round is made a moment later.
+  kick(): void {
+    if (this.phase === 'idle') this.scheduleAuto(WORDHUNT_RULES.autoStartDelayMs)
+  }
+
+  // The dictionary has just been read: the dashboards learn that a generated board can be made.
+  dictionaryLoaded(): void { this.publish(true) }
+
+  // A setting changed, or the game was resumed: if nothing is waiting between two rounds, look again soon.
+  settingsChanged(): void {
+    if ((this.phase === 'idle' || this.phase === 'finished') && this.autoTimer === null) this.scheduleAuto(1000)
+  }
+
+  private scheduleAuto(ms: number): void {
+    if (this.autoTimer !== null) this.deps.clearTimer(this.autoTimer)
+    this.autoTimer = null
+    this.nextAt = 0
+    if (this.disposed || this.autoHold || !this.deps.autoplay(this.key)) return
+    this.nextAt = this.deps.monotonicNow() + ms
+    this.autoTimer = this.deps.setTimer(() => { this.autoTimer = null; this.nextAt = 0; this.autoCycle() }, ms)
+  }
+
+  // Makes a round and starts it: a generated Tabellone Grande, or the reference board when there is no dictionary. A failure is told to
+  // the director and stops the automatism (it does not retry in a loop).
+  private autoCycle(): void {
+    if (this.disposed || this.autoHold || !this.deps.autoplay(this.key)) return
+    if (this.phase !== 'idle' && this.phase !== 'finished' && this.phase !== 'ready') return
+    // The dictionary is read off the main thread: the first round waits for it (a few seconds at most), then uses the reference board.
+    const words = this.deps.dictionary()
+    if (words === undefined && ++this.dictionaryWaits <= 60) { this.scheduleAuto(500); return }
+    try {
+      let made = this.createRound({ type: 'create-round', expectedVersion: this.version, mode: words?.length ? 'generated' : 'fixture' })
+      if (!made.ok && made.error === 'generation-failed') made = this.createRound({ type: 'create-round', expectedVersion: this.version, mode: 'fixture' })
+      if (!made.ok) throw new Error(made.message)
+      const started = this.start()
+      if (!started.ok) throw new Error(started.message)
+    } catch (error) {
+      this.deps.log('error', 'wordhunt: round automatico non avviato', { error: String(error) })
+      this.deps.issue(this.key, 'ZeroWordHunt: il round automatico non è partito. Crealo a mano dalla regia.')
+      this.autoHold = true
+      this.emitAll()
+    }
   }
 
   // §8.4: a correction frees one word with a reason that stays in the log; it never names a winner.
@@ -341,6 +408,7 @@ export class WordHuntRoom {
   }
 
   pause(on: boolean): void {
+    if (!on) this.settingsChanged() // the game is resumed between two rounds: the next one is waited for again
     if (this.disposed || this.phase !== 'active' || this.paused === on) return
     const now = this.deps.monotonicNow()
     if (on) {
@@ -402,6 +470,9 @@ export class WordHuntRoom {
 
   private clearTimers(): void {
     this.clearRoundTimer()
+    if (this.autoTimer !== null) this.deps.clearTimer(this.autoTimer)
+    this.autoTimer = null
+    this.nextAt = 0
     if (this.countdownTimer !== null) this.deps.clearTimer(this.countdownTimer)
     this.countdownTimer = null
     if (this.emitTimer !== null) this.deps.clearTimer(this.emitTimer)
@@ -444,6 +515,7 @@ export class WordHuntRooms {
     if (!room) {
       room = new WordHuntRoom(key, this.deps)
       this.rooms.set(key, room)
+      room.kick()
     }
     return room
   }
@@ -453,6 +525,7 @@ export class WordHuntRooms {
     this.rooms.delete(key)
     room?.dispose()
   }
+  dictionaryLoaded(): void { for (const room of this.rooms.values()) room.dictionaryLoaded() }
   closeAll(): void {
     const errors: unknown[] = []
     for (const room of this.rooms.values()) {

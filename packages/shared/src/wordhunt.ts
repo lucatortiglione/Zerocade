@@ -9,17 +9,25 @@ export const WORDHUNT_RULES = Object.freeze({
   version: 'wordhunt-1.0',
   rows: 20, // §2.1
   cols: 15, // §2.1
-  targetCount: 8, // §3.4
+  // The "Tabellone Grande": the 20 x 15 board (rows A-T, columns 1-15) with 24 words to find. The reference screenshot has 8; the
+  // generated board has 24, in the same geometry. With that many words the targets are kept to 8 letters so they all fit.
+  targetCount: 24,
   targetMin: 1,
-  targetMax: 12,
+  targetMax: 24,
+  denseTargets: 12, // above this many targets the words are cut to `denseMaxWordLength`
+  denseMaxWordLength: 8,
+  pauseSecondsDefault: 20, // between a round and the next one that starts by itself: the finished board stays on show
+  pauseSecondsMin: 5,
+  pauseSecondsMax: 120,
+  autoStartDelayMs: 1_500, // after the game is chosen, before the first round is made
   // Real words hidden in the grid that are NOT targets, so that a word the chat sees is not always an answer. Their number follows the
   // targets: 6 decoys for 8 targets keeps about a third of the 300 cells in words (8 targets of ~7 letters, 8 avatars, 6 decoys of ~7
   // letters: ~106 cells) and leaves the rest as filler; more would crowd the grid and make the targets hard to tell apart by the chat.
   decoyRatio: 0.75,
-  decoyMax: 9,
+  decoyMax: 6,
   minWordLength: 5, // §3.4
   maxWordLength: 12, // §3.4
-  roundSecondsDefault: 180, // §3.4
+  roundSecondsDefault: 360, // §3.4 says 180 for 8 words; 24 words need longer
   roundSecondsMin: 30,
   roundSecondsMax: 900,
   countdownSecondsDefault: 15, // §3.4 says 5; longer here so NASA's picture, shown whole before each round, can be looked at
@@ -63,10 +71,30 @@ export const WORDHUNT_COLORS = Object.freeze({
 // listed so the next colour is chosen away from the one just given.
 export const WORDHUNT_PALETTE: readonly string[] = Object.freeze([
   '#F97316', '#22D3EE', '#F472B6', '#22C55E', '#A855F7', '#FACC15', '#FF2D78', '#4ADE80',
+  // With 24 words the eight of the reference would repeat three times: these are six more, apart from them and from each other.
+  '#60A5FA', '#F87171', '#A3E635', '#2DD4BF', '#E879F9', '#FDBA74',
 ])
 export const WORDHUNT_SIMILAR: readonly (readonly [string, string])[] = Object.freeze([
-  ['#22C55E', '#4ADE80'], ['#F472B6', '#FF2D78'], ['#F97316', '#FACC15'],
+  ['#22C55E', '#4ADE80'], ['#F472B6', '#FF2D78'], ['#F97316', '#FACC15'], ['#4ADE80', '#A3E635'], ['#F472B6', '#E879F9'],
+  ['#F97316', '#FDBA74'], ['#22D3EE', '#2DD4BF'], ['#22D3EE', '#60A5FA'], ['#FF2D78', '#F87171'], ['#A855F7', '#E879F9'],
 ])
+
+// The sizes of the generated board, as "cols x rows, words" (the size menu of the games this one is modelled on). The large one is the
+// 20 rows (A-T) by 15 columns (1-15) of the reference screenshot; the others are smaller in the same geometry.
+export type WordHuntSize = 'quick' | 'standard' | 'large'
+export const WORDHUNT_SIZES: Readonly<Record<WordHuntSize, { label: string; cols: number; rows: number; words: number }>> = Object.freeze({
+  quick: { label: 'Rapido', cols: 13, rows: 15, words: 14 },
+  standard: { label: 'Standard', cols: 15, rows: 17, words: 20 },
+  large: { label: 'Grande', cols: 15, rows: 20, words: 24 },
+})
+export const WORDHUNT_SIZE_DEFAULT: WordHuntSize = 'large'
+export const isWordHuntSize = (value: unknown): value is WordHuntSize => typeof value === 'string' && Object.hasOwn(WORDHUNT_SIZES, value)
+
+// The board is drawn on a surface that grows with its cells: 570 x 769 for 15 x 20 (the screenshot), the same margins for the others.
+export const wordHuntCanvas = (cols: number, rows: number): { width: number; height: number } => ({
+  width: WORDHUNT_REFERENCE.gridX + cols * WORDHUNT_REFERENCE.step + 6,
+  height: WORDHUNT_REFERENCE.gridY + rows * WORDHUNT_REFERENCE.step + 4,
+})
 
 export type WordHuntDirection = 'RIGHT' | 'DOWN' | 'LEFT' | 'UP' | 'DOWN_RIGHT' | 'DOWN_LEFT' | 'UP_RIGHT' | 'UP_LEFT'
 export const WORDHUNT_DIRECTIONS: Readonly<Record<WordHuntDirection, readonly [number, number]>> = Object.freeze({
@@ -84,7 +112,7 @@ export type WordHuntReply = { ok: true } | { ok: false; error: WordHuntErrorCode
 
 // Commands of the dashboard. Each carries the version the clicker saw (DIRETTIVE §13).
 export type WordHuntCommand =
-  | { type: 'create-round'; expectedVersion: number; mode: WordHuntMode; seed?: string; durationSeconds?: number; targetCount?: number }
+  | { type: 'create-round'; expectedVersion: number; mode: WordHuntMode; size?: WordHuntSize; seed?: string; durationSeconds?: number; targetCount?: number }
   | { type: 'start'; expectedVersion: number }
   | { type: 'finish'; expectedVersion: number }
   | { type: 'reset'; expectedVersion: number }
@@ -131,6 +159,7 @@ export interface WordHuntPublicState {
   serverNow: number
   end: WordHuntEnd | null
   leaders: WordHuntLeader[]
+  nextRoundMs: number | null // at `serverNow`: when the next round starts by itself (the round is finished), else null
   lastClaim: WordHuntClaim | null
   notice: string | null
 }
@@ -152,6 +181,7 @@ export interface WordHuntAdminState {
   targets: WordHuntAdminTarget[]
   decoys: { word: string; cells: string[] }[] // real words in the grid that are not answers (the chat's guess of one is simply wrong)
   dictionaryReady: boolean
+  auto: boolean // rounds start by themselves (the setting is on and "Chiudi" has not stopped them)
   metrics: { received: number; ignored: Record<string, number>; guesses: number; overflow: number }
 }
 

@@ -47,6 +47,7 @@ async function execute(job: JobRequest): Promise<unknown> {
     case 'padRemove': removePad(job.args.key, job.args.id); return padBoard(job.args.key)
     case 'padVolume': setPadVolume(job.args.key, job.args.volume); return padBoard(job.args.key)
     case 'padBoard': return padBoard(job.args.key)
+    case 'wordhuntWords': return (await import('./wordhunt-dictionary.js')).loadWordHuntDictionary()
     case 'barrier': return
     case 'close': closeDb(); return
   }

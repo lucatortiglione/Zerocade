@@ -13,6 +13,8 @@ import {
   type TabooCommand,
   TABOO_RULES,
   WORDHUNT_RULES,
+  isWordHuntSize,
+  type WordHuntSize,
   type WordHuntCommand,
   type SourceConfig,
   type Trigger,
@@ -306,11 +308,12 @@ export function sanitizeWordHuntCommand(raw: unknown): WordHuntCommand | null {
       return { type: r.type, expectedVersion }
     case 'create-round': {
       if (r.mode !== 'fixture' && r.mode !== 'generated') return null
+      if (r.size !== undefined && !isWordHuntSize(r.size)) return null
       const seed = r.seed === undefined ? undefined : typeof r.seed === 'string' ? r.seed.trim().slice(0, WORDHUNT_RULES.maxSeedChars) : null
       const seconds = r.durationSeconds === undefined ? undefined : int(r.durationSeconds, WORDHUNT_RULES.roundSecondsMin, WORDHUNT_RULES.roundSecondsMax)
       const count = r.targetCount === undefined ? undefined : int(r.targetCount, WORDHUNT_RULES.targetMin, WORDHUNT_RULES.targetMax)
       if (seed === null || seconds === null || count === null) return null
-      return { type: 'create-round', expectedVersion, mode: r.mode, ...(seed ? { seed } : {}), ...(seconds !== undefined && { durationSeconds: seconds }), ...(count !== undefined && { targetCount: count }) }
+      return { type: 'create-round', expectedVersion, mode: r.mode, ...(r.size !== undefined && { size: r.size as WordHuntSize }), ...(seed ? { seed } : {}), ...(seconds !== undefined && { durationSeconds: seconds }), ...(count !== undefined && { targetCount: count }) }
     }
     case 'revoke': {
       const target = int(r.target, 1, WORDHUNT_RULES.targetMax)

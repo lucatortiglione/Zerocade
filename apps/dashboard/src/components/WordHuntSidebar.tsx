@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react'
-import { GAMES, WORDHUNT_RULES, defaultSettings, type LiveEvent, type SessionState, type WordHuntAdminState, type WordHuntMode } from '@zerocade/shared'
+import { GAMES, WORDHUNT_RULES, WORDHUNT_SIZES, type WordHuntSize, defaultSettings, type LiveEvent, type SessionState, type WordHuntAdminState, type WordHuntMode } from '@zerocade/shared'
 import { socket } from '../socket'
 import { useDashboard } from '../store'
 import { BridgeControl, ConnectionBadge, GameSwitch, LiveSimulator, MessageComposer, StreamSettings, pick, simViewer } from './Regia'
@@ -76,6 +76,7 @@ export function WordHuntSidebar({ session }: { session: SessionState }) {
 function Round({ admin, send }: { admin: WordHuntAdminState | null; send: Send }) {
   const [mode, setMode] = useState<WordHuntMode>('fixture')
   const [seed, setSeed] = useState('')
+  const [size, setSize] = useState<WordHuntSize | ''>('')
   const state = admin?.state
   if (!admin || !state) return <p className="text-muted small">In attesa dello stato…</p>
   const open = state.phase === 'countdown' || state.phase === 'active'
@@ -89,6 +90,11 @@ function Round({ admin, send }: { admin: WordHuntAdminState | null; send: Send }
         {state.phase === 'finished' && `Round finito · trovate ${state.found}/${state.total}`}
       </p>
       {state.notice && <p className="text-muted small">{state.notice}</p>}
+      <p className="text-muted small">
+        {admin.auto
+          ? `Round automatici attivi: un tabellone (dimensione dalle impostazioni) parte da solo${state.phase === 'finished' && state.nextRoundMs !== null ? ' tra poco' : ''}. “Chiudi” li ferma.`
+          : 'Round automatici fermi (impostazione spenta, gioco in pausa o fermati con “Chiudi”): crea il round qui sotto.'}
+      </p>
       {!open && (
         <>
           <label className="small">
@@ -99,9 +105,20 @@ function Round({ admin, send }: { admin: WordHuntAdminState | null; send: Send }
             </select>
           </label>
           {mode === 'generated' && (
+            <label className="small">
+              Dimensione{' '}
+              <select value={size} onChange={(e) => setSize(e.target.value as WordHuntSize | '')}>
+                <option value="">Come da impostazioni</option>
+                {(Object.keys(WORDHUNT_SIZES) as WordHuntSize[]).map((k) => (
+                  <option key={k} value={k}>{WORDHUNT_SIZES[k].label} ({WORDHUNT_SIZES[k].cols} × {WORDHUNT_SIZES[k].rows}, {WORDHUNT_SIZES[k].words} parole)</option>
+                ))}
+              </select>
+            </label>
+          )}
+          {mode === 'generated' && (
             <input className="input" maxLength={WORDHUNT_RULES.maxSeedChars} placeholder="Seme (facoltativo, per ripetere la griglia)" value={seed} onChange={(e) => setSeed(e.target.value)} />
           )}
-          <button type="button" className="side-action side-action--blue" onClick={() => void send({ type: 'create-round', mode, ...(mode === 'generated' && seed.trim() ? { seed: seed.trim() } : {}) })}>
+          <button type="button" className="side-action side-action--blue" onClick={() => void send({ type: 'create-round', mode, ...(mode === 'generated' && size ? { size } : {}), ...(mode === 'generated' && seed.trim() ? { seed: seed.trim() } : {}) })}>
             ＋ Crea round
           </button>
         </>

@@ -17,6 +17,8 @@ export interface InfrastructureJobs {
   padRemove: { args: { key: string; id: string }; result: PadBoard }
   padVolume: { args: { key: string; volume: number }; result: PadBoard }
   padBoard: { args: { key: string }; result: PadBoard }
+  // ZeroWordHunt's dictionary: read from the two databases in the worker, never on the main thread (it takes about a second).
+  wordhuntWords: { args: null; result: readonly string[] | null }
   barrier: { args: null; result: void }
   close: { args: null; result: void }
 }

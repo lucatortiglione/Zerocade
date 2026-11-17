@@ -79,7 +79,6 @@ import { ContextTournaments, sanitizeTournamentCommand } from './context-tournam
 import { TabooRooms } from './taboo.js'
 import { loadDeck } from './taboo-deck.js'
 import { WordHuntRooms } from './wordhunt.js'
-import { loadWordHuntDictionary } from './wordhunt-dictionary.js'
 import type { FixtureFile } from './wordhunt-domain.js'
 import { invalidateContextCorpus, serverCorpus } from './context-tournament-ranking.js'
 import { ContextSemanticGame } from './context-semantic.js'
@@ -641,10 +640,28 @@ const taboo = new TabooRooms({
 // ZeroWordHunt (wordhunt.ts): the round is the server's own. Its answers are the chat's comments, from the bridge, the direct
 // feeds and the simulator alike: the first one that arrives here takes the word. The public state goes to every client of the
 // room; the targets and their paths to the dashboards only.
+// The dictionary of the generated boards is read in the report worker (about a second of reading two databases), not here: reading it on
+// this thread stalled the server and with it every overlay and dashboard. `undefined` until read, then the words or null.
+let wordHuntWords: readonly string[] | null | undefined
+let wordHuntLoading = false
+function loadWordHuntWords(): void {
+  if (wordHuntLoading || wordHuntWords !== undefined) return
+  wordHuntLoading = true
+  reports.run('wordhuntWords', null)
+    .then((words) => { wordHuntWords = words })
+    .catch((error: unknown) => {
+      app.log.warn({ err: error }, 'ZeroWordHunt: dizionario non letto')
+      wordHuntWords = null
+    })
+    .finally(() => { wordHuntLoading = false; wordhunt.dictionaryLoaded() })
+}
 const wordhuntFixture = JSON.parse(readFileSync(join(dirname(fileURLToPath(import.meta.url)), 'wordhunt-fixture.json'), 'utf-8')) as FixtureFile
 const wordhunt = new WordHuntRooms({
   store: wordHuntStore,
-  dictionary: loadWordHuntDictionary,
+  dictionary: () => {
+    if (wordHuntWords === undefined) loadWordHuntWords()
+    return wordHuntWords
+  },
   fixture: () => wordhuntFixture,
   monotonicNow: () => performance.now(),
   wallNow: () => Date.now(),
@@ -656,6 +673,10 @@ const wordhunt = new WordHuntRooms({
   emitAdmin: (key, admin) => io.to(dashboardRoom(key)).emit('wordhunt:admin', admin),
   allowed: (key, user) => allowedToPlay(getSession(key).settings, user),
   settings: (key) => getSession(key).settings,
+  autoplay: (key) => {
+    const session = getSession(key)
+    return session.gameId === 'zerowordhunt' && session.settings.wordhuntAuto !== false && !session.paused && !session.ended
+  },
   issue: gameIssue,
   log: (level, message, fields) => app.log[level](fields ?? {}, message),
 })
@@ -674,17 +695,25 @@ const zfb = new ZfbBridge(
       incastro.get(roomKey)?.alreadyGuessed(event.text) === true
     // ZeroFollowerBot's voice does not read the comments the game ignores ("Chi può giocare"), nor, with "Voce solo
     // ai follower", the ones of viewers the bridge says do not follow (a viewer it says nothing about is read), and
-    // never ZeroWordle's guesses, nor ZeroContext's single words from the word shown to the next round (not in a
+    // (with "Voce: non leggere le risposte") the game's answers: ZeroWordle's guesses, ZeroContext's single words from the word shown to the next round (not in a
     // tournament: its rounds do not go through the overlay's classic engine, so the last classic round would stay "over").
     const session = getSession(roomKey)
+    // "Voce: non leggere le risposte" (a setting of every game): what counts as an answer is the game's own (see the setting's hint).
+    const skipsAnswers = session.settings.voiceSkipAnswers === true
+    const isAnswer = (): boolean => {
+      switch (session.gameId) {
+        case 'zerowordle': return true
+        case 'context': return !tournaments.has(roomKey) && roundOver(roomKey) && singleWord(event.type === 'comment' ? event.text : '')
+        case 'zerotaboo': return taboo.get(roomKey)?.listening() === true
+        case 'zerowordhunt': return wordhunt.get(roomKey)?.listening() === true
+        default: return triggersFor(activeTriggers(session), event).some((t) => t.action === 'guess' || t.action === 'answer')
+      }
+    }
     const silent =
       id !== '' &&
       event.type === 'comment' &&
-      (session.gameId === 'zerowordle' ||
-        (session.gameId === 'context' && !tournaments.has(roomKey) && roundOver(roomKey) && singleWord(event.text)) ||
+      ((skipsAnswers && isAnswer()) ||
         !allowedToPlay(session.settings, event.user) ||
-        (session.gameId === 'zerotaboo' && taboo.get(roomKey)?.listening() === true) ||
-        (session.gameId === 'zerowordhunt' && wordhunt.get(roomKey)?.listening() === true) ||
         (session.settings.voiceFollowersOnly === true && event.user.follower === false && event.user.fan !== true))
     broadcastEvent(roomKey, event, kind, account ? `${kind}:${account}` : '')
     if (repeat || silent) zfb.skip(id)
@@ -722,8 +751,8 @@ try {
 } catch (error) {
   app.log.warn({ err: error }, 'ZeroWordHunt: pulizia all\'avvio non riuscita')
 }
-// ZeroWordHunt's dictionary (about a second to read) is prepared now, with nobody playing, not at the first generated round of a live.
-setTimeout(() => { if (getSession(roomKey).gameId === 'zerowordhunt') loadWordHuntDictionary() }, 3000).unref()
+// ZeroWordHunt's dictionary is requested now, from the worker, whatever the game: it is ready before anybody chooses ZeroWordHunt.
+setTimeout(loadWordHuntWords, 3000).unref()
 // The tournament's corpus (68 MB read, hashed and parsed in one go, a few hundred ms with the server stopped) is
 // prepared now, with nobody playing, rather than at the first «Crea torneo» of a live.
 setTimeout(() => { if (getSession(roomKey).gameId === 'context') serverCorpus(contextProfile(getSession(roomKey).settings.associationSource)) }, 1000).unref()
@@ -1152,6 +1181,7 @@ io.on('connection', (socket) => {
     bivio.get(key)?.applySettings(settings)
     incastro.get(key)?.applySettings(settings)
     quizzland.get(key)?.applySettings(settings)
+    wordhunt.get(key)?.settingsChanged()
     semanticGames.get(key)?.settingsChanged(settings)
   })
 
