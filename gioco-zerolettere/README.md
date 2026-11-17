@@ -1,5 +1,8 @@
 # ZeroLettere: banca degli indizi
 
+> **Revisione documentale — 16 novembre 2026.** Confermati nel database 5.661 indizi e 109 alternative. — una banca autonoma: importazione e verifica non aggiungono un gioco al catalogo, una rotta al server o un file al pacchetto Windows. Per il censimento di tutti i database vedere [DB.md](../database/DB.md).
+> [Indice e stato della documentazione](../docs/STATO_DOCUMENTAZIONE.md).
+
 Il CSV `livecade-missing-letters-it-bank-2026-11-14.csv` e la sua copia SQLite
 `database/ZeroLettere.sqlite3` conservano indizi, risposte e alternative della banca.
 

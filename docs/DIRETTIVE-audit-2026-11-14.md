@@ -1,5 +1,8 @@
 # Verifica dell'infrastruttura rispetto a DIRETTIVE.md 2.6
 
+> **Revisione documentale — 16 novembre 2026.** Rapporto storico rispetto alle direttive 2.6 e al workspace del 14 novembre. Il riferimento normativo corrente — [DIRETTIVE.md](../DIRETTIVE.md), versione 2.9; gli esiti e i limiti qui riportati conservano la loro data e non attestano il codice modificato successivamente.
+> [Indice e stato della documentazione](STATO_DOCUMENTAZIONE.md).
+
 Ambito: server di coordinamento, persistenza operativa, rete, dashboard, cornice dell'overlay,
 classifiche pubblicate, media e strumenti di verifica. Esclusi motori, algoritmi, dati e strumenti
 dei giochi. Restano le modifiche ai giochi già presenti prima di questa revisione, inclusa

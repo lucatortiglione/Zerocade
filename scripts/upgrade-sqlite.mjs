@@ -4,13 +4,17 @@
 // Prereqs (Windows): "Desktop development with C++" (Visual Studio Build Tools) + Python 3.
 
 import { execFileSync } from 'node:child_process'
-import { copyFileSync, existsSync, rmSync, writeFileSync } from 'node:fs'
+import { existsSync, rmSync, writeFileSync } from 'node:fs'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { createRequire } from 'node:module'
+import { sqliteRuntime } from './sqlite-runtime.mjs'
 
 const VERSION = process.argv[2] ?? '3.54.1'
 const YEAR = process.argv[3] ?? '2026'
+if (!/^3\.\d{1,2}\.\d{1,2}$/.test(VERSION) || !/^20\d{2}$/.test(YEAR)) {
+  throw new Error('Expected SQLite version 3.minor.patch and a four-digit year')
+}
 const [major, minor, patch] = VERSION.split('.')
 const TAG = `${major}${minor.padStart(2, '0')}${patch.padStart(2, '0')}00`
 
@@ -64,16 +68,17 @@ if (!existsSync(cPath) || !existsSync(hPath)) {
   console.error('✗ sqlite3.c/.h not found after extraction.')
   process.exit(1)
 }
-copyFileSync(cPath, join(depsDir, 'sqlite3.c'))
-copyFileSync(hPath, join(depsDir, 'sqlite3.h'))
-console.log(`✓ Patched better-sqlite3 deps to SQLite ${VERSION}`)
-
 console.log('→ Rebuilding better-sqlite3 (needs a C++ toolchain)')
-execFileSync('npm', ['rebuild', 'better-sqlite3'], { cwd: root, stdio: 'inherit' })
+// npm rebuild is a no-op for releases with gypfile:false and a prebuild.
+// Use npm's node-gyp directly, forcing compilation with the custom amalgamation.
+const npmCli = process.env.npm_execpath ?? join(dirname(process.execPath), 'node_modules', 'npm', 'bin', 'npm-cli.js')
+const nodeGyp = join(dirname(npmCli), '..', 'node_modules', 'node-gyp', 'bin', 'node-gyp.js')
+if (!existsSync(nodeGyp)) throw new Error('node-gyp not found in npm; run this command through npm run sqlite:upgrade')
+execFileSync(process.execPath, [nodeGyp, 'rebuild', '--release', '--force_build=1', `--sqlite3=${extractDir}`], {
+  cwd: bsDir, stdio: 'inherit', windowsHide: true,
+})
 
 const req = createRequire(join(bsDir, '_noop.js'))
-const Database = req(bsDir)
-const db = new Database(':memory:')
-const engine = db.prepare('select sqlite_version() as v').get().v
-db.close()
-console.log(`✓ Done. SQLite engine: ${engine}`)
+const engine = sqliteRuntime(req)
+if (engine.version !== VERSION) throw new Error(`Expected SQLite ${VERSION}, loaded ${engine.version} from ${engine.binary}`)
+console.log(`✓ Done. SQLite engine: ${engine.version} (${engine.binary})`)

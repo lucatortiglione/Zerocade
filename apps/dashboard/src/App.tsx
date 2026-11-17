@@ -1,6 +1,7 @@
 import { BrowserRouter, Route, Routes } from 'react-router'
 import { LeftRail } from './components/LeftRail'
 import { DjPadPage } from './pages/DjPadPage'
+import { TabooCardPage } from './pages/TabooCardPage'
 import { GamesPage } from './pages/GamesPage'
 import { GiftsPage } from './pages/GiftsPage'
 import { SetupPage } from './pages/SetupPage'
@@ -26,6 +27,7 @@ export function App() {
           <Route path="/dj" element={<DjPadPage />} />
           <Route path="/gifts" element={<GiftsPage />} />
           <Route path="/setup" element={<SetupPage />} />
+          <Route path="/taboo" element={<TabooCardPage />} />
         </Routes>
       </div>
     </BrowserRouter>

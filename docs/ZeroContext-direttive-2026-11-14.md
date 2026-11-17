@@ -1,5 +1,8 @@
 # ZeroContext: applicazione di DIRETTIVE.md 2.6
 
+> **Revisione documentale — 16 novembre 2026.** Questo audit fotografa il runtime del 14 novembre. Sono successivi il corpus statistico, i vettori immutabili, il ricaricamento locale e il controllo della lunghezza della segreta. Il caricamento attuale confronta anche la revisione HTTP tra le risorse; per la procedura corrente usare il [README di ZeroContext](../gioco-zerocontext/README.md). Le misure sotto restano storiche.
+> [Indice e stato della documentazione](STATO_DOCUMENTAZIONE.md).
+
 Intervento sul runtime ZeroContext di Zerocade, sul servizio dei suoi dati e sui contratti di lifecycle
 necessari a chiuderlo. Include la scala colori richiesta durante il lavoro. Non rigenera o modifica i contenuti
 SQLite, i vettori o i modelli linguistici; non cambia gli algoritmi degli altri giochi.

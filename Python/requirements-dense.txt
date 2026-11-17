@@ -1,0 +1,5 @@
+# Installare prima torch==2.14.1 dal canale ufficiale CUDA cu130.
+numpy==2.5.4
+sentence-transformers==6.3.0
+transformers==5.3.0
+mteb==2.27.14

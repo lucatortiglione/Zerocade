@@ -1,5 +1,8 @@
 # 🟩 ZeroWordle
 
+> **Revisione documentale — 16 novembre 2026.** Confermati nello schema `wordle` 8.630 soluzioni e 105.310 tentativi. La rigenerazione legge il DB lessicale di lavoro e riscrive soltanto questo schema; il nuovo task di ZeroContext non modifica le parole di ZeroWordle.
+> [Indice e stato della documentazione](../docs/STATO_DOCUMENTAZIONE.md).
+
 La chat indovina insieme una parola nascosta. Ogni parola scritta in chat diventa una riga di tessere:
 
 - **verde**: lettera giusta al posto giusto;

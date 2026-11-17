@@ -27,6 +27,20 @@ def inflected(sources=('unimorph-ita', 'glaffit')):
 
 
 class UtilityTests(unittest.TestCase):
+    def test_prompt_evaluation_respects_an_upper_zipf_limit(self):
+        env = environment()
+        env['policy'] = {'maximum_zipf_it': 2.2}
+        data = {'sources': {'kaikki-itwiktionary'},
+                'analyses': {('casa', 'NOUN', 'lemma', 'noun', 'kaikki-itwiktionary')},
+                'wordle': empty_wordle(), 'context': empty_context()}
+        env['zipf'] = lambda *args: 2.2
+        _, accepted = assess('casa', data, env)
+        self.assertEqual(accepted['zeroassociations']['prompt']['status'], 'DA_REVISIONARE_SENSO')
+        env['zipf'] = lambda *args: 2.21
+        _, rejected = assess('casa', data, env)
+        self.assertEqual(rejected['zeroassociations']['prompt']['status'], 'NON_ADATTA_PROMPT')
+        self.assertEqual(rejected['zeroassociations']['prompt']['reason'], 'frequenza_superiore_soglia')
+
     def test_phrases_are_rejected_before_their_frequency_can_look_high(self):
         env = environment()
         env['zipf'] = lambda *args: self.fail('Una locuzione non deve ricevere la frequenza di una parola')

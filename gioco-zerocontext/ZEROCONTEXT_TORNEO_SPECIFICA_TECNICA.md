@@ -1,5 +1,8 @@
 # ZeroContext — Specifica tecnica di implementazione della modalità Torneo
 
+> **Revisione documentale — 16 novembre 2026.** La specifica iniziale e i suoi esempi SQL/Socket restano storici. Il runtime usa ora il corpus `context-statistical-1`, file vettoriali immutabili e ricaricamento locale: un cambio di impronta sospende i tornei aperti. Il contratto pubblico continua a nascondere la lunghezza della segreta; per uso e scostamenti vedere il [README](README.md) e la sezione finale.
+> [Indice e stato della documentazione](../docs/STATO_DOCUMENTAZIONE.md).
+
 **Versione:** 1.0 · 14 novembre 2026  
 **Regolamento di riferimento:** `REGOLAMENTO_CONTEXT_TORNEO_v2_3.md` (regole funzionali §§1–13 e Allegato A).  
 **Repository esaminato:** [`lucatortiglione/Zerocade`](https://github.com/lucatortiglione/Zerocade), ramo `main`, al tree SHA `3a70b2774ec6d7e54357b1b3d4c8ff4575fcad23`.  

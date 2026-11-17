@@ -1,0 +1,119 @@
+{
+  "version": "context-ensemble-3",
+  "models": {
+    "gemma": {
+      "id": "google/embeddinggemma-2",
+      "revision": "f9972ac22e696a105c482202646979e33e4b5a1e",
+      "prefix": "task: sentence similarity | query: ",
+      "config_kwargs": {
+        "vision_config": null,
+        "audio_config": null
+      },
+      "enabled": true,
+      "gated": false,
+      "license": "Apache-2.0",
+      "weight": 0.1
+    },
+    "bge_it": {
+      "id": "Kleva-ai/italian-bge-m3",
+      "enabled": false,
+      "revision": "8a77d0de73a323e80e5c6a02d4a73e1634c339f4",
+      "prefix": "",
+      "gated": true,
+      "disabled_reason": "Richiede autorizzazione e accesso personale a Hugging Face; escluso per scelta dell'utente.",
+      "weight": 0.1
+    },
+    "harrier": {
+      "id": "microsoft/harrier-oss-v1-0.6b",
+      "revision": "f9b9dc8d367d443f2479d27aa5d8d2850c0774ee",
+      "prefix": "Instruct: Retrieve semantically similar text\nQuery: ",
+      "enabled": true,
+      "gated": false,
+      "license": "MIT",
+      "weight": 0.1
+    },
+    "qwen": {
+      "id": "Qwen/Qwen3-Embedding-0.6B",
+      "revision": "97b0c614be4d77ee51c0cef4e5f07c00f9eb65b3",
+      "prefix": "Instruct: Retrieve semantically similar text\nQuery: ",
+      "enabled": true,
+      "gated": false,
+      "license": "Apache-2.0",
+      "weight": 0.1
+    },
+    "bge": {
+      "id": "BAAI/bge-m3",
+      "enabled": true,
+      "gated": false,
+      "revision": "5617a9f61b028005a4858fdac845db406aefb181",
+      "prefix": "",
+      "license": "MIT",
+      "representation": "dense",
+      "weight": 0.1
+    },
+    "e5": {
+      "id": "intfloat/multilingual-e5-large",
+      "enabled": true,
+      "gated": false,
+      "revision": "3d7cfbdacd47fdda877c5cd8a79fbcc4f2a574f3",
+      "prefix": "query: ",
+      "license": "MIT",
+      "weight": 0.1
+    },
+    "gte": {
+      "id": "Alibaba-NLP/gte-multilingual-base",
+      "enabled": true,
+      "gated": false,
+      "revision": "9bbca17d9273fd0d03d5725c7a4b0f6b45142062",
+      "prefix": "",
+      "license": "Apache-2.0",
+      "trust_remote_code": true,
+      "code_revision": "40ced75c3017eb27626c9d4ea981bde21a2662f4",
+      "weight": 0.1
+    }
+  },
+  "vector_weights": {
+    "fasttext": 0.15,
+    "conceptnet": 0.15
+  },
+  "block_dimensions": 170,
+  "max_sequence_length": 256,
+  "batch_size": 8,
+  "link_boost": 0.1,
+  "hub_strength": 0.0,
+  "probes": [
+    "cuculo",
+    "fotografo",
+    "spiaggia",
+    "pizza",
+    "banca",
+    "pesca"
+  ],
+  "watch_words": [
+    "uccello",
+    "nido",
+    "canto",
+    "orologio",
+    "luna",
+    "aurora",
+    "lattea",
+    "cocco",
+    "boreale",
+    "fotoreporter",
+    "pittore",
+    "autista",
+    "medico"
+  ],
+  "references": {
+    "conceptnet": "https://github.com/commonsense/conceptnet-numberbatch",
+    "conceptnet_relations": "https://github.com/commonsense/conceptnet5/wiki/Relations",
+    "fasttext": "https://fasttext.cc/docs/en/crawl-vectors.html",
+    "gemma": "https://huggingface.co/google/embeddinggemma-2",
+    "bge_it": "https://huggingface.co/Kleva-ai/italian-bge-m3",
+    "harrier": "https://huggingface.co/microsoft/harrier-oss-v1-0.6b",
+    "qwen": "https://huggingface.co/Qwen/Qwen3-Embedding-0.6B",
+    "bge": "https://huggingface.co/BAAI/bge-m3",
+    "e5": "https://huggingface.co/intfloat/multilingual-e5-large",
+    "gte": "https://huggingface.co/Alibaba-NLP/gte-multilingual-base"
+  }
+}

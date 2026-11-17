@@ -1,5 +1,8 @@
 # Candidati, voci valide e scarti
 
+> **Revisione documentale — 16 novembre 2026.** Le decisioni delle voci restano nel DB di lavoro e non vanno dedotte dalla sola assenza nella copia di gioco. Esclusione dai prompt, esclusione dalle segrete e mancata ammissione come tentativo sono ruoli diversi: rigenerare ZeroContext applica le proprie regole senza approvare automaticamente nuovi bacini di associazioni.
+> [Indice e stato della documentazione](../docs/STATO_DOCUMENTAZIONE.md).
+
 Tutti schemi del DB di lavoro `database/parole_ita_raw.sqlite3`.
 
 | Schema | Contenuto | Utilizzo |

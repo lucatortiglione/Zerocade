@@ -12,7 +12,7 @@ export interface InfrastructureJobs {
   feed: { args: { creator?: string; since: number }; result: Omit<Feed, 'live'> }
   boards: { args: { key: string; game: string; limit: number; at: number; start: number }; result: { boards: Boards; resets: Partial<Record<PeriodId, number>> } }
   site: { args: { key: string; at: number; starts: Record<string, number> }; result: Map<string, string> }
-  export: { args: { kind: 'bivio' | 'bivio-flags' | 'quizzland' | 'zw-plays' | 'zw-answers' | 'wa-rounds' | 'wa-guesses' }; result: string }
+  export: { args: { kind: 'bivio' | 'bivio-flags' | 'quizzland' | 'zw-plays' | 'zw-answers' | 'wa-rounds' | 'wa-guesses' | 'taboo-exposures' | 'taboo-calibration' }; result: string }
   padSave: { args: { key: string; input: unknown }; result: { error: string | null; board: PadBoard } }
   padRemove: { args: { key: string; id: string }; result: PadBoard }
   padVolume: { args: { key: string; volume: number }; result: PadBoard }

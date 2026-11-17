@@ -1,5 +1,8 @@
 # Revisione delle domande per un pubblico italiano
 
+> **Revisione documentale — 16 novembre 2026.** Rapporto della revisione del 6 novembre, conservato come fotografia storica. Nel DB locale verificato il 16 novembre risultano 26.715 domande, tutte attive. Segnalazioni ed esclusioni proposte nel rapporto non equivalgono allo stato corrente di attivazione; vedere il [README del gioco](../README.md).
+> [Indice e stato della documentazione](../../docs/STATO_DOCUMENTAZIONE.md).
+
 Data: 6 novembre 2026.
 
 **Snapshot della precedente revisione per pubblico italiano.** Successivamente sono state applicate le correzioni e le esclusioni contestuali descritte in [REVISIONE-RISPOSTE.md](REVISIONE-RISPOSTE.md); i conteggi sotto riportano lo stato precedente.

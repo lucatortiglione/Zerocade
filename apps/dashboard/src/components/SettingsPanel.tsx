@@ -56,7 +56,7 @@ export function SettingsPanel({ session }: { session: SessionState }) {
       <h2 className="section-label">Live settings</h2>
       <div className="settings">
         {game.settings
-          .filter((s) => settingVisible(s, game.settings, session.settings))
+          .filter((s) => !(session.gameId === 'context' && s.id === 'associationSource') && settingVisible(s, game.settings, session.settings))
           .map((s) => (
             // A setting shown because of another one sits indented under it.
             <div key={s.id} className={s.when ? 'setting-sub' : undefined} style={s.when ? undefined : { display: 'contents' }}>

@@ -1,33 +1,36 @@
 # Word Association IT v3.6.0
 
-Il **primo step** è [raccogliere e inserire tutti i prompt dalle fonti registrate](PROMPT_INVENTORY.md),
+> **Revisione documentale — 16 novembre 2026.** Documento della pipeline di estrazione del 9 novembre, conservato per riproducibilità. Percorsi e comandi nei blocchi storici si riferiscono alla disposizione originaria; per il flusso corrente usare il [README principale](../../README.md). I lotti voluminosi sono locali e alcuni artefatti originari restano soltanto nella storia Git.
+> [Indice e stato della documentazione](../../../docs/STATO_DOCUMENTAZIONE.md).
+
+Il **primo step** è [raccogliere e inserire tutti i prompt dalle fonti registrate](../../PROMPT_INVENTORY.md),
 con il task VS Code **1. Prompt: raccogli e inserisci inventario da tutte le fonti registrate**.
 La ricerca e verifica delle associazioni viene nella fase successiva.
 
 Il nuovo percorso con bacini estendibili, categoria per ogni prompt e selezione
-casuale di **sette risposte per Livecade** è descritto in [PROMPT_DATABASE.md](PROMPT_DATABASE.md).
+casuale di **sette risposte per Livecade** è descritto in [PROMPT_DATABASE.md](../../PROMPT_DATABASE.md).
 La verifica semantica precede l'inserimento in `prompt.sqlite3`;
 `prompt.sql` ne conserva l'esportazione SQL. I task VS Code raccolgono fonti,
 importano revisioni già effettuate e generano set dai bacini verificati.
 Questo aggiornamento prevale sui riferimenti storici a sette parole qui sotto.
 
-Le [direttive correnti](direttive_word_association_it_v3_6_0.md) definiscono
+Le [direttive correnti](../../direttive_word_association_it_v3_6_0.md) definiscono
 **contesto visibile → sette risposte nascoste**. Il catalogo contiene 172
 categorie in 16 cluster, senza rinumerazione degli ID precedenti.
 
 ## CSV filtrato del lotto corrente
 
-Il [filtro applicato al lotto 0003](filtered-v3_6_0/lotto_0003_20261108/LEGGIMI.md)
+Il [filtro applicato al lotto 0003](../lotti/filtered-v3_6_0/lotto_0003_20261108/LEGGIMI.md)
 ha riesaminato 35.000 coppie e separato 5.090 esclusioni contestuali da
 29.608 parole ancora dubbie. Il
-[nuovo CSV ridotto](filtered-v3_6_0/lotto_0003_20261108/candidati_filtrati_0003.csv)
+[nuovo CSV ridotto](../lotti/filtered-v3_6_0/lotto_0003_20261108/candidati_filtrati_0003.csv)
 contiene 40 set completi con proposte editoriali; gli altri 4.960 prompt sono
 conservati integralmente in revisione. Anche i 40 set richiedono QA indipendente.
 I vecchi CSV da 5.000 righe restano sorgenti di lavoro, non il risultato filtrato.
 
 ## Lotto di 5.000 esempi
 
-I file sono in [generated-v3_6_0](generated-v3_6_0/LEGGIMI.md):
+I file sono in [generated-v3_6_0](../LEGGIMI.md):
 
 - `word_association_it_5000_candidati_0003.csv`: lotto corrente, con prima riga
   `ref,source,language,prompt,words`, un campo per cella; `ref` vuoto,
@@ -66,7 +69,7 @@ La colonna `ordine` è disponibile soltanto nella copia facoltativa
 
 ## Familiarità dei prompt e prestiti ammessi
 
-[resources/prompt_policy.json](resources/prompt_policy.json) contiene la lista
+[resources/prompt_policy.json](../../resources/prompt_policy.json) contiene la lista
 chiusa di 462 `common_loanwords`. Si applica soltanto ai prestiti stranieri:
 se un prestito non è elencato, il generatore lo esclude, anche se frequente.
 Non esiste un dizionario di eccezioni `excluded_prompts`.
@@ -100,10 +103,10 @@ nemmeno con `--strict-warnings`. Qualità e sette risposte restano obbligatorie.
 ## Risorse e riproduzione
 
 L'ambiente dedicato è `.venv/` (Python 3.13, escluso da Git); pacchetti e versioni
-sono elencati in [resources/environment.txt](resources/environment.txt).
+sono elencati in [resources/environment.txt](../../resources/environment.txt).
 spaCy `it_core_news_md` 3.8.0 è stato eseguito su 69.598 definizioni distinte.
 Frequenze e DF reali, manifest con hash e metodi, lessico morfologico del lotto
-e crediti sono in [resources](resources/LEGGIMI.md).
+e crediti sono in [resources](../../resources/LEGGIMI.md).
 
 Corpus originale e cache NLP rimangono fuori dal repository:
 `%LOCALAPPDATA%/Zerocade/word-association/`.
@@ -141,8 +144,8 @@ gioco-zeroassociations/.venv/Scripts/python.exe gioco-zeroassociations/validate_
 
 `PASS_TECHNICAL_ONLY` non è approvazione semantica. I flag di frequenza,
 omonimia, forme sconosciute e parentela morfologica richiedono esame contestuale.
-I §§3.5–3.13 delle [direttive](direttive_word_association_it_v3_6_0.md) e la
-[direttiva di pertinenza](DIRETTIVA_INDIZI.md) impongono anche il controllo
+I §§3.5–3.13 delle [direttive](../../direttive_word_association_it_v3_6_0.md) e la
+[direttiva di pertinenza](../../DIRETTIVA_INDIZI.md) impongono anche il controllo
 semantico di ogni coppia: provenienza e frequenza non sostituiscono una
 relazione concreta, naturale e recuperabile nell'accezione scelta. Per ogni
 risposta debole cercare un'alternativa mantenendo il prompt. Il §3.10 include
@@ -164,7 +167,7 @@ Questo lotto di 5.000 esempi non viene caricato come dataset approvato nel gioco
 
 ## Riparazioni sul lotto corrente
 
-La [revisione del lotto 0003](generated-v3_6_0/LEGGIMI.md) ha sostituito 200
+La [revisione del lotto 0003](../LEGGIMI.md) ha sostituito 200
 risposte in 42 set, mantenendo i 5.000 prompt. Le altre 4.958 righe richiedono
 ancora selezione editoriale e tutte richiedono QA indipendente.
 
@@ -187,7 +190,7 @@ quella ordinaria dichiara `EDITORIAL_SELECTION`. Entrambe restano candidate fino
 
 ## Casi degli screenshot e contratto aggiornato
 
-L'[analisi dei 22 contesti](analisi_screenshot_word_association_20261108.md)
+L'[analisi dei 22 contesti](../../analisi_screenshot_word_association_20261108.md)
 ricostruisce cause, parole valide e fonti, comprese DIFENDERE e MASSO negli
 screenshot senza titolo. Il catalogo `resources/semantic_regressions_it.jsonl`
 alimenta segnalazioni contestuali, non blacklist. `semantic_rules.py` distingue

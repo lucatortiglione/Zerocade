@@ -88,13 +88,18 @@ def plural_evidence(source: str, pos: str, details: dict) -> bool:
     return False
 
 
-def pure_plurals(words, path: Path) -> dict[str, list[str]]:
+def pure_plurals(words, path: Path, *, active_only=False) -> dict[str, list[str]]:
     """Le parole di `words` che sono plurali puri, ognuna con i suoi singolari presenti nella raccolta."""
     import json
     with closing(sqlite3.connect(Path(path).resolve().as_uri() + '?mode=ro', uri=True)) as con:
         con.execute('BEGIN')
-        sources = dict(con.execute('''SELECT n.n, s.source_key FROM raw__inventory_snapshot_numbers n
-            JOIN raw__inventory_snapshots s ON s.id = n.snapshot_id'''))
+        if active_only:
+            sources = dict(con.execute('''SELECT n.n,h.source_key FROM raw__inventory_source_heads h
+                JOIN raw__inventory_snapshot_numbers n ON n.snapshot_id=h.snapshot_id
+                JOIN raw__inventory_registered_sources r USING(source_key) WHERE r.enabled=1'''))
+        else:
+            sources = dict(con.execute('''SELECT n.n, s.source_key FROM raw__inventory_snapshot_numbers n
+                JOIN raw__inventory_snapshots s ON s.id = n.snapshot_id'''))
         roles = dict(con.execute('SELECT n, role FROM raw__inventory_attestation_roles'))
         tags = dict(con.execute('SELECT n, pos FROM raw__inventory_attestation_pos'))
         con.execute('CREATE TEMP TABLE plural_targets(word TEXT PRIMARY KEY) WITHOUT ROWID')

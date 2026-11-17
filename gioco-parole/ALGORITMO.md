@@ -1,5 +1,8 @@
 # ZeroWords · Algoritmo di generazione di griglie e parole
 
+> **Revisione documentale — 16 novembre 2026.** Il documento descrive l'algoritmo `zw-2`; gli esempi e le misure conservano la data della generazione originale. Nel runtime attuale `wordgen/levels.ts` gestisce il worker con capacità 8 e timeout di 30 secondi: questi limiti operativi non cambiano la curva o il significato delle varianti. Per avvio e dati usare il [README](README.md).
+> [Indice e stato della documentazione](../docs/STATO_DOCUMENTAZIONE.md).
+
 Questo documento descrive, passo per passo, come ZeroWords costruisce ogni livello: la ruota di lettere, le parole dello schema, le parole bonus, la disposizione a incastro e le due varianti di difficoltà. Descrive l'algoritmo **così come è implementato** nella versione del generatore `zw-2` (2 novembre 2026). Dove il codice si discosta dalla specifica di partenza, o fissa un valore che la specifica non dava, lo dice esplicitamente (vedi [Scelte non coperte dalla specifica](#14-scelte-non-coperte-dalla-specifica)). La [sezione 16](#16-revisione-v21-cosa-è-cambiato-e-perché) riassume che cosa la versione `zw-2` ha preso dalla proposta di revisione v2.1 e che cosa ha rinviato.
 
 ## Indice

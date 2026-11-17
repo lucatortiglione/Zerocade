@@ -1,5 +1,8 @@
 # Analisi degli screenshot Word Association — 8 novembre 2026
 
+> **Revisione documentale — 16 novembre 2026.** Analisi storica degli screenshot dell'8 novembre. I casi di regressione e le osservazioni conservano il loro ambito; per le regole correnti usare [REGOLE.md](REGOLE.md) e [DIRETTIVA_INDIZI.md](DIRETTIVA_INDIZI.md). La revisione documentale non approva o modifica i bacini discussi negli esempi.
+> [Indice e stato della documentazione](../docs/STATO_DOCUMENTAZIONE.md).
+
 Ricostruiti i 22 contesti problematici mostrati o citati nella conversazione. I due screenshot senza prompt sono DIFENDERE e MASSO. RUGBY era citato anche nel testo. Il riferimento iniziale CARAMELLA documentava il formato del CSV.
 
 Le parole e le definizioni sono confrontate con i metadati originari: per i set già corretti è usato l’archivio precedente alla revisione. SPANDERE è nel lotto 0002. Questa analisi non equivale a una prova con giocatori né a un’approvazione indipendente.

@@ -1,5 +1,8 @@
 # Bivio · TODO
 
+> **Revisione documentale — 16 novembre 2026.** Questo — il piano dell'app mobile Bivio. In Zerocade esiste già ZeroDubbi, con 120 dilemmi, server, overlay e persistenza locale dei voti: vedere il [README](README.md). Le stime e le caselle della roadmap mobile non sono una dichiarazione delle funzioni mancanti nella versione PC.
+> [Indice e stato della documentazione](../docs/STATO_DOCUMENTAZIONE.md).
+
 Gioco "Preferiresti…?" per Android (poi iOS), **senza abbonamento**.
 "Bivio" è un titolo provvisorio (vedi [1. Decisioni](#1-decisioni-da-prendere-prima-di-scrivere-codice)).
 

@@ -10,6 +10,8 @@ import {
   type IncastroCommand,
   type LiveEvent,
   type QuizzlandCommand,
+  type TabooCommand,
+  TABOO_RULES,
   type SourceConfig,
   type Trigger,
   type TriggerSource,
@@ -245,4 +247,47 @@ export const sanitizeLevel = (raw: unknown): number | null =>
 export function sanitizeMessage(raw: unknown): string | null {
   if (typeof raw !== 'string') return null
   return raw.replace(/\s+/g, ' ').trim().slice(0, 140) || null
+}
+
+// ZeroTaboo's commands from the dashboard (taboo.ts): the shape, the types and the limits are checked here, at the boundary.
+// Each carries the version the director saw; a card command also the exposure (DIRETTIVE §13). Anything else is null.
+const TABOO_CATEGORIES_OK = ['A', 'B', 'C', 'D', 'E', 'F']
+const int = (x: unknown, min: number, max: number): number | null => (typeof x === 'number' && Number.isInteger(x) && x >= min && x <= max ? x : null)
+
+export function sanitizeTabooCommand(raw: unknown): TabooCommand | null {
+  if (!raw || typeof raw !== 'object') return null
+  const r = raw as Record<string, unknown>
+  const expectedVersion = int(r.expectedVersion, 0, Number.MAX_SAFE_INTEGER)
+  if (expectedVersion === null || typeof r.type !== 'string') return null
+  const exposure = int(r.exposure, 1, 1_000_000)
+  switch (r.type) {
+    case 'start-match': {
+      const threshold = r.threshold === undefined ? undefined : int(r.threshold, TABOO_RULES.thresholdMin, TABOO_RULES.thresholdMax)
+      if (threshold === null) return null
+      if (r.platform !== undefined && r.platform !== 'tiktok' && r.platform !== 'twitch') return null
+      if (r.mode !== undefined && r.mode !== 'standard' && r.mode !== 'practice') return null
+      return { type: 'start-match', expectedVersion, ...(threshold !== undefined && { threshold }), ...(r.platform !== undefined && { platform: r.platform }), ...(r.mode !== undefined && { mode: r.mode }) }
+    }
+    case 'start-round': case 'pause': case 'resume': case 'cancel': case 'dismiss':
+      return { type: r.type, expectedVersion }
+    case 'skip': case 'taboo': case 'sing':
+      return exposure === null ? null : { type: r.type, expectedVersion, exposure }
+    case 'category':
+      return typeof r.category === 'string' && TABOO_CATEGORIES_OK.includes(r.category) ? { type: 'category', expectedVersion, category: r.category as never } : null
+    case 'report': {
+      if (exposure === null || typeof r.reason !== 'string') return null
+      const reason = r.reason.replace(/\s+/g, ' ').trim().slice(0, TABOO_RULES.maxReasonChars)
+      const after = r.violationAfterMs === undefined ? undefined : int(r.violationAfterMs, 0, TABOO_RULES.roundMs)
+      if (!reason || after === null) return null
+      return { type: 'report', expectedVersion, exposure, reason, ...(after !== undefined && { violationAfterMs: after }) }
+    }
+    case 'decide': {
+      const report = int(r.report, 1, Number.MAX_SAFE_INTEGER)
+      if (report === null || typeof r.verifiable !== 'boolean' || typeof r.reason !== 'string') return null
+      const reason = r.reason.replace(/\s+/g, ' ').trim().slice(0, TABOO_RULES.maxReasonChars)
+      return reason ? { type: 'decide', expectedVersion, report, verifiable: r.verifiable, reason } : null
+    }
+    default:
+      return null
+  }
 }

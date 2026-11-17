@@ -14,7 +14,7 @@ import {
   type TournamentRow,
   type Viewer,
 } from '@zerocade/shared'
-import type { ContextTournamentStore, GuessRecord, RoundRecord, TournamentRecord } from './context-tournament-db.js'
+import type { ContextTournamentStore, GuessRecord, RejectionRecord, RoundRecord, TournamentRecord } from './context-tournament-db.js'
 import { planOf, planRound, positionOf, readGuess, type Corpus, type RoundPlan } from './context-tournament-ranking.js'
 import { scoreRound, standings, topTen, type RoundOutcome } from './context-tournament-scoring.js'
 
@@ -33,7 +33,9 @@ export interface TournamentDeps {
   countdownMs?: number
   // The setting "Parole scritte a schermo" of the room.
   typedWords?: (key: string) => boolean
-  corpus: () => Corpus | null
+  // The setting "Mostra numero di lettere" of the room (off when every hint is disabled).
+  showWordLength?: (key: string) => boolean
+  corpus: (key: string) => Corpus | null
   now?: () => number
   setTimer?: (fn: () => void, ms: number) => unknown
   clearTimer?: (handle: unknown) => void
@@ -46,6 +48,21 @@ export interface TournamentDeps {
   secretUses?: (word: string) => number
   secretLastAt?: (word: string) => number
   recordSecretUse?: (key: string, word: string) => void
+}
+
+// A valid word written in a window, whether or not it counted on arrival: at the window's close the words are put
+// back in the order they were written (see reconcile), so that a late arrival cannot steal the place of an earlier one.
+interface Candidate {
+  window: number
+  player: string
+  nickname: string
+  avatar: string | null
+  word: number
+  position: number
+  messageKey: string | null
+  messageAt: number | null
+  receivedAt: number
+  arrival: number
 }
 
 interface Live {
@@ -64,6 +81,8 @@ interface Live {
   pending: number | null
   usedWords: Set<number>
   messages: Set<string>
+  cands: Candidate[]
+  arrivals: number
   submissions: number
   overflow: number
   board: TournamentGuessView[]
@@ -80,6 +99,9 @@ interface Live {
   version: number
   publishTimer: unknown
 }
+
+// Candidates kept for a window: a flood of words must not fill the memory.
+const MAX_CANDIDATES = 6000
 
 const SUSPENDED_ON_RESTART = 'Zerocade si è riavviato durante una manche: la finestra interrotta ripartirà da capo, con i tentativi già registrati.'
 const SUSPENDED_ON_BRIDGE = 'Il ponte ZeroFollowerBot si è scollegato: senza i suoi messaggi il torneo non può continuare.'
@@ -142,7 +164,7 @@ export class ContextTournaments {
     if (!l) return null
     return {
       state: this.publicState(l),
-      secret: l.plan && l.round ? this.deps.corpus()?.data.words[l.plan.secret] ?? null : null,
+      secret: l.plan && l.round ? this.deps.corpus(key)?.data.words[l.plan.secret] ?? null : null,
       standings: l.rows,
       overflow: l.overflow,
       canStartRound: this.startable(l) === null,
@@ -167,6 +189,19 @@ export class ContextTournaments {
     for (const l of this.live.values()) {
       this.stopTimer(l)
       if (l.publishTimer) this.clearTimer(l.publishTimer)
+    }
+  }
+
+  // The room's settings changed: the secret's length may now be shown or hidden.
+  settingsChanged(key: string) {
+    const l = this.live.get(key)
+    if (l) this.publish(l, false)
+  }
+
+  corpusChanged() {
+    for (const l of this.live.values()) {
+      if (['active', 'intermission', 'suspended'].includes(l.t.status) && !this.corpusFor(l))
+        this.suspend(l, 'Il corpus di ZeroContext è stato aggiornato: il torneo resta salvato e sospeso sui dati precedenti.', 'sistema')
     }
   }
 
@@ -209,7 +244,7 @@ export class ContextTournaments {
     if (!Number.isFinite(intermissionMs) || intermissionMs < TOURNAMENT_RULES.intermissionMinMs || intermissionMs > TOURNAMENT_RULES.intermissionMaxMs)
       return fail(`L'intervallo con la Top 10 va da ${TOURNAMENT_RULES.intermissionMinMs / 1000} a ${TOURNAMENT_RULES.intermissionMaxMs / 1000} secondi.`)
     if (!this.deps.bridgeReady(key)) return fail('Collega ZeroFollowerBot: nel torneo contano solo i messaggi del suo ponte.')
-    const corpus = this.deps.corpus()
+    const corpus = this.deps.corpus(key)
     if (!corpus) return fail('Le parole di ZeroContext non sono disponibili sul server.')
     if (shown) this.live.delete(key)
     const audience = context.audience === 'followers' || context.audience === 'fans' ? context.audience : 'all'
@@ -416,28 +451,47 @@ export class ContextTournaments {
   // The chat: a comment from ZeroFollowerBot's bridge, while a window is open. A word that is not valid, already used
   // in the round, or a second word of the same player in the window is ignored and costs nothing (§3).
 
-  offer(key: string, user: Viewer, text: string, messageId: string, platform: string): boolean {
+  offer(key: string, user: Viewer, text: string, messageId: string, platform: string, messageAt: number | null = null): boolean {
     const l = this.live.get(key)
     if (!l || !l.round || !l.plan) return false
     const window = this.acceptingWindow(l)
-    if (window === null) return false
     if (!user.id || user.id === 'anonymous' || user.id.endsWith(':anonymous')) return false
     if (!allowedToPlay({ audience: l.t.audience }, user)) return false
     const messageKey = messageId ? `${platform}:${messageId}` : null
     if (messageKey && l.messages.has(messageKey)) return false
-    const corpus = this.deps.corpus()
+    const corpus = this.deps.corpus(key)
     if (!corpus) return false
+    // A valid word that does not count is kept (see reject), so that a dispute can be settled afterwards.
+    const reject = (reason: RejectionRecord['reason']) => this.reject(l, user, text, reason, window, messageAt)
+    if (window === null) {
+      if (readGuess(corpus, text, l.plan.secret) >= 0) reject('fuori-finestra')
+      return false
+    }
     if (this.deps.typedWords?.(key)) this.noteTyped(l, user, text, corpus)
-    if (l.thisWindow.has(user.id)) return false
     const word = readGuess(corpus, text, l.plan.secret)
-    if (word < 0 || l.usedWords.has(word)) return false
+    if (word < 0) return false
+    // Every valid word is remembered with the time it was written: at the close the window is put in that order.
+    if (l.cands.length < MAX_CANDIDATES) {
+      l.cands.push({ window, player: user.id, nickname: user.nickname, avatar: user.avatar ?? null, word, position: positionOf(l.plan, word),
+        messageKey, messageAt, receivedAt: this.now(), arrival: ++l.arrivals })
+      if (messageKey) l.messages.add(messageKey)
+    }
+    if (l.thisWindow.has(user.id)) {
+      reject('seconda-proposta')
+      return false
+    }
+    if (l.usedWords.has(word)) {
+      reject('parola-gia-usata')
+      return false
+    }
     if (l.submissions >= TOURNAMENT_RULES.maxPerWindow) {
       l.overflow++
+      reject('oltre-limite')
       this.publishSoon(l)
       return false
     }
     const guess: GuessRecord = { roundId: l.round.id, seq: l.seq + 1, window, messageKey, player: user.id, word,
-      position: positionOf(l.plan, word), receivedAt: this.now() }
+      position: positionOf(l.plan, word), receivedAt: this.now(), messageAt }
     if (!this.deps.store.acceptGuess(guess, l.t.id, user.nickname, user.avatar ?? null)) return false
     l.seq = guess.seq
     l.players.add(user.id)
@@ -447,6 +501,19 @@ export class ContextTournaments {
     l.submissions++
     this.publishSoon(l)
     return true
+  }
+
+  // At most this many per round: a flood of repeated words must not fill the database.
+  private static readonly MAX_REJECTIONS = 5000
+  private rejections = new Map<string, number>()
+
+  private reject(l: Live, user: Viewer, text: string, reason: RejectionRecord['reason'], window: number | null, messageAt: number | null) {
+    const round = l.round!.id
+    const n = this.rejections.get(round) ?? 0
+    if (n >= ContextTournaments.MAX_REJECTIONS) return
+    this.rejections.set(round, n + 1)
+    this.deps.store.addRejection({ roundId: round, window, player: user.id, nickname: user.nickname, text: text.trim(), reason,
+      messageAt, receivedAt: this.now() })
   }
 
   // The words written, shown on screen like the classic game does: any single word, valid or not, even one that does
@@ -517,10 +584,60 @@ export class ContextTournaments {
     this.publish(l)
   }
 
+  // The window's words in the order they were written, not the order they reached the server: TikTok and the bridge
+  // deliver messages with different delays, and who writes first must win (the solution, a word already taken, the
+  // player's one word of the window). A platform's clock is aligned with the server's by the median delay of its own
+  // messages, so that two platforms are compared by when they were written and not by clocks that disagree. Without
+  // the time on every message the arrival order stays, as before. Whatever goes wrong here leaves the saved order.
+  private reconcile(l: Live) {
+    const window = l.window
+    const mine = l.cands.filter((c) => c.window === window)
+    l.cands = l.cands.filter((c) => c.window !== window)
+    if (!mine.length || !l.round || mine.some((c) => c.messageAt === null)) return
+    try {
+      const platform = (c: Candidate) => c.player.slice(0, c.player.indexOf(':'))
+      const delays = new Map<string, number[]>()
+      for (const c of mine) {
+        const list = delays.get(platform(c)) ?? []
+        list.push(c.receivedAt - c.messageAt!)
+        delays.set(platform(c), list)
+      }
+      const shift = new Map([...delays].map(([p, d]) => [p, d.sort((a, b) => a - b)[Math.floor(d.length / 2)]]))
+      const written = (c: Candidate) => c.messageAt! + (shift.get(platform(c)) ?? 0)
+      const ordered = [...mine].sort((a, b) => written(a) - written(b) || a.arrival - b.arrival)
+      const old = this.deps.store.guesses(l.round.id).filter((g) => g.window === window)
+      const before = new Set(l.usedWords)
+      for (const g of old) before.delete(g.word)
+      const players = new Set<string>()
+      const words = new Set<number>()
+      const kept: Candidate[] = []
+      for (const c of ordered) {
+        if (players.has(c.player) || before.has(c.word) || words.has(c.word) || kept.length >= TOURNAMENT_RULES.maxPerWindow) continue
+        players.add(c.player)
+        words.add(c.word)
+        kept.push(c)
+      }
+      const same = kept.length === old.length && kept.every((c, i) => c.player === old[i].player && c.word === old[i].word)
+      if (same) return
+      const first = old.length ? old[0].seq : l.seq + 1
+      const guesses: GuessRecord[] = kept.map((c, i) => ({ roundId: l.round!.id, seq: first + i, window, messageKey: c.messageKey, player: c.player,
+        word: c.word, position: c.position, receivedAt: c.receivedAt, messageAt: c.messageAt }))
+      this.deps.store.replaceWindow(l.round.id, window, l.t.id, guesses, new Map(kept.map((c) => [c.player, { nickname: c.nickname, avatar: c.avatar }])))
+      l.seq = first + kept.length - 1
+      l.usedWords = new Set([...before, ...words])
+      l.submissions = kept.length
+      for (const c of kept) l.players.add(c.player)
+      console.warn(`[torneo] finestra ${window}: ordine di scrittura diverso da quello di arrivo, ${kept.length} parole riordinate`)
+    } catch (error) {
+      console.error("[torneo] riordino della finestra non riuscito: resta l'ordine di arrivo", error)
+    }
+  }
+
   // The closed window's results: ranks and Pioneer points of its guesses, in the official order; the lifeline after
   // window 30 when no player reached the cyan band.
   private process(l: Live): RoundOutcome {
-    const corpus = this.deps.corpus()
+    this.reconcile(l)
+    const corpus = this.deps.corpus(l.t.roomKey)
     const guesses = this.deps.store.guesses(l.round!.id)
     const outcome = scoreRound(guesses.map((g) => ({ seq: g.seq, window: g.window, player: g.player, position: g.position })))
     const names = new Map(this.deps.store.players(l.t.id).map((p) => [p.player, p.nickname]))
@@ -572,7 +689,7 @@ export class ContextTournaments {
     }
     l.t = this.deps.store.tournament(l.t.id)!
     l.settled = this.countSettled(l.t.id)
-    l.solution = this.deps.corpus()?.data.words[round.secret] ?? null
+    l.solution = this.deps.corpus(l.t.roomKey)?.data.words[round.secret] ?? null
     l.solvedBy = outcome.solvedBy ? name(outcome.solvedBy) : null
     l.achievements = achievements
     l.round = null
@@ -611,7 +728,7 @@ export class ContextTournaments {
 
   private fresh(t: TournamentRecord): Live {
     return { t, phase: 'ready', round: null, plan: null, window: 0, deadline: 0, timer: null, seq: 0, thisWindow: new Set(), pending: null,
-      usedWords: new Set(), messages: new Set(), submissions: 0, overflow: 0, board: [], lastWindow: [], typed: [], buoy: null, best: null,
+      usedWords: new Set(), messages: new Set(), cands: [], arrivals: 0, submissions: 0, overflow: 0, board: [], lastWindow: [], typed: [], buoy: null, best: null,
       solution: null, solvedBy: null, achievements: [], rows: [], players: new Set(this.deps.store.players(t.id).map((p) => p.player)),
       settled: this.countSettled(t.id), version: 0, publishTimer: null }
   }
@@ -626,6 +743,7 @@ export class ContextTournaments {
     l.thisWindow.clear()
     l.usedWords.clear()
     l.messages.clear()
+    l.cands = []
     l.submissions = 0
     l.typed = []
     l.board = []
@@ -639,6 +757,7 @@ export class ContextTournaments {
   // A round in play rebuilt from what was saved (a restart, or a resume after its data had to be reloaded).
   private loadRound(l: Live, round: RoundRecord, corpus = this.corpusFor(l)) {
     l.round = round
+    l.cands = []
     l.plan = corpus ? planOf(corpus, round.secret, round.buoy) : null
     l.window = Math.max(1, round.window)
     const guesses = this.deps.store.guesses(round.id)
@@ -656,7 +775,7 @@ export class ContextTournaments {
   }
 
   private corpusFor(l: Live): Corpus | null {
-    const corpus = this.deps.corpus()
+    const corpus = this.deps.corpus(l.t.roomKey)
     return corpus && corpus.hash === l.t.corpusHash ? corpus : null
   }
 
@@ -699,7 +818,9 @@ export class ContextTournaments {
       submissions: l.phase === 'window-open' ? l.submissions : 0,
       solution: l.round ? null : l.solution,
       solvedBy: l.round ? null : l.solvedBy,
-      corpusSize: this.deps.corpus()?.data.words.length ?? 0,
+      corpusSize: this.deps.corpus(l.t.roomKey)?.data.words.length ?? 0,
+      wordLength: l.round && l.plan && this.deps.showWordLength?.(l.t.roomKey)
+        ? this.deps.corpus(l.t.roomKey)?.data.words[l.plan.secret]?.length ?? null : null,
       typed: l.typed,
       board: l.board,
       lastWindow: l.lastWindow,

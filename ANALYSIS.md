@@ -1,201 +1,119 @@
-# Zerocade — Analisi architettura (ispirata a Livecade.io)
+# Zerocade — Architettura e stato dell'implementazione
 
-> Analisi di backend e frontend, con il mapping della piattaforma di riferimento
-> (livecade.io) sull'implementazione Zerocade.
+Revisione del **16 novembre 2026**, basata su sorgenti, manifest, lockfile e database del workspace.
+L'analisi storica di Livecade resta in [TODO.md](TODO.md); i contratti del prodotto di riferimento
+non descrivono automaticamente Zerocade. L'[indice documentale](docs/STATO_DOCUMENTAZIONE.md)
+distingue guide operative, specifiche e rapporti storici.
 
-## 1. Cosa è Livecade (evidenza dal sito)
+## Componenti e dipendenze
 
-Da `livecade.io` (pagina pubblica, analizzata via fetch):
+| Componente | Responsabilità |
+| --- | --- |
+| `apps/server` | Fastify, Socket.IO, stanze, sorgenti TikTok/Twitch/ZeroFollowerBot, persistenza e giochi con autorità server |
+| `apps/dashboard` | Regia React: catalogo, impostazioni, trigger, sorgenti, media e classifiche |
+| `apps/overlay` | Sorgente browser React/canvas per OBS e TikTok LIVE Studio, renderer e pagine dei giochi |
+| `packages/shared` | Catalogo di 40 giochi, impostazioni, validazioni, contratti e regole comuni |
+| `packages/browser-runtime` | Socket.IO in Web Worker, richieste HTTP limitate e notifiche raggruppate per frame |
+| `gioco-*`, `database/script` | Preparazione e verifica offline di lessici, domande, bacini e corpus |
 
-- **Prodotto**: "Interactive TikTok LIVE Games for Creators" — giochi interattivi che il
-  pubblico di una diretta TikTok gioca **in tempo reale** tramite commenti, regali, like
-  e share. Non è un CAD: il nome "Livecade" = "live + arcade".
-- **Target**: creator TikTok (gaming, varietà, educational), agenzie e team multi-account.
-- **Superfici** (3 prodotti distinti):
-  1. **Sito marketing** (`livecade.io`) — landing con feature, prezzi, FAQ, comparazioni.
-  2. **Dashboard creator** (`app.livecade.io`) — SPA "Checking your session…" (auth-based).
-  3. **Overlay** (`overlay.livecade.io/<user>`) — URL permanente aggiunto come
-     *browser source* in OBS / Streamlabs / TikTok LIVE Studio.
-- **Funzioni chiave** (dalla landing):
-  - 50+ giochi "plug-and-play", switch a metà diretta senza toccare OBS.
-  - **Action triggers**: regali, commenti, like, follow, share e join mappati su mosse.
-  - **Play guide** on-screen: icone live che mostrano ai viewer cosa inviare.
-  - **DJ Pad**: sound drop live (upload propri, link, libreria integrata).
-  - **Tuning live** delle impostazioni di gioco senza restart.
-  - Classifica gifters, multi-account TikTok, piani Free/Pro (limite tempo giornaliero).
+Le app dipendono da `shared`; dashboard e overlay usano anche `browser-runtime`, che dipende da `shared`.
+Le app comunicano via HTTP/Socket.IO e non si importano a vicenda. React, DOM e canvas restano sul thread
+UI. Worker Node separati gestiscono persistenza/report e generazione ZeroWords; ZeroContext classico
+carica i dati e calcola il ranking in un Web Worker del gioco.
 
-## 2. Architettura frontend
+## Sessioni ed eventi
 
-### 2.1 Dashboard (`apps/dashboard`)
-- **Stack**: React 19 + Vite 8 + `react-router` 8 + `socket.io-client` 4, TypeScript.
-- **Struttura**: rail sinistra + router con pagine `Games` (libreria, trigger, impostazioni
-  live), `DJ Pad`, `Gifts` (catalogo), `Setup` (link overlay).
-- **Stato**: `store.ts` usa `useSyncExternalStore` alimentato dal socket
-  (`session:state`, `live:event`); il ranking gifters è calcolato client-side.
-- **Overlay key**: `overlayKey.ts` genera/legge una chiave da `localStorage`
-  (sostituto dell'account finché non esiste autenticazione); l'URL overlay è `?key=<key>`.
+La dashboard conserva una chiave locale che identifica la stanza. Dashboard e overlay con la stessa
+chiave ricevono lo stato pertinente; i comandi di regia sono controllati sul server. La chiave locale
+non equivale a un sistema di account e OAuth per utenti remoti.
 
-### 2.2 Overlay (`apps/overlay`, aggiunto in questo task)
-- **Stack**: React 19 + Vite 8 (porta 5174) + canvas 2D, senza dipendenze grafiche pesanti
-  (veloce e leggero come browser source OBS).
-- **Motore** (`games/engine.ts`): game loop `requestAnimationFrame`, coda di azioni,
-  `GameInstance` (`reset/onAction/update/draw`), swap del gioco senza reload.
-- **Giochi** (`games/*.ts`): `giftDrop`, `mmaClash`, `lunarDash` — registry `createGame(id)`.
-- **UI**: canvas a schermo intero + barra superiore (titolo/status) + toast eventi +
-  **play guide** in basso che mappa ogni trigger sull'azione.
-- **DJ audio** (`audio.ts`): suoni built-in sintetizzati via Web Audio API (nessun asset),
-  URL custom riprodotti con `Audio`.
+1. Il server ripristina la sessione persistita e invia lo snapshot ai client.
+2. La dashboard modifica gioco, impostazioni, trigger o scena; il server valida e distribuisce lo stato.
+3. Le sorgenti producono eventi normalizzati; persistenza, ranking e gioco seguono i propri contratti.
+4. L'overlay applica stato e azioni; i giochi con autorità server ricevono gli esiti dal server.
+5. DJ Pad e widget condividono la stanza, con preferenze e media persistenti.
 
-### 2.3 Sito marketing
-Non implementato (il riferimento dell'utente è `app.livecade.io`, la dashboard).
-Estensione naturale: un workspace `apps/site` (Astro/Next) riutilizzando `@zerocade/shared`.
+Le code hanno limiti, deadline ed errori espliciti. Ricevere un evento non dimostra che sia stato salvato:
+la dashboard espone i problemi di persistenza. `GET /api/live` verifica che il processo risponda;
+`GET /api/health` riporta disponibilità, saturazione e metriche dei worker.
+Dettagli e limiti sono nell'[audit infrastrutturale](docs/DIRETTIVE-audit-2026-11-14.md).
 
-## 3. Architettura backend (`apps/server`)
-- **Stack**: Fastify 5 + `@fastify/helmet`, Socket.IO 4, `tsx` (dev), TypeScript, Node 24.
-- **REST**: `GET /api/health`, `GET /api/games` (catalogo giochi/regali dal pacchetto condiviso).
-- **Realtime (Socket.IO)**:
-  - **Autenticazione handshake**: `auth = { clientType: 'dashboard' | 'overlay', key }`
-    con chiave validata da regex; la `key` identifica la *room*.
-  - **Room**: dashboard e tutti gli overlay con la stessa key condividono la room.
-  - **Permessi**: solo la dashboard emette cambi di stato; l'overlay ascolta.
-  - **Client→server**: `sim:event`, `game:select`, `triggers:set`, `settings:set`, `dj:play`.
-  - **Server→client**: `session:state`, `live:event`, `dj:play`.
-- **Stato** (`sessions.ts`): mappa in-memory `key → SessionState` (gameId, triggers,
-  settings). Nota: un restart lo azzera → da migrare a DB (Postgres/Redis) con gli account.
-- **Validazione** (`validate.ts`): ogni payload dal socket è trattato come untrusted e
-  sanitizzato (viewer, eventi, trigger, settings clampate per game, URL DJ https-only).
+## Sorgenti
 
-## 4. Modello dati condiviso (`packages/shared`)
-- `LiveEvent` = gift | like | follow | share | comment | join.
-- `Gift` (18 regali, tier bronze/silver/gold/diamond), `GiftTier`, `giftById`.
-- `TriggerSource` / `Trigger` / `MAX_TRIGGERS` / `describeSource` / `sourceMatches` / `triggersFor`.
-- `GameSetting` (number/toggle) / `GameSettings` / `defaultSettings` / `GameDef` (3 giochi).
-- `DJ_SOUNDS` (6 built-in) / `DjPlay` / `djSoundById`.
-- Contratto Socket.IO (`ClientToServerEvents`, `ServerToClientEvents`, `HandshakeAuth`).
-- `Gifter` / `addToRanking`.
+- TikTok: `tiktok-live-connector` traduce chat, regali, like, follow, share e ingressi nel formato interno.
+- Twitch: `tmi.js` gestisce la chat. EventSub usa `TWITCH_CLIENT_ID` e `TWITCH_USER_ACCESS_TOKEN`,
+  con token utente; i follow usano `channel.follow` v2, scope `moderator:read:followers` e un utente
+  autorizzato sul canale. Il modulo gestisce keepalive, reconnect e timeout; manca il rinnovo OAuth interattivo.
+- ZeroFollowerBot: ponte locale con riconnessione automatica e comando per ritentare subito.
+  Il torneo ZeroContext accetta soltanto la chat proveniente da questo ponte.
 
-## 5. Flusso dati (end-to-end)
-1. Il creator apre la dashboard → genera/legge `overlayKey` → si connette al server.
-2. Copia l'URL overlay (`?key=…`) e lo aggiunge come browser source in OBS.
-3. L'overlay si connette con la stessa `key` → entra nella stessa room → riceve `session:state`.
-4. Il creator seleziona un gioco / modifica trigger / tune le impostazioni → il server salva
-   e **broadcasta** `session:state` → l'overlay aggiorna il gioco live.
-5. Una sorgente reale (o il simulatore) emette `sim:event` → il server valida e broadcasta
-   `live:event` → l'overlay mappa i trigger (`triggersFor`) sulle azioni del gioco.
-6. Il DJ Pad emette `dj:play` → broadcast alla room → l'overlay riproduce il suono.
+Le prove storiche con fixture non certificano connessioni reali alle piattaforme.
 
-## 6. Stack e versioni (aggiornate)
-| Area | Tecnologia | Versione |
-|---|---|---|
-| Linguaggio | TypeScript | 7.0.2 (ultima stabile) |
-| Runtime | Node.js | 24.x |
-| Frontend | React / React DOM | ^19.3.1 |
-| Router | react-router | ^8.5.0 |
-| Build | Vite | 8.3.5 (+ @vitejs/plugin-react ^6.1.2) |
-| Realtime | socket.io / socket.io-client | 4.7.5 |
-| Backend | Fastify + @fastify/helmet | 5.5.0 / ^13.2.0 |
-| Dev server | tsx | ^4.23.15 |
-| Orchestrazione | npm workspaces + concurrently | ^10.0.6 |
+## Dati e persistenza
 
-## 7. Passi successivi consigliati
-- **Account/auth**: sostituire l'`overlayKey` in `localStorage` con utenti, OAuth TikTok e
-  URL permanenti `overlay.livecade.io/<user>`.
-- **Sorgente reale TikTok/Twitch**: implementato (§9); resta solo da verificare TikTok su una live reale.
-- **Persistenza**: implementata (§10, SQLite via `node:sqlite`): sessioni, classifica gifters e
-  cronologia eventi sopravvivono al restart. Restano solo piani/billing/limiti tempo (se serviranno).
-- **Più giochi**: ora 8 (Gift Drop, MMA Clash, Lunar Dash, Trivia, Word Guess, Word Swipe,
-  4 Pics 1 Word, Picwords 2). Aggiungerne altri è semplice: un `GameDef` in `GAMES`, un modulo in
-  `apps/overlay/src/games` e una riga in `registry.ts`.
-- **Sito marketing**: workspace `apps/site` riutilizzando `@zerocade/shared`.
+| Archivio | Uso |
+| --- | --- |
+| `apps/server/data/zerocade.db` | Sessioni, eventi, classifiche, voti, telemetria e tornei sul PC della diretta |
+| `database/giochi.sqlite3` | Schemi logici `wordle`, `context`, `associazioni`, `parole`, `contenuti` |
+| `database/ZeroQuizz.sqlite3` | 26.715 domande, tutte attive nel DB locale esaminato |
+| `database/ZeroDubbi.sqlite3` | 120 dilemmi con testi italiano/inglese |
+| `database/ZeroLettere.sqlite3` | 5.661 indizi e 109 alternative; banca autonoma senza integrazione nel runtime |
+| `database/parole_ita_raw.sqlite3` | DB di lavoro lessicale, fuori da Git: inventario, decisioni, bacini e valutazioni |
 
-## 8. Risultati dell'analisi del bundle reale (app.livecade.io, senza login)
+Il binding — `better-sqlite3`; il motore effettivamente caricato nel workspace — **SQLite 3.54.1**.
+Il confezionamento seleziona il binario caricato tramite `scripts/sqlite-runtime.mjs`.
+`ZEROCADE_DB` cambia il DB operativo; `ZEROCADE_GIOCHI_FILE` cambia quello dei contenuti.
+Percorsi, origini e copie sono descritti in [database/DB.md](database/DB.md).
 
-Estratti dal bundle JS/CSS pubblico (771 KB index + chunk `react-vendor`/`socket-io`):
+## ZeroContext
 
-**Stack confermato**: React + Vite + Socket.IO. Autenticazione con **better-auth**
-(`better-auth:focus-manager/broadcast-channel/online-manager`).
+Il corpus ha **93.928 tentativi e 9.513 segrete per profilo**: originale (300 float32),
+TurboX e Harrier Model2Vec (256 float32). I tre schemi `context_original`, `context_turbox`,
+`context_harrier` condividono il DB; la scelta della regia è per stanza e avvia un nuovo round
+senza riavviare il server o azzerare le classifiche. `context` resta compatibile con gli strumenti.
+Tutte le 6.838 vecchie segrete sono conservate. Le geometrie dei nuovi modelli non sono state
+ricalcolate e i loro controlli sulle associazioni registrano regressioni; l'originale è predefinito.
+Dettagli in [PROFILI_ASSOCIAZIONI.md](gioco-zerocontext/PROFILI_ASSOCIAZIONI.md).
+Tutte le 9.513 segrete sono ora ordinarie, senza rimozioni; il pool speciale è vuoto.
+La nuova pipeline configurata `context-vectors-1` introduce Model2Vec, contesti densi,
+fallback FastText allineato, margine antonimico e collaudo obbligatorio; non ha ancora rigenerato
+il corpus pubblicato.
 
-**Domini**: `livecade.io`, `app.livecade.io`, `overlay.livecade.io`, `cdn.livecade.io`,
-`www.tiktok.com`, `huggingface.co` (AI), `challenges.cloudflare.com` (Turnstile), `flagcdn.com`.
+Il server gestisce anche la modalità classica: classifica precalcolata per round, punti,
+tentativi e timer della stanza. Tutti i round sono ordinari; la rotazione speciale è sospesa. Overlay e preview visualizzano snapshot; la lunghezza e gli aiuti restano configurabili.
+Il motore browser precedente mantiene la compatibilità con corpus int8.
 
-**REST**: `/api/auth`, `/api/user/me`, `/api/gifts?catalogOnly=1`. Quest'ultimo è pubblico e
-restituisce il catalogo regali reale: `{ gifts: [{ id, name, imageUrl, coinAmount, scrapedAt }] }`
-(~226 KB, id numerici TikTok, immagini `.webp` su `cdn.livecade.io`).
+I due task principali eseguono `build_context_semantic.py --publish`. La pubblicazione salva un backup,
+impedisce di perdere segrete, sostituisce solo lo schema `context` e attiva `vectors.<sha256>.bin`.
+Il ricaricamento locale riavvia la sessione classica e sospende i tornei con corpus incompatibile.
+Il torneo conserva finestre, punteggio e regolamento propri.
+Vedi [implementazione e limiti](gioco-zerocontext/IMPLEMENTAZIONE_VETTORI_SEMANTICI.md).
 
-**Eventi Socket.IO (naming reale)**: `session:heartbeat/stats/status`,
-`dashboard:event/gift/gifters/comment/join/history/music/reset`, `tiktok:connect/disconnect/status`,
-`simulator:ai/start/status/stop`, `game:apply_update/control_action/control_search/control_text/test_action`,
-`djpad:trigger/stop/triggered`, `mixer:set`, `shoutout:send`, `notification:new`,
-`scoreboard:show/hide`, `chat:action`, `creator:comment/gameInfo`, `firstlive:overlay`,
-`overlay:update_available`.
+## Versioni del checkout
 
-**Widget overlay** (oltre ai giochi): `board` (minimal/podium/race/ranked/spotlight/sticker),
-`follower` (minimal/slant/spotlight/sticker), `goal` (blocks/capsule/checkpoints/countdown/iconfill/
-ring/slant/sticker/tower), `jar` (bowl/mason/tip), `marquee` (band/caution/metal/neon/outline/
-rainbow/retro/ticker), `text` (metal/neon/outline/pill/rainbow/retro), `timer` (clock/minimal),
-`highlights` (hero/row), `notification`, `scoreboard`.
+| Componente | Versione |
+| --- | --- |
+| Node locale / requisito | 26.13.1 / >=26 |
+| npm locale | 12.2.2 |
+| TypeScript | 7.0.2 |
+| React / React DOM | 19.3.1 |
+| Vite / plugin React | 8.3.8 / 6.3.0 |
+| react-router | 8.5.1 |
+| Fastify / helmet / static | 5.12.8 / 13.2.0 / 10.1.11 |
+| Socket.IO / socket.io-client | 4.8.4 |
+| better-sqlite3 | 13.2.0 |
+| tsx / concurrently | 4.23.15 / 10.0.7 |
 
-**Route** (react-router): `/dashboard`, `/settings/:tab`, `/analytics/:tab`, `/history`,
-`/admin/:tab/:section`, `/affiliate/:tab`, `/billing/success`, `/game-assets/:gameId`,
-`/game-data/:gameId`, `/login`, `/register`, `/onboarding`, ...
+Le versioni descrivono il checkout, senza affermare che siano le più recenti disponibili.
+Gli aggiornamenti e le verifiche precedenti sono in [AGGIORNAMENTO_DIPENDENZE.md](AGGIORNAMENTO_DIPENDENZE.md).
 
-**Design token (CSS)**: `--bg-base/surface/elevated/overlay`, `--accent`, `--text-primary/secondary/
-muted`, `--border`, `--danger/success/warning`, `--radius-sm/md/lg`, `--font-stack`.
-Tier rarità TikTok: `--rare/epic/legendary/mythic`. Font: `Switzer` + famiglia `LC *`
-(Anton/Bangers/Fredoka/Inter/Lexend/Lobster/Marker/Montserrat/Nunito/Outfit/Pixel).
+## Verifiche e lavoro residuo
 
-**Nota**: i token di Zerocade (`--bg-base/surface/elevated`, `--accent`, `--text-muted`,
-`--border`, `--radius`) erano già allineati a quelli reali. In questo task sono stati adottati
-i tier rarità reali (`rare/epic/legendary/mythic` + `TIER_COLORS`) e il catalogo regali con
-nomi/importi reali (sottoinsieme curato di `livecade.io/api/gifts`). Resta solo da adottare
-i font `Switzer`/"LC *".
+La CI Windows definisce installazione pulita, typecheck, controlli dei confini, build, test Node/Python,
+smoke di sorgente e bundle e audit runtime. La configurazione della CI non prova che una specifica
+esecuzione su GitHub sia riuscita. I comandi di sviluppo, verifica e backup sono nel [README](README.md).
 
-## 9. Sorgenti reali (TikTok / Twitch)
-- **Server** (`apps/server/src/sources.ts`): classe `RoomSources` per overlay-key che mantiene i
-  connettori e traduce gli eventi nel tipo interno `LiveEvent` (broadcast su `live:event`).
-- **TikTok** (`tiktok-live-connector` 2.5.0, API legacy `WebcastPushConnection`): eventi
-  `chat/gift/like/follow/share/member` → `comment/gift/like/follow/share/join`; i regali reali
-  vengono mappati sul catalogo con `giftIdForTiktok` (match per nome, altrimenti monete più vicine).
-- **Twitch** (`tmi.js` 1.8.5, chat IRC anonima): `message` → `comment`, `cheer` (bits) → `like`.
-- **Contract**: `source:connect` / `source:disconnect` (client→server), `source:status` (server→client).
-- **Dashboard**: pagina **Sources** per inserire `@username` TikTok e canale Twitch, con stato live.
-- ⚠️ **Licenza**: `tiktok-live-connector` è **AGPL-3.0**: se distribuisci il servizio, verifica gli
-  obblighi copyleft (il resto dello stack è MIT/Apache). TikTok richiede una live attiva e la
-  connessione può essere bloccata da IP di datacenter.
-
-## 10. Persistenza (SQLite)
-- **Scelta**: `better-sqlite3` 13.0.3 (binding sincrono, engine SQLite **3.53.4**), file locale
-  `apps/server/data/zerocade.db` (gitignored), sovrascrivibile con la variabile `ZEROCADE_DB`.
-- **Engine 3.54.1** (ultima stabile): `npm run sqlite:upgrade` esegue `scripts/upgrade-sqlite.mjs`,
-  che scarica l'amalgamation 3.54.1 da sqlite.org e ricompila il binding nativo (richiede
-  Visual Studio Build Tools + Python 3). Fino ad allora l'engine resta 3.53.4, perché non esiste
-  ancora una release di `better-sqlite3` con 3.54.1 su npm.
-- **Tabelle**: `sessions` (gameId/triggers/settings in JSON per overlay-key), `gifters`
-  (classifica persistente per key), `events` (cronologia, prune a 2000 per key).
-- **Flusso**: `broadcastEvent` persiste l'evento, aggiorna la classifica e trasmette
-  `live:event` + `ranking:update`; alla connessione il server reinvia `session:state` e la
-  classifica persistente.
-- **Dashboard**: il ranking gifters arriva ora dal server (`ranking:update`) invece di essere
-  calcolato client-side, quindi **Top Gifters** sopravvive a refresh e restart.
-- **Endpoint**: `GET /api/events?key=…&limit=…` (cronologia eventi).
-
-## 11. Quiz, widget overlay e Twitch EventSub
-- **Giochi Quiz**: **Trivia** (`quiz.ts`, risposte multiple via commento A/B/C/D o 1-4),
-  **Word Guess** (`word.ts`, parola/lettere), **Word Swipe** (`wordSwipe.ts`, ruota di lettere in
-  stile Zen Word / Words of Wonder), **4 Pics 1 Word** (`fourPics.ts`) e **Picwords 2**
-  (`picwords.ts`). Gli ultimi due condividono la factory `picQuiz.ts` (indovina la parola dalle
-  immagini/emoji). Il trigger è `comment → answer`/`guess`.
-- **Widget overlay** (`apps/overlay/src/Widgets.tsx`): `alerts` (banner evento), `follower`
-  (ultimo follower), `goal` (barra verso un obiettivo in monete), `gifters` (classifica).
-  Abilitabili/configurabili dalla dashboard (`WidgetsPanel`, evento `scene:set`); persistiti nella
-  sessione (colonne `widgets`/`goal`).
-- **Twitch EventSub** (`apps/server/src/twitch-eventsub.ts`): WebSocket `eventsub.wss.twitch.tv`
-  con app access token (client credentials), sottoscrive `channel.follow` e `channel.raid`.
-  Richiede `TWITCH_CLIENT_ID`/`TWITCH_CLIENT_SECRET`; senza credenziali Twitch resta solo chat
-  (tmi.js). Mappatura: `channel.follow`→follow, `channel.raid`→commento.
-- ⚠️ EventSub non è stato testato end-to-end qui (mancano le credenziali Twitch); il percorso è
-  verificato solo a livello di compilazione/build.
-
-
-
-
+Restano da verificare sul campo connessioni alle piattaforme, sincronizzazione video/chat e comportamento
+in OBS. Account remoti, sito marketing e billing appartengono al backlog di prodotto. Condizioni e
+attribuzioni dei contenuti rimangono nei documenti delle fonti; le revisioni editoriali parziali non
+certificano l'intera banca.

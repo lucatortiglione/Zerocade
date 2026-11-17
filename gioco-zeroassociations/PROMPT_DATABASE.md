@@ -1,7 +1,10 @@
 # Database dei prompt italiani
 
-**Avanzamento delle associazioni, 9 novembre 2026:** la lavorazione della coda
-completa prosegue con tre agenti e importazione centrale dei bacini revisionati.
+> **Revisione documentale — 16 novembre 2026.** La copia runtime nello schema `associazioni` contiene 3.941 prompt, 11.847 parole e 58.551 collegamenti. La raccolta e i verbali restano nel DB di lavoro; le deleghe del 9 novembre citate sotto sono storiche. Un aggiornamento dei bacini richiede ancora importazione revisionata, sincronizzazione e copia verso il DB dei giochi.
+> [Indice e stato della documentazione](../docs/STATO_DOCUMENTAZIONE.md).
+
+**Avanzamento delle associazioni, 9 novembre 2026:** la lavorazione storica della coda
+completa comprende tre partizioni delegate e importazione centrale dei bacini revisionati.
 I conteggi delle copie aggiornate sono nel rapporto. Vedere
 [stato e procedura di ripresa](ASSOCIAZIONI_FILTRATI.md) e
 [rapporto dei controlli](resources/avanzamento_associazioni_filtrati_20261109.json).

@@ -3,7 +3,7 @@
 Dalla raccolta (schema raw, sola lettura) tiene una voce solo se:
 
 1. è una parola singola con prova di lemma, in forma canonica (2-15 lettere minuscole);
-2. è familiare: frequenza wordfreq (Zipf) almeno pari alla soglia di resources/prompt_policy.json
+2. rispetta il limite wordfreq (Zipf) configurato in resources/prompt_policy.json
    (per un verbo vale la sua forma più frequente in Morph-it, come in script/prompt_policy.py), oppure è
    nel Nuovo vocabolario di base di De Mauro (NVdB), che raccoglie le parole note a tutti;
 3. il Wikizionario italiano ha per essa un nome, un verbo o un aggettivo con almeno un senso
@@ -49,7 +49,7 @@ import sys
 import tempfile
 from typing import Callable
 
-from prompt_policy import load_prompt_policy
+from prompt_policy import load_prompt_policy, zipf_bound, zipf_matches
 from sqlite_prompt_runtime import publish_database
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -231,7 +231,7 @@ def build(raw_path: Path = RAW_DB, output: Path = FILTERED_DB, game_path: Path |
         steps.append(('parola singola con prova di lemma', len(lemmas)))
         canonical = [p for p in lemmas if CANONICAL.fullmatch(p)]
         steps.append(('forma canonica, 2-15 lettere minuscole', len(canonical)))
-        threshold = policy['minimum_zipf_it']
+        threshold_key, threshold, comparison = zipf_bound(policy)
         # Per un verbo conta la sua forma più frequente (prompt_policy.familiarity_reference).
         verb_forms = defaultdict(float)
         morph_snapshots = [s for s, key in sources.items() if key.startswith('morphit')]
@@ -250,8 +250,8 @@ def build(raw_path: Path = RAW_DB, output: Path = FILTERED_DB, game_path: Path |
                     value = json.loads(details).get('aoa_mean')
                     if isinstance(value, (int, float)): aoa[p] = round(float(value), 2)
         familiar = [(p, z) for p in canonical
-                    if max(z := zipf(p), verb_forms.get(p, 0.0)) >= threshold or p in nvdb]
-        steps.append((f'familiare: Zipf >= {threshold} (per i verbi la forma più frequente) o nel NVdB', len(familiar)))
+                    if zipf_matches(max(z := zipf(p), verb_forms.get(p, 0.0)), policy) or p in nvdb]
+        steps.append((f'frequenza: Zipf {comparison} {threshold} (per i verbi la forma più frequente) o nel NVdB', len(familiar)))
         kept, rejected, reasons = [], [], Counter()
         query = 'SELECT snapshot_id, role, pos, lemma, details_json FROM inventory_attestations WHERE prompt = ?'
         for prompt, z in familiar:
@@ -259,7 +259,7 @@ def build(raw_path: Path = RAW_DB, output: Path = FILTERED_DB, game_path: Path |
                        else judge(prompt, z, raw.execute(query, (prompt,)).fetchall(), sources, policy,
                                   verb_forms.get(prompt)))
             if verdict['keep']:
-                if max(z, verb_forms.get(prompt, 0.0)) < threshold: verdict['flags'].append('familiare_per_nvdb')
+                if not zipf_matches(max(z, verb_forms.get(prompt, 0.0)), policy): verdict['flags'].append('familiare_per_nvdb')
                 verdict.update(nvdb=int(prompt in nvdb), aoa=aoa.get(prompt))
                 kept.append((prompt, verdict))
             else:
@@ -293,7 +293,7 @@ def build(raw_path: Path = RAW_DB, output: Path = FILTERED_DB, game_path: Path |
             db.executemany('INSERT INTO filter_steps VALUES (?,?,?)', [(i, d, n) for i, (d, n) in enumerate(steps)])
             meta = {'filter_version': FILTER_VERSION, 'source_db': str(raw_path), 'created_at':
                     datetime.now(timezone.utc).isoformat(timespec='seconds'), 'prompt_policy_version': policy['version'],
-                    'minimum_zipf_it': str(threshold), 'semantic_approval': 'false',
+                    threshold_key: str(threshold), 'zipf_comparison': comparison, 'semantic_approval': 'false',
                     'inventory_snapshot_ids':json.dumps(sorted(sources),separators=(',',':'))}
             db.executemany('INSERT INTO metadata VALUES (?,?)', meta.items())
             db.commit()

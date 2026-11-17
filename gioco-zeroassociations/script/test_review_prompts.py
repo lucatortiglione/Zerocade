@@ -1,4 +1,5 @@
 """Dalle fonti ai prompt validi: NVdB e ItAoA, filtri, verbali, scarti e revisione LLM (con fixture)."""
+from contextlib import closing
 import json
 from pathlib import Path
 import sqlite3
@@ -11,7 +12,8 @@ from prompt_inventory import import_source, initialize_inventory, records
 from review_prompts import after_new_words, import_decisions, llm_review, pending
 from sqlite_prompt_runtime import CACHE, SQLite
 
-ZIPF = {'gatto': 4.5, 'fare': 6.2, 'acciuga': 2.6, 'abbassato': 3.4, 'flimk': 4.0, 'abbassare': 3.5}
+ZIPF = {'gatto': 4.5, 'fare': 2.1, 'acciuga': 4.0, 'abbassato': 2.1, 'flimk': 2.1,
+        'abbassare': 2.1, 'canotto': 3.0, 'carniera': 3.0}
 
 
 def source(key, kind, **extra):
@@ -62,7 +64,9 @@ class ReviewPipelineTests(unittest.TestCase):
         (d/'wiki.jsonl').write_text('\n'.join([
             entry('gatto', 'noun', 'piccolo felino domestico'), entry('fare', 'verb', 'realizzare qualcosa'),
             entry('acciuga', 'noun', 'piccolo pesce di mare'), entry('abbassato', 'adj', 'attributo araldico'),
-            entry('flimk', 'noun', 'parola straniera inventata')]), encoding='utf-8')
+            entry('flimk', 'noun', 'parola straniera inventata'),
+            entry('canotto', 'noun', 'piccola imbarcazione per navigare'),
+            entry('carniera', 'noun', 'borsa usata per contenere la selvaggina')]), encoding='utf-8')
         (d/'morph.txt').write_text('gatto\tgatto\tNOUN-M:s\nfare\tfare\tVER:inf+pres\nfacendo\tfare\tVER:ger+pres\n'
                                     'abbassato\tabbassare\tVER:part+past+s+m\nacciuga\tacciuga\tNOUN-F:s\n', encoding='latin-1')
         (d/'nvdb.txt').write_text('gatto s.m.\nacciuga s.f.\n', encoding='utf-8')
@@ -78,6 +82,18 @@ class ReviewPipelineTests(unittest.TestCase):
     def build(self):
         return build(self.raw, self.filtered, None, zipf=lambda w: ZIPF.get(w, 0.0))
 
+    def test_filter_task_uses_current_2_2_threshold_inclusively(self):
+        scores = {**ZIPF, 'canotto': 2.2, 'carniera': 2.21}
+        build(self.raw, self.filtered, None, zipf=lambda word: scores.get(word, 0.0))
+        with closing(sqlite3.connect(self.filtered)) as con:
+            kept = {w for w, in con.execute('SELECT prompt FROM filtered_prompts')}
+            metadata = dict(con.execute('SELECT * FROM metadata'))
+        self.assertIn('canotto', kept)
+        self.assertNotIn('carniera', kept)
+        self.assertEqual(metadata['maximum_zipf_it'], '2.2')
+        self.assertEqual(metadata['zipf_comparison'], '<=')
+        self.assertEqual(metadata['prompt_policy_version'], '2026-11-16.2')
+
     def test_filters_then_review_then_validated_database(self):
         result = self.build()
         self.assertEqual(result['rejection_reasons'], {'solo_participio': 1, 'prestito_non_in_lista': 1})
@@ -86,7 +102,7 @@ class ReviewPipelineTests(unittest.TestCase):
         f.close()
         self.assertEqual(set(rows), {'gatto', 'fare', 'acciuga'})
         self.assertEqual(rows['gatto'][:2], (1, 2.56))
-        self.assertIn('familiare_per_nvdb', rows['acciuga'][2])  # Zipf 2,6: la salva il vocabolario di base.
+        self.assertIn('familiare_per_nvdb', rows['acciuga'][2])  # Zipf 4,0: la salva il vocabolario di base.
         # L'ordine di revisione mette prima le parole di base imparate da piccoli.
         self.assertEqual([c['prompt'] for c in pending(self.raw, self.filtered)], ['gatto', 'acciuga', 'fare'])
 

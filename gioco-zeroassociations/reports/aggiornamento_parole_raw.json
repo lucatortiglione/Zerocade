@@ -1,0 +1,506 @@
+{
+  "started_at_utc": "2026-11-16T19:11:29.868983+00:00",
+  "database": "C:\\Progetti\\Zerocade\\database\\parole_ita_raw.sqlite3",
+  "schema": "raw",
+  "backup": "C:\\Progetti\\Zerocade\\gioco-zeroassociations\\database-backups\\parole_raw-20261116T191045040055Z.sqlite3",
+  "selected_sources": 46,
+  "row_limit": null,
+  "zipf_filter": null,
+  "gameplay_publication": false,
+  "attempts": [
+    {
+      "source": "kaikki-itwiktionary",
+      "status": "ALREADY_IMPORTED",
+      "sha256": "095df1665fde8e41bdf07250887d0cdacf570b543118aa09505f8628c9cf46e9",
+      "effective_url": "https://kaikki.org/itwiktionary/Italiano/kaikki.org-dictionary-Italiano.jsonl",
+      "cache_path": "C:\\Users\\lucat\\AppData\\Local\\Zerocade\\word-association\\updates\\kaikki-itwiktionary\\8a3b37d2aa17463191867c121c8aba08\\kaikki.org-dictionary-Italiano.jsonl",
+      "download_sha256": "095df1665fde8e41bdf07250887d0cdacf570b543118aa09505f8628c9cf46e9",
+      "revision": null
+    },
+    {
+      "source": "kaikki-enwiktionary-it",
+      "status": "ALREADY_IMPORTED",
+      "sha256": "f112deb9747b7f33f4247da4999dfba0aa739bb4aaff9dd42fdf0615918a9c11",
+      "effective_url": "https://kaikki.org/dictionary/Italian/kaikki.org-dictionary-Italian.jsonl",
+      "cache_path": "C:\\Users\\lucat\\AppData\\Local\\Zerocade\\word-association\\updates\\kaikki-enwiktionary-it\\91df5439af6e4bdaaae5d9240c463134\\kaikki.org-dictionary-Italian.jsonl",
+      "download_sha256": "f112deb9747b7f33f4247da4999dfba0aa739bb4aaff9dd42fdf0615918a9c11",
+      "revision": null
+    },
+    {
+      "source": "wikipedia-it",
+      "status": "ALREADY_IMPORTED",
+      "sha256": "fe0f1f8777b487d3e26caecf84e59e1ba46c540b347aa2646e837c45391ad756",
+      "effective_url": "https://dumps.wikimedia.org/itwiki/latest/itwiki-latest-all-titles-in-ns0.gz",
+      "cache_path": "C:\\Users\\lucat\\AppData\\Local\\Zerocade\\word-association\\updates\\wikipedia-it\\cf38b5e74eb24669a8697d5487bf5682\\itwiki-latest-all-titles-in-ns0.gz",
+      "download_sha256": "fe0f1f8777b487d3e26caecf84e59e1ba46c540b347aa2646e837c45391ad756",
+      "revision": null
+    },
+    {
+      "source": "wiktionary-it-titles",
+      "status": "ALREADY_IMPORTED",
+      "sha256": "b3f1a61cfd6b6f5cc10b0b7b50a30693042bad1353e619fe41f35c8dd1a15f1d",
+      "effective_url": "https://dumps.wikimedia.org/itwiktionary/latest/itwiktionary-latest-all-titles-in-ns0.gz",
+      "cache_path": "C:\\Users\\lucat\\AppData\\Local\\Zerocade\\word-association\\updates\\wiktionary-it-titles\\20dfab14625f4790bb7ba4f0808ea7e2\\itwiktionary-latest-all-titles-in-ns0.gz",
+      "download_sha256": "b3f1a61cfd6b6f5cc10b0b7b50a30693042bad1353e619fe41f35c8dd1a15f1d",
+      "revision": null
+    },
+    {
+      "source": "wikisource-it",
+      "status": "ALREADY_IMPORTED",
+      "sha256": "6291ca4f4ef778eb4252bdccbbdeb9a09cb91f673df50f0f87229c9a021d58bc",
+      "effective_url": "https://dumps.wikimedia.org/itwikisource/latest/itwikisource-latest-all-titles-in-ns0.gz",
+      "cache_path": "C:\\Users\\lucat\\AppData\\Local\\Zerocade\\word-association\\updates\\wikisource-it\\3f6cb74213f249eebb640be3fe7bacec\\itwikisource-latest-all-titles-in-ns0.gz",
+      "download_sha256": "6291ca4f4ef778eb4252bdccbbdeb9a09cb91f673df50f0f87229c9a021d58bc",
+      "revision": null
+    },
+    {
+      "source": "wikiquote-it",
+      "status": "ALREADY_IMPORTED",
+      "sha256": "72938f2bf3e3ef1c2c56ee5e0da64125f9386ef70929c1ae5ba574af5986cc96",
+      "effective_url": "https://dumps.wikimedia.org/itwikiquote/latest/itwikiquote-latest-all-titles-in-ns0.gz",
+      "cache_path": "C:\\Users\\lucat\\AppData\\Local\\Zerocade\\word-association\\updates\\wikiquote-it\\6d239f377cfa43a4ba053a9273778e16\\itwikiquote-latest-all-titles-in-ns0.gz",
+      "download_sha256": "72938f2bf3e3ef1c2c56ee5e0da64125f9386ef70929c1ae5ba574af5986cc96",
+      "revision": null
+    },
+    {
+      "source": "wikivoyage-it",
+      "status": "ALREADY_IMPORTED",
+      "sha256": "72244f42f8736e63dee6a0d8e30962503729c8eb61a47d0db832ea92b24d118d",
+      "effective_url": "https://dumps.wikimedia.org/itwikivoyage/latest/itwikivoyage-latest-all-titles-in-ns0.gz",
+      "cache_path": "C:\\Users\\lucat\\AppData\\Local\\Zerocade\\word-association\\updates\\wikivoyage-it\\3cb117d002d849a597eb9e02acd65bdb\\itwikivoyage-latest-all-titles-in-ns0.gz",
+      "download_sha256": "72244f42f8736e63dee6a0d8e30962503729c8eb61a47d0db832ea92b24d118d",
+      "revision": null
+    },
+    {
+      "source": "wikiversity-it",
+      "status": "ALREADY_IMPORTED",
+      "sha256": "7880d0da365c92350a1102029507b65ff1e97875898bbffd1ca86ac25307c6ea",
+      "effective_url": "https://dumps.wikimedia.org/itwikiversity/latest/itwikiversity-latest-all-titles-in-ns0.gz",
+      "cache_path": "C:\\Users\\lucat\\AppData\\Local\\Zerocade\\word-association\\updates\\wikiversity-it\\5dfbd7cdec26479f9a47b287996b31ea\\itwikiversity-latest-all-titles-in-ns0.gz",
+      "download_sha256": "7880d0da365c92350a1102029507b65ff1e97875898bbffd1ca86ac25307c6ea",
+      "revision": null
+    },
+    {
+      "source": "wikinews-it",
+      "status": "ALREADY_IMPORTED",
+      "sha256": "28b6781297c89da632d1ff85c8bbb79322405e9fee894afa5311bdb4b81e3ef7",
+      "effective_url": "https://dumps.wikimedia.org/itwikinews/latest/itwikinews-latest-all-titles-in-ns0.gz",
+      "cache_path": "C:\\Users\\lucat\\AppData\\Local\\Zerocade\\word-association\\updates\\wikinews-it\\edfa7c2dbb584a458adac8b838bb7949\\itwikinews-latest-all-titles-in-ns0.gz",
+      "download_sha256": "28b6781297c89da632d1ff85c8bbb79322405e9fee894afa5311bdb4b81e3ef7",
+      "revision": null
+    },
+    {
+      "source": "libreoffice-it-dictionary",
+      "status": "ALREADY_IMPORTED",
+      "sha256": "bae1e3501dcd2a923669592493b3fde6c02aae7c7aab83bf5e5b49077e73dd64",
+      "effective_url": "https://raw.githubusercontent.com/LibreOffice/dictionaries/c0865a85eb67dc377f2cf8e8fe2c4fa9e53f0dcb/it_IT/it_IT.dic",
+      "cache_path": "C:\\Users\\lucat\\AppData\\Local\\Zerocade\\word-association\\libreoffice-it-dictionary\\it_IT.dic",
+      "download_sha256": "bae1e3501dcd2a923669592493b3fde6c02aae7c7aab83bf5e5b49077e73dd64",
+      "revision": "c0865a85eb67dc377f2cf8e8fe2c4fa9e53f0dcb",
+      "license_file": "C:\\Users\\lucat\\AppData\\Local\\Zerocade\\word-association\\raw-licenses\\ff5935c79e4610d5c80af2e662b91eedb23a1a3de0d975a3801dae21eed6a0d3\\LICENSE.txt"
+    },
+    {
+      "source": "libreoffice-it-thesaurus",
+      "status": "ALREADY_IMPORTED",
+      "sha256": "96af44562d73ec56dbaacce04588f6a3b7569d581542d9518f64b7c5b1926bcf",
+      "effective_url": "https://raw.githubusercontent.com/LibreOffice/dictionaries/c0865a85eb67dc377f2cf8e8fe2c4fa9e53f0dcb/it_IT/th_it_IT_v2.dat",
+      "cache_path": "C:\\Users\\lucat\\AppData\\Local\\Zerocade\\word-association\\libreoffice-it-thesaurus\\th_it_IT_v2.dat",
+      "download_sha256": "96af44562d73ec56dbaacce04588f6a3b7569d581542d9518f64b7c5b1926bcf",
+      "revision": "c0865a85eb67dc377f2cf8e8fe2c4fa9e53f0dcb",
+      "license_file": "C:\\Users\\lucat\\AppData\\Local\\Zerocade\\word-association\\raw-licenses\\9d5d0d46e2ea2d4e0e55387f8b550b7fe841f6bc850d6171ae9f3830ecee535f\\LICENSE.txt"
+    },
+    {
+      "source": "omw-multiwordnet-it",
+      "status": "ALREADY_IMPORTED",
+      "sha256": "251ac0097ef81a7ed0d283f6852953106a37dbb8c1b9f93d87079641c271eafa",
+      "effective_url": "https://raw.githubusercontent.com/omwn/omw-data/406bf83b3c507a3d1f26e88252d5d66893fd36bf/wns/ita/wn-data-ita.tab",
+      "cache_path": "C:\\Users\\lucat\\AppData\\Local\\Zerocade\\word-association\\omw-multiwordnet-it\\wn-data-ita.tab",
+      "download_sha256": "251ac0097ef81a7ed0d283f6852953106a37dbb8c1b9f93d87079641c271eafa",
+      "revision": "406bf83b3c507a3d1f26e88252d5d66893fd36bf",
+      "license_file": "C:\\Users\\lucat\\AppData\\Local\\Zerocade\\word-association\\raw-licenses\\1155b0ef88865f1880204cb48c658dbe7e0ff2842237c1f01291a07ad4b58095\\LICENSE.txt"
+    },
+    {
+      "source": "napolux-paroleitaliane",
+      "status": "ALREADY_IMPORTED",
+      "sha256": "edd295a2e17d0c56e58e2f0e3936c0e8a331f591d47db8a1bd6d4ead4cc80d6e",
+      "effective_url": "https://raw.githubusercontent.com/napolux/paroleitaliane/2951524b6d5b67986f542937cef16a54af63ff84/paroleitaliane/parole_uniche.txt",
+      "cache_path": "C:\\Users\\lucat\\AppData\\Local\\Zerocade\\word-association\\napolux-paroleitaliane\\parole_uniche.txt",
+      "download_sha256": "edd295a2e17d0c56e58e2f0e3936c0e8a331f591d47db8a1bd6d4ead4cc80d6e",
+      "revision": "2951524b6d5b67986f542937cef16a54af63ff84",
+      "license_file": "C:\\Users\\lucat\\AppData\\Local\\Zerocade\\word-association\\raw-licenses\\3cbf1dcc995d5f6e740428e50bd2e4f2432dcc544e7e2b75652f40901da2937d\\LICENSE.txt"
+    },
+    {
+      "update_id": "a62adf95b26310fdeecc3a80622f011f416f1b48671177bdc66463e72f5132da",
+      "source_key": "wordfreq-it-local",
+      "status": "APPLIED",
+      "records": 322796,
+      "new_terms": 20536,
+      "changed_terms": 302240,
+      "removed_terms": 0,
+      "unchanged_terms": 20,
+      "gameplay_approval": false,
+      "effective_url": "https://github.com/rspeer/wordfreq",
+      "cache_path": "C:\\Users\\lucat\\AppData\\Local\\Zerocade\\word-association\\raw-wordfreq\\frequency_ranks_it_full.csv",
+      "download_sha256": "2524f09f3e4c0812f07d614f8ed710b292f577f0c4bc61c7bb84941213934fb2",
+      "revision": "3.1.1"
+    },
+    {
+      "source": "de-mauro-sitemaps",
+      "status": "ALREADY_IMPORTED",
+      "sha256": "deb175cf7b938247b76e853f8cb8a99738fb3e21e46503516611e460d9c87976",
+      "effective_url": "https://dizionario.internazionale.it/sitemaps/dizionario/sitemap_dizionario-index.xml",
+      "cache_path": "C:\\Users\\lucat\\AppData\\Local\\Zerocade\\word-association\\updates\\de-mauro-sitemaps\\600516206c674939876e328f86589f6e\\de-mauro-sitemaps\\dictionary_url_slugs.jsonl",
+      "download_sha256": "deb175cf7b938247b76e853f8cb8a99738fb3e21e46503516611e460d9c87976",
+      "revision": null
+    },
+    {
+      "source": "ud-isdt-train",
+      "status": "ALREADY_IMPORTED",
+      "sha256": "7c3e32d7f296c877387a0c805c3ae8c471e2b5e8df97f5e3da810834b50566ab",
+      "effective_url": "https://raw.githubusercontent.com/UniversalDependencies/UD_Italian-ISDT/155bd688b87b02a0df4dfc36908546a3cf274688/it_isdt-ud-train.conllu",
+      "cache_path": "C:\\Users\\lucat\\AppData\\Local\\Zerocade\\word-association\\updates\\ud-isdt-train\\0bbd55fd71c24278b30eddacf8c854f4\\it_isdt-ud-train.conllu",
+      "download_sha256": "7c3e32d7f296c877387a0c805c3ae8c471e2b5e8df97f5e3da810834b50566ab",
+      "revision": "155bd688b87b02a0df4dfc36908546a3cf274688",
+      "license_file": "C:\\Users\\lucat\\AppData\\Local\\Zerocade\\word-association\\raw-licenses\\20b70f04453e84530d41aa955fffdfce2792782a7d379b64b390558bd807adae\\LICENSE.txt"
+    },
+    {
+      "source": "ud-isdt-dev",
+      "status": "ALREADY_IMPORTED",
+      "sha256": "1bc7dda04c58a4d87e2e6607a0e612462b87e7da6dde56be610d3749521af744",
+      "effective_url": "https://raw.githubusercontent.com/UniversalDependencies/UD_Italian-ISDT/155bd688b87b02a0df4dfc36908546a3cf274688/it_isdt-ud-dev.conllu",
+      "cache_path": "C:\\Users\\lucat\\AppData\\Local\\Zerocade\\word-association\\updates\\ud-isdt-dev\\187fe351183847c78ede1a2177d0b626\\it_isdt-ud-dev.conllu",
+      "download_sha256": "1bc7dda04c58a4d87e2e6607a0e612462b87e7da6dde56be610d3749521af744",
+      "revision": "155bd688b87b02a0df4dfc36908546a3cf274688",
+      "license_file": "C:\\Users\\lucat\\AppData\\Local\\Zerocade\\word-association\\raw-licenses\\20b70f04453e84530d41aa955fffdfce2792782a7d379b64b390558bd807adae\\LICENSE.txt"
+    },
+    {
+      "source": "ud-isdt-test",
+      "status": "ALREADY_IMPORTED",
+      "sha256": "cea8ca0e8d1ddf7ce509f10afff426d00e058982f49473e0744cd0ee477129e3",
+      "effective_url": "https://raw.githubusercontent.com/UniversalDependencies/UD_Italian-ISDT/155bd688b87b02a0df4dfc36908546a3cf274688/it_isdt-ud-test.conllu",
+      "cache_path": "C:\\Users\\lucat\\AppData\\Local\\Zerocade\\word-association\\updates\\ud-isdt-test\\f07bca4c633a4da684c57a5cab69bfea\\it_isdt-ud-test.conllu",
+      "download_sha256": "cea8ca0e8d1ddf7ce509f10afff426d00e058982f49473e0744cd0ee477129e3",
+      "revision": "155bd688b87b02a0df4dfc36908546a3cf274688",
+      "license_file": "C:\\Users\\lucat\\AppData\\Local\\Zerocade\\word-association\\raw-licenses\\20b70f04453e84530d41aa955fffdfce2792782a7d379b64b390558bd807adae\\LICENSE.txt"
+    },
+    {
+      "source": "kaikki-frwiktionary-it",
+      "status": "ALREADY_IMPORTED",
+      "sha256": "f773ab4c9e25322271707638844748489d1f4d9ed745f738e8f6c4539d5f1c90",
+      "effective_url": "https://kaikki.org/frwiktionary/Italien/kaikki.org-dictionary-Italien.jsonl",
+      "cache_path": "C:\\Users\\lucat\\AppData\\Local\\Zerocade\\word-association\\updates\\kaikki-frwiktionary-it\\6669cc01b345405f8640a70e958f4769\\kaikki.org-dictionary-Italien.jsonl",
+      "download_sha256": "f773ab4c9e25322271707638844748489d1f4d9ed745f738e8f6c4539d5f1c90",
+      "revision": null
+    },
+    {
+      "source": "kaikki-dewiktionary-it",
+      "status": "ALREADY_IMPORTED",
+      "sha256": "e797f78d800f5a39e3874a5b1bb4ea0f804c5886badff20e21ad1029016b4840",
+      "effective_url": "https://kaikki.org/dewiktionary/Italienisch/kaikki.org-dictionary-Italienisch.jsonl",
+      "cache_path": "C:\\Users\\lucat\\AppData\\Local\\Zerocade\\word-association\\updates\\kaikki-dewiktionary-it\\40d85e7c4c7544e48dfbc783875425ac\\kaikki.org-dictionary-Italienisch.jsonl",
+      "download_sha256": "e797f78d800f5a39e3874a5b1bb4ea0f804c5886badff20e21ad1029016b4840",
+      "revision": null
+    },
+    {
+      "source": "kaikki-eswiktionary-it",
+      "status": "ALREADY_IMPORTED",
+      "sha256": "7ddb5a16fabf553fb1335418a374bce6ba9c3a78e4cb34e62f387d8bacd5c9c8",
+      "effective_url": "https://kaikki.org/eswiktionary/Italiano/kaikki.org-dictionary-Italiano.jsonl",
+      "cache_path": "C:\\Users\\lucat\\AppData\\Local\\Zerocade\\word-association\\updates\\kaikki-eswiktionary-it\\c60759f7bb084cadab751aaa5bb36624\\kaikki.org-dictionary-Italiano.jsonl",
+      "download_sha256": "7ddb5a16fabf553fb1335418a374bce6ba9c3a78e4cb34e62f387d8bacd5c9c8",
+      "revision": null
+    },
+    {
+      "source": "morphit-048-mirror",
+      "status": "ALREADY_IMPORTED",
+      "sha256": "7375216351ee59cee4326b455503f3a6c4e9542cd63ecb86ff5cd58ca5c8e800",
+      "effective_url": "https://raw.githubusercontent.com/giodegas/morphit-lemmatizer/b99d75d774367e4bedc5c5f339dec384777488ff/master/morph-it_048_utf8.txt",
+      "cache_path": "C:\\Users\\lucat\\AppData\\Local\\Zerocade\\word-association\\morphit-048-mirror\\morph-it_048_utf8.txt",
+      "download_sha256": "7375216351ee59cee4326b455503f3a6c4e9542cd63ecb86ff5cd58ca5c8e800",
+      "revision": "b99d75d774367e4bedc5c5f339dec384777488ff",
+      "license_file": "C:\\Users\\lucat\\AppData\\Local\\Zerocade\\word-association\\raw-licenses\\3efb5cdb64e217785ceda82ec6ddbd3006afa765fe372316bbe8ddde74c7d63c\\LICENSE.txt"
+    },
+    {
+      "source": "frequencywords-it-2018",
+      "status": "ALREADY_IMPORTED",
+      "sha256": "b23b0c6a3f59c1da1c7caa667b9df5699e95323fee20a05f343c7d7dae73c4be",
+      "effective_url": "https://raw.githubusercontent.com/hermitdave/FrequencyWords/525f9b560de45753a5ea01069454e72e9aa541c6/content/2018/it/it_full.txt",
+      "cache_path": "C:\\Users\\lucat\\AppData\\Local\\Zerocade\\word-association\\frequencywords-it-2018\\it_full.txt",
+      "download_sha256": "b23b0c6a3f59c1da1c7caa667b9df5699e95323fee20a05f343c7d7dae73c4be",
+      "revision": "525f9b560de45753a5ea01069454e72e9aa541c6",
+      "license_file": "C:\\Users\\lucat\\AppData\\Local\\Zerocade\\word-association\\raw-licenses\\7676fc5995366b582718ead7de286e2c7fb1571af9c1e700c932862f520169d8\\LICENSE.txt"
+    },
+    {
+      "source": "freedict-ita-deu",
+      "status": "ALREADY_IMPORTED",
+      "sha256": "b364b906dea10213b47d27ad1a4d0631b1ad6da0400304fefb2597ef765d5884",
+      "effective_url": "https://raw.githubusercontent.com/freedict/fd-dictionaries/5bdceeac8d0dba3298c1bebe734f60d54dad30f7/ita-deu/ita-deu.tei",
+      "cache_path": "C:\\Users\\lucat\\AppData\\Local\\Zerocade\\word-association\\freedict-ita-deu\\ita-deu.tei",
+      "download_sha256": "b364b906dea10213b47d27ad1a4d0631b1ad6da0400304fefb2597ef765d5884",
+      "revision": "5bdceeac8d0dba3298c1bebe734f60d54dad30f7",
+      "license_file": "C:\\Users\\lucat\\AppData\\Local\\Zerocade\\word-association\\raw-licenses\\7ee0e1caf5ddbae70eadb4515987eaba8a90655ce63d0b69a8c4a9b4ee042918\\LICENSE.txt"
+    },
+    {
+      "source": "ud-vit-dev",
+      "status": "ALREADY_IMPORTED",
+      "sha256": "d6e076afb639b4bee82f8caaaaed467cbd2c4f6ec2762aa0108ca865f97e0f3c",
+      "effective_url": "https://raw.githubusercontent.com/UniversalDependencies/UD_Italian-VIT/4c80bb283d02930a936dbb54519a7a67783f318f/it_vit-ud-dev.conllu",
+      "cache_path": "C:\\Users\\lucat\\AppData\\Local\\Zerocade\\word-association\\updates\\ud-vit-dev\\202728ae4db14e4cbd8fbd4c3639d513\\it_vit-ud-dev.conllu",
+      "download_sha256": "d6e076afb639b4bee82f8caaaaed467cbd2c4f6ec2762aa0108ca865f97e0f3c",
+      "revision": "4c80bb283d02930a936dbb54519a7a67783f318f",
+      "license_file": "C:\\Users\\lucat\\AppData\\Local\\Zerocade\\word-association\\raw-licenses\\a0d5ccddb45b22d3e853e69353aa0371832a7bbb1bdc5cbd3bcf0516a121aed9\\LICENSE.txt"
+    },
+    {
+      "source": "ud-vit-test",
+      "status": "ALREADY_IMPORTED",
+      "sha256": "1569c1c28727e1f99d8246c57b0ffa61ae0442747599051bfbd0e63d7081503f",
+      "effective_url": "https://raw.githubusercontent.com/UniversalDependencies/UD_Italian-VIT/4c80bb283d02930a936dbb54519a7a67783f318f/it_vit-ud-test.conllu",
+      "cache_path": "C:\\Users\\lucat\\AppData\\Local\\Zerocade\\word-association\\updates\\ud-vit-test\\4652239db02944688e057e2645db062b\\it_vit-ud-test.conllu",
+      "download_sha256": "1569c1c28727e1f99d8246c57b0ffa61ae0442747599051bfbd0e63d7081503f",
+      "revision": "4c80bb283d02930a936dbb54519a7a67783f318f",
+      "license_file": "C:\\Users\\lucat\\AppData\\Local\\Zerocade\\word-association\\raw-licenses\\a0d5ccddb45b22d3e853e69353aa0371832a7bbb1bdc5cbd3bcf0516a121aed9\\LICENSE.txt"
+    },
+    {
+      "source": "ud-vit-train",
+      "status": "ALREADY_IMPORTED",
+      "sha256": "678e41cc9771c8dec6a2b2a21489d549dd4d715bda582d3890b162b1c80ea33a",
+      "effective_url": "https://raw.githubusercontent.com/UniversalDependencies/UD_Italian-VIT/4c80bb283d02930a936dbb54519a7a67783f318f/it_vit-ud-train.conllu",
+      "cache_path": "C:\\Users\\lucat\\AppData\\Local\\Zerocade\\word-association\\updates\\ud-vit-train\\6ea01b025dfc425198f492d63aa289ab\\it_vit-ud-train.conllu",
+      "download_sha256": "678e41cc9771c8dec6a2b2a21489d549dd4d715bda582d3890b162b1c80ea33a",
+      "revision": "4c80bb283d02930a936dbb54519a7a67783f318f",
+      "license_file": "C:\\Users\\lucat\\AppData\\Local\\Zerocade\\word-association\\raw-licenses\\a0d5ccddb45b22d3e853e69353aa0371832a7bbb1bdc5cbd3bcf0516a121aed9\\LICENSE.txt"
+    },
+    {
+      "source": "ud-partut-dev",
+      "status": "ALREADY_IMPORTED",
+      "sha256": "c6542e547447df403e54f314a61ec9f4a5e1e0d770dbcbdedb5ea8edcb6758fc",
+      "effective_url": "https://raw.githubusercontent.com/UniversalDependencies/UD_Italian-ParTUT/9bc6f86bf5275e21976c0950b7337e04e6717e18/it_partut-ud-dev.conllu",
+      "cache_path": "C:\\Users\\lucat\\AppData\\Local\\Zerocade\\word-association\\updates\\ud-partut-dev\\d7c0c11f1d584590a998b845a8b4accb\\it_partut-ud-dev.conllu",
+      "download_sha256": "c6542e547447df403e54f314a61ec9f4a5e1e0d770dbcbdedb5ea8edcb6758fc",
+      "revision": "9bc6f86bf5275e21976c0950b7337e04e6717e18",
+      "license_file": "C:\\Users\\lucat\\AppData\\Local\\Zerocade\\word-association\\raw-licenses\\fc0bb44645611610ce1fcf866a1c98accd9aa4c6e1be1f3f3eeeab95148fa019\\LICENSE.txt"
+    },
+    {
+      "source": "ud-partut-test",
+      "status": "ALREADY_IMPORTED",
+      "sha256": "6a3f3437fd3ab383ba37122ec84cc1bd53662512f5ff1e80ed306c6b668eb6a2",
+      "effective_url": "https://raw.githubusercontent.com/UniversalDependencies/UD_Italian-ParTUT/9bc6f86bf5275e21976c0950b7337e04e6717e18/it_partut-ud-test.conllu",
+      "cache_path": "C:\\Users\\lucat\\AppData\\Local\\Zerocade\\word-association\\updates\\ud-partut-test\\0939947a4b374a4aaf57f93792a41bb3\\it_partut-ud-test.conllu",
+      "download_sha256": "6a3f3437fd3ab383ba37122ec84cc1bd53662512f5ff1e80ed306c6b668eb6a2",
+      "revision": "9bc6f86bf5275e21976c0950b7337e04e6717e18",
+      "license_file": "C:\\Users\\lucat\\AppData\\Local\\Zerocade\\word-association\\raw-licenses\\fc0bb44645611610ce1fcf866a1c98accd9aa4c6e1be1f3f3eeeab95148fa019\\LICENSE.txt"
+    },
+    {
+      "source": "ud-partut-train",
+      "status": "ALREADY_IMPORTED",
+      "sha256": "576ecef59bedbd740c6c8744af25726d5d279afac3555fa6a37c50ec7db1324d",
+      "effective_url": "https://raw.githubusercontent.com/UniversalDependencies/UD_Italian-ParTUT/9bc6f86bf5275e21976c0950b7337e04e6717e18/it_partut-ud-train.conllu",
+      "cache_path": "C:\\Users\\lucat\\AppData\\Local\\Zerocade\\word-association\\updates\\ud-partut-train\\1c7b2acbfad8437785b5d7e417177e92\\it_partut-ud-train.conllu",
+      "download_sha256": "576ecef59bedbd740c6c8744af25726d5d279afac3555fa6a37c50ec7db1324d",
+      "revision": "9bc6f86bf5275e21976c0950b7337e04e6717e18",
+      "license_file": "C:\\Users\\lucat\\AppData\\Local\\Zerocade\\word-association\\raw-licenses\\fc0bb44645611610ce1fcf866a1c98accd9aa4c6e1be1f3f3eeeab95148fa019\\LICENSE.txt"
+    },
+    {
+      "update_id": "c6ba93ee271de0d7962afb809e11db9471de81099d178d043c5baf92a1647be8",
+      "source_key": "ud-postwita-dev",
+      "status": "APPLIED",
+      "records": 15378,
+      "new_terms": 0,
+      "changed_terms": 0,
+      "removed_terms": 1,
+      "unchanged_terms": 4068,
+      "gameplay_approval": false,
+      "effective_url": "https://raw.githubusercontent.com/UniversalDependencies/UD_Italian-PoSTWITA/5b8b85c6cf27752c6cc7a054b10a302eb397a8e9/it_postwita-ud-dev.conllu",
+      "cache_path": "C:\\Users\\lucat\\AppData\\Local\\Zerocade\\word-association\\updates\\ud-postwita-dev\\b8ae2f88f4b94cdeb9e0183da33b68d3\\it_postwita-ud-dev.conllu",
+      "download_sha256": "d7aa66a1e30cec7b211991a5346205dc9b2a7bd98675d3b95a4be00bafff6490",
+      "revision": "5b8b85c6cf27752c6cc7a054b10a302eb397a8e9",
+      "license_file": "C:\\Users\\lucat\\AppData\\Local\\Zerocade\\word-association\\raw-licenses\\27d640e8e36d8f288592943d3f33756301d037633e2f51d837cc4c828354507d\\LICENSE.txt"
+    },
+    {
+      "source": "ud-postwita-test",
+      "status": "ALREADY_IMPORTED",
+      "sha256": "5db5e37ed8dc904595ac7d5bc3f746e6232a9fec0689948ffd17219c082a77c4",
+      "effective_url": "https://raw.githubusercontent.com/UniversalDependencies/UD_Italian-PoSTWITA/5b8b85c6cf27752c6cc7a054b10a302eb397a8e9/it_postwita-ud-test.conllu",
+      "cache_path": "C:\\Users\\lucat\\AppData\\Local\\Zerocade\\word-association\\updates\\ud-postwita-test\\8197f01bd1b54420b25b1d82f7c73469\\it_postwita-ud-test.conllu",
+      "download_sha256": "5db5e37ed8dc904595ac7d5bc3f746e6232a9fec0689948ffd17219c082a77c4",
+      "revision": "5b8b85c6cf27752c6cc7a054b10a302eb397a8e9",
+      "license_file": "C:\\Users\\lucat\\AppData\\Local\\Zerocade\\word-association\\raw-licenses\\27d640e8e36d8f288592943d3f33756301d037633e2f51d837cc4c828354507d\\LICENSE.txt"
+    },
+    {
+      "update_id": "b506e8cc6e4f1132fec4ea2e137e900bfc4a8224cf2249c7f3d3f0ba1a51251e",
+      "source_key": "ud-postwita-train",
+      "status": "APPLIED",
+      "records": 124585,
+      "new_terms": 0,
+      "changed_terms": 0,
+      "removed_terms": 1,
+      "unchanged_terms": 16576,
+      "gameplay_approval": false,
+      "effective_url": "https://raw.githubusercontent.com/UniversalDependencies/UD_Italian-PoSTWITA/5b8b85c6cf27752c6cc7a054b10a302eb397a8e9/it_postwita-ud-train.conllu",
+      "cache_path": "C:\\Users\\lucat\\AppData\\Local\\Zerocade\\word-association\\updates\\ud-postwita-train\\48a816298b0a47dd8bdf98bc8f95ba94\\it_postwita-ud-train.conllu",
+      "download_sha256": "8d2f976ead49c303ff522772792d418ea3887704a2f67143c88ec081c6ea05c8",
+      "revision": "5b8b85c6cf27752c6cc7a054b10a302eb397a8e9",
+      "license_file": "C:\\Users\\lucat\\AppData\\Local\\Zerocade\\word-association\\raw-licenses\\27d640e8e36d8f288592943d3f33756301d037633e2f51d837cc4c828354507d\\LICENSE.txt"
+    },
+    {
+      "source": "ud-twittiro-dev",
+      "status": "ALREADY_IMPORTED",
+      "sha256": "1f16040ae17395d2910784742e6b3344620a67937524d47ed96fd56f811a8c99",
+      "effective_url": "https://raw.githubusercontent.com/UniversalDependencies/UD_Italian-TWITTIRO/c40342afaf3648e9f3f0a3fc1e718364c4fdf243/it_twittiro-ud-dev.conllu",
+      "cache_path": "C:\\Users\\lucat\\AppData\\Local\\Zerocade\\word-association\\updates\\ud-twittiro-dev\\da55635e9df94db5aa5197d3646adba2\\it_twittiro-ud-dev.conllu",
+      "download_sha256": "1f16040ae17395d2910784742e6b3344620a67937524d47ed96fd56f811a8c99",
+      "revision": "c40342afaf3648e9f3f0a3fc1e718364c4fdf243",
+      "license_file": "C:\\Users\\lucat\\AppData\\Local\\Zerocade\\word-association\\raw-licenses\\6be38eb1cf8cf6435d6fdb56498263b09b588d2bd6e5407d5645ad0e46b2d0b3\\LICENSE.txt"
+    },
+    {
+      "source": "ud-twittiro-test",
+      "status": "ALREADY_IMPORTED",
+      "sha256": "ae8560ce8471d20fda2e242dc45b3be7d2e0e8f0ccec323a7750fe7511f8b9d4",
+      "effective_url": "https://raw.githubusercontent.com/UniversalDependencies/UD_Italian-TWITTIRO/c40342afaf3648e9f3f0a3fc1e718364c4fdf243/it_twittiro-ud-test.conllu",
+      "cache_path": "C:\\Users\\lucat\\AppData\\Local\\Zerocade\\word-association\\updates\\ud-twittiro-test\\3fe0c61178fc441b8153a676deef14ad\\it_twittiro-ud-test.conllu",
+      "download_sha256": "ae8560ce8471d20fda2e242dc45b3be7d2e0e8f0ccec323a7750fe7511f8b9d4",
+      "revision": "c40342afaf3648e9f3f0a3fc1e718364c4fdf243",
+      "license_file": "C:\\Users\\lucat\\AppData\\Local\\Zerocade\\word-association\\raw-licenses\\6be38eb1cf8cf6435d6fdb56498263b09b588d2bd6e5407d5645ad0e46b2d0b3\\LICENSE.txt"
+    },
+    {
+      "source": "ud-twittiro-train",
+      "status": "ALREADY_IMPORTED",
+      "sha256": "a470b66a73d2d489113de4f0591b1c61cf3848c6a94cedf33a8379d7e39a24f2",
+      "effective_url": "https://raw.githubusercontent.com/UniversalDependencies/UD_Italian-TWITTIRO/c40342afaf3648e9f3f0a3fc1e718364c4fdf243/it_twittiro-ud-train.conllu",
+      "cache_path": "C:\\Users\\lucat\\AppData\\Local\\Zerocade\\word-association\\updates\\ud-twittiro-train\\034fa40faeba4b8cb5220945cde49da0\\it_twittiro-ud-train.conllu",
+      "download_sha256": "a470b66a73d2d489113de4f0591b1c61cf3848c6a94cedf33a8379d7e39a24f2",
+      "revision": "c40342afaf3648e9f3f0a3fc1e718364c4fdf243",
+      "license_file": "C:\\Users\\lucat\\AppData\\Local\\Zerocade\\word-association\\raw-licenses\\6be38eb1cf8cf6435d6fdb56498263b09b588d2bd6e5407d5645ad0e46b2d0b3\\LICENSE.txt"
+    },
+    {
+      "source": "ud-valico-test",
+      "status": "ALREADY_IMPORTED",
+      "sha256": "a9f026703c1f3321eeba060460a1dac9d49677a641a7f03e78bcf8103667815a",
+      "effective_url": "https://raw.githubusercontent.com/UniversalDependencies/UD_Italian-Valico/32ccb6c686f9729ee471f093d6c303de44de2674/it_valico-ud-test.conllu",
+      "cache_path": "C:\\Users\\lucat\\AppData\\Local\\Zerocade\\word-association\\updates\\ud-valico-test\\0313b33291184554aa644e0fbdb7331d\\it_valico-ud-test.conllu",
+      "download_sha256": "a9f026703c1f3321eeba060460a1dac9d49677a641a7f03e78bcf8103667815a",
+      "revision": "32ccb6c686f9729ee471f093d6c303de44de2674",
+      "license_file": "C:\\Users\\lucat\\AppData\\Local\\Zerocade\\word-association\\raw-licenses\\b154ca0efd6d8d624a776a450c1a9c46703fc6a283f8f3c332309d2ed036a723\\LICENSE.txt"
+    },
+    {
+      "source": "ud-markit-dev",
+      "status": "ALREADY_IMPORTED",
+      "sha256": "633b6186f47ecfebfcff4ff9c7e19a0cbffd1f655f14fc1e9265b12bda597f97",
+      "effective_url": "https://raw.githubusercontent.com/UniversalDependencies/UD_Italian-MarkIT/40d333004758b8e390dd5eb02e95e964c2f500c7/it_markit-ud-dev.conllu",
+      "cache_path": "C:\\Users\\lucat\\AppData\\Local\\Zerocade\\word-association\\updates\\ud-markit-dev\\8f65f901bba94453bc4384d84584a27b\\it_markit-ud-dev.conllu",
+      "download_sha256": "633b6186f47ecfebfcff4ff9c7e19a0cbffd1f655f14fc1e9265b12bda597f97",
+      "revision": "40d333004758b8e390dd5eb02e95e964c2f500c7",
+      "license_file": "C:\\Users\\lucat\\AppData\\Local\\Zerocade\\word-association\\raw-licenses\\de4b4fc3f076a4d4938e68a8404173f90aad58f0958f493d3c6a9f39afff9614\\LICENSE.txt"
+    },
+    {
+      "source": "ud-markit-test",
+      "status": "ALREADY_IMPORTED",
+      "sha256": "9048ed0064e3989e2c37377755a28c25c7e462b1ad916e5808dc0a7ce95fc3fc",
+      "effective_url": "https://raw.githubusercontent.com/UniversalDependencies/UD_Italian-MarkIT/40d333004758b8e390dd5eb02e95e964c2f500c7/it_markit-ud-test.conllu",
+      "cache_path": "C:\\Users\\lucat\\AppData\\Local\\Zerocade\\word-association\\updates\\ud-markit-test\\e947a1ce52ea4aeb960eafd9cdf7d557\\it_markit-ud-test.conllu",
+      "download_sha256": "9048ed0064e3989e2c37377755a28c25c7e462b1ad916e5808dc0a7ce95fc3fc",
+      "revision": "40d333004758b8e390dd5eb02e95e964c2f500c7",
+      "license_file": "C:\\Users\\lucat\\AppData\\Local\\Zerocade\\word-association\\raw-licenses\\de4b4fc3f076a4d4938e68a8404173f90aad58f0958f493d3c6a9f39afff9614\\LICENSE.txt"
+    },
+    {
+      "source": "ud-markit-train",
+      "status": "ALREADY_IMPORTED",
+      "sha256": "4f6fc3423acb00d49e1e167bd21b11ebbc23e22275fd6f5eeb4d75cfbbccc5c6",
+      "effective_url": "https://raw.githubusercontent.com/UniversalDependencies/UD_Italian-MarkIT/40d333004758b8e390dd5eb02e95e964c2f500c7/it_markit-ud-train.conllu",
+      "cache_path": "C:\\Users\\lucat\\AppData\\Local\\Zerocade\\word-association\\updates\\ud-markit-train\\f703de2b31f142e8b3e94f2eca662fd7\\it_markit-ud-train.conllu",
+      "download_sha256": "4f6fc3423acb00d49e1e167bd21b11ebbc23e22275fd6f5eeb4d75cfbbccc5c6",
+      "revision": "40d333004758b8e390dd5eb02e95e964c2f500c7",
+      "license_file": "C:\\Users\\lucat\\AppData\\Local\\Zerocade\\word-association\\raw-licenses\\de4b4fc3f076a4d4938e68a8404173f90aad58f0958f493d3c6a9f39afff9614\\LICENSE.txt"
+    },
+    {
+      "source": "nvdb-de-mauro-2016",
+      "status": "ALREADY_IMPORTED",
+      "sha256": "f053fa2dd393a105d9645a86aa3c3994fe360c3896d7720b1c6e87246e4e5098",
+      "effective_url": "https://raw.githubusercontent.com/pettarin/nvdb/b5fb7f8d916a426934bcd20adc84bf97ab5899f6/nvdb.full.txt",
+      "cache_path": "C:\\Users\\lucat\\AppData\\Local\\Zerocade\\word-association\\nvdb-de-mauro-2016\\nvdb.full.txt",
+      "download_sha256": "f053fa2dd393a105d9645a86aa3c3994fe360c3896d7720b1c6e87246e4e5098",
+      "revision": "b5fb7f8d916a426934bcd20adc84bf97ab5899f6",
+      "license_file": "C:\\Users\\lucat\\AppData\\Local\\Zerocade\\word-association\\raw-licenses\\e897ea02944467cef9322376fb01ca6878b9b78aaac0c7b7366b66c46c0368ec\\LICENSE.txt"
+    },
+    {
+      "source": "itaoa-montefinese-2019",
+      "status": "ALREADY_IMPORTED",
+      "sha256": "026bcdba1c9544167829f19d7b0cd53fa21836fc7c24891a92eee75fbaf4aabc",
+      "effective_url": "https://osf.io/download/3nvh6/",
+      "cache_path": "C:\\Users\\lucat\\AppData\\Local\\Zerocade\\word-association\\updates\\itaoa-montefinese-2019\\af2319931e504c61a2343b96a9b5b63e\\source.bin",
+      "download_sha256": "026bcdba1c9544167829f19d7b0cd53fa21836fc7c24891a92eee75fbaf4aabc",
+      "revision": null,
+      "license_file": "C:\\Users\\lucat\\AppData\\Local\\Zerocade\\word-association\\raw-licenses\\a460f22e70e1677546974258d6f2e86967e02ee2efecb3420992a4f3f3b19d3d\\LICENSE.txt"
+    },
+    {
+      "source": "unimorph-ita",
+      "status": "ALREADY_IMPORTED",
+      "sha256": "6347bb15b3d2c3dafcbe4adc0e7beaa97a8bc61bcccc345079afb154c03f1321",
+      "effective_url": "https://raw.githubusercontent.com/unimorph/ita/fa2cc6ce173643e748bd8f4162709365bdc98805/ita",
+      "cache_path": "C:\\Users\\lucat\\AppData\\Local\\Zerocade\\word-association\\unimorph-ita\\ita",
+      "download_sha256": "6347bb15b3d2c3dafcbe4adc0e7beaa97a8bc61bcccc345079afb154c03f1321",
+      "revision": "fa2cc6ce173643e748bd8f4162709365bdc98805",
+      "license_file": "C:\\Users\\lucat\\AppData\\Local\\Zerocade\\word-association\\raw-licenses\\5c7c07dfb3395f95ccd1c73c427c84e64e5b4140275fc26ba3e80c0f54700673\\LICENSE.txt"
+    },
+    {
+      "source": "glaffit",
+      "status": "ALREADY_IMPORTED",
+      "sha256": "9e42965e5b7a8f4594c0199bbce6b6890c4bdc31a72a65af1b683b2025bf527d",
+      "effective_url": "https://redac.univ-tlse2.fr/lexiques/glaffit/GLAFFIT.txt.bz2",
+      "cache_path": "C:\\Users\\lucat\\AppData\\Local\\Zerocade\\word-association\\updates\\glaffit\\d84fc451126b433cada70332caf32d4b\\GLAFFIT.txt.bz2",
+      "download_sha256": "9e42965e5b7a8f4594c0199bbce6b6890c4bdc31a72a65af1b683b2025bf527d",
+      "revision": null,
+      "license_file": "C:\\Users\\lucat\\AppData\\Local\\Zerocade\\word-association\\raw-licenses\\48dd06b5b1c3bd4000acd8e4088de1fbffe77be6c33b9e35fb53f9ca6f1c8541\\LICENSE.txt"
+    },
+    {
+      "source": "flex-it-nouns",
+      "status": "ALREADY_IMPORTED",
+      "sha256": "1b0a06e94949827476621cfd3a639837d28905b91521c77c7958331785cf8587",
+      "effective_url": "https://raw.githubusercontent.com/franfranz/Flex_it/d97ddf57ddb209afbf4fc960eb5931b33244632d/Flex_it_nouns.csv",
+      "cache_path": "C:\\Users\\lucat\\AppData\\Local\\Zerocade\\word-association\\flex-it-nouns\\Flex_it_nouns.csv",
+      "download_sha256": "1b0a06e94949827476621cfd3a639837d28905b91521c77c7958331785cf8587",
+      "revision": "d97ddf57ddb209afbf4fc960eb5931b33244632d",
+      "license_file": "C:\\Users\\lucat\\AppData\\Local\\Zerocade\\word-association\\raw-licenses\\f3fb3d786ed349697d910d843c2d898daa5cb033e7b9bfd065897edef0031489\\LICENSE.txt"
+    },
+    {
+      "source": "flex-it-adjectives",
+      "status": "ALREADY_IMPORTED",
+      "sha256": "628a830f5d997d763d7522bd8e63589a4b98edd3189363f9a15b107b4418c97d",
+      "effective_url": "https://raw.githubusercontent.com/franfranz/Flex_it/d97ddf57ddb209afbf4fc960eb5931b33244632d/Flex_it_adj.csv",
+      "cache_path": "C:\\Users\\lucat\\AppData\\Local\\Zerocade\\word-association\\flex-it-adjectives\\Flex_it_adj.csv",
+      "download_sha256": "628a830f5d997d763d7522bd8e63589a4b98edd3189363f9a15b107b4418c97d",
+      "revision": "d97ddf57ddb209afbf4fc960eb5931b33244632d",
+      "license_file": "C:\\Users\\lucat\\AppData\\Local\\Zerocade\\word-association\\raw-licenses\\f3fb3d786ed349697d910d843c2d898daa5cb033e7b9bfd065897edef0031489\\LICENSE.txt"
+    }
+  ],
+  "all_sources_completed": true,
+  "completed_at_utc": "2026-11-16T19:15:48.873019+00:00",
+  "inventory": {
+    "collected_prompts": 2847433,
+    "single_word_candidates": 2496538,
+    "with_lemma_evidence": 201572,
+    "with_inflected_evidence": 1333481,
+    "with_italian_lexical_evidence": 1658116,
+    "sources": 46,
+    "attestations": 10252549,
+    "decisions": [
+      {
+        "decision": "DEFERRED",
+        "count": 699
+      },
+      {
+        "decision": "DISCARDED",
+        "count": 91072
+      }
+    ],
+    "updates": [
+      {
+        "status": "APPLIED",
+        "count": 3
+      }
+    ],
+    "association_generation_started": false,
+    "automatic_gameplay_approval": false,
+    "coverage": "sources_registered_and_imported_not_all_existing_sources"
+  }
+}

@@ -1,0 +1,78 @@
+/* ZeroTaboo's scene: sizes in vmin within the 9:16 frame main.tsx keeps, so the dashboard's preview and the 1080 x 1920 browser
+   source look the same. Colour is never the only signal (the difficulty has its word and its marks). */
+.taboo {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2.2vmin;
+  padding: 7vmin 5vmin 5vmin;
+  box-sizing: border-box;
+  font-family: 'Nunito Variable', system-ui, sans-serif;
+  color: #fff;
+  text-shadow: 0 0.2vmin 0.8vmin rgba(0, 0, 0, 0.55);
+  overflow: hidden;
+}
+.taboo h1, .taboo h2, .taboo-timer, .taboo-score__team strong { font-family: 'Fredoka Variable', system-ui, sans-serif; margin: 0; }
+.taboo--wait { align-items: center; justify-content: center; font-size: 6vmin; }
+.taboo-head { display: flex; flex-wrap: wrap; gap: 1.5vmin; align-items: center; }
+.taboo-head__round { font-size: 3.4vmin; font-weight: 800; letter-spacing: 0.1vmin; text-transform: uppercase; }
+.taboo-badge {
+  display: inline-block; padding: 0.7vmin 1.8vmin; border-radius: 99vmin; font-size: 2.4vmin; font-weight: 800;
+  background: rgba(0, 0, 0, 0.45); border: 0.3vmin solid rgba(255, 255, 255, 0.5);
+}
+.taboo-badge--streak { background: #b45309; }
+.taboo-badge--jackpot { background: #be123c; border-color: #fecdd3; }
+.taboo-badge--win { background: #047857; }
+.taboo-badge--narrative { background: #6d28d9; }
+.taboo-timer { align-self: center; font-size: 15vmin; font-weight: 700; line-height: 1; font-variant-numeric: tabular-nums; }
+.taboo-timer[data-low='true'] { color: #fecaca; }
+.taboo-score { display: flex; flex-direction: column; gap: 1vmin; }
+.taboo-score__team { font-size: 4vmin; }
+.taboo-score__team strong { font-size: 9vmin; }
+.taboo-score__meta { display: flex; gap: 1.5vmin; align-items: center; flex-wrap: wrap; }
+.taboo-skips { font-size: 2.6vmin; font-weight: 800; }
+.taboo-bar { height: 2.4vmin; border-radius: 99vmin; background: rgba(0, 0, 0, 0.5); overflow: hidden; border: 0.25vmin solid rgba(255, 255, 255, 0.4); }
+.taboo-bar__fill { height: 100%; background: linear-gradient(90deg, #f43f5e, #fb923c); }
+.taboo-card {
+  display: flex; flex-direction: column; gap: 2vmin; padding: 3vmin; border-radius: 3vmin;
+  background: rgba(20, 8, 16, 0.72); border: 0.4vmin solid rgba(255, 255, 255, 0.35);
+}
+.taboo-card__top { display: flex; flex-wrap: wrap; gap: 1.5vmin; align-items: center; }
+.taboo-card__category { font-size: 2.8vmin; font-weight: 800; }
+.taboo-card__difficulty { font-size: 2.6vmin; font-weight: 800; padding: 0.5vmin 1.6vmin; border-radius: 99vmin; background: rgba(255, 255, 255, 0.18); }
+.taboo-forbidden h2 { font-size: 3.4vmin; color: #fda4af; text-transform: uppercase; letter-spacing: 0.15vmin; }
+.taboo-forbidden ul { list-style: none; padding: 0; margin: 1.4vmin 0 0; display: flex; flex-wrap: wrap; gap: 1.4vmin; }
+.taboo-forbidden li {
+  font-size: 5.4vmin; font-weight: 800; padding: 1vmin 2.4vmin; border-radius: 1.6vmin; background: #9f1239;
+  border: 0.35vmin solid #fecdd3; text-transform: uppercase;
+}
+.taboo-pause { font-size: 3.6vmin; font-weight: 800; padding: 1.6vmin; text-align: center; background: #92400e; border-radius: 1.6vmin; }
+.taboo-last { font-size: 3.4vmin; display: flex; gap: 1.2vmin; align-items: center; flex-wrap: wrap; }
+.taboo-revealed { font-size: 2.8vmin; opacity: 0.92; }
+.taboo-center { text-align: center; padding: 3vmin 0; }
+.taboo-center h1 { font-size: 8vmin; }
+.taboo-center p { font-size: 3.4vmin; margin: 1vmin 0 0; }
+.taboo-summary { font-weight: 700; }
+.taboo-notice { background: rgba(0, 0, 0, 0.5); padding: 1.2vmin 2vmin; border-radius: 1.4vmin; display: inline-block; }
+.taboo-notice--correction { border: 0.3vmin solid #fbbf24; }
+.taboo-vote { margin-top: 2vmin; text-align: left; }
+.taboo-vote h2 { font-size: 3.4vmin; }
+.taboo-vote ul { list-style: none; padding: 0; margin: 1vmin 0 0; display: grid; gap: 0.8vmin; font-size: 3.2vmin; }
+.taboo-vote b { display: inline-block; width: 4vmin; font-weight: 800; color: #fbbf24; }
+.taboo-subtitle { font-size: 3.2vmin; margin: 0 0 0.6vmin; text-transform: uppercase; opacity: 0.85; }
+.taboo-leaders { list-style: none; padding: 0; margin: 0; display: grid; gap: 1vmin; font-size: 3.2vmin; }
+.taboo-leaders li { display: flex; gap: 1.6vmin; align-items: center; }
+.taboo-leaders__place { width: 4.6vmin; font-weight: 800; text-align: right; opacity: 0.85; }
+.taboo-leaders__wins { margin-left: auto; font-weight: 800; }
+.taboo-name { display: inline-flex; align-items: center; gap: 1.2vmin; min-width: 0; }
+.taboo-name__text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 42vmin; font-weight: 800; }
+.taboo-name .viewer-avatar { width: 4.6vmin; height: 4.6vmin; font-size: 2.4vmin; }
+
+/* Short animations, only when the director leaves them on, and never for who asks the system to reduce motion. */
+@media (prefers-reduced-motion: no-preference) {
+  .taboo--anim .taboo-card { animation: taboo-in 0.25s ease-out; }
+  .taboo--anim .taboo-bar__fill { transition: width 0.4s ease-out; }
+  .taboo--anim .taboo-last { animation: taboo-in 0.3s ease-out; }
+}
+@keyframes taboo-in { from { transform: translateY(1.5vmin); opacity: 0.4; } to { transform: none; opacity: 1; } }

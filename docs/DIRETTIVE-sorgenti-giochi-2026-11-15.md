@@ -1,5 +1,8 @@
 # Adeguamento dei sorgenti e dei giochi a DIRETTIVE.md 2.6
 
+> **Revisione documentale — 16 novembre 2026.** Rapporto storico del 15 novembre rispetto alle direttive 2.6. La versione normativa corrente — [2.9](../DIRETTIVE.md). Pubblicazione, ricaricamento del corpus e controllo della lunghezza in ZeroContext sono descritti nel [README aggiornato](../gioco-zerocontext/README.md); richiedono verifiche proprie oltre agli esiti storici sotto.
+> [Indice e stato della documentazione](STATO_DOCUMENTAZIONE.md).
+
 Verifica del 15 novembre 2026, workspace con base `3a70b27`, pacchetti `0.1.0`.
 Prosegue l'[audit infrastrutturale](DIRETTIVE-audit-2026-11-14.md) includendo
 i punti di ingresso dei giochi e gli strumenti dei contenuti interessati.

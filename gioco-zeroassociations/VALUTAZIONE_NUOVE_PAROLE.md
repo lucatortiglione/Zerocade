@@ -1,5 +1,8 @@
 # Utilità delle nuove parole per i giochi
 
+> **Revisione documentale — 16 novembre 2026.** Valutazione storica del lotto del 14 novembre. I risultati per gioco sono diagnosi dei ruoli su quegli input; non attestano la pubblicazione automatica. ZeroContext ora usa un corpus statistico di 89.380 tentativi e 6.833 segrete: per aggiornare la banca seguire il [README corrente](../gioco-zerocontext/README.md).
+> [Indice e stato della documentazione](../docs/STATO_DOCUMENTAZIONE.md).
+
 Valutazione del 14 novembre 2026 sulle **92.653 voci aggiunte** da UniMorph,
 GLAFF-IT e Flex_it. La selezione è la differenza esatta rispetto al backup
 precedente all'importazione; non comprende tutte le parole già presenti che

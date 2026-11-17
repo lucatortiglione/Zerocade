@@ -1,7 +1,7 @@
 // Per-instance and per-resource budgets for ZeroContext's real consumers:
 // HTTP hosting, browser loading, ranking worker and game coordination.
 export const CONTEXT_LIMITS = Object.freeze({
-  words: 200_000, dimensions: 1024, vectors: 128 * 1024 * 1024,
+  words: 200_000, dimensions: 1024, vectors: 384 * 1024 * 1024,
   vocab: 4 * 1024 * 1024, secrets: 512 * 1024, links: 4 * 1024 * 1024,
   linkCount: 500_000, linksPerSecret: 4096, maxBoost: 10_000_000,
   loadMs: 30_000, rankMs: 15_000,

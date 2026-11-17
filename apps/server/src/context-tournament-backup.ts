@@ -94,6 +94,11 @@ export interface BackupSnapshot {
 type Row = Record<string, unknown>
 
 export class TournamentBackup {
+  close(): void {
+    if (!this.db.open) return
+    this.db.pragma('wal_checkpoint(TRUNCATE)')
+    this.db.close()
+  }
   constructor(private readonly db: Database.Database) {
     db.exec(SCHEMA)
   }

@@ -54,6 +54,13 @@ export function controlGame(key: string, command: GameControl): SessionState {
   return getSession(key)
 }
 
+// Replace a round's resources without resetting its session leaderboard or pause.
+export function refreshGame(key: string): SessionState {
+  const cur = live(key)
+  runtime.set(key, { ...cur, run: cur.run + 1 })
+  return getSession(key)
+}
+
 function loadState(key: string): SessionState {
   const row = loadSession(key)
   if (row) {

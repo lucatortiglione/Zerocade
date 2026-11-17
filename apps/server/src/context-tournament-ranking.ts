@@ -1,5 +1,5 @@
 import { createHash } from 'node:crypto'
-import { TOURNAMENT_RULES, pickSecret } from '@zerocade/shared'
+import { TOURNAMENT_RULES, pickSecret, type ContextProfile } from '@zerocade/shared'
 import { lookup, parseContextData, rankAgainst, type ContextData, type Ranking } from '@zerocade/shared/contextRanking'
 import { contextFile, type ContextFile } from './context.js'
 
@@ -40,19 +40,20 @@ export function corpusFromBuffers(files: Record<'vocab.txt' | 'vectors.bin' | 's
   return { data, hash: hash.digest('hex') }
 }
 
-let cached: Corpus | null | undefined
+const cache = new Map<ContextProfile, Corpus | null>()
+export const invalidateContextCorpus = (profile?: ContextProfile) => { if (profile) cache.delete(profile); else cache.clear() }
 // The server's corpus, read once (on the first tournament).
-export function serverCorpus(): Corpus | null {
-  if (cached === undefined) {
+export function serverCorpus(profile: ContextProfile = 'original'): Corpus | null {
+  if (!cache.has(profile)) {
     try {
-      cached = corpusFromBuffers({ 'vocab.txt': contextFile('vocab.txt'), 'vectors.bin': contextFile('vectors.bin'),
-        'secrets.txt': contextFile('secrets.txt'), 'links.json': contextFile('links.json') })
+      cache.set(profile, corpusFromBuffers({ 'vocab.txt': contextFile('vocab.txt', profile), 'vectors.bin': contextFile('vectors.bin', profile),
+        'secrets.txt': contextFile('secrets.txt', profile), 'links.json': contextFile('links.json', profile) }))
     } catch (error) {
       console.error('[torneo] corpus di ZeroContext non leggibile:', error instanceof Error ? error.message : error)
-      cached = null
+      cache.set(profile, null)
     }
   }
-  return cached
+  return cache.get(profile) ?? null
 }
 
 // A secret not yet played in this tournament, its ranking and the lifeline word. Among those, a word that never came

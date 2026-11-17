@@ -1,4 +1,4 @@
-import { readBoundedBytes } from '@zerocade/shared'
+import { readBoundedBytes, isContextProfile } from '@zerocade/shared'
 import { CONTEXT_LIMITS, ContextError } from '@zerocade/shared'
 import { parseContextData, type ContextData } from './contextRanking'
 
@@ -7,13 +7,16 @@ import { parseContextData, type ContextData } from './contextRanking'
 export async function loadContextData(origin: string, signal: AbortSignal, fetchFn: typeof fetch = fetch): Promise<ContextData> {
   const url = new URL(origin)
   if (!['http:', 'https:'].includes(url.protocol) || url.username || url.password) throw new ContextError('data', 'Origine ZeroContext non valida.')
+  const profile = url.searchParams.get('profile') ?? 'original'
+  if (!isContextProfile(profile)) throw new ContextError('data', 'Associazioni ZeroContext non valide.')
   const controller = new AbortController()
   const timer = setTimeout(() => controller.abort(new ContextError('timeout', 'Caricamento ZeroContext scaduto.')), CONTEXT_LIMITS.loadMs)
   const combined = AbortSignal.any([signal, controller.signal])
+  let revision: string | null = null
   const read = async (name: string, limit: number, optional = false) => {
     combined.throwIfAborted()
     let response: Response
-    try { response = await fetchFn(new URL(`/api/context/${name}`, url.origin), { signal: combined, cache: 'no-store' }) }
+    try { response = await fetchFn(new URL(`/api/context/${name}${url.search}`, url.origin), { signal: combined, cache: 'no-store' }) }
     catch {
       combined.throwIfAborted()
       throw new ContextError('network', 'Connessione interrotta durante il caricamento di ZeroContext.')
@@ -23,6 +26,17 @@ export async function loadContextData(origin: string, signal: AbortSignal, fetch
       if (optional && response.status === 404) return null
       throw new ContextError(response.status >= 500 ? 'network' : 'data', `${name}: HTTP ${response.status}.`)
     }
+    const receivedRevision = response.headers.get('x-zerocontext-revision')
+    const receivedProfile = response.headers.get('x-zerocontext-profile')
+    if (receivedProfile && receivedProfile !== profile) {
+      await response.body?.cancel()
+      throw new ContextError('data', 'Le risorse appartengono ad associazioni ZeroContext diverse.')
+    }
+    if (revision && receivedRevision && receivedRevision !== revision) {
+      await response.body?.cancel()
+      throw new ContextError('network', 'Il corpus ZeroContext è cambiato durante il download: caricamento da ripetere.')
+    }
+    revision ??= receivedRevision
     const bytes = await readBoundedBytes(response, limit)
     combined.throwIfAborted()
     return bytes

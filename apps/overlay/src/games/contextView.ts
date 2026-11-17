@@ -3,11 +3,11 @@ import { drawAvatar, fillTextWithAvatar } from './avatar'
 import { clamp, type Score } from './common'
 import { bandColor, closeness, position } from './contextRanking'
 
-export interface ContextGuess { word: string; rank: number; by: Viewer | null; at: number }
+export interface ContextGuess { word: string; rank: number; by: Viewer | null; at: number; temperature?: number }
 export interface ContextTypedGuess { text: string; user: Viewer; rank: number | null }
 export interface ContextView {
   ready: boolean; problem: string | null; preparing: boolean; word: string; total: number; attempts: number
-  revealed: boolean; lettersShown: number; solver: Viewer | null; revealAt: number; best: number
+  revealed: boolean; lettersShown: number; showWordLength: boolean; solver: Viewer | null; revealAt: number; best: number
   redUntil: number; orangeUntil: number; yellowUntil: number; cyanUntil: number
   showBoard: boolean; last: ContextGuess | null; closest: readonly ContextGuess[]
   matchOver: boolean; leaders: readonly Score[]; typed: readonly ContextTypedGuess[]
@@ -17,6 +17,7 @@ export interface ContextView {
 
 export interface TournamentStandingRow { place: string; name: string; avatar?: string; points: number; delta: number }
 export interface TournamentLayer {
+  showTilesDuringRound?: boolean
   // "Modalità Torneo ZeroContext · Manche 2 di 5", under the title.
   mode: string
   // The clock of the window, top right: big text and what it is.
@@ -38,7 +39,7 @@ export interface TournamentLayer {
 
 // Presentation only: no downloads, ranking computation, worker or score effects.
 export function paintContext(ctx: CanvasRenderingContext2D, now: number, width: number, height: number, k: number, view: ContextView) {
-  const { ready, problem, preparing, word, total, attempts, revealed, lettersShown, solver, revealAt,
+  const { ready, problem, preparing, word, total, attempts, revealed, lettersShown, showWordLength, solver, revealAt,
     best, redUntil, orangeUntil, yellowUntil, cyanUntil, showBoard, last, closest, matchOver, leaders, typed } = view
       const T = view.tournament
       ctx.textBaseline = 'alphabetic'
@@ -120,12 +121,15 @@ export function paintContext(ctx: CanvasRenderingContext2D, now: number, width: 
 
       const n = word.length
 
-      // The secret as tiles: shown letters filled, the rest empty; they hop when it is found.
+      // With length hidden, draw only the known prefix: no empty tiles or widths
+      // derived from the full word. Revealing the solution always shows every letter.
+      const tileCount = revealed || showWordLength ? n : Math.min(n, Math.max(0, lettersShown))
       const gap = 8
-      const tile = Math.min(56, (panelW - gap * (n - 1)) / n)
-      const tilesW = n * tile + (n - 1) * gap
+      const tileSpace = panelW - (!revealed && !showWordLength ? 40 : 0)
+      const tile = Math.min(56, (tileSpace - gap * (tileCount - 1)) / Math.max(1, tileCount))
+      const tilesW = tileCount > 0 ? tileCount * tile + (tileCount - 1) * gap : 0
       const ty = top + (T ? 108 : 88)
-      for (let i = 0; i < n; i++) {
+      for (let i = 0; i < tileCount; i++) {
         const x = cx - tilesW / 2 + i * (tile + gap)
         const shown = revealed || i < lettersShown
         const pop = revealed ? clamp((now - revealAt - i * 70) / 260, 0, 1) : 1
@@ -144,6 +148,14 @@ export function paintContext(ctx: CanvasRenderingContext2D, now: number, width: 
         }
       }
 
+      if (!revealed && !showWordLength && (!T || T.showTilesDuringRound)) {
+        ctx.fillStyle = '#9aa0b8'
+        ctx.textBaseline = 'alphabetic'
+        ctx.font = '700 20px system-ui'
+        ctx.textAlign = tileCount ? 'left' : 'center'
+        ctx.fillText(tileCount ? '…' : 'PAROLA SEGRETA', tileCount ? cx + tilesW / 2 + 12 : cx, ty + 38)
+      }
+
       // Chips: tries, best rank and the scale.
       const chips = T?.chips ?? [`${attempts} tentativi`, Number.isFinite(best) ? `migliore #${position(best).toLocaleString('it-IT')}` : 'nessun tentativo', `su ${total.toLocaleString('it-IT')} parole`]
       const chipFont = '600 13px system-ui'
@@ -153,18 +165,19 @@ export function paintContext(ctx: CanvasRenderingContext2D, now: number, width: 
       // The tournament shows no tiles until the word is found: how many letters it has is not said.
       // In the tournament the finder's name goes right under the secret word, and the chips and the standings follow.
       const finderY = ty + tile * 1.15 + 34
-      const cy = ty + (T && !revealed ? -8 : tile * 1.15 + 18) + (T && revealed ? 40 : 0)
-      if (T && revealed) {
+      const cy = ty + (T && !T.showTilesDuringRound && !revealed ? -8 : tile * 1.15 + 18) + (revealed ? 40 : 0)
+      // The finder's name sits between the word and the ranking, in the classic game too.
+      if (revealed) {
         ctx.textAlign = 'center'
         ctx.fillStyle = solver ? '#3ccf7a' : '#E0A022'
         ctx.font = '800 26px system-ui'
         if (solver) fillTextWithAvatar(ctx, `${solver.nickname} ha trovato la parola!`, cx, finderY, solver)
         else ctx.fillText('Nessuno ha trovato la parola', cx, finderY)
       }
-      chips.forEach((c, i) => {
       // The font is set again: the finder's line above (round over) left the large one, and the chips, measured at the
       // small size, would be drawn wider than their pills and run into each other.
       ctx.font = chipFont
+      chips.forEach((c, i) => {
         ctx.fillStyle = 'rgba(255,255,255,0.08)'
         ctx.beginPath()
         ctx.roundRect(cxp, cy, cw[i], 28, 14)
@@ -194,7 +207,7 @@ export function paintContext(ctx: CanvasRenderingContext2D, now: number, width: 
         ctx.beginPath()
         ctx.roundRect(x, y, panelW, h, 16)
         ctx.fill()
-        const fillW = Math.max(h, panelW * closeness(g.rank, total))
+        const fillW = Math.max(h, panelW * (g.temperature === undefined ? closeness(g.rank, total) : g.temperature / 100))
         const bar = ctx.createLinearGradient(x, 0, x + fillW, 0)
         bar.addColorStop(0, color + '30')
         bar.addColorStop(1, color + (big ? 'aa' : '88'))
@@ -217,7 +230,7 @@ export function paintContext(ctx: CanvasRenderingContext2D, now: number, width: 
         ctx.fillText(g.word, x + 20, big ? y + h * 0.36 : mid)
         ctx.font = '600 16px system-ui'
         ctx.fillStyle = color
-        if (big) ctx.fillText(heat(g.rank), x + 20, y + h * 0.74)
+        if (big) ctx.fillText(`${heat(g.rank)}${g.temperature === undefined ? '' : ` · ${g.temperature.toFixed(1)}/100`}`, x + 20, y + h * 0.74)
         ctx.textAlign = 'right'
         ctx.fillStyle = '#ffffff'
         ctx.font = `800 ${big ? 38 : 22}px system-ui`
@@ -252,7 +265,7 @@ export function paintContext(ctx: CanvasRenderingContext2D, now: number, width: 
       let y = cy + 46
       const notes = T?.notes ?? []
       // The classic game's end-of-round lines (who found it, the match winner) sit under the list.
-      const endLines = !T && revealed ? 50 + (matchOver && leaders[0] ? 36 : 0) : 0
+      const endLines = !T && revealed && matchOver && leaders[0] ? 40 : 0
       const listBottom = (board ? boardTop : bottom) - 40 - notes.length * 26 - endLines
       if (S) {
         ctx.textAlign = 'left'
@@ -326,23 +339,18 @@ export function paintContext(ctx: CanvasRenderingContext2D, now: number, width: 
         ctx.textAlign = 'center'
         ctx.fillStyle = '#f5c542'
         ctx.font = '700 16px system-ui'
-        const base = (board ? boardTop : bottom) - (revealed && !T ? 52 : 14)
+        const base = (board ? boardTop : bottom) - (revealed && !T && matchOver ? 52 : 14)
         notes.forEach((line, i) => ctx.fillText(line, cx, base - (notes.length - 1 - i) * 26, panelW))
       }
 
-      // The end of the round, above the ranking.
+      // The end of a classic match, under the ranking (who found the word is under the word itself).
       if (revealed && !T) {
-        ctx.textAlign = 'center'
-        ctx.fillStyle = solver ? '#3ccf7a' : '#E0A022'
-        ctx.font = '800 26px system-ui'
-        const my = (board ? boardTop : bottom) - 14
-        if (solver) fillTextWithAvatar(ctx, `${solver.nickname} ha trovato: ${word}`, cx, my, solver)
-        else ctx.fillText(`Round terminato: era ${word}`, cx, my)
         const champion = matchOver ? leaders[0] : undefined
         if (champion) {
+          ctx.textAlign = 'center'
           ctx.fillStyle = '#f5c542'
           ctx.font = '800 22px system-ui'
-          fillTextWithAvatar(ctx, `🏁 Partita finita: vince ${champion.name} con ${champion.pts} pt`, cx, my - 36, { nickname: champion.name, avatar: champion.avatar })
+          fillTextWithAvatar(ctx, `🏁 Partita finita: vince ${champion.name} con ${champion.pts} pt`, cx, (board ? boardTop : bottom) - 14, { nickname: champion.name, avatar: champion.avatar })
         }
       }
 

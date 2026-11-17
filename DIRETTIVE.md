@@ -1,11 +1,33 @@
-# Software Engineering Standards — Versione 2.6
+# Software Engineering Standards — ZeroCade — Versione 2.9
 
 **Direttive per architettura, sviluppo, ottimizzazione, sicurezza, concorrenza e qualità del software.**
+
+Revisione documentale del **16 novembre 2026**, versione normativa 2.9 invariata:
+allineati inventario dei dati e riferimenti alla pubblicazione di ZeroContext.
+Stato del workspace e ambito dei rapporti sono nell'[indice documentale](docs/STATO_DOCUMENTAZIONE.md).
+
+Aggiornamento del 15 novembre 2026, versione 2.9: adattato a ZeroCade il documento 2.8 di
+ZeroFollowerBot. Integrate le regole su thread nativi, stalli, IPC e memoria condivisa con le
+condizioni effettive di Node.js, React, SQLite e degli strumenti Python. Distinte prescrizioni,
+funzionalità esistenti e verifiche ancora da eseguire; aggiornati confini del workspace e manutenzione.
+Il testo di riferimento è conservato nel progetto ZeroFollowerBot; questa copia ha evoluzione autonoma.
+
+Aggiornamento del 15 novembre 2026, versione 2.8: integrata nella sezione 5 e armonizzata nelle sezioni 6, 11 e 13
+la disciplina completa per il **multithreading puro nativo (1:1 OS thread)**: concorrenza strutturata RAII (`std::jthread`
+con cancellazione cooperativa `std::stop_token` e scoped threads `std::thread::scope`), hardware-awareness e coerenza
+di cache (prevenzione del false sharing con `hardware_destructive_interference_size`, TLS map-reduce e NUMA/core pinning),
+coordinamento a fasi (`std::barrier` e `std::latch`), architetture di schedulazione (thread pool bounded con backpressure
+e work-stealing pool), memory ordering atomico (Acquire/Release) e matrice comparativa dei modelli di concorrenza pura.
+
+Aggiornamento del 15 novembre 2026, versione 2.7: integrata nella sezione 6 la disciplina avanzata per la
+prevenzione di lock, deadlock, starvation e stalli dei processi (architetture share-nothing, I/O asincrono su pipe IPC,
+SQLite WAL con `BEGIN IMMEDIATE`, lock hierarchy, watchdog monotoni e matrice operativa dei rischi di blocco);
+allineati i vincoli operativi per lo stack di Zerocade nella sezione 16.
 
 Aggiornamento del 14 novembre 2026, versione 2.6: adeguato a Zerocade. Corrette le righe che riguardavano un altro
 progetto (direzione delle dipendenze, versioning, identità degli eseguibili di prova, ambiente incompleto) e aggiunta
 la sezione 16, che traduce le regole nello stack di Zerocade (TypeScript, Node.js, React, SQLite, giochi in Python).
-Le altre sezioni sono il testo generale: dove citano Rust, C++ o Qt, la sezione 16 indica l'equivalente.
+Questa voce descrive la revisione storica; la versione 2.9 adatta anche le regole operative nelle sezioni interessate.
 
 Aggiornamento del 13 ottobre 2026: requisiti verificabili derivati dai difetti di cancellazione, conferma degli
 invii, memoria dei log, salvataggi asincroni e aggiornamenti dell'interfaccia. Queste regole richiedono prove sui
@@ -45,8 +67,6 @@ Le direttive si applicano proporzionalmente alla complessità, ai rischi e alla 
 
 Le eccezioni devono essere documentate; non devono trasformarsi in debito tecnico invisibile.
 
----
-
 ## 1. Analisi preventiva, progettazione e controllo delle regressioni
 
 ### Analisi prima delle modifiche
@@ -65,8 +85,6 @@ Le eccezioni devono essere documentate; non devono trasformarsi in debito tecnic
 - [ ] **DRY con giudizio:** eliminare duplicazioni di conoscenza e regole di business, senza imporre astrazioni artificiali a codice solo superficialmente simile.
 - [ ] **Responsabilità chiare:** assegnare a ogni modulo responsabilità coerenti, evitando classi monolitiche e oggetti che coordinano troppe funzionalità.
 - [ ] **Complessità giustificata:** ogni nuovo livello architetturale, dipendenza o framework deve offrire un beneficio concreto.
-
----
 
 ## 2. Architettura, modularità e contratti
 
@@ -104,7 +122,7 @@ KISS e YAGNI (sezioni 0 e 1). I requisiti P0 su correttezza, risorse e concorren
 #### Scegliere il confine più semplice
 
 | Confine | Quando usarlo | Cosa deve restare esplicito |
-|---|---|---|
+| ----- | ----- | ----- |
 | Funzione | Calcolo, trasformazione o validazione con input e output definiti | Precondizioni, risultato, errori ed eventuali effetti |
 | Modulo | Funzioni e tipi coesi, con dettagli da nascondere ai chiamanti | API interna o pubblica, dipendenze e invarianti |
 | Crate o package | Consumo indipendente, dipendenze o piattaforme distinte, distribuzione o versionamento separati realmente necessari | Build autonoma rispetto all'app, dipendenze dirette, feature e compatibilità |
@@ -116,7 +134,7 @@ KISS e YAGNI (sezioni 0 e 1). I requisiti P0 su correttezza, risorse e concorren
 
 #### Direzione delle dipendenze e isolamento del dominio
 
-- [ ] **Dipendenze unidirezionali:** descrivere i livelli e il verso delle dipendenze dei componenti toccati. Per Zerocade vale `apps/* → packages/shared`: `shared` non importa nessuna app, e server, overlay e dashboard si parlano solo attraverso i tipi di `shared` e il protocollo Socket.IO, mai importandosi a vicenda. Le regole applicative ricevono dati e collaboratori senza conoscere finestre, query, endpoint o credenziali quando questi dettagli non appartengono alla decisione.
+- [ ] **Dipendenze unidirezionali:** descrivere livelli e import dei componenti toccati. Le app dipendono da `packages/shared`; dashboard e overlay usano anche `packages/browser-runtime`, che dipende da `shared`. `shared` non importa le app né browser-runtime; il server non importa codice del browser. Le app comunicano tramite contratti HTTP/Socket.IO, senza importarsi a vicenda. Le regole di dominio ricevono dati e collaboratori pertinenti, senza dipendenze implicite da DOM, query o credenziali.
 - [ ] **Assenza di cicli:** evitare dipendenze circolari tra componenti. Non risolverle trasferendo tutto in un modulo comune; individuare la responsabilità condivisa o il contratto necessario. La semplice separazione in crate non corregge un ciclo concettuale.
 - [ ] **Effetti ai bordi:** lettura di file, rete, database, ambiente, orologio e casualità appartengono agli adattatori o vengono forniti esplicitamente quando influenzano una decisione. Le funzioni del dominio restituiscono risultati o effetti descritti da dati; il chiamante ne esegue le operazioni esterne.
 - [ ] **Sostituzione minima:** preferire parametri, callback o trait già disponibili; introdurre un'interfaccia nuova quando consente una sostituzione o un contratto verificabile. Evitare un trait per ogni struttura o interfacce che riproducono tutti i metodi di un'implementazione.
@@ -132,9 +150,9 @@ KISS e YAGNI (sezioni 0 e 1). I requisiti P0 su correttezza, risorse e concorren
 
 #### API minima, tipi e contratti
 
-- [ ] **Visibilità minima:** dettagli privati per impostazione predefinita; in Rust usare `pub(super)`, `pub(crate)` e `pub` secondo gli effettivi chiamanti. Esportare intenzionalmente i punti d'ingresso stabili; preservare i percorsi già usati quando si spostano le implementazioni.
+- [ ] **Visibilità minima:** esportare solo i contratti consumati da altri moduli; mantenere privati i dettagli, limitare gli export dei pacchetti e preservare i percorsi pubblici quando si spostano le implementazioni.
 - [ ] **Input pertinenti:** le API richiedono dati e capacità utili al compito. Evitare di passare l'intero backend o un contenitore di servizi per accedere a pochi campi. Un aggregato di configurazione coerente è ammesso; documentare le conversioni e i dati inutilmente copiati se incidono sul percorso caldo.
-- [ ] **Tipi semantici:** identificatori, piattaforme, durate, stati ed errori distinguibili hanno tipi appropriati. Formati Qt, record SQLite e payload di protocollo si convertono al confine quando il dominio non deve dipenderne.
+- [ ] **Tipi semantici:** identificatori, piattaforme, durate, stati ed errori distinguibili hanno tipi appropriati. Eventi DOM, record SQLite e payload HTTP/Socket.IO si convertono e validano al confine quando il dominio non deve dipenderne.
 - [ ] **Invarianti protette:** campi privati e costruttori validati quando la mutazione può rendere un oggetto incoerente. Campi pubblici sono ammessi per dati passivi con un contratto chiaro; non obbligare ogni struttura a una gerarchia di getter e setter.
 - [ ] **Contratto operativo:** dichiarare precondizioni, postcondizioni, limiti, errori, ordine degli effetti, chiamate ripetute ammesse e stato dopo un fallimento. Se conta, indicare thread o executor, inizializzazione, rientranza, cancellazione, idempotenza e chiusura; richiamare le sezioni 3, 5, 6 e 7.
 - [ ] **Esempio significativo:** per una nuova API riutilizzabile fornire un uso minimo compilabile che mostri il beneficio e la gestione degli errori. Per una funzione interna semplice bastano documentazione essenziale e prove pertinenti; gli esempi non devono introdurre accessi a dati reali o segreti impliciti.
@@ -142,7 +160,7 @@ KISS e YAGNI (sezioni 0 e 1). I requisiti P0 su correttezza, risorse e concorren
 #### Composizione, ownership e configurazione
 
 - [ ] **Composizione esplicita:** costruire i collaboratori nel punto di avvio dell'applicazione o nell'adattatore competente e passarli ai componenti che li usano. Un costruttore apparentemente puro non apre connessioni, legge preferenze globali o avvia thread senza dichiararlo.
-- [ ] **Ownership nell'API:** rendere chiaro chi possiede dati, buffer, socket, task e callback. In Rust prendere in prestito ciò che si consulta e trasferire ciò che si conserva; una copia intenzionale si rende visibile e motivata. Generics e trait object si scelgono in base alla sostituzione necessaria e ai costi, senza imporre un modello unico.
+- [ ] **Ownership nell'API:** rendere chiaro chi possiede dati, buffer, socket, task e callback. Dichiarare mutabilità, copie, trasferimenti e responsabilità di chiusura; l'uso di TypeScript o del garbage collector non elimina queste responsabilità.
 - [ ] **Un proprietario per stato e risorse:** evitare copie mutabili dello stesso stato in moduli diversi e servizi che si chiudono a vicenda senza un ordine dichiarato. Spostare codice non deve cambiare chi annulla un task, libera una richiesta o termina un worker.
 - [ ] **Configurazione separata dalla sessione:** distinguere preferenze persistenti, stato operativo e fotografie consegnate al lavoro già accettato. Emote, regole compilate, account e autorizzazioni correnti sono input espliciti; una preferenza attiva non prova che il servizio sia autenticato o disponibile.
 - [ ] **Fotografie coerenti:** definire chi ricostruisce la configurazione e tutte le dipendenze che la invalidano, incluse risposte asincrone e cambi di stato temporanei. Una revisione nuova non modifica i dati delle operazioni già avviate; i risultati superati vengono riconosciuti al ritorno.
@@ -157,9 +175,9 @@ KISS e YAGNI (sezioni 0 e 1). I requisiti P0 su correttezza, risorse e concorren
 
 #### Estrarre e verificare in modo incrementale
 
-- [ ] **Contratti iniziali riletti:** individuare tutti i chiamanti e gli usi indiretti: callback, macro, codice generato, FFI, QML, esempi e test. Registrare cosa deve restare osservabile e le verifiche applicabili prima di muovere il codice.
+- [ ] **Contratti iniziali riletti:** individuare chiamanti e usi indiretti: callback, hook React, worker, codice generato, binding, esempi e test. Registrare cosa deve restare osservabile e le verifiche applicabili prima di muovere il codice.
 - [ ] **Spostamenti separati:** separare in commit revisionabili spostamenti, estrazioni di conoscenza comune e cambi intenzionali di comportamento. Mantenere la compatibilità durante la transizione e rimuovere le vecchie copie dopo aver aggiornato i chiamanti.
-- [ ] **Prove al confine corretto:** il dominio si prova senza GUI, rete o database reali, con dati e collaboratori controllati. Gli adattatori Qt, SQL e di trasporto hanno anche prove d'integrazione con il relativo framework o servizio locale controllato: è il loro scopo, non una violazione di isolamento.
+- [ ] **Prove al confine corretto:** provare le regole di dominio con dati e collaboratori controllati. Gli adattatori React/DOM, SQLite, HTTP, Socket.IO e worker richiedono anche integrazione con il framework o servizio locale pertinente.
 - [ ] **Stessa semantica nei consumatori:** per una regola comune esercitare gli ingressi realmente differenti dei chiamanti su casi normali, limiti ed errori. Verificare risultati ed effetti; evitare test che si limitano a ripetere l'implementazione o a controllare che una funzione sia stata chiamata.
 - [ ] **Verifica nativa:** compilare i target coinvolti e ripetere le prove pertinenti prima e dopo sulla toolchain supportata. Confronto testuale, conteggio delle righe, script estratti dalla GUI ed esempi non eseguiti sono evidenze parziali; si dichiarano secondo la sezione 14.
 - [ ] **Risorse e concorrenza preservate:** applicare anche la matrice della sezione 11 se l'estrazione tocca cache, cancellazione, code, persistenza o thread. Il refactoring del solo layout non autorizza a saltare le prove del confine FFI o dei callback.
@@ -167,7 +185,7 @@ KISS e YAGNI (sezioni 0 e 1). I requisiti P0 su correttezza, risorse e concorren
 Per una modularizzazione o estrazione significativa, la revisione deve contenere le evidenze pertinenti:
 
 | Criterio | Evidenza richiesta |
-|---|---|
+| ----- | ----- |
 | Responsabilità | Cosa decide il componente, cosa delega e chi possiede il suo stato |
 | Dipendenze | Direzione dei collegamenti, import o manifest e assenza di nuovi cicli |
 | Contratto | Input, output, errori, limiti ed effetti; invarianti di concorrenza quando presenti |
@@ -183,17 +201,12 @@ un'autorizzazione aggiuntiva per una scelta già compresa nel lavoro richiesto.
 #### Linee guida ufficiali e versioni
 
 - [ ] **Fonti correnti e compatibili:** controllare le linee guida ufficiali del linguaggio e del framework nella versione adottata dal progetto, registrando fonte, data e applicabilità delle scelte nuove. Usare standard stabili compatibili con la toolchain; un refactoring non comporta automaticamente un aggiornamento delle dipendenze.
-- [ ] **Conformità verificata:** per Rust applicare Rust API Guidelines, rustdoc, Clippy e rustfmt; per C++ le C++ Core Guidelines e lo standard supportato; per Qt le regole di lifetime, thread e collegamento FFI della versione adottata. Funzionalità instabili e nuove dipendenze richiedono una necessità esplicita.
+- [ ] **Conformità verificata:** applicare le API pubbliche delle versioni adottate di TypeScript, Node.js, React, Vite, Fastify, Socket.IO e Python. Verificare cleanup, compatibilità dei worker e binding nativi. Funzionalità instabili e nuove dipendenze richiedono una necessità esplicita.
 
-Riferimenti per questa sezione, consultati il 14 ottobre 2026:
-[Rust API Guidelines — flessibilità](https://rust-lang.github.io/api-guidelines/flexibility.html),
-[API ed evoluzione](https://rust-lang.github.io/api-guidelines/future-proofing.html),
-[documentazione](https://rust-lang.github.io/api-guidelines/documentation.html),
-[Rust Reference — visibilità](https://doc.rust-lang.org/reference/visibility-and-privacy.html),
-[Qt — thread e QObject](https://doc.qt.io/qt-6/threads-qobject.html) e
-[CXX-Qt — ponte RustQt](https://kdab.github.io/cxx-qt/book/bridge/extern_rustqt.html).
-
----
+Riferimenti dello stack: [TypeScript](https://www.typescriptlang.org/docs/),
+[Node.js](https://nodejs.org/docs/latest-v26.x/api/), [React](https://react.dev/reference/react),
+[Fastify](https://fastify.dev/docs/latest/), [Vite](https://vite.dev/guide/) e
+[Python](https://docs.python.org/3/). Per ogni scelta nuova verificare la documentazione della versione adottata.
 
 ## 3. Memoria, ownership e gestione delle risorse
 
@@ -225,8 +238,6 @@ Riferimenti per questa sezione, consultati il 14 ottobre 2026:
 - [ ] **Allineamento selettivo:** utilizzare padding o allineamento alla cache line quando il vantaggio supera il maggiore consumo di memoria.
 - [ ] **SIMD:** utilizzare vettorizzazione automatica o esplicita soltanto quando supportata dal target e verificata con benchmark.
 
----
-
 ## 4. Algoritmi, strutture dati e prestazioni
 
 ### Complessità e scelta algoritmica
@@ -254,8 +265,6 @@ Riferimenti per questa sezione, consultati il 14 ottobre 2026:
 - [ ] **Nessuna regressione significativa:** non accettare miglioramenti locali che peggiorano in modo sproporzionato il sistema complessivo.
 - [ ] **Ottimizzazioni documentate:** conservare la motivazione delle soluzioni meno intuitive adottate per ragioni prestazionali.
 
----
-
 ## 5. Multithreading, asincronia e gestione dei task
 
 ### Modello di concorrenza
@@ -269,24 +278,37 @@ Riferimenti per questa sezione, consultati il 14 ottobre 2026:
 - [ ] **Nessun fire-and-forget incontrollato:** ogni task deve avere responsabilità definite per errori, cancellazione e terminazione.
 - [ ] **Propagazione degli errori:** i fallimenti dei worker devono essere osservabili e gestiti; non devono scomparire silenziosamente.
 
-### Thread pool e scheduling
+### Thread nativi e concorrenza strutturata in ZeroCade — P0/P1
 
-- [ ] **Pool distinti quando utile:** separare lavoro CPU-bound, operazioni bloccanti e task asincroni per evitare interferenze.
-- [ ] **Pool CPU-bound misurato:** dimensionare il parallelismo usando CPU effettivamente disponibili, architettura hardware, altri carichi e benchmark.
-- [ ] **I/O asincrono:** preferire I/O non bloccante per molte connessioni concorrenti quando la piattaforma lo supporta efficacemente.
-- [ ] **Blocking isolato:** delegare operazioni sincrone lunghe a pool dedicati e limitati.
-- [ ] **Priorità e fairness:** impedire che task ad alta frequenza affamino attività meno frequenti ma importanti.
-- [ ] **Work stealing selettivo:** utilizzare scheduler consolidati e valutarne l'adeguatezza per carichi irregolari.
-- [ ] **Thread-local storage:** impiegare contesti e buffer locali dove riducono contesa senza causare crescita incontrollata della memoria.
+- [ ] **Proprietario esplicito — P0:** ogni `worker_threads.Worker`, Web Worker, processo Python e task asincrono ha un supervisore che ne osserva errori, completamento e chiusura. Un `Promise` o `async` non crea un thread e non rende parallelo un calcolo sincrono.
+- [ ] **Isolamento del lavoro — P0:** il server e il browser mantengono reattivi gli event loop. Calcoli lunghi e operazioni sincrone estese vanno in worker dedicati o processi separati. Ogni worker Node possiede un proprio isolate JavaScript; passare messaggi non equivale a condividere oggetti o connessioni SQLite.
+- [ ] **Cancellazione cooperativa — P0:** usare `AbortSignal`, messaggi di arresto e identificativi di generazione. Un `AbortSignal` non interrompe automaticamente codice CPU o una query sincrona nel worker; un messaggio non viene elaborato finché il suo event loop è bloccato. I calcoli devono avere punti di controllo o un protocollo di cancellazione adeguato.
+- [ ] **Shutdown con scadenza — P0:** fermare nuovi invii, drenare il lavoro accettato secondo il contratto, chiudere DB e porte e attendere l'evento `exit`. `unref()` non è una chiusura. `worker.terminate()` o l'arresto di un figlio sono escalation dopo la scadenza: registrare effetti di esito sconosciuto e non promettere cleanup ordinato.
+- [ ] **Python:** per calcolo parallelo valutare processi o librerie native che rilasciano il GIL; non presumere che thread Python accelerino codice Python CPU-bound. Registrare interprete, modalità GIL e numero di thread interni di BLAS/PyTorch quando incidono sui risultati.
+- [ ] **Eventuale codice nativo:** C++ può usare `std::jthread`/`std::stop_token`, Rust scoped threads e canali bounded. Il join resta dipendente dalla terminazione del lavoro: nessuna scadenza è garantita dal solo costrutto RAII. Queste API non sono requisiti di implementazione per TypeScript.
+
+### Hardware, cache e partizionamento — P1/P2
+
+- [ ] **Parallelismo misurato — P1:** partire dal carico e da `os.availableParallelism()` come indicazione, riservando risorse a OBS, browser e diretta; contare anche processi e thread interni delle librerie numeriche. Non creare un worker per evento o dimensionare tutti i pool al massimo della CPU.
+- [ ] **Dati locali — P1:** preferire accumulatori e buffer di proprietà del worker e aggregazione finale. Valutare costo delle copie, structured clone e trasferimenti di `ArrayBuffer`; dopo il trasferimento il mittente non deve riutilizzare il buffer distaccato.
+- [ ] **False sharing — P2:** se si introduce memoria condivisa aggiornata frequentemente, misurare contesa e disposizione dei dati. Allineamento e padding dipendono dal target e non sono una correzione da aggiungere a oggetti JavaScript ordinari.
+- [ ] **NUMA e affinità — P2:** valutare pinning e memoria locale soltanto su carichi misurati e piattaforme supportate. Non sono prerequisiti per avvio o correttezza di ZeroCade.
+
+### Coordinamento a fasi e scheduling — P1
+
+- [ ] **Fasi delimitate:** usare identificativi di richiesta/generazione, conferme e deadline per inizializzazione, batch e round. Una barriera non deve aspettare per sempre un worker terminato; errori e cancellazione completano anche i chiamanti in attesa.
+- [ ] **Pool per responsabilità:** separare calcolo intenso, persistenza/report sincroni e I/O asincrono quando possono interferire. Usare i worker già presenti prima di introdurre un nuovo pool; dimensionare code e concorrenza in base alle misure.
+- [ ] **Fairness:** gli eventi frequenti non devono affamare comandi di chiusura, conferme di persistenza o controllo della diretta. FIFO, priorità e coalescing devono preservare l'ordine richiesto dal dominio.
+- [ ] **Work stealing — P2:** adottare uno scheduler mantenuto solo per calcoli irregolari che ne beneficiano. Una coda FIFO o uno scheduler, da soli, non provano assenza di starvation o proprietà lock-free.
 
 ### Backpressure e gestione delle code
 
-- [ ] **Code delimitate:** nessuna coda potenzialmente illimitata senza una giustificazione e un controllo equivalente sulle risorse.
-- [ ] **Politica di saturazione:** definire esplicitamente cosa accade al raggiungimento della capacità massima.
-- [ ] **Strategie differenziate:** scegliere tra attesa, rifiuto, drop-oldest, drop-newest, coalescing o batching secondo la semantica degli eventi.
-- [ ] **Priorità agli eventi critici:** non scartare eventi che rappresentano transazioni, comandi essenziali o modifiche persistenti.
-- [ ] **Latest-wins controllato:** permettere la sostituzione di aggiornamenti obsoleti solo quando perdere gli stati intermedi è semanticamente corretto.
-- [ ] **Metriche delle code:** osservare profondità, tempo di attesa, saturazione e numero di elementi scartati.
+- [ ] **Eventi persistenti — P0:** non scartare silenziosamente regali, voti o comandi già accettati; distinguere rifiuto prima dell'avvio da esito sconosciuto. Latest-wins è ammesso solo dove gli stati intermedi sono sacrificabili.
+
+- [ ] **Code delimitate (Bounded Queues) — P0:** nessuna coda di thread pool può essere illimitata. Impostare una capacità massima prefissata per prevenire esaurimento della memoria sotto carico anomalo.
+- [ ] **Backpressure cooperativa o rifiuto esplicito — P1:** quando la coda di un thread pool è satura, il produttore deve attendere in modo asincrono entro una deadline, oppure l'invio deve rifiutare il lavoro con errore tipizzato esplicito, impedendo accumuli di latenza non gestibili.
+- [ ] **Strategie differenziate di saturazione:** scegliere tra attesa sincronizzata, rifiuto, coalescing o sostituzione dell'ultimo elemento (*latest-wins*) in base alla semantica del dato.
+- [ ] **Metriche delle code:** monitorare profondità istantanea, tempo medio di permanenza e frequenza di eventi scartati.
 
 ### Cancellazione e shutdown
 
@@ -300,39 +322,79 @@ Riferimenti per questa sezione, consultati il 14 ottobre 2026:
 
 ### Confini di cancellazione e side effect — P0
 
-- [ ] **Analisi di ogni `await` interrompibile:** per ogni ramo di `select!`, timeout o task annullabile, indicare quali side effect possono essere già avvenuti e quale stato sopravvive alla distruzione del futuro.
+- [ ] **Analisi di ogni `await` interrompibile:** per ogni ramo di competizione fra Promise, timeout o task annullabile, indicare quali side effect possono essere già avvenuti e quale stato sopravvive alla cancellazione o al completamento del chiamante.
 - [ ] **Invio iniziato distinto da invio confermato:** una richiesta già trasmessa, un Invio premuto o una scrittura iniziata non si riavviano automaticamente dall'inizio. Un esito sconosciuto deve essere esplicito; si ritenta soltanto se l'operazione è idempotente o se si può escludere l'effetto precedente.
 - [ ] **Comandi ordinari senza interruzione dell'invio:** aggiungere un messaggio alla coda non deve cancellare un invio in corso. Riservare la cancellazione ai comandi che la richiedono e gestire il punto in cui l'effetto esterno può essere avvenuto.
-- [ ] **Cleanup indipendente dalla conclusione normale:** rimuovere richieste pendenti, registrazioni e permessi anche se il futuro viene distrutto. Usare guardie RAII/`Drop`, non soltanto codice dopo un `await` o dentro il ramo timeout.
+- [ ] **Cleanup indipendente dalla conclusione normale:** rimuovere richieste pendenti, registrazioni e permessi anche se il chiamante viene annullato. Usare `try/finally` e cleanup del proprietario, non soltanto codice dopo un `await` o dentro il ramo timeout.
 - [ ] **Deadline delle scritture:** limitare anche invio, flush, Pong e Close del socket. Il timeout della risposta non garantisce che il task di trasporto possa terminare.
 - [ ] **Prova deterministica:** sospendere l'operazione prima e dopo il side effect, iniettare un nuovo comando e verificare assenza di duplicati, richieste pendenti e conferme spurie. Usare barriere o segnali controllati, non sperare che una corsa si manifesti con uno `sleep`.
 
----
+### Modelli di concorrenza e limiti da verificare
 
-## 6. Sincronizzazione, lock e primitive atomiche
+| Modello | Uso in ZeroCade | Limite da verificare |
+|---|---|---|
+| Event loop Node / Promise | Coordinamento, HTTP, Socket.IO | Il lavoro sincrono blocca gli altri callback; `await` introduce interleaving |
+| Worker Node e MessagePort | Persistenza, report, generazione e calcolo isolato | Code bounded, copie/trasferimenti, errori, ordine e shutdown |
+| Web Worker | Connessione e lavoro del browser fuori dal rendering | DOM sul main thread, notifiche raggruppate e chiusura del worker |
+| Processi Python | Preparazione dati e modelli con ambiente separato | Pipe drenate, timeout, memoria e processi discendenti |
+| Memoria condivisa / Atomics | Solo se giustificata da misure | Protocollo di pubblicazione, cancellazione e assenza di attese sul main thread |
+| Thread nativi / pool esterni | Binding e librerie numeriche, eventuale codice futuro | Budget globale, ABI e garanzie documentate dall'implementazione |
 
-### Mutex e sezioni critiche
+Nessun modello implica automaticamente assenza di deadlock, wait-freedom o lock-freedom.
+Anche attori senza memoria condivisa possono bloccarsi con attese circolari fra messaggi.
 
-- [ ] **Gestione automatica dei lock:** usare guardie RAII o costrutti equivalenti al posto di coppie manuali `lock()` / `unlock()`.
-- [ ] **Sezioni critiche ridotte:** mantenere minimo il lavoro svolto mentre un mutex è acquisito.
-- [ ] **Nessuna operazione imprevedibile sotto lock:** evitare I/O bloccante, attese lunghe e callback esterne durante una sezione critica.
-- [ ] **Lock ordering documentato:** definire un ordine coerente quando più mutex possono essere acquisiti contemporaneamente.
-- [ ] **Primitive per acquisizioni multiple:** impiegare meccanismi che evitino deadlock quando diversi lock devono essere acquisiti insieme.
-- [ ] **Nessun lock durante `await`:** evitare di mantenere lock sincroni attraverso punti di sospensione asincrona; eventuali eccezioni devono avere una motivazione precisa.
-- [ ] **Gestione del lock poisoning:** trattare esplicitamente gli stati potenzialmente incoerenti dove la piattaforma prevede il poisoning.
-- [ ] **Misura della contesa:** valutare tempo di attesa, frequenza di acquisizione e durata delle sezioni critiche.
+## 6. Sincronizzazione, lock, primitive atomiche e prevenzione degli stalli
 
-### Atomiche e lock-free
+### Stato, lock e sezioni critiche
 
-- [ ] **Primitive consolidate:** preferire implementazioni atomiche e code concorrenti mantenute e testate.
-- [ ] **Nessun lock-free custom ingiustificato:** non sviluppare strutture lock-free da zero senza una necessità dimostrata e competenze specialistiche.
-- [ ] **Memory ordering corretto:** utilizzare `seq_cst` come scelta conservativa iniziale, oppure ordinamenti più deboli con prova di correttezza e documentazione.
-- [ ] **Distinzione tra atomicità e sincronizzazione:** non presumere che un contatore atomico garantisca automaticamente la correttezza delle operazioni sui dati associati.
-- [ ] **Prevenzione ABA e problemi di reclamation:** valutare i problemi di riutilizzo della memoria nelle strutture concorrenti.
-- [ ] **No busy-wait incontrollato:** evitare spin loop che consumano inutilmente CPU, salvo casi specifici con backoff e misure.
-- [ ] **Nessun data race:** tutti gli accessi concorrenti incompatibili devono essere correttamente sincronizzati.
+- [ ] **Proprietà dello stato — P0:** preferire passaggio di messaggi e un proprietario delle mutazioni. Specificare ordine, conferma e invalidazione; snapshot immutabili riducono condivisione e contesa ma possono avere costi di copia.
+- [ ] **Sezioni critiche limitate — P0:** validare input e preparare lavoro fuori dai lock quando possibile; verificare sotto lock le precondizioni che dipendono dallo stato protetto. Emettere callback ed eventi esterni dopo il rilascio. Le transazioni DB comprendono l'I/O necessario al commit, senza rete o calcolo estraneo.
+- [ ] **Ordine dei lock — P0:** se servono più lock, documentare un ordine unico e vietare acquisizioni inverse e callback rientranti. Rilasciare anche su errore con `try/finally`, context manager o RAII.
+- [ ] **Nessuna attesa sincrona sul main thread — P0:** vietati spin loop e `Atomics.wait` nel coordinamento del server o nel rendering. Un lock sincrono o una transazione sincrona non attraversa `await`; un mutex asincrono richiede comunque analisi di rientranza, ordine e timeout.
+- [ ] **Acquisizioni bounded — P1:** definire timeout e budget di retry. Rilasciare quanto acquisito prima di riprovare; usare backoff con jitter fuori dalla sezione critica. Non ripetere automaticamente una mutazione il cui commit è incerto.
+- [ ] **Contesa e starvation — P1/P2:** misurare durata e attesa dei lock e assicurare avanzamento a lettori e scrittori. Sharding, RCU, spin brevi e protocolli di priorità appartengono a codice nativo con necessità dimostrata; non si introducono per simulare mutex nei callback JavaScript.
 
----
+### Processi figli e pipe IPC — P0
+
+- [ ] Consumare `stdout` e `stderr` contemporaneamente, prima di attendere l'uscita: listener streaming in Node, `communicate()`/`subprocess.run()` per output limitato in Python, oppure drain concorrente per output esteso. Non leggere una pipe fino a EOF lasciando l'altra piena.
+- [ ] Imporre limiti all'output conservato, timeout e gestione di `error`, `exit` e `close`. Attendere la chiusura degli stream prima di dichiarare completa la raccolta; controllare errori di `stdin` e backpressure di `write()`/`send()`.
+- [ ] Usare argomenti strutturati, `shell: false` e `windowsHide: true` per helper Windows. `execSync`/`execFileSync` e `subprocess.run` sono ammessi in script CLI di build/manutenzione con output ereditato o controllato, non nei percorsi interattivi del server o del browser.
+- [ ] Un figlio ha sempre un proprietario che raccoglie l'esito e gestisce eventuali discendenti. Node/libuv e `subprocess` gestiscono l'attesa secondo le rispettive API: non aggiungere handler `SIGCHLD` POSIX come requisito per Windows.
+
+### SQLite, transazioni e file lock — P0/P1
+
+- [ ] **Connessioni per proprietario:** ogni worker/thread possiede e chiude la propria connessione; nessun oggetto `Database`/statement passa attraverso MessagePort. Eseguire transazioni sincrone brevi e query parametrizzate.
+- [ ] **WAL sul database operativo:** usare WAL per database locali modificabili con lettori e scrittore concorrenti, verificando il valore restituito. Non imporlo a DB in memoria, snapshot in sola lettura, archivi distribuiti o filesystem di rete; non cambiare journal mode dei contenuti durante le prove.
+- [ ] **Busy timeout entro il budget:** configurare ogni connessione potenzialmente contesa; 5000 ms è il valore di riferimento operativo, da adeguare alla deadline della richiesta e al thread che attende. Aumentarlo non risolve lock circolari né rende asincrona una query sincrona. Trattare `SQLITE_BUSY` e `SQLITE_BUSY_SNAPSHOT` come esiti possibili anche con WAL.
+- [ ] **Scritture e snapshot:** usare `BEGIN IMMEDIATE`/`.immediate()` per transazioni di lettura-modifica-scrittura contese quando è necessario acquisire subito il diritto di scrittura. Le transazioni di sola lettura restano snapshot/deferred; una singola scrittura atomica non richiede un wrapper aggiuntivo. WAL mantiene un solo writer alla volta.
+- [ ] **Errori e commit:** rollback e rilascio in ogni percorso; notificare persistenza soltanto dopo conferma. Un timeout del chiamante non prova che il worker abbia annullato la query o il commit: mantenere l'esito sconosciuto senza replay automatico.
+- [ ] **Checkpoint e backup:** lettori lunghi possono trattenere WAL; checkpoint e VACUUM vanno pianificati fuori dalla diretta secondo i vincoli del database. Usare backup consistenti, includendo il WAL confermato; vietato sostituire file di un DB aperto.
+- [ ] **Lock su file:** preferire primitive mantenute e compatibili con Windows. Per file sentinella, PID da solo non basta: considerare riuso del PID, identità del proprietario e corse di creazione/rimozione. Lease e fencing servono soltanto se viene introdotto un coordinamento distribuito; il backend deve verificarli.
+
+### Watchdog e diagnostica — P0/P1
+
+- [ ] **Clock monotono:** misurare timeout, heartbeat e avanzamento con `performance.now()`/`process.hrtime` o `time.monotonic()`. Data/ora civile serve per eventi e log, non per garantire durata.
+- [ ] **Supervisore indipendente:** un timer sul medesimo event loop bloccato non rileva lo stallo in tempo. Se è richiesta rilevazione durante blocchi del main, prevedere supervisione separata con soglie e responsabilità esplicite.
+- [ ] **Escalation controllata:** al mancato avanzamento rifiutare nuovo lavoro, registrare identità/richieste ed esiti incerti, raccogliere diagnostica senza segreti, tentare shutdown entro deadline e solo poi terminare/riavviare secondo una politica dichiarata. Non inviare segnali POSIX né produrre dump completi di default su Windows.
+- [ ] **Disponibilità distinta da progresso:** `/api/live` segnala che il processo risponde e `/api/health` espone stato e saturazione dei worker; non garantiscono da soli un watchdog esterno o il completamento di una specifica scrittura.
+
+### Atomiche e memoria condivisa
+
+- [ ] **Prima scelta: messaggi — P1:** `SharedArrayBuffer`, ring buffer o strutture lock-free richiedono necessità misurata, protocollo scritto e test degli interleaving; non usare memoria condivisa per passare connessioni o oggetti JavaScript.
+- [ ] **JavaScript — P0:** usare le operazioni `Atomics` supportate e documentare quali dati proteggono. L'API JavaScript non espone una scelta C++ `memory_order_relaxed/acquire/release`; non trasferire tali opzioni nelle prescrizioni TypeScript.
+- [ ] **Codice nativo eventuale — P0:** usare primitive consolidate e memory ordering documentato. Acquire/release sincronizzano solo secondo le condizioni del modello di memoria; un contatore atomico non rende sicuri tutti i dati adiacenti. Verificare ABA, reclamation e proprietà di progresso prima di ridurre gli ordinamenti conservativi.
+- [ ] **Attese e cancellazione:** ogni attesa ha un protocollo di risveglio su errore, arresto e deadline. Non promettere che `Promise.race` cancelli l'operazione perdente o che un flag venga osservato da un worker che non lo controlla.
+
+### Matrice di prevenzione degli stalli
+
+| Confine | Scenario da provare | Evidenza richiesta |
+|---|---|---|
+| IPC | Figlio produce entrambi gli stream oltre la capacità della pipe | Drain concorrente, memoria bounded e uscita entro deadline |
+| SQLite | Due writer, lettore lungo, commit mentre il chiamante scade | Busy gestito, rollback/rilascio e nessuna conferma o duplicazione indebita |
+| Worker | Coda piena, worker terminato, messaggio tardivo | Rifiuto esplicito, pending completati e generazione vecchia ignorata |
+| Event loop | Calcolo o query che blocca il thread | Latenza misurata e isolamento quando richiesto; timer locale non spacciato per watchdog |
+| File lock | Crash e riavvio con sentinella residua | Proprietario verificato e nessuna rimozione del lock di un altro processo |
+| Shutdown | Lavoro accettato e operazione non interrompibile | Drain o esito sconosciuto, risorse chiuse e escalation documentata |
 
 ## 7. Resilienza, timeout e gestione dei guasti
 
@@ -364,8 +426,6 @@ Riferimenti per questa sezione, consultati il 14 ottobre 2026:
 - [ ] **Graceful degradation:** mantenere operative le funzioni essenziali quando un componente secondario non è disponibile.
 - [ ] **Health e readiness:** distinguere processo avviato, processo funzionante e capacità effettiva di servire lavoro.
 
----
-
 ## 8. Integrità dei dati, persistenza e database
 
 ### Transazioni e consistenza
@@ -387,8 +447,6 @@ Riferimenti per questa sezione, consultati il 14 ottobre 2026:
 - [ ] **Scritture atomiche su file:** evitare file parziali tramite file temporanei e sostituzione atomica quando il filesystem lo consente.
 - [ ] **Durabilità esplicita:** utilizzare flush, sincronizzazione e politiche di persistenza coerenti con i requisiti.
 - [ ] **Corruzione rilevabile:** valutare checksum, validazione del formato e procedure di recupero per dati critici.
-
----
 
 ## 9. Osservabilità, diagnostica e monitoraggio
 
@@ -421,8 +479,6 @@ Riferimenti per questa sezione, consultati il 14 ottobre 2026:
 - [ ] **Eventi di lifecycle:** rendere osservabili avvio, connessione, riconnessione, disconnessione e shutdown.
 - [ ] **Diagnostica configurabile:** permettere livelli più dettagliati senza richiedere modifiche al codice.
 - [ ] **SLO definiti:** stabilire obiettivi misurabili per disponibilità, latenza e affidabilità dei componenti critici.
-
----
 
 ## 10. Sicurezza, privacy e supply chain
 
@@ -474,8 +530,6 @@ vendorizzati, compilatori, framework, runtime e strumenti di build o generazione
 - [ ] **Verifica sulla versione nuova:** eseguire build, analisi statica e prove di integrazione/regressione pertinenti; verificare i bug corretti e i confini coinvolti. Per ottimizzazioni applicate al codice, confrontare le prestazioni quando misurabili. Dichiarare controlli non eseguiti e limiti residui secondo la sezione 14.
 - [ ] **Tracciabilità:** registrare versioni prima/dopo, fonti ufficiali consultate, modifiche applicate e risultati delle verifiche. Se una novità non richiede adeguamenti, motivarne la non applicabilità al progetto; se non è adottabile, documentare il vincolo e il lavoro residuo. Se mancano note ufficiali sufficienti, dichiararlo e integrare l'analisi con il confronto dei sorgenti o dei commit ufficiali.
 
----
-
 ## 11. Test, correttezza formale e verifica concorrente
 
 ### Strategia di test
@@ -491,9 +545,10 @@ vendorizzati, compilatori, framework, runtime e strumenti di build o generazione
 
 ### Concorrenza e failure testing
 
-- [ ] **Race detection:** eseguire test con TSan o strumenti equivalenti sui target supportati.
-- [ ] **Stress test concorrenti:** ripetere operazioni sotto differenti livelli di parallelismo.
-- [ ] **Test di cancellazione:** verificare arresti durante attese, I/O e operazioni parzialmente completate.
+- [ ] **Race detection — P0 sui target applicabili:** per codice nativo di proprietà del progetto usare TSan o equivalenti dove toolchain e piattaforma lo supportano. Per TypeScript/Python provare ordine degli eventi, cancellazione, saturazione e shutdown con worker/processi reali; questi test non dimostrano assenza di data race nei binding di terzi.
+- [ ] **Verifica di interleaving deterministico:** per algoritmi atomici o lock-free complessi, integrare strumenti di test esaustivo degli interleaving (es. Loom in Rust) che permutano l'ordine delle operazioni thread per intercettare violazioni rare del modello di memoria.
+- [ ] **Stress test concorrenti:** ripetere operazioni sotto differenti livelli di parallelismo e su architetture a debole consistenza di memoria (es. ARM64).
+- [ ] **Test di cancellazione:** verificare arresti durante attese, I/O e operazioni parzialmente completate con stop token.
 - [ ] **Test di shutdown:** garantire l'assenza di thread orfani, task dispersi e risorse non rilasciate.
 - [ ] **Deadlock testing:** esercitare scenari con acquisizione di più lock.
 - [ ] **Fault injection:** simulare timeout, disconnessioni, errori del filesystem e indisponibilità delle dipendenze.
@@ -505,7 +560,7 @@ vendorizzati, compilatori, framework, runtime e strumenti di build o generazione
 - [ ] **Benchmark CPU e memoria:** verificare il costo delle operazioni principali.
 - [ ] **Load testing:** misurare il comportamento al carico nominale e ai picchi.
 - [ ] **Soak testing:** valutare stabilità, leak e consumo risorse in esecuzioni prolungate.
-- [ ] **Test di scalabilità:** verificare come cambiano throughput e latenza aumentando il parallelismo.
+- [ ] **Test di scalabilità:** verificare come cambiano throughput e latenza aumentando il parallelismo e verificare l'assenza di collo di bottiglia da false sharing.
 - [ ] **Performance regression testing:** confrontare le nuove implementazioni con una baseline attendibile.
 
 La coverage è un indicatore di supporto: un'elevata percentuale non sostituisce test significativi e verifica delle invarianti.
@@ -517,7 +572,7 @@ che fallisce sul comportamento precedente e passa su quello corretto; se non è 
 dichiararla **non eseguita** e tenerla come requisito di verifica prima del rilascio.
 
 | Confine | Scenario da provare | Invariante |
-|---|---|---|
+| ----- | ----- | ----- |
 | Invio asincrono | nuovo messaggio mentre si aspetta la conferma dopo Invio | il messaggio precedente non viene inviato due volte |
 | Esito esterno | casella scomparsa, risposta incompleta o collegamento perso dopo l'invio | nessuna falsa conferma e nessun ritentativo automatico dell'esito sconosciuto |
 | Richiesta pendente | distruzione del futuro con risposta che non arriverà | la richiesta esce dalla mappa senza aspettare il timeout originale |
@@ -528,8 +583,6 @@ dichiararla **non eseguita** e tenerla come requisito di verifica prima del rila
 | Identità UI | menu aperto mentre la lista elimina o riordina righe | l'azione usa la riga scelta, non il nuovo contenuto del suo indice |
 | Cache di configurazione | modifica di proprietà, account, canale o emote con lavoro già in coda | il lavoro mantiene la propria fotografia; quello successivo usa la versione nuova |
 | Ricerca UI | digitazione rapida e risposta vecchia che arriva dopo quella nuova | un solo aggiornamento per il testo finale, nessuna risposta obsoleta |
-
----
 
 ## 12. CI/CD, build e qualità del rilascio
 
@@ -552,7 +605,9 @@ pacchetti del workspace la seguono, senza duplicare le fonti della versione.
 - [ ] **Dati e account di prova isolati (Zerocade):** quando si verifica o avvia il server per test, usare un
   database e una porta propri (`ZEROCADE_DB`, `PORT`) e mai `apps/server/data/zerocade.db`
   della diretta vera, né account, chiavi o dirette reali. Script e istruzioni di prova devono impostare queste
-  variabili; il pacchetto `release/` e l'installazione ordinaria non si usano per le prove.
+  variabili; l'installazione ordinaria e la sua cartella dati non si usano per le prove.
+  Per verificare una distribuzione preparata, copiarne app e runtime in una cartella di prova,
+  usare un eseguibile con identità distinta, dati e porta isolati, browser e modifica hosts disabilitati.
 - [ ] **Build verificata:** compilare tutti i target e le configurazioni supportate.
 - [ ] **Formatting automatico:** applicare le convenzioni di stile del progetto.
 - [ ] **Static analysis:** utilizzare compilatore, linter e analizzatori appropriati.
@@ -573,32 +628,36 @@ pacchetti del workspace la seguono, senza duplicare le fonti della versione.
 - [ ] **Verifica post-release:** controllare metriche, errori e funzionalità essenziali dopo il rilascio.
 - [ ] **Artefatti firmati:** utilizzare firme e verifica della provenienza quando richiesto dal modello di minaccia.
 
----
+## 13. Direttive specifiche per TypeScript, Node.js, React e Python
 
-## 13. Direttive specifiche per Rust, C++ e applicazioni desktop
+### TypeScript e Node.js
 
-### Rust
+- [ ] Usare TypeScript rigoroso, narrowing e contratti espliciti; evitare `any`, cast e soppressioni per nascondere incompatibilità.
+- [ ] Osservare tutte le Promise e associare richieste, worker e risorse al loro proprietario; cleanup in `finally` e gestori di chiusura.
+- [ ] Valutare ogni `await` come punto di interleaving; ricontrollare generazione e stato prima di applicare risultati tardivi.
+- [ ] Usare filesystem/rete asincroni nel server interattivo; confinare binding SQLite e calcoli lunghi secondo le sezioni 5 e 6.
+- [ ] Verificare con `npm run typecheck`, test Node e smoke sia del sorgente sia dei bundle.
 
-- [ ] Utilizzare ownership e borrowing per limitare la condivisione incontrollata.
-- [ ] Preferire API safe e isolare accuratamente i blocchi `unsafe`.
-- [ ] Documentare le invarianti di sicurezza di ogni operazione `unsafe`.
-- [ ] Utilizzare `Send` e `Sync` rispettandone i contratti effettivi.
-- [ ] Non mantenere `MutexGuard` sincroni durante operazioni `await`.
-- [ ] Gestire gli errori con `Result` e propagazione appropriata.
-- [ ] Evitare `unwrap()` ed `expect()` sui percorsi di fallimento ordinario.
-- [ ] Non convertire automaticamente tutti i lavori in task asincroni: distinguere CPU-bound e I/O-bound.
-- [ ] Gestire esplicitamente lifecycle di runtime, worker e task.
-- [ ] Verificare le API FFI e le conversioni dei dati verso librerie C/C++.
+### React e browser
 
-### C++
+- [ ] Effetti con cleanup simmetrico di listener, timer, socket e worker, anche nei cicli di montaggio/rimontaggio.
+- [ ] Mantenere DOM e canvas sul thread competente, raggruppando aggiornamenti ad alta frequenza senza perdere eventi persistenti.
+- [ ] Invalidare richieste e risultati quando cambiano stanza, round, parola o componente; una risposta vecchia non modifica la nuova partita.
+- [ ] Usare chiavi stabili e API React/Router pubbliche; controllare build e percorsi con base `/overlay/`.
 
-- [ ] Utilizzare smart pointer appropriati per esprimere ownership.
-- [ ] Preferire RAII a gestione manuale delle risorse.
-- [ ] Evitare raw owning pointer e lifetime ambigui.
-- [ ] Utilizzare `std::jthread` e stop token quando compatibili con il progetto.
-- [ ] Impedire undefined behavior, invalidazione di iteratori e dangling reference.
-- [ ] Validare thread safety ed exception safety delle API utilizzate.
-- [ ] Eseguire controlli statici e dinamici compatibili con la toolchain.
+### Python degli strumenti
+
+- [ ] Usare l'ambiente del gioco/profilo, registrando interprete, requisiti e dipendenze native; non aggiornare l'ambiente globale per risolvere un singolo strumento.
+- [ ] Chiudere file, connessioni e processi con context manager/`finally`; usare `unittest` e fixture isolate dai corpus operativi.
+- [ ] Distinguere test senza modelli, import delle librerie, caricamento di pesi e inferenza reale. Dichiarare download, modelli e hardware non verificati.
+- [ ] Controllare memoria, parallelismo delle librerie numeriche e compatibilità delle wheel Windows prima di aggiornare pacchetti NLP/GPU.
+
+### Binding e codice nativo eventuale
+
+- [ ] Verificare ABI Node, architettura e motore SQLite effettivamente caricati; il numero del pacchetto non identifica il motore.
+- [ ] C++/Rust applicano ownership, RAII, cancellazione cooperativa e sincronizzazione delle sezioni 3, 5 e 6 sui target realmente presenti.
+- [ ] Sanitizer e analisi nativa richiedono sorgenti/toolchain compatibili; test TypeScript/Python e TSan non sono intercambiabili.
+- [ ] Non modificare direttamente librerie in `node_modules` o ambienti virtuali come correzione permanente senza una procedura riproducibile e tracciata.
 
 ### Applicazioni desktop e GUI
 
@@ -613,8 +672,6 @@ pacchetti del workspace la seguono, senza duplicare le fonti della versione.
 - [ ] **Shutdown integrato:** coordinare chiusura della finestra, worker, connessioni e persistenza.
 - [ ] **Risorse native:** gestire correttamente handle Windows, socket, oggetti COM e risorse grafiche quando presenti.
 - [ ] **Responsiveness verificata:** controllare tempi di risposta dell'interfaccia durante carichi intensi.
-
----
 
 ## 14. Protocollo obbligatorio per agenti AI e modifiche al codice
 
@@ -632,28 +689,28 @@ Quando il codice viene sviluppato, corretto o ottimizzato da un agente AI, appli
 
 ### Fase B — Implementazione
 
-1. Applicare modifiche incrementali e coerenti.
-2. Riutilizzare le infrastrutture esistenti quando adeguate.
-3. Evitare nuove dipendenze senza benefici dimostrabili.
-4. Preservare API e comportamenti non coinvolti.
-5. Non introdurre concorrenza aggiuntiva senza una necessità concreta.
-6. Non usare workaround che nascondono errori di compilazione o runtime.
-7. Non disabilitare test o controlli per far apparire riuscito l'intervento.
-8. Scrivere e modificare il codice secondo la sezione 2, "Modularità e riuso": responsabilità, dipendenze, API e ownership esplicite; concentrare le regole comuni e limitare gli effetti agli adattatori competenti.
-9. Separare spostamenti, estrazioni comuni e cambi di comportamento in commit revisionabili, preservando i punti d'ingresso durante la transizione.
+ 1. Applicare modifiche incrementali e coerenti.
+ 2. Riutilizzare le infrastrutture esistenti quando adeguate.
+ 3. Evitare nuove dipendenze senza benefici dimostrabili.
+ 4. Preservare API e comportamenti non coinvolti.
+ 5. Non introdurre concorrenza aggiuntiva senza una necessità concreta.
+ 6. Non usare workaround che nascondono errori di compilazione o runtime.
+ 7. Non disabilitare test o controlli per far apparire riuscito l'intervento.
+ 8. Scrivere e modificare il codice secondo la sezione 2, "Modularità e riuso": responsabilità, dipendenze, API e ownership esplicite; concentrare le regole comuni e limitare gli effetti agli adattatori competenti.
+ 9. Separare spostamenti, estrazioni comuni e cambi di comportamento in commit revisionabili, preservando i punti d'ingresso durante la transizione.
 10. Documentare i chiamanti e il beneficio concreto del riuso o dell'isolamento, senza introdurre consumatori o framework soltanto per giustificare un'astrazione.
 
 ### Fase C — Verifica
 
-1. Eseguire formatting e analisi statica.
-2. Compilare il codice modificato.
-3. Eseguire i test pertinenti.
-4. Eseguire test di regressione.
-5. Verificare la concorrenza quando coinvolta.
-6. Misurare le prestazioni prima e dopo, se l'intervento è prestazionale.
-7. Ispezionare il diff finale per individuare modifiche accidentali.
-8. Controllare la matrice dei casi di regressione: cancellazione, saturazione, esito sconosciuto e invalidazione delle cache non possono essere sostituiti dalla sola prova del percorso normale.
-9. Distinguere verifica del prodotto, prova isolata, simulazione e analisi statica. Una simulazione dell'interleaving o uno script estratto da QML non equivale a compilazione o esecuzione Rust/Qt.
+ 1. Eseguire formatting e analisi statica.
+ 2. Compilare il codice modificato.
+ 3. Eseguire i test pertinenti.
+ 4. Eseguire test di regressione.
+ 5. Verificare la concorrenza quando coinvolta.
+ 6. Misurare le prestazioni prima e dopo, se l'intervento è prestazionale.
+ 7. Ispezionare il diff finale per individuare modifiche accidentali.
+ 8. Controllare la matrice dei casi di regressione: cancellazione, saturazione, esito sconosciuto e invalidazione delle cache non possono essere sostituiti dalla sola prova del percorso normale.
+ 9. Distinguere verifica del prodotto, prova isolata, simulazione e analisi statica. Una simulazione dell'interleaving o un mock del DOM non equivale a esecuzione del server, dei worker o del browser reale.
 10. Verificare responsabilità, direzione delle dipendenze e API dei moduli toccati: nessun nuovo ciclo, copia di una regola comune o accesso implicito a stato esterno nel dominio.
 11. Provare il dominio senza GUI o servizi reali e gli adattatori con le integrazioni pertinenti, secondo la sezione 2; un framework necessario a un adattatore non costituisce da solo una violazione.
 12. Confrontare contratti e comportamento nei chiamanti prima e dopo l'estrazione, includendo errori, ownership, configurazione e costi del percorso interessato.
@@ -677,8 +734,6 @@ una PR in bozza, indicando esattamente i controlli eseguiti e quelli mancanti. N
 completato, verificato o pronto al rilascio; non saltare controlli, abbassare limiti dei test o reinterpretare i
 risultati storici come prove della nuova versione. Prima del merge/rilascio, la toolchain supportata deve eseguire
 build e suite pertinenti; i controlli P0 devono essere bloccanti.
-
----
 
 ## 15. Definition of Done — Criteri di accettazione
 
@@ -704,8 +759,6 @@ Una modifica può essere considerata completata soltanto quando:
 - [ ] I casi pertinenti della matrice di regressione sono verificati sulla versione finale; gli esiti sconosciuti non sono presentati come successi.
 - [ ] La relazione distingue misure nuove da dati storici e identifica il commit, i comandi e l'ambiente usati.
 
----
-
 ## 16. Applicazione a Zerocade
 
 Le sezioni precedenti sono generali; questa le rende concrete per il progetto. Dove c'è un conflitto vale la regola
@@ -716,30 +769,36 @@ più rigida. Le versioni esatte non si ripetono qui: stanno in `package.json`, `
 
 - **Workspace npm** (Node.js 26 o successivo): `apps/server` (Fastify, Socket.IO, `better-sqlite3`, collegamento a
   TikTok e Twitch), `apps/overlay` e `apps/dashboard` (React con Vite), `packages/shared` (catalogo dei giochi,
-  impostazioni, tipi e regole comuni). TypeScript controlla tutto con `tsc`.
-- **Direzione delle dipendenze:** `apps/* → packages/shared`. `shared` non importa le app; le app non si importano a
-  vicenda e comunicano per tipi condivisi e protocollo Socket.IO (sezione 2). Le regole dei giochi vanno in
+  impostazioni, tipi e regole comuni) e `packages/browser-runtime` (HTTP, Socket.IO e Web Worker del browser). TypeScript controlla tutto con `tsc`.
+- **Direzione delle dipendenze:** `apps/* → packages/shared` e `apps/dashboard, apps/overlay → packages/browser-runtime → packages/shared`.
+  `shared` non importa le app o browser-runtime; le app comunicano tramite HTTP/Socket.IO senza importarsi a vicenda (sezione 2). Le regole dei giochi vanno in
   funzioni pure e provabili senza rete né database; Fastify, Socket.IO, SQLite e i connettori sono adattatori.
-- **Dati:** SQLite. `database/giochi.sqlite3` (contenuti, uno schema per gioco) e `database/ZeroQuizz.sqlite3` sono in
-  Git; `database/parole_ita_raw.sqlite3` (2,3 GB) è fuori da Git; i dati della diretta stanno in
-  `apps/server/data/zerocade.db` sul PC (ignorato da Git). Valgono le regole della sezione 8 per transazioni,
-  migrazioni e compatibilità; ogni schema dei giochi si confronta con la sua origine (`database/script/giochi.py verify`).
+- **Dati:** SQLite. `database/giochi.sqlite3` (contenuti, uno schema per gioco), `database/ZeroQuizz.sqlite3` e `database/ZeroDubbi.sqlite3` sono in
+  Git; anche la banca autonoma `database/ZeroLettere.sqlite3` è versionata, ma non integrata nel runtime.
+  `database/parole_ita_raw.sqlite3` (circa 3,43 GB nel workspace al 16 novembre 2026) è fuori da Git; i dati della diretta stanno in
+  `apps/server/data/zerocade.db` sul PC (ignorato da Git). Valgono le regole della sezione 8 e della sezione 6 per
+  transazioni, WAL, busy timeout e compatibilità; ogni schema dei giochi si confronta con la sua origine (`database/script/giochi.py verify`).
 - **Giochi con cartella propria** (`gioco-*`): dati, strumenti e prove in Python; ogni gioco ha il suo `README.md`
   e, dove serve, il suo `TODO.md`.
+- **Corpus ZeroContext:** la procedura Contesti pubblica solo lo schema `context`, dopo backup e scrittura
+  dei vettori immutabili indicati nei metadati. Il ricaricamento locale invalida il ranking e sospende
+  i tornei con impronta diversa; i conteggi storici negli audit non descrivono la generazione attiva.
 
-### Equivalenti delle regole specifiche per linguaggio (sezione 13)
+### Applicazione concreta delle sezioni 5, 6 e 13
 
-| Il testo generale cita | Per Zerocade vale |
+| Regola | Applicazione a ZeroCade |
 |---|---|
-| Rust, `Result`, `unwrap`/`expect` | TypeScript in modalità rigorosa; errori attesi come valori o eccezioni tipizzate gestite al confine; niente `any` né asserzioni di tipo per far passare `tsc`; niente `catch` vuoti |
-| `MutexGuard` durante `await`, task e runtime | Nessun stato condiviso modificato attraverso un `await` senza controllare che sia ancora valido al ritorno; timer, listener e socket hanno un proprietario che li chiude allo spegnimento |
-| Thread dell'interfaccia, Qt, QML | Il thread principale del browser (overlay e dashboard): niente calcoli pesanti o I/O bloccante nel rendering React; aggiornamenti ad alta frequenza raggruppati (`requestAnimationFrame`, coalescing); canvas senza ridisegni inutili |
-| FFI, `unsafe`, binding C/C++ | Il confine con il modulo nativo `better-sqlite3`, con i processi Python e con il sistema (file hosts, porte): input e percorsi validati, errori propagati, nessuna esecuzione di testo ricevuto da chat o eventi |
-| Clippy, rustfmt, `cargo test` | `tsc` (`npm run typecheck`), `node --test` e `unittest` |
-| Sanitizer (ASan, TSan, UBSan) | Non applicabili a TypeScript/Python; la concorrenza si prova con test di ordine degli eventi, cancellazione e chiusura |
+| Thread e lifetime | Worker Node per persistenza/report e generazione; Web Worker di browser-runtime; processi/ambienti Python separati |
+| Stato e messaggi | Tipi condivisi, request ID, generazioni, limiti di coda e conferme; nessuna connessione DB trasferita |
+| SQLite | Distinguere DB operativo modificabile e contenuti/snapshot in sola lettura; busy timeout e transazioni secondo la sezione 6 |
+| UI | React, DOM e canvas sul main thread; notifiche raggruppate e cleanup alla chiusura della stanza |
+| Binding | `better-sqlite3`, versione SQLite effettiva, architettura Windows x64 e selezione del binario distribuito |
+| Diagnostica | `/api/live`, `/api/health`, metriche dei worker e log bounded; watchdog separato solo se implementato e verificato |
+| Strumenti nativi | TSan/ASan per eventuale codice nativo compilabile; nessuna pretesa di copertura tramite soli test JavaScript |
 
-Le sezioni su C++ e Rust restano nel testo per l'eventuale codice futuro; il C++ presente in `gioco-*/.venv` è di
-librerie di terzi, non codice del progetto.
+Queste sono prescrizioni per le modifiche e criteri di verifica. La loro presenza nel documento
+non certifica che ogni percorso del progetto le rispetti già. Per stato e limiti usare gli audit
+in `docs/` e gli esiti del lavoro corrente.
 
 ### Verifiche minime prima di consegnare
 
@@ -750,13 +809,15 @@ Si eseguono dalla cartella radice e si riportano gli esiti reali (sezione 14):
 - `python -m unittest discover -s database/script` e, per ZeroAssociazioni, `npm run test:associations`
 - `python database/script/giochi.py verify` se si toccano i contenuti dei giochi
 - `npm run build` per overlay e dashboard, e un avvio di prova del server con dati isolati (sezione 12)
-- `npm audit --omit=dev` per le dipendenze; con npm 12 gli script di installazione sono bloccati, e solo
-  `better-sqlite3` ed `esbuild` sono consentiti in `allowScripts` del `package.json`
+- `node scripts/check-infrastructure.mjs`, `node scripts/smoke-runtime.mjs` e `node scripts/smoke-runtime.mjs --bundle`
+- `npm audit` per tutte le dipendenze e, quando utile, `npm audit --omit=dev` per il perimetro runtime; verificare
+  le autorizzazioni agli script di installazione nel manifest radice e nella configurazione npm effettiva
 
-Stato verificato il 14 novembre 2026: `typecheck` senza errori, 50 test Node superati, 13 test Python del database
-superati, `npm audit --omit=dev` senza vulnerabilità. La pipeline `.github/workflows/ci.yml` esegue gli stessi controlli
-a ogni push su `main` e a ogni PR; al 14 novembre 2026 non era ancora stata eseguita su GitHub, quindi i controlli
-manuali restano obbligatori finché non ha un'esecuzione verde.
+Gli esiti storici restano negli audit datati; non sono la baseline del lavoro corrente. La pipeline
+`.github/workflows/ci.yml` definisce i controlli automatici: verificare il suo esito reale prima di
+attribuirle una build riuscita. Segnalare separatamente fallimenti preesistenti e regressioni nuove.
+Le modifiche solo documentali richiedono verifica di contenuto, collegamenti e diff, senza una nuova
+suite applicativa se non cambiano comportamenti o configurazioni.
 
 ### Sicurezza e privacy
 
@@ -767,7 +828,7 @@ manuali restano obbligatori finché non ha un'esecuzione verde.
   serve nginx sulla VM Linux (`ZEROCADE_PUBLIC_URL` è il suo indirizzo, mostrato in dashboard). Nginx deve esporre solo
   le classifiche e la loro API in sola lettura. Nuove rotte pubbliche richiedono una revisione esplicita dei dati che
   mostrano.
-- Segreti (per esempio `TWITCH_CLIENT_SECRET`) solo in variabili d'ambiente o file `.env`, che Git ignora; mai nel
+- Segreti (per esempio `TWITCH_CLIENT_ID` e `TWITCH_USER_ACCESS_TOKEN`) solo in variabili d'ambiente o file `.env`, che Git ignora; mai nel
   codice, nei log né nel pacchetto `release/`. Un segreto finito in Git va revocato, non solo cancellato.
 - Il server aggiunge una riga al file hosts di Windows chiedendo i privilegi di amministratore (`apps/server/src/hosts.ts`):
   la modifica deve restare limitata al nome `zerocade.test` (`127.0.0.1`), e se il permesso è negato il server deve
@@ -777,11 +838,12 @@ manuali restano obbligatori finché non ha un'esecuzione verde.
 
 ### Aggiornare librerie e tool
 
-Vale la sezione 10 (note di rilascio, adeguamento, verifica, tracciabilità). Per Zerocade:
+Vale la sezione 10 (note di rilascio, adeguamento, verifica, tracciabilità). Il registro è
+[AGGIORNAMENTO_DIPENDENZE.md](AGGIORNAMENTO_DIPENDENZE.md). Per ZeroCade:
 
-- Le dipendenze di `package.json` sono per lo più bloccate a versione esatta; un aggiornamento modifica manifest e
+- I manifest usano versioni esatte e intervalli SemVer; il lockfile identifica la risoluzione effettiva. Un aggiornamento modifica manifest e
   `package-lock.json` insieme, con le note di tutte le release intermedie lette.
-- `better-sqlite3` ed `esbuild` hanno script nativi consentiti: un aggiornamento di uno dei due va verificato con
+- `allowScripts` contiene decisioni riferite a versioni specifiche: per `better-sqlite3` distribuito con prebuild la ricompilazione implicita è disabilitata; per `esbuild` il postinstall è consentito. Rivalutare queste decisioni con il manifest, senza dedurre che il pacchetto esegua effettivamente uno script. Un aggiornamento va verificato con
   l'avvio reale del server e dei test; `npm run sqlite:upgrade` aggiorna SQLite secondo `scripts/upgrade-sqlite.mjs`.
 - `tiktok-live-connector` e `tmi.js` dipendono da servizi esterni che cambiano: dopo un aggiornamento si prova con
   il connettore finto o con una diretta di prova, e si dichiara quello che non si è potuto provare.
@@ -794,7 +856,7 @@ Vale la sezione 10 (note di rilascio, adeguamento, verifica, tracciabilità). Pe
 
 - Schema: SemVer, con la versione definita nel `package.json` radice e i pacchetti del workspace allineati
   (`npm version <x.y.z> --workspaces --include-workspace-root --no-git-tag-version` li aggiorna insieme al lockfile).
-  Oggi è la `0.1.0`; non ci sono ancora tag Git. Ogni rilascio distribuito riceve un tag `vX.Y.Z` e una nota delle
+  La versione corrente si legge nei manifest; verificare i tag esistenti prima di un rilascio. Ogni rilascio distribuito riceve un tag `vX.Y.Z` e una nota delle
   modifiche, come chiede la sezione 12.
 - Ogni lavoro ha un branch e commit identificabili; se mancano prove o build la PR resta in bozza (sezione 14). Le
   modifiche non committate di un altro lavoro non si mescolano in un commit non pertinente.
@@ -802,27 +864,25 @@ Vale la sezione 10 (note di rilascio, adeguamento, verifica, tracciabilità). Pe
   progetto, i README dei giochi dati e regole di ciascuno. Si aggiornano insieme al codice, senza duplicare lo
   stesso dettaglio in più file.
 
----
-
 **Principio conclusivo**
 
 > Progettare prima per la correttezza, rendere espliciti gli invarianti, limitare il consumo di risorse, rendere osservabili i fallimenti, verificare ogni modifica e ottimizzare soltanto sulla base di evidenze.
 
 Lo scopo non è massimizzare il numero di pattern, thread, astrazioni o ottimizzazioni implementate, ma ottenere la soluzione complessivamente più corretta, semplice, efficiente e affidabile.
 
+### Appendice: Riduzione della ridondanza dei dati in SQLite3
+
 Per ridurre al minimo la ridondanza dei dati in un database relazionale basato su SQLite3, si interviene su due livelli complementari: la progettazione logica dello schema (normalizzazione relazionale) e l'adozione delle funzionalità native del motore di SQLite.
-1. Normalizzazione dello Schema (1NF, 2NF, 3NF)
+
+#### 1. Normalizzazione dello Schema (1NF, 2NF, 3NF)
 
 La normalizzazione è il principio cardine per eliminare la duplicazione delle informazioni dividendo i dati in entità logiche distinte collegate da chiavi.
 
-    1NF (Prima Forma Normale): Eliminare colonne ripetitive e valori composti (es. stringhe separate da virgole come "tag1,tag2,tag3"). Ogni colonna deve contenere un singolo valore atomico.
+- **1NF (Prima Forma Normale):** Eliminare colonne ripetitive e valori composti (es. stringhe separate da virgole come `"tag1,tag2,tag3"`). Ogni colonna deve contenere un singolo valore atomico.
+- **2NF (Seconda Forma Normale):** Rimuovere le dipendenze parziali nelle chiavi composte. Ogni attributo non chiave deve dipendere dall'intera chiave primaria.
+- **3NF (Terza Forma Normale):** Rimuovere le dipendenze transitive. Nessuna colonna deve dipendere da un'altra colonna non chiave.
 
-    2NF (Seconda Forma Normale): Rimuovere le dipendenze parziali nelle chiavi composte. Ogni attributo non chiave deve dipendere dall'intera chiave primaria.
-
-    3NF (Terza Forma Normale): Rimuovere le dipendenze transitive. Nessuna colonna deve dipendere da un'altra colonna non chiave.
-
-SQL
-
+```sql
 -- SCHEMA NON NORMALIZZATO (alta ridondanza: nome e indirizzo ripetuti per ogni ordine)
 -- Ordini(id_ordine, data, id_cliente, nome_cliente, indirizzo_cliente, totale)
 
@@ -839,23 +899,25 @@ CREATE TABLE ordini (
     id_cliente INTEGER NOT NULL,
     FOREIGN KEY (id_cliente) REFERENCES clienti(id_cliente)
 );
+```
 
-2. Abilitazione delle Chiavi Esterne (Foreign Keys)
+#### 2. Abilitazione delle Chiavi Esterne (Foreign Keys)
 
 SQLite supporta i vincoli di chiave esterna, ma per motivi di retrocompatibilità sono disabilitati per impostazione predefinita su ogni nuova connessione. Se non vengono attivati, il database non impedisce l'inserimento di chiavi orfane o l'inconsistenza referenziale.
 
-Abilita sempre il supporto all'apertura della sessione:
-SQL
+Abilitare sempre il supporto all'apertura di ogni sessione:
 
+```sql
 PRAGMA foreign_keys = ON;
+```
 
-3. Dizionari di Lookup per Stringhe Ripetute
+#### 3. Dizionari di Lookup per Stringhe Ripetute
 
-Campi categorici ripetuti frequentemente (es. stato_ordine come 'IN_ATTESA', 'SPEDITO', 'CONSEGNATO') occupano byte preziosi su disco per ogni record e aumentano il rischio di typo.
+Campi categorici ripetuti frequentemente (es. stato ordine come `'IN_ATTESA'`, `'SPEDITO'`, `'CONSEGNATO'`) occupano byte preziosi su disco per ogni record e aumentano il rischio di incongruenze.
 
-Sostituisci il testo con una chiave numerica che punta a una tabella di lookup:
-SQL
+Sostituire il testo con una chiave numerica che punta a una tabella di lookup:
 
+```sql
 CREATE TABLE stati_ordine (
     id_stato INTEGER PRIMARY KEY,
     descrizione TEXT NOT NULL UNIQUE
@@ -866,14 +928,15 @@ CREATE TABLE ordini (
     id_stato INTEGER NOT NULL,
     FOREIGN KEY (id_stato) REFERENCES stati_ordine(id_stato)
 );
+```
 
-    In SQLite, INTEGER PRIMARY KEY è un alias diretto per il puntatore interno a 64 bit (ROWID). Memorizzare un intero occupa da 1 a 8 byte a lunghezza variabile, risultando nettamente più compatto ed efficiente rispetto a stringhe duplicate.
+In SQLite, `INTEGER PRIMARY KEY` è un alias diretto per il puntatore interno a 64 bit (`ROWID`). Memorizzare un intero occupa da 1 a 8 byte a lunghezza variabile, risultando nettamente più compatto ed efficiente rispetto a stringhe duplicate.
 
-4. Tabelle di Giunzione per Relazioni Molti-a-Molti
+#### 4. Tabelle di Giunzione per Relazioni Molti-a-Molti
 
 Per gestire associazioni N:M senza duplicare attributi o creare array di stringhe non indicizzabili, si utilizza una tabella ponte con chiave primaria composita:
-SQL
 
+```sql
 CREATE TABLE prodotti (
     id_prodotto INTEGER PRIMARY KEY,
     nome TEXT NOT NULL,
@@ -888,12 +951,13 @@ CREATE TABLE ordini_dettaglio (
     FOREIGN KEY (id_ordine) REFERENCES ordini(id_ordine) ON DELETE CASCADE,
     FOREIGN KEY (id_prodotto) REFERENCES prodotti(id_prodotto)
 );
+```
 
-5. Colonne Generate (Generated Columns)
+#### 5. Colonne Generate (Generated Columns)
 
-Evita di salvare colonne derivate o calcolabili a partire da altri campi (ad esempio prezzo_totale = quantita * prezzo_unitario). SQLite supporta le colonne generate:
-SQL
+Evitare di salvare colonne derivate o calcolabili a partire da altri campi (ad esempio `totale_riga = quantita * prezzo_unitario`). SQLite supporta le colonne generate:
 
+```sql
 CREATE TABLE fatture_righe (
     id INTEGER PRIMARY KEY,
     prezzo_unitario REAL NOT NULL,
@@ -901,18 +965,18 @@ CREATE TABLE fatture_righe (
     -- VIRTUAL non consuma spazio su disco; viene calcolata solo in lettura
     totale_riga REAL GENERATED ALWAYS AS (prezzo_unitario * quantita) VIRTUAL
 );
+```
 
-    VIRTUAL: Non occupa spazio su disco, elimina la ridondanza fisica.
+- **`VIRTUAL`:** non occupa spazio su disco ed elimina la ridondanza fisica.
+- **`STORED`:** viene scritta su disco solo se serve indicizzarla intensamente, ma si aggiorna automaticamente garantendo l'integrità.
 
-    STORED: Viene scritta su disco solo se serve indicizzarla intensamente, ma si aggiorna automaticamente garantendo l'integrità.
+#### 6. Utilizzo di Tabelle WITHOUT ROWID
 
-6. Utilizzo di Tabelle WITHOUT ROWID
+Di default, ogni tabella SQLite crea una colonna nascosta a 64-bit chiamata `rowid` e un B-tree associato. Se una tabella ha già una chiave primaria naturale o composta (come le tabelle di giunzione N:M), la presenza del `rowid` genera un duplicato strutturale inutile.
 
-Di default, ogni tabella SQLite crea una colonna nascosta a 64-bit chiamata rowid e un B-tree associato. Se una tabella ha già una chiave primaria naturale o composta (come le tabelle di giunzione N:M), la presenza del rowid genera un duplicato strutturale inutile.
+La clausola `WITHOUT ROWID` elimina l'overhead del secondo albero B-tree:
 
-La clausola WITHOUT ROWID elimina l'overhead del secondo albero B-tree:
-SQL
-
+```sql
 CREATE TABLE tag_articoli (
     id_articolo INTEGER NOT NULL,
     id_tag INTEGER NOT NULL,
@@ -920,28 +984,28 @@ CREATE TABLE tag_articoli (
     FOREIGN KEY (id_articolo) REFERENCES articoli(id_articolo),
     FOREIGN KEY (id_tag) REFERENCES tag(id_tag)
 ) WITHOUT ROWID;
+```
 
-7. Vincoli di Unicità e Gestione dei Conflitti (UPSERT)
+#### 7. Vincoli di Unicità e Gestione dei Conflitti (UPSERT)
 
 Per evitare righe duplicate accidentali a livello applicativo:
 
-    Applica vincoli UNIQUE su singole colonne o tuple (UNIQUE(colonna_a, colonna_b)).
+- Applicare vincoli `UNIQUE` su singole colonne o tuple (`UNIQUE(colonna_a, colonna_b)`).
+- Usare la sintassi UPSERT (`ON CONFLICT`) per consolidare i dati anziché inserire duplicati:
 
-    Usa la sintassi UPSERT (ON CONFLICT) per consolidare i dati anziché inserire duplicati:
-
-SQL
-
+```sql
 INSERT INTO contatori_visite (pagina, conteggio)
 VALUES ('/home', 1)
 ON CONFLICT(pagina) DO UPDATE SET conteggio = conteggio + 1;
+```
 
-8. Viste (Views) al Posto di Tabelle Denormalizzate
+#### 8. Viste (Views) al Posto di Tabelle Denormalizzate
 
-Quando più query richiedono join complessi tra tabelle normalizzate, non duplicare i dati in una nuova tabella di riepilogo. Crea invece una vista logica:
-SQL
+Quando più query richiedono join complessi tra tabelle normalizzate, non duplicare i dati in una nuova tabella di riepilogo. Creare invece una vista logica:
 
+```sql
 CREATE VIEW vista_dettaglio_ordini AS
-SELECT 
+SELECT
     o.id_ordine,
     c.nome AS cliente,
     p.nome AS prodotto,
@@ -951,7 +1015,12 @@ FROM ordini o
 JOIN clienti c ON o.id_cliente = c.id_cliente
 JOIN ordini_dettaglio od ON o.id_ordine = od.id_ordine
 JOIN prodotti p ON od.id_prodotto = p.id_prodotto;
+```
 
-9. Manutenzione dello Spazio: VACUUM
+#### 9. Manutenzione dello Spazio: VACUUM
 
-Quando si eliminano o modificano record duplicati, SQLite non riduce automaticamente la dimensione fisica del file .sqlite, ma mantiene le pagine vuote in una "freelist" per riutilizzi futuri.
+Quando si eliminano o modificano record duplicati, SQLite non riduce automaticamente la dimensione fisica del file `.sqlite`, ma mantiene le pagine vuote in una "freelist" per riutilizzi futuri. Valutare `VACUUM` solo se lo spazio recuperabile giustifica costo, spazio temporaneo e finestra di manutenzione; non eseguirlo automaticamente durante una diretta.
+
+Fonti tecniche per l'adattamento delle regole di concorrenza: [worker Node](https://nodejs.org/api/worker_threads.html),
+[SQLite WAL](https://www.sqlite.org/wal.html), [transazioni SQLite](https://www.sqlite.org/lang_transaction.html),
+[processi Python](https://docs.python.org/3/library/subprocess.html).

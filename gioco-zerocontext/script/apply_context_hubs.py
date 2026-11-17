@@ -32,7 +32,8 @@ def main() -> None:
     args = ap.parse_args()
     vocab, secrets, links, meta = current()
     dim = int(meta['dim'])
-    q = np.fromfile(DATA / 'vectors.bin', dtype=np.int8)
+    from publish_context import active_vectors
+    q = np.fromfile(active_vectors(meta, DATA), dtype=np.int8)
     if q.size != len(vocab) * dim:
         raise SystemExit('vectors.bin non corrisponde al vocabolario')
     q = q.reshape(len(vocab), dim)

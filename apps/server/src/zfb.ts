@@ -33,7 +33,8 @@ export function singleWord(text: string): boolean {
 }
 
 // Each event with its feed, the account read there and the message's id ('' when it has none).
-type Emit = (event: LiveEvent, kind: SourceKind, account: string, id: string) => void
+// `at`: when the bridge says the message was written (ms; TikTok's clock when known), null when it does not say.
+type Emit = (event: LiveEvent, kind: SourceKind, account: string, id: string, at: number | null) => void
 
 const rec = (x: unknown): Record<string, unknown> => (x && typeof x === 'object' ? (x as Record<string, unknown>) : {})
 const str = (x: unknown, max: number) => (typeof x === 'string' ? x.slice(0, max) : '')
@@ -73,29 +74,30 @@ function viewerOf(raw: unknown, kind: SourceKind): Viewer {
 }
 
 // A bridge message -> a live event, with the message's id; null for the ones Zerocade has no event for.
-export function bridgeEvent(raw: unknown): { event: LiveEvent; kind: SourceKind; id: string } | null {
+export function bridgeEvent(raw: unknown): { event: LiveEvent; kind: SourceKind; id: string; at: number | null } | null {
   const m = rec(raw)
   const kind = m.platform === 'tiktok' || m.platform === 'twitch' ? m.platform : null
   if (!kind) return null
   const user = viewerOf(m.user, kind)
   // A cut id would name another message: one too long is left out.
   const id = typeof m.id === 'string' && m.id.length <= MAX_ID ? m.id : ''
+  const at = typeof m.at === 'number' && Number.isFinite(m.at) && m.at > 0 ? Math.floor(m.at) : null
   switch (m.type) {
     case 'comment':
-      return { kind, id, event: { type: 'comment', user, text: str(m.text, MAX_TEXT) } }
+      return { kind, id, at, event: { type: 'comment', user, text: str(m.text, MAX_TEXT) } }
     case 'gift': {
       const n = count(m.count)
       const each = Math.round(Number(m.coins) / n) || 1
-      return { kind, id, event: { type: 'gift', user, giftId: giftIdForTiktok(str(m.gift, 64), each), count: Math.min(n, 100) } }
+      return { kind, id, at, event: { type: 'gift', user, giftId: giftIdForTiktok(str(m.gift, 64), each), count: Math.min(n, 100) } }
     }
     // Twitch bits count as likes, as with the direct Twitch feed.
     case 'like':
     case 'bits':
-      return { kind, id, event: { type: 'like', user, count: Math.min(count(m.count), 100) } }
+      return { kind, id, at, event: { type: 'like', user, count: Math.min(count(m.count), 100) } }
     case 'follow':
     case 'share':
     case 'join':
-      return { kind, id, event: { type: m.type, user } }
+      return { kind, id, at, event: { type: m.type, user } }
     default:
       return null
   }
@@ -266,7 +268,7 @@ export class ZfbBridge {
     if (this.state !== 'connected') return
     if (m.type === 'viewers') return this.setViewers(m)
     const live = bridgeEvent(m)
-    if (live) this.emit(live.event, live.kind, live.kind === 'tiktok' ? this.tiktok : this.twitch, live.id)
+    if (live) this.emit(live.event, live.kind, live.kind === 'tiktok' ? this.tiktok : this.twitch, live.id, live.at)
   }
 
   // The viewers of the account the bridge reads on that platform; one it reads none on keeps none.

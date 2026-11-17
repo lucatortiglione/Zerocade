@@ -1,10 +1,13 @@
+import { contextProfile, isContextProfile } from '@zerocade/shared'
 import { spawn } from 'node:child_process'
 import { createReadStream } from 'node:fs'
 import { mkdir, rename, rm, stat, writeFile } from 'node:fs/promises'
 import { existsSync } from 'node:fs'
-import { dirname, join } from 'node:path'
+import { randomUUID } from 'node:crypto'
+import { dirname, join, resolve } from 'node:path'
+import { monitorEventLoopDelay } from 'node:perf_hooks'
 import { fileURLToPath } from 'node:url'
-import Fastify from 'fastify'
+import Fastify, { LogController } from 'fastify'
 import helmet from '@fastify/helmet'
 import fastifyStatic from '@fastify/static'
 import { Server } from 'socket.io'
@@ -40,6 +43,7 @@ import { QuizzlandRooms, quizzlandStats } from './quizzland.js'
 import {
   closeDb,
   contextTournamentStore,
+  tabooStore,
   contextSecretLast,
   contextSecretUses,
   recordContextSecretUse,
@@ -53,7 +57,8 @@ import {
   savedSources,
 } from './db.js'
 import { getContent, wordAssociation } from './content.js'
-import { contextFileBudget, contextResource, isContextFile } from './context.js'
+import { contextFileBudget, contextResource, contextRevision, isContextFile, reloadContext, availableContextProfiles } from './context.js'
+import { giochiDb } from './schema-db.js'
 import { isWordleFile, wordleFile } from './wordle.js'
 import { chainKeys, chains } from './chains.js'
 import { nasaPhotos } from './nasa.js'
@@ -65,12 +70,15 @@ import { PERIODS, isPeriod, recordScore, resetLeaderboard } from './scores.js'
 import { sanitizeRoundReport } from './word-association.js'
 import { HOSTS_LINE, LOCAL_DOMAIN, domainRegistered, ensureDomain } from './hosts.js'
 import { PAD_FILE_MAX, padBoard, padFile } from './pads.js'
-import { controlGame, getSession, selectGame, setScene, setSettings, setTriggers } from './sessions.js'
+import { controlGame, refreshGame, getSession, selectGame, setScene, setSettings, setTriggers } from './sessions.js'
 import { RoomSources, sourceUsername } from './sources.js'
 import { ZfbBridge, singleWord } from './zfb.js'
 import { RecentFollows } from './follows.js'
 import { ContextTournaments, sanitizeTournamentCommand } from './context-tournament.js'
-import { serverCorpus } from './context-tournament-ranking.js'
+import { TabooRooms } from './taboo.js'
+import { loadDeck } from './taboo-deck.js'
+import { invalidateContextCorpus, serverCorpus } from './context-tournament-ranking.js'
+import { ContextSemanticGame } from './context-semantic.js'
 import { persistence, reports, WorkerJobError } from './infrastructureClient.js'
 import { sessionSince } from './sessions.js'
 import { localAccess } from './localAccess.js'
@@ -82,6 +90,7 @@ import {
   sanitizeLevel,
   sanitizeMessage,
   sanitizeQuizzlandCommand,
+  sanitizeTabooCommand,
   sanitizeScene,
   sanitizeSettings,
   sanitizeBridgeConfig,
@@ -104,7 +113,7 @@ const overlayDir = pagesDir('overlay')
 
 const app = Fastify({
   bodyLimit: 1024 * 1024, requestTimeout: 15_000, connectionTimeout: 30_000,
-  disableRequestLogging: true,
+  logController: new LogController({ disableRequestLogging: true }),
   logger: { level: process.env.LOG_LEVEL ?? 'info', redact: ['req.headers.authorization', 'req.headers.cookie', '*.access_token', '*.client_secret', '*.password'] },
 })
 let draining = false
@@ -169,11 +178,31 @@ app.addHook('onRequest', async (req, reply) => {
   reply.raw.once('close', release)
 })
 
+// How long the server's main thread was blocked, to tell a slow live that comes from the server from one that does not.
+// Every 10 s the worst stall is kept, and a stall over 250 ms is logged: all sockets (overlay, dashboard) wait for it.
+const loopDelay = monitorEventLoopDelay({ resolution: 20 })
+loopDelay.enable()
+const SLOW_LOOP_MS = 250
+const loopStalls: { at: number; ms: number }[] = []
+setInterval(() => {
+  // The histogram's resolution is 20 ms: what it measures is the delay beyond that.
+  const worst = Math.round(loopDelay.max / 1e6)
+  if (worst >= SLOW_LOOP_MS) {
+    loopStalls.push({ at: Date.now(), ms: worst })
+    if (loopStalls.length > 20) loopStalls.shift()
+    app.log.warn({ stallMs: worst, p99Ms: Math.round(loopDelay.percentile(99) / 1e6), rssMb: Math.round(process.memoryUsage().rss / 1048576) },
+      'Il server è rimasto bloccato: overlay e regia hanno aspettato')
+  }
+  loopDelay.reset()
+}, 10_000).unref()
+
 app.get('/api/live', async () => ({ ok: true }))
 app.get('/api/health', async (_req, reply) => {
   const workers = { persistence: persistence.metrics(), reports: reports.metrics() }
   const ok = !draining && Object.values(workers).every((worker) => worker.state === 'ready' && worker.queued < worker.capacity)
-  return reply.code(ok ? 200 : 503).send({ ok, draining, workers, http: { active: httpActive, uploads: uploadsActive, capacity: 32, uploadCapacity: 4, suppressedErrors }, memory: process.memoryUsage(), uptimeSeconds: process.uptime() })
+  const eventLoop = { p50Ms: Math.round(loopDelay.percentile(50) / 1e6), p99Ms: Math.round(loopDelay.percentile(99) / 1e6),
+    maxMs: Math.round(loopDelay.max / 1e6), stalls: loopStalls }
+  return reply.code(ok ? 200 : 503).send({ ok, draining, workers, eventLoop, http: { active: httpActive, uploads: uploadsActive, capacity: 32, uploadCapacity: 4, suppressedErrors }, memory: process.memoryUsage(), uptimeSeconds: process.uptime() })
 })
 app.get('/api/room', async (): Promise<RoomInfo> => ({
   key: roomKey,
@@ -185,9 +214,13 @@ app.get('/api/room', async (): Promise<RoomInfo> => ({
 app.get('/api/games', async () => GAMES)
 app.get('/api/content', async () => getContent())
 // ZeroContext's words and vectors: static files, cached by the browser until the next build.
+app.get('/api/context/profiles', async () => availableContextProfiles())
 app.get('/api/context/:file', async (req, reply) => {
   const name = (req.params as { file: string }).file
-  const resource = isContextFile(name) ? contextResource(name) : null
+  const requested = (req.query as { profile?: unknown }).profile
+  if (requested !== undefined && !isContextProfile(requested)) return reply.code(400).send({ error: 'Associazioni non valide.' })
+  const profile = contextProfile(requested)
+  const resource = isContextFile(name) ? contextResource(name, profile) : null
   if (!resource) return reply.code(404).send({ error: 'not found' })
   if (typeof resource === 'string') {
     try {
@@ -198,7 +231,7 @@ app.get('/api/context/:file', async (req, reply) => {
   }
   const body = typeof resource === 'string' ? createReadStream(resource) : resource
   const type = name.endsWith('.bin') ? 'application/octet-stream' : name.endsWith('.json') ? 'application/json' : 'text/plain; charset=utf-8'
-  return reply.header('content-type', type).header('cache-control', 'no-cache').send(body)
+  return reply.header('content-type', type).header('cache-control', 'no-cache').header('x-zerocontext-revision', contextRevision(profile)).header('x-zerocontext-profile', profile).send(body)
 })
 // The leaderboards (session, day, week, month, all time) of each game, and the page that shows them: a link to
 // share or a browser source for the stream (leaderboard-page.ts).
@@ -263,6 +296,15 @@ app.get('/api/bivio/flagged.csv', async (_req, reply) =>
     .send(await reports.run('export', { kind: 'bivio-flags' })),
 )
 app.get('/api/quizzland/stats', async () => quizzlandStats())
+// ZeroTaboo's telemetry for the calibration of the cards (§9): computed by the reports worker, for local use like the other exports.
+for (const [path, kind, name] of [['exposures', 'taboo-exposures', 'esposizioni'], ['calibration', 'taboo-calibration', 'calibrazione']] as const) {
+  app.get(`/api/taboo/${path}.csv`, async (_req, reply) =>
+    reply
+      .header('content-type', 'text/csv; charset=utf-8')
+      .header('content-disposition', `attachment; filename="zerotaboo-${name}-${new Date().toISOString().slice(0, 10)}.csv"`)
+      .send(await reports.run('export', { kind })),
+  )
+}
 app.get('/api/quizzland/export.csv', async (_req, reply) => {
   const day = new Date().toISOString().slice(0, 10)
   return reply
@@ -509,6 +551,10 @@ function broadcastEvent(key: string, received: LiveEvent, origin: EventOrigin = 
   const room = bivio.get(key) ?? incastro.get(key) ?? quizzland.get(key)
   // "Aiuti dal pubblico" switched off: those triggers give no help (activeTriggers).
   if (room && plays && !session.ended) for (const t of triggersFor(activeTriggers(session), event)) room.action(t.action, event)
+  if (session.gameId === 'context' && plays && !session.paused && !session.ended) {
+    const semantic = ensureSemantic(key)
+    if (semantic) for (const t of triggersFor(activeTriggers(session), event)) semantic.action(t.action, event)
+  }
 }
 
 // One RoomSources per overlay key: real TikTok/Twitch feeds are relayed as live events.
@@ -535,19 +581,19 @@ const roomSources = (key: string) => {
 // A new round, classic or tournament, counts once and goes to every client of the room.
 const secretUseCounts = new Map<string, number>(Object.entries(contextSecretUses()))
 const secretLastAt = new Map<string, number>(Object.entries(contextSecretLast()))
-const noteSecretUse = (key: string, word: string) => {
+const noteSecretUse = (key: string, word: string, privateWord = false) => {
   const at = Date.now()
   const uses = recordContextSecretUse(word, at)
   secretUseCounts.set(word, uses)
   secretLastAt.set(word, at)
-  io.to(key).emit('context:secret-used', { word, uses, at })
+  io.to(privateWord ? dashboardRoom(key) : key).emit('context:secret-used', { word, uses, at })
 }
 
 // ZeroContext's tournament, run by the server (context-tournament.ts): its public state to every client of the room,
 // the secret and the full standings to dashboards only. It needs ZeroFollowerBot's bridge, which serves roomKey.
 const tournaments = new ContextTournaments({
   store: contextTournamentStore,
-  corpus: serverCorpus,
+  corpus: (key) => serverCorpus(contextProfile(getSession(key).settings.associationSource)),
   emitPublic: (key, state) => io.to(key).emit('context:tournament', state),
   emitAdmin: (key, admin) => io.to(dashboardRoom(key)).emit('context:tournament-admin', admin),
   bridgeReady: (key) => {
@@ -558,11 +604,35 @@ const tournaments = new ContextTournaments({
   secretLastAt: (word) => secretLastAt.get(word) ?? 0,
   recordSecretUse: noteSecretUse,
   typedWords: (key) => getSession(key).settings.tournamentTypedWords === true,
+  showWordLength: (key) => { const s = getSession(key).settings; return s.disableAllHints !== true && s.showWordLength !== false },
+})
+
+// ZeroTaboo (taboo.ts): the match is the server's own. Its answers come from ZeroFollowerBot's bridge only (the simulator
+// only in practice mode); the public state goes to every client of the room, the card in play to the dashboards.
+const taboo = new TabooRooms({
+  store: tabooStore,
+  deck: () => loadDeck(),
+  monotonicNow: () => performance.now(),
+  wallNow: () => Date.now(),
+  setTimer: (fn, ms) => setTimeout(fn, ms),
+  clearTimer: (handle) => clearTimeout(handle as NodeJS.Timeout),
+  random: Math.random,
+  newId: randomUUID,
+  emitPublic: (key, state) => io.to(key).emit('taboo:state', state),
+  emitAdmin: (key, admin) => io.to(dashboardRoom(key)).emit('taboo:admin', admin),
+  bridgeReady: (key) => {
+    const status = zfb.status()
+    return key === roomKey && status.state === 'connected' && Boolean(status.tiktok || status.twitch)
+  },
+  allowed: (key, user) => allowedToPlay(getSession(key).settings, user),
+  settings: (key) => getSession(key).settings,
+  issue: gameIssue,
+  log: (level, message, fields) => app.log[level](fields ?? {}, message),
 })
 
 // ZeroFollowerBot's event bridge, for this Zerocade's room: its events go where the direct feeds' go.
 const zfb = new ZfbBridge(
-  (received, kind, account, id) => {
+  (received, kind, account, id, at) => {
     // A viewer who followed during the live is a follower for the voice too (see follows.ts).
     const event = follows.apply(roomKey, received)
     // A ZeroWords guess that only repeats words the level already has: ZeroFollowerBot's voice need not read it.
@@ -583,15 +653,19 @@ const zfb = new ZfbBridge(
       (session.gameId === 'zerowordle' ||
         (session.gameId === 'context' && !tournaments.has(roomKey) && roundOver(roomKey) && singleWord(event.text)) ||
         !allowedToPlay(session.settings, event.user) ||
+        (session.gameId === 'zerotaboo' && taboo.get(roomKey)?.listening() === true) ||
         (session.settings.voiceFollowersOnly === true && event.user.follower === false && event.user.fan !== true))
     broadcastEvent(roomKey, event, kind, account ? `${kind}:${account}` : '')
     if (repeat || silent) zfb.skip(id)
     // ZeroContext's tournament takes its words from ZeroFollowerBot's bridge only (context-tournament.ts).
-    if (event.type === 'comment' && session.gameId === 'context') tournaments.offer(roomKey, event.user, event.text, id, kind)
+    if (event.type === 'comment' && session.gameId === 'context') tournaments.offer(roomKey, event.user, event.text, id, kind, at)
+    // ZeroTaboo takes its answers here and nowhere else: this is the only place that knows the message's id (D2, D7).
+    if (event.type === 'comment' && session.gameId === 'zerotaboo') taboo.get(roomKey)?.offer({ source: 'bridge', user: event.user, text: event.text, messageId: id, platform: kind })
   },
   (status) => {
     io.to(dashboardRoom(roomKey)).emit('bridge:status', status)
     tournaments.bridgeChanged()
+    taboo.bridgeChanged()
     for (const a of zfb.accounts()) saveCreator(a.kind, a.username, getSession(roomKey).gameId)
     // Another account, or none: the viewers it counted are gone.
     pushStats(roomKey)
@@ -602,9 +676,17 @@ const zfb = new ZfbBridge(
 zfb.configure(bridgeConfig())
 // A tournament open when the server stopped comes back; one in the middle of a round waits suspended for its organiser.
 tournaments.restore()
+// ZeroTaboo: a match left open when the server stopped is closed as cancelled; the data older than 90 days is purged (D16), now,
+// at the start, never during a live.
+try {
+  tabooStore.abandonOpenMatches(Date.now())
+  tabooStore.purgeExpired(Date.now())
+} catch (error) {
+  app.log.warn({ err: error }, 'ZeroTaboo: pulizia all\'avvio non riuscita')
+}
 // The tournament's corpus (68 MB read, hashed and parsed in one go, a few hundred ms with the server stopped) is
 // prepared now, with nobody playing, rather than at the first «Crea torneo» of a live.
-setTimeout(() => { if (getSession(roomKey).gameId === 'context') serverCorpus() }, 1000).unref()
+setTimeout(() => { if (getSession(roomKey).gameId === 'context') serverCorpus(contextProfile(getSession(roomKey).settings.associationSource)) }, 1000).unref()
 
 const liveCreators = (): FeedCreator[] => {
   const seen = new Map<string, FeedCreator>()
@@ -655,21 +737,96 @@ const roundOver = (key: string) => {
   return revealed !== undefined && revealed === roomSecrets.get(key)
 }
 
+const semanticGames = new Map<string, ContextSemanticGame>()
+function ensureSemantic(key: string): ContextSemanticGame | null {
+  const session = getSession(key)
+  if (session.gameId !== 'context' || session.ended || tournaments.has(key)) return null
+  const existing = semanticGames.get(key)
+  if (existing) return existing
+  const corpus = serverCorpus(contextProfile(session.settings.associationSource))
+  if (!corpus?.data.semantic) return null
+  const game = new ContextSemanticGame({ corpus, settings: session.settings,
+    emit: (state) => {
+      if (state.solution) revealedSecrets.set(key, state.solution)
+      io.to(key).emit('context:semantic', state)
+    },
+    award: (user, points) => recordScore(key, 'context', user, points),
+    secret: (word) => {
+      roomSecrets.set(key, word); revealedSecrets.delete(key)
+      io.to(dashboardRoom(key)).emit('secret:word', { word })
+      noteSecretUse(key, word, true)
+    },
+    uses: (word) => secretUseCounts.get(word) ?? 0,
+    lastAt: (word) => secretLastAt.get(word) ?? 0,
+  })
+  semanticGames.set(key, game)
+  game.pause(Boolean(session.paused))
+  return game
+}
+function clearSemantic(key: string) {
+  semanticGames.delete(key)
+  io.to(key).emit('context:semantic', null)
+}
+const semanticClock = setInterval(() => {
+  for (const [key, game] of semanticGames) {
+    const session = getSession(key)
+    if (session.gameId !== 'context' || session.ended || tournaments.has(key)) { clearSemantic(key); continue }
+    game.pause(Boolean(session.paused))
+    game.tick()
+  }
+}, 250)
+semanticClock.unref()
+
+// Local publisher: reload only ZeroContext and let its existing clients start on the new corpus.
+app.post('/api/context/reload', async (req, reply) => {
+  const body = req.body as { revision?: unknown; database?: unknown } | null
+  if (!body || typeof body.revision !== 'string' || !/^[a-f0-9]{64}$/.test(body.revision) ||
+      typeof body.database !== 'string' || !giochiDb || resolve(body.database) !== resolve(giochiDb))
+    return reply.code(409).send({ error: 'Database o revisione di ZeroContext non corrispondenti a questo server.' })
+  try {
+    const previous = contextRevision()
+    const loaded = reloadContext(body.revision)
+    invalidateContextCorpus()
+    if (!serverCorpus()) throw new Error('Il nuovo corpus non supera la validazione del ranking')
+    if (previous !== loaded.revision) {
+      tournaments.corpusChanged()
+      const keys = new Set([roomKey, ...roomSecrets.keys(), ...[...io.sockets.sockets.values()].map((s) => (s.handshake.auth as HandshakeAuth).key)])
+      for (const key of keys) {
+        if (getSession(key).gameId !== 'context' || tournaments.isOpen(key)) continue
+        roomSecrets.delete(key)
+        revealedSecrets.delete(key)
+        clearSemantic(key)
+        io.to(key).emit('session:state', controlGame(key, 'restart'))
+        ensureSemantic(key)
+      }
+    }
+    return reply.send({ ok: true, ...loaded })
+  } catch (error) {
+    return reply.code(503).send({ error: error instanceof Error ? error.message : 'Ricaricamento ZeroContext non riuscito.' })
+  }
+})
+
 // Each overlay key is a room: the dashboard and every overlay opened with that key share it.
 io.on('connection', (socket) => {
   const { clientType, key } = socket.handshake.auth as HandshakeAuth
   void socket.join(key)
+  if (clientType === 'dashboard') void socket.join(dashboardRoom(key))
   const session = getSession(key)
   socket.emit('session:state', session)
   const secret = roomSecrets.get(key)
-  if (SECRET_GAMES.includes(session.gameId) && secret) socket.emit('secret:word', { word: secret })
+  if (SECRET_GAMES.includes(session.gameId) && secret && (clientType === 'dashboard' || session.gameId !== 'context' || !serverCorpus(contextProfile(getSession(key).settings.associationSource))?.data.semantic)) socket.emit('secret:word', { word: secret })
+  const semantic = ensureSemantic(key)
+  socket.emit('context:semantic', semantic?.snapshot() ?? null)
   if (session.gameId === 'zerodubbi') socket.emit('bivio:state', bivio.open(key, session.settings))
   if (session.gameId === 'incastro') socket.emit('incastro:state', incastro.open(key, session.settings))
   if (session.gameId === 'quizzland') socket.emit('quizzland:state', quizzland.open(key, session.settings))
+  if (session.gameId === 'zerotaboo') socket.emit('taboo:state', taboo.open(key).state())
   const tournament = tournaments.state(key)
   if (tournament) socket.emit('context:tournament', tournament)
-  socket.emit('context:secret-uses', Object.fromEntries(secretUseCounts))
-  socket.emit('context:secret-last', Object.fromEntries(secretLastAt))
+  if (clientType === 'dashboard' || !semantic) {
+    socket.emit('context:secret-uses', Object.fromEntries(secretUseCounts))
+    socket.emit('context:secret-last', Object.fromEntries(secretLastAt))
+  }
   // While a ZeroContext tournament is open, the generic controls cannot replace or restart it (specifica §3.2).
   const tournamentLocks = (what: string) => {
     if (!tournaments.isOpen(key)) return false
@@ -693,8 +850,22 @@ io.on('connection', (socket) => {
     if (command === 'restart' || command === 'start') {
       roomSecrets.delete(key)
       revealedSecrets.delete(key)
+      clearSemantic(key)
     }
     io.to(key).emit('session:state', controlGame(key, command as GameControl))
+    if (getSession(key).gameId === 'zerotaboo') {
+      if (command === 'pause' || command === 'resume') taboo.get(key)?.pause(command === 'pause')
+      else if (command === 'end' || command === 'restart') {
+        taboo.close(key)
+        if (command === 'restart') {
+          const room = taboo.open(key)
+          io.to(key).emit('taboo:state', room.state())
+          io.to(dashboardRoom(key)).emit('taboo:admin', room.admin())
+        }
+      }
+    }
+    if (command === 'end') clearSemantic(key)
+    else ensureSemantic(key)?.pause(command === 'pause')
   })
 
   // A command of the creator to the game in play (the dashboard's "Termina round"): the overlays of the room carry it
@@ -703,6 +874,7 @@ io.on('connection', (socket) => {
     const session = getSession(key)
     if (clientType !== 'dashboard' || !isGameCommand(command) || session.paused || session.ended) return
     if (tournamentLocks('«Termina round»')) return
+    if (command === 'next-round' && ensureSemantic(key)) { ensureSemantic(key)!.next(); return }
     io.to(key).emit('game:command', command)
   })
 
@@ -713,7 +885,8 @@ io.on('connection', (socket) => {
     const session = getSession(key)
     if (!r || !u || r.game !== session.gameId || session.paused || session.ended) return
     // The tournament's points are the server's own, never an overlay's (and never in the ordinary leaderboards).
-    if (session.gameId === 'context' && tournaments.has(key)) return
+    if (session.gameId === 'context' && (tournaments.has(key) || ensureSemantic(key))) return
+    if (session.gameId === 'zerotaboo') return // its standings are the server's own (D17)
     if (typeof u.id !== 'string' || typeof u.nickname !== 'string' || typeof r.points !== 'number') return
     const avatar = typeof u.avatar === 'string' && /^https?:\/\//.test(u.avatar) ? u.avatar.slice(0, 512) : undefined
     recordScore(key, session.gameId, { id: u.id, nickname: u.nickname, avatar }, r.points)
@@ -732,7 +905,7 @@ io.on('connection', (socket) => {
 
   socket.on('secret:round', (raw: unknown) => {
     if (!SECRET_GAMES.includes(getSession(key).gameId) || !raw || typeof raw !== 'object') return
-    if (getSession(key).gameId === 'context' && tournaments.has(key)) return
+    if (getSession(key).gameId === 'context' && (tournaments.has(key) || ensureSemantic(key))) return
     const { word, prev } = raw as { word?: unknown; prev?: unknown }
     // One word, or a chain of them joined by "-" (ZeroReazioniACatena's led by its mode and round).
     if (typeof word !== 'string' || word.length > ROOM_SECRET_MAX || !ROOM_SECRET.test(word)) return
@@ -748,6 +921,7 @@ io.on('connection', (socket) => {
   // ZeroContext: an overlay shows the round's word (see revealedSecrets); only the room's word counts.
   socket.on('secret:revealed', (raw: unknown) => {
     if (getSession(key).gameId !== 'context' || !raw || typeof raw !== 'object') return
+    if (ensureSemantic(key)) return
     const { word } = raw as { word?: unknown }
     if (typeof word === 'string' && word === roomSecrets.get(key)) revealedSecrets.set(key, word)
   })
@@ -780,11 +954,12 @@ io.on('connection', (socket) => {
   // Otherwise overlays only listen; everything that changes state comes from the dashboard.
   if (clientType !== 'dashboard') return
 
-  void socket.join(dashboardRoom(key))
   const words = incastro.get(key)
   if (words) socket.emit('incastro:solution', words.solution())
   const quiz = quizzland.get(key)?.solution()
   if (quiz) socket.emit('quizzland:solution', quiz)
+  // The card in play and the director's tools: to a dashboard only, never to an overlay.
+  if (session.gameId === 'zerotaboo') socket.emit('taboo:admin', taboo.open(key).admin())
   void persistence.run('ranking', { key }).then((ranking) => { if (socket.connected) socket.emit('ranking:update', ranking) })
     .catch((error: unknown) => app.log.error({ err: error }, 'Classifica donatori non disponibile'))
   void persistence.run('padBoard', { key }).then((board) => { if (socket.connected) socket.emit('pads:state', board) })
@@ -856,7 +1031,11 @@ io.on('connection', (socket) => {
 
   socket.on('sim:event', (raw: unknown) => {
     const event = sanitizeEvent(raw)
-    if (event) broadcastEvent(key, event)
+    if (!event) return
+    broadcastEvent(key, event)
+    // The simulator plays a ZeroTaboo practice match only (outside the standings and the calibration, D7): the room refuses it otherwise.
+    if (event.type === 'comment' && getSession(key).gameId === 'zerotaboo')
+      taboo.get(key)?.offer({ source: 'simulator', user: event.user, text: event.text, messageId: '', platform: getSession(key).settings.tabooPlatform === 'twitch' ? 'twitch' : 'tiktok' })
   })
 
   socket.on('game:select', (gameId: unknown) => {
@@ -864,15 +1043,23 @@ io.on('connection', (socket) => {
     const state = selectGame(key, gameId)
     if (!state) return
     roomSecrets.delete(key)
+    clearSemantic(key)
     io.to(key).emit('session:state', state)
     // Selecting Bivio or Quizzland again starts a fresh round (and Quizzland a fresh
     // leaderboard); Incastro picks up its saved level with a fresh leaderboard.
     bivio.close(key)
     incastro.close(key)
     quizzland.close(key)
+    taboo.close(key)
     if (state.gameId === 'zerodubbi') bivio.open(key, state.settings)
     if (state.gameId === 'incastro') incastro.open(key, state.settings)
     if (state.gameId === 'quizzland') quizzland.open(key, state.settings)
+    if (state.gameId === 'zerotaboo') {
+      const room = taboo.open(key)
+      io.to(key).emit('taboo:state', room.state())
+      io.to(dashboardRoom(key)).emit('taboo:admin', room.admin())
+    }
+    ensureSemantic(key)
   })
 
   socket.on('triggers:set', (raw: unknown) => {
@@ -885,11 +1072,27 @@ io.on('connection', (socket) => {
     // different fields cannot overwrite each other.
     const current = getSession(key)
     const settings = sanitizeSettings(current.gameId, raw && typeof raw === 'object' ? { ...current.settings, ...raw } : raw)
-    if (!settings) return
-    io.to(key).emit('session:state', setSettings(key, settings))
+    if (!settings || clientType !== 'dashboard') return
+    const changingProfile = current.gameId === 'context' && contextProfile(settings.associationSource) !== contextProfile(current.settings.associationSource)
+    if (changingProfile) {
+      if (tournamentLocks('Cambiare associazioni')) return
+      const profile = contextProfile(settings.associationSource)
+      if (!serverCorpus(profile)) {
+        socket.emit('context:tournament-error', { message: 'Queste associazioni non sono disponibili. La scelta precedente resta attiva.' })
+        return
+      }
+      roomSecrets.delete(key)
+      revealedSecrets.delete(key)
+      clearSemantic(key)
+    }
+    setSettings(key, settings)
+    tournaments.settingsChanged(key)
+    io.to(key).emit('session:state', changingProfile ? refreshGame(key) : getSession(key))
+    if (changingProfile) { ensureSemantic(key); return }
     bivio.get(key)?.applySettings(settings)
     incastro.get(key)?.applySettings(settings)
     quizzland.get(key)?.applySettings(settings)
+    semanticGames.get(key)?.settingsChanged(settings)
   })
 
   socket.on('bivio:control', (raw: unknown) => {
@@ -905,6 +1108,17 @@ io.on('connection', (socket) => {
   socket.on('quizzland:control', (raw: unknown) => {
     const command = sanitizeQuizzlandCommand(raw)
     if (command) quizzland.get(key)?.control(command)
+  })
+
+  // ZeroTaboo: every command is checked here, carries the version the director saw, and is answered with a typed reply.
+  socket.on('taboo:control', (raw: unknown, ack?: unknown) => {
+    const command = sanitizeTabooCommand(raw)
+    const reply = !command
+      ? ({ ok: false, error: 'bad-input', message: 'Comando non valido.' } as const)
+      : getSession(key).gameId !== 'zerotaboo'
+        ? ({ ok: false, error: 'wrong-phase', message: 'ZeroTaboo non è il gioco selezionato.' } as const)
+        : taboo.open(key).control(command)
+    if (typeof ack === 'function') ack(reply)
   })
 
   socket.on('incastro:goto', (raw: unknown) => {
@@ -983,10 +1197,12 @@ const shutdown = createShutdown({
   steps: [
     { name: 'stop accepting work', run: () => { draining = true } },
     { name: 'ZeroContext tournament', run: () => tournaments.shutdown() },
+    { name: 'ZeroContext semantic clock', run: () => { clearInterval(semanticClock); semanticGames.clear() } },
     { name: 'live sources', run: () => { zfb.close(); sources.forEach((room) => room.disconnectAll()) } },
     { name: 'ZeroDubbi rooms', run: () => bivio.closeAll() },
     { name: 'ZeroWords rooms', run: () => incastro.closeAll() },
     { name: 'ZeroQuizz rooms', run: () => quizzland.closeAll() },
+    { name: 'ZeroTaboo rooms', run: () => taboo.closeAll() },
     { name: 'level generator', run: () => levels.close() },
     { name: 'sockets', run: () => new Promise<void>((resolve) => void io.close(() => resolve())) },
     { name: 'leaderboard publisher', run: () => leaderboardPublisher?.close() },

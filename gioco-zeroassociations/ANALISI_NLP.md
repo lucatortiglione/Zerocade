@@ -1,5 +1,8 @@
 # Analisi morfologica italiana
 
+> **Revisione documentale — 16 novembre 2026.** I requisiti di generazione locali fissano wordfreq 3.1.1, NLTK 3.10.4 e spaCy 3.8.18. I profili statistico e neurale di ZeroContext hanno ambienti separati; LSA non sostituisce le attestazioni morfologiche né una revisione semantica. Le versioni effettive dei modelli vanno registrate separatamente da quelle delle librerie.
+> [Indice e stato della documentazione](../docs/STATO_DOCUMENTAZIONE.md).
+
 La raccolta distingue le **attestazioni lessicali** dalle **previsioni dei modelli**.
 Per una parola isolata si consultano le analisi attive del DB: `porta` può essere
 sia il nome `porta` sia una forma di `portare`. Per scegliere un'analisi in una

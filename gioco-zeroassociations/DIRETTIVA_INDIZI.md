@@ -1,5 +1,8 @@
 # Direttiva di pertinenza e recuperabilità delle risposte
 
+> **Revisione documentale — 16 novembre 2026.** Il criterio di pertinenza e recuperabilità qui definito resta invariato. Le fonti possono proporre parole e relazioni; l'ampliamento di ZeroContext e i suoi ranking automatici non costituiscono una revisione dei bacini di ZeroAssociazioni. Procedura di importazione e copie sono nel [README](README.md).
+> [Indice e stato della documentazione](../docs/STATO_DOCUMENTAZIONE.md).
+
 Aggiornamento dell'8 novembre 2026 alla specifica Word Association IT v3.6.0.
 La fonte normativa è [la direttiva operativa](direttive_word_association_it_v3_6_0.md),
 in particolare §§3.5–3.14, 7 e 8. Il nome di questo file è storico:

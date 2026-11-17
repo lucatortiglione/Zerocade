@@ -56,3 +56,14 @@ test('a transport that ignores cancellation cannot revive an obsolete load', asy
   resolve(new Response('mare\nonda\n'))
   await assert.rejects(loading, (error) => error instanceof ContextError && error.kind === 'closed')
 })
+
+test('a corpus changed between HTTP files is rejected instead of mixing generations', async () => {
+  const responses: typeof fetch = async (input) => {
+    const first = String(input).endsWith('vocab.txt')
+    return new Response(first ? 'mare\nonda\n' : 'mare\n', {
+      headers: { 'x-zerocontext-revision': first ? 'old' : 'new' },
+    })
+  }
+  await assert.rejects(loadContextData('http://localhost:3001', new AbortController().signal, responses),
+    (error) => error instanceof ContextError && error.kind === 'network' && /cambiato/.test(error.message))
+})

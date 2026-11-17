@@ -1,12 +1,15 @@
 # I file .sqlite3 di `database/`
 
-Situazione al 13/11/2026, con l'aggiunta di ZeroLettere il 14/11: quattro file, e tutti servono.
+Inventario aggiornato al **16 novembre 2026**, con ruoli distinti.
+Le dimensioni sono quelle del workspace locale; le ottimizzazioni descritte più sotto sono storiche.
 
 | File | Peso | In Git | A che cosa serve |
 | --- | ---: | :---: | --- |
-| `giochi.sqlite3` | 11 MB | sì | Il DB dei giochi di parole: uno schema per gioco, letto dal server e dal pacchetto Windows |
-| `parole_ita_raw.sqlite3` | 2,3 GB | no | Il DB di lavoro di ZeroAssociazioni: i sei DB storici, uno schema ciascuno |
+| `giochi.sqlite3` | 53,00 MB | sì | Il DB dei giochi di parole: uno schema per gioco, letto dal server e dal pacchetto Windows |
+| `parole_ita_raw.sqlite3` | 3,43 GB | no | Il DB di lavoro di ZeroAssociazioni: i sei DB storici, più candidati e valutazioni |
+| `parole_ita_raw_2.0.sqlite3` | 631,04 MB | no | Seconda raccolta: tabella `parole` con 2.847.433 voci uniche da tutte le fonti, senza scarti editoriali; [schema e task](PAROLE_RAW_2.0.md) |
 | `ZeroQuizz.sqlite3` | 7 MB | sì | Il DB di ZeroQuizz: domande e risposte, un gioco a sé (era `gioco-quizzland/data/domande.db`, poi lo schema `quizz` di `giochi.sqlite3`). Lo leggono il server e il pacchetto Windows |
+| `ZeroTaboo.sqlite3` | 84 KB | sì | Il mazzo di ZeroTaboo: 62 carte con bersaglio, cinque parole Taboo e alias approvati, più gli avvisi editoriali. Lo scrive `gioco-zerotaboo/script/mazzo.py`, lo legge in sola lettura il server (`app\ZeroTaboo.sqlite3` nel pacchetto Windows) |
 | `ZeroDubbi.sqlite3` | piccolo | sì | Il DB di ZeroDubbi: i dilemmi (tabelle `dilemmi` e `testi`), un gioco a sé come ZeroQuizz. Lo leggono il server e il pacchetto Windows (`app\ZeroDubbi.sqlite3`) |
 | `ZeroLettere.sqlite3` | 836 KiB | sì | Banca autonoma di ZeroLettere: 5.661 indizi e risposte, più 109 alternative, importati dal CSV in `gioco-zerolettere`. Dati e comando in [README](../gioco-zerolettere/README.md) |
 
@@ -19,7 +22,8 @@ Il DB che i giochi leggono, in sola lettura. Sta in Git e va nel pacchetto Windo
 | Schema | Gioco |
 | --- | --- |
 | `wordle` | ZeroWordle |
-| `context` | ZeroContext (le parole e i collegamenti con ZeroAssociazioni; i vettori sono in `gioco-zerocontext/data/vectors.bin`) |
+| `context` | ZeroContext: parole, collegamenti, penalità e metadati; i vettori sono nel file `vectors_file` sotto `gioco-zerocontext/data/` |
+| `context_original`, `context_abtt` | Profili selezionabili di ZeroContext: originale 300 float32 e ABTT 1.024 float32; stesso inventario. TurboX/Harrier rimossi |
 | `associazioni` | ZeroAssociazioni e ZeroReazioniACatena: solo i prompt, le parole (ognuna una volta) e i collegamenti |
 | `parole` | ZeroWords |
 | `contenuti` | gli altri giochi dell'overlay |
@@ -46,6 +50,15 @@ Gli script indicano uno schema con il suo indirizzo, `database/parole_ita_raw.sq
 la stessa scrittura del server, e leggono e scrivono qui. Il nome storico del file indica ancora lo stesso schema,
 perché compare nei metadati e nelle ricevute già scritti, ma i file con quei nomi non esistono più. Da qui
 `script/giochi.py aggiorna associazioni` copia i bacini del gioco, prendendoli dallo schema `validi`.
+
+Per ZeroContext la generazione attiva contiene 93.928 tentativi e 9.513 segrete,
+con tre profili selezionabili nella regia: originale (300 float32), TurboX e Harrier (256 float32).
+I profili sono integrati negli schemi context_original, context_turbox e context_harrier;
+vedi [PROFILI_ASSOCIAZIONI.md](../gioco-zerocontext/PROFILI_ASSOCIAZIONI.md).
+L'importazione diretta conserva le regressioni semantiche descritte in [Python/README.md](../Python/README.md).
+La pubblicazione aggiorna solo lo schema
+`context` e il riferimento a un file immutabile `vectors.<sha256>.bin`, conservando un backup.
+Il metodo e i comandi sono nel [README del gioco](../gioco-zerocontext/README.md).
 
 ### Com'è fatto
 
@@ -154,3 +167,13 @@ poi i file sono stati cancellati:
 | `apps/server/data/zerocade.db` | **Sì**: sessioni, eventi, classifiche, voti e progressi della diretta; i tornei ZeroContext (tabelle `context_tournament_*`) e le uscite delle parole segrete (`context_secret_uses`) |
 | `apps/server/data/content.db` | No: la banca dei giochi ora è lo schema `contenuti`. Il server lo crea solo se quello schema manca |
 | `gioco-dilemmi/data/domande.db` | No: era il DB di ZeroDubbi, ora `ZeroDubbi.sqlite3`. Non serve più a nessuno strumento |
+
+## Corpus semantico ZeroContext
+
+Lo schema `context` comprende ora `targets`, con appartenenza ai pool ordinario/speciale,
+frequenze, densità, ponti e deroghe per conservare le vecchie segrete. Il corpus ha 93.928
+tentativi e 9.513 segrete; i vettori esterni dipendono dal profilo: originale 300 float32, ABTT 1.024 float32.
+Le densità e i ponti precedenti sono archiviati come riferiti alla vecchia matrice. La pubblicazione impedisce
+la rimozione di segrete esistenti. I vecchi strumenti di riscrittura dello schema rifiutano
+di sovrascrivere un corpus semantico privo di questa gestione dei target.
+Dettagli in [IMPLEMENTAZIONE_SEMANTICA.md](../gioco-zerocontext/IMPLEMENTAZIONE_SEMANTICA.md).

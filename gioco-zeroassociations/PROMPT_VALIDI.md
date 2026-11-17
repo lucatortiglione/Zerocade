@@ -1,5 +1,8 @@
 # Lo schema `validi`: cosa contiene e quando una voce può entrarvi
 
+> **Revisione documentale — 16 novembre 2026.** La copia runtime attuale ha 3.941 prompt con bacini pubblicati. `validi` resta una copia dei verbali conformi, mentre il server usa lo schema `associazioni` di `giochi.sqlite3`. I controlli strutturali e la rigenerazione dei vettori di ZeroContext non sostituiscono la revisione delle singole associazioni prescritta qui.
+> [Indice e stato della documentazione](../docs/STATO_DOCUMENTAZIONE.md).
+
 Documento aggiornato il **9 novembre 2026**, sulla base dell'implementazione
 locale di [script/validated_prompt_database.py](script/validated_prompt_database.py),
 [script/prompt_database.py](script/prompt_database.py) e [prompt_schema.sql](prompt_schema.sql).

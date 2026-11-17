@@ -1,5 +1,8 @@
 # 🌱 ZeroWords
 
+> **Revisione documentale — 16 novembre 2026.** Il generatore resta `zw-2` nei sorgenti del server. La generazione usa un worker Node, con coda limitata e timeout; l'overlay riceve livelli e stato dal server. Il [TODO](TODO.md) conserva la roadmap mobile, mentre [ALGORITMO.md](ALGORITMO.md) descrive il generatore PC.
+> [Indice e stato della documentazione](../docs/STATO_DOCUMENTAZIONE.md).
+
 Una ruota di lettere e uno schema a incastro: il pubblico scrive in chat le parole che riesce a formare con le
 lettere della ruota, e ogni parola dello schema trovata si scrive al suo posto. Valgono anche le parole bonus,
 cioè le parole italiane valide che non sono nello schema. I livelli non finiscono mai: il server li genera

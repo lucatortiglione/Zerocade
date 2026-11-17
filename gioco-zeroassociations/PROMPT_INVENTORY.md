@@ -1,5 +1,8 @@
 # Primo step: raccogliere i prompt
 
+> **Revisione documentale — 16 novembre 2026.** Il riepilogo locale `prompt_inventory_status.json` registra 2.833.072 voci, 9.789.790 attestazioni e 46 fonti. Si tratta dello stato salvato dall'ultima raccolta, non di una nuova acquisizione eseguita in questa revisione. Contesti e il nuovo task di rigenerazione ZeroContext riusano tale inventario; nuove versioni richiedono integrazione esplicita.
+> [Indice e stato della documentazione](../docs/STATO_DOCUMENTAZIONE.md).
+
 L'inventario è ora gestito come **database unico con decisioni persistenti**:
 vedere [aggiornamenti delle fonti e scelte sulle voci](AGGIORNAMENTI_FONTI.md).
 Le nuove versioni di fonti già importate vengono confrontate prima di integrarle.
@@ -20,6 +23,15 @@ nelle tabelle di inventario, senza attribuire loro un'approvazione semantica.
 La verifica prima dell'inserimento rimane necessaria per le associazioni di gioco.
 
 ## Task da utilizzare ora
+
+Per creare e aggiornare il secondo archivio usare **ZeroCade : Aggiornamento parole RAW**.
+La procedura `script/aggiorna_parole_raw.py` crea `parole_ita_raw_2.0.sqlite3`, tabella
+`parole`, e controlla tutte le 46 fonti senza limiti di righe, duplicati o scarti
+editoriali. Il vecchio DB conserva le sue decisioni e lavorazioni. Il task crea un
+backup prima degli aggiornamenti e non pubblica le banche dei giochi. Il catalogo è
+[FONTI_PAROLE_RAW.md](../database/FONTI_PAROLE_RAW.md).
+
+Per la raccolta con confronto manuale rimane disponibile il comando storico:
 
 In VS Code: **Terminale → Esegui attività → 1. Prompt: raccogli e inserisci
 inventario da tutte le fonti registrate**.

@@ -1,11 +1,22 @@
 {
-  "collected_prompts": 2740415,
-  "single_word_candidates": 2490114,
-  "with_lemma_evidence": 200203,
-  "with_inflected_evidence": 1235619,
-  "with_italian_lexical_evidence": 1562072,
-  "sources": 40,
-  "attestations": 7731331,
+  "collected_prompts": 2833072,
+  "single_word_candidates": 2496538,
+  "with_lemma_evidence": 201572,
+  "with_inflected_evidence": 1333481,
+  "with_italian_lexical_evidence": 1658116,
+  "sources": 46,
+  "attestations": 9789790,
+  "decisions": [
+    {
+      "decision": "DEFERRED",
+      "count": 699
+    },
+    {
+      "decision": "DISCARDED",
+      "count": 91072
+    }
+  ],
+  "updates": [],
   "association_generation_started": false,
   "automatic_gameplay_approval": false,
   "coverage": "sources_registered_and_imported_not_all_existing_sources",
@@ -77,8 +88,8 @@
     },
     {
       "source": "wordfreq-it-local",
-      "status": "ALREADY_IMPORTED",
-      "sha256": "e4e4fc0d8af8f4e6d853670a9bf5f5ef43d315d29e1a65765d476f1f44bf7aa1"
+      "status": "FAILED",
+      "error": "C:\\Progetti\\Zerocade\\gioco-zeroassociations\\resources\\frequency_ranks_it.csv"
     },
     {
       "source": "de-mauro-sitemaps",
@@ -102,136 +113,144 @@
     },
     {
       "source": "kaikki-frwiktionary-it",
-      "status": "IMPORTED",
-      "records": 1199070,
+      "status": "ALREADY_IMPORTED",
       "sha256": "f773ab4c9e25322271707638844748489d1f4d9ed745f738e8f6c4539d5f1c90"
     },
     {
       "source": "kaikki-dewiktionary-it",
-      "status": "IMPORTED",
-      "records": 17914,
+      "status": "ALREADY_IMPORTED",
       "sha256": "e797f78d800f5a39e3874a5b1bb4ea0f804c5886badff20e21ad1029016b4840"
     },
     {
       "source": "kaikki-eswiktionary-it",
-      "status": "IMPORTED",
-      "records": 6934,
+      "status": "ALREADY_IMPORTED",
       "sha256": "7ddb5a16fabf553fb1335418a374bce6ba9c3a78e4cb34e62f387d8bacd5c9c8"
     },
     {
       "source": "morphit-048-mirror",
-      "status": "IMPORTED",
-      "records": 505072,
+      "status": "ALREADY_IMPORTED",
       "sha256": "7375216351ee59cee4326b455503f3a6c4e9542cd63ecb86ff5cd58ca5c8e800"
     },
     {
       "source": "frequencywords-it-2018",
-      "status": "IMPORTED",
-      "records": 798017,
+      "status": "ALREADY_IMPORTED",
       "sha256": "b23b0c6a3f59c1da1c7caa667b9df5699e95323fee20a05f343c7d7dae73c4be"
     },
     {
       "source": "freedict-ita-deu",
-      "status": "IMPORTED",
-      "records": 2924,
+      "status": "ALREADY_IMPORTED",
       "sha256": "b364b906dea10213b47d27ad1a4d0631b1ad6da0400304fefb2597ef765d5884"
     },
     {
       "source": "ud-vit-dev",
-      "status": "IMPORTED",
-      "records": 38082,
+      "status": "ALREADY_IMPORTED",
       "sha256": "d6e076afb639b4bee82f8caaaaed467cbd2c4f6ec2762aa0108ca865f97e0f3c"
     },
     {
       "source": "ud-vit-test",
-      "status": "IMPORTED",
-      "records": 34502,
+      "status": "ALREADY_IMPORTED",
       "sha256": "1569c1c28727e1f99d8246c57b0ffa61ae0442747599051bfbd0e63d7081503f"
     },
     {
       "source": "ud-vit-train",
-      "status": "IMPORTED",
-      "records": 296318,
+      "status": "ALREADY_IMPORTED",
       "sha256": "678e41cc9771c8dec6a2b2a21489d549dd4d715bda582d3890b162b1c80ea33a"
     },
     {
       "source": "ud-partut-dev",
-      "status": "IMPORTED",
-      "records": 4042,
+      "status": "ALREADY_IMPORTED",
       "sha256": "c6542e547447df403e54f314a61ec9f4a5e1e0d770dbcbdedb5ea8edcb6758fc"
     },
     {
       "source": "ud-partut-test",
-      "status": "IMPORTED",
-      "records": 4894,
+      "status": "ALREADY_IMPORTED",
       "sha256": "6a3f3437fd3ab383ba37122ec84cc1bd53662512f5ff1e80ed306c6b668eb6a2"
     },
     {
       "source": "ud-partut-train",
-      "status": "IMPORTED",
-      "records": 65246,
+      "status": "ALREADY_IMPORTED",
       "sha256": "576ecef59bedbd740c6c8744af25726d5d279afac3555fa6a37c50ec7db1324d"
     },
     {
       "source": "ud-postwita-dev",
-      "status": "IMPORTED",
-      "records": 15378,
+      "status": "ALREADY_IMPORTED",
       "sha256": "ba359dae18bce28208945004cf75a100d72e667fb724f917cd6f405aef150142"
     },
     {
       "source": "ud-postwita-test",
-      "status": "IMPORTED",
-      "records": 15859,
+      "status": "ALREADY_IMPORTED",
       "sha256": "5db5e37ed8dc904595ac7d5bc3f746e6232a9fec0689948ffd17219c082a77c4"
     },
     {
       "source": "ud-postwita-train",
-      "status": "IMPORTED",
-      "records": 124585,
+      "status": "ALREADY_IMPORTED",
       "sha256": "1cd7c0bdce31c1f9768e9a95befd69ffe2246b98b42446ab8912fe7ec665d2d9"
     },
     {
       "source": "ud-twittiro-dev",
-      "status": "IMPORTED",
-      "records": 3801,
+      "status": "ALREADY_IMPORTED",
       "sha256": "1f16040ae17395d2910784742e6b3344620a67937524d47ed96fd56f811a8c99"
     },
     {
       "source": "ud-twittiro-test",
-      "status": "IMPORTED",
-      "records": 3771,
+      "status": "ALREADY_IMPORTED",
       "sha256": "ae8560ce8471d20fda2e242dc45b3be7d2e0e8f0ccec323a7750fe7511f8b9d4"
     },
     {
       "source": "ud-twittiro-train",
-      "status": "IMPORTED",
-      "records": 30158,
+      "status": "ALREADY_IMPORTED",
       "sha256": "a470b66a73d2d489113de4f0591b1c61cf3848c6a94cedf33a8379d7e39a24f2"
     },
     {
       "source": "ud-valico-test",
-      "status": "IMPORTED",
-      "records": 8707,
+      "status": "ALREADY_IMPORTED",
       "sha256": "a9f026703c1f3321eeba060460a1dac9d49677a641a7f03e78bcf8103667815a"
     },
     {
       "source": "ud-markit-dev",
-      "status": "IMPORTED",
-      "records": 13859,
+      "status": "ALREADY_IMPORTED",
       "sha256": "633b6186f47ecfebfcff4ff9c7e19a0cbffd1f655f14fc1e9265b12bda597f97"
     },
     {
       "source": "ud-markit-test",
-      "status": "IMPORTED",
-      "records": 14383,
+      "status": "ALREADY_IMPORTED",
       "sha256": "9048ed0064e3989e2c37377755a28c25c7e462b1ad916e5808dc0a7ce95fc3fc"
     },
     {
       "source": "ud-markit-train",
-      "status": "IMPORTED",
-      "records": 26369,
+      "status": "ALREADY_IMPORTED",
       "sha256": "4f6fc3423acb00d49e1e167bd21b11ebbc23e22275fd6f5eeb4d75cfbbccc5c6"
+    },
+    {
+      "source": "nvdb-de-mauro-2016",
+      "status": "ALREADY_IMPORTED",
+      "sha256": "f053fa2dd393a105d9645a86aa3c3994fe360c3896d7720b1c6e87246e4e5098"
+    },
+    {
+      "source": "itaoa-montefinese-2019",
+      "status": "ALREADY_IMPORTED",
+      "sha256": "026bcdba1c9544167829f19d7b0cd53fa21836fc7c24891a92eee75fbaf4aabc"
+    },
+    {
+      "source": "unimorph-ita",
+      "status": "ALREADY_IMPORTED",
+      "sha256": "6347bb15b3d2c3dafcbe4adc0e7beaa97a8bc61bcccc345079afb154c03f1321"
+    },
+    {
+      "source": "glaffit",
+      "status": "ALREADY_IMPORTED",
+      "sha256": "9e42965e5b7a8f4594c0199bbce6b6890c4bdc31a72a65af1b683b2025bf527d"
+    },
+    {
+      "source": "flex-it-nouns",
+      "status": "ALREADY_IMPORTED",
+      "sha256": "1b0a06e94949827476621cfd3a639837d28905b91521c77c7958331785cf8587"
+    },
+    {
+      "source": "flex-it-adjectives",
+      "status": "ALREADY_IMPORTED",
+      "sha256": "628a830f5d997d763d7522bd8e63589a4b98edd3189363f9a15b107b4418c97d"
     }
   ],
-  "all_selected_sources_completed": true
+  "all_selected_sources_completed": false
 }

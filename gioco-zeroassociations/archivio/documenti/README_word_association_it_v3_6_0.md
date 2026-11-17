@@ -1,5 +1,8 @@
 # Word Association IT — Pacchetto v3.6.0
 
+> **Revisione documentale — 16 novembre 2026.** Pacchetto storico v3.6.0. Gli esempi di comandi riflettono la disposizione originaria dei file; i validatori correnti sono in `../../script/` e gli estrattori storici in `../script/`. La procedura attuale parte dai bacini revisionati nel [README principale](../../README.md).
+> [Indice e stato della documentazione](../../../docs/STATO_DOCUMENTAZIONE.md).
+
 ## Regola del gioco
 
 **`prompt` è il contesto che il giocatore vede. `words` contiene sette risposte nascoste che il giocatore deve indovinare.** Il vecchio protocollo che ricostruiva il prompt dai sette indizi è superato e non è compatibile con questa versione.
@@ -35,7 +38,7 @@ La modalità `--export-csv` crea un CSV **tecnicamente conforme**, non un datase
 ## Revisione delle associazioni
 
 La correzione semantica dell'8 novembre 2026 è descritta nei §§3.5–3.9 delle
-direttive complete, nel protocollo del §3.10 e in [DIRETTIVA_INDIZI.md](DIRETTIVA_INDIZI.md). Ogni risposta
+direttive complete, nel protocollo del §3.10 e in [DIRETTIVA_INDIZI.md](../../DIRETTIVA_INDIZI.md). Ogni risposta
 richiede una relazione concreta, una motivazione e una revisione indipendente:
 la sola presenza nella definizione non la rende giocabile. Date, incisi,
 locuzioni quantitative e verbi di servizio non devono riempire i set.
@@ -56,7 +59,7 @@ lotti esistenti abbiano già superato i nuovi controlli semantici.
 
 ## Aggiornamento dagli screenshot
 
-Vedere l'[analisi dei 22 contesti](analisi_screenshot_word_association_20261108.md)
+Vedere l'[analisi dei 22 contesti](../../analisi_screenshot_word_association_20261108.md)
 e i §§3.11–3.13: polarità della fonte, diversità dei contenuti, senso dominante,
 qualità delle definizioni e confronto delle regressioni. SKATEBOARD non eredita
 il manubrio da «senza manubrio»; IMPROVVISO non accumula varianti di inatteso.

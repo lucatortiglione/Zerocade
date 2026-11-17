@@ -13,6 +13,7 @@
 //                                   Bivio's dilemmas, word lists, ZeroAssociazioni's verified pools, ZeroWords'
 //                                   lexicon and the other games' content
 //   app/ZeroDubbi.sqlite3           Bivio's dilemmas (database/ZeroDubbi.sqlite3), a database of their own
+//   app/ZeroTaboo.sqlite3           ZeroTaboo's deck of 62 cards (database/ZeroTaboo.sqlite3), read only
 //   app/ZeroQuizz.sqlite3           ZeroQuizz's questions and answers (database/ZeroQuizz.sqlite3), a database
 //                                   of their own
 //   app/zerocontext/vectors.bin     ZeroContext's vectors (gioco-zerocontext/data)
@@ -30,6 +31,7 @@ import { createRequire } from 'node:module'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { build } from 'esbuild'
+import { sqliteRuntime } from './sqlite-runtime.mjs'
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const releaseDir = join(root, 'release')
@@ -82,11 +84,25 @@ cpSync(join(root, 'apps', 'overlay', 'dist'), join(app, 'public', 'overlay'), { 
 // be verified and have them all: the package has no other copy of the pools, words and banks.
 const giochi = join(root, 'database', 'giochi.sqlite3')
 const SCHEMAS = ['wordle', 'context', 'associazioni', 'parole', 'contenuti']
+let contextVectors = 'vectors.bin'
+const profileVectors = new Set()
 {
   const Database = createRequire(join(root, 'apps', 'server', 'package.json'))('better-sqlite3')
   const db = new Database(giochi, { readonly: true, fileMustExist: true })
   const verified = db.prepare("SELECT value FROM zerodb_meta WHERE name = 'verified'").pluck().get()
   const present = new Set(db.prepare('SELECT DISTINCT schema FROM zerodb_objects').pluck().all())
+  const namedVectors = db.prepare("SELECT value FROM context__meta WHERE name = 'vectors_file'").pluck().get()
+  if (namedVectors !== undefined) {
+    const parsed = JSON.parse(namedVectors)
+    if (typeof parsed !== 'string' || !/^vectors\.[a-f0-9]{64}\.bin$/.test(parsed)) throw new Error('Invalid active ZeroContext vector file')
+    contextVectors = parsed
+  }
+  for (const schema of ['context_original', 'context_abtt']) {
+    if (!present.has(schema)) continue
+    const name = JSON.parse(db.prepare(`SELECT value FROM ${schema}__meta WHERE name = 'vectors_file'`).pluck().get())
+    if (typeof name !== 'string' || !/^vectors\.[a-f0-9]{64}\.bin$/.test(name)) throw new Error(`Invalid ZeroContext profile vectors: ${schema}`)
+    profileVectors.add(name)
+  }
   db.close()
   const missing = SCHEMAS.filter((s) => !present.has(s))
   if (verified !== '1' || missing.length) {
@@ -121,18 +137,35 @@ const zeroQuizz = join(root, 'database', 'ZeroQuizz.sqlite3')
   }
 }
 copyFileSync(zeroQuizz, join(app, 'ZeroQuizz.sqlite3'))
+// ZeroTaboo: its deck of cards is a database of their own (apps/server/src/taboo-deck.ts); without it the game cannot start.
+const zeroTaboo = join(root, 'database', 'ZeroTaboo.sqlite3')
+{
+  const Database = createRequire(join(root, 'apps', 'server', 'package.json'))('better-sqlite3')
+  const db = new Database(zeroTaboo, { readonly: true, fileMustExist: true })
+  const cards = db.prepare('SELECT count(*) FROM mazzo_corrente').pluck().get()
+  db.close()
+  if (!cards) {
+    console.error('✗ database/ZeroTaboo.sqlite3 has no cards')
+    process.exit(1)
+  }
+}
+copyFileSync(zeroTaboo, join(app, 'ZeroTaboo.sqlite3'))
 // ZeroContext: the vectors of the playable words, in their order (apps/server/src/context.ts).
 mkdirSync(join(app, 'zerocontext'), { recursive: true })
-copyFileSync(join(root, 'gioco-zerocontext', 'data', 'vectors.bin'), join(app, 'zerocontext', 'vectors.bin'))
+copyFileSync(join(root, 'gioco-zerocontext', 'data', contextVectors), join(app, 'zerocontext', contextVectors))
+for (const name of profileVectors) copyFileSync(join(root, 'gioco-zerocontext', 'data', name), join(app, 'zerocontext', name))
+if (contextVectors !== 'vectors.bin') copyFileSync(join(app, 'zerocontext', contextVectors), join(app, 'zerocontext', 'vectors.bin'))
 // ZeroWords: the attribution the word list asks for (the words are in the schema parole).
 copyFileSync(join(root, 'gioco-parole', 'lexicon', 'it', 'SOURCE'), join(app, 'CREDITI-parole.txt'))
 
-const sqliteDir = dirname(createRequire(join(root, 'apps', 'server', 'package.json')).resolve('better-sqlite3/package.json'))
+const sqlite = sqliteRuntime(createRequire(join(root, 'apps', 'server', 'package.json')), 'win32-x64')
+const sqliteDir = sqlite.directory
 const sqliteOut = join(app, 'node_modules', 'better-sqlite3')
 cpSync(join(sqliteDir, 'lib'), join(sqliteOut, 'lib'), { recursive: true })
 for (const file of ['package.json', 'LICENSE']) copyFileSync(join(sqliteDir, file), join(sqliteOut, file))
 mkdirSync(join(sqliteOut, 'prebuilds'), { recursive: true })
-copyFileSync(join(sqliteDir, 'prebuilds', 'win32-x64.node'), join(sqliteOut, 'prebuilds', 'win32-x64.node'))
+copyFileSync(sqlite.binary, join(sqliteOut, 'prebuilds', 'win32-x64.node'))
+console.log(`SQLite runtime: ${sqlite.version ?? 'win32-x64 prebuild (cross build)'} from ${sqlite.binary}`)
 
 step(`Adding the Node.js ${process.version} runtime`)
 mkdirSync(runtime, { recursive: true })
@@ -311,7 +344,7 @@ writeFileSync(
     '  associazioni__ (ZeroAssociazioni e ZeroReazioniACatena), parole__ (ZeroWords),',
     '  contenuti__ (gli altri giochi). I vettori di ZeroContext sono a parte, in',
     '  app\\zerocontext\\vectors.bin. Le domande di ZeroQuizz hanno un database a sé,',
-    '  app\\ZeroQuizz.sqlite3.',
+    '  app\\ZeroQuizz.sqlite3. Il mazzo di ZeroTaboo, in sola lettura, è app\\ZeroTaboo.sqlite3.',
     '',
     'DOMANDE DI BIVIO',
     '  app\\ZeroDubbi.sqlite3, tabella dilemmi (id, categoria, difficolta, esplicita,',

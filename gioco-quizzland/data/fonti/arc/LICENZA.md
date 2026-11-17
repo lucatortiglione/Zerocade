@@ -1,5 +1,8 @@
 # Domande della categoria "scienze" (ARC, attive)
 
+> **Revisione documentale — 16 novembre 2026.** Le 7.709 domande ARC risultano attive nel DB locale. Attribuzione, trasformazioni e condizioni sotto documentano l'acquisizione; questa revisione aggiorna lo stato locale senza dichiarare una nuova verifica delle condizioni esterne.
+> [Indice e stato della documentazione](../../../../docs/STATO_DOCUMENTAZIONE.md).
+
 Le domande con id `arc-…` vengono dall'**AI2 Reasoning Challenge (ARC)** dell'Allen Institute for AI (AI2):
 https://huggingface.co/datasets/allenai/ai2_arc (la pagina ufficiale https://allenai.org/data/arc rimanda lì).
 

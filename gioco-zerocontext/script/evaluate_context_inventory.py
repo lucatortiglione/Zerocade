@@ -268,7 +268,9 @@ def main():
     if not current_secret <= current_vocab: raise ValueError('Segrete fuori dal vocabolario')
     if int(current_meta['words']) != len(current_vocab) or int(current_meta['secrets']) != len(current_secret):
         raise ValueError('Metadati del gioco non coerenti')
-    if (HERE / 'data/vectors.bin').stat().st_size != len(current_vocab)*int(current_meta['dim']):
+    from publish_context import active_vectors
+    current_vectors = active_vectors({k: json.loads(v) for k, v in current_meta.items()}, HERE / 'data')
+    if current_vectors.stat().st_size != len(current_vocab)*int(current_meta['dim']):
         raise ValueError('Vocabolario e vettori di gioco non allineati')
     with bank.LIVECADE_CSV.open(encoding='utf-8-sig', newline='') as stream:
         livecade = {r['word'] for r in csv.DictReader(stream)}
@@ -284,7 +286,7 @@ def main():
     words = sorted(inventory | set(fasttext) | set(numberbatch) | frequencies | current_vocab | current_secret | livecade | old_bank)
     files = POLICY_FILES + [ROOT / 'gioco-zeroassociations/script/inventory_evidence.py']
     files += [bank.LIVECADE_CSV, bank.OUT_CSV, bank.OUT_META, data.FREQ,
-              HERE / 'data/vectors.bin']
+              current_vectors]
     files += [data.CACHE / f'{name}_{part}' for name in ('fasttext_it', 'numberbatch_it')
               for part in ('words.txt', 'vectors.npy')]
     file_hashes = {str(p.relative_to(ROOT)): sha(p) for p in files}

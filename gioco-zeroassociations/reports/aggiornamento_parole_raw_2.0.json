@@ -1,0 +1,285 @@
+{
+  "schema_version": "parole-raw-2.0",
+  "started_at_utc": "2026-11-16T21:47:30.991893+00:00",
+  "database": "C:\\Progetti\\Zerocade\\database\\parole_ita_raw_2.0.sqlite3",
+  "words_table": "parole",
+  "backup": "C:\\Progetti\\Zerocade\\gioco-zeroassociations\\database-backups\\parole_raw_2.0-20261116T214447937653Z.sqlite3",
+  "selected_sources": 46,
+  "row_limit": null,
+  "zipf_filter": null,
+  "editorial_exclusions": false,
+  "gameplay_publication": false,
+  "attempts": [
+    {
+      "source": "kaikki-itwiktionary",
+      "status": "UNCHANGED",
+      "sha256": "095df1665fde8e41bdf07250887d0cdacf570b543118aa09505f8628c9cf46e9",
+      "new_words": 0,
+      "effective_url": "https://kaikki.org/itwiktionary/Italiano/kaikki.org-dictionary-Italiano.jsonl",
+      "cache_path": "C:\\Users\\lucat\\AppData\\Local\\Zerocade\\word-association\\updates\\kaikki-itwiktionary\\0823b44ed93f44a8b18f17b78dcb9096\\kaikki.org-dictionary-Italiano.jsonl",
+      "revision": null
+    },
+    {
+      "source": "kaikki-enwiktionary-it",
+      "status": "UNCHANGED",
+      "sha256": "f112deb9747b7f33f4247da4999dfba0aa739bb4aaff9dd42fdf0615918a9c11",
+      "new_words": 0,
+      "effective_url": "https://kaikki.org/dictionary/Italian/kaikki.org-dictionary-Italian.jsonl",
+      "cache_path": "C:\\Users\\lucat\\AppData\\Local\\Zerocade\\word-association\\updates\\kaikki-enwiktionary-it\\861ee700b62e4068a4a59e7a84726bd9\\kaikki.org-dictionary-Italian.jsonl",
+      "revision": null
+    },
+    {
+      "source": "wikipedia-it",
+      "status": "UNCHANGED",
+      "sha256": "fe0f1f8777b487d3e26caecf84e59e1ba46c540b347aa2646e837c45391ad756",
+      "new_words": 0,
+      "effective_url": "https://dumps.wikimedia.org/itwiki/latest/itwiki-latest-all-titles-in-ns0.gz",
+      "cache_path": "C:\\Users\\lucat\\AppData\\Local\\Zerocade\\word-association\\updates\\wikipedia-it\\ac5119f62d594adaaf641e41927fe1b8\\itwiki-latest-all-titles-in-ns0.gz",
+      "revision": null
+    },
+    {
+      "source": "wiktionary-it-titles",
+      "status": "UNCHANGED",
+      "sha256": "b3f1a61cfd6b6f5cc10b0b7b50a30693042bad1353e619fe41f35c8dd1a15f1d",
+      "new_words": 0,
+      "effective_url": "https://dumps.wikimedia.org/itwiktionary/latest/itwiktionary-latest-all-titles-in-ns0.gz",
+      "cache_path": "C:\\Users\\lucat\\AppData\\Local\\Zerocade\\word-association\\updates\\wiktionary-it-titles\\01c11f17e2834813b3c19af378e24da1\\itwiktionary-latest-all-titles-in-ns0.gz",
+      "revision": null
+    },
+    {
+      "source": "wikisource-it",
+      "status": "UNCHANGED",
+      "sha256": "6291ca4f4ef778eb4252bdccbbdeb9a09cb91f673df50f0f87229c9a021d58bc",
+      "new_words": 0,
+      "effective_url": "https://dumps.wikimedia.org/itwikisource/latest/itwikisource-latest-all-titles-in-ns0.gz",
+      "cache_path": "C:\\Users\\lucat\\AppData\\Local\\Zerocade\\word-association\\updates\\wikisource-it\\40bfc0417a034397af859bedcd1bc41d\\itwikisource-latest-all-titles-in-ns0.gz",
+      "revision": null
+    },
+    {
+      "source": "wikiquote-it",
+      "status": "UNCHANGED",
+      "sha256": "72938f2bf3e3ef1c2c56ee5e0da64125f9386ef70929c1ae5ba574af5986cc96",
+      "new_words": 0,
+      "effective_url": "https://dumps.wikimedia.org/itwikiquote/latest/itwikiquote-latest-all-titles-in-ns0.gz",
+      "cache_path": "C:\\Users\\lucat\\AppData\\Local\\Zerocade\\word-association\\updates\\wikiquote-it\\c0e085269b5e4d3587fc484b343dfbe7\\itwikiquote-latest-all-titles-in-ns0.gz",
+      "revision": null
+    },
+    {
+      "source": "wikivoyage-it",
+      "status": "UNCHANGED",
+      "sha256": "72244f42f8736e63dee6a0d8e30962503729c8eb61a47d0db832ea92b24d118d",
+      "new_words": 0,
+      "effective_url": "https://dumps.wikimedia.org/itwikivoyage/latest/itwikivoyage-latest-all-titles-in-ns0.gz",
+      "cache_path": "C:\\Users\\lucat\\AppData\\Local\\Zerocade\\word-association\\updates\\wikivoyage-it\\69204635479046258c10cdfe410318a7\\itwikivoyage-latest-all-titles-in-ns0.gz",
+      "revision": null
+    },
+    {
+      "source": "wikiversity-it",
+      "status": "UNCHANGED",
+      "sha256": "7880d0da365c92350a1102029507b65ff1e97875898bbffd1ca86ac25307c6ea",
+      "new_words": 0,
+      "effective_url": "https://dumps.wikimedia.org/itwikiversity/latest/itwikiversity-latest-all-titles-in-ns0.gz",
+      "cache_path": "C:\\Users\\lucat\\AppData\\Local\\Zerocade\\word-association\\updates\\wikiversity-it\\45f116ebf5464b75a0e6fd84b1c7a859\\itwikiversity-latest-all-titles-in-ns0.gz",
+      "revision": null
+    },
+    {
+      "source": "wikinews-it",
+      "status": "UNCHANGED",
+      "sha256": "28b6781297c89da632d1ff85c8bbb79322405e9fee894afa5311bdb4b81e3ef7",
+      "new_words": 0,
+      "effective_url": "https://dumps.wikimedia.org/itwikinews/latest/itwikinews-latest-all-titles-in-ns0.gz",
+      "cache_path": "C:\\Users\\lucat\\AppData\\Local\\Zerocade\\word-association\\updates\\wikinews-it\\ab6bd5a91fa84721b5f6abc625315f62\\itwikinews-latest-all-titles-in-ns0.gz",
+      "revision": null
+    },
+    {
+      "source": "libreoffice-it-dictionary",
+      "status": "UNCHANGED",
+      "sha256": "bae1e3501dcd2a923669592493b3fde6c02aae7c7aab83bf5e5b49077e73dd64",
+      "new_words": 0,
+      "effective_url": "https://raw.githubusercontent.com/LibreOffice/dictionaries/c0865a85eb67dc377f2cf8e8fe2c4fa9e53f0dcb/it_IT/it_IT.dic",
+      "cache_path": "C:\\Users\\lucat\\AppData\\Local\\Zerocade\\word-association\\libreoffice-it-dictionary\\it_IT.dic",
+      "revision": "c0865a85eb67dc377f2cf8e8fe2c4fa9e53f0dcb"
+    },
+    {
+      "source": "libreoffice-it-thesaurus",
+      "status": "UNCHANGED",
+      "sha256": "96af44562d73ec56dbaacce04588f6a3b7569d581542d9518f64b7c5b1926bcf",
+      "new_words": 0,
+      "effective_url": "https://raw.githubusercontent.com/LibreOffice/dictionaries/c0865a85eb67dc377f2cf8e8fe2c4fa9e53f0dcb/it_IT/th_it_IT_v2.dat",
+      "cache_path": "C:\\Users\\lucat\\AppData\\Local\\Zerocade\\word-association\\libreoffice-it-thesaurus\\th_it_IT_v2.dat",
+      "revision": "c0865a85eb67dc377f2cf8e8fe2c4fa9e53f0dcb"
+    },
+    {
+      "source": "omw-multiwordnet-it",
+      "status": "UNCHANGED",
+      "sha256": "251ac0097ef81a7ed0d283f6852953106a37dbb8c1b9f93d87079641c271eafa",
+      "new_words": 0,
+      "effective_url": "https://raw.githubusercontent.com/omwn/omw-data/406bf83b3c507a3d1f26e88252d5d66893fd36bf/wns/ita/wn-data-ita.tab",
+      "cache_path": "C:\\Users\\lucat\\AppData\\Local\\Zerocade\\word-association\\omw-multiwordnet-it\\wn-data-ita.tab",
+      "revision": "406bf83b3c507a3d1f26e88252d5d66893fd36bf"
+    },
+    {
+      "source": "napolux-paroleitaliane",
+      "status": "UNCHANGED",
+      "sha256": "edd295a2e17d0c56e58e2f0e3936c0e8a331f591d47db8a1bd6d4ead4cc80d6e",
+      "new_words": 0,
+      "effective_url": "https://raw.githubusercontent.com/napolux/paroleitaliane/2951524b6d5b67986f542937cef16a54af63ff84/paroleitaliane/parole_uniche.txt",
+      "cache_path": "C:\\Users\\lucat\\AppData\\Local\\Zerocade\\word-association\\napolux-paroleitaliane\\parole_uniche.txt",
+      "revision": "2951524b6d5b67986f542937cef16a54af63ff84"
+    },
+    {
+      "source": "wordfreq-it-local",
+      "status": "UNCHANGED",
+      "sha256": "2524f09f3e4c0812f07d614f8ed710b292f577f0c4bc61c7bb84941213934fb2",
+      "new_words": 0,
+      "effective_url": "https://github.com/rspeer/wordfreq",
+      "cache_path": "C:\\Users\\lucat\\AppData\\Local\\Zerocade\\word-association\\raw-wordfreq\\frequency_ranks_it_full.csv",
+      "revision": "3.1.1"
+    },
+    {
+      "source": "de-mauro-sitemaps",
+      "status": "UNCHANGED",
+      "sha256": "deb175cf7b938247b76e853f8cb8a99738fb3e21e46503516611e460d9c87976",
+      "new_words": 0,
+      "effective_url": "https://dizionario.internazionale.it/sitemaps/dizionario/sitemap_dizionario-index.xml",
+      "cache_path": "C:\\Users\\lucat\\AppData\\Local\\Zerocade\\word-association\\updates\\de-mauro-sitemaps\\bb5b5f90d19a4dd5863bb045388d9d13\\de-mauro-sitemaps\\dictionary_url_slugs.jsonl",
+      "revision": null
+    },
+    {
+      "source": "ud-isdt-train",
+      "status": "UNCHANGED",
+      "sha256": "7c3e32d7f296c877387a0c805c3ae8c471e2b5e8df97f5e3da810834b50566ab",
+      "new_words": 0,
+      "effective_url": "https://raw.githubusercontent.com/UniversalDependencies/UD_Italian-ISDT/155bd688b87b02a0df4dfc36908546a3cf274688/it_isdt-ud-train.conllu",
+      "cache_path": "C:\\Users\\lucat\\AppData\\Local\\Zerocade\\word-association\\updates\\ud-isdt-train\\501eb049c5074238b48474158570988c\\it_isdt-ud-train.conllu",
+      "revision": "155bd688b87b02a0df4dfc36908546a3cf274688"
+    },
+    {
+      "source": "ud-isdt-dev",
+      "status": "UNCHANGED",
+      "sha256": "1bc7dda04c58a4d87e2e6607a0e612462b87e7da6dde56be610d3749521af744",
+      "new_words": 0,
+      "effective_url": "https://raw.githubusercontent.com/UniversalDependencies/UD_Italian-ISDT/155bd688b87b02a0df4dfc36908546a3cf274688/it_isdt-ud-dev.conllu",
+      "cache_path": "C:\\Users\\lucat\\AppData\\Local\\Zerocade\\word-association\\updates\\ud-isdt-dev\\0de43de7f2cf43a0ab90cd96854b6145\\it_isdt-ud-dev.conllu",
+      "revision": "155bd688b87b02a0df4dfc36908546a3cf274688"
+    },
+    {
+      "source": "ud-isdt-test",
+      "status": "UNCHANGED",
+      "sha256": "cea8ca0e8d1ddf7ce509f10afff426d00e058982f49473e0744cd0ee477129e3",
+      "new_words": 0,
+      "effective_url": "https://raw.githubusercontent.com/UniversalDependencies/UD_Italian-ISDT/155bd688b87b02a0df4dfc36908546a3cf274688/it_isdt-ud-test.conllu",
+      "cache_path": "C:\\Users\\lucat\\AppData\\Local\\Zerocade\\word-association\\updates\\ud-isdt-test\\f66f373ab8ed426a9fc7b64f87440717\\it_isdt-ud-test.conllu",
+      "revision": "155bd688b87b02a0df4dfc36908546a3cf274688"
+    },
+    {
+      "source": "kaikki-frwiktionary-it",
+      "status": "UNCHANGED",
+      "sha256": "f773ab4c9e25322271707638844748489d1f4d9ed745f738e8f6c4539d5f1c90",
+      "new_words": 0,
+      "effective_url": "https://kaikki.org/frwiktionary/Italien/kaikki.org-dictionary-Italien.jsonl",
+      "cache_path": "C:\\Users\\lucat\\AppData\\Local\\Zerocade\\word-association\\updates\\kaikki-frwiktionary-it\\fd4edf4b8e8f4a8bad12e33c9bfcd9c5\\kaikki.org-dictionary-Italien.jsonl",
+      "revision": null
+    },
+    {
+      "source": "kaikki-dewiktionary-it",
+      "status": "UNCHANGED",
+      "sha256": "e797f78d800f5a39e3874a5b1bb4ea0f804c5886badff20e21ad1029016b4840",
+      "new_words": 0,
+      "effective_url": "https://kaikki.org/dewiktionary/Italienisch/kaikki.org-dictionary-Italienisch.jsonl",
+      "cache_path": "C:\\Users\\lucat\\AppData\\Local\\Zerocade\\word-association\\updates\\kaikki-dewiktionary-it\\6f58199b396f437998584c0fc2f2791d\\kaikki.org-dictionary-Italienisch.jsonl",
+      "revision": null
+    },
+    {
+      "source": "kaikki-eswiktionary-it",
+      "status": "UNCHANGED",
+      "sha256": "7ddb5a16fabf553fb1335418a374bce6ba9c3a78e4cb34e62f387d8bacd5c9c8",
+      "new_words": 0,
+      "effective_url": "https://kaikki.org/eswiktionary/Italiano/kaikki.org-dictionary-Italiano.jsonl",
+      "cache_path": "C:\\Users\\lucat\\AppData\\Local\\Zerocade\\word-association\\updates\\kaikki-eswiktionary-it\\75d8e9f4eeba4a5d8719ecb36f199587\\kaikki.org-dictionary-Italiano.jsonl",
+      "revision": null
+    },
+    {
+      "source": "morphit-048-mirror",
+      "status": "UNCHANGED",
+      "sha256": "7375216351ee59cee4326b455503f3a6c4e9542cd63ecb86ff5cd58ca5c8e800",
+      "new_words": 0,
+      "effective_url": "https://raw.githubusercontent.com/giodegas/morphit-lemmatizer/b99d75d774367e4bedc5c5f339dec384777488ff/master/morph-it_048_utf8.txt",
+      "cache_path": "C:\\Users\\lucat\\AppData\\Local\\Zerocade\\word-association\\morphit-048-mirror\\morph-it_048_utf8.txt",
+      "revision": "b99d75d774367e4bedc5c5f339dec384777488ff"
+    },
+    {
+      "source": "frequencywords-it-2018",
+      "status": "UNCHANGED",
+      "sha256": "b23b0c6a3f59c1da1c7caa667b9df5699e95323fee20a05f343c7d7dae73c4be",
+      "new_words": 0,
+      "effective_url": "https://raw.githubusercontent.com/hermitdave/FrequencyWords/525f9b560de45753a5ea01069454e72e9aa541c6/content/2018/it/it_full.txt",
+      "cache_path": "C:\\Users\\lucat\\AppData\\Local\\Zerocade\\word-association\\frequencywords-it-2018\\it_full.txt",
+      "revision": "525f9b560de45753a5ea01069454e72e9aa541c6"
+    },
+    {
+      "source": "freedict-ita-deu",
+      "status": "UNCHANGED",
+      "sha256": "b364b906dea10213b47d27ad1a4d0631b1ad6da0400304fefb2597ef765d5884",
+      "new_words": 0,
+      "effective_url": "https://raw.githubusercontent.com/freedict/fd-dictionaries/5bdceeac8d0dba3298c1bebe734f60d54dad30f7/ita-deu/ita-deu.tei",
+      "cache_path": "C:\\Users\\lucat\\AppData\\Local\\Zerocade\\word-association\\freedict-ita-deu\\ita-deu.tei",
+      "revision": "5bdceeac8d0dba3298c1bebe734f60d54dad30f7"
+    },
+    {
+      "source": "ud-vit-dev",
+      "status": "UNCHANGED",
+      "sha256": "d6e076afb639b4bee82f8caaaaed467cbd2c4f6ec2762aa0108ca865f97e0f3c",
+      "new_words": 0,
+      "effective_url": "https://raw.githubusercontent.com/UniversalDependencies/UD_Italian-VIT/4c80bb283d02930a936dbb54519a7a67783f318f/it_vit-ud-dev.conllu",
+      "cache_path": "C:\\Users\\lucat\\AppData\\Local\\Zerocade\\word-association\\updates\\ud-vit-dev\\659ef9d7284c4e1c88a53884ea3d3bdd\\it_vit-ud-dev.conllu",
+      "revision": "4c80bb283d02930a936dbb54519a7a67783f318f"
+    },
+    {
+      "source": "ud-vit-test",
+      "status": "UNCHANGED",
+      "sha256": "1569c1c28727e1f99d8246c57b0ffa61ae0442747599051bfbd0e63d7081503f",
+      "new_words": 0,
+      "effective_url": "https://raw.githubusercontent.com/UniversalDependencies/UD_Italian-VIT/4c80bb283d02930a936dbb54519a7a67783f318f/it_vit-ud-test.conllu",
+      "cache_path": "C:\\Users\\lucat\\AppData\\Local\\Zerocade\\word-association\\updates\\ud-vit-test\\af9cdf3c32554b59bdf0ceffaec8d92d\\it_vit-ud-test.conllu",
+      "revision": "4c80bb283d02930a936dbb54519a7a67783f318f"
+    },
+    {
+      "source": "ud-vit-train",
+      "status": "UNCHANGED",
+      "sha256": "678e41cc9771c8dec6a2b2a21489d549dd4d715bda582d3890b162b1c80ea33a",
+      "new_words": 0,
+      "effective_url": "https://raw.githubusercontent.com/UniversalDependencies/UD_Italian-VIT/4c80bb283d02930a936dbb54519a7a67783f318f/it_vit-ud-train.conllu",
+      "cache_path": "C:\\Users\\lucat\\AppData\\Local\\Zerocade\\word-association\\updates\\ud-vit-train\\f4fd5ece76694054a5667a26cd886624\\it_vit-ud-train.conllu",
+      "revision": "4c80bb283d02930a936dbb54519a7a67783f318f"
+    },
+    {
+      "source": "ud-partut-dev",
+      "status": "UNCHANGED",
+      "sha256": "c6542e547447df403e54f314a61ec9f4a5e1e0d770dbcbdedb5ea8edcb6758fc",
+      "new_words": 0,
+      "effective_url": "https://raw.githubusercontent.com/UniversalDependencies/UD_Italian-ParTUT/9bc6f86bf5275e21976c0950b7337e04e6717e18/it_partut-ud-dev.conllu",
+      "cache_path": "C:\\Users\\lucat\\AppData\\Local\\Zerocade\\word-association\\updates\\ud-partut-dev\\dd67bcd1a96c4f90b26c990ff8472cf3\\it_partut-ud-dev.conllu",
+      "revision": "9bc6f86bf5275e21976c0950b7337e04e6717e18"
+    },
+    {
+      "source": "ud-partut-test",
+      "status": "UNCHANGED",
+      "sha256": "6a3f3437fd3ab383ba37122ec84cc1bd53662512f5ff1e80ed306c6b668eb6a2",
+      "new_words": 0,
+      "effective_url": "https://raw.githubusercontent.com/UniversalDependencies/UD_Italian-ParTUT/9bc6f86bf5275e21976c0950b7337e04e6717e18/it_partut-ud-test.conllu",
+      "cache_path": "C:\\Users\\lucat\\AppData\\Local\\Zerocade\\word-association\\updates\\ud-partut-test\\6fb9987ae1fc470d9dfdf3f52b84f6c8\\it_partut-ud-test.conllu",
+      "revision": "9bc6f86bf5275e21976c0950b7337e04e6717e18"
+    },
+    {
+      "source": "ud-partut-train",
+      "status": "UNCHANGED",
+      "sha256": "576ecef59bedbd740c6c8744af25726d5d279afac3555fa6a37c50ec7db1324d",
+      "new_words": 0,
+      "effective_url": "https://raw.githubusercontent.com/UniversalDependencies/UD_Italian-ParTUT/9bc6f86bf5275e21976c0950b7337e04e6717e18/it_partut-ud-train.conllu",
+      "cache_path": "C:\\Users\\lucat\\AppData\\Local\\Zerocade\\word-association\\updates\\ud-partut-train\\e5c2d21bed4a452eabda7e4d4c75a844\\it_partut-ud-train.conllu",
+      "revision": "9bc6f86bf5275e21976c0950b7337e04e6717e18"
+    }
+  ],
+  "all_sources_completed": false
+}

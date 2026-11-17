@@ -1,5 +1,8 @@
 # Regole in una pagina
 
+> **Revisione documentale — 16 novembre 2026.** Le regole semantiche restano invariate. Per percorsi e passaggi operativi usare il [README](README.md): inventario e decisioni nel DB di lavoro, bacini pubblicati nello schema `associazioni`. Nessuna rigenerazione di vocabolario o vettori equivale all'approvazione di nuove associazioni.
+> [Indice e stato della documentazione](../docs/STATO_DOCUMENTAZIONE.md).
+
 Sintesi operativa delle [direttive complete](direttive_word_association_it_v3_6_0.md)
 e della [direttiva di pertinenza](DIRETTIVA_INDIZI.md): in caso di dubbio valgono
 quelle. Versione delle regole: `SEMANTIC_POLICY` in `semantic_rules.py`.
@@ -8,7 +11,8 @@ quelle. Versione delle regole: `SEMANTIC_POLICY` in `semantic_rules.py`.
 
 - Un solo **senso familiare**, scelto prima delle risposte. Senza un tema visibile
   nel gioco, niente accezioni tecniche o rare.
-- Parola italiana familiare (Zipf ≥ 3,0) oppure prestito della lista chiusa
+- Preselezione per frequenza italiana con **Zipf ≤ 2,2** (configurazione dal 16 novembre 2026),
+  con eccezione NVdB e riferimento alle forme verbali attestate; oppure prestito della lista chiusa
   `resources/prompt_policy.json`.
 - Categoria del catalogo coerente con il senso; non cambiarla per salvare un set.
 

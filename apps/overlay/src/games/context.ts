@@ -1,3 +1,4 @@
+import { contextProfile } from '@zerocade/shared'
 import { payloadBytes, normalizeContextColors, type LiveEvent, type Viewer } from '@zerocade/shared'
 import { retryDue } from './retry'
 import { CONTEXT_LIMITS, ContextError } from '@zerocade/shared'
@@ -22,8 +23,9 @@ import { roundCheer } from '../audio'
 // it down until someone writes the secret. An owned worker ranks the vectors the
 // server serves at /api/context/*; there is no list of "close" words to learn.
 
-export function createContext(createComputer: () => ContextComputer = () => new ContextWorkerClient(window.location.origin),
+export function createContext(createComputer: (profile?: string) => ContextComputer = (profile) => new ContextWorkerClient(window.location.origin + '?profile=' + contextProfile(profile)),
   room: RoomSecret = { follow: followSecret, report: reportSecret, reveal: revealSecret }): GameInstance {
+  let profile = 'original'
   let width = 0
   let height = 0
   let breakSecs = 8
@@ -40,6 +42,7 @@ export function createContext(createComputer: () => ContextComputer = () => new 
   let yellowUntil = 1000
   let cyanUntil = 10000
   let showBoard = true
+  let showWordLength = true
   let starterWords = false
   let closestMult = 1
   let matchWords = 0 // 0: one leaderboard all stream
@@ -58,7 +61,9 @@ export function createContext(createComputer: () => ContextComputer = () => new 
       lettersShown = 0
       hintClock = 0
     }
+    profile = contextProfile(settings.associationSource)
     disableAllHints = settings.disableAllHints === true
+    showWordLength = !disableAllHints && settings.showWordLength !== false
     breakSecs = num('breakSeconds', 8)
     finderPts = num('finderPoints', 100)
     autoHints = !disableAllHints && settings.autoHints === true // off unless the creator turns it on
@@ -267,7 +272,7 @@ export function createContext(createComputer: () => ContextComputer = () => new 
     const life = generation
     loading = true
     attempts++
-    try { computer ??= createComputer() }
+    try { computer ??= createComputer(profile) }
     catch { loading = false; freeze('Impossibile avviare ZeroContext in un worker.'); return }
     void computer.load()
       .then((d) => {
@@ -476,7 +481,7 @@ export function createContext(createComputer: () => ContextComputer = () => new 
         ctx.scale(k, k)
         paintContext(ctx, now, width / k, height / k, k, {
         ready: Boolean(data && ranking), problem, preparing, word: secretWord(), total: total(), attempts: guesses.length,
-        revealed, lettersShown, solver, revealAt, best, redUntil, orangeUntil, yellowUntil, cyanUntil,
+        revealed, lettersShown, showWordLength, solver, revealAt, best, redUntil, orangeUntil, yellowUntil, cyanUntil,
         showBoard, last, closest, matchOver, leaders, typed,
         })
       } finally { ctx.restore() }

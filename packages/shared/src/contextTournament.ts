@@ -126,8 +126,10 @@ export interface ContextTournamentState {
   // The secret, only once the round is over.
   solution: string | null
   solvedBy: string | null
-  // The corpus size, to draw the closeness bars like the classic game. Not the secret's length: the tournament never says it.
+  // The corpus size, to draw the closeness bars like the classic game.
   corpusSize: number
+  // The secret's length, only while a round is on and the room's "Mostra numero di lettere" is on (else null: never said).
+  wordLength: number | null
   // The newest words written, only with that setting on (else empty): as in the classic game, coloured at once.
   typed: TournamentTypedView[]
   board: TournamentGuessView[]

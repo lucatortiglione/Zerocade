@@ -13,8 +13,8 @@ globalThis.addEventListener('message', (event: MessageEvent<ContextRequest>) => 
     if (loading || source) { send({ type: 'error', id: request.id, kind: 'saturated', message: 'Dati già caricati o in caricamento.' }); return }
     loading = true
     void loadContextData(request.origin, new AbortController().signal).then((data) => {
-      source = { wordCount: data.words.length, vectors: data.vectors, dim: data.dim, links: data.links, linkBoost: data.linkBoost, hubs: data.hubs }
-      send({ type: 'ready', id: request.id, vocabulary: { words: data.words, secrets: data.secrets, index: data.index, folded: data.folded } })
+      source = { wordCount: data.words.length, vectors: data.vectors, dim: data.dim, links: data.links, linkBoost: data.linkBoost, hubs: data.hubs, norms: data.norms }
+      send({ type: 'ready', id: request.id, vocabulary: { words: data.words, secrets: data.secrets, index: data.index, folded: data.folded, semantic: data.semantic } })
       // After this callback, word maps belong only to the UI. This thread keeps
       // its dense vectors and links; no second copy of vectors crosses the port.
     }).catch((error: unknown) => {
@@ -27,7 +27,8 @@ globalThis.addEventListener('message', (event: MessageEvent<ContextRequest>) => 
     if (!source) throw new ContextError('data', 'Vocabolario non ancora disponibile.')
     const started = performance.now()
     const ranking = rankAgainst(source, request.secret)
-    send({ type: 'ranked', id: request.id, ranking, durationMs: performance.now() - started }, [ranking.order.buffer, ranking.rankOf.buffer])
+    send({ type: 'ranked', id: request.id, ranking, durationMs: performance.now() - started }, [ranking.order.buffer, ranking.rankOf.buffer,
+      ...(ranking.similarities ? [ranking.similarities.buffer] : [])])
   } catch (error) {
     const failure = error instanceof ContextError ? error : new ContextError('worker', 'Calcolo ZeroContext non riuscito.')
     send({ type: 'error', id: request.id, kind: failure.kind, message: failure.message })

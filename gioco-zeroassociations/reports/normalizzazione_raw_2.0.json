@@ -1,0 +1,711 @@
+{
+  "policy": "canonical-gender-number-2.0",
+  "database": "C:\\Progetti\\Zerocade\\database\\parole_ita_raw_2.0.sqlite3",
+  "source_table": "parole",
+  "target_table": "normalizzata",
+  "source_words": 2539592,
+  "single_words": 2500926,
+  "excluded": 111359,
+  "normalized_words": 2428233,
+  "source_words_sha256": "7ea4e69841cb4af4a1a429190716749166436ac6a0dd45aa2781407dfca17062",
+  "wordfreq_version": "3.1.1",
+  "zipf_minimum_filter": null,
+  "rules": {
+    "feminine_with_masculine": 46672,
+    "number_frequency": 64687
+  },
+  "sources": [
+    {
+      "source": "flex-it-adjectives",
+      "snapshot": "6f75c70786e2087ebe557926a93521322b4d4e70a0cebf4759aeddfd81a669d0",
+      "sha256": "628a830f5d997d763d7522bd8e63589a4b98edd3189363f9a15b107b4418c97d"
+    },
+    {
+      "source": "flex-it-nouns",
+      "snapshot": "d993ea00882d27c20a0f500bf63a9badbf02d701a692ad25f87cbaf265d6139e",
+      "sha256": "1b0a06e94949827476621cfd3a639837d28905b91521c77c7958331785cf8587"
+    },
+    {
+      "source": "glaffit",
+      "snapshot": "3ea20ca80b679d0abc392ec9463896195875b557f033f1cc3a7d7ebee60cb260",
+      "sha256": "9e42965e5b7a8f4594c0199bbce6b6890c4bdc31a72a65af1b683b2025bf527d"
+    },
+    {
+      "source": "kaikki-dewiktionary-it",
+      "snapshot": "9fff6763755b58d67d1e8eb41a72a3867dd728f22555a2dc159760bc981e670e",
+      "sha256": "e797f78d800f5a39e3874a5b1bb4ea0f804c5886badff20e21ad1029016b4840"
+    },
+    {
+      "source": "kaikki-enwiktionary-it",
+      "snapshot": "476addc4c7118fc79ae79e2815b169ef62d3072f3d9e5ab066e53c611f8fae08",
+      "sha256": "f112deb9747b7f33f4247da4999dfba0aa739bb4aaff9dd42fdf0615918a9c11"
+    },
+    {
+      "source": "kaikki-eswiktionary-it",
+      "snapshot": "0deab9226eab98866f1476c0061f51b62684f3a188be2d906c6699d9d655aec6",
+      "sha256": "7ddb5a16fabf553fb1335418a374bce6ba9c3a78e4cb34e62f387d8bacd5c9c8"
+    },
+    {
+      "source": "kaikki-frwiktionary-it",
+      "snapshot": "6aef94cf4cf98c8555d08b7e38fb54f68209983fca0ecf8c0a1a67eb73f73f51",
+      "sha256": "f773ab4c9e25322271707638844748489d1f4d9ed745f738e8f6c4539d5f1c90"
+    },
+    {
+      "source": "kaikki-itwiktionary",
+      "snapshot": "bb039bab0c56cc7363f052ca53104866814e15cd4e5a2e7c8dfcd8b467531487",
+      "sha256": "095df1665fde8e41bdf07250887d0cdacf570b543118aa09505f8628c9cf46e9"
+    },
+    {
+      "source": "morphit-048-mirror",
+      "snapshot": "d64de8e0979b9fe5374b3faf40370fc1787532ad7a0d7e70a0d6f8227df9d31e",
+      "sha256": "7375216351ee59cee4326b455503f3a6c4e9542cd63ecb86ff5cd58ca5c8e800"
+    },
+    {
+      "source": "ud-isdt-dev",
+      "snapshot": "79db4e8518f5630cfc6f78857cad76cfed8032af8bb5f208f36009b0645f2837",
+      "sha256": "1bc7dda04c58a4d87e2e6607a0e612462b87e7da6dde56be610d3749521af744"
+    },
+    {
+      "source": "ud-isdt-test",
+      "snapshot": "4c8152fc678df9f18531197229b8cc12279eff44e41728fa3531ab18482ad0bd",
+      "sha256": "cea8ca0e8d1ddf7ce509f10afff426d00e058982f49473e0744cd0ee477129e3"
+    },
+    {
+      "source": "ud-isdt-train",
+      "snapshot": "9cc35765f5fa15b9610e82eaf76bb1cdd762438c277b9ec6f4f945a6a2d6abf3",
+      "sha256": "7c3e32d7f296c877387a0c805c3ae8c471e2b5e8df97f5e3da810834b50566ab"
+    },
+    {
+      "source": "ud-markit-dev",
+      "snapshot": "3f4b58a91c14e2684a8d044c54b86c1061d31ac66f969a2fabf9295f52d4144f",
+      "sha256": "633b6186f47ecfebfcff4ff9c7e19a0cbffd1f655f14fc1e9265b12bda597f97"
+    },
+    {
+      "source": "ud-markit-test",
+      "snapshot": "710780a89c1ef0bdc1edd51e527047fb1514a2f722a04193540571c5f81249b5",
+      "sha256": "9048ed0064e3989e2c37377755a28c25c7e462b1ad916e5808dc0a7ce95fc3fc"
+    },
+    {
+      "source": "ud-markit-train",
+      "snapshot": "8251dbc4249270ae8e4bacdeb8cf1c1a7d0612aa009dbe0b52c6dc485fd732c2",
+      "sha256": "4f6fc3423acb00d49e1e167bd21b11ebbc23e22275fd6f5eeb4d75cfbbccc5c6"
+    },
+    {
+      "source": "ud-partut-dev",
+      "snapshot": "705d73c79e7de8615e7acfadc59042c9147b1ee7b67ad4b8d0862de9ecfde5b0",
+      "sha256": "c6542e547447df403e54f314a61ec9f4a5e1e0d770dbcbdedb5ea8edcb6758fc"
+    },
+    {
+      "source": "ud-partut-test",
+      "snapshot": "aa96dd15fff106287eddc88b6cd982f3a5a6d6b4489e1b14cf4db34b6008dca7",
+      "sha256": "6a3f3437fd3ab383ba37122ec84cc1bd53662512f5ff1e80ed306c6b668eb6a2"
+    },
+    {
+      "source": "ud-partut-train",
+      "snapshot": "c9f994e0aaff032b00f27b1d8cd6ff571cf85c63912f583206322ef5cf38363e",
+      "sha256": "576ecef59bedbd740c6c8744af25726d5d279afac3555fa6a37c50ec7db1324d"
+    },
+    {
+      "source": "ud-postwita-dev",
+      "snapshot": "2a10cca7edf60449ef230a0d24a85b2bf08ebfe8b0e1283761ed222629de5a51",
+      "sha256": "d7aa66a1e30cec7b211991a5346205dc9b2a7bd98675d3b95a4be00bafff6490"
+    },
+    {
+      "source": "ud-postwita-test",
+      "snapshot": "d76258956a7800e9d0a0e263d37004ba2a120f9e7aec56b0a94378af18c6488d",
+      "sha256": "5db5e37ed8dc904595ac7d5bc3f746e6232a9fec0689948ffd17219c082a77c4"
+    },
+    {
+      "source": "ud-postwita-train",
+      "snapshot": "0cfe63023596c4c3b278e66dc152dfef4346b2fffc9fed30c532748d7e271cca",
+      "sha256": "8d2f976ead49c303ff522772792d418ea3887704a2f67143c88ec081c6ea05c8"
+    },
+    {
+      "source": "ud-twittiro-dev",
+      "snapshot": "7228f774a6ccc2c9020a9055424bd18aa3bbf263e51214753a61d6aa0d55884b",
+      "sha256": "1f16040ae17395d2910784742e6b3344620a67937524d47ed96fd56f811a8c99"
+    },
+    {
+      "source": "ud-twittiro-test",
+      "snapshot": "ce5fb7e377afa333274d714532185807f80f2edfa64a2f3140731a9b3af5fc86",
+      "sha256": "ae8560ce8471d20fda2e242dc45b3be7d2e0e8f0ccec323a7750fe7511f8b9d4"
+    },
+    {
+      "source": "ud-twittiro-train",
+      "snapshot": "0135d8c97b765f94359426e94e850f598b5fbfb1231e5dc5e44b95a71d95b1e8",
+      "sha256": "a470b66a73d2d489113de4f0591b1c61cf3848c6a94cedf33a8379d7e39a24f2"
+    },
+    {
+      "source": "ud-valico-test",
+      "snapshot": "589690bbf22a4494ead396c9cc4b1e81ad19e69bcce5bd84ca65900acf4e1c4f",
+      "sha256": "a9f026703c1f3321eeba060460a1dac9d49677a641a7f03e78bcf8103667815a"
+    },
+    {
+      "source": "ud-vit-dev",
+      "snapshot": "c5fc97b8a0e3707aea599472bfe9e4b66c589b2a328a0aabf826d87cc145eb73",
+      "sha256": "d6e076afb639b4bee82f8caaaaed467cbd2c4f6ec2762aa0108ca865f97e0f3c"
+    },
+    {
+      "source": "ud-vit-test",
+      "snapshot": "94816cb2ee4fc8b467476a1062cd4c19ff6fdeec928cb6440366e9b872886bab",
+      "sha256": "1569c1c28727e1f99d8246c57b0ffa61ae0442747599051bfbd0e63d7081503f"
+    },
+    {
+      "source": "ud-vit-train",
+      "snapshot": "90c9e5a77d6085e8688d286e13446fa4eaeefad4f68a0dfeab737b8e72883537",
+      "sha256": "678e41cc9771c8dec6a2b2a21489d549dd4d715bda582d3890b162b1c80ea33a"
+    },
+    {
+      "source": "unimorph-ita",
+      "snapshot": "acc8ca2917dd51fd7b93d27b3bdd2f5898db3a873dc974dcf921d2c3d68fe9fb",
+      "sha256": "6347bb15b3d2c3dafcbe4adc0e7beaa97a8bc61bcccc345079afb154c03f1321"
+    }
+  ],
+  "examples": [
+    {
+      "canonical": "aaleniano",
+      "lemma": "aaleniano",
+      "pos": "ADJ",
+      "zipf_form": 0.0,
+      "zipf_canonical": 0.0,
+      "form_gender": [
+        "Fem"
+      ],
+      "form_number": [
+        "Sing"
+      ],
+      "canonical_gender": [],
+      "canonical_number": [
+        "Sing"
+      ],
+      "sources": [
+        "kaikki-enwiktionary-it"
+      ],
+      "rule": "feminine_with_masculine",
+      "word": "aaleniana",
+      "reason": "Variante femminile: esiste un equivalente maschile attestato; si tiene aaleniano (Zipf 0.00 vs 0.00)"
+    },
+    {
+      "canonical": "aaleniano",
+      "lemma": "aaleniano",
+      "pos": "ADJ",
+      "zipf_form": 0.0,
+      "zipf_canonical": 0.0,
+      "form_gender": [
+        "Fem"
+      ],
+      "form_number": [
+        "Plur"
+      ],
+      "canonical_gender": [],
+      "canonical_number": [
+        "Sing"
+      ],
+      "sources": [
+        "kaikki-enwiktionary-it"
+      ],
+      "rule": "feminine_with_masculine",
+      "word": "aaleniane",
+      "reason": "Variante femminile: esiste un equivalente maschile attestato; si tiene aaleniano (Zipf 0.00 vs 0.00)"
+    },
+    {
+      "canonical": "aaleniano",
+      "lemma": "aaleniano",
+      "pos": "ADJ",
+      "zipf_form": 0.0,
+      "zipf_canonical": 0.0,
+      "form_gender": [
+        "Masc"
+      ],
+      "form_number": [
+        "Plur"
+      ],
+      "canonical_gender": [],
+      "canonical_number": [
+        "Sing"
+      ],
+      "sources": [
+        "kaikki-enwiktionary-it"
+      ],
+      "rule": "number_frequency",
+      "word": "aaleniani",
+      "reason": "Variante di numero: si preferisce la forma di uso più comune; a parità il singolare; si tiene aaleniano (Zipf 0.00 vs 0.00)"
+    },
+    {
+      "canonical": "abaceto",
+      "lemma": "abaceto",
+      "pos": "NOUN",
+      "zipf_form": 0.0,
+      "zipf_canonical": 0.0,
+      "form_gender": [
+        "Masc"
+      ],
+      "form_number": [
+        "Plur"
+      ],
+      "canonical_gender": [
+        "Masc"
+      ],
+      "canonical_number": [
+        "Sing"
+      ],
+      "sources": [
+        "glaffit",
+        "kaikki-enwiktionary-it",
+        "kaikki-eswiktionary-it",
+        "kaikki-itwiktionary"
+      ],
+      "rule": "number_frequency",
+      "word": "abaceti",
+      "reason": "Variante di numero: si preferisce la forma di uso più comune; a parità il singolare; si tiene abaceto (Zipf 0.00 vs 0.00)"
+    },
+    {
+      "canonical": "abaca",
+      "lemma": "abaca",
+      "pos": "NOUN",
+      "zipf_form": 0.0,
+      "zipf_canonical": 1.2,
+      "form_gender": [
+        "Fem"
+      ],
+      "form_number": [
+        "Plur"
+      ],
+      "canonical_gender": [
+        "Fem",
+        "Masc"
+      ],
+      "canonical_number": [
+        "Sing"
+      ],
+      "sources": [
+        "glaffit",
+        "kaikki-enwiktionary-it",
+        "kaikki-eswiktionary-it",
+        "kaikki-itwiktionary"
+      ],
+      "rule": "number_frequency",
+      "word": "abache",
+      "reason": "Variante di numero: si preferisce la forma di uso più comune; a parità il singolare; si tiene abaca (Zipf 1.20 vs 0.00)"
+    },
+    {
+      "canonical": "abaco",
+      "lemma": "abaco",
+      "pos": "NOUN",
+      "zipf_form": 1.42,
+      "zipf_canonical": 2.55,
+      "form_gender": [
+        "Masc"
+      ],
+      "form_number": [
+        "Plur"
+      ],
+      "canonical_gender": [
+        "Masc"
+      ],
+      "canonical_number": [
+        "Sing"
+      ],
+      "sources": [
+        "glaffit",
+        "kaikki-dewiktionary-it",
+        "kaikki-enwiktionary-it",
+        "kaikki-eswiktionary-it",
+        "kaikki-frwiktionary-it",
+        "kaikki-itwiktionary",
+        "ud-isdt-train"
+      ],
+      "rule": "number_frequency",
+      "word": "abachi",
+      "reason": "Variante di numero: si preferisce la forma di uso più comune; a parità il singolare; si tiene abaco (Zipf 2.55 vs 1.42)"
+    },
+    {
+      "canonical": "abachista",
+      "lemma": "abachista",
+      "pos": "NOUN",
+      "zipf_form": 0.0,
+      "zipf_canonical": 0.0,
+      "form_gender": [
+        "Fem"
+      ],
+      "form_number": [
+        "Plur"
+      ],
+      "canonical_gender": [
+        "Fem",
+        "Masc"
+      ],
+      "canonical_number": [
+        "Sing"
+      ],
+      "sources": [
+        "glaffit",
+        "kaikki-enwiktionary-it",
+        "kaikki-eswiktionary-it",
+        "kaikki-itwiktionary"
+      ],
+      "rule": "number_frequency",
+      "word": "abachiste",
+      "reason": "Variante di numero: si preferisce la forma di uso più comune; a parità il singolare; si tiene abachista (Zipf 0.00 vs 0.00)"
+    },
+    {
+      "canonical": "abachista",
+      "lemma": "abachista",
+      "pos": "NOUN",
+      "zipf_form": 0.0,
+      "zipf_canonical": 0.0,
+      "form_gender": [
+        "Fem",
+        "Masc"
+      ],
+      "form_number": [
+        "Plur"
+      ],
+      "canonical_gender": [
+        "Fem",
+        "Masc"
+      ],
+      "canonical_number": [
+        "Sing"
+      ],
+      "sources": [
+        "glaffit",
+        "kaikki-enwiktionary-it",
+        "kaikki-eswiktionary-it",
+        "kaikki-itwiktionary"
+      ],
+      "rule": "number_frequency",
+      "word": "abachisti",
+      "reason": "Variante di numero: si preferisce la forma di uso più comune; a parità il singolare; si tiene abachista (Zipf 0.00 vs 0.00)"
+    },
+    {
+      "canonical": "abacista",
+      "lemma": "abacista",
+      "pos": "NOUN",
+      "zipf_form": 0.0,
+      "zipf_canonical": 0.0,
+      "form_gender": [
+        "Masc"
+      ],
+      "form_number": [
+        "Plur"
+      ],
+      "canonical_gender": [
+        "Masc"
+      ],
+      "canonical_number": [
+        "Sing"
+      ],
+      "sources": [
+        "glaffit",
+        "kaikki-itwiktionary"
+      ],
+      "rule": "number_frequency",
+      "word": "abacisti",
+      "reason": "Variante di numero: si preferisce la forma di uso più comune; a parità il singolare; si tiene abacista (Zipf 0.00 vs 0.00)"
+    },
+    {
+      "canonical": "abadi",
+      "lemma": "abada",
+      "pos": "NOUN",
+      "zipf_form": 0.0,
+      "zipf_canonical": 1.99,
+      "form_gender": [
+        "Fem",
+        "Masc"
+      ],
+      "form_number": [
+        "Sing"
+      ],
+      "canonical_gender": [
+        "Masc"
+      ],
+      "canonical_number": [
+        "Plur"
+      ],
+      "sources": [
+        "glaffit",
+        "kaikki-enwiktionary-it",
+        "kaikki-itwiktionary"
+      ],
+      "rule": "number_frequency",
+      "word": "abada",
+      "reason": "Variante di numero: si preferisce la forma di uso più comune; a parità il singolare; si tiene abadi (Zipf 1.99 vs 0.00)"
+    },
+    {
+      "canonical": "abadi",
+      "lemma": "abada",
+      "pos": "NOUN",
+      "zipf_form": 0.0,
+      "zipf_canonical": 1.99,
+      "form_gender": [
+        "Fem"
+      ],
+      "form_number": [
+        "Plur"
+      ],
+      "canonical_gender": [
+        "Masc"
+      ],
+      "canonical_number": [
+        "Plur"
+      ],
+      "sources": [
+        "glaffit",
+        "kaikki-enwiktionary-it"
+      ],
+      "rule": "feminine_with_masculine",
+      "word": "abade",
+      "reason": "Variante femminile: esiste un equivalente maschile attestato; si tiene abadi (Zipf 1.99 vs 0.00)"
+    },
+    {
+      "canonical": "abadeco",
+      "lemma": "abadeco",
+      "pos": "NOUN",
+      "zipf_form": 0.0,
+      "zipf_canonical": 0.0,
+      "form_gender": [
+        "Masc"
+      ],
+      "form_number": [
+        "Plur"
+      ],
+      "canonical_gender": [
+        "Masc"
+      ],
+      "canonical_number": [
+        "Sing"
+      ],
+      "sources": [
+        "kaikki-frwiktionary-it"
+      ],
+      "rule": "number_frequency",
+      "word": "abadeci",
+      "reason": "Variante di numero: si preferisce la forma di uso più comune; a parità il singolare; si tiene abadeco (Zipf 0.00 vs 0.00)"
+    },
+    {
+      "canonical": "abate",
+      "lemma": "abate",
+      "pos": "NOUN",
+      "zipf_form": 1.1,
+      "zipf_canonical": 3.96,
+      "form_gender": [
+        "Fem"
+      ],
+      "form_number": [
+        "Sing"
+      ],
+      "canonical_gender": [
+        "Masc"
+      ],
+      "canonical_number": [
+        "Sing"
+      ],
+      "sources": [
+        "flex-it-nouns",
+        "glaffit",
+        "kaikki-dewiktionary-it",
+        "kaikki-enwiktionary-it",
+        "kaikki-frwiktionary-it",
+        "kaikki-itwiktionary",
+        "morphit-048-mirror",
+        "ud-isdt-train",
+        "ud-partut-train",
+        "ud-twittiro-train"
+      ],
+      "rule": "feminine_with_masculine",
+      "word": "abadessa",
+      "reason": "Variante femminile: esiste un equivalente maschile attestato; si tiene abate (Zipf 3.96 vs 1.10)"
+    },
+    {
+      "canonical": "abadia",
+      "lemma": "abadia",
+      "pos": "NOUN",
+      "zipf_form": 1.44,
+      "zipf_canonical": 1.52,
+      "form_gender": [
+        "Fem"
+      ],
+      "form_number": [
+        "Plur"
+      ],
+      "canonical_gender": [
+        "Fem"
+      ],
+      "canonical_number": [
+        "Sing"
+      ],
+      "sources": [
+        "glaffit",
+        "kaikki-enwiktionary-it",
+        "kaikki-frwiktionary-it",
+        "kaikki-itwiktionary"
+      ],
+      "rule": "number_frequency",
+      "word": "abadie",
+      "reason": "Variante di numero: si preferisce la forma di uso più comune; a parità il singolare; si tiene abadia (Zipf 1.52 vs 1.44)"
+    },
+    {
+      "canonical": "abadita",
+      "lemma": "abadita",
+      "pos": "NOUN",
+      "zipf_form": 0.0,
+      "zipf_canonical": 0.0,
+      "form_gender": [
+        "Fem"
+      ],
+      "form_number": [
+        "Plur"
+      ],
+      "canonical_gender": [
+        "Fem",
+        "Masc"
+      ],
+      "canonical_number": [
+        "Sing"
+      ],
+      "sources": [
+        "kaikki-enwiktionary-it",
+        "kaikki-itwiktionary"
+      ],
+      "rule": "feminine_with_masculine",
+      "word": "abadite",
+      "reason": "Variante femminile: esiste un equivalente maschile attestato; si tiene abadita (Zipf 0.00 vs 0.00)"
+    },
+    {
+      "canonical": "abadita",
+      "lemma": "abadita",
+      "pos": "NOUN",
+      "zipf_form": 0.0,
+      "zipf_canonical": 0.0,
+      "form_gender": [
+        "Masc"
+      ],
+      "form_number": [
+        "Plur"
+      ],
+      "canonical_gender": [
+        "Fem",
+        "Masc"
+      ],
+      "canonical_number": [
+        "Sing"
+      ],
+      "sources": [
+        "kaikki-enwiktionary-it",
+        "kaikki-itwiktionary"
+      ],
+      "rule": "number_frequency",
+      "word": "abaditi",
+      "reason": "Variante di numero: si preferisce la forma di uso più comune; a parità il singolare; si tiene abadita (Zipf 0.00 vs 0.00)"
+    },
+    {
+      "canonical": "abalienazione",
+      "lemma": "abalienazione",
+      "pos": "NOUN",
+      "zipf_form": 0.0,
+      "zipf_canonical": 0.0,
+      "form_gender": [
+        "Fem"
+      ],
+      "form_number": [
+        "Plur"
+      ],
+      "canonical_gender": [
+        "Fem"
+      ],
+      "canonical_number": [
+        "Sing"
+      ],
+      "sources": [
+        "kaikki-enwiktionary-it",
+        "kaikki-frwiktionary-it",
+        "kaikki-itwiktionary"
+      ],
+      "rule": "number_frequency",
+      "word": "abalienazioni",
+      "reason": "Variante di numero: si preferisce la forma di uso più comune; a parità il singolare; si tiene abalienazione (Zipf 0.00 vs 0.00)"
+    },
+    {
+      "canonical": "abamectina",
+      "lemma": "abamectina",
+      "pos": "NOUN",
+      "zipf_form": 0.0,
+      "zipf_canonical": 0.0,
+      "form_gender": [
+        "Fem"
+      ],
+      "form_number": [
+        "Plur"
+      ],
+      "canonical_gender": [
+        "Fem"
+      ],
+      "canonical_number": [
+        "Sing"
+      ],
+      "sources": [
+        "kaikki-frwiktionary-it"
+      ],
+      "rule": "number_frequency",
+      "word": "abamectine",
+      "reason": "Variante di numero: si preferisce la forma di uso più comune; a parità il singolare; si tiene abamectina (Zipf 0.00 vs 0.00)"
+    },
+    {
+      "canonical": "abapicale",
+      "lemma": "abapicale",
+      "pos": "ADJ",
+      "zipf_form": 0.0,
+      "zipf_canonical": 0.0,
+      "form_gender": [
+        "Fem",
+        "Masc"
+      ],
+      "form_number": [
+        "Plur"
+      ],
+      "canonical_gender": [
+        "Fem",
+        "Masc"
+      ],
+      "canonical_number": [
+        "Sing"
+      ],
+      "sources": [
+        "kaikki-enwiktionary-it",
+        "kaikki-itwiktionary"
+      ],
+      "rule": "number_frequency",
+      "word": "abapicali",
+      "reason": "Variante di numero: si preferisce la forma di uso più comune; a parità il singolare; si tiene abapicale (Zipf 0.00 vs 0.00)"
+    },
+    {
+      "canonical": "abaptista",
+      "lemma": "abaptista",
+      "pos": "NOUN",
+      "zipf_form": 0.0,
+      "zipf_canonical": 0.0,
+      "form_gender": [
+        "Masc"
+      ],
+      "form_number": [
+        "Plur"
+      ],
+      "canonical_gender": [
+        "Masc"
+      ],
+      "canonical_number": [
+        "Sing"
+      ],
+      "sources": [
+        "kaikki-enwiktionary-it"
+      ],
+      "rule": "number_frequency",
+      "word": "abaptisti",
+      "reason": "Variante di numero: si preferisce la forma di uso più comune; a parità il singolare; si tiene abaptista (Zipf 0.00 vs 0.00)"
+    }
+  ],
+  "completed_at_utc": "2026-11-16T21:26:16.889353+00:00",
+  "published": true,
+  "backup": "C:\\Progetti\\Zerocade\\gioco-zeroassociations\\database-backups\\normalizzata-20261116T212616889383Z.sqlite3"
+}

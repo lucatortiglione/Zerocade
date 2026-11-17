@@ -6,7 +6,7 @@ import { paintContext, type ContextGuess, type ContextView, type TournamentLayer
 
 // ZeroContext's tournament, drawn with the same code as the classic game (paintContext): the same panel, tiles, chips,
 // cards, ranking and words of the moment. It decides nothing: everything comes from the server's state (specifica §10),
-// the clock counted down locally from its remainingMs. The secret is never here before the round is over: only its length.
+// the clock counted down locally from its remainingMs. Neither the secret nor its length is sent before the round ends.
 
 const UI = {
   mode: (round: number, total: number | null) =>
@@ -110,6 +110,7 @@ function viewOf(t: ContextTournamentState, elapsed: number, now: number, make: (
   if (between && t.tieAtTen) notes.push(UI.tieAtTen)
   if (t.phase === 'intermission') notes.push(UI.waitNext)
   const layer: TournamentLayer = {
+    showTilesDuringRound: t.wordLength !== null,
     mode: UI.mode(t.round, t.totalRounds),
     badge,
     bigCount: counting ? count : null,
@@ -124,8 +125,9 @@ function viewOf(t: ContextTournamentState, elapsed: number, now: number, make: (
   // The window's words: the closest as the featured card, the others as the words of the moment under the panel.
   const window = [...t.lastWindow].sort((a, b) => a.position - b.position)
   return {
-    ready: true, problem: null, preparing: false, word: t.solution ?? '', total: Math.max(t.corpusSize, 3),
-    attempts: t.submissions, revealed: t.solution !== null, lettersShown: 0,
+    // With "Mostra numero di lettere" on, the round shows one empty tile per letter (the word is blank padding).
+    ready: true, problem: null, preparing: false, word: t.solution ?? ' '.repeat(t.wordLength ?? 0), total: Math.max(t.corpusSize, 3),
+    attempts: t.submissions, revealed: t.solution !== null, lettersShown: 0, showWordLength: t.wordLength !== null,
     solver: t.solvedBy ? { id: 't:solver', nickname: t.solvedBy } : null, revealAt: now - 1_000_000,
     best: t.best === null ? Infinity : t.best - 1, redUntil: 100, orangeUntil: 600, yellowUntil: 2500, cyanUntil: 7500,
     showBoard: !between && t.top10.length > 0, last: window[0] ? make(window[0], now, 'w') : null,

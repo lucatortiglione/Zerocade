@@ -22,7 +22,7 @@ from audit_word_databases import upos
 from italian_nlp import digest
 from nlp_tools import write_json
 from prompt_inventory import normalize, SINGLE_WORD, source_family as family
-from prompt_policy import load_prompt_policy
+from prompt_policy import load_prompt_policy, zipf_bound, zipf_matches
 import json_store
 import unified_db
 
@@ -232,8 +232,9 @@ def assess(word, data, env):
                         'forma_flessa_non_approvata_come_risposta')
     else:
         reference = env['verb_references'].get(word, (z, word)) if 'VERB' in own else (z, word)
-        prompt = result('ESCLUSA_LUNGHEZZA', 'prompt_2_15_lettere') if not 2 <= len(word) <= 15 else result('NON_ADATTA_PROMPT', 'familiarita_inferiore_soglia',
-                        reference_form=reference[1], reference_zipf=reference[0]) if reference[0] < env['policy']['minimum_zipf_it'] else result(
+        prompt = result('ESCLUSA_LUNGHEZZA', 'prompt_2_15_lettere') if not 2 <= len(word) <= 15 else result('NON_ADATTA_PROMPT',
+                        'familiarita_inferiore_soglia' if zipf_bound(env['policy'])[2] == '>=' else 'frequenza_superiore_soglia',
+                        reference_form=reference[1], reference_zipf=reference[0]) if not zipf_matches(reference[0], env['policy']) else result(
                             'DA_REVISIONARE_SENSO', 'mancano_senso_familiare_categoria_e_bacino',
                             reference_form=reference[1], reference_zipf=reference[0])
         answer = result('DA_REVISIONARE_IN_COPPIA', 'mancano_prompt_senso_e_relazione_revisionata')

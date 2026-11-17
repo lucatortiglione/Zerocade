@@ -1,5 +1,8 @@
 # 🔀 ZeroDubbi
 
+> **Revisione documentale — 16 novembre 2026.** Confermati nel DB locale 120 dilemmi. I contenuti sono in `database/ZeroDubbi.sqlite3`, mentre i voti della diretta appartengono al DB operativo. Il [TODO](TODO.md) riguarda il progetto mobile Bivio e non rappresenta il backlog della versione Zerocade già integrata.
+> [Indice e stato della documentazione](../docs/STATO_DOCUMENTAZIONE.md).
+
 «Preferiresti…?»: sullo schermo compaiono due scelte, A e B, e il pubblico vota scrivendo `A` o `B` in chat.
 Allo scadere del tempo l'overlay rivela come si è diviso il voto. Ogni voto resta salvato sul PC, legato all'id
 del dilemma. Nel codice il gioco si chiama ancora **Bivio**, il suo titolo provvisorio.

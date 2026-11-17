@@ -1,5 +1,8 @@
 # ZeroAssociazioni: prompt e associazioni verificate
 
+> **Revisione documentale — 16 novembre 2026.** La copia di gioco contiene 3.941 prompt, 11.847 parole e 58.551 collegamenti. I riferimenti a lotti e deleghe del 9 novembre descrivono la lavorazione storica; non indicano agenti attivi. Il DB di lavoro locale pesa circa 3,43 GB. ZeroContext ne riusa l'inventario e i sensi revisionati, mantenendo una banca di segrete distinta.
+> [Indice e stato della documentazione](../docs/STATO_DOCUMENTAZIONE.md).
+
 La tassonomia canonica è ora in [JSON](resources/taxonomy_it_v3_6_0.json), così
 il checkout non dipende dai CSV locali ignorati da Git. Conserva le stesse 172
 categorie e i 16 cluster, con provenienza e impronta del CSV originale. Archivio
@@ -10,8 +13,8 @@ Il gioco mostra una parola (il **prompt**) e la chat indovina **7 o 8 parole
 collegate nascoste**. Questa cartella produce e verifica quei dati; il gioco è in
 `apps/overlay/src/games/wordAssociation.ts` e li legge dal server.
 
-La costruzione dei bacini dell'intera coda è in corso: cinque lotti centrali
-e tre agenti su partizioni distinte, con verifica e importazione centrali.
+La lavorazione storica della coda comprende cinque lotti centrali
+e tre partizioni delegate, con verifica e importazione centrali.
 I 102 bacini precedenti vengono confrontati per preservarne il contenuto.
 I conteggi aggiornati sono in [stato e ripresa](ASSOCIAZIONI_FILTRATI.md) e nel
 [rapporto verificabile](resources/avanzamento_associazioni_filtrati_20261109.json).
@@ -52,6 +55,8 @@ Dalla cartella `gioco-zeroassociations`, con `.venv/Scripts/python.exe -B`:
 | Comando | Cosa fa |
 |---|---|
 | `script/prompt_inventory.py collect` | Raccoglie l'inventario dei prompt (task «1. Prompt: raccogli…») |
+| `script/aggiorna_parole_raw.py` | Task «ZeroCade : Aggiornamento parole RAW»: secondo DB `parole_ita_raw_2.0.sqlite3`, tabella `parole` senza duplicati, tutte le fonti e backup; [schema](../database/PAROLE_RAW_2.0.md) |
+| `script/normalizza_parole_raw_v2.py` | Task «ZeroCade : Normalizzare parole RAW»: popola `normalizzata`, con eccezioni per femminili autonomi e plurali esclusivi/più comuni; [criteri](../database/NORMALIZZAZIONE_PAROLE_RAW.md) |
 | `script/normalize_words.py plan` / `apply` | Normalizzazione: conta / registra i plurali puri come DISCARDED, con il singolare nel motivo (task «1a)Parole: normalizza…»); non tocca le decisioni di altri |
 | `script/prompt_database.py import-reviewed FILE.jsonl` | Importa bacini già revisionati, tutto o niente |
 | `script/prompt_database.py status` | Conteggi e integrità del DB |
@@ -88,7 +93,7 @@ soltanto `giochi.sqlite3`.
 
 `database/parole_ita_raw.sqlite3` riunisce i sei DB storici in un solo file, uno **schema** ciascuno. In
 SQLite lo schema è il prefisso `<schema>__` di tabelle, indici, viste e trigger: `raw`, `game`, `validi`,
-`filtrati`, `finale`, `scartati`, più `candidati`, nato nel DB unico. Non è in Git (2,3 GB). Si chiamava
+`filtrati`, `finale`, `scartati`, più `candidati`, nato nel DB unico. Non è in Git (circa 3,43 GB al 16 novembre 2026). Si chiamava
 `zeroassociazioni.sqlite3`. Sta nella cartella `database/` del repository (`unified_db.DB_DIR`), non accanto
 agli script; [database/DB.md](../database/DB.md) spiega ogni file.
 
@@ -127,7 +132,8 @@ Gli schemi del DB unico (fra parentesi il nome del file storico, che indica anco
 - `resources/policy_versions.json`: per ogni testo delle direttive, la versione
   delle regole (`SEMANTIC_POLICY`) con cui i bacini sono stati revisionati.
 - `resources/prompt_policy.json`: prestiti comuni ammessi (lista chiusa) e soglia
-  di familiarità Zipf 3,0 per i termini italiani.
+  massima Zipf **≤ 2,2** per i termini italiani (dal 16 novembre 2026, versione `2026-11-16.2`).
+  Restano le eccezioni NVdB e la frequenza di riferimento delle forme verbali attestate.
 - `script/verified_pools.py`: lettura dei bacini e confronto delle parole, con le stesse
   regole del gioco (accenti, forme flesse).
 - `script/validate_word_association_it_v3_6_0.py`: validatore tecnico dei CSV.

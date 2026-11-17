@@ -1,5 +1,8 @@
 # 🧠 ZeroQuizz
 
+> **Revisione documentale — 16 novembre 2026.** Nel DB locale sono presenti **26.715 domande, tutte attive**. I rapporti del 6 novembre descrivono revisioni precedenti: in particolare le 26.372 attive di `REVISIONE-RISPOSTE.md` non sono il conteggio corrente. Questa verifica riguarda conteggi e attivazione, senza certificare la correttezza di ogni domanda o aggiornare le condizioni delle fonti.
+> [Indice e stato della documentazione](../docs/STATO_DOCUMENTAZIONE.md).
+
 Un quiz a quattro risposte: la chat risponde `A`, `B`, `C` o `D`, e chi indovina prima prende più punti. La regia ha
 l'aiuto 50:50, il tempo extra e il passaggio alla domanda successiva. Nel codice il gioco si chiama ancora
 **quizzland**.

@@ -1,0 +1,7 @@
+# Installare prima PyTorch CUDA come indicato in ../requirements-dense.txt.
+-r ../requirements-dense.txt
+peft==0.18.1
+accelerate==1.12.0
+datasets==5.2.0
+scikit-learn==1.9.1
+scipy==1.18.1

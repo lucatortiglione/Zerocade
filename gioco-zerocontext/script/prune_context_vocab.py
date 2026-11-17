@@ -62,7 +62,9 @@ def main() -> None:
     ap.add_argument('--dry-run', action='store_true', help='conta e mostra, senza scrivere nulla')
     args = ap.parse_args()
     vocab, secrets, links, meta = current()
-    raw = np.fromfile(DATA / 'vectors.bin', dtype=np.int8)
+    from publish_context import active_vectors
+    source_vectors = active_vectors(meta, DATA)
+    raw = np.fromfile(source_vectors, dtype=np.int8)
     dim = int(meta['dim'])
     if raw.size != len(vocab) * dim:
         raise SystemExit(f'vectors.bin ({raw.size} valori) non corrisponde a {len(vocab)} parole x {dim}')
@@ -86,6 +88,10 @@ def main() -> None:
         if (DATA / name).exists():
             shutil.copy2(DATA / name, backup / name)
     new_meta = {**meta, 'words': len(new_vocab), 'secrets': len(new_secrets), 'links': len(new_links)}
+    if source_vectors.name != 'vectors.bin':
+        shutil.copy2(source_vectors, backup / source_vectors.name)
+    for key in ('vectors_file', 'vectors_sha256', 'corpus_revision'):
+        new_meta.pop(key, None)  # questo generatore storico scrive il proprio vectors.bin
     (DATA / 'vectors.bin.part').write_bytes(np.ascontiguousarray(new_vectors).tobytes())
     giochi.write_context(new_vocab, new_secrets, new_meta, new_links, new_hubs)
     (DATA / 'vectors.bin.part').replace(DATA / 'vectors.bin')

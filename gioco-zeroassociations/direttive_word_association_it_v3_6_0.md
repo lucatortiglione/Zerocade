@@ -1,5 +1,8 @@
 # Word Association IT — Direttive operative v3.6.0
 
+> **Revisione documentale — 16 novembre 2026.** Revisione esclusivamente documentale: versione v3.6.0 e politica semantica invariate. Il percorso attuale — nel [README](README.md): DB di lavoro `database/parole_ita_raw.sqlite3`, copia runtime nello schema `associazioni` di `giochi.sqlite3`. La copia contiene 3.941 prompt; i volumi obiettivo e gli esempi sotto non certificano altri bacini. Il nuovo hash del testo viene registrato con `register-directives` sotto la stessa politica.
+> [Indice e stato della documentazione](../docs/STATO_DOCUMENTAZIONE.md).
+
 **Data:** 8 novembre 2026  
 **Stato:** specifica di progetto / non certificazione di 10.001 enigmi approvati  
 **Revisione semantica:** 8 novembre 2026 — controllo obbligatorio di accezione e associazioni per singola risposta.  

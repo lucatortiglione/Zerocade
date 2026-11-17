@@ -1,0 +1,36 @@
+{
+  "version": "context-vectors-1",
+  "dimensions": 300,
+  "special_rounds_enabled": false,
+  "teacher": {
+    "id": "BAAI/bge-m3",
+    "revision": "5617a9f61b028005a4858fdac845db406aefb181",
+    "pooling": "first",
+    "sif_coefficient": 0.0001,
+    "device": "cpu",
+    "batch_size": 16,
+    "max_length": 128
+  },
+  "multi_context": {
+    "enabled": true,
+    "scope": "verbs_domains_reviewed",
+    "templates": [
+      "Il concetto e il significato proprio del termine '{w}'.",
+      "In senso astratto e concettuale, l'ambito di '{w}'.",
+      "Tutto ciò che riguarda, richiama o è fortemente associato a '{w}'.",
+      "Nel parlare comune e figurato, la parola '{w}' indica..."
+    ]
+  },
+  "alignment": { "anchors": 4096, "ridge": 0.001 },
+  "retrofitting": { "iterations": 15, "alpha": 1.0, "beta": 0.8, "gamma": 0.5, "margin": 1.2, "step": 0.05 },
+  "storage": "float32",
+  "quality": {
+    "polarity": [["caldo", "freddo", "tiepido"]],
+    "oov": [{ "word": "scialacquamento", "lemma": "scialacquare", "minimum_cosine": 0.65 }],
+    "angular_samples": 10000,
+    "angular_min": 0.05,
+    "angular_max": 0.15,
+    "norm_tolerance": 0.001,
+    "seed": 0
+  }
+}

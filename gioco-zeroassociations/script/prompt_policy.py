@@ -1,5 +1,6 @@
 """Accessibilità dei contesti: prestiti comuni ammessi, tecnicismi da filtrare."""
 import json
+import math
 from pathlib import Path
 import re
 import unicodedata
@@ -7,13 +8,30 @@ import unicodedata
 DEFAULT_POLICY_PATH=Path(__file__).parent.parent/'resources'/'prompt_policy.json'
 
 
+def zipf_bound(policy):
+    keys = [key for key in ('minimum_zipf_it', 'maximum_zipf_it') if key in policy]
+    if len(keys) != 1:
+        raise ValueError('Configurare un solo limite Zipf: minimo oppure massimo')
+    key = keys[0]
+    threshold = policy[key]
+    if type(threshold) not in (int, float) or not math.isfinite(threshold) or not 0 <= threshold <= 8:
+        raise ValueError('Limite Zipf non valido')
+    return key, threshold, '>=' if key == 'minimum_zipf_it' else '<='
+
+
+def zipf_matches(score, policy):
+    key, threshold, _ = zipf_bound(policy)
+    if score is None or not math.isfinite(score):
+        return False
+    return score >= threshold if key == 'minimum_zipf_it' else score <= threshold
+
+
 def load_prompt_policy(path=DEFAULT_POLICY_PATH):
     policy=json.loads(Path(path).read_text(encoding='utf-8'))
     if (not isinstance(policy.get('version'),str)
-            or type(policy.get('minimum_zipf_it')) not in (int,float)
-            or not 0<=policy['minimum_zipf_it']<=8
             or not isinstance(policy.get('common_loanwords'),list)):
         raise ValueError('Politica di accessibilità dei prompt non valida')
+    zipf_bound(policy)
     for word in policy['common_loanwords']:
         if not isinstance(word,str) or not re.fullmatch('[a-zàèéìòù]+',word):
             raise ValueError(f'Forma non canonica nella politica prompt: {word!r}')
@@ -71,8 +89,9 @@ def screen_prompt(word,zipf_it,policy,loan_evidence=(),frequency_reference=None)
         reason='loanword_requires_editorial_review';accepted=False
     elif loan and allowed_loan:
         reason='common_loanword_listed';accepted=True
-    elif (frequency_reference or {}).get('zipf_it',zipf_it) is None or (frequency_reference or {}).get('zipf_it',zipf_it)<policy['minimum_zipf_it']:
-        reason='below_familiarity_frequency_threshold';accepted=False
+    elif not zipf_matches((frequency_reference or {}).get('zipf_it',zipf_it), policy):
+        reason=('below_familiarity_frequency_threshold' if zipf_bound(policy)[2] == '>='
+                else 'above_familiarity_frequency_threshold');accepted=False
     else:
         reason='frequency_screen_passed';accepted=True
     result={'accepted':accepted,'reason':reason,'policy_version':policy['version'],

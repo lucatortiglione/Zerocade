@@ -23,7 +23,7 @@ from urllib.parse import quote
 
 from association_rules import STOP_ASSOCIATIONS
 from semantic_rules import SEMANTIC_POLICY, definitional_connector
-from prompt_policy import DEFAULT_POLICY_PATH,load_prompt_policy,borrowing_evidence,screen_prompt,familiarity_reference
+from prompt_policy import DEFAULT_POLICY_PATH,load_prompt_policy,borrowing_evidence,screen_prompt,familiarity_reference,zipf_bound
 from validate_word_association_it_v3_6_0 import (
     TAXONOMY_FILENAME, LexicalResources, load_taxonomy,
     load_italian_nlp, load_frequency_ranks, load_definition_document_counts,
@@ -504,7 +504,7 @@ def main(argv=None):
         'candidate_csv':{'path':str(candidate_path),'columns':['ref','source','language','prompt','words'],
             'ref':'','source':'ChatGPT','language':'it','prompt_case':'upper','words_case':'lower','delimiter':',','encoding':'utf-8'},
         'prompt_policy':{'path':str(args.prompt_policy),'version':prompt_policy['version'],
-            'minimum_zipf_it':prompt_policy['minimum_zipf_it'],'listed_loanwords':len(prompt_policy['common_loanwords']),
+            zipf_bound(prompt_policy)[0]:zipf_bound(prompt_policy)[1],'listed_loanwords':len(prompt_policy['common_loanwords']),
             'selected_loanwords':sorted({e['word'] for e in chosen if e['prompt_familiarity']['loanword_detected']}),
             'rejections_by_prompt':prompt_screen_rejections},
         'status':'CANDIDATI_NON_APPROVATI','approved':0,'target_approved':10001,

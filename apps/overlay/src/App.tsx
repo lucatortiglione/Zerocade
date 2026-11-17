@@ -5,6 +5,8 @@ import { NasaBackdrop } from './NasaBackdrop'
 import { Engine } from './games/engine'
 import { createGame } from './games/registry'
 import { createContextTournament } from './games/contextTournamentGame'
+import { createSemanticContext } from './games/contextSemanticGame'
+import { Taboo } from './Taboo'
 import { socket } from './socket'
 import { overlaySnapshot, useOverlay } from './store'
 import { Widgets } from './Widgets'
@@ -17,9 +19,10 @@ import { ScoreTicker } from './ScoreTicker'
 
 
 export function App() {
-  const { connected, session, message, messageSeq, gif, gifSeq, incastro, quizzland, contextTournament } = useOverlay()
+  const { connected, session, message, messageSeq, gif, gifSeq, incastro, quizzland, contextTournament, contextSemantic } = useOverlay()
   // ZeroContext's tournament is the server's (ContextTournament): the classic game does not run under it.
   const tournamentOn = session?.gameId === 'context' && Boolean(contextTournament)
+  const semanticOn = session?.gameId === 'context' && !tournamentOn && Boolean(contextSemantic)
   const contentReady = useSyncExternalStore(subscribeContent, isContentReady)
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const engineRef = useRef<Engine | null>(null)
@@ -68,11 +71,12 @@ export function App() {
       engineRef.current?.setGame(createContextTournament(), session.settings)
       return
     }
+    if (semanticOn) { engineRef.current?.setGame(createSemanticContext(), session.settings); return }
     const game = GAMES.find((g) => g.id === session.gameId)
     const instance = game ? createGame(game.id) : null
     if (game && instance) engineRef.current?.setGame(instance, session.settings)
     else engineRef.current?.clear()
-  }, [session?.gameId, session?.run, session?.ended, contentReady, tournamentOn])
+  }, [session?.gameId, session?.run, session?.ended, contentReady, tournamentOn, semanticOn])
 
   useEffect(() => {
     engineRef.current?.setPaused(Boolean(session?.paused))
@@ -88,9 +92,9 @@ export function App() {
   // joins) shows over the game by itself: the Alerts widget does that, when the creator turns it on.
   useEffect(() => {
     const dispatch = (event: LiveEvent) => {
-      const { session, contextTournament } = overlaySnapshot()
+      const { session, contextTournament, contextSemantic } = overlaySnapshot()
       if (!session || session.paused || session.ended) return
-      if (session.gameId === 'context' && contextTournament) return // the tournament takes no actions from here
+      if (session.gameId === 'context' && (contextTournament || contextSemantic)) return
       if (GAMES.some((g) => g.id === session.gameId)) {
         for (const t of triggersFor(activeTriggers(session), event)) engineRef.current?.pushAction(t.action, event)
       }
@@ -118,6 +122,7 @@ export function App() {
       {session?.gameId === 'zerodubbi' && <Bivio />}
       {session?.gameId === 'incastro' && <Incastro />}
       {session?.gameId === 'quizzland' && <Quizzland />}
+      {session?.gameId === 'zerotaboo' && <Taboo />}
       {tournamentOn && <ContextTournament />}
       <header className="overlay__top">
         <span className="overlay__brand">{game?.emoji ?? '🎮'}</span>

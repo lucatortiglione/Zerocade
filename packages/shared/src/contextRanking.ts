@@ -19,13 +19,23 @@ export interface ContextVocabulary {
   secrets: number[]
   index: Map<string, number>
   folded: Map<string, number>
+  semantic?: ContextSemanticPools
+}
+export interface ContextSemanticPools {
+  version: 'context-semantic-1'
+  ordinary: number[]
+  special: number[]
+  curatedOrdinary: number[]
+  compatibility: number[]
+  domains: Record<string, string>
 }
 export interface ContextRankSource {
   wordCount: number
   dim: number
   // One row of `dim` integers per word, normalised: the dot product orders like the cosine (of two sources, side by
   // side in the row: gioco-zerocontext/script/build_context_data.py).
-  vectors: Int8Array
+  vectors: Int8Array | Float32Array | Uint16Array
+  norms?: Float32Array
   // The words ZeroAssociazioni ties to a secret (secret's index -> words' indices): in that secret's ranking they
   // rise by `linkBoost`, in the scale of the vectors' dot product. Empty when the server has no links.
   links: Map<number, number[]>
@@ -41,9 +51,22 @@ export interface ContextLinks {
   boost: number
   links: Record<string, number[]>
   hubs?: number[]
+  vector_format?: 'int8' | 'float32' | 'float16'
+  dim?: number
+  semantic?: ContextSemanticPools
 }
 
 export const fold = (s: string) => s.normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+
+// Portable IEEE-754 binary16 decoding; the dense matrix stays at two bytes per value.
+export function contextHalf(bits: number): number {
+  const sign = bits & 0x8000 ? -1 : 1
+  const exponent = (bits >>> 10) & 31
+  const fraction = bits & 1023
+  return exponent === 0 ? sign * fraction * 2 ** -24
+    : exponent === 31 ? fraction ? NaN : sign * Infinity
+    : sign * (1 + fraction / 1024) * 2 ** (exponent - 15)
+}
 
 const lines = (text: string): string[] => {
   const result: string[] = []
@@ -66,9 +89,25 @@ export function parseContextData(vocab: string, vectors: ArrayBuffer, secrets: s
   const words = lines(vocab)
   if (!words.length || words.length > CONTEXT_LIMITS.words || words.some((word) => !/^[a-zàèéìòù]{2,20}$/.test(word)))
     throw new ContextError('data', 'Vocabolario ZeroContext non valido.')
-  const flat = new Int8Array(vectors)
+  const format = linked && typeof linked === 'object' ? Reflect.get(linked, 'vector_format') : undefined
+  if (format !== undefined && format !== 'int8' && format !== 'float32' && format !== 'float16') throw new ContextError('data', 'Formato vettori sconosciuto.')
+  if (format === 'float32' && vectors.byteLength % 4) throw new ContextError('data', 'Vettori float32 troncati.')
+  if (format === 'float16' && vectors.byteLength % 2) throw new ContextError('data', 'Vettori float16 troncati.')
+  const flat = format === 'float32' ? new Float32Array(vectors) : format === 'float16' ? new Uint16Array(vectors) : new Int8Array(vectors)
   const dim = words.length ? flat.length / words.length : 0
   if (!Number.isInteger(dim) || dim < 1 || dim > CONTEXT_LIMITS.dimensions) throw new ContextError('data', 'vectors.bin does not match vocab.txt')
+  let norms: Float32Array | undefined
+  if (format === 'float32' || format === 'float16') {
+    if (!linked || Reflect.get(linked, 'dim') !== dim || ![256, 300, 1024].includes(dim))
+      throw new ContextError('data', 'Dimensioni floating point non valide.')
+    if (format === 'float16') norms = new Float32Array(words.length)
+    for (let i = 0; i < words.length; i++) {
+      let norm = 0
+      for (let d = 0; d < dim; d++) norm += (format === 'float16' ? contextHalf(flat[i * dim + d]) : flat[i * dim + d]) ** 2
+      if (!Number.isFinite(norm) || Math.abs(norm - 1) > (format === 'float16' ? .002 : .0002)) throw new ContextError('data', 'Vettori floating point non normalizzati.')
+      if (norms) norms[i] = Math.sqrt(norm)
+    }
+  }
   const index = new Map<string, number>()
   const folded = new Map<string, number>()
   words.forEach((w, i) => {
@@ -112,7 +151,26 @@ export function parseContextData(vocab: string, vectors: ArrayBuffer, secrets: s
       throw new ContextError('data', 'Penalità di ZeroContext non valide.')
     hubs = Int32Array.from(given as number[])
   }
-  return { words, dim, vectors: flat, secrets: secretIdx, index, folded, links, linkBoost, hubs }
+  let semantic: ContextSemanticPools | undefined
+  const rules = linked && typeof linked === 'object' ? Reflect.get(linked, 'semantic') : undefined
+  if (rules !== undefined) {
+    if (!rules || typeof rules !== 'object' || rules.version !== 'context-semantic-1' || (format !== 'float32' && format !== 'float16'))
+      throw new ContextError('data', 'Pool semantici non validi.')
+    for (const name of ['ordinary', 'special', 'curatedOrdinary', 'compatibility'] as const) {
+      const pool: unknown = rules[name]
+      if (!Array.isArray(pool) || pool.length > secretIdx.length || new Set(pool).size !== pool.length ||
+          pool.some((i) => !inside(i) || !candidates.has(i))) throw new ContextError('data', 'Pool di segrete fuori dal corpus.')
+    }
+    const ordinary = new Set<number>(rules.ordinary), special = new Set<number>(rules.special)
+    if (!rules.ordinary.length || !rules.domains || typeof rules.domains !== 'object' || Array.isArray(rules.domains) ||
+        rules.special.some((i: number) => typeof rules.domains[i] !== 'string' || rules.domains[i].length > 120) ||
+        secretIdx.some((i) => !ordinary.has(i) && !special.has(i)) ||
+        rules.curatedOrdinary.some((i: number) => !ordinary.has(i)) || rules.compatibility.some((i: number) => !ordinary.has(i)) ||
+        linkBoost !== 0 || (hubs?.some((p) => p !== 0) ?? false))
+      throw new ContextError('data', 'Pool semantici incompleti.')
+    semantic = rules as ContextSemanticPools
+  }
+  return { words, dim, vectors: flat, secrets: secretIdx, index, folded, links, linkBoost, hubs, ...(norms ? { norms } : {}), ...(semantic ? { semantic } : {}) }
 }
 
 // The word a chat comment names, or -1: one word only, in any case, with or without accents.
@@ -137,23 +195,30 @@ export interface Ranking {
   // order[r] is the word at rank r (order[0] is the secret); rankOf[i] is word i's rank.
   order: Uint32Array<ArrayBuffer>
   rankOf: Uint32Array<ArrayBuffer>
+  similarities?: Float32Array<ArrayBuffer>
 }
 
 export function rankAgainst(data: ContextData | ContextRankSource, secret: number): Ranking {
   const { vectors, dim } = data
   const n = 'wordCount' in data ? data.wordCount : data.words.length
-  if (!Number.isSafeInteger(n) || n < 1 || n > CONTEXT_LIMITS.words || !Number.isInteger(dim) || dim < 1 ||
-      dim > CONTEXT_LIMITS.dimensions || vectors.byteLength !== n * dim || vectors.byteLength > CONTEXT_LIMITS.vectors)
+  if (!(vectors instanceof Int8Array || vectors instanceof Float32Array || vectors instanceof Uint16Array) || !Number.isSafeInteger(n) || n < 1 || n > CONTEXT_LIMITS.words || !Number.isInteger(dim) || dim < 1 ||
+      dim > CONTEXT_LIMITS.dimensions || vectors.length !== n * dim || vectors.byteLength > CONTEXT_LIMITS.vectors)
     throw new ContextError('data', 'Dimensioni dei vettori ZeroContext non valide.')
   if (!Number.isInteger(secret) || secret < 0 || secret >= n) throw new ContextError('data', 'Soluzione ZeroContext fuori dal vocabolario.')
   const sims = new Float32Array(n)
   const s0 = secret * dim
+  const half = vectors instanceof Uint16Array
+  const norms = data.norms
+  if (half && (!norms || norms.length !== n || norms.some((v) => !Number.isFinite(v) || v <= 0)))
+    throw new ContextError('data', 'Norme float16 mancanti o non valide.')
+  const target = half ? Float32Array.from(vectors.subarray(s0, s0 + dim), contextHalf) : null
   for (let i = 0; i < n; i++) {
     let dot = 0
     const o = i * dim
-    for (let d = 0; d < dim; d++) dot += vectors[o + d] * vectors[s0 + d]
-    sims[i] = dot
+    for (let d = 0; d < dim; d++) dot += half ? contextHalf(vectors[o + d]) * target![d] : vectors[o + d] * vectors[s0 + d]
+    sims[i] = half ? dot / (norms![i] * norms![secret]) : dot
   }
+  const similarities = vectors instanceof Int8Array ? undefined : sims.slice()
   // Words close to almost everything count as less close (the same for every secret), then the words people
   // associate with the secret count as closer than their vectors alone say.
   const hubs = data.hubs ?? null
@@ -168,7 +233,7 @@ export function rankAgainst(data: ContextData | ContextRankSource, secret: numbe
   order.sort((a, b) => sims[b] - sims[a] || a - b)
   const rankOf = new Uint32Array(n)
   for (let r = 0; r < n; r++) rankOf[order[r]] = r
-  return { secret, order, rankOf }
+  return { secret, order, rankOf, ...(similarities ? { similarities } : {}) }
 }
 
 // How close a rank looks, 0 (far) to 1 (the secret): the logarithm, so the first hundred

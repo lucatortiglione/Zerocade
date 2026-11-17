@@ -3,12 +3,14 @@ import { GAMES, chainModeLabel, parseChainSecret, type SessionState } from '@zer
 import { PlaceBoxes } from '../components/PlaceBoxes'
 import { BivioSidebar } from '../components/BivioSidebar'
 import { ContextTournamentPanel } from '../components/ContextTournamentPanel'
+import { ContextAssociationsPanel } from '../components/ContextAssociationsPanel'
 import { IncastroSidebar } from '../components/IncastroSidebar'
 import { LeaderboardPanel } from '../components/LeaderboardPanel'
 import { LiveColumn } from '../components/LiveColumn'
 import { GameControls } from '../components/GameControls'
 import { BridgeControl, listedGames } from '../components/Regia'
 import { QuizzlandSidebar } from '../components/QuizzlandSidebar'
+import { TabooSidebar } from '../components/TabooSidebar'
 import { SettingsPanel } from '../components/SettingsPanel'
 import { Simulator } from '../components/Simulator'
 import { TopGifters } from '../components/TopGifters'
@@ -27,13 +29,15 @@ export function GamesPage() {
 
   // Bivio, Incastro and Quizzland have their own control column (game switcher included) next
   // to the preview. Every game gets the same right column: pads, creators and latest gifts.
-  if (session?.gameId === 'zerodubbi' || session?.gameId === 'incastro' || session?.gameId === 'quizzland') {
+  if (session?.gameId === 'zerodubbi' || session?.gameId === 'incastro' || session?.gameId === 'quizzland' || session?.gameId === 'zerotaboo') {
     return (
       <div className="games games--bivio">
         {session.gameId === 'zerodubbi' ? (
           <BivioSidebar session={session} />
         ) : session.gameId === 'incastro' ? (
           <IncastroSidebar session={session} />
+        ) : session.gameId === 'zerotaboo' ? (
+          <TabooSidebar session={session} />
         ) : (
           <QuizzlandSidebar session={session} />
         )}
@@ -51,6 +55,7 @@ export function GamesPage() {
           <GamePicker session={session} locked={tournamentOpen} />
         </section>
         {session?.gameId === 'context' && <ContextTournamentPanel />}
+        {session?.gameId === 'context' && <ContextAssociationsPanel session={session} locked={Boolean(tournamentOpen)} />}
         {!tournamentShown && (session?.gameId === 'context' || session?.gameId === 'zerowordle' || session?.gameId === 'zeroreazioniacatena') && (
           <section>
             <h2 className="section-label">Soluzione</h2>

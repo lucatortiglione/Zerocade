@@ -1,5 +1,8 @@
 # Database unico, aggiornamenti e decisioni
 
+> **Revisione documentale — 16 novembre 2026.** Gli aggiornamenti delle fonti richiedono una decisione salvata nel DB di lavoro; rigenerare i corpus dei giochi non acquisisce automaticamente nuovi snapshot. Il nuovo task ZeroContext usa l'inventario locale già disponibile. Per includere una nuova fonte occorre prima raccoglierla e integrarla con gli strumenti descritti qui.
+> [Indice e stato della documentazione](../docs/STATO_DOCUMENTAZIONE.md).
+
 Il database operativo è la raccolta, **schema `raw` di `database/parole_ita_raw.sqlite3`**. Contiene voci raccolte,
 attestazioni, fonti, versioni, confronti, decisioni, storico e bacini verificati.
 Non esiste un database operativo separato per ciascuna fonte.
@@ -10,6 +13,18 @@ Le attestazioni rimangono distinte per conservare la provenienza. I file nella
 cache sono le copie dei download: non sono l'archivio delle decisioni.
 
 ## Come si cercano gli aggiornamenti
+
+Per l'aggiornamento completo richiesto il 16 novembre 2026 è disponibile il task
+**ZeroCade : Aggiornamento parole RAW**. Il task ora crea e aggiorna il secondo DB
+`database/parole_ita_raw_2.0.sqlite3`, tabella `parole`, con tutte le 46 fonti e senza
+duplicati. Conserva la provenienza e non importa scarti o decisioni editoriali
+del vecchio archivio. Prima di aggiornare il secondo DB ne crea un backup;
+non avvia filtri, generazione di associazioni o pubblicazione nei giochi.
+Il [catalogo delle fonti](../database/FONTI_PAROLE_RAW.md) descrive sorgenti,
+licenze, revisioni, destinazione e rapporto progressivo.
+
+Il percorso seguente continua a gestire il vecchio `parole_ita_raw.sqlite3`, con
+la scelta manuale per ogni aggiornamento:
 
 1. Eseguire **Fonti: cerca aggiornamenti e prepara il confronto**.
    Indicare l'ID della fonte oppure `*` per tutte quelle abilitate nel database.

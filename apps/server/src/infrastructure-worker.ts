@@ -34,6 +34,9 @@ async function execute(job: JobRequest): Promise<unknown> {
         case 'quizzland': return (await import('./quizzland.js')).quizzlandCsv()
         case 'zw-plays': return (await import('./incastro.js')).zerowordsCsv('plays')
         case 'zw-answers': return (await import('./incastro.js')).zerowordsCsv('answers')
+        // ZeroTaboo's telemetry: computed here, in the worker, never on the main thread (the winner is a pseudonym).
+        case 'taboo-exposures': { const { tabooStore } = await import('./db.js'); const t = tabooStore.exposuresTable(); return toCsv([t.columns, ...t.rows]) }
+        case 'taboo-calibration': { const { tabooStore } = await import('./db.js'); const t = tabooStore.calibrationTable(); return toCsv([t.columns, ...t.rows]) }
         default: {
           const { columns, rows } = job.args.kind === 'wa-rounds' ? wordAssociationRounds() : wordAssociationGuesses()
           return toCsv([columns, ...rows])

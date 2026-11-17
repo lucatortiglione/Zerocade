@@ -1,0 +1,26 @@
+{
+  "version": "context-statistical-1",
+  "models": {},
+  "vector_weights": {"fasttext": 0.4, "conceptnet": 0.3},
+  "lsa": {
+    "enabled": true,
+    "weight": 0.3,
+    "dimensions": 256,
+    "max_features": 50000,
+    "min_df": 2,
+    "random_state": 0
+  },
+  "block_dimensions": 256,
+  "max_sequence_length": 256,
+  "batch_size": 8,
+  "link_boost": 0.1,
+  "hub_strength": 0.0,
+  "probes": ["cuculo", "fotografo", "spiaggia", "pizza", "banca", "pesca"],
+  "watch_words": ["uccello", "nido", "canto", "orologio", "luna", "aurora", "lattea", "cocco", "boreale", "fotoreporter", "pittore", "autista", "medico"],
+  "references": {
+    "lsa": "https://scikit-learn.org/stable/modules/decomposition.html#truncated-singular-value-decomposition-and-latent-semantic-analysis",
+    "conceptnet": "https://github.com/commonsense/conceptnet-numberbatch",
+    "fasttext": "https://fasttext.cc/docs/en/crawl-vectors.html",
+    "morphit": "https://raw.githubusercontent.com/giodegas/morphit-lemmatizer/b99d75d774367e4bedc5c5f339dec384777488ff/master/morph-it_048_utf8.txt"
+  }
+}

@@ -1,5 +1,8 @@
 # ⛓️ ZeroReazioniACatena
 
+> **Revisione documentale — 16 novembre 2026.** Il gioco continua a derivare i dati dai bacini di ZeroAssociazioni, senza una banca autonoma. La copia disponibile contiene 3.941 prompt: dopo l'aggiornamento dello schema `associazioni`, il server deve ricostruire le catene al successivo caricamento. Le variazioni della banca ZeroContext non aggiungono automaticamente nuove catene.
+> [Indice e stato della documentazione](../docs/STATO_DOCUMENTAZIONE.md).
+
 Parole legate tra loro da associazioni, in tre modalità che si danno il cambio (di base ogni 5 round, in
 quest'ordine):
 

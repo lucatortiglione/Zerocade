@@ -6,7 +6,7 @@ from pathlib import Path
 import tempfile
 import unittest
 
-from prompt_policy import load_prompt_policy, screen_prompt, borrowing_evidence, familiarity_reference
+from prompt_policy import load_prompt_policy, screen_prompt, borrowing_evidence, familiarity_reference, zipf_matches, zipf_bound
 from validate_word_association_it_v3_6_0 import check_candidates_jsonl, load_taxonomy, TAXONOMY_FILENAME, main as validate_main
 from test_word_association_it_v3_6_0 import candidate
 
@@ -21,8 +21,21 @@ class PromptPolicyTests(unittest.TestCase):
         self.assertFalse(screen_prompt('abstract', 6.0, policy, ['source_loanword_label'])['accepted'])
         self.assertFalse(screen_prompt('background', 6.0, policy, ['source_loanword_label'])['accepted'])
         self.assertFalse(screen_prompt('abside', 2.94, policy)['accepted'])
-        self.assertTrue(screen_prompt('basilico', 3.5, policy)['accepted'])
+        self.assertFalse(screen_prompt('basilico', 3.5, policy)['accepted'])
         self.assertNotIn('basilico', policy['common_loanwords'])
+
+    def test_current_threshold_is_inclusive_at_2_2(self):
+        policy = load_prompt_policy()
+        self.assertEqual(policy['maximum_zipf_it'], 2.2)
+        self.assertTrue(screen_prompt('parola', 2.19, policy)['accepted'])
+        self.assertTrue(screen_prompt('parola', 2.2, policy)['accepted'])
+        self.assertFalse(screen_prompt('parola', 2.21, policy)['accepted'])
+
+    def test_old_minimum_policies_remain_explicit_and_ambiguous_bounds_are_rejected(self):
+        self.assertTrue(zipf_matches(3.0, {'minimum_zipf_it': 3.0}))
+        self.assertFalse(zipf_matches(2.99, {'minimum_zipf_it': 3.0}))
+        with self.assertRaises(ValueError):
+            zipf_bound({'minimum_zipf_it': 2.2, 'maximum_zipf_it': 2.2})
 
     def test_borrowing_detection_ignores_translations_and_italian_derivations(self):
         entry = {'word': 'basilico', 'pos': 'noun', 'translations': [{'lang_code': 'en', 'word': 'basil'}]}
@@ -33,14 +46,14 @@ class PromptPolicyTests(unittest.TestCase):
         self.assertEqual(borrowing_evidence(entry, {'raw_tags': ['forestierismo']}), [])
 
     def test_verbal_frequency_uses_only_attested_forms(self):
-        scores = {'affettare': 2.7, 'affettato': 3.4, 'abside': 2.94, 'absidi': 3.8, 'avere': 6.0}
+        scores = {'affettare': 2.1, 'affettato': 3.4, 'abside': 2.19, 'absidi': 3.8, 'avere': 6.0}
         reference = familiarity_reference({'word': 'affettare', 'pos': 'verb', 'forms': [
             {'form': 'affettato'}, {'form': 'avere', 'tags': ['auxiliary']}]}, scores.get)
         self.assertEqual(reference['form'], 'affettato')
-        self.assertTrue(screen_prompt('affettare', 2.7, load_prompt_policy(), frequency_reference=reference)['accepted'])
+        self.assertFalse(screen_prompt('affettare', 2.1, load_prompt_policy(), frequency_reference=reference)['accepted'])
         reference = familiarity_reference({'word': 'abside', 'pos': 'noun', 'forms': [{'form': 'absidi'}]}, scores.get)
         self.assertEqual(reference['form'], 'abside')
-        self.assertFalse(screen_prompt('abside', 2.94, load_prompt_policy(), frequency_reference=reference)['accepted'])
+        self.assertTrue(screen_prompt('abside', 2.19, load_prompt_policy(), frequency_reference=reference)['accepted'])
 
 
 class ValidatorTests(unittest.TestCase):

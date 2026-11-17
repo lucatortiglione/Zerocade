@@ -158,6 +158,18 @@ def write_context(vocab: list[str], secrets: list[str], meta: dict, links: list[
     di quel round salgono di meta['link_boost'] (gioco-zerocontext/script/build_context_data.py).
     hubs: per ogni parola (nell'ordine di vocab) la penalità di genericità, sottratta dal suo punteggio in ogni
     classifica (gioco-zerocontext/script/hubness.py); senza, nessuna parola è penalizzata."""
+    if meta.get('pipeline') == 'context-semantic-1':
+        raise ValueError('Il corpus semantico richiede targets e vettori verificati: usare build_context_semantic.py --publish')
+    if FILE.exists():
+        with closing(sqlite3.connect(FILE.resolve().as_uri() + '?mode=ro', uri=True)) as current:
+            if current.execute("SELECT 1 FROM sqlite_schema WHERE name='context__meta'").fetchone():
+                row = current.execute("SELECT value FROM context__meta WHERE name='pipeline'").fetchone()
+                if row and json.loads(row[0]) == 'context-semantic-1':
+                    raise ValueError('Uno strumento storico non può sovrascrivere il corpus semantico: usare build_context_semantic.py --publish')
+            if current.execute("SELECT 1 FROM sqlite_schema WHERE name='context__secrets'").fetchone():
+                missing = {w for w, in current.execute('SELECT word FROM context__secrets')} - set(secrets)
+                if missing:
+                    raise ValueError(f'Aggiornamento bloccato: perderebbe {len(missing)} segrete ZeroContext')
     path, con = _temp_db(CONTEXT_SCHEMA)
     try:
         con.executemany('INSERT INTO vocab VALUES(?,?)', list(enumerate(vocab)))

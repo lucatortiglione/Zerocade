@@ -5,8 +5,13 @@ export { CONTEXT_LIMITS, CONTEXT_COLORS, CONTEXT_COLOR_STOPS, CONTEXT_COLOR_MAX,
 export { payloadBytes } from './threadBudget.js'
 export { BodyLimitError, readBoundedBytes } from './httpBody.js'
 export * from './contextTournament.js'
+export * from './contextSemantic.js'
+export * from './contextProfiles.js'
+export * from './taboo.js'
+import type { ContextSemanticState } from './contextSemantic.js'
 export { pickSecret } from './secretPick.js'
 import type { ContextTournamentAdmin, ContextTournamentState, TournamentCommand, TournamentReply, TournamentRow, TournamentSummary } from './contextTournament.js'
+import { TABOO_RULES, type TabooAdminState, type TabooCommand, type TabooPublicState, type TabooReply } from './taboo.js'
 
 export {
   WORD_ASSOCIATION_MAX_WORDS,
@@ -1306,7 +1311,7 @@ const GAME_DEFS: GameDef[] = [
     id: 'context',
     name: 'ZeroContext',
     category: 'Quiz',
-    description: 'Trova la parola segreta: ogni parola in chat riceve una posizione per vicinanza di significato (1 = la parola segreta, 2 = la più vicina).',
+    description: 'Trova la parola segreta con posizione e temperatura semantica. Tutti i round sono ordinari, senza limite di tempo.',
     emoji: '🎯',
     gradient: ['#ffffff', '#2d3642'],
     actions: [
@@ -1315,7 +1320,12 @@ const GAME_DEFS: GameDef[] = [
       { id: 'small_hint', label: 'Piccolo aiuto', help: true },
     ],
     settings: [
+      { id: 'associationSource', label: 'Associazioni', kind: 'select', default: 'original', options: [
+        { value: 'original', label: 'Associazioni originali' },
+        { value: 'abtt', label: 'Associazioni ABTT' },
+      ], hint: 'Il cambio avvia un nuovo round senza riavviare il server. La classifica generale è conservata.' },
       { id: 'disableAllHints', label: 'Disabilita tutti gli aiuti', kind: 'toggle', default: false, hint: 'Blocca regali, comandi, suggerimenti automatici e iniziali e lettere rivelate. Nasconde gli aiuti già mostrati, conservando i tentativi dei giocatori.' },
+      { id: 'showWordLength', label: 'Mostra numero di lettere', kind: 'toggle', default: true, hint: 'Nella modalità classica mostra un riquadro per ogni lettera della parola segreta. Spento, nasconde la lunghezza fino alla fine del round; gli eventuali piccoli aiuti mostrano solo le lettere già rivelate. Disabilita tutti gli aiuti ha precedenza.' },
       { id: 'starterWords', label: 'Parole iniziali', kind: 'toggle', default: false, hint: 'A inizio round mostra tre parole lontane, per dare alla chat un punto di partenza.' },
       { id: 'startHintOn', label: 'Suggerimento iniziale', kind: 'toggle', default: false, hint: 'Ogni round parte con una parola già sul tabellone. Spento (predefinito), il tabellone parte vuoto (o con le parole iniziali).' },
       { id: 'startHint', label: 'Posizione del suggerimento iniziale', kind: 'number', min: 3, max: 1000, step: 1, default: 30, when: { id: 'startHintOn', value: true }, hint: 'La parola a questa posizione è già sul tabellone: un poco lontana dalla più vicina (la 2).' },
@@ -1660,6 +1670,52 @@ const GAME_DEFS: GameDef[] = [
       { source: { type: 'comment' }, action: 'answer' },
       { source: { type: 'gift', giftId: 'rose' }, action: 'fifty' },
     ],
+  },
+  {
+    id: 'zerotaboo',
+    name: 'ZeroTaboo',
+    category: 'Parole',
+    description:
+      'Taboo per la diretta: lo streamer descrive la carta senza dire le parole vietate, la chat indovina e il primo messaggio valido vince. Cinque round da 90 secondi contro una soglia di squadra. Funziona con il ponte ZeroFollowerBot.',
+    emoji: '🎭',
+    gradient: ['#f43f5e', '#2a0a14'],
+    // ZEROTABOO.md prevede nessun aiuto dal pubblico: niente azioni "help".
+    actions: [{ id: 'guess', label: 'Risposta' }],
+    settings: [
+      {
+        id: 'tabooThreshold',
+        label: 'Soglia di squadra',
+        hint: 'Punti da raggiungere. Vale dalla partita successiva: non cambia a partita in corso.',
+        kind: 'number',
+        min: TABOO_RULES.thresholdMin,
+        max: TABOO_RULES.thresholdMax,
+        step: 1,
+        default: TABOO_RULES.thresholdDefault,
+      },
+      {
+        id: 'tabooPlatform',
+        label: 'Piattaforma competitiva',
+        hint: 'Solo qui si assegna il primo indovino. Una risposta giusta dall’altra piattaforma chiude la carta per la squadra, senza vincitore individuale.',
+        kind: 'select',
+        default: 'tiktok',
+        options: [
+          { value: 'tiktok', label: 'TikTok' },
+          { value: 'twitch', label: 'Twitch' },
+        ],
+      },
+      {
+        id: 'tabooIntermissionSeconds',
+        label: 'Secondi tra i round',
+        hint: 'Da 15 a 30. Il round parte quando premi “Avvia round”, dopo questo intervallo.',
+        kind: 'number',
+        min: TABOO_RULES.intermissionMinMs / 1000,
+        max: TABOO_RULES.intermissionMaxMs / 1000,
+        step: 1,
+        default: TABOO_RULES.intermissionDefaultMs / 1000,
+      },
+      { id: 'tabooAnimations', label: 'Animazioni', hint: 'Brevi e silenziabili.', kind: 'toggle', default: true },
+    ],
+    defaultTriggers: [{ source: { type: 'comment' }, action: 'guess' }],
   },
   {
     id: 'ruzzle',
@@ -2225,6 +2281,10 @@ export interface ServerToClientEvents {
   'quizzland:state': (state: QuizzlandState) => void
   // Dashboards only.
   'quizzland:solution': (solution: QuizzlandSolution) => void
+  // ZeroTaboo (taboo.ts): the public state for every client of the room; the card in play, the reports and the deck's
+  // warnings to dashboards only. Never a target, a Taboo word or an alias in the public one before the card is closed.
+  'taboo:state': (state: TabooPublicState | null) => void
+  'taboo:admin': (admin: TabooAdminState | null) => void
   // ZeroContext's secret word of the room: dashboards show it to the creator, and every overlay
   // (the preview too) plays the same one.
   'secret:word': (secret: { word: string }) => void
@@ -2239,6 +2299,7 @@ export interface ServerToClientEvents {
   // ZeroContext's tournament (contextTournament.ts): the public state for every client of the room, null when the room
   // has none to show; the organiser's view (secret, full standings) and command errors to dashboards only.
   'context:tournament': (state: ContextTournamentState | null) => void
+  'context:semantic': (state: ContextSemanticState | null) => void
   'context:tournament-admin': (admin: ContextTournamentAdmin | null) => void
   'context:tournament-error': (error: { message: string }) => void
   // ZeroContext: how many times each secret word has come out (classic games and tournaments), all of them on
@@ -2291,6 +2352,8 @@ export interface ClientToServerEvents {
   'pad:remove': (id: string) => void
   // The dashboard: ZeroContext's tournament commands (checked on the server), its history and a tournament's standings.
   'context:tournament': (command: TournamentCommand, ack: (reply: TournamentReply) => void) => void
+  // The dashboard: ZeroTaboo's commands (checked on the server; each carries the version the director saw).
+  'taboo:control': (command: TabooCommand, ack: (reply: TabooReply) => void) => void
   'context:tournament-history': (ack: (history: TournamentSummary[]) => void) => void
   'context:tournament-standings': (id: string, ack: (rows: TournamentRow[] | null) => void) => void
   // The copies of the standings saved after every round in a separate SQLite file (latest first), and the restore

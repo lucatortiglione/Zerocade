@@ -1,5 +1,8 @@
 # Risorse reali del lotto
 
+> **Revisione documentale — 16 novembre 2026.** Questa cartella contiene risorse correnti e manifest storici del lotto: i numeri e le versioni sotto appartengono alle rispettive acquisizioni. `taxonomy_it_v3_6_0.json` — la tassonomia canonica versionata. Il nuovo task ZeroContext legge le frequenze direttamente dagli snapshot del DB lessicale; il CSV delle frequenze resta una risorsa della pipeline storica.
+> [Indice e stato della documentazione](../../docs/STATO_DOCUMENTAZIONE.md).
+
 - `frequency_ranks_it.csv`: 302.260 forme canoniche dalla lista italiana di
   wordfreq 3.1.1; i ranghi sono della forma, consultati attraverso i lemmi,
   senza inventare una nuova graduatoria lemmatizzata.

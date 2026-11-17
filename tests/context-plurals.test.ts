@@ -47,7 +47,8 @@ test('a plural winning guess ends the round, awards finder points and keeps the 
   }, { get: (target, key) => key in target ? Reflect.get(target, key) : () => {} }) as unknown as CanvasRenderingContext2D
   const draw = () => { texts.length = 0; game.draw(canvas, performance.now()); return texts.join('\n') }
   game.onAction('guess', { type: 'comment', text: 'GATTI!', user: { id: 'a', nickname: 'Tester' } }, 0)
-  assert.match(draw(), /Tester ha trovato: gatto/)
+  assert.match(draw(), /Tester ha trovato la parola/)
+  assert.match(draw().replace(/\s/g, ''), /GATTO/)
   assert.match(draw(), /100 pt/)
   game.onAction('guess', { type: 'comment', text: 'gatto', user: { id: 'b', nickname: 'Secondo' } }, 0)
   assert.doesNotMatch(draw(), /Secondo/)

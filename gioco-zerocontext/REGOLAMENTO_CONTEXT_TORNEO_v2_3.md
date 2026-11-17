@@ -1,7 +1,12 @@
 # Context — Regolamento Ufficiale del Torneo
 
+> **Revisione documentale — 16 novembre 2026.** Versione delle regole 2.3 invariata. Il corpus attivo — statistico (fastText 40%, ConceptNet 30%, LSA 30%), 89.380 parole e 6.838 segrete; i parametri a due fonti descrivono il generatore storico. L'implementazione ammette anche manche infinite e usa soltanto il ponte ZeroFollowerBot, come descritto nel [README](README.md). L'Allegato A conserva il progetto iniziale, antecedente al codice.
+> [Indice e stato della documentazione](../docs/STATO_DOCUMENTAZIONE.md).
+
 **Versione 2.3 — 14 novembre 2026**  
 **Modalità:** competizione individuale su tabellone condiviso; sistema Pioniere + Jackpot + Rollover.
+
+Integrazione documentale del 15 novembre 2026: fonti delle parole e metodologia di costruzione del database nella sezione 14.
 
 ## 1. Obiettivo e struttura
 
@@ -134,7 +139,7 @@ L'achievement **Hole in One non è un criterio di spareggio**.
 ## 10. Validità degli invii, controllo e correttezza
 
 - Il vocabolario e il motore di ranking sono fissati per tutto il torneo. La parola target deve avere un rank 1 univoco.
-- Si normalizzano maiuscole/minuscole, spazi superflui e varianti tipografiche degli apostrofi. Gli accenti con valore lessicale non vengono indiscriminatamente eliminati. Plurali e coniugazioni sono validi soltanto se presenti nel vocabolario.
+- Si normalizzano maiuscole/minuscole, spazi superflui e varianti tipografiche degli apostrofi. Gli accenti con valore lessicale non vengono indiscriminatamente eliminati. Plurali e coniugazioni valgono come tentativi se presenti nel vocabolario; fa eccezione il plurale attestato della parola segreta, che risolve la manche anche senza una propria voce nel vocabolario (sezione 14.3). La soluzione è riconosciuta anche senza accenti.
 - Una parola normalizzata può essere usata una sola volta per manche. In caso di duplicazione anche nella stessa finestra, vale il primo invio registrato dal server.
 - Per la precedenza conta **l'arrivo al server**, non l'ora che appare nella chat del partecipante. In caso di timestamp identico decide l'ID progressivo dell'evento.
 - Sono vietati multiaccount, bot di invio, tentativi automatizzati e manipolazioni del client o del flusso dei messaggi. Gli organizzatori possono annullare tentativi illeciti ed escludere i partecipanti, registrando e comunicando il motivo.
@@ -229,9 +234,91 @@ Questa sezione è **vincolante per l'implementazione dell'interfaccia e della lo
 
 ---
 
+## 14. Provenienza delle parole e costruzione del database lessicale
+
+Il lessico di ZeroContext nasce da una raccolta di risorse linguistiche pubbliche, integrata con la banca storica esportata da Livecade. La raccolta conserva **voci, lemmi, forme flesse e attestazioni**: non tutte le parole scaricate sono lemmi e non tutte sono ammesse al gioco. L'inventario condiviso è nello schema `raw` di `database/parole_ita_raw.sqlite3`; le parole effettivamente utilizzate da ZeroContext sono nello schema `context` di `database/giochi.sqlite3`.
+
+### 14.1 Da dove provengono le parole
+
+Il [registro delle fonti](../gioco-zeroassociations/resources/prompt_inventory_sources.json) identifica ogni risorsa con URL o percorso locale, formato, attribuzione, condizioni dichiarate ed eventuale revisione. Al 15 novembre 2026 comprende 46 risorse, raggruppate qui per provenienza: i file di una stessa collezione non sono editori indipendenti.
+
+| Fonte o collezione | Dati acquisiti e impiego |
+| --- | --- |
+| Wikizionario italiano e lessico italiano delle edizioni inglese, francese, tedesca e spagnola di Wiktionary, tramite Kaikki/Wiktextract | Entrate italiane, categorie grammaticali, lemmi, forme flesse, definizioni ed etichette d'uso disponibili. Le definizioni aiutano a valutare il senso; le loro singole parole non diventano automaticamente associazioni. |
+| Dump dei sette progetti Wikimedia italiani: Wikipedia, Wikizionario, Wikisource, Wikiquote, Wikivoyage, Wikiversità e Wikinotizie | Titoli compatibili con una parola singola e relativi riferimenti. Un titolo, specialmente di Wikizionario, può essere straniero o un nome proprio: da solo non prova che la voce sia un lemma italiano. Non si importano i testi degli articoli. |
+| Morph-it! 0.4.8, di Marco Baroni ed Eros Zanchetta | Forme, lemmi e analisi morfologiche, da una copia pubblica fissata a una revisione Git e corredata dal README originale. Fornisce anche la base del riconoscimento dei plurali della soluzione. |
+| UniMorph italiano | Paradigmi con lemma, forma e tratti morfologici espliciti. |
+| GLÀFF-IT / GLAFF-IT | Forme, lemmi, codici grammaticali e dati fonologici. Deriva da Wikizionario e non costituisce una prova indipendente da quella famiglia. |
+| Flex_it, file di nomi e aggettivi | Forme, lemmi, genere, numero e frequenze. Deriva da Morph-it! e ItWaC: nell'espansione dei tentativi conta nella stessa famiglia di Morph-it!. |
+| Corpora Universal Dependencies italiani: ISDT, VIT, ParTUT, PoSTWITA, TWITTIRO, Valico e MarkIT | Forme osservate nei testi, lemmi, categorie grammaticali e tratti delle annotazioni. Gli split train/dev/test sono risorse della stessa collezione. |
+| Dizionario Hunspell e thesaurus italiani di LibreOffice | Grafie elencate e relazioni lessicali. I flag del file Hunspell non vengono espansi e non certificano da soli un lemma o la sua categoria grammaticale. |
+| MultiWordNet italiano, distribuzione Open Multilingual Wordnet; FreeDict italiano–tedesco | Lemmi e relazioni lessicali disponibili. Da FreeDict si raccolgono le entrate italiane, non le traduzioni tedesche come parole italiane. |
+| Liste `napolux/paroleitaliane` | Ulteriori grafie da confrontare con le altre attestazioni. La presenza nella lista non equivale all'approvazione per il gioco. |
+| wordfreq 3.1.1 e frequenze OpenSubtitles 2018, distribuzione FrequencyWords | Indicatori di frequenza e familiarità riferiti alle forme osservate. Una parola frequente non è necessariamente un lemma né un sostantivo. |
+| Sitemap pubbliche del Nuovo De Mauro, Internazionale | Indirizzi delle voci. Gli slug vengono conservati senza ricostruire arbitrariamente accenti o lemmi ambigui. |
+| Nuovo vocabolario di base, De Mauro 2016, estrazione testuale di Alberto Pettarin | Elenco e categorie usati come prova di familiarità; è distinto dalla raccolta degli indirizzi delle sitemap. |
+| ItAoA, Montefinese, Vinson, Vigliocco e Ambrosini, 2019 | Norme sull'età di acquisizione di 1.957 parole italiane, con categorie e valori disponibili: un ulteriore indicatore di familiarità. |
+
+Gli URL esatti dei download, le revisioni e le attribuzioni restano nel registro; gli hash dei file effettivamente acquisiti e gli esiti delle importazioni sono conservati negli snapshot e nel [rapporto dell'inventario](../gioco-zeroassociations/prompt_inventory_status.json). **Registrata, scaricata e importata sono condizioni distinte**: un tentativo fallito non costituisce una nuova importazione riuscita. Fonti soltanto consultate, come Treccani, CoLFIS o PAISÀ senza dati importabili, non contribuiscono alla raccolta per quella consultazione.
+
+### 14.2 Acquisizione, normalizzazione e riconoscimento dei lemmi
+
+La costruzione dell'inventario segue questi passaggi:
+
+1. **Acquisizione tracciata.** Ogni file viene scaricato o riutilizzato dalla cache e identificato dalla sua impronta SHA-256. Reimportare lo stesso contenuto non duplica lo snapshot. Il parser è specifico del formato: non si estraggono indiscriminatamente parole dai testi di pagine web.
+2. **Normalizzazione della grafia.** Si applicano Unicode NFC, uniformazione delle maiuscole e normalizzazione degli spazi. Gli accenti restano distinti: `e` ed `è` non vengono fusi nell'inventario. La grafia originale resta nell'attestazione. Composti e grafie incompatibili possono rimanere nella raccolta con indicazione che non sono parole singole.
+3. **Distinzione tra voce e attestazione.** `inventory_terms` conserva una voce per grafia normalizzata; `inventory_attestations` conserva le sue prove, con fonte, snapshot, posizione nel file, forma originale, ruolo, categoria grammaticale, eventuale lemma e metadati. Se più fonti riportano `case`, la voce è unica e le attestazioni restano separate.
+4. **Lemma ricavato da prove esplicite.** Un lemma è la forma di riferimento lessicale, per esempio `casa` per `case` o `cantare` per `cantavo`. Quando la fonte dichiara forma e lemma, si conserva il collegamento e si raccoglie anche il lemma se diverso dalla forma. Si distinguono i ruoli di lemma, forma flessa, nome proprio, titolo e semplice forma elencata o frequente. Se la fonte non offre un'analisi affidabile, il dato resta irrisolto; una previsione NLP su una parola isolata non basta ad approvarla.
+5. **Controllo delle dipendenze tra fonti.** Per l'espansione lessicale dei tentativi, GLAFF-IT e Wikizionario italiano contano come una famiglia, Flex_it e Morph-it! come un'altra. Moltiplicare le copie dello stesso materiale non aumenta le prove indipendenti.
+6. **Decisioni persistenti e aggiornamenti.** Scarti e rinvii conservano il motivo. Una nuova versione di una fonte già importata viene confrontata con quella attiva prima di essere integrata, scartata o rimandata; una ricomparsa da un'altra fonte non azzera la decisione sulla voce. Ogni fonte è importata in una transazione, così un errore non lascia un'importazione parziale di quel file.
+
+Le tabelle dell'inventario sono dunque un archivio delle prove linguistiche. L'indicazione «con prova di lemma» non certifica da sola familiarità, senso, qualità delle associazioni o ammissibilità in ogni gioco.
+
+### 14.3 Selezione delle parole segrete e dei tentativi
+
+**Parole segrete.** `script/build_context_bank.py` parte dall'esportazione storica `livecade-context-it-bank.csv`, mantenuta come origine separata, e aggiunge candidati dall'inventario. Per le aggiunte valuta grafia di 4–14 lettere, uso come sostantivo, prove lessicografiche e morfologiche, omografie, nomi propri, etichette di registro e familiarità. Il NVdB e ItAoA contribuiscono alla fascia `base`; negli altri casi le soglie di frequenza distinguono `comune` da `esteso`: rango wordfreq fino a 30.000 e frequenza OpenSubtitles almeno 150 per `comune`, fino a 60.000 e almeno 60 per `esteso`, dopo gli altri controlli. Le esclusioni editoriali sono in `context_bank_exclusions.txt` e le prove in `zerocontext-it-bank-meta.csv`.
+
+Il generatore dei dati ammette come segrete soltanto le fasce `livecade`, `base` e `comune` presenti nel vocabolario con vettore disponibile; `esteso` resta una riserva. L'origine storica Livecade viene conservata separatamente dalla valutazione delle nuove aggiunte.
+
+**Tentativi.** `script/build_context_data.py` unisce una base di massimo 60.000 parole per frequenza dotate di vettore fastText, la banca, il vocabolario già attivo e l'espansione lessicale attestata. Per questa espansione servono una grafia di 3–16 lettere italiane, il vettore fastText disponibile e una prova in Morph-it!/Flex_it, UniMorph o NVdB, oppure almeno due famiglie lessicali indipendenti negli snapshot attivi e abilitati. Titoli, semplici frequenze e attestazioni come nome proprio non valgono come prove per l'espansione. Il limite di 60.000 riguarda la base, non il totale finale; ammettere un tentativo non lo promuove a possibile segreta.
+
+**Plurali.** Dal 15 novembre 2026 si eliminano dal vocabolario i plurali puri quando le fonti attestano il plurale di un nome o aggettivo, il singolare è presente nella raccolta e non emergono letture come lemma autonomo o altra forma flessa. Non si tagliano desinenze per indovinare il singolare. Un omografo con altra lettura non viene escluso solo perché può essere anche plurale. Il plurale attestato della parola segreta continua a risolvere la manche tramite il dizionario derivato da Morph-it!, anche quando non possiede una riga nel vocabolario dei tentativi. La soluzione mostrata resta la forma della segreta.
+
+Le scelte delle segrete e quelle dei tentativi hanno criteri distinti. I filtri automatici producono candidati ed esiti motivati; la qualità del significato e delle vicinanze richiede una verifica editoriale e di gioco. Il database non viene presentato come un elenco completo di tutti i lemmi italiani.
+
+**Aggiornamento del 16 novembre 2026:** il vincolo Zipf minimo 2,85 è stato annullato.
+La banca torna alle 6.838 segrete precedenti; restano i criteri lessicali e le revisioni
+senza una soglia Zipf minima globale sulle soluzioni.
+
+### 14.4 Origine e preparazione della vicinanza semantica
+
+Le fonti delle parole sono distinte dalle fonti dei **vettori**, cioè le rappresentazioni numeriche usate per calcolare le vicinanze:
+
+- **fastText italiano `cc.it.300`**, acquisito dalla distribuzione `facebook/fasttext-it-vectors` su Hugging Face: lo script legge le prime 300.000 parole e i relativi vettori del modello, senza scaricare integralmente il file.
+- **ConceptNet Numberbatch 19.08**, dal file multilingue della distribuzione ConceptNet: si acquisisce il blocco italiano e si tengono le entrate di una parola sola. Se una parola giocabile manca in Numberbatch, il suo vettore viene stimato dal fastText con una regressione sulle parole comuni alle due risorse.
+- **Bacini verificati di ZeroAssociazioni**, copiati nello schema `associazioni` del DB dei giochi: forniscono collegamenti tra la segreta e le parole associate, considerati nei due sensi. Una relazione raccolta da un dizionario o proposta da un LLM non diventa per questo un collegamento verificato.
+
+Con i parametri predefiniti del generatore storico `build_context_data.py`, a ciascuna fonte vettoriale si sottraggono la media e le prime due direzioni principali e si normalizzano i vettori. La somiglianza combina fastText con peso **0,7** e Numberbatch con peso **0,3**; i due vettori vengono concatenati e quantizzati in **600 interi int8 per parola**. I collegamenti verificati aggiungono un bonus equivalente a **0,15** nella scala del coseno. Si applica inoltre una penalità di genericità, con forza predefinita **0,5**, alle parole che risultano vicine a molte altre. Parametri effettivi e dimensioni sono registrati nei metadati del corpus.
+
+Il rank deriva dall'ordinamento di questi punteggi rispetto alla segreta: descrive la prossimità del modello e dei collegamenti documentati, non un giudizio assoluto sulla lingua o una graduatoria di sinonimi.
+
+### 14.5 Riproducibilità, pubblicazione e attribuzioni
+
+Il corpus corrente è generato dal task **00)ZeroContext : Contesti**, che esegue fastText, ConceptNet Numberbatch e LSA (TF-IDF + SVD sulle definizioni italiane), senza LLM. Configurazione e pesi iniziali sono in [contexts.json](resources/contexts.json); metodologia e ordine sono nel [README](README.md#task-00zerocontext--contesti). Il task conserva le definizioni e la loro provenienza, genera il rapporto di confronto e pubblica automaticamente il corpus completo verificato nel solo schema `context`, con backup precedente e vettori immutabili indicati nei metadati. Il server ricarica i dati e avvia un nuovo round classico; un torneo aperto su un'impronta diversa viene conservato e sospeso. La verifica tecnica della pubblicazione non costituisce una certificazione della qualità semantica del ranking. Il pilota resta senza pubblicazione. Il precedente profilo con modelli neurali resta disponibile separatamente in [ensemble.json](resources/ensemble.json), con BGE-M3 italiano disabilitato.
+
+Il percorso corrente è: raccolta con `prompt_inventory.py`, integrazione delle versioni con `inventory_updates.py`, selezione di segrete e vocabolario dal DB con `build_context_ensemble.py --refresh-vocabulary`, quindi generazione e pubblicazione fastText + ConceptNet + LSA. I CSV di banca non sono richiesti. `build_context_bank.py` e `build_context_data.py` restano strumenti del generatore storico a due fonti. `evaluate_context_inventory.py` registra valutazioni e motivi senza pubblicare automaticamente le parole nel gioco; `prune_context_vocab.py` può applicare la rimozione dei plurali puri ai dati già generati.
+
+Lo schema `context` contiene vocabolario, segrete, collegamenti, penalità e metadati; il file indicato da `vectors_file` contiene le righe dei vettori nello stesso ordine del vocabolario. Nel corpus statistico è un file immutabile `data/vectors.<sha256>.bin`; `data/vectors.bin` resta il nome del generatore storico e dei candidati. Il generatore salva una copia precedente in `.cache/backups/` e produce `reports/vocabulary_update.json` con conteggi, snapshot lessicali e hash di vocabolario e vettori; la potatura registra il proprio esito in `reports/vocabulary_prune.json`. Per riprodurre un corpus occorre conservare anche banca, frequenze, cache dei modelli, parametri e versione degli script: i soli URL di risorse aggiornabili non bastano.
+
+I conteggi vanno sempre letti con la data e il rapporto della specifica generazione: parole raccolte, lemmi attestati, tentativi ammessi e segrete sono insiemi differenti. La pubblicazione statistica usa il ricaricamento locale automatico; per il generatore storico occorrono riavvio del server e ricaricamento degli overlay. Durante un torneo il corpus resta quello identificato all'avvio; un cambiamento dell'impronta dei dati richiede la gestione prevista per la sospensione, senza sostituire silenziosamente il lessico competitivo.
+
+Attribuzioni e condizioni dichiarate di ogni risorsa sono conservate nel registro e nei relativi file di licenza; il riconoscimento dei plurali include quelle di Morph-it! nel file derivato `contextPlurals.json`. La disponibilità pubblica di un download non equivale a una licenza uniforme per tutti i contenuti: l'eventuale redistribuzione deve rispettare le condizioni delle singole fonti e dei dati derivati. Dettagli operativi e comandi sono nel [README di ZeroContext](README.md#ricostruire-i-dati), nella [guida all'inventario](../gioco-zeroassociations/PROMPT_INVENTORY.md) e nella [gestione degli aggiornamenti](../gioco-zeroassociations/AGGIORNAMENTI_FONTI.md).
+
+---
+
 # ALLEGATO A — Impatto sul codice sorgente e specifica tecnica di implementazione
 
-> Allegato normativo/tecnico: i requisiti qui specificati si applicano esclusivamente alla **modalità torneo**. I file del repository elencati sono stati verificati sul ramo `main`; i moduli definiti come nuovi sono **proposti, non ancora esistenti**. L’implementazione non è stata eseguita.
+> Allegato del progetto iniziale del 14 novembre: i requisiti riguardano esclusivamente la **modalità torneo**. La mappa e le proposte sotto precedono l’implementazione del 15 novembre. I moduli esistono ora; per contratti effettivi, manche infinite e altre differenze usare il [README](README.md) e gli [scostamenti della specifica](ZEROCONTEXT_TORNEO_SPECIFICA_TECNICA.md#scostamenti-dallimplementazione-15-novembre-2026).
 
 
 

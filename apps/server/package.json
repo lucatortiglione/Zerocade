@@ -11,17 +11,17 @@
   },
   "dependencies": {
     "@fastify/helmet": "^13.2.0",
-    "@fastify/static": "10.1.8",
+    "@fastify/static": "10.1.11",
     "@zerocade/shared": "*",
-    "better-sqlite3": "13.0.3",
-    "fastify": "^5.12.7",
+    "better-sqlite3": "13.2.0",
+    "fastify": "^5.12.8",
     "socket.io": "^4.8.4",
     "tiktok-live-connector": "2.5.0",
     "tmi.js": "1.8.5"
   },
   "devDependencies": {
     "@types/better-sqlite3": "9.6.0",
-    "@types/node": "^26.6.5",
+    "@types/node": "^26.6.6",
     "@types/tmi.js": "1.8.6",
     "tsx": "^4.23.15"
   }

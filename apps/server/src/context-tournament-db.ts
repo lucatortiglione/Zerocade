@@ -74,6 +74,20 @@ CREATE TABLE IF NOT EXISTS context_tournament_guesses (
 ) WITHOUT ROWID;
 CREATE UNIQUE INDEX IF NOT EXISTS context_guess_message
   ON context_tournament_guesses(round_id, source_message_key) WHERE source_message_key IS NOT NULL;
+-- Valid words that did not count (second of the player in the window, word already used, window closed, over the
+-- limit), kept to settle disputes: who wrote what, when the bridge says it was written, and when it reached the server.
+CREATE TABLE IF NOT EXISTS context_tournament_rejections (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  round_id TEXT NOT NULL REFERENCES context_tournament_rounds(id),
+  window_index INTEGER,
+  player_id TEXT NOT NULL,
+  nickname TEXT NOT NULL,
+  word_text TEXT NOT NULL,
+  reason TEXT NOT NULL,
+  message_at INTEGER,
+  received_at INTEGER NOT NULL
+);
+CREATE INDEX IF NOT EXISTS context_rejection_round ON context_tournament_rejections(round_id, received_at);
 CREATE TABLE IF NOT EXISTS context_tournament_round_scores (
   round_id TEXT NOT NULL REFERENCES context_tournament_rounds(id),
   player_id TEXT NOT NULL,
@@ -138,6 +152,19 @@ export interface GuessRecord {
   word: number
   position: number
   receivedAt: number
+  // When the bridge says the message was written (TikTok's clock when known), not when it reached the server.
+  messageAt?: number | null
+}
+
+export interface RejectionRecord {
+  roundId: string
+  window: number | null
+  player: string
+  nickname: string
+  text: string
+  reason: 'seconda-proposta' | 'parola-gia-usata' | 'fuori-finestra' | 'oltre-limite'
+  messageAt: number | null
+  receivedAt: number
 }
 
 export interface PlayerRecord {
@@ -163,7 +190,7 @@ const roundOf = (r: Row): RoundRecord => ({
 const guessOf = (r: Row): GuessRecord => ({
   roundId: r.round_id as string, seq: r.ingress_seq as number, window: r.window_index as number,
   messageKey: (r.source_message_key as string | null) ?? null, player: r.player_id as string, word: r.word_idx as number,
-  position: r.position as number, receivedAt: r.received_at as number,
+  position: r.position as number, receivedAt: r.received_at as number, messageAt: (r.message_at as number | null) ?? null,
 })
 
 // Until 15/11/2026 a tournament had 5 or 7 rounds (total_rounds NOT NULL); now it may have no limit (NULL). SQLite
@@ -192,6 +219,9 @@ export class ContextTournamentStore {
   constructor(private readonly db: Database.Database, private readonly backup: TournamentBackup | null = null) {
     allowEndless(db)
     db.exec(SCHEMA)
+    // Added 16/11/2026: the message's own time, to compare with the arrival order.
+    if (!(db.prepare('PRAGMA table_info(context_tournament_guesses)').all() as Row[]).some((c) => c.name === 'message_at'))
+      db.exec('ALTER TABLE context_tournament_guesses ADD COLUMN message_at INTEGER')
   }
 
   // A copy of the standings and of the settled rounds' points. It never stops the game: a failure is only logged.
@@ -339,9 +369,32 @@ export class ContextTournamentStore {
   // An accepted guess, saved before its window closes; false when it repeats a player's window, a word or a message.
   addGuess(g: GuessRecord): boolean {
     const r = this.db.prepare(`INSERT OR IGNORE INTO context_tournament_guesses (round_id, ingress_seq, window_index, source_message_key,
-      player_id, word_idx, position, received_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`)
-      .run(g.roundId, g.seq, g.window, g.messageKey, g.player, g.word, g.position, g.receivedAt)
+      player_id, word_idx, position, received_at, message_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`)
+      .run(g.roundId, g.seq, g.window, g.messageKey, g.player, g.word, g.position, g.receivedAt, g.messageAt ?? null)
     return r.changes === 1
+  }
+
+  // The words of a window put in another order, in one transaction: either all of them or none.
+  replaceWindow(roundId: string, window: number, tournamentId: string, guesses: GuessRecord[], who: Map<string, { nickname: string; avatar: string | null }>) {
+    this.db.transaction(() => {
+      this.db.prepare('DELETE FROM context_tournament_guesses WHERE round_id = ? AND window_index = ?').run(roundId, window)
+      for (const g of guesses) {
+        if (!this.addGuess(g)) throw new Error('Parola della finestra non registrata')
+        const p = who.get(g.player)
+        if (p) this.enrol(tournamentId, g.player, p.nickname, p.avatar, g.receivedAt)
+      }
+    })()
+  }
+
+  // A valid word that did not count. Never throws: a failure here must not touch the game.
+  addRejection(x: RejectionRecord): void {
+    try {
+      this.db.prepare(`INSERT INTO context_tournament_rejections (round_id, window_index, player_id, nickname, word_text, reason,
+        message_at, received_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`)
+        .run(x.roundId, x.window, x.player, x.nickname.slice(0, 32), x.text.slice(0, 40), x.reason, x.messageAt, x.receivedAt)
+    } catch (error) {
+      console.error('[torneo] proposta scartata non registrata', error)
+    }
   }
 
   // A guess and its player's enrolment (the nickname follows the latest seen) in one transaction: one commit, not two,

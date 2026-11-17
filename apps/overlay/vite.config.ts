@@ -9,6 +9,19 @@ import react from '@vitejs/plugin-react'
 export default defineConfig(({ command }) => ({
   plugins: [react()],
   base: command === 'build' ? '/overlay/' : '/',
+  build: {
+    rolldownOptions: {
+      output: {
+        codeSplitting: {
+          groups: [
+            // A pure data module: keep the plural dictionary out of the game bundle
+            // without changing game initialization or making lookups asynchronous.
+            { name: 'context-plurals', test: /[\\/]packages[\\/]shared[\\/]src[\\/]contextPlurals\.json$/ },
+          ],
+        },
+      },
+    },
+  },
   resolve: {
     alias: {
       '@bivio': fileURLToPath(new URL('../../gioco-dilemmi/assets', import.meta.url)),

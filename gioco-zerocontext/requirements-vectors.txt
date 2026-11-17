@@ -1,0 +1,5 @@
+# Ambiente dedicato: Model2Vec 0.10 richiede Transformers <5.4.
+-r requirements-contexts.txt
+model2vec[distill]==0.10.0
+transformers==5.3.0
+torch==2.15.0

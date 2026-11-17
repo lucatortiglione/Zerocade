@@ -1,5 +1,8 @@
 # Zerocade
 
+Documentazione aggiornata al **16 novembre 2026**. [Indice e stato dei documenti](docs/STATO_DOCUMENTAZIONE.md),
+[architettura attuale](ANALYSIS.md) e [registro delle dipendenze](AGGIORNAMENTO_DIPENDENZE.md).
+
 Giochi per le dirette su TikTok e Twitch: la chat gioca scrivendo, e regali, like e follow fanno succedere
 cose nel gioco. Zerocade gira sul PC di chi fa la diretta:
 
@@ -33,7 +36,9 @@ i tentativi automatici continuano dopo un errore.
 
 ## I giochi
 
-Sette giochi hanno una cartella propria, con i dati e gli strumenti per prepararli:
+Sette giochi integrati hanno una cartella propria, con i dati e gli strumenti per prepararli.
+Il catalogo condiviso contiene **40 giochi**; la banca autonoma di
+[ZeroLettere](gioco-zerolettere/README.md) ha una cartella aggiuntiva e non è ancora collegata al runtime.
 
 | Gioco | Cartella | In breve |
 | --- | --- | --- |
@@ -42,7 +47,7 @@ Sette giochi hanno una cartella propria, con i dati e gli strumenti per preparar
 | 🎯 **ZeroContext** | [gioco-zerocontext](gioco-zerocontext/README.md) | Ogni parola in chat riceve una posizione per vicinanza di significato a quella segreta; c'è anche la modalità Torneo (5, 7 o infinite manche) |
 | 🟩 **ZeroWordle** | [gioco-zerowordle](gioco-zerowordle/README.md) | La chat indovina insieme una parola di 5–8 lettere, con le tessere verdi, oro e grigie |
 | 🌱 **ZeroWords** | [gioco-parole](gioco-parole/README.md) | Ruota di lettere e schema a incastro, livelli senza fine generati durante la partita |
-| 🧠 **ZeroQuizz** | [gioco-quizzland](gioco-quizzland/README.md) | Quiz di scienze, curiosità e cultura su 26.000 domande, risposta A, B, C o D |
+| 🧠 **ZeroQuizz** | [gioco-quizzland](gioco-quizzland/README.md) | Quiz di scienze, curiosità e cultura su 26.715 domande, risposta A, B, C o D |
 | 🔀 **ZeroDubbi** | [gioco-dilemmi](gioco-dilemmi/README.md) | «Preferiresti…?»: il pubblico vota A o B |
 
 Gli altri giochi sono solo codice dell'overlay (`apps/overlay/src/games`); quelli che hanno bisogno di
@@ -101,10 +106,22 @@ Lunar Dash e Guess the Location ne restano senza, perché la loro scena occupa t
   schema per gioco. Vedi [database/README.md](database/README.md).
 - **`database/ZeroQuizz.sqlite3`** e **`database/ZeroDubbi.sqlite3`**, in Git: le domande di ZeroQuizz e i dilemmi di
   ZeroDubbi, un DB a sé ciascuno.
-- **`database/parole_ita_raw.sqlite3`**, fuori da Git (2,3 GB): il DB di lavoro di ZeroAssociazioni, con la
+- **`database/ZeroTaboo.sqlite3`**, in Git: il mazzo di 62 carte di ZeroTaboo; regole, dati e comandi in [gioco-zerotaboo/README.md](gioco-zerotaboo/README.md).
+- **`database/ZeroLettere.sqlite3`**, in Git: 5.661 indizi e 109 alternative, banca autonoma.
+- **`database/parole_ita_raw.sqlite3`**, fuori da Git (circa 3,43 GB nel workspace al 16 novembre): il DB di lavoro di ZeroAssociazioni, con la
   raccolta delle parole italiane da cui nascono anche le parole di ZeroWordle e ZeroContext.
 - [database/DB.md](database/DB.md) spiega ogni file e il percorso di una parola dalla raccolta al gioco.
 - I dati della diretta (sessioni, eventi, classifiche, voti) stanno in `apps/server/data/zerocade.db`, sul PC.
+
+ZeroContext usa **93.928 parole e 9.513 segrete**, conservando tutte le precedenti 6.838.
+Il pannello della regia sceglie fra associazioni **originali e ABTT**, senza riavviare
+il server a ogni cambio. Ogni profilo conserva tutte le parole e le segrete; cambia solo il corpus
+usato per le associazioni. Dettagli in [PROFILI_ASSOCIAZIONI.md](gioco-zerocontext/PROFILI_ASSOCIAZIONI.md).
+Tutti i round sono ordinari: gli speciali sono sospesi.
+Codice e task sono aggiornati a Model2Vec, fallback FastText e retrofitting con margine;
+la nuova rigenerazione completa non è ancora stata eseguita. I task principali
+pubblicano il corpus verificato con backup e blocco delle rimozioni.
+Dettagli nel [README del gioco](gioco-zerocontext/README.md).
 
 ## Struttura
 
@@ -166,5 +183,6 @@ database aperto né associarlo ai vecchi file `-wal` e `-shm`.
   API (CC BY-NC 4.0), OpenBookQA (licenza non nota) e API Ninjas (solo uso personale). Licenze e condizioni sono nelle
   cartelle di [gioco-quizzland/data/fonti](gioco-quizzland/data/fonti); [gioco-quizzland/README.md](gioco-quizzland/README.md)
   spiega quali vanno decise prima di una diretta monetizzata.
-- ZeroContext usa i vettori fastText italiani `cc.it.300` (`gioco-zerocontext/script/fetch_vectors.py`).
+- ZeroContext combina fastText italiano `cc.it.300`, ConceptNet Numberbatch e LSA sulle definizioni italiane;
+  fonti e attribuzioni sono nel [README del gioco](gioco-zerocontext/README.md).
 - Le foto di sfondo sono le «Image of the Day» della NASA, scaricate durante la partita.

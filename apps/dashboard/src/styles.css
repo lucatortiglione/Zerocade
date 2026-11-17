@@ -1150,6 +1150,13 @@ input[type='number']:focus { border-color: var(--accent); outline: none; }
 .runtime-issue { position: fixed; z-index: 1000; top: 12px; left: 50%; transform: translateX(-50%); max-width: min(720px, 95vw); padding: 12px 16px; border: 1px solid #e0a022; border-radius: 10px; background: #30250f; color: #fff; box-shadow: 0 8px 30px #0008; }
 .runtime-issue .btn { margin-left: 12px; }
 
+.context-associations__choices { display: grid; gap: 8px; }
+.context-associations__choice { display: flex; align-items: center; gap: 10px; padding: 11px 12px; border: 1px solid var(--line, #343a46); border-radius: 10px; cursor: pointer; }
+.context-associations__choice.is-selected { border-color: var(--accent, #a78bfa); background: rgba(139, 92, 246, .12); }
+.context-associations__choice:has(input:disabled) { cursor: default; opacity: .6; }
+.context-associations__choice small { display: block; font-size: 11px; opacity: .7; margin-top: 3px; }
+.context-associations__choice input { accent-color: var(--accent, #a78bfa); }
+
 /* ZeroContext's tournament panel (ContextTournamentPanel.tsx). */
 .tournament-panel { display: grid; gap: 10px; }
 .tournament-panel__create, .tournament-panel__running { display: grid; gap: 8px; }
@@ -1172,3 +1179,23 @@ input[type='number']:focus { border-color: var(--accent); outline: none; }
 
 .ticker-panel { display: grid; gap: 6px; margin-top: 12px; }
 .ticker-panel textarea { width: 100%; resize: vertical; font: inherit; }
+
+/* ZeroTaboo: the card in play (for the director's eyes only) and the typed error of a refused command. */
+.side-error { margin: 6px 0; padding: 6px 8px; border-radius: 6px; background: rgba(239, 68, 68, 0.14); color: #fca5a5; font-size: 0.85rem; }
+.taboo-private { display: grid; gap: 4px; padding: 8px; border-radius: 8px; border: 1px solid rgba(244, 63, 94, 0.45); background: rgba(244, 63, 94, 0.08); }
+.taboo-private__target { margin: 0; font-size: 1.7rem; font-weight: 800; letter-spacing: 0.03em; text-transform: uppercase; }
+
+/* ZeroTaboo, the streamer's full-screen view (/taboo): the word to be guessed in big letters, for a second monitor or a phone. */
+.taboo-director { display: flex; flex-direction: column; gap: 2vh; padding: 3vh 4vw; min-height: 100vh; box-sizing: border-box; }
+.taboo-director__bar { display: flex; gap: 4vw; align-items: baseline; font-size: clamp(1rem, 2.6vw, 1.8rem); font-weight: 700; }
+.taboo-director__time { font-size: clamp(2rem, 7vw, 4.5rem); font-variant-numeric: tabular-nums; }
+.taboo-director__time[data-low='true'] { color: #fca5a5; }
+.taboo-director__meta { margin: 0; font-size: clamp(1rem, 2.4vw, 1.6rem); opacity: 0.85; }
+.taboo-director__target { margin: 0; font-size: clamp(2.6rem, 11vw, 9rem); line-height: 1.05; text-transform: uppercase; letter-spacing: 0.02em; color: #fde68a; word-break: break-word; }
+.taboo-director__taboo h2 { margin: 0 0 1vh; font-size: clamp(1rem, 2.4vw, 1.6rem); color: #fda4af; text-transform: uppercase; }
+.taboo-director__taboo ul { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: 1.2vw; }
+.taboo-director__taboo li { padding: 1vh 2vw; border-radius: 10px; background: #9f1239; border: 2px solid #fecdd3; font-size: clamp(1.2rem, 4vw, 2.8rem); font-weight: 800; text-transform: uppercase; }
+.taboo-director__rule { margin: 0; font-size: clamp(0.9rem, 1.8vw, 1.2rem); opacity: 0.75; }
+.taboo-director__buttons { display: flex; gap: 2vw; flex-wrap: wrap; }
+.taboo-director__buttons .side-action { width: auto; flex: 1; min-width: 40vw; padding: 2vh 2vw; font-size: clamp(1rem, 2.6vw, 1.6rem); }
+.taboo-director__idle h1 { font-size: clamp(2rem, 6vw, 4rem); margin: 4vh 0 2vh; }

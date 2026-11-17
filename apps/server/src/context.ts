@@ -1,10 +1,10 @@
 import { existsSync, readFileSync, statSync } from 'node:fs'
-import { CONTEXT_LIMITS } from '@zerocade/shared'
+import { CONTEXT_LIMITS, CONTEXT_PROFILES, type ContextProfile } from '@zerocade/shared'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { giochiDb, openSchema } from './schema-db.js'
+import { giochiDb, openSchema, openOptionalSchema } from './schema-db.js'
 
-// ZeroContext's data: the playable words (vocab.txt), their vectors (vectors.bin, int8, one row per word, in the
+// ZeroContext's data: the playable words (vocab.txt), their vectors (vectors.bin, float32/float16 or legacy int8, one row per word, in the
 // words' order) and the words that can be secret (secrets.txt). The words live in the games' database, schema
 // context (database/giochi.sqlite3), with the words ZeroAssociazioni ties to each secret (links.json); the vectors,
 // 36 MB, in a file of their own. gioco-zerocontext/script/build_context_data.py
@@ -18,7 +18,7 @@ export type ContextFile = (typeof FILES)[number]
 const budgets: Record<ContextFile, number> = { 'vocab.txt': CONTEXT_LIMITS.vocab, 'vectors.bin': CONTEXT_LIMITS.vectors,
   'secrets.txt': CONTEXT_LIMITS.secrets, 'links.json': CONTEXT_LIMITS.links, 'meta.json': 64 * 1024 }
 export const contextFileBudget = (name: ContextFile) => budgets[name]
-let unavailable = false
+const unavailable = new Set<ContextProfile>()
 
 // The words ZeroAssociazioni ties to each secret (table links, indices into the vocabulary) and how much they rise
 // in that secret's ranking (meta.link_boost, in the vectors' own scale): { boost, links: { secretIdx: [wordIdx…] } }.
@@ -49,10 +49,33 @@ function hubsOf(db: ReturnType<typeof openSchema>, wordCount: number): number[] 
   return hubs
 }
 
-function fromDatabase(): Map<string, Buffer> | null {
+function semanticOf(db: ReturnType<typeof openSchema>, meta: Record<string, unknown>, vocab: string[]) {
+  if (meta.pipeline !== 'context-semantic-1') return {}
+  const index = new Map(vocab.map((w, i) => [w, i]))
+  const ordinary: number[] = [], special: number[] = [], curatedOrdinary: number[] = [], compatibility: number[] = []
+  const domains: Record<string, string> = {}
+  for (const row of db.prepare<[], { word: string; ordinary: number; special: number; details: string }>(
+    'SELECT word,ordinary,special,details FROM targets ORDER BY word').iterate()) {
+    const i = index.get(row.word)
+    if (i === undefined) throw new Error('target outside vocabulary')
+    const detail = JSON.parse(row.details)
+    if (row.ordinary) {
+      ordinary.push(i)
+      if (detail.legacy_exception) compatibility.push(i)
+      else curatedOrdinary.push(i)
+    }
+    if (row.special) { special.push(i); domains[i] = detail.domain }
+  }
+  return { vector_format: meta.vector_format, dim: meta.dim,
+    semantic: { version: 'context-semantic-1', ordinary, special, curatedOrdinary, compatibility, domains } }
+}
+
+function fromDatabase(profile: ContextProfile = 'original'): Map<string, Buffer> | null {
   if (!giochiDb) return null
   try {
-    const db = openSchema(giochiDb, 'context')
+    const schema = CONTEXT_PROFILES.find((p) => p.id === profile)!.schema
+    const db = openOptionalSchema(giochiDb, schema) ?? (profile === 'original' ? openSchema(giochiDb, 'context') : null)
+    if (!db) return null
     try {
       return db.transaction(() => {
         const vocab: string[] = []
@@ -83,7 +106,8 @@ function fromDatabase(): Map<string, Buffer> | null {
           ['vocab.txt', Buffer.from(vocab.join('\n') + '\n', 'utf-8')],
           ['secrets.txt', Buffer.from(secrets.join('\n') + '\n', 'utf-8')],
           ['meta.json', Buffer.from(JSON.stringify(meta, null, 2) + '\n', 'utf-8')],
-          ['links.json', Buffer.from(JSON.stringify({ ...linksOf(db, boost, vocab.length), hubs: hubsOf(db, vocab.length) }), 'utf-8')],
+          ['links.json', Buffer.from(JSON.stringify({ ...linksOf(db, boost, vocab.length), hubs: hubsOf(db, vocab.length),
+            ...semanticOf(db, meta, vocab), ...(meta.vector_format ? { vector_format: meta.vector_format, dim: meta.dim } : {}) }), 'utf-8')],
         ])
         for (const [name, buffer] of files) if (buffer.byteLength > budgets[name]) throw new Error(`${name} too large`)
         return files
@@ -95,16 +119,58 @@ function fromDatabase(): Map<string, Buffer> | null {
     // Legacy files are supported only when the schema is absent. A corrupt or
     // unverified present schema must never silently switch to different words.
     if (error instanceof Error && error.message.endsWith('has no schema context')) return null
-    unavailable = true
+    unavailable.add(profile)
     console.error('[context] Dati non disponibili; fallback disabilitato:', error instanceof Error ? error.message : String(error))
     return null
   }
 }
 
-const words = fromDatabase()
+let words = fromDatabase()
+const variants = new Map<ContextProfile, Map<string, Buffer> | null>()
+function wordsFor(profile: ContextProfile) {
+  if (profile === 'original') return words
+  if (!variants.has(profile)) variants.set(profile, fromDatabase(profile))
+  return variants.get(profile) ?? null
+}
 const dir = [process.env.ZEROCADE_CONTEXT_DATA, join(here, 'zerocontext'), join(here, '..', '..', '..', 'gioco-zerocontext', 'data')].find(
   (d): d is string => d !== undefined && existsSync(join(d, 'vectors.bin')),
 )
+
+function vectorPath(files = words): string | null {
+  if (!dir) return null
+  const metadata = files?.get('meta.json')
+  const name: unknown = metadata ? JSON.parse(metadata.toString('utf8')).vectors_file ?? 'vectors.bin' : 'vectors.bin'
+  if (typeof name !== 'string' || !/^vectors(?:\.[a-f0-9]{64})?\.bin$/.test(name)) throw new Error('File vettori ZeroContext non valido')
+  return join(dir, name)
+}
+
+export function contextRevision(profile: ContextProfile = 'original'): string {
+  const metadata = wordsFor(profile)?.get('meta.json')
+  return metadata ? JSON.parse(metadata.toString('utf8')).corpus_revision ?? JSON.parse(metadata.toString('utf8')).vectors_sha256 ?? 'legacy' : 'legacy'
+}
+
+// Called only after the publisher committed a schema referencing an already complete immutable vector file.
+export function reloadContext(expectedRevision: string, profile: ContextProfile = 'original'): { revision: string; words: number; dim: number } {
+  const previousUnavailable = unavailable.has(profile)
+  unavailable.delete(profile)
+  try {
+    const next = fromDatabase(profile)
+    if (!next || unavailable.has(profile)) throw new Error('Il nuovo corpus ZeroContext non è disponibile')
+    const meta = JSON.parse(next.get('meta.json')!.toString('utf8'))
+    if (meta.corpus_revision !== expectedRevision) throw new Error('La revisione pubblicata non corrisponde alla richiesta')
+    const path = vectorPath(next)
+    if (meta.vector_format !== undefined && !['int8', 'float32', 'float16'].includes(meta.vector_format)) throw new Error('Formato vettori non valido')
+    if (!path || statSync(path).size !== meta.words * meta.dim * (meta.vector_format === 'float32' ? 4 : meta.vector_format === 'float16' ? 2 : 1) || statSync(path).size > budgets['vectors.bin'])
+      throw new Error('Vettori e parole del nuovo corpus non sono allineati')
+    if (profile === 'original') words = next
+    else variants.set(profile, next)
+    return { revision: expectedRevision, words: meta.words, dim: meta.dim }
+  } catch (error) {
+    if (previousUnavailable) unavailable.add(profile)
+    else unavailable.delete(profile)
+    throw error
+  }
+}
 
 if (!words || !dir) console.warn('[context] words (database/giochi.sqlite3, schema context) or vectors.bin missing: run gioco-zerocontext/script/build_context_data.py')
 
@@ -112,16 +178,30 @@ export const isContextFile = (name: string): name is ContextFile => (FILES as re
 
 // Hosting only: the HTTP adapter streams large files with backpressure. The
 // game's word/vector format and the synchronous reader used by tools stay intact.
-export function contextResource(name: ContextFile): Buffer | string | null {
-  if (unavailable) return null
-  if (words && name !== 'vectors.bin') return words.get(name) ?? null
-  return dir ? join(dir, name) : null
+export function contextResource(name: ContextFile, profile: ContextProfile = 'original'): Buffer | string | null {
+  const files = wordsFor(profile)
+  if (unavailable.has(profile) || (profile !== 'original' && !files)) return null
+  if (files && name !== 'vectors.bin') return files.get(name) ?? null
+  return name === 'vectors.bin' ? vectorPath(files) : dir ? join(dir, name) : null
 }
 
-export function contextFile(name: ContextFile): Buffer | null {
-  if (unavailable) return null
-  if (words && name !== 'vectors.bin') return words.get(name) ?? null
+export function contextFile(name: ContextFile, profile: ContextProfile = 'original'): Buffer | null {
+  const files = wordsFor(profile)
+  if (unavailable.has(profile) || (profile !== 'original' && !files)) return null
+  if (files && name !== 'vectors.bin') return files.get(name) ?? null
   if (!dir) return null
-  const path = join(dir, name)
+  const path = name === 'vectors.bin' ? vectorPath(files) : join(dir, name)
+  if (!path) return null
   return existsSync(path) && statSync(path).size <= budgets[name] ? readFileSync(path) : null
+}
+
+export function availableContextProfiles() {
+  return CONTEXT_PROFILES.map(({ id, label }) => {
+    const metadata = wordsFor(id)?.get('meta.json')
+    const meta = metadata ? JSON.parse(metadata.toString('utf8')) : {}
+    const path = vectorPath(wordsFor(id))
+    const expected = meta.words * meta.dim * (meta.vector_format === 'float32' ? 4 : meta.vector_format === 'float16' ? 2 : 1)
+    const available = !unavailable.has(id) && Boolean(metadata && path && existsSync(path) && statSync(path).size === expected)
+    return { id, label, available, words: meta.words ?? 0, secrets: meta.secrets ?? 0, dim: meta.dim ?? 0, revision: contextRevision(id) }
+  })
 }

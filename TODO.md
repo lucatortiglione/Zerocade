@@ -1,5 +1,8 @@
 # Zerocade — analisi di Livecade e piano di ricostruzione
 
+> **Revisione documentale — 16 novembre 2026.** Il backlog Livecade conserva la rilevazione del 23 ottobre e i successivi audit datati. Lo stato attuale di Zerocade — descritto in [ANALYSIS.md](ANALYSIS.md): 40 giochi, persistenza SQLite e worker già implementati, EventSub con token utente e follow v2, torneo ZeroContext e corpus statistico. Le caselle storiche non costituiscono un elenco aggiornato delle funzioni mancanti.
+> [Indice e stato della documentazione](docs/STATO_DOCUMENTAZIONE.md).
+
 > Rilevazione: **23 ottobre 2026**, fuso Europe/Rome. Punto di partenza: <https://app.livecade.io/>. Destinazione progettuale: Zerocade, React 19 stabile. Questo documento contiene l'analisi e il backlog; le caselle non selezionate indicano lavoro di implementazione ancora da svolgere.
 
 ## Ingegnerizzazione secondo DIRETTIVE.md — audit del 14 novembre 2026
@@ -29,10 +32,10 @@ errore, messaggi malformati ignorati; test in `tests/twitch-eventsub.test.ts`.
   fallisce. Collegato a `SIGINT` e `SIGTERM` in `index.ts`; provato con passi finti, con Fastify e Socket.IO veri e con
   la chiusura del database (`tests/shutdown.test.ts`). **Non provato** con un segnale reale sul processo del server:
   su Windows `SIGINT` verso un processo figlio lo termina senza eseguire il gestore, serve Ctrl+C in un terminale.
-- [ ] **P1 — EventSub dopo il benvenuto** (`twitch-eventsub.ts`): non gestisce `session_keepalive` scaduto,
+- [x] **P1 — EventSub dopo il benvenuto** (risolto nell’audit infrastrutturale successivo; descrizione iniziale): (`twitch-eventsub.ts`): non gestisce `session_keepalive` scaduto,
   `session_reconnect` né la chiusura del socket a sessione avviata; dopo una caduta follow e raid si fermano senza
   avvisi. Serve un riavvio con attesa crescente e uno stato visibile nella dashboard.
-- [ ] **P0 — EventSub non può funzionare con un token d'app** (verificato sulla documentazione di Twitch il
+- [x] **P0 — EventSub non può funzionare con un token d'app** (token utente e follow v2 implementati; rinnovo OAuth interattivo ancora assente): (verificato sulla documentazione di Twitch il
   14 novembre 2026): il trasporto WebSocket accetta **solo un token utente**, un token d'app fa fallire la richiesta, e
   la versione 1 di `channel.follow` è stata rimossa (la 2 chiede lo scope `moderator:read:followers`). Il codice attuale
   usa un token d'app e la versione 1, quindi follow e raid da Twitch non arrivano mai; dopo il fix del 14 novembre se ne

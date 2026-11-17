@@ -100,7 +100,8 @@ def records(path,source):
                 details={'language_claim':'it_from_dictionary','definition_language':source.get('definition_language'),
                     'senses':[{'id':s.get('id'),'glosses':s.get('glosses',[])[:4],
                                'tags':s.get('tags',[]),'form_of':s.get('form_of',[])} for s in senses[:8]],
-                    'entry_tags':entry.get('tags',[]),'source_scope':'headword_not_association'}
+                    'entry_tags':entry.get('tags',[]),'forms':entry.get('forms',[]),
+                    'source_scope':'headword_not_association'}
                 row=observation(entry.get('word',''),number,'proper_name' if proper else 'inflected_form' if inflected else 'lemma',
                     entry.get('pos',''),form_of[0] if form_of else entry.get('word',''),details)
                 if row:yield row

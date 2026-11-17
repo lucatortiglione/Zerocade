@@ -1,5 +1,8 @@
 # Revisione del contesto delle domande e delle risposte
 
+> **Revisione documentale — 16 novembre 2026.** Rapporto storico del 6 novembre: le 26.372 domande attive e le esclusioni applicate sono gli esiti di quella revisione. Nel DB locale verificato il 16 novembre tutte le 26.715 domande sono attive. L'attivazione successiva non annulla il registro editoriale e non certifica le domande ancora da leggere.
+> [Indice e stato della documentazione](../../docs/STATO_DOCUMENTAZIONE.md).
+
 6 novembre 2026.
 
 Controlli automatici su **26,715 domande**. Decisioni editoriali registrate: **820 correzioni**, **343 esclusioni reversibili**. Applicate al database: **1163/1163**.

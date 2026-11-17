@@ -1,5 +1,8 @@
 # Valutazione completa di ZeroContext — 14 novembre 2026
 
+> **Revisione documentale — 16 novembre 2026.** Rapporto storico precedente all'ampliamento e alla potatura. Il corpus attivo verificato il 16 novembre ha 89.380 tentativi, 6.833 segrete e 768 dimensioni; le dieci candidate e le cinque consigliate sotto vanno ricontrollate contro tale corpus prima di considerarle nuove aggiunte. La valutazione non pubblica dati: usare il task di aggiornamento documentato nel [README](README.md).
+> [Indice e stato della documentazione](../docs/STATO_DOCUMENTAZIONE.md).
+
 Questa valutazione fotografa il gioco **prima dell'ampliamento del vocabolario**.
 Il successivo aggiornamento del 14 novembre ha portato i tentativi a **101.304**
 (41.075 aggiunte), con 6.837 segrete. Conteggi, snapshot e hash dell'aggiornamento

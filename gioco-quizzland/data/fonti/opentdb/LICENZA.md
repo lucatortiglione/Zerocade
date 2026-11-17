@@ -1,5 +1,8 @@
 # Domande della categoria "cultura"
 
+> **Revisione documentale — 16 novembre 2026.** Le 4.978 domande Open Trivia risultano attive nel DB locale. Restano conservate attribuzioni e trasformazioni della fonte; questa revisione dello stato locale non — una nuova verifica delle condizioni esterne.
+> [Indice e stato della documentazione](../../../../docs/STATO_DOCUMENTAZIONE.md).
+
 Le domande con id `otdb-…` vengono da **Open Trivia Database** (https://opentdb.com).
 Sono rilasciate sotto licenza **Creative Commons Attribution-ShareAlike 4.0 International** (CC BY-SA 4.0):
 https://creativecommons.org/licenses/by-sa/4.0/

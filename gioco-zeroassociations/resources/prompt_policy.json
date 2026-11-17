@@ -1,6 +1,6 @@
 {
-  "version": "2026-11-08.1",
-  "minimum_zipf_it": 3.0,
+  "version": "2026-11-16.2",
+  "maximum_zipf_it": 2.2,
   "common_loanwords": [
     "account",
     "airbag",

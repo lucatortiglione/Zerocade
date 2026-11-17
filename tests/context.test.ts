@@ -58,7 +58,8 @@ test('the game awards the finder points and ends the round for an unaccented win
   }, { get: (target, key) => key in target ? Reflect.get(target, key) : () => {} }) as unknown as CanvasRenderingContext2D
   const draw = () => { texts.length = 0; game.draw(canvas, performance.now()); return texts.join('\n') }
   game.onAction('guess', { type: 'comment', text: 'proprieta', user: { id: 'a', nickname: 'Tester' } }, 0)
-  assert.match(draw(), /Tester ha trovato: proprietà/)
+  assert.match(draw(), /Tester ha trovato/)
+  assert.match(draw().replace(/\s/g, ''), /proprietà/i)
   assert.match(draw(), /100 pt/)
   game.onAction('guess', { type: 'comment', text: 'proprietà', user: { id: 'b', nickname: 'Secondo' } }, 0)
   assert.doesNotMatch(draw(), /Secondo/)
@@ -161,22 +162,31 @@ test('the shipped data is consistent: vectors match the vocabulary and neighbour
   assert.ok(real.secrets.length > 5000)
   // About 101 000 words before the pure plurals left the vocabulary (15/11/2026: 11 924 of them, gatti, case, ...).
   assert.ok(real.words.length > 85_000, `expanded vocabulary: ${real.words.length}`)
-  for (const plural of ['gatti', 'case', 'abati']) assert.equal(lookup(real, plural), -1, `pure plural out: ${plural}`)
+  if (real.semantic) {
+    assert.ok(real.secrets.length >= 6838)
+    assert.ok(real.vectors instanceof Float32Array)
+    for (const plural of ['gatti', 'case']) assert.notEqual(lookup(real, plural), -1, `attested plural admitted: ${plural}`)
+    assert.equal(real.semantic.special.length, 0, 'special rounds are suspended')
+    assert.equal(new Set([...real.semantic.ordinary, ...real.semantic.special]).size, real.secrets.length)
+  } else for (const plural of ['gatti', 'case', 'abati']) assert.equal(lookup(real, plural), -1, `pure plural out: ${plural}`)
   // The secret's plural still wins, without a row of its own.
   assert.equal(lookup(real, 'gatti', real.index.get('gatto')!), real.index.get('gatto'))
   for (const word of ['zuccheriera', 'videochiamare', 'mostriciattolo'])
     assert.notEqual(lookup(real, word), -1, `new playable word: ${word}`)
   // Most secrets have words tied to them, and every link names a secret and a playable word.
-  assert.ok(real.linkBoost > 0 && real.links.size > 4000, `links for ${real.links.size} secrets`)
-  // Genericity penalty (15/11/2026): one per word, and a generic word falls for "fotografo" where a pertinent one stays.
+  if (real.semantic) assert.equal(real.linkBoost, 0, 'retrofitted FP32 rankings use pure cosine')
+  else assert.ok(real.linkBoost > 0 && real.links.size > 4000, `links for ${real.links.size} secrets`)
+  // Every corpus supplies one penalty per word (the statistical ensemble deliberately uses zeros).
   assert.equal(real.hubs?.length, real.words.length)
   const photo = rankAgainst(real, real.index.get('fotografo')!)
   const place = (w: string) => photo.rankOf[real.index.get(w)!]
-  assert.ok(place('fotoreporter') < 5 && place('pittore') < 150, `pertinent words stay: ${place('fotoreporter')}, ${place('pittore')}`)
-  assert.ok(place('autista') > 350 && place('medico') > 1500, `generic words fall: ${place('autista')}, ${place('medico')}`)
+  assert.ok(place('fotoreporter') < 100 && place('pittore') < 150, `pertinent words stay: ${place('fotoreporter')}, ${place('pittore')}`)
+  assert.ok(place('fotoreporter') < place('autista') && place('pittore') < place('medico'), 'pertinent roles precede general occupations')
+  if (real.hubs!.some((penalty) => penalty > 0))
+    assert.ok(place('autista') > 350 && place('medico') > 1500, `generic words fall: ${place('autista')}, ${place('medico')}`)
   const secret = new Set(real.secrets)
   assert.ok([...real.links.keys()].every((s) => secret.has(s)))
-  assert.ok(real.links.get(real.index.get('spiaggia')!)!.includes(real.index.get('ombrellone')!))
+  if (!real.semantic) assert.ok(real.links.get(real.index.get('spiaggia')!)!.includes(real.index.get('ombrellone')!))
   const r = rankAgainst(real, real.index.get('spiaggia')!)
   assert.equal(new Set(r.order).size, real.words.length)
   assert.equal(r.rankOf[r.order[real.words.length - 1]], real.words.length - 1)

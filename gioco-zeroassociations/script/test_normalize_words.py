@@ -42,14 +42,15 @@ class NormalizeTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             path = Path(tmp) / 'raw.sqlite3'
             make(path)
-            plurals = n.detect(path)
+            plurals = n.detect(path, frequency=lambda w: 5 if w in {'gatto','casa','cane'} else 2)
             self.assertEqual(plurals, {'case': ['casa'], 'cani': ['cane'], 'gatti': ['gatto']})
             p = n.plan(path, plurals)
             self.assertEqual((p['new'], p['kept_manual'], p['withdrawn']), (['case', 'gatti'], ['cani'], ['vecchi']))
             self.assertEqual(n.apply(path, plurals), {'recorded': 2, 'withdrawn': 1})
             with closing(sqlite3.connect(path)) as con:
                 rows = dict((w, (d, r)) for w, d, r in con.execute('SELECT prompt, decision, reason FROM raw__inventory_term_decisions'))
-                self.assertEqual(rows['gatti'], ('DISCARDED', 'Plurale puro di gatto: si tiene il singolare'))
+                self.assertEqual(rows['gatti'][0], 'DISCARDED')
+                self.assertIn('si tiene gatto', rows['gatti'][1])
                 self.assertEqual(rows['cani'][0], 'DEFERRED')
                 self.assertNotIn('vecchi', rows)
                 self.assertEqual(con.execute('SELECT count(*) FROM raw__inventory_decision_history').fetchone()[0], 3)

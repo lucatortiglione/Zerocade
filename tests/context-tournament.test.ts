@@ -27,8 +27,9 @@ function setup(opts: { typed?: boolean; countdown?: number; bridge?: boolean; st
   let bridge = opts.bridge ?? true
   const uses = new Map<string, number>(Object.entries(opts.uses ?? {}))
   const recorded: string[] = []
+  let currentCorpus = corpus
   const tournaments = new ContextTournaments({
-    store, countdownMs: opts.countdown ?? 0, typedWords: () => opts.typed ?? false, corpus: () => corpus, now: () => clock.now, setTimer: (fn, ms) => clock.add(fn, ms), clearTimer: (h) => clock.cancel(h as number),
+    store, countdownMs: opts.countdown ?? 0, typedWords: () => opts.typed ?? false, corpus: () => currentCorpus, now: () => clock.now, setTimer: (fn, ms) => clock.add(fn, ms), clearTimer: (h) => clock.cancel(h as number),
     random: () => 0, emitPublic: (_k, s) => published.push(s), emitAdmin: (_k, a) => admins.push(a), bridgeReady: () => bridge,
     secretUses: (w) => uses.get(w) ?? 0, recordSecretUse: (_k, w) => { recorded.push(w); uses.set(w, (uses.get(w) ?? 0) + 1) },
   })
@@ -36,7 +37,8 @@ function setup(opts: { typed?: boolean; countdown?: number; bridge?: boolean; st
   const cmd = (c: Record<string, unknown>) =>
     tournaments.command(ROOM, { expectedVersion: state()?.version, ...c } as TournamentCommand, { gameId: 'context', audience: 'all' })
   const say = (id: string, text: string, msg = '') => tournaments.offer(ROOM, viewer(id), text, msg, 'tiktok')
-  return { clock, store, tournaments, published, admins, state, cmd, say, recorded, setBridge: (v: boolean) => { bridge = v } }
+  return { clock, store, tournaments, published, admins, state, cmd, say, recorded, setBridge: (v: boolean) => { bridge = v },
+    setCorpus: (v: Corpus) => { currentCorpus = v } }
 }
 
 class Clock {
@@ -517,4 +519,90 @@ test('the written words, with their band at once, only with the setting on; a wo
   assert.deepEqual(s.state().typed.map((w) => [w.nickname, w.text, w.position]), [['anna', at(300), 300], ['anna', at(400), 400], ['bruno', 'zzzzzzzz', null]])
   closeWindow(s)
   assert.deepEqual(s.state().typed, []) // cleared when the window closes
+})
+
+test('publishing another corpus suspends an open tournament and keeps its saved guesses', () => {
+  const s = setup()
+  create(s)
+  s.cmd({ type: 'start-round' })
+  s.say('anna', at(300), 'saved-before-publication')
+  const round = s.store.playing(s.state().tournamentId)!
+  s.setCorpus({ ...corpus, hash: 'new-corpus' })
+  s.tournaments.corpusChanged()
+  assert.equal(s.state().phase, 'suspended')
+  assert.match(s.state().suspendedReason!, /corpus.*aggiornato/)
+  assert.equal(s.store.guesses(round.id).length, 1)
+  assert.equal(s.say('bruno', at(100), 'after-publication'), false)
+  assert.equal(s.cmd({ type: 'resume' }).ok, false)
+})
+
+test('valid words that do not count are kept for disputes, with the message time; invalid ones and repeats are not (16/11/2026)', () => {
+  const s = setup()
+  create(s)
+  s.cmd({ type: 'start-round' })
+  assert.equal(s.tournaments.offer(ROOM, viewer('anna'), at(5000), 'm1', 'tiktok', 1_700_000_000_111), true)
+  s.say('anna', at(4000)) //        a second word in the window
+  s.say('bruno', at(5000)) //       the same word, by another player
+  s.say('bruno', 'non è una parola') // not a word: not kept
+  s.say('bruno', at(3000), 'm1') // the same message again: not kept
+  const roundId = s.store.rounds(s.state().tournamentId).at(-1)!.id
+  const rows = (s.store as unknown as { db: Database.Database }).db
+    .prepare('SELECT player_id, word_text, reason, window_index, message_at FROM context_tournament_rejections WHERE round_id = ? ORDER BY id').all(roundId)
+  assert.deepEqual(rows, [
+    { player_id: 'tiktok:anna', word_text: at(4000), reason: 'seconda-proposta', window_index: 1, message_at: null },
+    { player_id: 'tiktok:bruno', word_text: at(5000), reason: 'parola-gia-usata', window_index: 1, message_at: null },
+  ])
+  assert.equal(s.store.guesses(roundId)[0].messageAt, 1_700_000_000_111)
+})
+
+const sayAt = (s: ReturnType<typeof setup>, id: string, text: string, messageAt: number | null, msg: string) =>
+  s.tournaments.offer(ROOM, viewer(id), text, msg, 'tiktok', messageAt)
+
+test('the words of a window count in the order they were written, not the order they arrived (16/11/2026)', () => {
+  const s = setup()
+  create(s)
+  s.cmd({ type: 'start-round' })
+  const secret = s.tournaments.admin(ROOM)!.secret!
+  // Anna writes the solution at 2000 and it arrives first; Bruno wrote it at 1000 but it arrives later (a slower delivery).
+  assert.equal(sayAt(s, 'anna', secret, 2000, 'a1'), true)
+  assert.equal(sayAt(s, 'bruno', secret, 1000, 'b1'), false)
+  closeWindow(s)
+  assert.equal(s.state().solvedBy, 'bruno')
+})
+
+test('a player\'s word of the window is the first one written; a message without a time keeps the arrival order', () => {
+  const s = setup()
+  create(s)
+  s.cmd({ type: 'start-round' })
+  const secret = s.tournaments.admin(ROOM)!.secret!
+  // Carla wrote the solution first (1000), then a wrong word (2000); the wrong one arrived first.
+  assert.equal(sayAt(s, 'carla', at(50), 2000, 'c2'), true)
+  assert.equal(sayAt(s, 'carla', secret, 1000, 'c1'), false)
+  closeWindow(s)
+  assert.equal(s.state().solvedBy, 'carla')
+  // Without the time on a message the saved arrival order stands.
+  s.clock.advance(60_000)
+  s.cmd({ type: 'start-round' })
+  const secret2 = s.tournaments.admin(ROOM)!.secret!
+  assert.equal(sayAt(s, 'anna', secret2, null, 'a1'), true)
+  assert.equal(sayAt(s, 'bruno', secret2, 1000, 'b1'), false)
+  closeWindow(s)
+  assert.equal(s.state().solvedBy, 'anna')
+})
+
+test('two platforms are compared by when they were written: each clock is aligned by its own delay', () => {
+  const s = setup()
+  create(s)
+  s.cmd({ type: 'start-round' })
+  const secret = s.tournaments.admin(ROOM)!.secret!
+  s.clock.advance(1000)
+  const now = s.clock.now
+  // TikTok's clock is 5 s behind the server's, Twitch's is right; both feeds have about 100 ms of delay.
+  assert.equal(s.tournaments.offer(ROOM, viewer('anna'), at(60), 't0', 'tiktok', now - 5000 - 100), true)
+  assert.equal(s.tournaments.offer(ROOM, { id: 'twitch:gino', nickname: 'gino' }, at(61), 'w0', 'twitch', now - 100), true)
+  // Bruno (TikTok) wrote the solution 20 ms before Gina (Twitch), real time; Gina's message arrives first.
+  assert.equal(s.tournaments.offer(ROOM, { id: 'twitch:gina', nickname: 'gina' }, secret, 'w2', 'twitch', now - 30), true)
+  assert.equal(s.tournaments.offer(ROOM, viewer('bruno'), secret, 'b1', 'tiktok', now - 50 - 5000), false)
+  closeWindow(s)
+  assert.equal(s.state().solvedBy, 'bruno')
 })

@@ -1,5 +1,8 @@
 # ZeroQuizz · Come si scrivono le domande
 
+> **Revisione documentale — 16 novembre 2026.** Questa — una guida editoriale per nuove domande e revisioni. La banca corrente contiene anche scienze e cultura generale importate: non tutte le 26.715 domande rispettano già l'obiettivo editoriale delle domande di ragionamento. Strumenti, DB e stato di attivazione sono nel [README](README.md).
+> [Indice e stato della documentazione](../docs/STATO_DOCUMENTAZIONE.md).
+
 Questa guida è per chi scrive le domande di ZeroQuizz (nel codice si chiama ancora `quizzland`): una persona, oppure Claude quando prepara una bozza da rivedere.
 Spiega cosa rende buona una domanda, quanto testo entra a schermo (misurato sull'overlay vero), come si sceglie la difficoltà, come si compone il mazzo e come lo si migliora con le risposte raccolte in live.
 

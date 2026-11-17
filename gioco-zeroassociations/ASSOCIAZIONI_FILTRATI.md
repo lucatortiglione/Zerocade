@@ -1,5 +1,8 @@
 # Associazioni dei prompt filtrati: avanzamento e ripresa
 
+> **Revisione documentale — 16 novembre 2026.** Le assegnazioni ad agenti e i lotti del 9–10 novembre sono registrazioni storiche, non lavorazioni attive in questa revisione. La copia di gioco attuale contiene 3.941 prompt e 58.551 collegamenti; per riprendere la coda occorre confrontare i registri locali e i bacini già importati, senza ripartire dai conteggi iniziali sotto.
+> [Indice e stato della documentazione](../docs/STATO_DOCUMENTAZIONE.md).
+
 ## Stato del lavoro
 
 La lavorazione del 9 novembre 2026 comprende cinque lotti editoriali centrali

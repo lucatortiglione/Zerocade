@@ -4,6 +4,8 @@ import {
   giftById,
   type BivioState,
   type ContextTournamentState,
+  type ContextSemanticState,
+  type TabooPublicState,
   type GifShow,
   type Gifter,
   type IncastroState,
@@ -37,6 +39,11 @@ interface OverlayState {
   contextTournament: ContextTournamentState | null
   // performance.now() when `contextTournament` arrived, to count its remainingMs down locally.
   contextTournamentAt: number
+  contextSemantic: ContextSemanticState | null
+  contextSemanticAt: number
+  // ZeroTaboo, as the server runs it: only the public state (never the card in play), and when it arrived, to count the round down.
+  taboo: TabooPublicState | null
+  tabooAt: number
   // The creator's latest message, shown for a few seconds; messageSeq keys each one.
   message: string | null
   messageSeq: number
@@ -61,6 +68,10 @@ let state: OverlayState = {
   quizzlandAt: 0,
   contextTournament: null,
   contextTournamentAt: 0,
+  contextSemantic: null,
+  contextSemanticAt: 0,
+  taboo: null,
+  tabooAt: 0,
   message: null,
   messageSeq: 0,
   gif: null,
@@ -93,6 +104,8 @@ socket.on('bivio:state', (bivio) => update({ bivio, bivioAt: performance.now() }
 socket.on('incastro:state', (incastro) => update({ incastro, incastroAt: performance.now() }))
 socket.on('quizzland:state', (quizzland) => update({ quizzland, quizzlandAt: performance.now() }))
 socket.on('context:tournament', (contextTournament) => update({ contextTournament, contextTournamentAt: performance.now() }))
+socket.on('context:semantic', (contextSemantic) => update({ contextSemantic, contextSemanticAt: performance.now() }))
+socket.on('taboo:state', (taboo) => update({ taboo, tabooAt: performance.now() }))
 socket.on('context:secret-uses', (uses) => setSecretUses(uses))
 socket.on('context:secret-used', ({ word, uses, at }) => noteSecretUse(word, uses, at))
 socket.on('context:secret-last', (last) => setSecretLast(last))

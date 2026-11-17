@@ -1,5 +1,31 @@
 # 🎯 ZeroContext
 
+Stato del **16 novembre 2026**: **93.928 parole giocabili e 9.513 segrete**, con tutte le
+**6.838 segrete precedenti conservate** e 2.675 aggiunte. Il pannello **Associazioni ZeroContext**
+permette di scegliere fra **originali e ABTT**, senza riavviare il server a ogni cambio.
+Tutti i profili conservano le stesse parole: originale 300 float32 (112.713.600 byte),
+ABTT 1.024 float32 (384.729.088 byte), senza riduzione della matrice valutata.
+Tutte le **9.513 segrete sono ordinarie**: i round speciali sono sospesi e nessuna parola è stata rimossa.
+La scelta predefinita è l'originale. TurboX e Harrier sono stati rimossi dal DB e dal selettore.
+Il cambio avvia un nuovo round e conserva le classifiche; durante un torneo aperto la scelta è bloccata.
+Procedura, origini e backup in [PROFILI_ASSOCIAZIONI.md](PROFILI_ASSOCIAZIONI.md).
+La pipeline configurata BGE-M3 con contesti e retrofitting non è ancora stata eseguita sull'intero corpus.
+Stato, task e dettagli in [IMPLEMENTAZIONE_VETTORI_SEMANTICI.md](IMPLEMENTAZIONE_VETTORI_SEMANTICI.md).
+Fanno fede `context__meta`, `context__targets` e il file indicato da `vectors_file`.
+
+## Mostrare o nascondere il numero di lettere
+
+In **Live settings → Mostra numero di lettere** si sceglie se mostrare i
+riquadri della parola segreta nella modalità classica. L'impostazione è attiva
+per impostazione predefinita e si applica subito, anche durante il round.
+
+Spegnendola, i riquadri vuoti scompaiono e compare **PAROLA SEGRETA**: né il
+numero dei riquadri né la loro larghezza rivelano la lunghezza. I piccoli aiuti
+possono ancora mostrare il prefisso già rivelato, seguito da puntini, senza
+riquadri per le lettere mancanti. Alla fine del round si vede sempre la parola
+completa. **Disabilita tutti gli aiuti** nasconde anche il numero di lettere.
+Nel torneo la lunghezza della soluzione resta nascosta fino a fine manche.
+
 ## Disabilitare tutti gli aiuti
 
 Nelle impostazioni di ZeroContext, **Disabilita tutti gli aiuti** blocca gli
@@ -21,7 +47,7 @@ Il suggerimento iniziale è facoltativo: se attivato, ogni round parte con la pa
 un poco lontana dalla più vicina (si cambia in «Posizione del suggerimento iniziale»). Non conta tra gli aiuti
 del round, ma è il punto da battere per i punti e per «Rivela più vicino».
 
-Un round non ha un tempo limite: finisce quando qualcuno scrive la parola segreta, oppure quando la regia preme
+Un round ordinario non ha un tempo limite: finisce quando qualcuno scrive la parola segreta, oppure quando la regia preme
 **⏭ Termina round** nella dashboard (sezione «Soluzione»). In quel caso la parola si mostra a tutti, senza punti, e
 dopo la pausa («Secondi prima della prossima parola») parte il round successivo.
 
@@ -31,16 +57,15 @@ Il commento che indovina si legge; quelli di più parole si leggono come sempre.
 
 ## Come funziona
 
-Caricamento, validazione dei vettori e classifica si eseguono in un **Web Worker dedicato** per ogni istanza
-del gioco. Il thread dell'interfaccia conserva parole e posizioni, disegna e applica punti e regole.
-Il worker mantiene i vettori per i round successivi; quando si cambia gioco o si chiude l'overlay viene terminato.
-Un riavvio crea una nuova istanza e riscarica i dati, evitando cache globali con dati di una versione precedente.
+Il server carica e valida il corpus e precalcola una classifica per round. Timer, tentativi,
+aiuti e punti della modalità classica sono ora condivisi dalla stanza; overlay e preview disegnano
+lo stesso stato, senza scaricare i vettori né assegnare punti autonomamente.
 
-Le risposte in ritardo di round o istanze precedenti non possono cambiare parola né assegnare punti.
-Gli eventi ricevuti mentre si prepara un round sono ordinati e limitati: se la coda si satura, il gioco
-mostra un errore e chiede di riavviare. I guasti di rete hanno al massimo tre tentativi; dati non validi
-richiedono una correzione e un riavvio. I dettagli e le prove sono nel
-[rapporto sulle direttive](../docs/ZeroContext-direttive-2026-11-14.md).
+Tutti i round sono **ordinari, senza limite di tempo**. I round speciali sono sospesi: anche al
+round 9 e 18 si usa l'intera banca delle segrete. Non si applicano il limite di 100 tentativi,
+il timer survival o i bonus speciali. L'indicatore termico e i punti ordinari restano attivi.
+Il torneo mantiene il proprio regolamento. Il motore precedente con worker resta compatibile con
+corpus storici int8.
 
 ### Colori delle parole
 
@@ -52,19 +77,18 @@ La posizione 1 è la soluzione; numeri più bassi indicano parole più vicine.
 | Arancione | 11–100 | 90 |
 | Giallo | 101–1.000 | 900 |
 | Ciano | 1.001–10.000 | 9.000 |
-| Blu | oltre 10.000 | 91.304 su 101.304 |
+| Blu | oltre 10.000 | 83.928 su 93.928 |
 
 Le soglie crescono di un ordine di grandezza: rendono più visibile ogni avvicinamento alla soluzione,
-mentre circa il 90% delle parole resta in blu. La soluzione ha anche la stella e l'annuncio del vincitore.
+mentre circa l'89% delle parole resta in blu. La soluzione ha anche la stella e l'annuncio del vincitore.
 Le quattro soglie sono modificabili dalla regia; il server le mantiene crescenti e restituisce alla dashboard
 i valori effettivi. Le precedenti soglie verde/arancione vengono sostituite dai nuovi valori predefiniti,
 senza reinterpretare i vecchi numeri come colori diversi.
 
 ### Dati e tentativi
 
-Ogni parola giocabile ha un vettore che ne rappresenta il significato. L'overlay scarica una volta dal server
-parole, vettori e collegamenti (`/api/context/…`). A ogni round ordina tutte le parole giocabili per vicinanza alla
-parola segreta, e la posizione in quella classifica è il punteggio di ogni tentativo. Una parola che non è tra
+Ogni parola giocabile ha un vettore che ne rappresenta il significato. Il server legge parole e vettori e, a ogni round, ordina le parole per vicinanza alla soluzione.
+Ogni tentativo riceve posizione e temperatura; l’overlay visualizza lo stato della stanza. Una parola che non è tra
 quelle giocabili non vale.
 
 La parola segreta si indovina anche senza accenti: `proprieta` trova `proprietà`.
@@ -87,7 +111,13 @@ o vettori, con `python script/build_context_plurals.py` dalla cartella del
 gioco, dopo `python script/fetch_morphit.py`. L'overlay lo include nella build:
 ricompilare e ricaricare la sorgente browser per applicare la regola.
 
-La vicinanza nasce da tre cose, tutte preparate da `script/build_context_data.py`:
+Il corpus viene scelto dal pannello **Associazioni ZeroContext**:
+originale FastText + retrofitting oppure BGE-M3 Italian con ABTT. La selezione è per stanza.
+Ogni parola ha un vettore unitario completo. Non si applicano boost dei collegamenti
+o penalità di genericità dopo il calcolo del coseno.
+
+Il **generatore storico** `script/build_context_data.py`, ancora disponibile, costruisce invece
+la vicinanza con questi passaggi:
 
 1. **Due fonti di vettori.** fastText italiano (`cc.it.300`), che impara dai testi, e ConceptNet Numberbatch, che
    aggiunge un grafo di conoscenza. La vicinanza di due parole è la media pesata dei due coseni: 0,7 fastText e 0,3
@@ -100,19 +130,24 @@ La vicinanza nasce da tre cose, tutte preparate da `script/build_context_data.py
    Li ha l'80% delle parole segrete, in media 14 ciascuna. Non vanno in cima d'ufficio: una parola associata ma
    lontana per i vettori sale, senza scavalcare i sinonimi.
 
-I pesi vengono da una misura: quanto in alto finiscono le parole associate da ZeroAssociazioni, prima di farle
+I pesi storici vengono da una misura: quanto in alto finiscono le parole associate da ZeroAssociazioni, prima di farle
 salire. Con il solo fastText la loro posizione mediana era 383 e il 65% stava entro la 1000; con le due fonti e
 senza le direzioni comuni 261 e 71%; con i collegamenti 32 e 98%.
+Questi risultati non misurano il corpus semantico corrente; per quello usare il `report.json` della generazione.
 
 ## Parole mai uscite
 
 Ogni parola segreta che esce, in una partita classica o in una manche del torneo, viene contata nella tabella
 `context_secret_uses` del database della diretta (`apps/server/data/zerocade.db`). Una nuova manche sceglie a caso tra
-le parole uscite meno volte, quindi sempre una parola mai uscita finché ce ne sono (6.837 in tutto). Quando sono finite
+le parole uscite meno volte nel pool del round: prima quelle mai uscite, quando disponibili. Il corpus complessivo contiene 9.513 segrete. Quando sono finite
 riparte dalle meno usate, mai la stessa della manche appena giocata. La dashboard mostra accanto alla soluzione quante
 volte è uscita.
 
 ## Penalità di genericità
+
+Questa sezione descrive il metodo storico. Nel corpus semantico attivo `hub_strength = 0`:
+le penalità non vengono applicate. Non eseguire `apply_context_hubs.py` per riprodurre il corpus corrente;
+il comando modifica il ranking pubblicato.
 
 Alcune parole (autista, guidatore, medico...) sono vicine a quasi tutto nei vettori, e per ogni segreta finivano in
 alto anche con poca attinenza. Dal 15/11/2026 ogni parola ha una penalità, `hubs` nel DB (e `hubs` in `links.json`),
@@ -132,6 +167,10 @@ Le regole sono in [REGOLAMENTO_CONTEXT_TORNEO_v2_3.md](REGOLAMENTO_CONTEXT_TORNE
 [ZEROCONTEXT_TORNEO_SPECIFICA_TECNICA.md](ZEROCONTEXT_TORNEO_SPECIFICA_TECNICA.md). In breve: finestre globali da 6 s,
 una parola valida per persona e finestra, 70 finestre per manche, 5 o 7 manche, punti Pioniere + Jackpot − Filtro
 Ghiaccio, la Top 10 a schermo tra le manche (almeno 15 s, poi la manche successiva parte solo a comando).
+
+La [sezione 14 del regolamento](REGOLAMENTO_CONTEXT_TORNEO_v2_3.md#14-provenienza-delle-parole-e-costruzione-del-database-lessicale)
+descrive le fonti delle parole scaricate, la costruzione dell'inventario di lemmi e forme flesse, i criteri per
+segrete e tentativi, l'origine dei vettori e la tracciabilità delle versioni del database.
 
 **Come si usa.** In dashboard, con ZeroContext selezionato e ZeroFollowerBot collegato, il pannello «Torneo
 ZeroContext» permette di scegliere le manche (5, 7 o infinite) e la durata minima della Top 10, poi «Avvia torneo
@@ -192,18 +231,29 @@ la specifica indica come lavoro distinto; provare il torneo in una diretta vera.
 
 | Dove | Contenuto | In Git |
 | --- | --- | :---: |
-| schema `context` di [`database/giochi.sqlite3`](../database/README.md) | `context__vocab`, le parole giocabili; `context__secrets`, quelle che possono essere segrete; `context__links`, per ogni parola segreta le parole che ZeroAssociazioni le associa; `context__meta`, i conteggi e `link_boost` | sì |
-| `data/vectors.bin` | Una riga per ogni parola giocabile: i vettori delle due fonti uno dopo l'altro (600 int8, già normalizzati), circa 60 MB | no |
+| schema `context` di [`database/giochi.sqlite3`](../database/README.md) | `context__vocab`, le parole giocabili; `context__secrets`, quelle che possono essere segrete; `context__targets`, pool, frequenze, domini e deroghe; `context__meta`, conteggi e formato vettoriale; tabelle `links` e `hubs` per compatibilità | sì |
+| `data/vectors.<sha256>.bin` | Matrici immutabili dei profili, selezionate dai rispettivi metadati: originale 300 float32, ABTT 1.024 float32 | no |
+| `data/vectors.bin` | Nome storico e file di lavoro/candidato; nel runtime vale solo se i metadati non indicano un nome immutabile | no |
 | `livecade-context-it-bank.csv` | L'esportazione della banca di Livecade, il punto di partenza: non si modifica mai | sì |
 | `zerocontext-it-bank-aggiunte.csv` | Le parole nuove: sostantivi italiani comuni presi dall'inventario di ZeroAssociazioni | sì |
 | `zerocontext-it-bank.csv` | La banca delle parole segrete: Livecade più le aggiunte | sì |
 | `zerocontext-it-bank-meta.csv` | Una riga per parola, con la fascia e le prove usate | sì |
 | `context_bank_exclusions.txt` | Le parole che non vanno aggiunte, anche se passano i filtri automatici | sì |
 
-`data/vectors.bin` non è in Git: chi scarica il repository lo ricrea con i comandi qui sotto. Senza, il server lo
-segnala all'avvio e il gioco non ha i dati per partire. Il pacchetto Windows lo include (`zerocontext/vectors.bin`).
+I CSV della banca elencati sopra appartengono al percorso storico. Il nuovo task di aggiornamento
+legge direttamente il DB lessicale e non li richiede, neppure per le frequenze.
+
+I vettori non sono in Git: il solo checkout non basta per giocare. Occorrono lo schema e il file
+vettoriale della stessa generazione. Il runtime cerca la cartella anche tramite `ZEROCADE_CONTEXT_DATA`;
+attualmente la sua individuazione richiede la presenza del nome storico `vectors.bin`, anche quando
+il file attivo è quello immutabile. Conservare entrambi. Il confezionamento legge i dati attivi
+tramite il servizio `context.ts` e li copia nel pacchetto come `zerocontext/vectors.bin`.
 
 ## Ricostruire i dati
+
+Per il corpus corrente usare il task **00)ZeroContext : Contesti**, descritto nella sezione successiva.
+I comandi qui sotto ricostruiscono la banca e il corpus **storico a due fonti**: rilanciarli pubblica
+quel metodo e non riproduce la generazione statistica attiva.
 
 Dalla cartella `gioco-zerocontext`, in quest'ordine:
 
@@ -217,6 +267,41 @@ Dalla cartella `gioco-zerocontext`, in quest'ordine:
 `script/build_context_data.py --probe spiaggia pizza` stampa le 20 parole più vicine a quelle indicate, con `*` quelle
 salite per un collegamento. Con `--dry-run` non scrive nulla: serve a provare altri pesi. Dopo un aggiornamento dei
 bacini (`giochi.py aggiorna associazioni`) i collegamenti si rifanno rilanciando `script/build_context_data.py`.
+
+## Task di aggiornamento della banca
+
+I task **00)ZeroContext : Aggiornamento banca e rigenerazione segrete, vocabolario e vettori.**
+e **00)ZeroContext : Contesti** eseguono la nuova pipeline descritta in
+[IMPLEMENTAZIONE_VETTORI_SEMANTICI.md](IMPLEMENTAZIONE_VETTORI_SEMANTICI.md).
+Leggono i DB locali in sola lettura, senza CSV della banca. I nuovi target ordinari applicano finestre Zipf, deroghe NVdB, frequenze verbali aggregate,
+densità e ponti. La nuova pipeline usa Model2Vec da BGE-M3, prompt-averaging offline, fallback
+FastText allineato e retrofitting con margine. La pubblicazione richiede collaudi di polarità, OOV
+e distribuzione angolare, oltre alla conservazione di tutte le segrete.
+
+Le segrete già pubblicate sono sempre conservate e restano estraibili, eventualmente nel pool ordinario
+di compatibilità. La pubblicazione impedisce di rimuoverne anche una sola, crea un backup e sostituisce
+solo lo schema `context` e il riferimento al file vettoriale immutabile. Un errore durante la generazione
+lascia attivo il corpus precedente. Dopo il primo aggiornamento del codice serve riavviare il server;
+i successivi cambi di corpus usano `POST /api/context/reload`.
+
+```powershell
+.venv-vectors/Scripts/python.exe -B script/build_context_semantic.py
+.venv-vectors/Scripts/python.exe -B script/build_context_semantic.py --publish
+```
+
+Senza `--publish` si genera soltanto il candidato. Fonti, hash, conteggi, densità e deroghe sono
+registrati in `report.json` e `targets.json`; `data/publication.json` identifica la pubblicazione.
+L'ambiente è preparato dal task dipendente, con `requirements-vectors.txt`, in un ambiente dedicato.
+
+## Task «00)ZeroContext : Contesti»
+
+Esegue la stessa nuova pipeline Model2Vec + fallback FastText + retrofitting con margine. I precedenti profili
+FastText/ConceptNet/LSA e con modelli neurali restano disponibili come esperimenti in
+`resources/contexts.json` e `resources/ensemble.json`; il task pilota storico **00b** usa l'ensemble
+statistico su 256 parole, senza pubblicarlo. **00a** verifica invece la nuova pipeline su 1.024 parole. Questi esperimenti non descrivono il corpus attivo.
+
+Le sezioni seguenti conservano procedure e misure della pipeline storica: non vanno usate per
+sovrascrivere il corpus semantico. La ricostruzione corrente è quella dei due task sopra.
 
 ## Espansione del vocabolario dei tentativi
 
@@ -239,7 +324,7 @@ testuali in `data/`. Prima della pubblicazione salva DB e file precedenti in
 snapshot e hash. Dopo la generazione riavviare il server e ricaricare gli overlay:
 il server conserva le parole in memoria e l'overlay scarica i dati una volta.
 
-Aggiornamento del 14 novembre 2026: **101.304 parole giocabili**, 41.075 aggiunte,
+Fotografia storica del 14 novembre 2026: **101.304 parole giocabili**, 41.075 aggiunte,
 nessuna rimossa, 6.837 possibili segrete. Vettori: 60.782.400 byte (600 int8 per
 parola). Riepilogo: [vocabulary_update.json](reports/vocabulary_update.json).
 
@@ -282,8 +367,10 @@ Test: `python -m unittest discover -s . -p script/test_evaluate_context_inventor
 
 - Server: `apps/server/src/context.ts` serve parole, vettori e collegamenti (`links.json`). `ZEROCADE_CONTEXT_DATA` può indicare un'altra
   cartella per `vectors.bin`.
-- Overlay: `apps/overlay/src/games/context.ts` (la partita) e `apps/overlay/src/games/contextRanking.ts` (la
-  classifica per vicinanza).
+- Server: `apps/server/src/context-semantic.ts` gestisce la partita semantica; `packages/shared/src/contextRanking.ts`
+  calcola la classifica condivisa con il torneo.
+- Overlay: `apps/overlay/src/games/contextSemanticGame.ts` visualizza lo stato della stanza con `contextView.ts`.
+  `context.ts` mantiene il motore precedente per i corpus storici.
 
 **Elimina lo storico.** Nello «Storico dei tornei» della dashboard, «🗑 Elimina lo storico» cancella (dopo conferma) tutti
 i tornei finiti, concordi o annullati, con manche, tentativi, punti e registro; il cestino accanto a un torneo cancella

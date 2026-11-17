@@ -1,5 +1,8 @@
 # ZeroWords · TODO
 
+> **Revisione documentale — 16 novembre 2026.** La roadmap seguente riguarda l'app mobile. La versione Zerocade PC — già integrata: genera livelli nel server tramite worker, gestisce chat e difficoltà automatica e conserva la telemetria. Percorsi e uso corrente sono nel [README](README.md); i risultati datati della roadmap non sostituiscono una verifica della versione attuale.
+> [Indice e stato della documentazione](../docs/STATO_DOCUMENTAZIONE.md).
+
 Gioco di parole per Android (poi iOS): una ruota di lettere e uno schema a incastro da completare trascinando il dito sulle lettere.
 "ZeroWords" è il nome scelto (prima "Incastro", titolo provvisorio; nel codice resta `incastro`). Va ancora verificato: vedi [1. Decisioni](#1-decisioni-da-prendere-prima-di-scrivere-codice).
 

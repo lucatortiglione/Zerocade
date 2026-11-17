@@ -1,5 +1,8 @@
 # Lo schema `filtrati`: contenuto, criteri e verifiche
 
+> **Revisione documentale — 16 novembre 2026.** I conteggi datati del 9 novembre sono una fotografia della preselezione. Il runtime legge i bacini pubblicati nello schema `associazioni`, non direttamente `filtered_prompts`. La normalizzazione dei plurali e la selezione per ZeroContext sono passaggi distinti: una parola ammessa nei tentativi non — automaticamente una segreta o un prompt approvato.
+> [Indice e stato della documentazione](../docs/STATO_DOCUMENTAZIONE.md).
+
 Documento aggiornato il **9 novembre 2026**, sulla base del codice locale di
 [script/filter_prompts.py](script/filter_prompts.py), [script/review_prompts.py](script/review_prompts.py) e
 [script/validated_prompt_database.py](script/validated_prompt_database.py).
@@ -89,18 +92,23 @@ far passare una parola. `meta` e `metà` restano voci diverse.
 ### 3.3 Familiarità preliminare
 
 La configurazione è [resources/prompt_policy.json](resources/prompt_policy.json).
-Al momento della stesura, `minimum_zipf_it` vale **3.0**.
+Dal **16 novembre 2026**, `maximum_zipf_it` vale **2.2** (politica `2026-11-16.2`),
+con confronto inclusivo **Zipf ≤ 2,2**. È un limite massimo, che sostituisce il precedente
+minimo 2,2 e l'iniziale minimo 3,0. La configurazione non contiene entrambi i limiti.
+La stessa politica è letta dal task «3)Parole: scarta quelle non utili e filtrate»,
+dal refresh e dalla costruzione diretta dei filtrati.
 
 La voce passa se soddisfa almeno una di queste condizioni:
 
-1. frequenza italiana `wordfreq` sulla scala Zipf almeno pari alla soglia;
+1. frequenza italiana `wordfreq` sulla scala Zipf minore o uguale al massimo configurato;
 2. presenza nel **Nuovo vocabolario di base di De Mauro**, attraverso le
    attestazioni NVdB raccolte nel database.
 
 Per i lemmi verbali, il programma considera anche la frequenza delle forme
-verbali attestate da Morph-it e usa il massimo disponibile. Serve a non
-penalizzare un verbo solo perché l'infinito è meno frequente delle forme
-coniugate. Questo massimo deriva dalle attestazioni morfologiche: non è una
+verbali attestate da Morph-it e usa il massimo disponibile. Non si deve
+scegliere arbitrariamente una forma meno frequente del verbo. Con il limite massimo attuale,
+il riferimento verbale deve essere ≤ 2,2, salvo l'eccezione NVdB. Questo massimo deriva
+dalle attestazioni morfologiche: non è una
 conferma del significato o del POS che il revisore sceglierà in seguito.
 
 La frequenza è un indizio sulla **parola**, non una prova sulla familiarità di
