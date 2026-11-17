@@ -37,6 +37,7 @@ Normalizzazione di maiuscole, accenti, apostrofi, spazi e punteggiatura. Il bers
 | Overlay | `apps/overlay/src/Taboo.tsx`, `taboo.css` |
 | Regia | `apps/dashboard/src/components/TabooSidebar.tsx` |
 | Strumento del mazzo | `script/mazzo.py` |
+| Schede editoriali v2.2 (schema, controlli, database) | `script/schede.py` |
 
 I moduli puri non leggono orologio, casualità, database o rete: li ricevono come parametri, e i test usano un orologio finto.
 
@@ -52,6 +53,19 @@ python -I gioco-zerotaboo/script/mazzo.py export     # CSV con BOM
 ```
 
 Gli **avvisi editoriali si mostrano e non si correggono da soli**. I cinque avvisi della v3.0 (D03, D06, F07 con un Taboo della stessa radice del bersaglio; D09 senza alias; E08 con un alias solo nella nota) sono stati risolti nel regolamento v3.1. Finché la fonte non è rigenerata (`parse`, `import`: TODO, fase 8.1) il DB contiene ancora la v3.0 a 62 carte. Le carte in playtest (categorie G–L, carte aggiunte e riscritte) sono in §8. Nel round 3 una categoria è votabile solo con almeno 6 carte disponibili, e il voto ne mostra al massimo 6.
+
+## Schede editoriali v2.2
+
+Le carte della v2.2 ([LINEE_GUIDA_CARTE_ZEROTABOO_v2.2.md](LINEE_GUIDA_CARTE_ZEROTABOO_v2.2.md)) vivono a parte dal mazzo v3, che resta quello giocato (§6.5). I file sono in `data/schede-v2.2/` (una per categoria; `data/` è in `.gitignore`) e `mazzo.py import` le carica in tabelle proprie accanto al mazzo, con `verify` che le confronta con i file.
+
+```powershell
+python -I gioco-zerotaboo/script/schede.py ingest BOZZA.json   # bozze del generatore -> data/schede-v2.2/
+python -I gioco-zerotaboo/script/schede.py check [--write]    # ricalcola i controlli automatici (§5.3)
+python -I gioco-zerotaboo/script/schede.py report            # stati, livelli, difficoltà e tag comici per categoria
+python -I gioco-zerotaboo/script/schede.py export            # CSV con BOM per l'editor
+```
+
+Stato al 17/11/2026: 340 schede (17 categorie × 20), tutte `auto_checked`. Blind test, revisione dell'editor e revisioni di piattaforma sono passi successivi; un FAIL di sicurezza porta a `rejected` senza riscritture. Il controllo D-002 usa un proxy lessicale, senza embedding: le coppie vicine (ad esempio ACQUA CALDA FINITA e BORSA DELL'ACQUA CALDA) vanno in `REVIEW`. `schede.py` non ha ancora test automatici.
 
 ## Telemetria e calibrazione
 

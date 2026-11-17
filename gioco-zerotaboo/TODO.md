@@ -168,6 +168,12 @@ Nota: con il tetto a 4, frasi lunghe come «allora secondo me è il peto» vengo
 - Commit su un branch `zerotaboo-v3.1`, aggiungendo i file di ZeroTaboo **per percorso** (il working tree contiene lavori di altre sessioni). Se le fasi 0–7 non sono ancora state committate, un primo commit separato per quelle.
 - Eseguire `scripts/package-win.mjs` e controllare che `ZeroTaboo.sqlite3` sia accanto al server.
 
+## Schede v2.2 (17/11/2026)
+
+- Fatto: `script/schede.py` (schema, controlli §5.3, ingest, report, export) e caricamento in `mazzo.py import`/`verify`; 340 schede `auto_checked` in `data/schede-v2.2/`.
+- Da fare: `script/test_schede.py` (nessun test automatico oggi), blind test e revisione dell'editor (§5.1, §5.2), embedding al posto del proxy lessicale di D-002.
+- Il mazzo giocato resta la v3; il passaggio alle schede v2.2 è una decisione successiva.
+
 ## Non verificato
 
 - **La resa a schermo** di overlay e regia (browser, OBS, TikTok LIVE Studio): compilano e sono collegati, l'aspetto non è stato visto.

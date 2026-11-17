@@ -8,6 +8,9 @@
 
 Gli avvisi editoriali si mostrano, non si correggono da soli (decisione D18): D09 senza alias, E08 con alias discordanti,
 Taboo con la stessa radice del bersaglio (D03, D06, F07). Nessuna dipendenza esterna.
+
+`import` e `verify` trattano anche le schede editoriali v2.2 (data/schede-v2.2/, strumento schede.py): stanno in tabelle
+proprie accanto al mazzo v3, che resta quello giocato (LINEE_GUIDA_CARTE_ZEROTABOO_v2.2.md §6.5).
 """
 from __future__ import annotations
 
@@ -22,6 +25,9 @@ import sqlite3
 import sys
 import tempfile
 import unicodedata
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))  # `python -I` non aggiunge la cartella dello script
+import schede  # noqa: E402
 
 HERE = Path(__file__).resolve().parent.parent
 ROOT = HERE.parent
@@ -210,10 +216,12 @@ def validate(deck: dict) -> tuple[list[str], list[str]]:
 
 # ---- Database ----
 
-def build_db(deck: dict, path: Path) -> None:
+def build_db(deck: dict, path: Path, cards: list[dict] | None = None) -> None:
+    """`cards`: i file delle schede v2.2 (None: quelli di data/schede-v2.2/)."""
     errors, warnings = validate(deck)
     if errors:
         raise SystemExit('Mazzo non valido:\n - ' + '\n - '.join(errors))
+    cards = schede.load_card_files() if cards is None else cards
     with closing(sqlite3.connect(path)) as db:
         db.executescript(SCHEMA)
         db.executemany('INSERT INTO livelli VALUES (?,?)', LEVEL_NAME.items())
@@ -239,6 +247,7 @@ def build_db(deck: dict, path: Path) -> None:
             db.execute('INSERT INTO avvisi (revisione, tipo, dettaglio) VALUES (?,?,?)', (by_code[code], kind, w))
         db.executemany('INSERT INTO meta VALUES (?,?)', [('deck_version', deck['deck_version']), ('rules', deck['rules']), ('cards', str(len(deck['cards']))),
                                                          ('verified', 'true')])
+        schede.build_tables(db, cards, schede.Context(checks=False))
         db.commit()
         if db.execute('PRAGMA integrity_check').fetchall() != [('ok',)] or db.execute('PRAGMA foreign_key_check').fetchall():
             raise SystemExit('Il database costruito non è integro')
@@ -258,9 +267,11 @@ def read_db(path: Path) -> dict:
          'excluded_answers': excluded[r[0]]} for r in rows]}
 
 
-def verify(deck: dict, path: Path) -> list[str]:
+def verify(deck: dict, path: Path, cards: list[dict] | None = None) -> list[str]:
     stored = read_db(path)
     problems: list[str] = []
+    with closing(sqlite3.connect(path.resolve().as_uri() + '?mode=ro', uri=True)) as db:
+        problems += schede.verify_db(db, schede.load_card_files() if cards is None else cards)
     if stored['categories'] != deck['categories']:
         problems.append('Categorie diverse dalla fonte')
     by = {k['card_id']: k for k in stored['cards']}
@@ -280,15 +291,16 @@ def verify(deck: dict, path: Path) -> list[str]:
     return problems
 
 
-def replace_atomically(deck: dict, target: Path) -> None:
+def replace_atomically(deck: dict, target: Path, cards: list[dict] | None = None) -> None:
     target.parent.mkdir(parents=True, exist_ok=True)
+    cards = schede.load_card_files() if cards is None else cards
     fd, name = tempfile.mkstemp(suffix='.sqlite3', dir=target.parent)
     os.close(fd)
     temporary = Path(name)
     try:
         temporary.unlink()
-        build_db(deck, temporary)
-        problems = verify(deck, temporary)
+        build_db(deck, temporary, cards)
+        problems = verify(deck, temporary, cards)
         if problems:
             raise SystemExit('Verifica fallita:\n - ' + '\n - '.join(problems))
         os.replace(temporary, target)
@@ -325,9 +337,11 @@ def main(argv=None) -> int:
         print(f'{len(deck["cards"])} carte, {len(errors)} errori, {len(warnings)} avvisi')
         return 1 if errors else 0
     if args.command == 'import':
-        replace_atomically(deck, args.db)
+        cards = schede.load_card_files()
+        replace_atomically(deck, args.db, cards)
         _, warnings = validate(deck)
-        print(f'Costruito {args.db} ({len(deck["cards"])} carte, {len(warnings)} avvisi editoriali da rivedere)')
+        print(f'Costruito {args.db} ({len(deck["cards"])} carte, {len(warnings)} avvisi editoriali da rivedere;'
+              f' {len(schede.all_cards(cards))} schede v2.2)')
         return 0
     if args.command == 'verify':
         problems = verify(deck, args.db)
