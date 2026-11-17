@@ -6,6 +6,10 @@ Revisione documentale del **16 novembre 2026**, versione normativa 2.9 invariata
 allineati inventario dei dati e riferimenti alla pubblicazione di ZeroContext.
 Stato del workspace e ambito dei rapporti sono nell'[indice documentale](docs/STATO_DOCUMENTAZIONE.md).
 
+Aggiornamento del 17 novembre 2026, versione 2.9 invariata: aggiunte le ottimizzazioni dei database riprese da
+ZeroFollowerBot (sezione 6: messa a punto della connessione e statement preparati riusati; appendice SQLite, punti 10 e 11:
+indici e query che crescono con i dati, retention e crescita del file).
+
 Aggiornamento del 15 novembre 2026, versione 2.9: adattato a ZeroCade il documento 2.8 di
 ZeroFollowerBot. Integrate le regole su thread nativi, stalli, IPC e memoria condivisa con le
 condizioni effettive di Node.js, React, SQLite e degli strumenti Python. Distinte prescrizioni,
@@ -369,6 +373,8 @@ Anche attori senza memoria condivisa possono bloccarsi con attese circolari fra 
 - [ ] **Scritture e snapshot:** usare `BEGIN IMMEDIATE`/`.immediate()` per transazioni di lettura-modifica-scrittura contese quando è necessario acquisire subito il diritto di scrittura. Le transazioni di sola lettura restano snapshot/deferred; una singola scrittura atomica non richiede un wrapper aggiuntivo. WAL mantiene un solo writer alla volta.
 - [ ] **Errori e commit:** rollback e rilascio in ogni percorso; notificare persistenza soltanto dopo conferma. Un timeout del chiamante non prova che il worker abbia annullato la query o il commit: mantenere l'esito sconosciuto senza replay automatico.
 - [ ] **Checkpoint e backup:** lettori lunghi possono trattenere WAL; checkpoint e VACUUM vanno pianificati fuori dalla diretta secondo i vincoli del database. Usare backup consistenti, includendo il WAL confermato; vietato sostituire file di un DB aperto.
+- [ ] **Messa a punto della connessione:** impostare per connessione, e misurare prima di adottarli (sezione 4): `cache_size` adeguata al carico (il valore predefinito, circa 2 MB, è piccolo), `temp_store = MEMORY` se gli ordinamenti temporanei sono piccoli, `journal_size_limit` perché il file WAL rientri dopo i checkpoint, `mmap_size` solo dopo prova su Windows (filesystem e connessioni multiple possono renderlo inutile o rischioso). Lanciare `PRAGMA optimize` alla chiusura e, nei processi lunghi, a intervalli di ore e fuori dalle finestre critiche, così le statistiche del planner seguono i dati.
+- [ ] **Statement preparati riusati:** le query ripetute con frequenza (scritture per evento o per round, letture periodiche) si preparano una volta per connessione (`db.prepare(...)` tenuto in un campo del modulo che possiede la connessione) e si riusano, invece di ricompilare l'SQL a ogni chiamata; lo statement appartiene al worker e non attraversa MessagePort.
 - [ ] **Lock su file:** preferire primitive mantenute e compatibili con Windows. Per file sentinella, PID da solo non basta: considerare riuso del PID, identità del proprietario e corse di creazione/rimozione. Lease e fencing servono soltanto se viene introdotto un coordinamento distribuito; il backend deve verificarli.
 
 ### Watchdog e diagnostica — P0/P1
@@ -1020,6 +1026,20 @@ JOIN prodotti p ON od.id_prodotto = p.id_prodotto;
 #### 9. Manutenzione dello Spazio: VACUUM
 
 Quando si eliminano o modificano record duplicati, SQLite non riduce automaticamente la dimensione fisica del file `.sqlite`, ma mantiene le pagine vuote in una "freelist" per riutilizzi futuri. Valutare `VACUUM` solo se lo spazio recuperabile giustifica costo, spazio temporaneo e finestra di manutenzione; non eseguirlo automaticamente durante una diretta.
+
+#### 10. Indici e query che crescono con i dati
+
+Una query corretta oggi può diventare lenta quando la tabella cresce: va controllata con `EXPLAIN QUERY PLAN` sui volumi attesi, non sui dati di prova.
+
+- **Indici su ciò che si filtra e si ordina:** ogni `WHERE`/`ORDER BY` frequente ha un indice che lo serve; un indice parziale (`WHERE …`) basta se il filtro riguarda un sottoinsieme piccolo. Ogni indice costa spazio e tempo di scrittura: niente indici non usati.
+- **Ricerca testuale:** `LIKE '%testo%'` legge l'intera tabella. Oltre le decine di migliaia di righe, o se la ricerca è interattiva, usare FTS5 (tabella virtuale tenuta allineata da trigger) invece di scansioni complete.
+- **Paginazione a chiave:** `OFFSET` rilegge e scarta tutte le righe saltate, quindi le pagine in fondo costano di più. Per scorrere una tabella ordinata usare la paginazione a chiave (`WHERE id < ? ORDER BY id DESC LIMIT n`).
+- **Conteggi e aggregazioni:** `COUNT(*)` e `GROUP BY` su tabelle grandi sono scansioni; se servono a ogni apertura di una vista, conservare il valore in cache invalidata dalle scritture, o in una tabella di riepilogo aggiornata nella stessa transazione.
+- **Niente lettura integrale per abitudine:** caricare in memoria un'intera tabella che cresce con gli utenti o con il tempo richiede un limite o un caricamento a pagine (sezione 3, budget di memoria). Con `better-sqlite3`, `.all()` materializza tutto il risultato: per risultati grandi usare `.iterate()`.
+
+#### 11. Retention e crescita del file
+
+Una tabella di cronologia, log o eventi senza politica di conservazione cresce per sempre. Ogni tabella che si accumula nel tempo dichiara un limite (per età o per numero di righe) e la pulizia che lo applica, a lotti e in transazioni brevi, fuori dalle finestre critiche. Lo spazio liberato resta nella freelist: recuperarlo con `VACUUM` secondo il punto 9 oppure, se il file deve restituire spazio senza blocchi lunghi, con `auto_vacuum = INCREMENTAL` e `incremental_vacuum` a piccoli passi (richiede un `VACUUM` una tantum per attivarlo e va provato prima).
 
 Fonti tecniche per l'adattamento delle regole di concorrenza: [worker Node](https://nodejs.org/api/worker_threads.html),
 [SQLite WAL](https://www.sqlite.org/wal.html), [transazioni SQLite](https://www.sqlite.org/lang_transaction.html),
