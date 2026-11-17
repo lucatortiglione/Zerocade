@@ -176,4 +176,4 @@ tentativi e 9.513 segrete; i vettori esterni dipendono dal profilo: originale 30
 Le densità e i ponti precedenti sono archiviati come riferiti alla vecchia matrice. La pubblicazione impedisce
 la rimozione di segrete esistenti. I vecchi strumenti di riscrittura dello schema rifiutano
 di sovrascrivere un corpus semantico privo di questa gestione dei target.
-Dettagli in [IMPLEMENTAZIONE_SEMANTICA.md](../gioco-zerocontext/IMPLEMENTAZIONE_SEMANTICA.md).
+Dettagli in [IMPLEMENTAZIONE_VETTORI_SEMANTICI.md#segrete-domini-e-ricevute](../gioco-zerocontext/IMPLEMENTAZIONE_VETTORI_SEMANTICI.md#segrete-domini-e-ricevute).

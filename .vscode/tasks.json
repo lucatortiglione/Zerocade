@@ -48,7 +48,7 @@
         "--db", "${workspaceFolder}/database/giochi_v2.sqlite3"
       ],
       "options": { "cwd": "${workspaceFolder}", "env": { "PYTHONUNBUFFERED": "1" } },
-      "detail": "Genera le segrete di ZeroContext secondo ARCHITETTURA_SEMANTICA_CONTEXT.md (da normalizzata, nella guess list del profilo originale: Zipf, NVdB, verbi attestati, densità e ponti) e le scrive tutte (ordinarie, speciali e quelle in uso conservate in deroga) in database/giochi_v2.sqlite3, tabella zerocade_segrete, con viste, backup e verifica riga per riga. Richiede RAW pulito e normalizzato con le regole correnti. Non tocca giochi.sqlite3 né il server.",
+      "detail": "Genera le segrete di ZeroContext secondo ARCHITETTURA_VETTORI_SEMANTICI.md (da normalizzata, nella guess list del profilo originale: Zipf, NVdB, verbi attestati, densità e ponti) e le scrive tutte (ordinarie, speciali e quelle in uso conservate in deroga) in database/giochi_v2.sqlite3, tabella zerocade_segrete, con viste, backup e verifica riga per riga. Richiede RAW pulito e normalizzato con le regole correnti. Non tocca giochi.sqlite3 né il server.",
       "problemMatcher": [],
       "runOptions": { "instanceLimit": 1 },
       "presentation": { "reveal": "always", "panel": "dedicated", "clear": true }

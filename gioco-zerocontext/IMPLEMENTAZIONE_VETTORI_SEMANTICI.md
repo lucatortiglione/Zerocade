@@ -101,3 +101,38 @@ Il primo build richiede download del docente e distillazione offline; su CPU pu�
 Anche il pilota conserva il tokenizer del docente, quindi non equivale a un docente piccolo.
 Le cache riusabili sono identificate da parole, configurazione, pacchetti e hash del codice; le impronte
 degli artefatti vengono verificate prima del riuso. Il pilota ha una ricevuta separata dalla generazione completa.
+
+## Segrete, domini e ricevute
+
+Integrato dalla prima implementazione (16 novembre 2026), che non è più un file a parte. I criteri di selezione
+sono nella [sezione 18 dell'architettura](ARCHITETTURA_VETTORI_SEMANTICI.md#18-selezione-delle-segrete-e-curva-termica).
+
+- **Conservazione.** Il corpus ha 93.928 tentativi e 9.513 segrete, comprese tutte le 6.838 precedenti (2.675 aggiunte).
+  Le 6.805 vecchie segrete non conformi ai nuovi filtri restano estraibili nei round ordinari, anche se FO o fuori
+  finestra: non sono archiviate né contate artificialmente. Ogni deroga è in `context__targets.details`. La
+  pubblicazione si blocca se manca una segreta già disponibile, anche a conteggio invariato.
+- **Domini.** L'accreditamento è esplicito in `resources/semantic-domains.json`; nuovi lemmi si aggiungono lì e devono
+  superare di nuovo tutti i controlli. Attribuzione dei domini e filtri automatici non sostituiscono una revisione
+  linguistica umana della banca. L'unica fonte ammessa per i dati è il DB locale: non si usano CSV della banca.
+- **Frequenze e fasce.** Le frequenze vengono da `wordfreq==3.1.1`: lo snapshot lessicale conserva i ranghi, non i
+  valori Zipf. Le fasce NVdB sono ricavate dai caratteri del PDF originale (grassetto FO, corsivo AD, tondo AU); FO
+  prevale sugli omografi. Per i verbi si sommano le frequenze delle forme attestate (snapshot Morph-it attivo).
+- **Soccorsi.** Si attivano una sola volta per soglia: 50 tentativi oppure 90 secondi con migliore posizione oltre
+  1.000; 75 tentativi oppure 150 secondi con migliore posizione oltre 300. Il primo indica il dominio effettivo della
+  soluzione. **Disabilita tutti gli aiuti** prevale anche sui soccorsi.
+- **Ranking.** La classifica della soluzione è precalcolata una volta per round; un tentativo usa lookup e posizione già
+  disponibili. Il limite infrastrutturale dei round ordinari è 10.000 tentativi. Il torneo mantiene il proprio
+  regolamento, condivide lettura dei vettori FP32 e ordinamento, e un cambio di corpus sospende i tornei incompatibili.
+- **Ricevute.** `report.json` registra fonti, hash, versioni di pacchetti e script, conteggi e segrete preservate;
+  `targets.json` contiene per parola frequenze, fascia NVdB, dominio, densità, ponti e deroghe; la ricevuta finale è
+  `data/publication.json`. Una generazione senza `--publish` resta un candidato in `.cache/semantic/runs/`.
+  Prima di pubblicare si può provare un candidato con `node scripts/smoke-runtime.mjs --context-candidate=<cartella-candidato>`.
+- **Formato.** Matrice contigua float32 little endian, righe L2 unitarie: 93.928 × 300 × 4 = 112.713.600 byte per il profilo a 300 dimensioni.
+
+## Precisazioni matematiche
+
+- La scala standard *wordfreq* è `log10(frequenza per miliardo)`. Il `+3` nella definizione iniziale era un refuso.
+- Il funzionale quadratico con repulsione negativa può essere illimitato inferiormente: l'implementazione usa
+  aggiornamenti con ancoraggio e proiezione sulla sfera unitaria, con pesi limitati, per evitare divergenze.
+- La finestra 2,00–2,40 valeva prima del 16 novembre 2026; oggi la finestra ordinaria è 1,80–2,50, con la deroga per i
+  verbi `Zipf_att >= 1,80`.

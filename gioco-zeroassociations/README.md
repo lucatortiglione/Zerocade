@@ -56,7 +56,7 @@ Dalla cartella `gioco-zeroassociations`, con `.venv/Scripts/python.exe -B`:
 |---|---|
 | `script/prompt_inventory.py collect` | Raccoglie l'inventario dei prompt (task «1. Prompt: raccogli…») |
 | `script/aggiorna_parole_raw.py` | Task «ZeroCade : Aggiornamento parole RAW»: secondo DB `parole_ita_raw_2.0.sqlite3`, tabella `parole` senza duplicati, tutte le fonti e backup; [schema](../database/PAROLE_RAW_2.0.md) |
-| `script/normalizza_parole_raw_v2.py` | Task «ZeroCade : Normalizzare parole RAW»: popola `normalizzata`, con eccezioni per femminili autonomi e plurali esclusivi/più comuni; [criteri](../database/NORMALIZZAZIONE_PAROLE_RAW.md) |
+| `script/normalizza_parole_raw_v2.py` | Task «ZeroCade : Normalizzare parole RAW»: popola `normalizzata`, con eccezioni per femminili autonomi e plurali esclusivi/più comuni; [criteri](../database/PAROLE_RAW_2.0.md#normalizzazione-delle-forme-delle-parole) |
 | `script/normalize_words.py plan` / `apply` | Normalizzazione: conta / registra i plurali puri come DISCARDED, con il singolare nel motivo (task «1a)Parole: normalizza…»); non tocca le decisioni di altri |
 | `script/prompt_database.py import-reviewed FILE.jsonl` | Importa bacini già revisionati, tutto o niente |
 | `script/prompt_database.py status` | Conteggi e integrità del DB |

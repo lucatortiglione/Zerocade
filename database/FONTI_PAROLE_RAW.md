@@ -8,7 +8,7 @@ Le fonti sono definite in [prompt_inventory_sources.json](../gioco-zeroassociati
 
 ## Task e destinazione
 
-La selezione successiva segue i [criteri di genere e numero](NORMALIZZAZIONE_PAROLE_RAW.md):
+La selezione successiva segue i [criteri di genere e numero](PAROLE_RAW_2.0.md#normalizzazione-delle-forme-delle-parole):
 femminile quando manca un maschile equivalente e plurale soltanto quando più comune.
 Il download RAW conserva comunque tutte le forme.
 
@@ -16,7 +16,7 @@ Il download RAW conserva comunque tutte le forme.
 - Configurazione: [tasks.json](../.vscode/tasks.json).
 - Procedura: [aggiorna_parole_raw.py](../gioco-zeroassociations/script/aggiorna_parole_raw.py).
 - Destinazione: `database/parole_ita_raw_2.0.sqlite3`, tabella **`parole`**.
-- Pulizia e deduplicazione: emoji, faccine e simboli decorativi rimossi; Unicode, maiuscole/minuscole e spazi normalizzati; `parola` è la chiave primaria. [Regole](PULIZIA_PAROLE_RAW.md).
+- Pulizia e deduplicazione: emoji, faccine e simboli decorativi rimossi; Unicode, maiuscole/minuscole e spazi normalizzati; `parola` è la chiave primaria. [Regole](PAROLE_RAW_2.0.md#pulizia-dei-caratteri-nel-raw-20).
 - Provenienza: tabelle `fonti`, `parole_fonti` e `inventory_snapshots`.
 - Backup del secondo DB prima degli aggiornamenti: `gioco-zeroassociations/database-backups/parole_raw_2.0-<data>.sqlite3`.
 - Rapporto aggiornato dopo ogni fonte: `gioco-zeroassociations/reports/aggiornamento_parole_raw_2.0.json`.

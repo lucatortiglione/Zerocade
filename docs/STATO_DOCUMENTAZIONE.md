@@ -44,7 +44,7 @@ La pipeline legge i DB locali, genera FastText subword + retrofitting e pool sep
 la perdita di qualsiasi segreta e attiva il solo schema `context`, con backup.
 Le nuove regole includono round speciali ogni nove, 180 secondi e 100 tentativi validi sul server.
 Il corpus passa da 6.838 a 9.513 segrete. Le deroghe delle vecchie segrete e i tre target speciali
-conformi sono spiegati in [IMPLEMENTAZIONE_SEMANTICA.md](../gioco-zerocontext/IMPLEMENTAZIONE_SEMANTICA.md).
+conformi sono spiegati in [IMPLEMENTAZIONE_VETTORI_SEMANTICI.md#segrete-domini-e-ricevute](../gioco-zerocontext/IMPLEMENTAZIONE_VETTORI_SEMANTICI.md#segrete-domini-e-ricevute).
 I paragrafi successivi sono il registro cronologico delle scelte precedenti.
 
 ## Indice dei documenti
@@ -235,7 +235,7 @@ subword + retrofitting. Il corpus generato ha 93.928 tentativi e 9.513 segrete: 
 6.838 segrete precedenti è stata rimossa. Le deroghe di compatibilità restano giocabili.
 Il server gestisce round, tempo e punti anche in classica; il torneo mantiene le sue regole.
 La descrizione corrente e le precisazioni matematiche sono nel
-[rapporto di implementazione](../gioco-zerocontext/IMPLEMENTAZIONE_SEMANTICA.md).
+[rapporto di implementazione](../gioco-zerocontext/IMPLEMENTAZIONE_VETTORI_SEMANTICI.md#segrete-domini-e-ricevute).
 
 ## Pipeline vettoriale e sospensione speciali — 16 novembre 2026
 

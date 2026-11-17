@@ -34,7 +34,7 @@ con una sola riga per parola normalizzata per Unicode, maiuscole e spazi. Conser
 le fonti in `fonti` e le appartenenze in `parole_fonti`. Raccoglie tutte le forme,
 compresi i vecchi scarti editoriali; non applica esclusioni Zipf, di genere o numero.
 Il task elimina emoji e voci non lessicali, ripulisce simboli decorativi come `#`
-e unisce i duplicati risultanti mantenendo le fonti. [Criteri di pulizia](PULIZIA_PAROLE_RAW.md).
+e unisce i duplicati risultanti mantenendo le fonti. [Criteri di pulizia](PAROLE_RAW_2.0.md#pulizia-dei-caratteri-nel-raw-20).
 Prima di aggiornare un archivio già esistente crea un backup del secondo DB.
 Il vecchio `parole_ita_raw.sqlite3` rimane separato. Non pubblica le banche dei giochi.
 Prosegue dopo una fonte fallita e restituisce errore se una fonte non viene completata.
@@ -44,7 +44,7 @@ configurate e 5 fonti documentate come non importate. Il rapporto progressivo è
 `gioco-zeroassociations/reports/aggiornamento_parole_raw_2.0.json`.
 Il nuovo DB contiene inizialmente **2.847.433 voci uniche** copiate dalla raccolta
 locale, senza un nuovo download. Schema, comandi e query: [PAROLE_RAW_2.0.md](PAROLE_RAW_2.0.md).
-La selezione delle forme segue la [politica di normalizzazione](NORMALIZZAZIONE_PAROLE_RAW.md):
+La selezione delle forme segue la [politica di normalizzazione](PAROLE_RAW_2.0.md#normalizzazione-delle-forme-delle-parole):
 maschile equivalente se attestato e plurale solo quando più comune del singolare.
 Il task **ZeroCade : Normalizzare parole RAW** popola la seconda tabella
 `normalizzata` nel DB 2.0, mantenendo `parole` completa e registrando le varianti
@@ -231,4 +231,4 @@ Gli schemi selezionabili sono `context_original` e `context_abtt`; TurboX e Harr
 Le densità e i ponti della vecchia matrice sono archiviati nei dettagli e non ricalcolati per Harrier. La pubblicazione impedisce
 la rimozione di segrete esistenti. I vecchi strumenti di riscrittura dello schema rifiutano
 di sovrascrivere un corpus semantico privo di questa gestione dei target.
-Dettagli in [IMPLEMENTAZIONE_SEMANTICA.md](../gioco-zerocontext/IMPLEMENTAZIONE_SEMANTICA.md).
+Dettagli in [IMPLEMENTAZIONE_VETTORI_SEMANTICI.md#segrete-domini-e-ricevute](../gioco-zerocontext/IMPLEMENTAZIONE_VETTORI_SEMANTICI.md#segrete-domini-e-ricevute).

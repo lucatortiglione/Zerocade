@@ -26,6 +26,7 @@
 15. [Piano di adozione per ZeroContext](#15-piano-di-adozione-per-zerocontext)
 16. [Correzioni rispetto alla prima versione](#16-correzioni-rispetto-alla-prima-versione)
 17. [Fonti e riferimenti](#17-fonti-e-riferimenti)
+18. [Selezione delle segrete e curva termica](#18-selezione-delle-segrete-e-curva-termica)
 
 ---
 
@@ -1268,3 +1269,76 @@ Fonti controllate per questa revisione, consultate il **16 novembre 2026**. Link
 ### Nota finale
 
 Le scelte che determinano davvero la riuscita del gioco sono **qualità del lessico**, **giudizi di pertinenza umani**, **confronto tra rappresentazioni**, **politica di ranking**, **coerenza durante il round**. La pipeline numerica è un mezzo, non il criterio di qualità finale.
+
+---
+
+## 18. Selezione delle segrete e curva termica
+
+Integrato dalla prima specifica semantica (16 novembre 2026), che non è più un file a parte. Le parti sulle
+architetture dei vettori e sul retrofitting sono già nelle sezioni 5–9; qui restano i criteri che decidono **quali
+parole possono essere segrete**, il punteggio termico e ciò che è stato sospeso.
+
+### 18.1 Frequenza Zipf
+
+La scala usata è quella standard di *wordfreq*: $\text{Zipf} = \log_{10}(\text{frequenza per miliardo di parole})$.
+Il «$+3$» che compariva nella definizione iniziale era un refuso: esempi e somme delle frequenze verbali vanno letti
+sulla scala standard.
+
+### 18.2 Pool ordinario
+
+Dal 16 novembre 2026 il pool ordinario include le parole con $1.80 \le \text{Zipf} \le 2.50$ (prima $[2.00, 2.40]$).
+Il task *Zerocade : Generazione parole segrete* applica questa finestra. Il vocabolario di riferimento è il Nuovo
+Vocabolario di Base di De Mauro (NVdB: fondamentale **FO**, alto uso **AU**, alta disponibilità **AD**), con queste regole:
+
+| Caso | Regola |
+| --- | --- |
+| Parola **AD** con $\text{Zipf} < 1.80$ (*scolapasta, cavatappi, pinzetta*) | Promossa in deroga: la notorietà dell'oggetto comune prevale sulla bassa frequenza scritta |
+| Sostantivo **AU** con $2.50 < \text{Zipf} \le 3.20$ (*cardine, perno, cerniera*) | Ammesso in deroga |
+| Parola **FO** (circa $\text{Zipf} \ge 4.5$) | Esclusa dalle segrete, per non banalizzare la scalata |
+| Verbo | Si usa la frequenza aggregata delle forme attestate (sotto): ammesso se $\text{Zipf}_{\text{att}} \ge 1.80$; la soluzione è l'infinito presente |
+| Densità media dei 100 vicini | $D_{100}(w) = \frac{1}{100}\sum_{v \in \mathcal{N}_{100}(w)} \cos(\vec w, \vec v) \ge 0.45$ |
+| Ponti semantici | Almeno **10** vicini tra i 100 con $\text{Zipf} \ge 4.0$ |
+
+**Frequenza aggregata dei verbi.** Il solo infinito sottostima i verbi molto usati nelle loro flessioni. Detto
+$\mathcal{F}_{\text{att}}(v)$ l'insieme delle forme flesse attestate nei corpora morfologici (*Morph-it!*, *CoLFIS*):
+
+$$F_{\text{att}}(v) = \sum_{f \in \mathcal{F}_{\text{att}}(v)} 10^{\text{Zipf}(f)}, \qquad \text{Zipf}_{\text{att}}(v) = \log_{10} F_{\text{att}}(v)$$
+
+Le forme si deduplicano, l'infinito compreso; una frequenza assente non viene inventata. Esempi: *ghermire*
+($\text{Zipf}_{\text{att}} \approx 2.28$, infinito $\approx 1.92$), *lambire* ($\approx 2.35$, infinito $\approx 1.96$).
+Esempi per categoria: *imbuto* ($\approx 2.32$, AD), *alambicco* ($\approx 2.38$, sostantivo concreto), *bruma* ($\approx 2.31$, astratto).
+
+### 18.3 Curva termica
+
+Il coseno si rimappa su una scala 0–100 per renderlo leggibile ai giocatori:
+
+$$S = \left(\frac{\max(0, \cos(\vec u, \vec v) - s_0)}{1 - s_0}\right)^{\gamma} \times 100$$
+
+Nei round ordinari $s_0 = 0.10$ e $\gamma = 1.15$. Classifica e temperatura usano il coseno puro, senza boost o
+penalità aggiuntive; le posizioni restano visibili.
+
+### 18.4 Round speciale (sospeso)
+
+La prima specifica prevedeva un round speciale ogni nove round, con soluzioni a $\text{Zipf} \approx 1.90$. **È sospeso**:
+tutte le segrete sono ordinarie, nono e diciottesimo round compresi; il server non lo attiva e la regia non lo offre.
+Il codice survival resta per compatibilità e test. Se tornasse, i parametri previsti erano:
+
+| Parametro | Valore |
+| --- | --- |
+| Finestra | $1.85 \le \text{Zipf} \le 2.05$ (verbi: $\text{Zipf}_{\text{att}}$ nella stessa finestra) |
+| Fine round | $t \ge 180\ \text{s}$, oppure 100 tentativi validi e distinti, oppure risposta esatta |
+| Densità e ponti | $D_{100} \ge 0.48$; almeno 15 vicini con $\text{Zipf} \ge 3.8$ |
+| Curva termica | $s_0 = 0.07$, $\gamma = 1.05$ |
+| Punteggio | $2500 \times \bigl(1 + 0.60\,\frac{180 - t}{180} + 0.40\,\frac{100 - N}{100}\bigr)$, massimo teorico 5.000 |
+| Anti-monosettoriale | Scartati i suffissi tecnici (*-ite, -osi, -asi, -ato, -uro, -morfismo, -ectomia, -terapia, -metria, -scopia, -fagia, -logia*); ammessi solo domini espressivi (carattere e morale, stati d'animo, descrizioni evocative, manufatti non industriali: *pusillanime, inedia, caduco, chincaglieria*), accreditati in `resources/semantic-domains.json` |
+
+Le quantità indicative di allora (circa 6.200 ordinarie e 520 speciali) erano stime, non risultati: non si abbassano
+densità, ponti o soglie per raggiungerle. Il pool speciale conforme conteneva 3 lemmi (*monile, probità, suppellettile*).
+
+### 18.5 Conservazione delle segrete
+
+Vincolo dell'utente: **le segrete non diminuiscono**. Le vecchie soluzioni che non superano i filtri restano estraibili
+nel pool ordinario, in deroga di compatibilità, e la deroga è registrata in `context__targets.details`. Le nuove
+ammissioni applicano invece i filtri. La pubblicazione si blocca se manca anche una sola segreta precedente: il
+controllo confronta i nomi, non i conteggi, quindi anche una sostituzione a numero invariato viene fermata. Prima
+pubblicazione: 9.513 segrete, comprese tutte le 6.838 precedenti.

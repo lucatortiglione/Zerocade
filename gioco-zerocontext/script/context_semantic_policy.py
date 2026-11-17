@@ -132,7 +132,7 @@ def retrofit(initial, synonyms, antonyms, iterations=10, attraction=.35, repulsi
     return q
 
 
-# Finestra ordinaria dal 16 novembre 2026 (ARCHITETTURA_SEMANTICA_CONTEXT.md, §3.1): prima 2,00-2,40.
+# Finestra ordinaria dal 16 novembre 2026 (ARCHITETTURA_VETTORI_SEMANTICI.md, §3.1): prima 2,00-2,40.
 ORDINARY_FLOOR, ORDINARY_CEILING = 1.8, 2.5
 
 

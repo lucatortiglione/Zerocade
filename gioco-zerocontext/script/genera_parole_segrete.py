@@ -1,4 +1,4 @@
-"""Genera le parole segrete di ZeroContext dal RAW 2.0, secondo ARCHITETTURA_SEMANTICA_CONTEXT.md.
+"""Genera le parole segrete di ZeroContext dal RAW 2.0, secondo ARCHITETTURA_VETTORI_SEMANTICI.md.
 
 Parte da `normalizzata` (parole singole, senza doppioni di genere e numero e senza forme verbali diverse
 dall'infinito), le limita alla guess list del gioco e misura densità e ponti semantici nei vettori che il gioco
@@ -258,7 +258,7 @@ def main(argv=None):
                               'reviews': len(reviews)},
                   'packages': {n: version(n) for n in ('numpy', 'wordfreq')},
                   'script_sha256': sha(Path(__file__)), 'published': False, 'plan_only': args.plan,
-                  'note': 'Specifica: ARCHITETTURA_SEMANTICA_CONTEXT.md. Non pubblica in giochi.sqlite3 e non attiva i round speciali.'}
+                  'note': 'Specifica: ARCHITETTURA_VETTORI_SEMANTICI.md. Non pubblica in giochi.sqlite3 e non attiva i round speciali.'}
         if not args.plan:
             write_table(database, rows, report, args.backup_root, datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%S%fZ'))
         write_json(args.report, report)
