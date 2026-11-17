@@ -1,4 +1,4 @@
-"""Criteri scelti dall'utente: genere attestato e numero più comune."""
+"""Criteri scelti dall'utente: genere attestato (16/11/2026) e lemma al posto delle forme flesse (17/11/2026)."""
 from contextlib import closing
 import json
 from pathlib import Path
@@ -24,7 +24,7 @@ class CanonicalTests(unittest.TestCase):
         evidence.add('ud-fixture','conllu',{'prompt':'stoviglie','lemma':'stoviglia','role':'inflected_form',
                      'pos':'NOUN','details':{'features':'Gender=Fem|Number=Sing'}})
         selected=evidence.finish({'stoviglia':1.4,'stoviglie':3.15}.__getitem__)
-        self.assertEqual(selected,{'stoviglia':['stoviglie']})
+        self.assertEqual(selected,{'stoviglie':['stoviglia']})
 
     def test_dictionary_comparatives_do_not_replace_positive_degree(self):
         evidence=FamilyEvidence({'buono','buoni','migliore','migliori'})
@@ -39,15 +39,21 @@ class CanonicalTests(unittest.TestCase):
                 'prompt':word,'lemma':'buono','role':'inflected_form','pos':pos,'details':{}})
         selected=evidence.finish({'buono':6,'buoni':5,'migliore':4,'migliori':8}.__getitem__)
         self.assertNotIn('buono',selected)
-        self.assertEqual(selected['migliore'],['migliori'])
+        # Il comparativo resta una famiglia distinta, rappresentata dal maschile singolare anche se meno frequente.
+        self.assertEqual(selected['migliori'],['migliore'])
         self.assertEqual(selected['buoni'],['buono'])
 
-    def test_plural_wins_only_when_more_frequent_and_singular_wins_ties(self):
+    def test_the_lemma_wins_whatever_the_frequency(self):
         family = {('stoviglia','NOUN'): {'stoviglia': form('Fem','Sing'), 'stoviglie': form('Fem','Plur')}}
         selected = select_families(family, set(), lambda w: {'stoviglia':1.4,'stoviglie':3.15}[w])
-        self.assertEqual(selected, {'stoviglia':['stoviglie']})
-        self.assertEqual(selected.evidence['stoviglia']['rule'], 'number_frequency')
+        self.assertEqual(selected, {'stoviglie':['stoviglia']})
+        self.assertEqual(selected.evidence['stoviglie']['rule'], 'inflected_form')
         self.assertEqual(select_families(family, set(), lambda w: 2), {'stoviglie':['stoviglia']})
+
+    def test_a_variant_without_gender_or_number_is_not_an_inflected_form(self):
+        family = {('obiettivo','NOUN'): {'obiettivo': form('Masc','Sing'), 'obbiettivo': {'gender':set(),'number':set(),'sources':{'fixture'}},
+                                        'obiettivi': form('Masc','Plur')}}
+        self.assertEqual(select_families(family, set(), lambda w: 3), {'obiettivi':['obiettivo']})
 
     def test_feminine_is_excluded_only_with_explicit_masculine_even_if_more_frequent(self):
         family = {('bello','ADJ'): {'bello':form('Masc','Sing'), 'bella':form('Fem','Sing')}}
@@ -60,14 +66,34 @@ class CanonicalTests(unittest.TestCase):
                                    'bella':form('Fem','Sing'), 'belle':form('Fem','Plur')}}
         scores = {'bello':2,'belli':4,'bella':5,'belle':6}
         selected = select_families(family, set(), scores.__getitem__)
-        self.assertEqual(selected, {'bella':['belli'],'belle':['belli'],'bello':['belli']})
+        self.assertEqual(selected, {'bella':['bello'],'belle':['bello'],'belli':['bello']})
+        self.assertEqual(selected.evidence['bella']['rule'], 'feminine_with_masculine')
         self.assertNotIn('bella',select_families(family, {'bella'}, scores.__getitem__))
 
-    def test_gender_change_in_plural_is_a_number_choice(self):
+    def test_gender_change_in_plural_is_an_inflected_form_of_the_lemma(self):
         family = {('uovo','NOUN'): {'uovo':form('Masc','Sing'), 'uova':form('Fem','Plur'), 'uovi':form('Masc','Plur')}}
         selected = select_families(family, set(), {'uova':5,'uovo':3,'uovi':1}.__getitem__)
-        self.assertEqual(selected, {'uovo':['uova'],'uovi':['uova']})
-        self.assertEqual(selected.evidence['uovo']['rule'], 'number_frequency')
+        self.assertEqual(selected, {'uova':['uovo'],'uovi':['uovo']})
+        self.assertEqual(selected.evidence['uova']['rule'], 'inflected_form')
+
+    def test_a_feminine_lemma_with_a_masculine_equivalent_gives_way_to_it(self):
+        family = {('infermiera','NOUN'): {'infermiera':form('Fem','Sing'), 'infermiere':form('Masc','Sing'), 'infermieri':form('Masc','Plur')}}
+        selected = select_families(family, set(), lambda w: 3)
+        self.assertEqual(selected['infermiera'], ['infermiere'])
+        self.assertEqual(selected['infermieri'], ['infermiere'])
+
+    def test_a_lemma_seen_elsewhere_only_as_a_verb_form_stays_as_the_replacement(self):
+        # "ali" plurale di "ala"; "ala" compare come lemma della famiglia ma, come riga propria, solo da forma verbale.
+        evidence = FamilyEvidence({'ala','ali','alare'})
+        evidence.add('morphit-048-mirror','morphit',{'prompt':'ali','lemma':'ala','role':'inflected_form','pos':'NOUN-F:p','details':{}})
+        # Una riga con source_scope=explicit_lemma segna la forma verbale ma non registra la lettura: "ala" non risulta ambigua.
+        evidence.add('morphit-048-mirror','morphit',{'prompt':'ala','lemma':'alare','role':'inflected_form','pos':'VER:ind+pres+3+s',
+                                                     'details':{'source_scope':'explicit_lemma'}})
+        selected = evidence.finish(lambda w: 3)
+        self.assertEqual(selected.get('ali'), ['ala'])
+        self.assertNotIn('ala', selected)
+        for word, target in selected.items():
+            self.assertFalse(target and target[0] in selected, word)
 
     def test_feature_tags_and_database_links_do_not_use_word_endings(self):
         self.assertEqual(features('morphit-048-mirror','ADJ:pos+f+s',{}), ({'Fem'},{'Sing'}))
@@ -87,7 +113,7 @@ class CanonicalTests(unittest.TestCase):
                     con.execute('INSERT INTO raw__inventory_terms VALUES (?,1)',(word,))
             scores = {'stoviglia':1.4,'stoviglie':3.15,'bello':5,'bella':6,'voli':1,'volo':4}
             selected = detect_canonical(path, frequency=lambda w: scores.get(w,2))
-            self.assertEqual(selected['stoviglia'], ['stoviglie'])
+            self.assertEqual(selected['stoviglie'], ['stoviglia'])
             self.assertEqual(selected['bella'], ['bello'])
             self.assertNotIn('banca',selected)
             self.assertNotIn('voli',selected)

@@ -41,6 +41,39 @@ def legacy_fixture(path):
                     ('snapshot','fixture','sha','2026-11-16','cache',4,json.dumps(config)))
 
 
+class PruneSourcesTests(unittest.TestCase):
+    def test_removed_source_and_foreign_treebank_tokens_leave_the_collection(self):
+        with tempfile.TemporaryDirectory() as folder, redirect_stdout(io.StringIO()):
+            folder = Path(folder)
+            (folder/'it.txt').write_text('casa\nmela\n', encoding='utf-8')
+            (folder/'titles.txt').write_text('casa\nhouse\n', encoding='utf-8')
+            (folder/'ud.conllu').write_text('1\tcase\tcasa\tNOUN\t_\tNumber=Plur\t0\troot\t_\t_\n'
+                                            '2\tpeople\tpeople\tNOUN\t_\tForeign=Yes\t1\tdep\t_\t_\n', encoding='utf-8')
+            italian, titles = source('italian', folder/'it.txt'), source('titles', folder/'titles.txt')
+            treebank = {**source('ud', folder/'ud.conllu'), 'kind': 'conllu'}
+            with closing(WordDatabase(folder/'raw.sqlite3')) as db:
+                for config in (italian, titles, treebank):
+                    db.import_source(config, Path(config['local_path']))
+                con = db.con
+                # Un'attestazione straniera registrata prima del filtro dei treebank, e una parola della copia storica senza fonte.
+                con.execute("INSERT INTO parole VALUES ('people',1),('storica',1)")
+                con.execute("INSERT INTO parole_fonti VALUES ('people','ud')")
+                con.executescript('''CREATE TABLE normalizzata(parola TEXT PRIMARY KEY REFERENCES parole(parola), is_single_word INTEGER NOT NULL);
+                    INSERT INTO normalizzata SELECT parola, is_single_word FROM parole;
+                    INSERT OR REPLACE INTO meta VALUES ('normalizzazione_stato','aggiornata');''')
+                report = db.prune_sources(['italian', 'ud'])
+                words = {w for w, in con.execute('SELECT parola FROM parole')}
+                self.assertEqual(report['removed_sources'], ['titles'])
+                self.assertEqual(report['refiltered_sources'], {'ud': 1})
+                self.assertEqual(report['words_removed'], 2)  # house (solo dai titoli) e people (token straniero)
+                self.assertEqual(words, {'casa', 'mela', 'case', 'storica'})
+                self.assertNotIn('titles', {f for f, in con.execute('SELECT id FROM fonti')})
+                self.assertEqual({w for w, in con.execute('SELECT parola FROM normalizzata')}, words)
+                self.assertEqual(con.execute("SELECT value FROM meta WHERE name='normalizzazione_stato'").fetchone(), ('da_aggiornare',))
+                self.assertIsNone(con.execute('PRAGMA foreign_key_check').fetchone())
+                self.assertEqual(db.prune_sources(['italian', 'ud'])['words_removed'], 0)  # idempotente
+
+
 class RawV2Tests(unittest.TestCase):
     def test_remote_download_and_http_304_reuse_the_same_words(self):
         with tempfile.TemporaryDirectory() as folder,redirect_stdout(io.StringIO()):

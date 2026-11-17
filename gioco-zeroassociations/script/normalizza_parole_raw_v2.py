@@ -1,6 +1,7 @@
 """Popola normalizzata da parole nel RAW 2.0, preservando la raccolta originale.
 
-Tiene una forma per genere e numero e toglie le forme verbali diverse dall'infinito."""
+Tiene i lemmi e scarta le forme flesse: per nomi e aggettivi il lemma attestato (non la forma più frequente),
+per i verbi l'infinito (17/11/2026)."""
 import argparse
 from collections import Counter
 from contextlib import closing
@@ -18,7 +19,7 @@ from collect_prompt_sources import checksum
 from parole_raw_v2 import DEFAULT_DB, ROOT, VERSION
 from prompt_inventory import records
 
-POLICY = 'canonical-gender-number-verbs-2.1'
+POLICY = 'canonical-lemma-2.2'
 KINDS = {'wiktextract','morphit','unimorph','glaffit','flex_it','conllu'}
 
 
@@ -85,6 +86,10 @@ def analyze(con, frequency=None):
 
 
 def populate(con, selected, report, baseline):
+    # Ogni sostituta deve restare in normalizzata: un errore qui nomina le parole, invece del solo vincolo violato.
+    chained = sorted((w, v[0]) for w, v in selected.items() if v and v[0] in selected)
+    if chained:
+        raise ValueError(f'{len(chained)} sostitute escluse a loro volta, per esempio {chained[:10]}')
     con.execute('PRAGMA foreign_keys=ON')
     con.execute('BEGIN IMMEDIATE')
     try:

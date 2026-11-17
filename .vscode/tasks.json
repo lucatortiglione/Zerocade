@@ -32,7 +32,7 @@
         "--db", "${workspaceFolder}/database/parole_ita_raw_2.0.sqlite3"
       ],
       "options": { "cwd": "${workspaceFolder}", "env": { "PYTHONUNBUFFERED": "1" } },
-      "detail": "Popola normalizzata da parole: elimina doppioni di genere e numero attestati, conserva femminili autonomi, plurali senza singolare e plurali più comuni. Crea backup e registro delle esclusioni.",
+      "detail": "Popola normalizzata da parole tenendo solo i lemmi: scarta plurali e forme flesse di nomi e aggettivi, femminili con un maschile equivalente e forme verbali diverse dall'infinito. Crea backup e registro delle esclusioni.",
       "problemMatcher": [],
       "runOptions": { "instanceLimit": 1 },
       "presentation": { "reveal": "always", "panel": "dedicated", "clear": true }

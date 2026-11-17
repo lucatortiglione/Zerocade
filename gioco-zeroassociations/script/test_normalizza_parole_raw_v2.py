@@ -69,8 +69,11 @@ class NormalizeV2Tests(unittest.TestCase):
                 selected,report,baseline=analyze(db.con,frequency)
                 populate(db.con,selected,report,baseline)
                 kept={w for w, in db.con.execute('SELECT parola FROM normalizzata')}
-                self.assertTrue({'casa','caso','nozze','occhiali','stoviglie','uova','ragazzo','fare','volo','voli','bellissimo'}<=kept)
-                self.assertFalse({'case','gatti','stoviglia','uovo','bella','bellissima','ragazza','ragazze','ragazzi'}&kept)
+                # Il lemma resta anche quando una sua forma flessa è più frequente (17/11/2026); "occhiali" resta perché
+                # il lemma "occhiale" non è nella raccolta.
+                self.assertTrue({'casa','caso','nozze','occhiali','stoviglia','uovo','ragazzo','fare','volo','voli','bellissimo'}<=kept)
+                self.assertFalse({'case','gatti','stoviglie','uova','uovi','bella','bellissima','ragazza','ragazze','ragazzi'}&kept)
+                self.assertEqual(db.con.execute("SELECT sostituita_da FROM normalizzazione_esclusioni WHERE parola='stoviglie'").fetchone(),('stoviglia',))
                 self.assertEqual(set(db.con.execute('SELECT parola FROM parole')),before)
                 self.assertEqual(db.con.execute("SELECT sostituita_da FROM normalizzazione_esclusioni WHERE parola='ragazza'").fetchone(),('ragazzo',))
                 # Forme verbali diverse dall'infinito: via; infinito e forme anche nominali restano.

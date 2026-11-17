@@ -160,6 +160,82 @@ class WordDatabase:
         return {'source':source['id'],'status':'IMPORTED','records':count,'records_read':read_count,
                 'non_lexical_records_removed':read_count-count,'sha256':digest,'new_words':after-before}
 
+    def _head_file(self, source_id):
+        """Il file in cache della versione attiva di una fonte, o None se non è più sul disco."""
+        row = self.con.execute('''SELECT s.cache_path, s.sha256, s.source_config_json FROM meta m
+            JOIN inventory_snapshots s ON s.id=m.value WHERE m.name=?''', ('head:'+source_id,)).fetchone()
+        if not row:
+            return None, None
+        path, digest, config = Path(row[0]), row[1], json.loads(row[2])
+        if not path.is_file():
+            path = next((Path(p) for p, in self.con.execute(
+                'SELECT cache_path FROM inventory_http_cache WHERE source_key=? AND sha256=?', (source_id, digest))
+                if Path(p).is_file()), None)
+        if path is None or checksum(path) != digest:
+            return None, None
+        return path, config
+
+    def prune_sources(self, registered, refilter_kinds=frozenset({'conllu'})):
+        """Allinea la raccolta al registro (17/11/2026): le fonti tolte dal registro perché davano parole straniere
+        perdono le loro attestazioni; le fonti dei tipi in `refilter_kinds` si rileggono con le regole attuali di
+        `records` (i treebank non danno più token stranieri né nomi propri). Una parola rimasta senza alcuna fonte
+        esce da `parole`, e con lei le righe della normalizzazione che la nominano."""
+        registered = set(registered)
+        removed = sorted({r[0] for r in self.con.execute('SELECT id FROM fonti')} - registered)
+        refiltered, skipped, dropped = {}, [], []
+        for source_id, kind in self.con.execute('SELECT id, tipo FROM fonti ORDER BY id').fetchall():
+            if source_id in removed or kind not in refilter_kinds:
+                continue
+            path, config = self._head_file(source_id)
+            if path is None:
+                skipped.append(source_id)
+                continue
+            keep = {w for row in records(path, config) if (w := clean_word(row['prompt'])) is not None}
+            stale = [w for w, in self.con.execute('SELECT parola FROM parole_fonti WHERE fonte_id=?', (source_id,)) if w not in keep]
+            refiltered[source_id] = len(stale)
+            dropped += [(w, source_id) for w in stale]
+        self.con.execute('BEGIN IMMEDIATE')
+        try:
+            self.con.execute('CREATE TEMP TABLE IF NOT EXISTS pruned_words(parola TEXT PRIMARY KEY) WITHOUT ROWID')
+            self.con.execute('DELETE FROM pruned_words')
+            self.con.executemany('INSERT OR IGNORE INTO pruned_words VALUES (?)', ((w,) for w, _ in dropped))
+            attestations = len(dropped)
+            if removed:
+                marks = ','.join('?' * len(removed))
+                attestations += self.con.execute(f'SELECT count(*) FROM parole_fonti WHERE fonte_id IN ({marks})', removed).fetchone()[0]
+                self.con.execute(f'INSERT OR IGNORE INTO pruned_words SELECT parola FROM parole_fonti WHERE fonte_id IN ({marks})', removed)
+                self.con.execute(f'DELETE FROM parole_fonti WHERE fonte_id IN ({marks})', removed)
+            self.con.executemany('DELETE FROM parole_fonti WHERE parola=? AND fonte_id=?', dropped)
+            # Solo le parole toccate qui e rimaste senza fonte: quelle senza fonte da prima (copia storica) restano.
+            self.con.execute('DELETE FROM pruned_words WHERE EXISTS (SELECT 1 FROM parole_fonti f WHERE f.parola=pruned_words.parola)')
+            orphans = self.con.execute('SELECT count(*) FROM pruned_words').fetchone()[0]
+            tables = {r[0] for r in self.con.execute("SELECT name FROM sqlite_schema WHERE type='table'")}
+            if orphans:
+                if 'normalizzazione_esclusioni' in tables:
+                    self.con.execute('''DELETE FROM normalizzazione_esclusioni WHERE parola IN (SELECT parola FROM pruned_words)
+                                        OR sostituita_da IN (SELECT parola FROM pruned_words)''')
+                if 'normalizzata' in tables:
+                    self.con.execute('DELETE FROM normalizzata WHERE parola IN (SELECT parola FROM pruned_words)')
+                self.con.execute('DELETE FROM parole WHERE parola IN (SELECT parola FROM pruned_words)')
+                self.con.execute("UPDATE meta SET value='da_aggiornare' WHERE name='normalizzazione_stato'")
+            for source_id in removed:
+                self.con.execute('DELETE FROM inventory_http_cache WHERE source_key=?', (source_id,))
+                self.con.execute('DELETE FROM inventory_snapshots WHERE source_key=?', (source_id,))
+                self.con.execute('DELETE FROM meta WHERE name=?', ('head:'+source_id,))
+                self.con.execute('DELETE FROM fonti WHERE id=?', (source_id,))
+            report = {'removed_sources': removed, 'refiltered_sources': refiltered, 'refilter_skipped_no_cache': skipped,
+                      'attestations_removed': attestations, 'words_removed': orphans}
+            if removed or dropped:
+                self.con.execute("INSERT OR REPLACE INTO meta VALUES ('fonti_potatura',?)",
+                                 (json.dumps({**report, 'at_utc': now()}, ensure_ascii=False),))
+            if self.con.execute('PRAGMA foreign_key_check').fetchone():
+                raise ValueError('Riferimenti non validi dopo la potatura delle fonti')
+            self.con.execute('COMMIT')
+        except BaseException:
+            self.con.execute('ROLLBACK')
+            raise
+        return {**report, **self.counts()}
+
     def seed_from(self, source):
         """Copia il lessico già acquisito; non copia decisioni né filtri editoriali."""
         source = Path(source).resolve()

@@ -130,14 +130,36 @@ Per applicare soltanto la pulizia locale, senza scaricare le fonti:
 ```
 
 Una modifica della raccolta marca `normalizzata` come da aggiornare. Eseguire poi
-**ZeroCade : Normalizzare parole RAW** per ricostruirla con i criteri di genere e
-numero. Questa pulizia non è una valutazione editoriale e non applica soglie Zipf.
+**ZeroCade : Normalizzare parole RAW** per ricostruirla tenendo i lemmi e scartando
+le forme flesse. Questa pulizia non è una valutazione editoriale e non applica soglie Zipf.
 
 ## Normalizzazione delle forme delle parole
 
-Regola scelta il **16 novembre 2026**. Il RAW 2.0 conserva tutte le forme originali
-nella tabella `parole`. La normalizzazione popola la seconda tabella
-**`normalizzata`**, senza cancellare righe da `parole` o approvare associazioni.
+Regola scelta il **16 novembre 2026** e aggiornata il **17 novembre 2026**: le forme
+flesse si scartano e si tengono solo i relativi lemmi (politica `canonical-lemma-2.2`).
+Il RAW 2.0 conserva tutte le forme originali nella tabella `parole`. La normalizzazione
+popola la seconda tabella **`normalizzata`**, senza cancellare righe da `parole` o
+approvare associazioni.
+
+| Forma | Si tiene | Esempi |
+|---|---|---|
+| Plurale, femminile o altra flessione di un nome o aggettivo | il lemma attestato, anche se meno frequente | `stoviglie` → `stoviglia`, `uova` → `uovo`, `case` → `casa` |
+| Femminile con un maschile equivalente | il maschile | `ragazza` → `ragazzo` |
+| Forma verbale coniugata, participio, gerundio | l'infinito (se è nella raccolta) | `mangiavo` → `mangiare` |
+| Comparativo e superlativo | restano famiglie distinte, rappresentate dal maschile singolare | `migliori` → `migliore` |
+
+Restano, in modo conservativo: le forme che hanno anche un'altra lettura (`bella`
+è anche un nome), le varianti senza genere o numero attestati (grafie alternative),
+le forme il cui lemma non è nella raccolta (`occhiali` resterebbe se `occhiale` mancasse)
+e le categorie diverse da nomi, aggettivi e verbi (pronomi come `tutti`). Una sostituta
+non è mai a sua volta esclusa: nel dubbio la parola resta.
+
+Risultato del 17/11/2026: 2.519.378 parole, 1.355.976 tenute, 1.163.402 escluse
+(1.045.746 forme verbali, 64.972 forme flesse di nomi e aggettivi, 45.500 femminili
+con maschile, 7.184 forme di comparativo o superlativo).
+
+Le sezioni Genere e Numero qui sotto restano come storia della regola del 16/11/2026:
+la scelta del numero per frequenza è **sostituita** dal lemma.
 
 ### Genere
 
@@ -154,7 +176,7 @@ nella tabella `parole`. La normalizzazione popola la seconda tabella
   certifica l'assenza di un equivalente: la voce resta nel RAW per la revisione
   lessicale/semantica. Questo passaggio non la approva automaticamente per il gioco.
 
-### Numero
+### Numero (regola del 16/11/2026, sostituita dal lemma il 17/11/2026)
 
 - Preferire il plurale soltanto se è più comune del singolare corrispondente.
 - Il confronto automatico usa la frequenza Zipf italiana di **wordfreq**, sulle

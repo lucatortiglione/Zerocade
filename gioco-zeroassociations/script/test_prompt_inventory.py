@@ -133,6 +133,16 @@ class ParserTests(unittest.TestCase):
         self.assertEqual([r['prompt'] for r in rows],['andarono','andare'])
         self.assertEqual([r['role'] for r in rows],['inflected_form','lemma'])
 
+    def test_treebank_skips_foreign_tokens_and_proper_names(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path=Path(directory)/'fixture.conllu'
+            path.write_text('1\tinsurance\tinsurance\tX\t_\tForeign=Yes\t0\troot\t_\t_\n'
+                            '2\tpeople\tpeople\tNOUN\t_\tForeign=Yes|Number=Plur\t1\tdep\t_\t_\n'
+                            '3\tPotsdamer\tPotsdamer\tPROPN\t_\t_\t1\tdep\t_\t_\n'
+                            '4\tcase\tcasa\tNOUN\t_\tNumber=Plur\t1\tdep\t_\t_\n',encoding='utf-8')
+            rows=list(records(path,source('conllu')))
+        self.assertEqual([r['prompt'] for r in rows],['case','casa'])
+
     def test_sitemap_slug_is_stored_without_guessing_a_lemma(self):
         with tempfile.TemporaryDirectory() as directory:
             path=Path(directory)/'sitemap.jsonl'

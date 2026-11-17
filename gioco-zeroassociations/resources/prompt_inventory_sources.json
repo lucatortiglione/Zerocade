@@ -20,70 +20,6 @@
     "definition_language": "en"
   },
   {
-    "id": "wikipedia-it",
-    "name": "Titoli Wikipedia italiana",
-    "kind": "wiki_titles",
-    "url": "https://dumps.wikimedia.org/itwiki/20261101/itwiki-20261101-all-titles-in-ns0.gz",
-    "cache_file": "itwiki-20261101-all-titles-in-ns0.gz",
-    "license": "Titoli e URL di voci; nessun testo degli articoli importato",
-    "attribution": "Contributori Wikipedia; Wikimedia dumps",
-    "wiki_base": "https://it.wikipedia.org/wiki/"
-  },
-  {
-    "id": "wiktionary-it-titles",
-    "name": "Titoli Wikizionario, tutte le lingue presenti nell'edizione italiana",
-    "kind": "wiki_titles",
-    "url": "https://dumps.wikimedia.org/itwiktionary/20261101/itwiktionary-20261101-all-titles-in-ns0.gz",
-    "license": "Titoli e URL di voci; nessun testo importato",
-    "attribution": "Contributori Wikizionario; Wikimedia dumps",
-    "wiki_base": "https://it.wiktionary.org/wiki/"
-  },
-  {
-    "id": "wikisource-it",
-    "name": "Titoli Wikisource italiana",
-    "kind": "wiki_titles",
-    "url": "https://dumps.wikimedia.org/itwikisource/20261101/itwikisource-20261101-all-titles-in-ns0.gz",
-    "license": "Titoli e URL di voci; nessun testo importato",
-    "attribution": "Contributori Wikisource; Wikimedia dumps",
-    "wiki_base": "https://it.wikisource.org/wiki/"
-  },
-  {
-    "id": "wikiquote-it",
-    "name": "Titoli Wikiquote italiana",
-    "kind": "wiki_titles",
-    "url": "https://dumps.wikimedia.org/itwikiquote/20261101/itwikiquote-20261101-all-titles-in-ns0.gz",
-    "license": "Titoli e URL di voci; nessun testo importato",
-    "attribution": "Contributori Wikiquote; Wikimedia dumps",
-    "wiki_base": "https://it.wikiquote.org/wiki/"
-  },
-  {
-    "id": "wikivoyage-it",
-    "name": "Titoli Wikivoyage italiana",
-    "kind": "wiki_titles",
-    "url": "https://dumps.wikimedia.org/itwikivoyage/20261101/itwikivoyage-20261101-all-titles-in-ns0.gz",
-    "license": "Titoli e URL di voci; nessun testo importato",
-    "attribution": "Contributori Wikivoyage; Wikimedia dumps",
-    "wiki_base": "https://it.wikivoyage.org/wiki/"
-  },
-  {
-    "id": "wikiversity-it",
-    "name": "Titoli Wikiversità italiana",
-    "kind": "wiki_titles",
-    "url": "https://dumps.wikimedia.org/itwikiversity/20261101/itwikiversity-20261101-all-titles-in-ns0.gz",
-    "license": "Titoli e URL di voci; nessun testo importato",
-    "attribution": "Contributori Wikiversità; Wikimedia dumps",
-    "wiki_base": "https://it.wikiversity.org/wiki/"
-  },
-  {
-    "id": "wikinews-it",
-    "name": "Titoli Wikinotizie italiana",
-    "kind": "wiki_titles",
-    "url": "https://dumps.wikimedia.org/itwikinews/20261101/itwikinews-20261101-all-titles-in-ns0.gz",
-    "license": "Titoli e URL di voci; nessun testo importato",
-    "attribution": "Contributori Wikinotizie; Wikimedia dumps",
-    "wiki_base": "https://it.wikinews.org/wiki/"
-  },
-  {
     "id": "libreoffice-it-dictionary",
     "name": "Hunspell, dizionario ortografico italiano LibreOffice",
     "kind": "hunspell",
@@ -123,16 +59,6 @@
     "license_url": "https://raw.githubusercontent.com/napolux/paroleitaliane/2951524b6d5b67986f542937cef16a54af63ff84/LICENSE",
     "attribution": "Francesco Napoletano e contributori; fonti delle singole liste nel README",
     "revision": "2951524b6d5b67986f542937cef16a54af63ff84"
-  },
-  {
-    "id": "wordfreq-it-local",
-    "name": "Frequenze italiane wordfreq 3.1.1 già presenti nel progetto",
-    "kind": "frequency_csv",
-    "local_path": "resources/frequency_ranks_it.csv",
-    "url": "https://github.com/rspeer/wordfreq",
-    "license": "Dati CC BY-SA 4.0 e condizioni delle fonti riportate in wordfreq",
-    "attribution": "Robyn Speer e contributori wordfreq",
-    "revision": "3.1.1"
   },
   {
     "id": "de-mauro-sitemaps",
@@ -216,17 +142,6 @@
     "source_group": "morphit",
     "primary_reference": "https://docs.sslmit.unibo.it/doku.php?id=resources:morph-it",
     "distribution_note": "Il vecchio indirizzo ufficiale non era raggiungibile; il download proviene dal mirror dichiarato, non dal server originale."
-  },
-  {
-    "id": "frequencywords-it-2018",
-    "name": "Frequenze italiane OpenSubtitles 2018, FrequencyWords, lista completa",
-    "kind": "frequency_text",
-    "url": "https://raw.githubusercontent.com/hermitdave/FrequencyWords/525f9b560de45753a5ea01069454e72e9aa541c6/content/2018/it/it_full.txt",
-    "license": "CC BY-SA 4.0 per i dati; MIT soltanto per il codice, come da README",
-    "license_url": "https://raw.githubusercontent.com/hermitdave/FrequencyWords/525f9b560de45753a5ea01069454e72e9aa541c6/README.md",
-    "attribution": "Hermit Dave; corpus OpenSubtitles 2018 distribuito tramite OPUS",
-    "revision": "525f9b560de45753a5ea01069454e72e9aa541c6",
-    "source_group": "opensubtitles-frequencywords"
   },
   {
     "id": "freedict-ita-deu",

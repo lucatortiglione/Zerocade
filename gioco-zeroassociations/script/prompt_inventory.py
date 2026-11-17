@@ -167,6 +167,9 @@ def records(path,source):
                 cells=line.rstrip('\n').split('\t')
                 if len(cells)!=10 or not cells[0].isdigit():continue
                 form,lemma,pos=cells[1:4]
+                # Le citazioni straniere (Foreign=Yes, categoria X) e i nomi propri dei treebank portavano parole
+                # inglesi, tedesche o nomi esteri nella raccolta (17/11/2026): non sono parole italiane.
+                if pos in {'X','PROPN'} or 'Foreign=Yes' in cells[5].split('|'):continue
                 details={'language_claim':'it_treebank_token_not_isolated_language_proof','features':cells[5]}
                 row=observation(form,f'{number}:form','proper_name' if pos=='PROPN' else
                     'lemma' if normalize(form)==normalize(lemma) else 'inflected_form',pos,lemma if lemma!='_' else '',details)

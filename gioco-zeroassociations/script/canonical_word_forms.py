@@ -1,4 +1,8 @@
-"""Scelta delle forme canoniche con genere attestato e frequenza del numero."""
+"""Scelta delle forme canoniche: per nomi e aggettivi si tiene il lemma e si scartano le sue forme flesse (17/11/2026).
+
+Prima (16/11/2026) il numero si sceglieva per frequenza (stoviglie batteva stoviglia): ora la forma flessa lascia
+sempre il posto al lemma attestato. Comparativi e superlativi restano famiglie distinte, rappresentate dal maschile
+singolare. La frequenza decide solo quando il lemma non è nella famiglia."""
 from collections import defaultdict
 from contextlib import closing
 import json
@@ -59,6 +63,7 @@ def select_families(families, ambiguous, frequency):
     proposals = defaultdict(list)
     for key, forms in sorted(families.items()):
         lemma, category = key[:2]
+        degree = key[2] if len(key) > 2 else 'Pos'
         if len(forms) < 2:
             continue
         males = {w for w, d in forms.items() if d['gender'] == {'Masc'}}
@@ -72,33 +77,45 @@ def select_families(families, ambiguous, frequency):
         eligible = set(forms) - feminine_variants
         singular = {w for w in eligible if 'Sing' in forms[w]['number']}
         plural = {w for w in eligible if 'Plur' in forms[w]['number']}
-        # Un lemma attestato senza numero non autorizza a inventarne la flessione.
-        candidates = singular | plural
-        if not candidates:
-            continue
         scores = {w: float(frequency(w)) for w in forms}
-        winner = max(sorted(candidates), key=lambda w: (scores[w], w in singular))
+        # Grado positivo: il lemma della famiglia è il rappresentante e ogni sua forma flessa si scarta.
+        # Un lemma femminile con un maschile equivalente nella famiglia non vince: si preferisce il maschile (16/11/2026).
+        by_lemma = degree == 'Pos' and lemma in forms and lemma not in feminine_variants
+        if by_lemma:
+            winner = lemma
+        else:
+            # Un lemma attestato senza numero non autorizza a inventarne la flessione.
+            candidates = singular | plural
+            if not candidates:
+                continue
+            # Comparativo/superlativo, o lemma assente dalla famiglia: il maschile singolare, poi la frequenza.
+            winner = max(sorted(candidates), key=lambda w: (w in singular, forms[w]['gender'] != {'Fem'}, scores[w]))
         for word in forms:
             if word == winner or word in ambiguous:
                 continue
             feminine = word in feminine_variants
-            same_gender = word in eligible
-            different_number = ((forms[word]['number'] == {'Sing'} and forms[winner]['number'] == {'Plur'})
-                                or (forms[word]['number'] == {'Plur'} and forms[winner]['number'] == {'Sing'}))
-            inferior_plural = (forms[word]['number']==forms[winner]['number']=={'Plur'} and singular
-                               and scores[word]<=max(scores[s] for s in singular))
             if not feminine and winner in ambiguous:
                 continue
-            if not feminine and not (same_gender and (different_number or inferior_plural)):
+            # Solo una forma con genere o numero attestati è una forma flessa: una variante senza tratti
+            # (grafia alternativa, annotazione incompleta) resta per la revisione.
+            if not (forms[word]['gender'] or forms[word]['number']):
                 continue
+            if not by_lemma:
+                same_gender = word in eligible
+                different_number = ((forms[word]['number'] == {'Sing'} and forms[winner]['number'] == {'Plur'})
+                                    or (forms[word]['number'] == {'Plur'} and forms[winner]['number'] == {'Sing'}))
+                same_number = forms[word]['number'] == forms[winner]['number'] and bool(forms[word]['number'])
+                if not feminine and not (same_gender and (different_number or same_number)):
+                    continue
             reason = ('Variante femminile: esiste un equivalente maschile attestato' if feminine
-                      else 'Variante di numero: si preferisce la forma di uso più comune; a parità il singolare')
+                      else 'Forma flessa: si tiene il lemma' if by_lemma
+                      else 'Forma flessa di comparativo o superlativo: si tiene il maschile singolare')
             record = {'canonical': winner, 'lemma': lemma, 'pos': category,
                       'zipf_form': scores[word], 'zipf_canonical': scores[winner],
                       'form_gender':sorted(forms[word]['gender']),'form_number':sorted(forms[word]['number']),
                       'canonical_gender':sorted(forms[winner]['gender']),'canonical_number':sorted(forms[winner]['number']),
                       'sources': sorted(forms[word]['sources'] | forms[winner]['sources']),
-                      'rule': 'feminine_with_masculine' if feminine else 'number_frequency'}
+                      'rule': 'feminine_with_masculine' if feminine else 'inflected_form' if by_lemma else 'degree_form'}
             proposals[word].append((winner, reason, record))
     for word, choices in sorted(proposals.items()):
         if len({v[0] for v in choices}) != 1:
@@ -108,7 +125,7 @@ def select_families(families, ambiguous, frequency):
         if winner in proposals:
             continue
         out[word] = [winner]
-        out.reasons[word] = f"{reason}; si tiene {winner} (Zipf {record['zipf_canonical']:.2f} vs {record['zipf_form']:.2f})"
+        out.reasons[word] = f"{reason}; si tiene {winner} (Zipf {record['zipf_canonical']:.2f}, forma esclusa {record['zipf_form']:.2f})"
         out.evidence[word] = record
     return out
 
@@ -254,7 +271,10 @@ class FamilyEvidence:
     def exclude_verb_forms(self, out):
         """Toglie le parole attestate solo come forme verbali diverse dall'infinito (coniugate, participi, gerundi).
         Una forma attestata anche come nome, aggettivo, avverbio o altro, o come infinito, resta."""
-        verbs = sorted(w for w,m in self.verb_marks.items() if m==1 and w not in out)
+        # Un rappresentante scelto per nomi e aggettivi resta anche se altrove è attestato solo come forma verbale:
+        # escluderlo lascerebbe le sue forme flesse senza sostituta.
+        representatives = {v[0] for v in out.values() if v}
+        verbs = sorted(w for w,m in self.verb_marks.items() if m==1 and w not in out and w not in representatives)
         gone = set(verbs)
         for word in verbs:
             lemmas = sorted(self.verb_lemmas[word])
@@ -262,6 +282,17 @@ class FamilyEvidence:
             out[word] = replacement[:1]
             out.reasons[word] = "Forma verbale diversa dall'infinito" +(f'; infinito: {replacement[0]}' if replacement else '')
             out.evidence[word] = {'rule':'verb_form','lemmas':lemmas,'pos':'VERB'}
+        # Nessuna sostituta può essere a sua volta esclusa (normalizzazione_esclusioni.sostituita_da -> normalizzata):
+        # nel dubbio la parola resta.
+        changed = True
+        while changed:
+            changed = False
+            for word, target in list(out.items()):
+                if target and target[0] in out:
+                    del out[word]
+                    out.reasons.pop(word, None)
+                    out.evidence.pop(word, None)
+                    changed = True
         return out
 
 

@@ -1,0 +1,108 @@
+{
+  "task": "ZeroCade : Generazione parole segrete",
+  "completed_at_utc": "2026-11-17T18:28:43.488717+00:00",
+  "database": "C:\\Progetti\\Zerocade\\database\\parole_ita_raw_2.0.sqlite3",
+  "profile": "original",
+  "dimensions": 300,
+  "normalization_source_sha256": "7a178ae6e55d4b1af0266654765b583d3d5fa9e258fcbeb10d1d153f39b41c05",
+  "vectors_sha256": "7e586c7ddcfe4f19c833c657b1ee95c30ed13c8a4c65a253793d6e76c5f58dea",
+  "guess_list": 93928,
+  "normalized_single_words": 1337524,
+  "thresholds": {
+    "ordinary": {
+      "density": 0.45,
+      "bridges_zipf": 4.0,
+      "bridges": 10
+    },
+    "special": {
+      "density": 0.48,
+      "bridges_zipf": 3.8,
+      "bridges": 15
+    }
+  },
+  "candidates": 8912,
+  "ordinary_pool": 3099,
+  "special_pool": 3,
+  "current_secrets": 9513,
+  "current_conforming": 2694,
+  "current_kept_with_exception": 6819,
+  "added": 405,
+  "secrets_total": 9918,
+  "rejected": {
+    "densità o ponti insufficienti": 5813
+  },
+  "special_words": [
+    "monile",
+    "probità",
+    "suppellettile"
+  ],
+  "added_examples": [
+    "sessantasei",
+    "cinquantuno",
+    "ventitrè",
+    "ricercatezza",
+    "demoralizzato",
+    "limitatezza",
+    "limpidezza",
+    "mantella",
+    "gradevolezza",
+    "solerzia",
+    "saldezza",
+    "trentacinquesimo",
+    "ventinovesimo",
+    "irrequietezza",
+    "terrazzino",
+    "schematico",
+    "incongruente",
+    "ritrosia",
+    "economizzare",
+    "concretizzazione",
+    "passionalità",
+    "snellezza",
+    "ventiseiesimo",
+    "macchinoso",
+    "trentunesimo",
+    "decelerare",
+    "ingegnarsi",
+    "deperimento",
+    "insperato",
+    "bimbetta",
+    "abiezione",
+    "puntualizzazione",
+    "relativizzare",
+    "bramosia",
+    "seccante",
+    "interrelazione",
+    "musicologo",
+    "malavitoso",
+    "tristo",
+    "nonnino"
+  ],
+  "sources": {
+    "nvdb": {
+      "url": "https://raw.githubusercontent.com/pettarin/nvdb/b5fb7f8d916a426934bcd20adc84bf97ab5899f6/20170108.nvdb.pdf",
+      "sha256": "eef743fbc8a71d5588f6aa746501e7b5bfba624c5ce4c0c01a6f6bdd83ed5d44",
+      "classes": {
+        "FO": 1890,
+        "AU": 2769,
+        "AD": 2085
+      },
+      "method": "fonti PDF: grassetto FO, corsivo AD, tondo AU; omografi FO prioritari"
+    },
+    "morphit": {
+      "snapshot": "d64de8e0979b9fe5374b3faf40370fc1787532ad7a0d7e70a0d6f8227df9d31e",
+      "sha256": "7375216351ee59cee4326b455503f3a6c4e9542cd63ecb86ff5cd58ca5c8e800"
+    },
+    "exclusions_sha256": "11be2e44985a532a6a3ae0ce160cb3c76afcbeaddbccafc343ca00fde3072125",
+    "reviews": 10
+  },
+  "packages": {
+    "numpy": "2.5.4",
+    "wordfreq": "3.1.1"
+  },
+  "script_sha256": "978d93f204e34b40a2a090474e6c05d089b012db3c4ec1ff8ef34c23c1a25455",
+  "published": false,
+  "plan_only": false,
+  "note": "Specifica: ARCHITETTURA_VETTORI_SEMANTICI.md. Non pubblica in giochi.sqlite3 e non attiva i round speciali.",
+  "backup": "C:\\Progetti\\Zerocade\\gioco-zeroassociations\\database-backups\\parole_raw_2.0-segrete-20261117T182843511808Z.sqlite3"
+}

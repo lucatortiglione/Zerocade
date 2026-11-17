@@ -1,18 +1,20 @@
 {
-  "policy": "canonical-gender-number-2.0",
+  "policy": "canonical-lemma-2.2",
   "database": "C:\\Progetti\\Zerocade\\database\\parole_ita_raw_2.0.sqlite3",
   "source_table": "parole",
   "target_table": "normalizzata",
-  "source_words": 2539592,
+  "source_words": 2519378,
   "single_words": 2500926,
-  "excluded": 111359,
-  "normalized_words": 2428233,
-  "source_words_sha256": "7ea4e69841cb4af4a1a429190716749166436ac6a0dd45aa2781407dfca17062",
+  "excluded": 1163402,
+  "normalized_words": 1355976,
+  "source_words_sha256": "7a178ae6e55d4b1af0266654765b583d3d5fa9e258fcbeb10d1d153f39b41c05",
   "wordfreq_version": "3.1.1",
   "zipf_minimum_filter": null,
   "rules": {
-    "feminine_with_masculine": 46672,
-    "number_frequency": 64687
+    "feminine_with_masculine": 45500,
+    "inflected_form": 64972,
+    "degree_form": 7184,
+    "verb_form": 1045746
   },
   "sources": [
     {
@@ -183,7 +185,7 @@
       ],
       "rule": "feminine_with_masculine",
       "word": "aaleniana",
-      "reason": "Variante femminile: esiste un equivalente maschile attestato; si tiene aaleniano (Zipf 0.00 vs 0.00)"
+      "reason": "Variante femminile: esiste un equivalente maschile attestato; si tiene aaleniano (Zipf 0.00, forma esclusa 0.00)"
     },
     {
       "canonical": "aaleniano",
@@ -206,7 +208,7 @@
       ],
       "rule": "feminine_with_masculine",
       "word": "aaleniane",
-      "reason": "Variante femminile: esiste un equivalente maschile attestato; si tiene aaleniano (Zipf 0.00 vs 0.00)"
+      "reason": "Variante femminile: esiste un equivalente maschile attestato; si tiene aaleniano (Zipf 0.00, forma esclusa 0.00)"
     },
     {
       "canonical": "aaleniano",
@@ -227,9 +229,9 @@
       "sources": [
         "kaikki-enwiktionary-it"
       ],
-      "rule": "number_frequency",
+      "rule": "inflected_form",
       "word": "aaleniani",
-      "reason": "Variante di numero: si preferisce la forma di uso più comune; a parità il singolare; si tiene aaleniano (Zipf 0.00 vs 0.00)"
+      "reason": "Forma flessa: si tiene il lemma; si tiene aaleniano (Zipf 0.00, forma esclusa 0.00)"
     },
     {
       "canonical": "abaceto",
@@ -255,9 +257,9 @@
         "kaikki-eswiktionary-it",
         "kaikki-itwiktionary"
       ],
-      "rule": "number_frequency",
+      "rule": "inflected_form",
       "word": "abaceti",
-      "reason": "Variante di numero: si preferisce la forma di uso più comune; a parità il singolare; si tiene abaceto (Zipf 0.00 vs 0.00)"
+      "reason": "Forma flessa: si tiene il lemma; si tiene abaceto (Zipf 0.00, forma esclusa 0.00)"
     },
     {
       "canonical": "abaca",
@@ -284,9 +286,9 @@
         "kaikki-eswiktionary-it",
         "kaikki-itwiktionary"
       ],
-      "rule": "number_frequency",
+      "rule": "inflected_form",
       "word": "abache",
-      "reason": "Variante di numero: si preferisce la forma di uso più comune; a parità il singolare; si tiene abaca (Zipf 1.20 vs 0.00)"
+      "reason": "Forma flessa: si tiene il lemma; si tiene abaca (Zipf 1.20, forma esclusa 0.00)"
     },
     {
       "canonical": "abaco",
@@ -315,9 +317,9 @@
         "kaikki-itwiktionary",
         "ud-isdt-train"
       ],
-      "rule": "number_frequency",
+      "rule": "inflected_form",
       "word": "abachi",
-      "reason": "Variante di numero: si preferisce la forma di uso più comune; a parità il singolare; si tiene abaco (Zipf 2.55 vs 1.42)"
+      "reason": "Forma flessa: si tiene il lemma; si tiene abaco (Zipf 2.55, forma esclusa 1.42)"
     },
     {
       "canonical": "abachista",
@@ -344,9 +346,9 @@
         "kaikki-eswiktionary-it",
         "kaikki-itwiktionary"
       ],
-      "rule": "number_frequency",
+      "rule": "inflected_form",
       "word": "abachiste",
-      "reason": "Variante di numero: si preferisce la forma di uso più comune; a parità il singolare; si tiene abachista (Zipf 0.00 vs 0.00)"
+      "reason": "Forma flessa: si tiene il lemma; si tiene abachista (Zipf 0.00, forma esclusa 0.00)"
     },
     {
       "canonical": "abachista",
@@ -374,9 +376,34 @@
         "kaikki-eswiktionary-it",
         "kaikki-itwiktionary"
       ],
-      "rule": "number_frequency",
+      "rule": "inflected_form",
       "word": "abachisti",
-      "reason": "Variante di numero: si preferisce la forma di uso più comune; a parità il singolare; si tiene abachista (Zipf 0.00 vs 0.00)"
+      "reason": "Forma flessa: si tiene il lemma; si tiene abachista (Zipf 0.00, forma esclusa 0.00)"
+    },
+    {
+      "canonical": "abachistico",
+      "lemma": "abachistico",
+      "pos": "ADJ",
+      "zipf_form": 0.0,
+      "zipf_canonical": 0.0,
+      "form_gender": [
+        "Fem"
+      ],
+      "form_number": [
+        "Sing"
+      ],
+      "canonical_gender": [
+        "Fem"
+      ],
+      "canonical_number": [
+        "Sing"
+      ],
+      "sources": [
+        "ud-isdt-train"
+      ],
+      "rule": "inflected_form",
+      "word": "abachistica",
+      "reason": "Forma flessa: si tiene il lemma; si tiene abachistico (Zipf 0.00, forma esclusa 0.00)"
     },
     {
       "canonical": "abacista",
@@ -400,44 +427,16 @@
         "glaffit",
         "kaikki-itwiktionary"
       ],
-      "rule": "number_frequency",
+      "rule": "inflected_form",
       "word": "abacisti",
-      "reason": "Variante di numero: si preferisce la forma di uso più comune; a parità il singolare; si tiene abacista (Zipf 0.00 vs 0.00)"
+      "reason": "Forma flessa: si tiene il lemma; si tiene abacista (Zipf 0.00, forma esclusa 0.00)"
     },
     {
-      "canonical": "abadi",
+      "canonical": "abada",
       "lemma": "abada",
       "pos": "NOUN",
       "zipf_form": 0.0,
-      "zipf_canonical": 1.99,
-      "form_gender": [
-        "Fem",
-        "Masc"
-      ],
-      "form_number": [
-        "Sing"
-      ],
-      "canonical_gender": [
-        "Masc"
-      ],
-      "canonical_number": [
-        "Plur"
-      ],
-      "sources": [
-        "glaffit",
-        "kaikki-enwiktionary-it",
-        "kaikki-itwiktionary"
-      ],
-      "rule": "number_frequency",
-      "word": "abada",
-      "reason": "Variante di numero: si preferisce la forma di uso più comune; a parità il singolare; si tiene abadi (Zipf 1.99 vs 0.00)"
-    },
-    {
-      "canonical": "abadi",
-      "lemma": "abada",
-      "pos": "NOUN",
-      "zipf_form": 0.0,
-      "zipf_canonical": 1.99,
+      "zipf_canonical": 0.0,
       "form_gender": [
         "Fem"
       ],
@@ -445,18 +444,20 @@
         "Plur"
       ],
       "canonical_gender": [
+        "Fem",
         "Masc"
       ],
       "canonical_number": [
-        "Plur"
+        "Sing"
       ],
       "sources": [
         "glaffit",
-        "kaikki-enwiktionary-it"
+        "kaikki-enwiktionary-it",
+        "kaikki-itwiktionary"
       ],
       "rule": "feminine_with_masculine",
       "word": "abade",
-      "reason": "Variante femminile: esiste un equivalente maschile attestato; si tiene abadi (Zipf 1.99 vs 0.00)"
+      "reason": "Variante femminile: esiste un equivalente maschile attestato; si tiene abada (Zipf 0.00, forma esclusa 0.00)"
     },
     {
       "canonical": "abadeco",
@@ -479,9 +480,9 @@
       "sources": [
         "kaikki-frwiktionary-it"
       ],
-      "rule": "number_frequency",
+      "rule": "inflected_form",
       "word": "abadeci",
-      "reason": "Variante di numero: si preferisce la forma di uso più comune; a parità il singolare; si tiene abadeco (Zipf 0.00 vs 0.00)"
+      "reason": "Forma flessa: si tiene il lemma; si tiene abadeco (Zipf 0.00, forma esclusa 0.00)"
     },
     {
       "canonical": "abate",
@@ -515,7 +516,35 @@
       ],
       "rule": "feminine_with_masculine",
       "word": "abadessa",
-      "reason": "Variante femminile: esiste un equivalente maschile attestato; si tiene abate (Zipf 3.96 vs 1.10)"
+      "reason": "Variante femminile: esiste un equivalente maschile attestato; si tiene abate (Zipf 3.96, forma esclusa 1.10)"
+    },
+    {
+      "canonical": "abada",
+      "lemma": "abada",
+      "pos": "NOUN",
+      "zipf_form": 1.99,
+      "zipf_canonical": 0.0,
+      "form_gender": [
+        "Masc"
+      ],
+      "form_number": [
+        "Plur"
+      ],
+      "canonical_gender": [
+        "Fem",
+        "Masc"
+      ],
+      "canonical_number": [
+        "Sing"
+      ],
+      "sources": [
+        "glaffit",
+        "kaikki-enwiktionary-it",
+        "kaikki-itwiktionary"
+      ],
+      "rule": "inflected_form",
+      "word": "abadi",
+      "reason": "Forma flessa: si tiene il lemma; si tiene abada (Zipf 0.00, forma esclusa 1.99)"
     },
     {
       "canonical": "abadia",
@@ -541,9 +570,9 @@
         "kaikki-frwiktionary-it",
         "kaikki-itwiktionary"
       ],
-      "rule": "number_frequency",
+      "rule": "inflected_form",
       "word": "abadie",
-      "reason": "Variante di numero: si preferisce la forma di uso più comune; a parità il singolare; si tiene abadia (Zipf 1.52 vs 1.44)"
+      "reason": "Forma flessa: si tiene il lemma; si tiene abadia (Zipf 1.52, forma esclusa 1.44)"
     },
     {
       "canonical": "abadita",
@@ -570,7 +599,7 @@
       ],
       "rule": "feminine_with_masculine",
       "word": "abadite",
-      "reason": "Variante femminile: esiste un equivalente maschile attestato; si tiene abadita (Zipf 0.00 vs 0.00)"
+      "reason": "Variante femminile: esiste un equivalente maschile attestato; si tiene abadita (Zipf 0.00, forma esclusa 0.00)"
     },
     {
       "canonical": "abadita",
@@ -595,9 +624,9 @@
         "kaikki-enwiktionary-it",
         "kaikki-itwiktionary"
       ],
-      "rule": "number_frequency",
+      "rule": "inflected_form",
       "word": "abaditi",
-      "reason": "Variante di numero: si preferisce la forma di uso più comune; a parità il singolare; si tiene abadita (Zipf 0.00 vs 0.00)"
+      "reason": "Forma flessa: si tiene il lemma; si tiene abadita (Zipf 0.00, forma esclusa 0.00)"
     },
     {
       "canonical": "abalienazione",
@@ -622,9 +651,9 @@
         "kaikki-frwiktionary-it",
         "kaikki-itwiktionary"
       ],
-      "rule": "number_frequency",
+      "rule": "inflected_form",
       "word": "abalienazioni",
-      "reason": "Variante di numero: si preferisce la forma di uso più comune; a parità il singolare; si tiene abalienazione (Zipf 0.00 vs 0.00)"
+      "reason": "Forma flessa: si tiene il lemma; si tiene abalienazione (Zipf 0.00, forma esclusa 0.00)"
     },
     {
       "canonical": "abamectina",
@@ -647,9 +676,9 @@
       "sources": [
         "kaikki-frwiktionary-it"
       ],
-      "rule": "number_frequency",
+      "rule": "inflected_form",
       "word": "abamectine",
-      "reason": "Variante di numero: si preferisce la forma di uso più comune; a parità il singolare; si tiene abamectina (Zipf 0.00 vs 0.00)"
+      "reason": "Forma flessa: si tiene il lemma; si tiene abamectina (Zipf 0.00, forma esclusa 0.00)"
     },
     {
       "canonical": "abapicale",
@@ -675,37 +704,12 @@
         "kaikki-enwiktionary-it",
         "kaikki-itwiktionary"
       ],
-      "rule": "number_frequency",
+      "rule": "inflected_form",
       "word": "abapicali",
-      "reason": "Variante di numero: si preferisce la forma di uso più comune; a parità il singolare; si tiene abapicale (Zipf 0.00 vs 0.00)"
-    },
-    {
-      "canonical": "abaptista",
-      "lemma": "abaptista",
-      "pos": "NOUN",
-      "zipf_form": 0.0,
-      "zipf_canonical": 0.0,
-      "form_gender": [
-        "Masc"
-      ],
-      "form_number": [
-        "Plur"
-      ],
-      "canonical_gender": [
-        "Masc"
-      ],
-      "canonical_number": [
-        "Sing"
-      ],
-      "sources": [
-        "kaikki-enwiktionary-it"
-      ],
-      "rule": "number_frequency",
-      "word": "abaptisti",
-      "reason": "Variante di numero: si preferisce la forma di uso più comune; a parità il singolare; si tiene abaptista (Zipf 0.00 vs 0.00)"
+      "reason": "Forma flessa: si tiene il lemma; si tiene abapicale (Zipf 0.00, forma esclusa 0.00)"
     }
   ],
-  "completed_at_utc": "2026-11-16T21:26:16.889353+00:00",
+  "completed_at_utc": "2026-11-17T18:27:39.974725+00:00",
   "published": true,
-  "backup": "C:\\Progetti\\Zerocade\\gioco-zeroassociations\\database-backups\\normalizzata-20261116T212616889383Z.sqlite3"
+  "backup": "C:\\Progetti\\Zerocade\\gioco-zeroassociations\\database-backups\\normalizzata-20261117T182739974753Z.sqlite3"
 }
