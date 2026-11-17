@@ -4,13 +4,13 @@
 // The public state never holds a target that is not found, its path or its avatar cell (§10.3): only the admin state has them.
 // Nothing here awaits: every write is a short synchronous transaction.
 import {
-  WORDHUNT_RULES, WORDHUNT_SIZES, WORDHUNT_SIZE_DEFAULT, isWordHuntSize, wordHuntPoints,
+  WORDHUNT_RULES, WORDHUNT_SIZES, wordHuntDirections, WORDHUNT_SIZE_DEFAULT, isWordHuntSize, wordHuntPoints,
   type GameSettings, type Viewer, type WordHuntAdminState, type WordHuntAdminTarget, type WordHuntClaim, type WordHuntCommand, type WordHuntEnd,
   type WordHuntErrorCode, type WordHuntLeader, type WordHuntMode, type WordHuntPhase, type WordHuntPublicState, type WordHuntReply, type WordHuntWinner,
 } from '@zerocade/shared'
 import { RoomParticipants } from './gameRooms.js'
 import {
-  DEFAULT_DIRECTIONS, WordHuntGenerationError, cellName, fixtureBoard, generateBoard, nextColor, normalizeGuess,
+  WordHuntGenerationError, cellName, fixtureBoard, generateBoard, nextColor, normalizeGuess,
   type Board, type BoardTarget, type FixtureFile,
 } from './wordhunt-domain.js'
 import type { WordHuntStore } from './wordhunt-db.js'
@@ -284,7 +284,7 @@ export class WordHuntRoom {
         board = generateBoard(words, {
           seed: command.seed ?? this.deps.newSeed(),
           targetCount: targets, rows: size.rows, cols: size.cols,
-          minWordLength: WORDHUNT_RULES.minWordLength, directions: DEFAULT_DIRECTIONS,
+          minWordLength: WORDHUNT_RULES.minWordLength, directions: wordHuntDirections(settings.wordhuntReverse === true, settings.wordhuntDiagonal === true),
           // The Tabellone Grande: with many words they are kept short so that all of them, and the avatars, fit.
           maxWordLength: targets > WORDHUNT_RULES.denseTargets ? WORDHUNT_RULES.denseMaxWordLength : WORDHUNT_RULES.maxWordLength,
         })

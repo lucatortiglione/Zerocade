@@ -3,7 +3,7 @@ import { readFileSync } from 'node:fs'
 import { test } from 'node:test'
 import Database from 'better-sqlite3'
 import {
-  WORDHUNT_RULES, WORDHUNT_SIZES, isWordHuntSize, wordHuntCanvas, wordHuntPoints, type GameSettings, type Viewer, type WordHuntAdminState, type WordHuntCommand, type WordHuntPublicState,
+  WORDHUNT_RULES, WORDHUNT_SIZES, WORDHUNT_DIRECTIONS, wordHuntDirections, isWordHuntSize, wordHuntCanvas, wordHuntPoints, type GameSettings, type Viewer, type WordHuntAdminState, type WordHuntCommand, type WordHuntPublicState,
 } from '../packages/shared/src/index.ts'
 import { WordHuntRoom, type WordHuntDeps } from '../apps/server/src/wordhunt.ts'
 import { WordHuntStore } from '../apps/server/src/wordhunt-db.ts'
@@ -615,4 +615,62 @@ test('sizes: the surface of the board grows with its cells, and is 570 x 769 for
   assert.deepEqual(wordHuntCanvas(15, 20), { width: 570, height: 769 })
   assert.deepEqual(wordHuntCanvas(13, 15), { width: 498, height: 589 })
   assert.ok(isWordHuntSize('standard') && !isWordHuntSize('huge') && !isWordHuntSize('toString'))
+})
+
+// ---- Words backwards and on the diagonals ----
+
+test('directions: none, backwards, diagonal, both (with both, the diagonals can be backwards too)', () => {
+  assert.deepEqual(wordHuntDirections(false, false), ['RIGHT', 'DOWN'])
+  assert.deepEqual(wordHuntDirections(true, false).sort(), ['DOWN', 'LEFT', 'RIGHT', 'UP'])
+  assert.deepEqual(wordHuntDirections(false, true).sort(), ['DOWN', 'DOWN_LEFT', 'DOWN_RIGHT', 'RIGHT'])
+  assert.equal(wordHuntDirections(true, true).length, 8)
+  assert.equal(new Set(wordHuntDirections(true, true)).size, 8)
+})
+
+test('directions: the room draws only the directions the two settings allow, and every board stays sound', () => {
+  const cases: [boolean, boolean, string[]][] = [
+    [false, false, ['RIGHT', 'DOWN']],
+    [true, false, ['RIGHT', 'DOWN', 'LEFT', 'UP']],
+    [false, true, ['RIGHT', 'DOWN', 'DOWN_RIGHT', 'DOWN_LEFT']],
+    [true, true, ['RIGHT', 'DOWN', 'LEFT', 'UP', 'DOWN_RIGHT', 'DOWN_LEFT', 'UP_LEFT', 'UP_RIGHT']],
+  ]
+  for (const [reverse, diagonal, allowed] of cases) {
+    const used = new Set<string>()
+    for (let i = 0; i < 12; i++) {
+      const h = setup({ dictionary: DICTIONARY_BIG, settings: { wordhuntCountdown: 0, wordhuntReverse: reverse, wordhuntDiagonal: diagonal } })
+      h.begin('generated', { seed: `d${i}` })
+      for (const t of h.admin().targets) used.add(t.direction)
+      assert.equal(h.admin().targets.length, 24)
+    }
+    assert.ok([...used].every((d) => allowed.includes(d)), `${reverse}/${diagonal}: ${[...used]}`)
+    assert.equal(used.size, allowed.length, `${reverse}/${diagonal}: every allowed direction is used (${[...used]})`) // 12 boards of 24 words
+  }
+})
+
+test('directions: a word on a diagonal, backwards, is found by its normal spelling and its avatar sits on the diagonal', () => {
+  let board
+  for (let i = 0; i < 200 && !board; i++) {
+    const b = generateBoard(DICTIONARY_BIG, { seed: `x${i}`, targetCount: 24, minWordLength: 5, maxWordLength: 8, directions: wordHuntDirections(true, true) })
+    if (b.targets.some((t) => t.direction === 'UP_LEFT' || t.direction === 'UP_RIGHT')) board = b
+  }
+  assert.ok(board)
+  assert.deepEqual(auditBoard(board), [])
+  const t = board.targets.find((x) => x.direction === 'UP_LEFT' || x.direction === 'UP_RIGHT')!
+  const [dr, dc] = WORDHUNT_DIRECTIONS[t.direction]
+  const first = t.cells[0]!
+  const last = t.cells.at(-1)!
+  const before = { row: first.row - dr, col: first.col - dc }
+  const after = { row: last.row + dr, col: last.col + dc }
+  assert.ok((t.anchor.row === before.row && t.anchor.col === before.col) || (t.anchor.row === after.row && t.anchor.col === after.col))
+  assert.equal(t.cells.map((c) => board.letters[c.row]![c.col]).join(''), t.word) // read along its direction, it is the word itself
+})
+
+test('directions: every size fills with every option on (a synthetic dictionary)', () => {
+  const dictionary = DICTIONARY_BIG
+  for (const size of Object.values(WORDHUNT_SIZES)) {
+    for (let i = 0; i < 8; i++) {
+      const board = generateBoard(dictionary, { seed: `r${size.words}-${i}`, targetCount: size.words, minWordLength: 5, maxWordLength: 8, directions: wordHuntDirections(true, true), rows: size.rows, cols: size.cols })
+      assert.deepEqual(auditBoard(board), [])
+    }
+  }
 })

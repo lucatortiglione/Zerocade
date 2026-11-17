@@ -102,6 +102,15 @@ export const WORDHUNT_DIRECTIONS: Readonly<Record<WordHuntDirection, readonly [n
   DOWN_RIGHT: [1, 1], DOWN_LEFT: [1, -1], UP_RIGHT: [-1, 1], UP_LEFT: [-1, -1],
 })
 
+// The directions a word may take (spec §3.3). Without options: left to right and top to bottom. "Parole al contrario" adds the
+// opposite of each; "Parole in diagonale" adds the diagonals. With both, the diagonals too can be written backwards. A direction is
+// "forward" when it reads downwards, or rightwards on a row (the order of the text): RIGHT, DOWN and the two diagonals that go down.
+export const wordHuntDirections = (reverse: boolean, diagonal: boolean): WordHuntDirection[] => {
+  const forward: WordHuntDirection[] = ['RIGHT', 'DOWN', ...(diagonal ? (['DOWN_RIGHT', 'DOWN_LEFT'] as const) : [])]
+  const backward: WordHuntDirection[] = ['LEFT', 'UP', ...(diagonal ? (['UP_LEFT', 'UP_RIGHT'] as const) : [])]
+  return reverse ? [...forward, ...backward] : forward
+}
+
 export type WordHuntMode = 'fixture' | 'generated'
 // §8.1 without the states the room never rests in: CREATED and READY are one, ARCHIVED is the end of the stored record.
 export type WordHuntPhase = 'idle' | 'ready' | 'countdown' | 'active' | 'finished'
