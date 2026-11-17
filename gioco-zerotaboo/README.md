@@ -2,7 +2,7 @@
 
 Taboo per la diretta: lo streamer descrive la carta senza dire le parole vietate, la chat prova a indovinare e **il primo messaggio valido arrivato al server** vince. Cinque round da 90 secondi contro una soglia di squadra (25 per impostazione predefinita).
 
-- Regolamento e mazzo: [ZEROTABOO.md](ZEROTABOO.md) (v3.0, 62 carte).
+- Regolamento e mazzo: [ZEROTABOO.md](ZEROTABOO.md) (v3.2: 144 carte in 12 categorie, 59 standard e 85 in playtest).
 - Guida per chi scrive il codice: [GUIDA_CODICE_ZEROTABOO.md](GUIDA_CODICE_ZEROTABOO.md).
 - Stato del lavoro e decisioni dell'organizzatore: [TODO.md](TODO.md).
 
@@ -51,7 +51,7 @@ python -I gioco-zerotaboo/script/mazzo.py verify     # confronta il DB con la fo
 python -I gioco-zerotaboo/script/mazzo.py export     # CSV con BOM
 ```
 
-Gli **avvisi editoriali si mostrano e non si correggono da soli**: D03 e D06 e F07 hanno un Taboo con la stessa radice del bersaglio; D09 non ha alias; E08 ha un alias nella nota che non è nella tabella degli alias. Le 16 carte candidate G–J di §12.1 non si caricano finché la Fase 1 non è completa.
+Gli **avvisi editoriali si mostrano e non si correggono da soli**. I cinque avvisi della v3.0 (D03, D06, F07 con un Taboo della stessa radice del bersaglio; D09 senza alias; E08 con un alias solo nella nota) sono stati risolti nel regolamento v3.1. Finché la fonte non è rigenerata (`parse`, `import`: TODO, fase 8.1) il DB contiene ancora la v3.0 a 62 carte. Le carte in playtest (categorie G–L, carte aggiunte e riscritte) sono in §8. Nel round 3 una categoria è votabile solo con almeno 6 carte disponibili, e il voto ne mostra al massimo 6.
 
 ## Telemetria e calibrazione
 
@@ -78,4 +78,5 @@ I test `taboo-socket` e `taboo-bridge` avviano un server vero su una porta liber
 - **Non verificato a schermo**: la resa dell'overlay e della regia non è stata vista in un browser, in OBS o in TikTok LIVE Studio; compilano e sono collegati al server, ma l'aspetto non è stato controllato.
 - Fuori ambito (v1): ruota delle penitenze, esibizioni (Taboo invertito, Mimo Proibito, No Sostantivi), Speedrun, Una Parola Sola, progressione stagionale, premi simbolici nella scena (le funzioni di calcolo esistono in `taboo-scoring.ts`).
 - La rettifica sposta la carta contestata a «Taboo» e ricalcola il round; il punteggio di squadra è corretto, ma una serie già mostrata non viene ricostruita a schermo.
-- Il testo del regolamento (§3.2, §12.2) vuole i Taboo nascosti al pubblico; per decisione dell'organizzatore (D26) l'overlay li **mostra**. Bersaglio e alias restano nascosti fino alla chiusura.
+- Dal regolamento v3.1 l'overlay **mostra** i Taboo al pubblico (D26, D27); bersaglio e alias restano nascosti fino alla chiusura.
+- Le migliorie decise il 17/11/2026 (D27–D46) sono nei documenti ma **non ancora nel codice**: vedi [TODO.md](TODO.md), fase 8. Le sezioni sopra descrivono il comportamento attuale.
