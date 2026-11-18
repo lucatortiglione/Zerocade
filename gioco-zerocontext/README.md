@@ -293,6 +293,15 @@ Senza `--publish` si genera soltanto il candidato. Fonti, hash, conteggi, densit
 registrati in `report.json` e `targets.json`; `data/publication.json` identifica la pubblicazione.
 L'ambiente è preparato dal task dipendente, con `requirements-vectors.txt`, in un ambiente dedicato.
 
+## Task «ZeroContext : Copia segrete da normalizzata»
+
+Copia in `database/giochi_v2.sqlite3`, nella tabella **`ZeroContext_Segrete`**, tutte le parole di `normalizzata` (RAW 2.0) con un IWFS di almeno 45
+(`script/copia_segrete_normalizzata.py`, test in `script/test_copia_segrete_normalizzata.py`). Non applica altri filtri: né finestre Zipf né NVdB né
+densità e ponti, che sono invece quelli di «ZeroContext : Generazione segrete» (tabella `zerocade_segrete`, che il nuovo task non tocca). Colonne e
+comportamento: [PAROLE_RAW_2.0.md](../database/PAROLE_RAW_2.0.md#tabelle-di-giochi_v2-derivate-da-normalizzata-18112026). Il task esegue in sequenza, tramite `dependsOn`
+in `tasks.json`, «ZeroCade : Normalizzare parole RAW» (che calcola l'IWFS), «ZeroWordHunt : Genera Parole» e infine la propria copia; se un passo fallisce
+i successivi non partono. Non include «ZeroCade : Aggiornamento parole RAW», che scarica le fonti. Il server non legge ancora questa tabella.
+
 ## Task «00)ZeroContext : Contesti»
 
 Esegue la stessa nuova pipeline Model2Vec + fallback FastText + retrofitting con margine. I precedenti profili
@@ -375,3 +384,37 @@ Test: `python -m unittest discover -s . -p script/test_evaluate_context_inventor
 **Elimina lo storico.** Nello «Storico dei tornei» della dashboard, «🗑 Elimina lo storico» cancella (dopo conferma) tutti
 i tornei finiti, concordi o annullati, con manche, tentativi, punti e registro; il cestino accanto a un torneo cancella
 solo quello. Non si recupera. Un torneo in corso, o ancora a schermo, resta.
+
+## Associazione Parole — Pipeline A
+
+Implementazione di [`PIPELINE_A_BGE-M3_PMI-SVD_ConceptNet_PPMI_v1.0.md`](../database/PIPELINE_A_BGE-M3_PMI-SVD_ConceptNet_PPMI_v1.0.md)
+in [`pipeline_a/`](pipeline_a/). Le parole da associare (i candidati) sono quelle della tabella `parole` del RAW 2.0
+(841.578 parole singole, validità da `normalizzata` o `UNKNOWN`); le parole a cui associare sono quelle di
+`ZeroContext_Segrete` in `giochi_v2.sqlite3` (sola lettura; 4 segrete multiword non sono tra le parole singole e vengono saltate). Task VS Code:
+**ZeroContext : Associazione Parole Pipeline A**: calcola i segnali e, a build finita, esporta in automatico (`build --export-db`) i top 1000 in
+`database/ZeroContext_Associazioni_PipelineA.sqlite3` (schema `lexemes` + `semantic_pair_scores` della specifica). L'export si può rilanciare
+da solo con `build.py export`.
+
+- Segnali: `E` BGE-M3 dense (`embeddings.py`), `D` SPPMI+SVD e `C` PPMI diretta (`cooccurrence.py`, `distributional.py`),
+  `G` ConceptNet it→it (`conceptnet.py`); fusione, confidenza, MMR e segnali `missing` mai a zero in `ranker.py`.
+- **Posizione di ogni parola per ogni segreta**: non è salvata (43.407 × 841.578 ≈ 36,5 miliardi di righe) ma calcolata al volo su
+  tutto il vocabolario in modo vettoriale (GPU): `Pipeline.rank_of(segreta, parola)`, `Pipeline.ranks(segreta)` (array per tutte
+  le parole) e `build.py rank <segreta> [parola]`. Le parità condividono la posizione; le parole senza alcun segnale non hanno
+  posizione. L'export salva solo i top N (`--top`, 1000 di default). Nota: una parola con un solo segnale può avere un punteggio
+  alto perché i pesi disponibili vengono rinormalizzati; `weight_coverage` e `min_weight_coverage` servono a controllarlo.
+- Ambiente: `requirements-pipeline-a.txt` (FlagEmbedding, faiss opzionale: senza, la ricerca è esatta in numpy).
+- **Dati da fornire** in `.cache/pipeline_a_input/`: `corpus/` (file .txt, un documento per riga, licenza da verificare)
+  e `conceptnet-assertions.csv.gz`. Senza, i segnali D, C e G risultano `missing` (il corpus e ConceptNet non sono nel repository).
+- Limiti dichiarati: `parole`/`normalizzata` non hanno POS né accezioni (`pos`/`sense_id` vuoti, `sense_ambiguous=true`); gli ECDF
+  sono stimati su un campione di coppie candidate, non su coppie annotate, quindi `score_is_calibrated=false` e nessun
+  `high_confidence`; benchmark e ablazione (§8) non eseguiti. Test: `python -m unittest pipeline_a.test_pipeline_a`.
+
+## Associazione Parole — Pipeline B
+
+[`pipeline_b/`](pipeline_b/) implementa [`PIPELINE_B_FastText_PMI-SVD_ConceptNet_PPMI_v1.0.md`](../database/PIPELINE_B_FastText_PMI-SVD_ConceptNet_PPMI_v1.0.md).
+Come chiede la specifica per un confronto equo con la A, cambia **solo** il backend `E`: vocabolario (tabella `parole`), corpus,
+PMI-SVD, PPMI, ConceptNet, filtri e scoring sono il codice di `pipeline_a` (nessuna copia). `E` è `cc.it.300.bin`
+(fastText, 300d, già in `.cache/`, letto con il lettore verificato di `script/context_subword.py`, senza il pacchetto `fasttext`).
+Un vettore da sole sottoparole non rende valido il lemma: i risultati portano `oov_subword_only` e, per quei lemmi, mai `high_confidence`.
+Task: **ZeroContext : Associazione Parole PipelineB** (build + export automatico) → `database/ZeroContext_Associazioni_PipelineB.sqlite3`
+(top 1000 per ogni parola di `ZeroContext_Segrete`, con colonna `rank`; prove complete solo per i primi 20). Segnali in `.cache/pipeline_b`.

@@ -1,0 +1,6 @@
+# Pipeline A (ZeroContext : Associazione Parole). Ambiente dedicato: BGE-M3 richiede FlagEmbedding.
+
+scipy
+scikit-learn
+FlagEmbedding
+faiss-cpu

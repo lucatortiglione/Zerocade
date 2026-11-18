@@ -17,7 +17,7 @@
         "cwd": "${workspaceFolder}",
         "env": { "PYTHONUNBUFFERED": "1" }
       },
-      "detail": "Crea/aggiorna parole_ita_raw_2.0.sqlite3: tutte le fonti, solo parole singole (niente espressioni come a bagnomaria), senza duplicati, emoji o simboli. Conserva accenti, provenienza e backup; nessuno scarto editoriale o filtro Zipf.",
+      "detail": "Crea/aggiorna parole_ita_raw_2.0.sqlite3 da 9 fonti (LiITA Lemma Bank, CompL-it, Wikizionario/Wiktionary via Kaikki solo italiano, Morph-it!, CoLFIS, NVdB De Mauro, MAGIC, PAISÀ), senza duplicati, emoji o simboli. Solo parole italiane (scarta le straniere) e senza nomi di persona e cognomi; i conteggi sono nel rapporto. Conserva accenti, provenienza e backup; nessuno scarto editoriale.",
       "problemMatcher": [],
       "runOptions": { "instanceLimit": 1 },
       "presentation": { "reveal": "always", "panel": "dedicated", "clear": true }
@@ -32,7 +32,41 @@
         "--db", "${workspaceFolder}/database/parole_ita_raw_2.0.sqlite3"
       ],
       "options": { "cwd": "${workspaceFolder}", "env": { "PYTHONUNBUFFERED": "1" } },
-      "detail": "Popola normalizzata da parole tenendo solo i lemmi: scarta plurali e forme flesse di nomi e aggettivi, femminili con un maschile equivalente e forme verbali diverse dall'infinito. Crea backup e registro delle esclusioni.",
+      "detail": "Popola normalizzata da parole tenendo solo i lemmi: scarta plurali e forme flesse di nomi e aggettivi, femminili con un maschile equivalente, forme verbali diverse dall'infinito (anche con particelle) e infiniti riflessivi in -rsi che hanno l'infinito semplice. Un solo lemma per parola: maschile (femminile solo senza maschile), singolare (plurale solo se è la forma più comune, come stoviglie). Calcola per ogni parola l'IWFS (Word Prevalence 50%, Contextual Diversity 30%, frequenza 20%) con stato dei dati e confidence. Crea backup e registro delle esclusioni, e un rapporto di controlli (residui, omografi, parole di riferimento).",
+      "problemMatcher": [],
+      "runOptions": { "instanceLimit": 1 },
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true }
+    },
+    {
+      "label": "ZeroWordHunt : Genera Parole",
+      "type": "process",
+      "command": "${workspaceFolder}/gioco-zerocontext/.venv-vectors/Scripts/python.exe",
+      "args": [
+        "-B", "-X", "utf8",
+        "${workspaceFolder}/gioco-zerowordhunt/script/genera_parole.py",
+        "--raw-db", "${workspaceFolder}/database/parole_ita_raw_2.0.sqlite3",
+        "--db", "${workspaceFolder}/database/giochi_v2.sqlite3"
+      ],
+      "options": { "cwd": "${workspaceFolder}", "env": { "PYTHONUNBUFFERED": "1" } },
+      "detail": "Crea in giochi_v2.sqlite3 la tabella zerowordhunt_parole (vista zerowordhunt) con tutte le parole di normalizzata di almeno 4 lettere e IWFS di almeno 50. Legge il RAW 2.0 in sola lettura: va eseguito dopo Normalizzare parole RAW, che calcola l'IWFS. Sostituisce solo le tabelle di ZeroWordHunt, con backup.",
+      "problemMatcher": [],
+      "runOptions": { "instanceLimit": 1 },
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true }
+    },
+    {
+      "label": "ZeroContext : Copia segrete da normalizzata",
+      "dependsOn": ["ZeroCade : Normalizzare parole RAW", "ZeroWordHunt : Genera Parole"],
+      "dependsOrder": "sequence",
+      "type": "process",
+      "command": "${workspaceFolder}/gioco-zerocontext/.venv-vectors/Scripts/python.exe",
+      "args": [
+        "-B", "-X", "utf8",
+        "${workspaceFolder}/gioco-zerocontext/script/copia_segrete_normalizzata.py",
+        "--raw-db", "${workspaceFolder}/database/parole_ita_raw_2.0.sqlite3",
+        "--db", "${workspaceFolder}/database/giochi_v2.sqlite3"
+      ],
+      "options": { "cwd": "${workspaceFolder}", "env": { "PYTHONUNBUFFERED": "1" } },
+      "detail": "Esegue in sequenza: 1) ZeroCade : Normalizzare parole RAW (calcola l'IWFS), 2) ZeroWordHunt : Genera Parole (zerowordhunt_parole in giochi_v2, parole di almeno 4 lettere con IWFS almeno 50), 3) questo passo, che crea in giochi_v2.sqlite3 la tabella ZeroContext_Segrete con tutte le parole di normalizzata che hanno un IWFS di almeno 45 (parola, lunghezza, parola_singola, iwfs, iwfs_completo, confidenza). Legge il RAW 2.0 in sola lettura e sostituisce solo le proprie tabelle (non zerocade_segrete), con backup. Non include Aggiornamento parole RAW (scarica le fonti): va lanciato a parte quando cambiano le fonti.",
       "problemMatcher": [],
       "runOptions": { "instanceLimit": 1 },
       "presentation": { "reveal": "always", "panel": "dedicated", "clear": true }
@@ -49,6 +83,53 @@
       ],
       "options": { "cwd": "${workspaceFolder}", "env": { "PYTHONUNBUFFERED": "1" } },
       "detail": "Genera le segrete di ZeroContext secondo ARCHITETTURA_VETTORI_SEMANTICI.md (da normalizzata, nella guess list del profilo originale: Zipf, NVdB, verbi attestati, densità e ponti) e le scrive tutte (ordinarie, speciali e quelle in uso conservate in deroga) in database/giochi_v2.sqlite3, tabella zerocade_segrete, con viste, backup e verifica riga per riga. Richiede RAW pulito e normalizzato con le regole correnti. Non tocca giochi.sqlite3 né il server.",
+      "problemMatcher": [],
+      "runOptions": { "instanceLimit": 1 },
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true }
+    },
+    {
+      "label": "ZeroContext : Associazione Parole Pipeline A (scarica dati)",
+      "type": "process",
+      "command": "${workspaceFolder}/gioco-zerocontext/.venv-pipeline-a/Scripts/python.exe",
+      "args": ["-B", "-X", "utf8", "${workspaceFolder}/gioco-zerocontext/pipeline_a/fetch_data.py"],
+      "options": { "cwd": "${workspaceFolder}/gioco-zerocontext", "env": { "PYTHONUNBUFFERED": "1" } },
+      "detail": "Scarica (con ripresa) in gioco-zerocontext/.cache/pipeline_a_input: ConceptNet 5.7.0 filtrato it-it (CC BY-SA 4.0), 4 blocchi su 10 di Wikipedia italiana 20231101 (CC BY-SA 4.0) e BAAI/bge-m3 (MIT, revisione fissata). Circa 6 GB.",
+      "problemMatcher": [],
+      "runOptions": { "instanceLimit": 1 },
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true }
+    },
+    {
+      "label": "ZeroContext : Associazione Parole Pipeline A",
+      "dependsOn": ["ZeroContext : Associazione Parole Pipeline A (scarica dati)"],
+      "type": "process",
+      "command": "${workspaceFolder}/gioco-zerocontext/.venv-pipeline-a/Scripts/python.exe",
+      "args": [
+        "-B", "-X", "utf8",
+        "${workspaceFolder}/gioco-zerocontext/pipeline_a/build.py",
+        "build",
+        "--raw-db", "${workspaceFolder}/database/parole_ita_raw_2.0.sqlite3",
+        "--export-db", "${workspaceFolder}/database/giochi_v2.sqlite3"
+      ],
+      "options": { "cwd": "${workspaceFolder}/gioco-zerocontext", "env": { "PYTHONUNBUFFERED": "1" } },
+      "detail": "Pipeline A (BGE-M3 + PMI/SVD + ConceptNet + PPMI, database/PIPELINE_A_BGE-M3_PMI-SVD_ConceptNet_PPMI_v1.0.md). Parole da associare: quelle della tabella parole del RAW 2.0 (parole singole). Calcola i segnali e li salva in gioco-zerocontext/.cache/pipeline_a. Corpus italiano (cartella corpus/) e dump ConceptNet (conceptnet-assertions.csv.gz) vanno messi in .cache/pipeline_a_input/: senza, D/C/G risultano missing. Al termine esporta in automatico: per ogni parola di ZeroContext_Segrete (giochi_v2, sola lettura) i top 1000 associati con colonna rank, in database/ZeroContext_Associazioni_PipelineA.sqlite3.",
+      "problemMatcher": [],
+      "runOptions": { "instanceLimit": 1 },
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true }
+    },
+    {
+      "label": "ZeroContext : Associazione Parole PipelineB",
+      "dependsOn": ["ZeroContext : Associazione Parole Pipeline A (scarica dati)"],
+      "type": "process",
+      "command": "${workspaceFolder}/gioco-zerocontext/.venv-pipeline-a/Scripts/python.exe",
+      "args": [
+        "-B", "-X", "utf8",
+        "${workspaceFolder}/gioco-zerocontext/pipeline_b/build.py",
+        "build",
+        "--raw-db", "${workspaceFolder}/database/parole_ita_raw_2.0.sqlite3",
+        "--export-db", "${workspaceFolder}/database/giochi_v2.sqlite3"
+      ],
+      "options": { "cwd": "${workspaceFolder}/gioco-zerocontext", "env": { "PYTHONUNBUFFERED": "1" } },
+      "detail": "Pipeline B (fastText cc.it.300 + PMI/SVD + ConceptNet + PPMI, database/PIPELINE_B_FastText_PMI-SVD_ConceptNet_PPMI_v1.0.md). Come la A, ma cambia solo il backend E: parole da associare = tabella parole, stesso corpus e stesso ConceptNet (scaricati dal task Pipeline A scarica dati). Salva i segnali in gioco-zerocontext/.cache/pipeline_b; i lemmi il cui vettore nasce solo da sottoparole sono marcati oov_subword_only. Al termine esporta in automatico i top 1000 per ogni parola di ZeroContext_Segrete in database/ZeroContext_Associazioni_PipelineB.sqlite3.",
       "problemMatcher": [],
       "runOptions": { "instanceLimit": 1 },
       "presentation": { "reveal": "always", "panel": "dedicated", "clear": true }
