@@ -54,7 +54,7 @@
   transform-origin: top left;
   background: var(--wh-bg);
   isolation: isolate;
-  font-family: 'Nunito Variable', 'Segoe UI', system-ui, sans-serif;
+  font-family: var(--wh-font, 'Nunito Variable', 'Segoe UI', system-ui, sans-serif);
   user-select: none;
 }
 .wordhunt-tile {

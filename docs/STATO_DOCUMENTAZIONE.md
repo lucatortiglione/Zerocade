@@ -13,6 +13,7 @@ Le cache dei modelli, gli ambienti virtuali, le dipendenze e gli artefatti di bu
 | Runtime locale | Node 26.13.1, npm 12.2.2, better-sqlite3 13.2.0, SQLite caricato 3.54.1 |
 | ZeroContext | 93.928 tentativi, 9.513 segrete; tutte le precedenti 6.838 conservate; ordinario 9.513, speciale 0 |
 | Pipeline ZeroContext | Tre profili: originale 300 float32, TurboX e Harrier 256 float32; cambio dalla regia senza riavvio; round speciali sospesi |
+| Pipeline di associazione A/B | `gioco-zerocontext/pipeline_a` (BGE-M3) e `pipeline_b` (fastText) calcolano i top 1000 per ogni parola di `ZeroContext_Segrete` tra le parole della tabella `parole` del RAW 2.0; i task VS Code esportano a fine build in `database/ZeroContext_Associazioni_PipelineA/B.sqlite3` |
 | File vettoriale attivo | 112.713.600 byte originale; 96.182.272 byte ciascuno TurboX/Harrier; riferimento nei metadati di ogni profilo |
 | ZeroAssociazioni pubblicato | 3.941 prompt, 11.847 parole, 58.551 collegamenti |
 | ZeroWordle | 8.630 soluzioni e 105.310 tentativi |

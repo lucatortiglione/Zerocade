@@ -4,6 +4,9 @@ import { useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperti
 import { WORDHUNT_REFERENCE as REF, parseWordHuntCell, wordHuntCanvas, type WordHuntClaim, type WordHuntLeader, type WordHuntPublicState, type WordHuntWinner } from '@zerocade/shared'
 import { useOverlay } from './store'
 import { ViewerAvatar } from './ViewerAvatar'
+import '@fontsource/opendyslexic/latin-700.css'
+import '@fontsource/atkinson-hyperlegible/latin-700.css'
+import '@fontsource/atkinson-hyperlegible/latin-ext-700.css'
 import './wordhunt.css'
 
 // ZeroWordHunt is drawn in the DOM: the server runs the round and this renders its WordHuntPublicState. The board keeps the
@@ -62,13 +65,20 @@ export const themeFor = (setting: unknown, hour: number): WordHuntTheme =>
 // «Personalizzati»: the three colours chosen in the dashboard, applied as the board's own variables (live: the settings reach the overlay at once).
 const HEX = /^#[0-9a-f]{6}$/i
 const pickColor = (value: unknown, fallback: string): string => (typeof value === 'string' && HEX.test(value) ? value : fallback)
+const FONTS: Record<string, string> = {
+  opendyslexic: "'OpenDyslexic', 'Comic Sans MS', system-ui, sans-serif",
+  atkinson: "'Atkinson Hyperlegible', system-ui, sans-serif",
+}
 function customColors(settings: Record<string, unknown> | undefined): CSSProperties {
-  if (settings?.wordhuntTheme !== 'custom') return {}
+  // Atkinson Hyperlegible unless the director chose another one (a setting never saved is the default).
+  const font = FONTS[typeof settings?.wordhuntFont === 'string' ? settings.wordhuntFont : 'atkinson']
+  const base = font ? ({ '--wh-font': font } as CSSProperties) : {}
+  if (settings?.wordhuntTheme !== 'custom') return base
   const letter = pickColor(settings.wordhuntLetterColor, '#e4e7ef')
   const tile = pickColor(settings.wordhuntTileColor, '#1c2030')
   const board = pickColor(settings.wordhuntBoardColor, '#12141c')
   return {
-    '--wh-letter': letter, '--wh-tile': tile, '--wh-bg': board,
+    ...base, '--wh-letter': letter, '--wh-tile': tile, '--wh-bg': board,
     '--wh-border': `color-mix(in srgb, ${tile} 80%, ${letter})`, '--wh-coord': `color-mix(in srgb, ${board} 35%, ${letter})`,
   } as CSSProperties
 }

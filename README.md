@@ -152,7 +152,9 @@ non viene presentato come salvato se manca la conferma. Gli export CSV rifiutano
 
 Per EventSub Twitch servono `TWITCH_CLIENT_ID` e `TWITCH_USER_ACCESS_TOKEN`, un **token utente** della stessa app.
 I follow richiedono lo scope `moderator:read:followers` e un utente autorizzato come moderatore del canale.
-La chat funziona anche senza EventSub. Il token si configura nell'ambiente del processo e si sostituisce
+La chat funziona anche senza EventSub.
+
+**Comandi dei moderatori in chat:** `!next` (scritto da un moderatore del canale o dallo streamer; ZeroFollowerBot manda il campo `moderator`) termina il round del gioco in corso: ZeroDubbi, ZeroWords, Quizzland, ZeroWordHunt e ZeroContext (fuori dal torneo). Gli altri giochi dell'overlay non lo eseguono ancora e ZeroTaboo non ha un «termina round». Il comando non è mai una risposta di gioco. Il token si configura nell'ambiente del processo e si sostituisce
 quando scade o viene revocato; non c'è un flusso interattivo di rinnovo OAuth. Le prove locali usano fixture,
 non un account Twitch reale.
 

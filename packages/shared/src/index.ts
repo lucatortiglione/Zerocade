@@ -1816,6 +1816,18 @@ const GAME_DEFS: GameDef[] = [
           { value: 'custom', label: 'Personalizzati (scegli i colori)' },
         ],
       },
+      {
+        id: 'wordhuntFont',
+        label: 'Carattere delle lettere',
+        hint: 'Per chi ha difficoltà di lettura: OpenDyslexic ha le lettere ancorate in basso per non farle scambiare o ruotare; Atkinson Hyperlegible distingue bene le lettere simili. Cambia subito, anche a round in corso.',
+        kind: 'select',
+        default: 'atkinson',
+        options: [
+          { value: 'atkinson', label: 'Atkinson Hyperlegible (alta leggibilità)' },
+          { value: 'opendyslexic', label: 'OpenDyslexic (dislessia)' },
+          { value: 'standard', label: 'Standard (Nunito)' },
+        ],
+      },
       { id: 'wordhuntLetterColor', label: 'Colore delle lettere', hint: 'Cambia subito, anche a round in corso.', kind: 'color', default: '#e4e7ef', when: { id: 'wordhuntTheme', value: 'custom' } },
       { id: 'wordhuntTileColor', label: 'Sfondo delle lettere', hint: 'Il riquadro di ogni lettera. Le parole trovate tengono i loro colori.', kind: 'color', default: '#1c2030', when: { id: 'wordhuntTheme', value: 'custom' } },
       { id: 'wordhuntBoardColor', label: 'Sfondo della griglia', hint: 'Il fondo dietro i riquadri.', kind: 'color', default: '#12141c', when: { id: 'wordhuntTheme', value: 'custom' } },

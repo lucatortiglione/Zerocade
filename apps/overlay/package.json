@@ -10,9 +10,11 @@
     "typecheck": "tsc -p ."
   },
   "dependencies": {
-    "@zerocade/browser-runtime": "*",
     "@fontsource-variable/fredoka": "^5.3.0",
     "@fontsource-variable/nunito": "^5.3.0",
+    "@fontsource/atkinson-hyperlegible": "^5.3.0",
+    "@fontsource/opendyslexic": "^5.3.0",
+    "@zerocade/browser-runtime": "*",
     "@zerocade/shared": "*",
     "fastify": "5.12.8",
     "react": "^19.3.1",
