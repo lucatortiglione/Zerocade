@@ -45,6 +45,8 @@ export interface WordHuntMessage {
 
 type Ignored = 'not-listening' | 'late' | 'host' | 'audience' | 'duplicate' | 'rate' | 'invalid' | 'wrong' | 'already-claimed' | 'limit' | 'storage'
 
+interface Total { winner: WordHuntWinner; words: number; points: number; first: number }
+
 interface Held {
   target: BoardTarget
   winner: WordHuntWinner
@@ -91,6 +93,10 @@ export class WordHuntRoom {
   private readonly windows = new Map<string, number[]>()
   private storedGuesses = 0
   private lastClaim: WordHuntClaim | null = null
+  private readonly sessionTotals = new Map<string, Total>()
+  private sessionRounds = 0
+  private readonly userColors = new Map<string, string>() // every player keeps one colour for the whole session
+  private roundFolded = false
   private metrics = { received: 0, ignored: {} as Record<string, number>, guesses: 0, overflow: 0 }
 
   constructor(private readonly key: string, private readonly deps: WordHuntDeps) {}
@@ -104,13 +110,19 @@ export class WordHuntRoom {
     }
   }
 
-  private leaders(): WordHuntLeader[] {
-    const byId = new Map<string, { winner: WordHuntWinner; words: number; points: number; first: number }>()
-    for (const h of this.held.values()) {
-      const row = byId.get(h.winner.id)
-      if (row) { row.words++; row.points += h.points; row.first = Math.min(row.first, h.seq); if (h.winner.avatar) row.winner = h.winner }
-      else byId.set(h.winner.id, { winner: h.winner, words: 1, points: h.points, first: h.seq })
-    }
+  // The colour of a player's words: the same one for all of them, and in the next rounds too. A colour already worn on the board by someone
+  // else is not given twice (a remembered one that clashes is replaced); the palette starts again only when it has run out.
+  private colorFor(id: string): string {
+    const others = [...this.held.values()].filter((h) => h.winner.id !== id).sort((a, b) => a.seq - b.seq).map((h) => h.color)
+    const mine = this.userColors.get(id)
+    if (mine && !others.includes(mine)) return mine
+    const color = nextColor(others)
+    this.userColors.set(id, color)
+    return color
+  }
+
+  // One standings table from per-player totals: points, then words, then who scored first.
+  private rank(byId: Map<string, Total>): WordHuntLeader[] {
     const sorted = [...byId.values()].sort((a, b) => b.points - a.points || b.words - a.words || a.first - b.first)
     let place = 0
     return sorted.slice(0, WORDHUNT_RULES.leaders).map((r, i): WordHuntLeader => {
@@ -120,9 +132,37 @@ export class WordHuntRoom {
     })
   }
 
+  private add(byId: Map<string, Total>, h: Held): void {
+    const row = byId.get(h.winner.id)
+    if (row) { row.words++; row.points += h.points; row.first = Math.min(row.first, h.seq); if (h.winner.avatar) row.winner = h.winner }
+    else byId.set(h.winner.id, { winner: h.winner, words: 1, points: h.points, first: h.seq })
+  }
+
+  private leaders(): WordHuntLeader[] {
+    const byId = new Map<string, Total>()
+    for (const h of this.held.values()) this.add(byId, h)
+    return this.rank(byId)
+  }
+
+  // The session: the rounds already closed plus the one on the board. `first` is an order of arrival that restarts every round, so for
+  // the ties the rounds are kept apart by an offset (an earlier round came first).
+  private sessionLeaders(): WordHuntLeader[] {
+    const byId = new Map<string, Total>([...this.sessionTotals].map(([id, t]) => [id, { ...t }]))
+    if (!this.roundFolded) for (const h of this.held.values()) this.add(byId, { ...h, seq: h.seq + this.sessionRounds * 1e9 })
+    return this.rank(byId)
+  }
+
+  // Closes the round on the board into the session totals, once.
+  private foldRound(): void {
+    if (this.roundFolded || !this.held.size) return
+    for (const h of this.held.values()) this.add(this.sessionTotals, { ...h, seq: h.seq + this.sessionRounds * 1e9 })
+    this.sessionRounds++
+    this.roundFolded = true
+  }
+
   private remaining(now: number): number {
     if (this.phase === 'countdown') return Math.max(0, this.countdownEnd - now)
-    if (this.phase === 'active') return this.paused ? this.pausedRemaining : Math.max(0, this.deadline - now)
+    if (this.phase === 'active') return this.durationMs === 0 ? 0 : this.paused ? this.pausedRemaining : Math.max(0, this.deadline - now)
     if (this.phase === 'ready') return this.durationMs
     return 0
   }
@@ -135,8 +175,8 @@ export class WordHuntRoom {
       rows: board?.rows ?? WORDHUNT_RULES.rows, cols: board?.cols ?? WORDHUNT_RULES.cols,
       letters: board ? board.letters.map((line) => line.join('')) : [],
       total: board?.targets.length ?? 0, found: this.held.size, claims, paused: this.paused,
-      remainingMs: this.remaining(this.deps.monotonicNow()), serverNow: this.deps.wallNow(), end: this.end,
-      leaders: this.leaders(), nextRoundMs: this.autoTimer !== null ? Math.max(0, this.nextAt - this.deps.monotonicNow()) : null, lastClaim: this.lastClaim ? { ...this.lastClaim, cells: [...this.lastClaim.cells], winner: copyWinner(this.lastClaim.winner) } : null,
+      limited: this.durationMs > 0, remainingMs: this.remaining(this.deps.monotonicNow()), serverNow: this.deps.wallNow(), end: this.end,
+      leaders: this.leaders(), sessionLeaders: this.sessionLeaders(), nextRoundMs: this.autoTimer !== null ? Math.max(0, this.nextAt - this.deps.monotonicNow()) : null, lastClaim: this.lastClaim ? { ...this.lastClaim, cells: [...this.lastClaim.cells], winner: copyWinner(this.lastClaim.winner) } : null,
       notice: this.notice,
     }
   }
@@ -194,7 +234,7 @@ export class WordHuntRoom {
       this.audit(target, winner, m, messageKey, guess, now, seq)
       return ignore('already-claimed') // the colour, the avatar and the score of the first one do not change (§7.4)
     }
-    const color = target.color ?? nextColor([...this.held.values()].sort((a, b) => a.seq - b.seq).map((h) => h.color))
+    const color = this.colorFor(winner.id)
     const points = wordHuntPoints(target.word.length)
     try {
       // Saved before it is shown: a crash between the commit and the broadcast loses nothing (§9.4).
@@ -271,9 +311,12 @@ export class WordHuntRoom {
     // gives the time, a proportionally shorter round (the setting is the time for 24 words).
     const size = WORDHUNT_SIZES[command.size ?? (isWordHuntSize(settings.wordhuntSize) ? settings.wordhuntSize : WORDHUNT_SIZE_DEFAULT)]
     const targets = clampInt(command.targetCount, WORDHUNT_RULES.targetMin, WORDHUNT_RULES.targetMax, size.words)
-    const baseSeconds = clampInt(settings.wordhuntSeconds, WORDHUNT_RULES.roundSecondsMin, WORDHUNT_RULES.roundSecondsMax, WORDHUNT_RULES.roundSecondsDefault)
+    // 0 seconds is no limit (the default); otherwise the setting is the time for 24 words.
+    const baseSeconds = settings.wordhuntSeconds === 0 ? 0 : clampInt(settings.wordhuntSeconds, WORDHUNT_RULES.roundSecondsMin, WORDHUNT_RULES.roundSecondsMax, WORDHUNT_RULES.roundSecondsDefault)
     const scaled = command.mode === 'generated' ? Math.round((baseSeconds * targets) / WORDHUNT_RULES.targetCount / 10) * 10 : baseSeconds
-    const durationMs = clampInt(command.durationSeconds ?? scaled, WORDHUNT_RULES.roundSecondsMin, WORDHUNT_RULES.roundSecondsMax, WORDHUNT_RULES.roundSecondsDefault) * 1000
+    const durationMs = command.durationSeconds === undefined && baseSeconds === 0
+      ? 0
+      : clampInt(command.durationSeconds ?? scaled, WORDHUNT_RULES.roundSecondsMin, WORDHUNT_RULES.roundSecondsMax, WORDHUNT_RULES.roundSecondsMin) * 1000
     let board: Board
     try {
       if (command.mode === 'fixture') board = fixtureBoard(this.deps.fixture())
@@ -284,7 +327,7 @@ export class WordHuntRoom {
         board = generateBoard(words, {
           seed: command.seed ?? this.deps.newSeed(),
           targetCount: targets, rows: size.rows, cols: size.cols,
-          minWordLength: WORDHUNT_RULES.minWordLength, directions: wordHuntDirections(settings.wordhuntReverse === true, settings.wordhuntDiagonal === true),
+          minWordLength: WORDHUNT_RULES.minWordLength, directions: wordHuntDirections(settings.wordhuntReverse !== false, settings.wordhuntDiagonal !== false),
           // The Tabellone Grande: with many words they are kept short so that all of them, and the avatars, fit.
           maxWordLength: targets > WORDHUNT_RULES.denseTargets ? WORDHUNT_RULES.denseMaxWordLength : WORDHUNT_RULES.maxWordLength,
         })
@@ -324,8 +367,9 @@ export class WordHuntRoom {
   private begin(): void {
     if (this.disposed || (this.phase !== 'ready' && this.phase !== 'countdown')) return
     this.phase = 'active'
-    this.deadline = this.deps.monotonicNow() + this.durationMs
-    this.roundTimer = this.deps.setTimer(() => { this.roundTimer = null; this.finishRound('timeout') }, this.durationMs)
+    // No limit: the deadline never comes and no timer is set; the round ends with the last word or by the director.
+    this.deadline = this.durationMs === 0 ? Number.POSITIVE_INFINITY : this.deps.monotonicNow() + this.durationMs
+    if (this.durationMs > 0) this.roundTimer = this.deps.setTimer(() => { this.roundTimer = null; this.finishRound('timeout') }, this.durationMs)
     this.store((s, row) => s.setStatus(row, 'active', this.deps.wallNow()))
     this.eventSeq++
     this.emitAll()
@@ -337,6 +381,7 @@ export class WordHuntRoom {
     this.paused = false
     this.phase = 'finished'
     this.end = end
+    this.foldRound()
     this.store((s, row) => s.setStatus(row, 'finished', this.deps.wallNow(), end))
     this.eventSeq++
     // The next round starts by itself after the pause, which is the time to look at the board that is over.
@@ -411,6 +456,7 @@ export class WordHuntRoom {
     if (!on) this.settingsChanged() // the game is resumed between two rounds: the next one is waited for again
     if (this.disposed || this.phase !== 'active' || this.paused === on) return
     const now = this.deps.monotonicNow()
+    if (this.durationMs === 0) { this.paused = on; this.emitAll(); return } // no clock to stop
     if (on) {
       this.pausedRemaining = Math.max(0, this.deadline - now)
       this.clearRoundTimer()
@@ -445,7 +491,9 @@ export class WordHuntRoom {
     this.paused = false
     this.notice = null
     this.lastClaim = null
+    this.foldRound() // a round closed by hand still counts for the session
     this.held.clear()
+    this.roundFolded = false
     this.byWord.clear()
     this.participants.clear()
     this.seenKeys = new Set()

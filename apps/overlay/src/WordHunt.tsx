@@ -1,7 +1,7 @@
 import '@fontsource-variable/fredoka'
 import '@fontsource-variable/nunito'
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties } from 'react'
-import { WORDHUNT_REFERENCE as REF, parseWordHuntCell, wordHuntCanvas, type WordHuntClaim, type WordHuntPublicState, type WordHuntWinner } from '@zerocade/shared'
+import { WORDHUNT_REFERENCE as REF, parseWordHuntCell, wordHuntCanvas, type WordHuntClaim, type WordHuntLeader, type WordHuntPublicState, type WordHuntWinner } from '@zerocade/shared'
 import { useOverlay } from './store'
 import { ViewerAvatar } from './ViewerAvatar'
 import './wordhunt.css'
@@ -59,6 +59,20 @@ export type WordHuntTheme = 'day' | 'night'
 export const themeFor = (setting: unknown, hour: number): WordHuntTheme =>
   setting === 'day' || setting === 'night' ? setting : hour >= 7 && hour < 19 ? 'day' : 'night'
 
+// «Personalizzati»: the three colours chosen in the dashboard, applied as the board's own variables (live: the settings reach the overlay at once).
+const HEX = /^#[0-9a-f]{6}$/i
+const pickColor = (value: unknown, fallback: string): string => (typeof value === 'string' && HEX.test(value) ? value : fallback)
+function customColors(settings: Record<string, unknown> | undefined): CSSProperties {
+  if (settings?.wordhuntTheme !== 'custom') return {}
+  const letter = pickColor(settings.wordhuntLetterColor, '#e4e7ef')
+  const tile = pickColor(settings.wordhuntTileColor, '#1c2030')
+  const board = pickColor(settings.wordhuntBoardColor, '#12141c')
+  return {
+    '--wh-letter': letter, '--wh-tile': tile, '--wh-bg': board,
+    '--wh-border': `color-mix(in srgb, ${tile} 80%, ${letter})`, '--wh-coord': `color-mix(in srgb, ${board} 35%, ${letter})`,
+  } as CSSProperties
+}
+
 function useTheme(setting: unknown): WordHuntTheme {
   const [hour, setHour] = useState(() => new Date().getHours())
   useEffect(() => {
@@ -68,7 +82,7 @@ function useTheme(setting: unknown): WordHuntTheme {
   return themeFor(setting, hour)
 }
 
-function Board({ state, animated, theme }: { state: WordHuntPublicState; animated: boolean; theme: WordHuntTheme }) {
+function Board({ state, animated, theme, colors }: { state: WordHuntPublicState; animated: boolean; theme: WordHuntTheme; colors: CSSProperties }) {
   // The surface grows with the cells: 570 x 769 for 15 x 20 (the screenshot), the same margins for the smaller boards.
   const canvas = wordHuntCanvas(state.cols, state.rows)
   const [ref, scale] = useFit<HTMLDivElement>(canvas.width, canvas.height)
@@ -83,7 +97,7 @@ function Board({ state, animated, theme }: { state: WordHuntPublicState; animate
   return (
     <div className="wordhunt-fit" ref={ref}>
       <div className="wordhunt-frame" style={{ width: canvas.width * scale, height: canvas.height * scale }}>
-        <div className={`wordhunt-board${animated ? ' wordhunt-board--anim' : ''}`} data-theme={theme} style={{ width: canvas.width, height: canvas.height, transform: `scale(${scale})` }} role="grid" aria-label="Griglia di lettere">
+        <div className={`wordhunt-board${animated ? ' wordhunt-board--anim' : ''}`} data-theme={theme} style={{ ...colors, width: canvas.width, height: canvas.height, transform: `scale(${scale})` }} role="grid" aria-label="Griglia di lettere">
           {cols.map((c) => (
             <span key={`c${c}`} className="wordhunt-coord wordhunt-coord--col" style={{ left: px(c), top: 22, width: REF.tile }}>{c + 1}</span>
           ))}
@@ -127,10 +141,32 @@ function Last({ claim }: { claim: WordHuntClaim }) {
   )
 }
 
+// The standings of the whole session, on show for the last seconds of the pause between two rounds.
+const STANDINGS_MS = 8_000
+
+function Standings({ leaders }: { leaders: WordHuntLeader[] }) {
+  return (
+    <section className="wordhunt-standings" aria-live="polite">
+      <h2>Classifica della sessione</h2>
+      <ol>
+        {leaders.map((l) => (
+          <li key={l.id}>
+            <span className="wordhunt-standings__place">{l.place}</span>
+            <Name winner={l} />
+            <span className="wordhunt-standings__words">{l.words} {l.words === 1 ? 'parola' : 'parole'}</span>
+            <span className="wordhunt-standings__points">{l.points}</span>
+          </li>
+        ))}
+      </ol>
+    </section>
+  )
+}
+
 export function WordHunt() {
   const { wordhunt, wordhuntAt, session } = useOverlay()
   const [now, setNow] = useState(() => performance.now())
   const theme = useTheme(session?.settings.wordhuntTheme)
+  const colors = customColors(session?.settings)
   const counting = wordhunt !== null && (wordhunt.phase === 'countdown' || (wordhunt.phase === 'active' && !wordhunt.paused) || (wordhunt.phase === 'finished' && wordhunt.nextRoundMs !== null))
   useEffect(() => {
     if (!counting) return
@@ -141,6 +177,8 @@ export function WordHunt() {
   const animated = session?.settings.wordhuntAnimations !== false
   const leftMs = counting ? Math.max(0, wordhunt.remainingMs - (now - wordhuntAt)) : wordhunt.remainingMs
   const showLeaders = session?.settings.showLeaderboard !== false && wordhunt.leaders.length > 0
+  const nextInMs = wordhunt.nextRoundMs === null ? null : Math.max(0, wordhunt.nextRoundMs - (now - wordhuntAt))
+  const showStandings = session?.settings.showLeaderboard !== false && wordhunt.phase === 'finished' && nextInMs !== null && nextInMs <= STANDINGS_MS && wordhunt.sessionLeaders.length > 0
   // Before every round (nothing yet, a round made and waiting, the countdown) the board stays away and NASA's picture is shown whole, with no
   // veil and nothing over it but a caption; the picture comes from the overlay's background (App.tsx), so only with that background chosen.
   const nasa = (session?.settings.background ?? 'nasa') === 'nasa'
@@ -156,11 +194,19 @@ export function WordHunt() {
       </div>
     )
   }
+  if (showStandings) {
+    return (
+      <div className="wordhunt wordhunt--standings" data-phase={wordhunt.phase} data-nasa={nasa}>
+        <Standings leaders={wordhunt.sessionLeaders} />
+        <p className="wordhunt-caption">Nuovo round tra <strong>{Math.max(1, Math.ceil((nextInMs ?? 0) / 1000))}</strong></p>
+      </div>
+    )
+  }
   return (
     <div className="wordhunt" data-phase={wordhunt.phase} data-nasa={nasa}>
       <header className="wordhunt-head">
         {wordhunt.phase === 'countdown' && <div className="wordhunt-timer">Si parte tra {Math.max(1, Math.ceil(leftMs / 1000))}</div>}
-        {wordhunt.phase === 'active' && <div className="wordhunt-timer" data-low={leftMs < 15_000 && !wordhunt.paused}>{wordhunt.paused ? 'In pausa' : clock(leftMs)}</div>}
+        {wordhunt.phase === 'active' && (wordhunt.limited || wordhunt.paused) && <div className="wordhunt-timer" data-low={wordhunt.limited && leftMs < 15_000 && !wordhunt.paused}>{wordhunt.paused ? 'In pausa' : clock(leftMs)}</div>}
         {wordhunt.phase === 'finished' && (
           <div className="wordhunt-timer">
             {wordhunt.end ? END_LABEL[wordhunt.end] : 'Round concluso'}
@@ -170,7 +216,7 @@ export function WordHunt() {
         {wordhunt.total > 0 && <div className="wordhunt-count" aria-label="Parole trovate"><strong>{wordhunt.found}</strong>/{wordhunt.total}</div>}
       </header>
       {wordhunt.letters.length > 0 ? (
-        <Board state={wordhunt} animated={animated} theme={theme} />
+        <Board state={wordhunt} animated={animated} theme={theme} colors={colors} />
       ) : (
         <div className="wordhunt-center"><p>{wordhunt.notice ?? 'Il prossimo round sta per iniziare.'}</p></div>
       )}

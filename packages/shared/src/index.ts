@@ -53,6 +53,7 @@ export interface Viewer {
   follower?: boolean
   fan?: boolean
   host?: boolean
+  moderator?: boolean // a moderator of the channel (ZeroFollowerBot sends it only when true): "!next" ends the round
 }
 
 export type LiveEvent =
@@ -1742,10 +1743,10 @@ const GAME_DEFS: GameDef[] = [
     settings: [
       {
         id: 'wordhuntSeconds',
-        label: 'Secondi per round',
-        hint: `Da ${WORDHUNT_RULES.roundSecondsMin} a ${WORDHUNT_RULES.roundSecondsMax}. Vale dal round successivo.`,
+        label: 'Durata massima del round (secondi)',
+        hint: `0 = nessun limite: il round finisce quando tutte le parole sono trovate o lo chiudi tu. Altrimenti da ${WORDHUNT_RULES.roundSecondsMin} a ${WORDHUNT_RULES.roundSecondsMax}. Vale dal round successivo.`,
         kind: 'number',
-        min: WORDHUNT_RULES.roundSecondsMin,
+        min: 0,
         max: WORDHUNT_RULES.roundSecondsMax,
         step: 10,
         default: WORDHUNT_RULES.roundSecondsDefault,
@@ -1765,14 +1766,14 @@ const GAME_DEFS: GameDef[] = [
         label: 'Parole al contrario',
         hint: 'Le parole possono essere scritte anche da destra a sinistra e dal basso in alto. Con le diagonali attive, anche quelle possono essere al contrario. Vale dal round successivo.',
         kind: 'toggle',
-        default: false,
+        default: true,
       },
       {
         id: 'wordhuntDiagonal',
         label: 'Parole in diagonale',
         hint: 'Le parole possono essere scritte anche in diagonale. Con «Parole al contrario» attivo, anche al contrario. L’avatar sta sempre nella casella dopo l’ultima lettera o prima della prima, lungo la diagonale. Vale dal round successivo.',
         kind: 'toggle',
-        default: false,
+        default: true,
       },
       {
         id: 'wordhuntSize',
@@ -1805,15 +1806,19 @@ const GAME_DEFS: GameDef[] = [
       {
         id: 'wordhuntTheme',
         label: 'Colori della griglia',
-        hint: 'Automatico: carta chiara con lettere scure dalle 7 alle 19, ardesia scura con lettere morbide la sera e la notte. Le parole trovate tengono i loro colori.',
+        hint: 'Automatico: carta chiara con lettere scure dalle 7 alle 19, ardesia scura con lettere morbide la sera e la notte. Le parole trovate tengono i loro colori. «Personalizzati» apre tre selettori di colore che cambiano la griglia in tempo reale.',
         kind: 'select',
         default: 'auto',
         options: [
           { value: 'auto', label: 'Automatico (giorno/sera)' },
           { value: 'day', label: 'Giorno (carta chiara)' },
           { value: 'night', label: 'Sera (ardesia scura)' },
+          { value: 'custom', label: 'Personalizzati (scegli i colori)' },
         ],
       },
+      { id: 'wordhuntLetterColor', label: 'Colore delle lettere', hint: 'Cambia subito, anche a round in corso.', kind: 'color', default: '#e4e7ef', when: { id: 'wordhuntTheme', value: 'custom' } },
+      { id: 'wordhuntTileColor', label: 'Sfondo delle lettere', hint: 'Il riquadro di ogni lettera. Le parole trovate tengono i loro colori.', kind: 'color', default: '#1c2030', when: { id: 'wordhuntTheme', value: 'custom' } },
+      { id: 'wordhuntBoardColor', label: 'Sfondo della griglia', hint: 'Il fondo dietro i riquadri.', kind: 'color', default: '#12141c', when: { id: 'wordhuntTheme', value: 'custom' } },
       { id: 'wordhuntAnimations', label: 'Animazioni', hint: 'Brevi e silenziabili: nessuna nella vista di riferimento.', kind: 'toggle', default: true },
       { id: 'showLeaderboard', label: 'Classifica', kind: 'toggle', default: true },
     ],

@@ -112,3 +112,12 @@
 .wordhunt-leaders li { display: flex; align-items: center; gap: 1vmin; }
 .wordhunt-leaders__place { font-weight: 800; opacity: 0.7; }
 .wordhunt-leaders__points { font-weight: 800; }
+
+.wordhunt--standings { align-items: center; justify-content: center; gap: 3vmin; }
+.wordhunt-standings { background: rgba(0, 0, 0, 0.55); border-radius: 2vmin; padding: 3vmin 5vmin; min-width: 55%; }
+.wordhunt-standings h2 { margin: 0 0 2vmin; text-align: center; font-size: 3.6vmin; letter-spacing: 0.1em; text-transform: uppercase; }
+.wordhunt-standings ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 1.2vmin; font-size: 3vmin; }
+.wordhunt-standings li { display: flex; align-items: center; gap: 2vmin; }
+.wordhunt-standings__place { width: 4vmin; font-weight: 800; text-align: right; opacity: 0.75; }
+.wordhunt-standings__words { margin-left: auto; opacity: 0.75; font-size: 2.4vmin; }
+.wordhunt-standings__points { min-width: 8vmin; text-align: right; font-weight: 800; }

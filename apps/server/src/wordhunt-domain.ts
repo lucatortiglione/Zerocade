@@ -3,7 +3,7 @@
 // the choice of the colour of a word. Nothing here has a clock, a socket or a database: the room (wordhunt.ts) owns those.
 import { createHash } from 'node:crypto'
 import {
-  WORDHUNT_DIRECTIONS, WORDHUNT_PALETTE, WORDHUNT_RULES, WORDHUNT_SIMILAR, parseWordHuntCell, wordHuntCell,
+  WORDHUNT_BASE_COLORS, WORDHUNT_DIRECTIONS, WORDHUNT_PALETTE, WORDHUNT_RULES, parseWordHuntCell, wordHuntCell,
   type WordHuntDirection,
 } from '@zerocade/shared'
 
@@ -347,13 +347,41 @@ export function fixtureBoard(file: FixtureFile): Board {
 
 // ---- Colours (§6.5) ----
 
-const similar = (a: string, b: string): boolean => WORDHUNT_SIMILAR.some(([x, y]) => (x === a && y === b) || (x === b && y === a))
 
-// The next colour for a word found now: one not used yet, and not one that could be mistaken for the colour just given.
-// With more words than colours the palette starts again, still away from the last one.
+// Perceptual distance (CIE76 in Lab) between two #RRGGBB colours: the larger, the easier to tell apart on the board.
+function lab(hex: string): [number, number, number] {
+  const lin = [1, 3, 5].map((i) => {
+    const v = parseInt(hex.slice(i, i + 2), 16) / 255
+    return v <= 0.04045 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4
+  }) as [number, number, number]
+  const [r, g, b] = lin
+  const f = (t: number) => (t > 0.008856 ? Math.cbrt(t) : 7.787 * t + 16 / 116)
+  const x = f((0.4124 * r + 0.3576 * g + 0.1805 * b) / 0.95047)
+  const y = f(0.2126 * r + 0.7152 * g + 0.0722 * b)
+  const z = f((0.0193 * r + 0.1192 * g + 0.9505 * b) / 1.08883)
+  return [116 * y - 16, 500 * (x - y), 200 * (y - z)]
+}
+const distance = (a: string, b: string): number => {
+  const [l1, a1, b1] = lab(a)
+  const [l2, a2, b2] = lab(b)
+  return Math.hypot(l1 - l2, a1 - a2, b1 - b2)
+}
+
+// The next colour: the one of the free palette (the first 16 before the others) farthest from the colours already given (the nearest of them counts), so the colours on the
+// board are as different as they can be. The first one is the first of the palette. Past the palette the colours start again, away from
+// the ones given most recently.
 export function nextColor(used: readonly string[], palette: readonly string[] = WORDHUNT_PALETTE): string {
-  const last = used[used.length - 1]
-  const free = palette.filter((c) => !used.includes(c))
-  const pool = free.length ? free : palette
-  return pool.find((c) => last === undefined || (c !== last && !similar(c, last))) ?? pool[0]!
+  const recent = used.slice(-(palette.length - 1))
+  if (!recent.length) return palette[0]!
+  // The first colours of the palette until all are in use, then the others; the palette starts again only when none is free.
+  const base = Math.min(WORDHUNT_BASE_COLORS, palette.length)
+  const free = (list: readonly string[]) => list.filter((c) => !used.includes(c))
+  const pool = free(palette.slice(0, base)).length ? free(palette.slice(0, base)) : free(palette).length ? free(palette) : palette
+  let best = pool[0]!
+  let bestScore = -1
+  for (const c of pool) {
+    const score = Math.min(...recent.map((u) => (u === c ? 0 : distance(c, u))))
+    if (score > bestScore + 1e-9) { best = c; bestScore = score }
+  }
+  return best
 }

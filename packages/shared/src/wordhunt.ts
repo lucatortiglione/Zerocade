@@ -27,10 +27,10 @@ export const WORDHUNT_RULES = Object.freeze({
   decoyMax: 6,
   minWordLength: 5, // §3.4
   maxWordLength: 12, // §3.4
-  roundSecondsDefault: 360, // §3.4 says 180 for 8 words; 24 words need longer
+  roundSecondsDefault: 0, // 0 = no time limit: the round ends when every word is found or the director closes it (decided 17/11/2026)
   roundSecondsMin: 30,
   roundSecondsMax: 900,
-  countdownSecondsDefault: 15, // §3.4 says 5; longer here so NASA's picture, shown whole before each round, can be looked at
+  countdownSecondsDefault: 5, // §3.4 (decided 17/11/2026; it was 15)
   countdownSecondsMax: 30,
   guessesPerWindow: 3, // §7.5: three guesses every two seconds per user
   guessWindowMs: 2_000,
@@ -67,16 +67,15 @@ export const WORDHUNT_COLORS = Object.freeze({
   foundLetter: '#000000',
 })
 
-// §6.5: the colours given to the words as they are found. Pairs that can be confused (the two greens, the two pinks) are
-// listed so the next colour is chosen away from the one just given.
+// §6.5: the colours given to the players as they find words: bright enough for the black letter of a found word. The first 16 are as
+// far apart in hue as a palette allows and are used first; the others (closer to some of them) come only when those are all in use.
+// `nextColor` picks, each time, the one farthest from those already on the board.
+export const WORDHUNT_BASE_COLORS = 16
 export const WORDHUNT_PALETTE: readonly string[] = Object.freeze([
-  '#F97316', '#22D3EE', '#F472B6', '#22C55E', '#A855F7', '#FACC15', '#FF2D78', '#4ADE80',
-  // With 24 words the eight of the reference would repeat three times: these are six more, apart from them and from each other.
-  '#60A5FA', '#F87171', '#A3E635', '#2DD4BF', '#E879F9', '#FDBA74',
-])
-export const WORDHUNT_SIMILAR: readonly (readonly [string, string])[] = Object.freeze([
-  ['#22C55E', '#4ADE80'], ['#F472B6', '#FF2D78'], ['#F97316', '#FACC15'], ['#4ADE80', '#A3E635'], ['#F472B6', '#E879F9'],
-  ['#F97316', '#FDBA74'], ['#22D3EE', '#2DD4BF'], ['#22D3EE', '#60A5FA'], ['#FF2D78', '#F87171'], ['#A855F7', '#E879F9'],
+  '#F97316', '#22D3EE', '#F472B6', '#22C55E', '#A855F7', '#FACC15', '#EF4444', '#3B82F6',
+  '#A3E635', '#14B8A6', '#D946EF', '#C08457', '#94A3B8', '#FDBA74', '#818CF8', '#F0ABFC',
+  '#0EA5E9', '#F59E0B', '#10B981', '#EC4899', '#8B5CF6', '#84CC16', '#FB7185', '#67E8F9',
+  '#FDE047', '#86EFAC', '#C084FC', '#FB923C', '#06B6D4', '#E11D48', '#A78BFA', '#FCA5A5',
 ])
 
 // The sizes of the generated board, as "cols x rows, words" (the size menu of the games this one is modelled on). The large one is the
@@ -164,10 +163,12 @@ export interface WordHuntPublicState {
   found: number
   claims: WordHuntClaim[]
   paused: boolean
+  limited: boolean // false: the round has no time limit (remainingMs is 0 and there is no clock)
   remainingMs: number // at `serverNow`; the overlay counts down from here while the phase is countdown or active
   serverNow: number
   end: WordHuntEnd | null
   leaders: WordHuntLeader[]
+  sessionLeaders: WordHuntLeader[] // the standings of every round since the game was chosen, shown between two rounds
   nextRoundMs: number | null // at `serverNow`: when the next round starts by itself (the round is finished), else null
   lastClaim: WordHuntClaim | null
   notice: string | null

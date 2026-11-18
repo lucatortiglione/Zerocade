@@ -70,6 +70,8 @@ function viewerOf(raw: unknown, kind: SourceKind): Viewer {
     ...(flag(u, 'fan', 'isSubscriber', 'is_subscriber') !== undefined && { fan: flag(u, 'fan', 'isSubscriber', 'is_subscriber') }),
     // The streamer: ZeroFollowerBot sends it only when true.
     ...(flag(u, 'host', 'isAnchor', 'is_host') === true && { host: true }),
+    // A moderator of the channel: the bridge sends it only when true.
+    ...(flag(u, 'moderator', 'isModerator', 'is_moderator') === true && { moderator: true }),
   }
 }
 

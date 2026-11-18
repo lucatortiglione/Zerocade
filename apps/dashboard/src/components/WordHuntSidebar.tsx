@@ -74,11 +74,14 @@ export function WordHuntSidebar({ session }: { session: SessionState }) {
 }
 
 function Round({ admin, send }: { admin: WordHuntAdminState | null; send: Send }) {
-  const [mode, setMode] = useState<WordHuntMode>('fixture')
+  // Until the director chooses, the grid is a generated one (the size comes from the settings); the 8-word reference board only when
+  // the dictionary is not available or when it is picked by hand.
+  const [picked, setMode] = useState<WordHuntMode | null>(null)
   const [seed, setSeed] = useState('')
   const [size, setSize] = useState<WordHuntSize | ''>('')
   const state = admin?.state
   if (!admin || !state) return <p className="text-muted small">In attesa dello stato…</p>
+  const mode: WordHuntMode = picked === 'generated' && !admin.dictionaryReady ? 'fixture' : picked ?? (admin.dictionaryReady ? 'generated' : 'fixture')
   const open = state.phase === 'countdown' || state.phase === 'active'
   return (
     <>
@@ -144,7 +147,7 @@ function Words({ admin, send }: { admin: WordHuntAdminState | null; send: Send }
       <ul className="small">
         {admin.targets.map((t) => (
           <li key={t.target}>
-            <b>{t.word}</b> <span className="text-muted">{t.cells[0]}→{t.cells[t.cells.length - 1]} · avatar {t.avatarCell}</span>
+            <b style={t.found ? { textDecoration: 'line-through', color: '#22c55e' } : undefined}>{t.word}</b> <span className="text-muted">{t.cells[0]}→{t.cells[t.cells.length - 1]} · avatar {t.avatarCell}</span>
             {t.found ? <> ✓ {t.winner}</> : null}
             {t.found && active && (
               <button type="button" className="btn btn--small" disabled={!reason.trim()} title="Riapre la parola; serve il motivo" onClick={() => void send({ type: 'revoke', target: t.target, reason }).then((r) => { if (r.ok) setReason('') })}>
@@ -184,5 +187,20 @@ function Simulator({ admin }: { admin: WordHuntAdminState | null }) {
     const text = open.length && Math.random() < 0.3 ? pick(open).word.toLowerCase() : pick(CHATTER)
     return { type: 'comment', user: simViewer(), text }
   }
-  return <LiveSimulator makeEvent={makeEvent} />
+  // A word typed by hand, sent as a made-up viewer: to try a guess without waiting for the random chat.
+  const [text, setText] = useState('')
+  const sendText = () => {
+    if (!text.trim()) return
+    socket.emit('sim:event', { type: 'comment', user: simViewer(), text: text.trim() } satisfies LiveEvent)
+    setText('')
+  }
+  return (
+    <>
+      <LiveSimulator makeEvent={makeEvent} />
+      <form className="side-message" onSubmit={(e) => { e.preventDefault(); sendText() }}>
+        <input type="text" value={text} maxLength={140} placeholder="Scrivi come spettatore finto…" aria-label="Messaggio di uno spettatore finto" onChange={(e) => setText(e.target.value)} />
+        <button type="submit" className="side-action side-action--blue" disabled={!text.trim()}>Invia</button>
+      </form>
+    </>
+  )
 }

@@ -174,7 +174,7 @@ test('a round: create, start (no countdown), the first valid message takes the w
   assert.equal(s.claims[0]!.word, 'OBBLIGO')
   assert.deepEqual(s.claims[0]!.cells, ['C7', 'C8', 'C9', 'C10', 'C11', 'C12', 'C13'])
   assert.equal(s.claims[0]!.avatarCell, 'C14')
-  assert.equal(s.claims[0]!.color, '#22C55E')
+  assert.equal(s.claims[0]!.color, '#F97316')
   assert.equal(s.claims[0]!.winner.nickname, 'anna')
   assert.equal(s.claims[0]!.winner.avatar, 'https://img.test/anna.png')
   assert.equal(s.claims[0]!.points, wordHuntPoints(7))
@@ -605,10 +605,27 @@ test('sizes: the room takes the size from the command, else the setting, else la
   dflt.begin('generated', { seed: 'q' })
   assert.equal(dflt.state().rows, 20)
   assert.equal(dflt.state().total, 24)
-  assert.equal(dflt.state().remainingMs, 360_000)
+  assert.equal(dflt.state().limited, false) // by default a round has no time limit
+  assert.equal(dflt.state().remainingMs, 0)
   const fixed = setup({ settings: { wordhuntCountdown: 0, wordhuntSize: 'quick' } })
   fixed.begin('fixture')
   assert.equal(fixed.state().rows, 20) // the reference board is always 15 x 20
+})
+
+test('no time limit by default: the round stays active without a deadline, and 5 s of countdown', () => {
+  const h = setup({ dictionary: DICTIONARY_BIG, settings: {} })
+  h.begin('generated', { seed: 'q' })
+  assert.equal(h.state().phase, 'countdown')
+  assert.equal(h.state().remainingMs, 5_000)
+  h.clock.advance(5_000)
+  assert.equal(h.state().phase, 'active')
+  assert.equal(h.state().limited, false)
+  h.clock.advance(3_600_000) // an hour later the round is still going
+  assert.equal(h.state().phase, 'active')
+  const limited = setup({ dictionary: DICTIONARY_BIG, settings: { wordhuntCountdown: 0, wordhuntSeconds: 120 } })
+  limited.begin('generated', { seed: 'q' })
+  assert.equal(limited.state().limited, true)
+  assert.ok(limited.state().remainingMs > 0)
 })
 
 test('sizes: the surface of the board grows with its cells, and is 570 x 769 for the screenshot', () => {
@@ -673,4 +690,48 @@ test('directions: every size fills with every option on (a synthetic dictionary)
       assert.deepEqual(auditBoard(board), [])
     }
   }
+})
+
+// ---- The standings of the session ----
+
+test('session standings: the totals of the rounds already played plus the one on the board', () => {
+  const h = setup({ dictionary: DICTIONARY_BIG, settings: { wordhuntCountdown: 0 } })
+  h.begin('generated', { size: 'quick', seed: 'a' })
+  const first = h.admin().targets
+  h.say(viewer('anna'), first[0]!.word)
+  h.say(viewer('anna'), first[1]!.word)
+  h.say(viewer('bruno'), first[2]!.word)
+  assert.deepEqual(h.state().sessionLeaders.map((l) => [l.nickname, l.words]), [['anna', 2], ['bruno', 1]])
+  assert.deepEqual(h.cmd({ type: 'finish' }), { ok: true })
+  assert.equal(h.state().sessionLeaders.length, 2) // the closed round is counted once, not twice
+  assert.deepEqual(h.state().sessionLeaders.map((l) => l.words), [2, 1])
+  assert.deepEqual(h.cmd({ type: 'reset' }), { ok: true })
+  h.begin('generated', { size: 'quick', seed: 'b' })
+  assert.deepEqual(h.state().leaders, []) // the round's own standings start from zero
+  const second = h.admin().targets
+  h.say(viewer('bruno'), second[0]!.word)
+  h.say(viewer('bruno'), second[1]!.word)
+  const session = h.state().sessionLeaders
+  assert.deepEqual(session.map((l) => [l.nickname, l.words]), [['bruno', 3], ['anna', 2]])
+})
+
+test('colours: one per player, the same for all their words and in the next round, never shared on the same board', () => {
+  const h = setup({ dictionary: DICTIONARY_BIG, settings: { wordhuntCountdown: 0 } })
+  h.begin('generated', { size: 'quick', seed: 'c1' })
+  const t1 = h.admin().targets
+  h.say(viewer('anna'), t1[0]!.word)
+  h.say(viewer('bruno'), t1[1]!.word)
+  h.say(viewer('anna'), t1[2]!.word)
+  const c1 = h.state().claims
+  assert.equal(c1[0]!.color, c1[2]!.color)
+  assert.notEqual(c1[0]!.color, c1[1]!.color)
+  const annaColor = c1[0]!.color
+  assert.deepEqual(h.cmd({ type: 'finish' }), { ok: true })
+  assert.deepEqual(h.cmd({ type: 'reset' }), { ok: true })
+  h.begin('generated', { size: 'quick', seed: 'c2' })
+  h.say(viewer('bruno'), h.admin().targets[0]!.word) // bruno first now
+  h.say(viewer('anna'), h.admin().targets[1]!.word)
+  const c2 = h.state().claims
+  assert.equal(c2[1]!.color, annaColor)
+  assert.notEqual(c2[0]!.color, c2[1]!.color)
 })

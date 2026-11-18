@@ -1,0 +1,42 @@
+{
+  "task": "ZeroWordHunt : Genera Parole",
+  "database": "C:\\Progetti\\Zerocade\\database\\giochi_v2.sqlite3",
+  "tabella": "zerowordhunt_parole",
+  "vista": "zerowordhunt",
+  "lunghezza_minima": 4,
+  "iwfs_minimo": 50.0,
+  "conteggi": {
+    "normalizzata": 140265,
+    "selezionate": 33341,
+    "iwfs_completo": 31062,
+    "iwfs_parziale": 2279,
+    "lettere_semplici": 32395,
+    "per_confidenza": {
+      "LOW": 2279,
+      "MEDIUM": 45,
+      "HIGH": 31017
+    }
+  },
+  "origine": {
+    "database": "C:\\Progetti\\Zerocade\\database\\parole_ita_raw_2.0.sqlite3",
+    "normalization_version": "iwfs-norm-1/51f876b7fc2b",
+    "iwfs_model_version": "1.0",
+    "source_words_sha256": "915890a9af33d72c0837f743614879961059a94d4ccbf0aac3d6a2d3a4e10a1b"
+  },
+  "plan_only": false,
+  "backup": "C:\\Progetti\\Zerocade\\gioco-zeroassociations\\database-backups\\giochi_v2-20261118T193035126571Z.sqlite3",
+  "meta": {
+    "schema": "zerowordhunt-parole-1",
+    "generato_il_utc": "2026-11-18T19:30:35.382552+00:00",
+    "origine": "C:\\Progetti\\Zerocade\\database\\parole_ita_raw_2.0.sqlite3",
+    "lunghezza_minima": "4",
+    "iwfs_minimo": "50.0",
+    "versione_normalizzazione_iwfs": "iwfs-norm-1/51f876b7fc2b",
+    "versione_modello_iwfs": "1.0",
+    "impronta_normalizzazione": "915890a9af33d72c0837f743614879961059a94d4ccbf0aac3d6a2d3a4e10a1b",
+    "parole": "33341",
+    "conteggi": "{\"normalizzata\": 140265, \"selezionate\": 33341, \"iwfs_completo\": 31062, \"iwfs_parziale\": 2279, \"lettere_semplici\": 32395, \"per_confidenza\": {\"LOW\": 2279, \"MEDIUM\": 45, \"HIGH\": 31017}}"
+  },
+  "size_bytes": 6197248,
+  "sha256": "09abe44129a556f60027b4a73c077e66bbab10defca0bbc33015f12f1df01d43"
+}

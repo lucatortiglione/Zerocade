@@ -74,6 +74,7 @@ import { PAD_FILE_MAX, padBoard, padFile } from './pads.js'
 import { controlGame, refreshGame, getSession, selectGame, setScene, setSettings, setTriggers } from './sessions.js'
 import { RoomSources, sourceUsername } from './sources.js'
 import { ZfbBridge, singleWord } from './zfb.js'
+import { isEndRoundCommand } from './mod-commands.js'
 import { RecentFollows } from './follows.js'
 import { ContextTournaments, sanitizeTournamentCommand } from './context-tournament.js'
 import { TabooRooms } from './taboo.js'
@@ -532,6 +533,26 @@ setInterval(() => {
 // Who followed during the live counts as a follower at once, for "Chi può giocare" (see follows.ts).
 const follows = new RecentFollows()
 
+// Ends the round in play, whatever the game: the server's own games take the command, ZeroContext too, the others get it as the
+// overlay's "next-round" (the games that know it carry it out). Used by the dashboard's "Termina round" and by a moderator's "!next".
+function endRound(key: string, gameId: string): void {
+  switch (gameId) {
+    case 'zerodubbi': return bivio.get(key)?.control('next')
+    case 'incastro': return incastro.get(key)?.control('next')
+    case 'quizzland': return quizzland.get(key)?.control('next')
+    case 'zerowordhunt': {
+      const room = wordhunt.get(key)
+      if (room?.state().phase === 'active') room.control({ type: 'finish', expectedVersion: room.state().version })
+      return
+    }
+    default: {
+      const semantic = gameId === 'context' ? ensureSemantic(key) : null
+      if (semantic) semantic.next()
+      else io.to(key).emit('game:command', 'next-round')
+    }
+  }
+}
+
 function broadcastEvent(key: string, received: LiveEvent, origin: EventOrigin = 'sim', creator = '') {
   const at = Date.now()
   const event = follows.apply(key, received)
@@ -552,6 +573,11 @@ function broadcastEvent(key: string, received: LiveEvent, origin: EventOrigin = 
   feeds.set(key, [...(feeds.get(key) ?? []).slice(1 - FEED_KEPT), item])
   io.to(dashboardRoom(key)).emit('feed:events', [item])
   countEvent(key, event, origin)
+  // A moderator's "!next" ends the round (not in a ZeroContext tournament, whose controls are its own); it is never read as an answer.
+  if (isEndRoundCommand(event)) {
+    if (plays && !session.paused && !session.ended && !tournaments.isOpen(key)) endRound(key, session.gameId)
+    return
+  }
   const room = bivio.get(key) ?? incastro.get(key) ?? quizzland.get(key)
   // "Aiuti dal pubblico" switched off: those triggers give no help (activeTriggers).
   if (room && plays && !session.ended) for (const t of triggersFor(activeTriggers(session), event)) room.action(t.action, event)
@@ -718,6 +744,7 @@ const zfb = new ZfbBridge(
     broadcastEvent(roomKey, event, kind, account ? `${kind}:${account}` : '')
     if (repeat || silent) zfb.skip(id)
     // ZeroContext's tournament takes its words from ZeroFollowerBot's bridge only (context-tournament.ts).
+    if (isEndRoundCommand(event)) return // the command is not a word of the games
     if (event.type === 'comment' && session.gameId === 'context') tournaments.offer(roomKey, event.user, event.text, id, kind, at)
     // ZeroTaboo takes its answers here and nowhere else: this is the only place that knows the message's id (D2, D7).
     if (event.type === 'comment' && session.gameId === 'zerotaboo') taboo.get(roomKey)?.offer({ source: 'bridge', user: event.user, text: event.text, messageId: id, platform: kind })
@@ -955,8 +982,7 @@ io.on('connection', (socket) => {
     const session = getSession(key)
     if (clientType !== 'dashboard' || !isGameCommand(command) || session.paused || session.ended) return
     if (tournamentLocks('«Termina round»')) return
-    if (command === 'next-round' && ensureSemantic(key)) { ensureSemantic(key)!.next(); return }
-    io.to(key).emit('game:command', command)
+    endRound(key, session.gameId)
   })
 
   // Points a viewer has just earned, from the overlay of the game in play (never the dashboard's preview).

@@ -42,6 +42,7 @@ function sanitizeViewer(raw: unknown): Viewer | null {
     ...(r.follower === true && { follower: true }),
     ...(r.fan === true && { fan: true }),
     ...(r.host === true && { host: true }),
+    ...(r.moderator === true && { moderator: true }),
   }
 }
 
