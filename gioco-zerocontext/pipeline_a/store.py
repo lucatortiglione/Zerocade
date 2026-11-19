@@ -77,19 +77,24 @@ def export_sqlite(pipeline, path, mode='balanced', top_n=1000, detail_top=20, va
     con.executemany('INSERT INTO lexemes(lexeme_id,lemma,lexical_validity,source_id) VALUES (?,?,?,?)',
                     [(i, lemma, (validity or {}).get(lemma, 'UNKNOWN'), source_id) for lemma, i in ids.items()])
     version = f'{mode}:{pipeline.meta.get("build_id", "")}'
-    rows = []
+    total = 0
     known = [q for q in (queries if queries is not None else pipeline.vocab) if q in ids]
     missing = (len(queries) - len(known)) if queries is not None else 0
     for n, lemma in enumerate(known):
         if progress and n % 1000 == 0:
             progress(n, len(known))
+        rows = []
         for rank, r in enumerate(pipeline.query(lemma, mode, top_n)['results'], 1):
             s = r['signals']
             rows.append((ids[lemma], ids[r['lemma']], version, r['score'], s['embedding'], s['pmi_svd'], s['conceptnet'],
                          s['ppmi_direct'], r['weight_coverage'],
                          json.dumps({'evidence': r['evidence'], 'availability': r['availability'], 'confidence': r['confidence']},
                                     ensure_ascii=False) if rank <= detail_top else '{}', rank))
-    con.executemany('INSERT INTO semantic_pair_scores VALUES (?,?,?,?,?,?,?,?,?,?,?)', rows)
+        # una segreta alla volta: con 43.407 segrete non si tengono in memoria decine di milioni di righe
+        con.executemany('INSERT INTO semantic_pair_scores VALUES (?,?,?,?,?,?,?,?,?,?,?)', rows)
+        total += len(rows)
+        if n % 500 == 499:
+            con.commit()
     con.executemany('INSERT INTO pipeline_meta VALUES (?,?)',
                     [('model_version', version), ('score_calibrator_version', pipeline.cal.version),
                      ('score_is_calibrated', str(pipeline.cal.calibrated)),
@@ -98,4 +103,4 @@ def export_sqlite(pipeline, path, mode='balanced', top_n=1000, detail_top=20, va
     con.commit()
     con.execute('VACUUM')
     con.close()
-    return len(rows)
+    return total

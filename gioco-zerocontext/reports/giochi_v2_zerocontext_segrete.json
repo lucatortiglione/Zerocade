@@ -1,0 +1,39 @@
+{
+  "task": "ZeroContext : Copia segrete da normalizzata",
+  "database": "C:\\Progetti\\Zerocade\\database\\giochi_v2.sqlite3",
+  "tabella": "ZeroContext_Segrete",
+  "iwfs_minimo": 45.0,
+  "conteggi": {
+    "normalizzata": 140265,
+    "copiate": 43407,
+    "iwfs_completo": 39357,
+    "iwfs_parziale": 4050,
+    "parole_singole": 43403,
+    "per_confidenza": {
+      "LOW": 4050,
+      "MEDIUM": 824,
+      "HIGH": 38533
+    }
+  },
+  "origine": {
+    "database": "C:\\Progetti\\Zerocade\\database\\parole_ita_raw_2.0.sqlite3",
+    "normalization_version": "iwfs-norm-1/51f876b7fc2b",
+    "iwfs_model_version": "1.0",
+    "source_words_sha256": "915890a9af33d72c0837f743614879961059a94d4ccbf0aac3d6a2d3a4e10a1b"
+  },
+  "plan_only": false,
+  "backup": "C:\\Progetti\\Zerocade\\gioco-zeroassociations\\database-backups\\giochi_v2-20261118T132813996705Z.sqlite3",
+  "meta": {
+    "schema": "zerocontext-segrete-1",
+    "generato_il_utc": "2026-11-18T13:28:14.249039+00:00",
+    "origine": "C:\\Progetti\\Zerocade\\database\\parole_ita_raw_2.0.sqlite3",
+    "iwfs_minimo": "45.0",
+    "versione_normalizzazione_iwfs": "iwfs-norm-1/51f876b7fc2b",
+    "versione_modello_iwfs": "1.0",
+    "impronta_normalizzazione": "915890a9af33d72c0837f743614879961059a94d4ccbf0aac3d6a2d3a4e10a1b",
+    "parole": "43407",
+    "conteggi": "{\"normalizzata\": 140265, \"copiate\": 43407, \"iwfs_completo\": 39357, \"iwfs_parziale\": 4050, \"parole_singole\": 43403, \"per_confidenza\": {\"LOW\": 4050, \"MEDIUM\": 824, \"HIGH\": 38533}}"
+  },
+  "size_bytes": 6291456,
+  "sha256": "7e0c25fe853f83b4199b0d2e25f4bc3e342b68238c57eff692d3f76805649445"
+}
