@@ -735,3 +735,31 @@ test('colours: one per player, the same for all their words and in the next roun
   assert.equal(c2[1]!.color, annaColor)
   assert.notEqual(c2[0]!.color, c2[1]!.color)
 })
+
+// ---- A busy database does not lose a word ----
+
+test('a busy database: the word waits, is saved as soon as the lock clears, and nobody takes it meanwhile', async () => {
+  const { mkdtempSync } = await import('node:fs')
+  const { tmpdir } = await import('node:os')
+  const { join } = await import('node:path')
+  const dir = mkdtempSync(join(tmpdir(), 'wh-busy-'))
+  const file = join(dir, 'wh.db')
+  const db = new Database(file)
+  db.pragma('journal_mode = WAL')
+  const h = setup({ store: new WordHuntStore(db) })
+  h.begin()
+  const other = new Database(file)
+  other.exec('BEGIN IMMEDIATE') // someone else holds the write lock
+  h.say(viewer('anna'), 'obbligo')
+  assert.equal(h.state().found, 0, 'not shown before it is saved')
+  h.say(viewer('bruno'), 'obbligo')
+  assert.equal(h.state().found, 0)
+  other.exec('COMMIT') // the lock clears
+  h.clock.advance(300)
+  const s = h.state()
+  assert.equal(s.found, 1)
+  assert.equal(s.claims[0]!.winner.nickname, 'anna', 'the first one to arrive wins')
+  assert.equal(h.issues.length, 0)
+  other.close()
+  db.close()
+})

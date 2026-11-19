@@ -87,6 +87,11 @@ export interface ClaimInput {
   wallMs: number
 }
 
+export const CLAIM_BUSY_MS = 150
+
+// better-sqlite3 reports a lock that did not clear in time as SQLITE_BUSY (or SQLITE_BUSY_SNAPSHOT).
+export const isBusyError = (error: unknown): boolean => typeof (error as { code?: unknown } | null)?.code === 'string' && (error as { code: string }).code.startsWith('SQLITE_BUSY')
+
 export class WordHuntStore {
   constructor(private readonly db: Database.Database) {
     db.exec(SCHEMA)
@@ -154,6 +159,14 @@ export class WordHuntStore {
   // §9.3: the guess and the claim in one transaction. `false` when the target already has a holder: nothing is written then
   // except the guess, which is kept with the outcome "already-claimed" up to a cap.
   claim(input: ClaimInput): boolean {
+    // The claim runs on the main thread: it waits briefly for the write lock (the persistence worker writes every chat event) and, if the
+    // database is still busy, throws, and the room tries again a moment later; the 5 s of the connection would stop the whole server.
+    const previous = this.db.pragma('busy_timeout', { simple: true }) as number
+    this.db.pragma(`busy_timeout = ${CLAIM_BUSY_MS}`)
+    try { return this.claimNow(input) } finally { this.db.pragma(`busy_timeout = ${previous}`) }
+  }
+
+  private claimNow(input: ClaimInput): boolean {
     return this.db.transaction(() => {
       const target = this.db.prepare('SELECT n FROM wordhunt_targets WHERE round = ? AND seq = ?').pluck().get(input.roundRow, input.targetSeq) as number | undefined
       if (target === undefined) throw new Error('wordhunt: bersaglio inesistente')

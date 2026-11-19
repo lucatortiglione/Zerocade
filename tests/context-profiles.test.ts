@@ -7,12 +7,14 @@ import { serverCorpus } from '../apps/server/src/context-tournament-ranking.ts'
 
 test('the integrated profiles preserve every secret and use distinct matrices and caches', () => {
   const profiles = availableContextProfiles()
-  assert.deepEqual(profiles.map((p) => p.id), ['original', 'abtt'])
-  assert.ok(profiles.every((p) => p.available))
-  assert.equal(new Set(profiles.map((p) => p.revision)).size, 2)
+  assert.deepEqual(profiles.map((p) => p.id), ['original', 'abtt', 'pipeline_b'])
+  // Pipeline B depends on the export file (database/ZeroContext_Associazioni_PipelineB.sqlite3): when it is there and valid it has its own revision.
+  const stored = profiles.filter((p) => p.id !== 'pipeline_b')
+  assert.ok(stored.every((p) => p.available))
+  assert.equal(new Set(stored.map((p) => p.revision)).size, 2)
   const original = serverCorpus('original')!
   const expected = original.data.secrets.map((i) => original.data.words[i]).sort()
-  for (const profile of profiles) {
+  for (const profile of stored) {
     const corpus = serverCorpus(profile.id)!
     assert.equal(corpus.data.words.length, 93928)
     assert.deepEqual(corpus.data.secrets.map((i) => corpus.data.words[i]).sort(), expected)

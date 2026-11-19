@@ -1336,6 +1336,7 @@ const GAME_DEFS: GameDef[] = [
       { id: 'associationSource', label: 'Associazioni', kind: 'select', default: 'original', options: [
         { value: 'original', label: 'Associazioni originali' },
         { value: 'abtt', label: 'Associazioni ABTT' },
+        { value: 'pipeline_b', label: 'Pipeline B (fastText + PMI-SVD + ConceptNet)' },
       ], hint: 'Il cambio avvia un nuovo round senza riavviare il server. La classifica generale è conservata.' },
       { id: 'disableAllHints', label: 'Disabilita tutti gli aiuti', kind: 'toggle', default: false, hint: 'Blocca regali, comandi, suggerimenti automatici e iniziali e lettere rivelate. Nasconde gli aiuti già mostrati, conservando i tentativi dei giocatori.' },
       { id: 'showWordLength', label: 'Mostra numero di lettere', kind: 'toggle', default: true, hint: 'Nella modalità classica mostra un riquadro per ogni lettera della parola segreta. Spento, nasconde la lunghezza fino alla fine del round; gli eventuali piccoli aiuti mostrano solo le lettere già rivelate. Disabilita tutti gli aiuti ha precedenza.' },

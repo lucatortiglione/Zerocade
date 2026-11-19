@@ -13,7 +13,7 @@ import {
   WordHuntGenerationError, cellName, fixtureBoard, generateBoard, nextColor, normalizeGuess,
   type Board, type BoardTarget, type FixtureFile,
 } from './wordhunt-domain.js'
-import type { WordHuntStore } from './wordhunt-db.js'
+import { isBusyError, type ClaimInput, type WordHuntStore } from './wordhunt-db.js'
 
 export interface WordHuntDeps {
   store: WordHuntStore
@@ -46,6 +46,10 @@ export interface WordHuntMessage {
 type Ignored = 'not-listening' | 'late' | 'host' | 'audience' | 'duplicate' | 'rate' | 'invalid' | 'wrong' | 'already-claimed' | 'limit' | 'storage'
 
 interface Total { winner: WordHuntWinner; words: number; points: number; first: number }
+
+interface Pending { target: BoardTarget; winner: WordHuntWinner; color: string; points: number; seq: number; input: ClaimInput; tries: number }
+const CLAIM_RETRY_MS = 150
+const CLAIM_RETRIES = 40 // about 6 s: after that the claim is given up and the director is told
 
 interface Held {
   target: BoardTarget
@@ -95,6 +99,8 @@ export class WordHuntRoom {
   private lastClaim: WordHuntClaim | null = null
   private readonly sessionTotals = new Map<string, Total>()
   private sessionRounds = 0
+  private readonly pending: Pending[] = []
+  private retryTimer: unknown = null
   private readonly userColors = new Map<string, string>() // every player keeps one colour for the whole session
   private roundFolded = false
   private metrics = { received: 0, ignored: {} as Record<string, number>, guesses: 0, overflow: 0 }
@@ -236,26 +242,67 @@ export class WordHuntRoom {
     }
     const color = this.colorFor(winner.id)
     const points = wordHuntPoints(target.word.length)
+    // A claim waiting for the database to be free (below) already owns its word: whoever writes it after is late.
+    if (this.pending.some((p) => p.target.id === target.id)) return ignore('already-claimed')
+    const claim: Pending = { target, winner, color, points, seq, input: {
+      roundRow: this.roundRow!, targetSeq: target.id, viewer: winner, platform: m.platform, messageKey, guess, receivedMs: Math.round(now),
+      receiveSeq: seq, color, points, wallMs: this.deps.wallNow(),
+    }, tries: 0 }
+    const done = this.tryClaim(claim)
+    if (done === 'lost') return ignore('already-claimed')
+    if (done === 'failed') return ignore('storage')
+    if (done === 'busy') return // retried by the timer: the word is shown as soon as it is saved
+    this.confirm(claim)
+  }
+
+  // Saved before it is shown: a crash between the commit and the broadcast loses nothing (§9.4). A database that stays busy is not a
+  // lost word: the claim waits in `pending`, in order of arrival, and is retried every few tenths of a second.
+  private tryClaim(c: Pending): 'ok' | 'lost' | 'busy' | 'failed' {
     try {
-      // Saved before it is shown: a crash between the commit and the broadcast loses nothing (§9.4).
-      const won = this.deps.store.claim({
-        roundRow: this.roundRow!, targetSeq: target.id, viewer: winner, platform: m.platform, messageKey, guess, receivedMs: Math.round(now),
-        receiveSeq: seq, color, points, wallMs: this.deps.wallNow(),
-      })
-      if (!won) return ignore('already-claimed')
+      if (!this.deps.store.claim(c.input)) return 'lost'
       this.storedGuesses++
+      return 'ok'
     } catch (error) {
-      this.deps.log('error', 'wordhunt: parola non salvata', { error: String(error) })
+      if (isBusyError(error) && c.tries < CLAIM_RETRIES) {
+        c.tries++
+        if (!this.pending.includes(c)) this.pending.push(c)
+        this.scheduleRetry()
+        return 'busy'
+      }
+      this.deps.log('error', 'wordhunt: parola non salvata', { error: String(error), tries: c.tries })
       this.deps.issue(this.key, 'ZeroWordHunt: una parola trovata non è stata salvata e non è stata assegnata. Controlla il registro del server.')
-      return ignore('storage')
+      return 'failed'
     }
+  }
+
+  private scheduleRetry(): void {
+    if (this.retryTimer !== null || this.disposed) return
+    this.retryTimer = this.deps.setTimer(() => {
+      this.retryTimer = null
+      const waiting = this.pending.splice(0)
+      for (const c of waiting) {
+        if (this.phase !== 'active' || this.held.has(c.target.id) || c.input.roundRow !== this.roundRow) continue
+        const done = this.tryClaim(c) // a busy one goes back to `pending`, keeping its place at the front
+        if (done === 'ok') this.confirm(c)
+        else if (done === 'busy') {
+          // keep the order of arrival: the ones after it wait too
+          const rest = waiting.slice(waiting.indexOf(c) + 1).filter((x) => !this.pending.includes(x))
+          this.pending.push(...rest)
+          break
+        }
+      }
+    }, CLAIM_RETRY_MS)
+  }
+
+  private confirm(c: Pending): void {
+    const { target, winner, color, points, seq } = c
     const held: Held = { target, winner, color, points, seq }
     this.held.set(target.id, held)
     this.lastClaim = this.claimOf(held)
     this.eventSeq++
     this.bump()
     this.publish(true)
-    if (this.held.size >= this.board.targets.length) this.finishRound('completed')
+    if (this.board && this.held.size >= this.board.targets.length) this.finishRound('completed')
   }
 
   // A hit on a word already taken is kept for the audit, up to a cap; a failure to write it never touches the round.
@@ -523,6 +570,9 @@ export class WordHuntRoom {
     this.nextAt = 0
     if (this.countdownTimer !== null) this.deps.clearTimer(this.countdownTimer)
     this.countdownTimer = null
+    if (this.retryTimer !== null) this.deps.clearTimer(this.retryTimer)
+    this.retryTimer = null
+    this.pending.length = 0
     if (this.emitTimer !== null) this.deps.clearTimer(this.emitTimer)
     this.emitTimer = null
   }

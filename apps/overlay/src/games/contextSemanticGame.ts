@@ -37,7 +37,7 @@ export function createSemanticContext() {
       if (state.reason === 'time') notes.push('Tempo scaduto')
       if (state.reason === 'attempts') notes.push('Tentativi esauriti')
       const view: ContextView = {
-        ready: true, problem: null, preparing: false,
+        ready: state.preparing !== true, problem: null, preparing: state.preparing === true,
         word: state.solution ?? state.prefix.padEnd(state.wordLength ?? state.prefix.length, ' '),
         total: state.total, attempts: state.attempts, revealed, lettersShown: state.prefix.length,
         showWordLength: state.wordLength !== null, solver: state.solvedBy, revealAt,

@@ -134,7 +134,15 @@ export function App() {
 
       {session?.settings.showLeaderboard !== false && scores && <ScoreTicker scores={scores} />}
       <Widgets />
-      {session?.paused && !session.ended && <div className="overlay-state">⏸ In pausa</div>}
+      {session?.paused && !session.ended && (
+        <div className="overlay-pause" role="status" aria-live="polite">
+          <div className="overlay-pause__card">
+            <span className="overlay-pause__icon" aria-hidden="true">⏸</span>
+            <strong>In pausa</strong>
+            <small>Si riparte tra poco</small>
+          </div>
+        </div>
+      )}
       {session?.ended && <div className="overlay-state">Sessione terminata</div>}
 
       {gif && <img key={gifSeq} className="overlay-gif" src={gif.url} alt={gif.label} />}

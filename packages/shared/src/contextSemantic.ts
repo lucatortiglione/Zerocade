@@ -16,6 +16,8 @@ export function specialPoints(elapsedSeconds: number, attempts: number): number 
 export interface ContextSemanticGuess { word: string; rank: number; temperature: number; by: Viewer | null; at: number }
 export interface ContextSemanticState {
   round: number
+  // The first round is being prepared (the server's ranking thread is loading the words or ranking the secret).
+  preparing?: boolean
   mode: 'ordinary' | 'special'
   phase: 'playing' | 'intermission' | 'completed'
   paused: boolean

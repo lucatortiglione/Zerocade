@@ -15,7 +15,8 @@ import {
   type Viewer,
 } from '@zerocade/shared'
 import type { ContextTournamentStore, GuessRecord, RejectionRecord, RoundRecord, TournamentRecord } from './context-tournament-db.js'
-import { planOf, planRound, positionOf, readGuess, type Corpus, type RoundPlan } from './context-tournament-ranking.js'
+import { pickRound, planFrom, positionOf, rankLocally, readGuess, type Corpus, type Ranker, type RoundPlan } from './context-tournament-ranking.js'
+import type { Ranking } from '@zerocade/shared/contextRanking'
 import { scoreRound, standings, topTen, type RoundOutcome } from './context-tournament-scoring.js'
 
 // ZeroContext's tournament, run by the server alone (regolamento v2.3, specifica tecnica): global 6-second windows, one
@@ -36,6 +37,12 @@ export interface TournamentDeps {
   // The setting "Mostra numero di lettere" of the room (off when every hint is disabled).
   showWordLength?: (key: string) => boolean
   corpus: (key: string) => Corpus | null
+  // A secret's ranking: computed here by default (the corpus has its vectors: tests); on the server it is asked of the
+  // ranking thread (context-corpora.ts). The next round is prepared between rounds, so starting one never waits for it.
+  rank?: Ranker
+  // The room's corpus is still loading (in the ranking thread): a command that needs it says to wait, rather than that the
+  // words are missing, and a tournament is not suspended for it.
+  corpusLoading?: (key: string) => boolean
   now?: () => number
   setTimer?: (fn: () => void, ms: number) => unknown
   clearTimer?: (handle: unknown) => void
@@ -98,11 +105,18 @@ interface Live {
   settled: number
   version: number
   publishTimer: unknown
+  // The next round, chosen and ranked between rounds (with the corpus it was ranked on); `asking` while its ranking is on
+  // its way. `planAsk` counts the rankings asked for the round in play (restored after a restart): an old answer is ignored.
+  upcoming: { plan: RoundPlan; hash: string } | null
+  asking: boolean
+  planAsk: number
+  planPending: string | null // the round whose ranking is on its way
 }
 
 // Candidates kept for a window: a flood of words must not fill the memory.
 const MAX_CANDIDATES = 6000
 
+const LOADING = 'Sto caricando le parole di ZeroContext: riprova tra un istante.'
 const SUSPENDED_ON_RESTART = 'Zerocade si è riavviato durante una manche: la finestra interrotta ripartirà da capo, con i tentativi già registrati.'
 const SUSPENDED_ON_BRIDGE = 'Il ponte ZeroFollowerBot si è scollegato: senza i suoi messaggi il torneo non può continuare.'
 const PAUSED = 'Pausa dell\'organizzatore.'
@@ -200,7 +214,7 @@ export class ContextTournaments {
 
   corpusChanged() {
     for (const l of this.live.values()) {
-      if (['active', 'intermission', 'suspended'].includes(l.t.status) && !this.corpusFor(l))
+      if (['active', 'intermission', 'suspended'].includes(l.t.status) && !this.corpusFor(l) && !this.deps.corpusLoading?.(l.t.roomKey))
         this.suspend(l, 'Il corpus di ZeroContext è stato aggiornato: il torneo resta salvato e sospeso sui dati precedenti.', 'sistema')
     }
   }
@@ -245,7 +259,7 @@ export class ContextTournaments {
       return fail(`L'intervallo con la Top 10 va da ${TOURNAMENT_RULES.intermissionMinMs / 1000} a ${TOURNAMENT_RULES.intermissionMaxMs / 1000} secondi.`)
     if (!this.deps.bridgeReady(key)) return fail('Collega ZeroFollowerBot: nel torneo contano solo i messaggi del suo ponte.')
     const corpus = this.deps.corpus(key)
-    if (!corpus) return fail('Le parole di ZeroContext non sono disponibili sul server.')
+    if (!corpus) return fail(this.deps.corpusLoading?.(key) ? LOADING : 'Le parole di ZeroContext non sono disponibili sul server.')
     if (shown) this.live.delete(key)
     const audience = context.audience === 'followers' || context.audience === 'fans' ? context.audience : 'all'
     const t = this.deps.store.create({ id: randomUUID(), roomKey: key, totalRounds, intermissionMs, audience, corpusHash: corpus.hash,
@@ -270,9 +284,16 @@ export class ContextTournaments {
     const why = this.startable(l)
     if (why) return fail(why)
     const corpus = this.corpusFor(l)
-    if (!corpus) return fail('Le parole di ZeroContext sono cambiate o non sono disponibili: il torneo non può continuare su altri dati.')
-    const plan = planRound(corpus, this.deps.store.usedSecrets(l.t.id), this.random, this.deps.secretUses, this.deps.secretLastAt)
-    if (!plan) return fail('Non ci sono più parole segrete da giocare.')
+    if (!corpus) return fail(this.deps.corpusLoading?.(l.t.roomKey) ? LOADING : 'Le parole di ZeroContext sono cambiate o non sono disponibili: il torneo non può continuare su altri dati.')
+    // The round prepared between rounds; one prepared on other data, or on a secret played since, is chosen again.
+    if (l.upcoming && (l.upcoming.hash !== corpus.hash || this.deps.store.usedSecrets(l.t.id).has(l.upcoming.plan.secret))) l.upcoming = null
+    if (!l.upcoming) {
+      const prepared = this.prepareNext(l, corpus)
+      if (prepared === 'none') return fail('Non ci sono più parole segrete da giocare.')
+      if (prepared === 'asking') return fail('Sto preparando la classifica della manche: riprova tra un istante.')
+    }
+    const plan = l.upcoming!.plan
+    l.upcoming = null
     const number = this.settledRounds(l) + 1
     const round = this.deps.store.startRound(l.t.id, number, plan.secret, plan.buoy, this.now(), actor)
     this.deps.recordSecretUse?.(l.t.roomKey, corpus.data.words[plan.secret])
@@ -326,8 +347,9 @@ export class ContextTournaments {
       return { ok: true }
     }
     const corpus = this.corpusFor(l)
-    if (!corpus) return fail('Le parole di ZeroContext sono cambiate o non sono disponibili: la manche non si può ricostruire. Annullala o annulla il torneo.')
-    if (!l.plan || l.plan.secret !== round.secret) this.loadRound(l, round, corpus)
+    if (!corpus) return fail(this.deps.corpusLoading?.(l.t.roomKey) ? LOADING : 'Le parole di ZeroContext sono cambiate o non sono disponibili: la manche non si può ricostruire. Annullala o annulla il torneo.')
+    if ((!l.plan || l.plan.secret !== round.secret) && l.planPending !== round.id) this.loadRound(l, round, corpus)
+    if (!l.plan || l.plan.secret !== round.secret) return fail('Sto preparando la classifica della manche: riprova tra un istante.')
     this.deps.store.setStatus(l.t.id, 'active', this.now())
     this.deps.store.audit(l.t.id, round.id, 'resume', actor, { window: round.window, remainingMs: round.remainingMs }, this.now())
     l.t = this.deps.store.tournament(l.t.id)!
@@ -730,7 +752,7 @@ export class ContextTournaments {
     return { t, phase: 'ready', round: null, plan: null, window: 0, deadline: 0, timer: null, seq: 0, thisWindow: new Set(), pending: null,
       usedWords: new Set(), messages: new Set(), cands: [], arrivals: 0, submissions: 0, overflow: 0, board: [], lastWindow: [], typed: [], buoy: null, best: null,
       solution: null, solvedBy: null, achievements: [], rows: [], players: new Set(this.deps.store.players(t.id).map((p) => p.player)),
-      settled: this.countSettled(t.id), version: 0, publishTimer: null }
+      settled: this.countSettled(t.id), version: 0, publishTimer: null, upcoming: null, asking: false, planAsk: 0, planPending: null }
   }
 
   private countSettled(tournamentId: string): number {
@@ -758,7 +780,32 @@ export class ContextTournaments {
   private loadRound(l: Live, round: RoundRecord, corpus = this.corpusFor(l)) {
     l.round = round
     l.cands = []
-    l.plan = corpus ? planOf(corpus, round.secret, round.buoy) : null
+    l.plan = null
+    const ask = ++l.planAsk
+    let ranking: Ranking | Promise<Ranking> | null = null
+    try { ranking = corpus ? this.rank(corpus, round.secret) : null }
+    catch (error) { console.error('[torneo] classifica della manche non calcolata:', error) }
+    if (ranking instanceof Promise) {
+      // Ready in a moment (the ranking thread): the round is rebuilt then, if it is still the one in play.
+      l.planPending = round.id
+      ranking.then((r) => {
+        if (ask !== l.planAsk) return
+        l.planPending = null
+        if (l.round?.id !== round.id || this.live.get(l.t.roomKey) !== l) return
+        this.rebuild(l, round, { secret: round.secret, ranking: r, buoy: round.buoy })
+        this.publish(l, false)
+      }, (error) => {
+        if (ask === l.planAsk) l.planPending = null
+        console.error('[torneo] classifica della manche non calcolata:', error instanceof Error ? error.message : error)
+      })
+      ranking = null
+    } else l.planPending = null
+    this.rebuild(l, round, ranking ? { secret: round.secret, ranking, buoy: round.buoy } : null)
+  }
+
+  // The data of a round in play, from what was saved; with its plan, the windows already closed are shown again.
+  private rebuild(l: Live, round: RoundRecord, plan: RoundPlan | null) {
+    l.plan = plan
     l.window = Math.max(1, round.window)
     const guesses = this.deps.store.guesses(round.id)
     l.seq = this.deps.store.lastSeq(round.id)
@@ -771,6 +818,43 @@ export class ContextTournaments {
       l.window = shown - 1
       this.process(l)
       l.window = shown
+    }
+  }
+
+  private rank(corpus: Corpus, secret: number): Ranking | Promise<Ranking> {
+    return (this.deps.rank ?? rankLocally)(corpus, secret)
+  }
+
+  // Chooses the next round's secret and asks for its ranking: 'ready' (l.upcoming is set), 'asking' (it will be) or 'none'
+  // (every secret has been played).
+  private prepareNext(l: Live, corpus: Corpus): 'ready' | 'asking' | 'none' {
+    if (l.upcoming) return 'ready'
+    if (l.asking) return 'asking'
+    const secret = pickRound(corpus, this.deps.store.usedSecrets(l.t.id), this.random, this.deps.secretUses, this.deps.secretLastAt)
+    if (secret === null) return 'none'
+    let ranking: Ranking | Promise<Ranking>
+    try { ranking = this.rank(corpus, secret) }
+    catch (error) { console.error('[torneo] classifica della prossima manche non calcolata:', error); return 'asking' }
+    if (!(ranking instanceof Promise)) {
+      l.upcoming = { plan: planFrom(secret, ranking, this.random), hash: corpus.hash }
+      return 'ready'
+    }
+    l.asking = true
+    ranking.then((r) => {
+      l.asking = false
+      if (this.live.get(l.t.roomKey) === l) l.upcoming = { plan: planFrom(secret, r, this.random), hash: corpus.hash }
+    }, (error) => {
+      l.asking = false
+      console.error('[torneo] classifica della prossima manche non calcolata:', error instanceof Error ? error.message : error)
+    })
+    return 'asking'
+  }
+
+  // The corpus of the rooms has been (re)loaded: a round restored before it was ready gets its ranking now.
+  corpusReady() {
+    for (const l of this.live.values()) {
+      if (l.round && !l.plan && l.planPending !== l.round.id && this.corpusFor(l)) this.loadRound(l, l.round)
+      else this.publish(l, false)
     }
   }
 
@@ -843,6 +927,11 @@ export class ContextTournaments {
     }
     if (bump) l.version = ++this.version
     if (this.live.get(l.t.roomKey) !== l) return
+    // Between rounds the next one is prepared, so that «Avvia manche» finds its ranking ready.
+    if ((l.phase === 'ready' || l.phase === 'intermission') && !l.upcoming && !l.asking && !(l.t.totalRounds !== null && this.settledRounds(l) >= l.t.totalRounds)) {
+      const corpus = this.corpusFor(l)
+      if (corpus) this.prepareNext(l, corpus)
+    }
     this.deps.emitPublic(l.t.roomKey, this.publicState(l))
     this.publishAdmin(l)
   }

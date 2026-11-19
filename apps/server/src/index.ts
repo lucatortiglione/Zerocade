@@ -31,6 +31,7 @@ import {
   type Feed,
   type FeedCreator,
   type FeedEvent,
+  type ContextSemanticState,
   type HandshakeAuth,
   type LiveEvent,
   type LiveStats,
@@ -58,7 +59,7 @@ import {
   savedSources,
 } from './db.js'
 import { getContent, wordAssociation } from './content.js'
-import { contextFileBudget, contextResource, contextRevision, isContextFile, reloadContext, availableContextProfiles } from './context.js'
+import { contextFileBudget, contextResource, contextRevision, isContextFile, reloadContext } from './context.js'
 import { giochiDb } from './schema-db.js'
 import { isWordleFile, wordleFile } from './wordle.js'
 import { chainKeys, chains } from './chains.js'
@@ -81,7 +82,7 @@ import { TabooRooms } from './taboo.js'
 import { loadDeck } from './taboo-deck.js'
 import { WordHuntRooms } from './wordhunt.js'
 import type { FixtureFile } from './wordhunt-domain.js'
-import { invalidateContextCorpus, serverCorpus } from './context-tournament-ranking.js'
+import { ContextCorpora } from './context-corpora.js'
 import { ContextSemanticGame } from './context-semantic.js'
 import { persistence, reports, WorkerJobError } from './infrastructureClient.js'
 import { sessionSince } from './sessions.js'
@@ -219,7 +220,8 @@ app.get('/api/room', async (): Promise<RoomInfo> => ({
 app.get('/api/games', async () => GAMES)
 app.get('/api/content', async () => getContent())
 // ZeroContext's words and vectors: static files, cached by the browser until the next build.
-app.get('/api/context/profiles', async () => availableContextProfiles())
+// Asked of the ranking thread: checking Pipeline B reads its export, which must not stop this thread.
+app.get('/api/context/profiles', async () => contextCorpora.profiles())
 app.get('/api/context/:file', async (req, reply) => {
   const name = (req.params as { file: string }).file
   const requested = (req.query as { profile?: unknown }).profile
@@ -622,11 +624,25 @@ const noteSecretUse = (key: string, word: string, privateWord = false) => {
   io.to(privateWord ? dashboardRoom(key) : key).emit('context:secret-used', { word, uses, at })
 }
 
+// ZeroContext's words: the vocabulary here, the vectors and the rankings in a thread of their own (context-corpora.ts,
+// context-worker.ts), so that loading a corpus (up to 2 s) or ranking a secret (up to 0.3 s) never stops overlays and dashboards.
+const contextCorpora = new ContextCorpora()
+const roomProfile = (key: string) => contextProfile(getSession(key).settings.associationSource)
+// The room's corpus when it is ready (null while it loads: its loading starts).
+const roomCorpus = (key: string) => contextCorpora.get(roomProfile(key))
+// The room plays (or will play, once loaded) the semantic ZeroContext of the server, not the old one of the overlay.
+const semanticRoom = (key: string) => {
+  const corpus = roomCorpus(key)
+  return corpus ? Boolean(corpus.data.semantic) : contextCorpora.status(roomProfile(key)) === 'loading'
+}
+
 // ZeroContext's tournament, run by the server (context-tournament.ts): its public state to every client of the room,
 // the secret and the full standings to dashboards only. It needs ZeroFollowerBot's bridge, which serves roomKey.
 const tournaments = new ContextTournaments({
   store: contextTournamentStore,
-  corpus: (key) => serverCorpus(contextProfile(getSession(key).settings.associationSource)),
+  corpus: (key) => roomCorpus(key),
+  rank: (corpus, secret) => contextCorpora.rank(corpus, secret),
+  corpusLoading: (key) => contextCorpora.status(roomProfile(key)) === 'loading',
   emitPublic: (key, state) => io.to(key).emit('context:tournament', state),
   emitAdmin: (key, admin) => io.to(dashboardRoom(key)).emit('context:tournament-admin', admin),
   bridgeReady: (key) => {
@@ -782,7 +798,7 @@ try {
 setTimeout(loadWordHuntWords, 3000).unref()
 // The tournament's corpus (68 MB read, hashed and parsed in one go, a few hundred ms with the server stopped) is
 // prepared now, with nobody playing, rather than at the first «Crea torneo» of a live.
-setTimeout(() => { if (getSession(roomKey).gameId === 'context') serverCorpus(contextProfile(getSession(roomKey).settings.associationSource)) }, 1000).unref()
+setTimeout(() => { if (getSession(roomKey).gameId === 'context') void contextCorpora.load(roomProfile(roomKey)) }, 1000).unref()
 
 const liveCreators = (): FeedCreator[] => {
   const seen = new Map<string, FeedCreator>()
@@ -839,9 +855,11 @@ function ensureSemantic(key: string): ContextSemanticGame | null {
   if (session.gameId !== 'context' || session.ended || tournaments.has(key)) return null
   const existing = semanticGames.get(key)
   if (existing) return existing
-  const corpus = serverCorpus(contextProfile(session.settings.associationSource))
+  const corpus = roomCorpus(key)
   if (!corpus?.data.semantic) return null
   const game = new ContextSemanticGame({ corpus, settings: session.settings,
+    rank: (secret) => contextCorpora.rank(corpus, secret),
+    failed: (error) => app.log.warn({ err: error.message }, 'ZeroContext: classifica del round non calcolata, riprovo'),
     emit: (state) => {
       if (state.solution) revealedSecrets.set(key, state.solution)
       io.to(key).emit('context:semantic', state)
@@ -860,9 +878,30 @@ function ensureSemantic(key: string): ContextSemanticGame | null {
   return game
 }
 function clearSemantic(key: string) {
+  semanticGames.get(key)?.dispose()
   semanticGames.delete(key)
   io.to(key).emit('context:semantic', null)
 }
+// What the overlays draw: the game, or "preparing" while the room's corpus loads (not the overlay's old engine meanwhile).
+function semanticState(key: string): ContextSemanticState | null {
+  const game = ensureSemantic(key)
+  if (game) return game.snapshot()
+  const session = getSession(key)
+  return session.gameId === 'context' && !session.ended && !tournaments.has(key) && semanticRoom(key) ? PREPARING_STATE : null
+}
+const PREPARING_STATE: ContextSemanticState = { round: 0, mode: 'ordinary', phase: 'intermission', paused: false, preparing: true,
+  remainingMs: null, attempts: 0, total: 0, solution: null, prefix: '', wordLength: null, solvedBy: null, reason: null, best: null,
+  closest: [], last: null, typed: [], notes: [], leaders: [] }
+const contextRooms = () => new Set([roomKey, ...semanticGames.keys(), ...[...io.sockets.sockets.values()].map((s) => (s.handshake.auth as HandshakeAuth).key)])
+// A corpus is ready (or found unavailable): the rooms waiting for it start, a restored tournament gets its round's ranking.
+contextCorpora.onLoaded((profile) => {
+  tournaments.corpusReady()
+  for (const key of contextRooms()) {
+    if (getSession(key).gameId !== 'context' || roomProfile(key) !== profile || semanticGames.has(key)) continue
+    const state = semanticState(key)
+    if (!semanticGames.has(key)) io.to(key).emit('context:semantic', state)
+  }
+})
 const semanticClock = setInterval(() => {
   for (const [key, game] of semanticGames) {
     const session = getSession(key)
@@ -882,18 +921,19 @@ app.post('/api/context/reload', async (req, reply) => {
   try {
     const previous = contextRevision()
     const loaded = reloadContext(body.revision)
-    invalidateContextCorpus()
-    if (!serverCorpus()) throw new Error('Il nuovo corpus non supera la validazione del ranking')
+    // The ranking thread reloads and checks it too; the vocabulary here is read again from it.
+    await contextCorpora.reload(body.revision)
+    if (!await contextCorpora.load('original')) throw new Error('Il nuovo corpus non supera la validazione del ranking')
     if (previous !== loaded.revision) {
       tournaments.corpusChanged()
-      const keys = new Set([roomKey, ...roomSecrets.keys(), ...[...io.sockets.sockets.values()].map((s) => (s.handshake.auth as HandshakeAuth).key)])
+      const keys = new Set([...contextRooms(), ...roomSecrets.keys()])
       for (const key of keys) {
         if (getSession(key).gameId !== 'context' || tournaments.isOpen(key)) continue
         roomSecrets.delete(key)
         revealedSecrets.delete(key)
         clearSemantic(key)
         io.to(key).emit('session:state', controlGame(key, 'restart'))
-        ensureSemantic(key)
+        io.to(key).emit('context:semantic', semanticState(key))
       }
     }
     return reply.send({ ok: true, ...loaded })
@@ -910,9 +950,10 @@ io.on('connection', (socket) => {
   const session = getSession(key)
   socket.emit('session:state', session)
   const secret = roomSecrets.get(key)
-  if (SECRET_GAMES.includes(session.gameId) && secret && (clientType === 'dashboard' || session.gameId !== 'context' || !serverCorpus(contextProfile(getSession(key).settings.associationSource))?.data.semantic)) socket.emit('secret:word', { word: secret })
-  const semantic = ensureSemantic(key)
-  socket.emit('context:semantic', semantic?.snapshot() ?? null)
+  if (SECRET_GAMES.includes(session.gameId) && secret && (clientType === 'dashboard' || session.gameId !== 'context' || !semanticRoom(key))) socket.emit('secret:word', { word: secret })
+  const semanticSnapshot = semanticState(key)
+  const semantic = semanticSnapshot !== null
+  socket.emit('context:semantic', semanticSnapshot)
   if (session.gameId === 'zerodubbi') socket.emit('bivio:state', bivio.open(key, session.settings))
   if (session.gameId === 'incastro') socket.emit('incastro:state', incastro.open(key, session.settings))
   if (session.gameId === 'quizzland') socket.emit('quizzland:state', quizzland.open(key, session.settings))
@@ -992,7 +1033,7 @@ io.on('connection', (socket) => {
     const session = getSession(key)
     if (!r || !u || r.game !== session.gameId || session.paused || session.ended) return
     // The tournament's points are the server's own, never an overlay's (and never in the ordinary leaderboards).
-    if (session.gameId === 'context' && (tournaments.has(key) || ensureSemantic(key))) return
+    if (session.gameId === 'context' && (tournaments.has(key) || ensureSemantic(key) || semanticRoom(key))) return
     if (session.gameId === 'zerotaboo') return // its standings are the server's own (D17)
     if (session.gameId === 'zerowordhunt') return // its claims are the server's own
     if (typeof u.id !== 'string' || typeof u.nickname !== 'string' || typeof r.points !== 'number') return
@@ -1013,7 +1054,7 @@ io.on('connection', (socket) => {
 
   socket.on('secret:round', (raw: unknown) => {
     if (!SECRET_GAMES.includes(getSession(key).gameId) || !raw || typeof raw !== 'object') return
-    if (getSession(key).gameId === 'context' && (tournaments.has(key) || ensureSemantic(key))) return
+    if (getSession(key).gameId === 'context' && (tournaments.has(key) || ensureSemantic(key) || semanticRoom(key))) return
     const { word, prev } = raw as { word?: unknown; prev?: unknown }
     // One word, or a chain of them joined by "-" (ZeroReazioniACatena's led by its mode and round).
     if (typeof word !== 'string' || word.length > ROOM_SECRET_MAX || !ROOM_SECRET.test(word)) return
@@ -1029,7 +1070,7 @@ io.on('connection', (socket) => {
   // ZeroContext: an overlay shows the round's word (see revealedSecrets); only the room's word counts.
   socket.on('secret:revealed', (raw: unknown) => {
     if (getSession(key).gameId !== 'context' || !raw || typeof raw !== 'object') return
-    if (ensureSemantic(key)) return
+    if (ensureSemantic(key) || semanticRoom(key)) return
     const { word } = raw as { word?: unknown }
     if (typeof word === 'string' && word === roomSecrets.get(key)) revealedSecrets.set(key, word)
   })
@@ -1174,7 +1215,8 @@ io.on('connection', (socket) => {
       io.to(key).emit('wordhunt:state', room.state())
       io.to(dashboardRoom(key)).emit('wordhunt:admin', room.admin())
     }
-    ensureSemantic(key)
+    // The game, or "preparing" while its words load in the ranking thread.
+    if (state.gameId === 'context') io.to(key).emit('context:semantic', semanticState(key))
   })
 
   socket.on('triggers:set', (raw: unknown) => {
@@ -1182,7 +1224,7 @@ io.on('connection', (socket) => {
     if (triggers) io.to(key).emit('session:state', setTriggers(key, triggers))
   })
 
-  socket.on('settings:set', (raw: unknown) => {
+  const setSettingsFrom = (raw: unknown) => {
     // Partial updates are merged onto the current settings, so two quick changes to
     // different fields cannot overwrite each other.
     const current = getSession(key)
@@ -1192,8 +1234,12 @@ io.on('connection', (socket) => {
     if (changingProfile) {
       if (tournamentLocks('Cambiare associazioni')) return
       const profile = contextProfile(settings.associationSource)
-      if (!serverCorpus(profile)) {
-        socket.emit('context:tournament-error', { message: 'Queste associazioni non sono disponibili. La scelta precedente resta attiva.' })
+      if (!contextCorpora.get(profile)) {
+        // Loaded in the ranking thread (up to 2 s), then the change is applied to the settings of that moment.
+        void contextCorpora.load(profile).then((corpus) => {
+          if (corpus) setSettingsFrom(raw)
+          else socket.emit('context:tournament-error', { message: 'Queste associazioni non sono disponibili. La scelta precedente resta attiva.' })
+        })
         return
       }
       roomSecrets.delete(key)
@@ -1203,13 +1249,14 @@ io.on('connection', (socket) => {
     setSettings(key, settings)
     tournaments.settingsChanged(key)
     io.to(key).emit('session:state', changingProfile ? refreshGame(key) : getSession(key))
-    if (changingProfile) { ensureSemantic(key); return }
+    if (changingProfile) { io.to(key).emit('context:semantic', semanticState(key)); return }
     bivio.get(key)?.applySettings(settings)
     incastro.get(key)?.applySettings(settings)
     quizzland.get(key)?.applySettings(settings)
     wordhunt.get(key)?.settingsChanged()
     semanticGames.get(key)?.settingsChanged(settings)
-  })
+  }
+  socket.on('settings:set', setSettingsFrom)
 
   socket.on('bivio:control', (raw: unknown) => {
     const command = sanitizeBivioCommand(raw)
@@ -1325,6 +1372,7 @@ const shutdown = createShutdown({
     { name: 'stop accepting work', run: () => { draining = true } },
     { name: 'ZeroContext tournament', run: () => tournaments.shutdown() },
     { name: 'ZeroContext semantic clock', run: () => { clearInterval(semanticClock); semanticGames.clear() } },
+    { name: 'ZeroContext ranking thread', run: () => contextCorpora.close() },
     { name: 'live sources', run: () => { zfb.close(); sources.forEach((room) => room.disconnectAll()) } },
     { name: 'ZeroDubbi rooms', run: () => bivio.closeAll() },
     { name: 'ZeroWords rooms', run: () => incastro.closeAll() },
