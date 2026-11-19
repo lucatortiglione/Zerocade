@@ -7,6 +7,7 @@ const LINKS = [
   { to: '/dj', label: 'DJ Pad', icon: '🎚️' },
   { to: '/gifts', label: 'Gifts', icon: '🎁' },
   { to: '/setup', label: 'Setup', icon: '🔗' },
+  { to: '/qualita', label: 'Qualità', icon: '🎯' },
 ]
 
 export function LeftRail() {
