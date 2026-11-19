@@ -102,7 +102,8 @@ seconda fase, senza dedurle arbitrariamente dal nome del sito.
 ## Fonti attualmente registrate
 
 Il registro estendibile è `resources/prompt_inventory_sources.json`.
-Contiene 40 risorse:
+Dal 18/11/2026 contiene 6 risorse (LiITA Lemma Bank, CompL-it, Wikizionario e Wiktionary inglese tramite Kaikki, Morph-it!, CoLFIS),
+elencate nel [catalogo](../database/FONTI_PAROLE_RAW.md). L'elenco seguente è lo storico delle fonti tolte e di quelle rimaste:
 
 - lessico italiano di Wikizionario italiano e delle edizioni inglese,
   francese, tedesca e spagnola di Wiktionary,
@@ -111,7 +112,6 @@ Contiene 40 risorse:
   Wikiquote, Wikivoyage, Wikiversità e Wikinotizie;
 - dizionario ortografico e thesaurus italiani di LibreOffice;
 - lemmi italiani di MultiWordNet nella distribuzione Open Multilingual Wordnet;
-- unione delle liste `napolux/paroleitaliane`;
 - lista italiana di frequenze wordfreq già presente nel progetto;
 - URL dei lemmi nelle sitemap pubbliche del Nuovo De Mauro di Internazionale;
 - lemmi e forme dei tre file train/dev/test di UD Italian ISDT;

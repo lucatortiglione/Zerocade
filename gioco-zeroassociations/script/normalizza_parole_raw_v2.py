@@ -18,6 +18,8 @@ from canonical_word_forms import FamilyEvidence
 from collect_prompt_sources import checksum
 from parole_raw_v2 import DEFAULT_DB, ROOT, VERSION
 from prompt_inventory import records
+import raw_word_familiarity
+import raw_word_metrics
 
 POLICY = 'canonical-lemma-2.2'
 KINDS = {'wiktextract','morphit','unimorph','glaffit','flex_it','conllu'}
@@ -73,19 +75,20 @@ def analyze(con, frequency=None):
             raise ValueError(f"Fonte vuota o modificata durante la lettura: {source['source']}")
     print('Confronto delle forme e delle frequenze italiane...',flush=True)
     selected = evidence.finish(frequency)
+    audit = evidence.audit(selected)
     if con.execute('PRAGMA data_version').fetchone()[0]!=baseline:
         raise ValueError('Il database è cambiato durante il calcolo: ripetere la normalizzazione')
     report = {'policy':POLICY,'database':str(DEFAULT_DB),'source_table':'parole','target_table':'normalizzata',
               'source_words':total,'single_words':len(known),'excluded':len(selected),
               'normalized_words':total-len(selected),'source_words_sha256':digest.hexdigest(),
-              'wordfreq_version':importlib.metadata.version('wordfreq'),'zipf_minimum_filter':None,
+              'wordfreq_version':importlib.metadata.version('wordfreq'),'zipf_minimum_filter':None,'audit':audit,
               'rules':dict(Counter(v['rule'] for v in selected.evidence.values())),
               'sources':[{k:s[k] for k in ('source','snapshot','sha256')} for s in sources],
               'examples':[{**v,'word':w,'reason':selected.reasons[w]} for w,v in list(selected.evidence.items())[:20]]}
     return selected,report,baseline
 
 
-def populate(con, selected, report, baseline):
+def populate(con, selected, report, baseline, metrics=None):
     # Ogni sostituta deve restare in normalizzata: un errore qui nomina le parole, invece del solo vincolo violato.
     chained = sorted((w, v[0]) for w, v in selected.items() if v and v[0] in selected)
     if chained:
@@ -95,21 +98,49 @@ def populate(con, selected, report, baseline):
     try:
         if con.execute('PRAGMA data_version').fetchone()[0]!=baseline:
             raise ValueError('Le parole sono cambiate prima della pubblicazione')
-        con.execute('''CREATE TABLE IF NOT EXISTS normalizzata(
-            parola TEXT PRIMARY KEY REFERENCES parole(parola),
-            is_single_word INTEGER NOT NULL CHECK(is_single_word IN (0,1))) STRICT, WITHOUT ROWID''')
-        # sostituita_da è vuoto per le forme verbali il cui infinito non è nella raccolta.
+        # normalizzata e le tabelle che la usano sono interamente derivate: si ricreano ogni volta, con lo schema attuale.
+        con.execute('DROP TABLE IF EXISTS word_measurements')
         con.execute('DROP TABLE IF EXISTS normalizzazione_esclusioni')
+        con.execute('DROP TABLE IF EXISTS normalizzata')
+        con.execute('''CREATE TABLE normalizzata(
+            parola TEXT PRIMARY KEY REFERENCES parole(parola),
+            is_single_word INTEGER NOT NULL CHECK(is_single_word IN (0,1)),
+            lexical_validity TEXT NOT NULL CHECK(lexical_validity IN ('VALID','REVIEW_REQUIRED','REJECTED','UNKNOWN')),
+            word_prevalence REAL,
+            contextual_diversity INTEGER CHECK(contextual_diversity IS NULL OR contextual_diversity>=0),
+            frequency INTEGER CHECK(frequency IS NULL OR frequency>=0),
+            iwfs REAL CHECK(iwfs IS NULL OR (iwfs>=0 AND iwfs<=100)),
+            iwfs_status TEXT NOT NULL CHECK(iwfs_status IN ('FULL','PARTIAL','DIAGNOSTIC','UNAVAILABLE')),
+            iwfs_confidence TEXT NOT NULL CHECK(iwfs_confidence IN ('HIGH','MEDIUM','LOW','NONE')),
+            familiarity_band TEXT CHECK(familiarity_band IS NULL OR familiarity_band IN ('MOLTO_FAMILIARE','FAMILIARE','POCO_FAMILIARE','RARA'))
+            ) STRICT, WITHOUT ROWID''')
+        con.execute('''CREATE TABLE word_measurements(
+            parola TEXT NOT NULL REFERENCES normalizzata(parola),
+            metric TEXT NOT NULL CHECK(metric IN ('prevalence','contextual_diversity','frequency')),
+            value_raw REAL,
+            value_normalized REAL CHECK(value_normalized IS NULL OR (value_normalized>=0 AND value_normalized<=100)),
+            status TEXT NOT NULL CHECK(status IN ('OBSERVED','ESTIMATED','MISSING','NOT_APPLICABLE')),
+            sample_size INTEGER,
+            source_id TEXT NOT NULL,source_version TEXT,normalization_version TEXT NOT NULL,
+            PRIMARY KEY(parola,metric)) STRICT, WITHOUT ROWID''')
+        # sostituita_da è vuoto per le forme verbali il cui infinito non è nella raccolta.
         con.execute('''CREATE TABLE normalizzazione_esclusioni(
             parola TEXT PRIMARY KEY REFERENCES parole(parola),
             sostituita_da TEXT REFERENCES normalizzata(parola),
             motivo TEXT NOT NULL,dettagli_json TEXT NOT NULL) STRICT, WITHOUT ROWID''')
         con.execute('CREATE TEMP TABLE excluded_words(parola TEXT PRIMARY KEY) WITHOUT ROWID')
         con.executemany('INSERT INTO excluded_words VALUES (?)',((w,) for w in selected))
-        con.execute('DELETE FROM normalizzazione_esclusioni')
-        con.execute('DELETE FROM normalizzata')
-        con.execute('''INSERT INTO normalizzata SELECT p.parola,p.is_single_word FROM parole p
-                       WHERE NOT EXISTS (SELECT 1 FROM excluded_words e WHERE e.parola=p.parola)''')
+        kept_rows = con.execute('''SELECT p.parola,p.is_single_word FROM parole p
+                       WHERE NOT EXISTS (SELECT 1 FROM excluded_words e WHERE e.parola=p.parola)''').fetchall()
+        # IWFS (specifica database/IWFS_Specifica_Indice_Familiarita_Italiano_v1.0.md): Word Prevalence, Contextual Diversity e
+        # frequenza per ogni parola tenuta, con stato dei dati, confidence e fascia. NULL = non misurata.
+        metrics = metrics or raw_word_metrics.load()
+        sources_by_word = {w:set(f.split(',')) for w,f in con.execute('SELECT parola,group_concat(fonte_id) FROM parole_fonti GROUP BY parola')}
+        table,measurements,summary = raw_word_familiarity.compute(kept_rows,sources_by_word,metrics)
+        con.executemany('INSERT INTO normalizzata VALUES (?,?,?,?,?,?,?,?,?,?)',table)
+        con.executemany('INSERT INTO word_measurements VALUES (?,?,?,?,?,?,?,?,?)',measurements)
+        report['iwfs'] = {**summary,'metrics_version':raw_word_metrics.VERSION,'sources':metrics.sources}
+        con.execute("INSERT OR REPLACE INTO meta VALUES ('iwfs_model',?)",(json.dumps(report['iwfs'],ensure_ascii=False),))
         con.executemany('INSERT INTO normalizzazione_esclusioni VALUES (?,?,?,?)',
                         ((w,v[0] if v else None,selected.reasons[w],json.dumps(selected.evidence[w],ensure_ascii=False))
                          for w,v in selected.items()))
@@ -153,10 +184,19 @@ def main(argv=None):
                 with closing(sqlite3.connect(backup)) as target:
                     con.backup(target)
                 report['backup'] = str(backup)
-                populate(con,selected,report,baseline)
+                print('Word Prevalence (ICP) e Contextual Diversity (SUBTLEX-IT): download o cache...',flush=True)
+                metrics = raw_word_metrics.load()  # prima della transazione: un download fallito non tocca il DB
+                populate(con,selected,report,baseline,metrics)
             args.report.parent.mkdir(parents=True,exist_ok=True)
             args.report.write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
             print(json.dumps({k:report[k] for k in ('source_words','normalized_words','excluded','published','rules')},ensure_ascii=False),flush=True)
+            audit = report['audit']
+            residue = audit['residual_inflected_forms']
+            print(f"Controlli: {audit['reference_checks']['checked']} parole di riferimento, {len(audit['reference_checks']['failed'])} non conformi; "
+                  f"plurali e femminili con lemma presente ancora in normalizzata: {residue['total']}, sospetti {residue['suspect']} (limite {residue['limit']}) {residue['by_reason']}; "
+                  f"omografi tenuti: {audit['homographs_kept']['total']}; plurali più comuni: {audit['common_plurals']['total']}",flush=True)
+            if not audit['ok']:
+                print('ATTENZIONE: controlli non superati:',audit['reference_checks']['failed'] or 'residui oltre il limite',flush=True)
     return 0
 
 

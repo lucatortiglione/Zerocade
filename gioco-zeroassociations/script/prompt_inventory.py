@@ -28,7 +28,7 @@ from inventory_evidence import source_family
 
 REGISTRY=ROOT/'resources/prompt_inventory_sources.json'
 SINGLE_WORD=re.compile(r'[a-zàèéìòù]+')
-KINDS={'wiktextract','wiki_titles','hunspell','mythes','wordnet_tab','wordlist','frequency_csv','frequency_text','morphit','unimorph','glaffit','flex_it','sitemap_index','conllu','tei_headwords','nvdb_text','xlsx_table'}
+KINDS={'wiktextract','wiki_titles','hunspell','mythes','wordnet_tab','wordlist','frequency_csv','frequency_text','morphit','unimorph','glaffit','flex_it','sitemap_index','conllu','tei_headwords','nvdb_text','xlsx_table','liita_ttl','complit_ttl','colfis_lemmas','magic_forms','paisa_lemmas'}
 FIELD_SEPARATOR='\x1f'
 RECORD_SEPARATOR='\x1e'
 
@@ -187,6 +187,78 @@ def records(path,source):
                 row=observation(cells[0],number,'frequency_form',details={
                     'frequency':int(cells[1]),'language_claim':'italian_frequency_list_not_language_proof'})
                 if row:yield row
+    elif kind=='liita_ttl':
+        # LiITA Lemma Bank (Turtle): un blocco per lemma, con lila:hasPOS e ontolex:writtenRep. Niente nomi propri.
+        pos='';written=None
+        with path.open(encoding=encoding) as stream:
+            for number,line in enumerate(stream,1):
+                line=line.strip()
+                if line.startswith('lila:hasPOS'):
+                    pos=line.split()[1].rstrip(';.').removeprefix('lila:')
+                elif line.startswith('ontolex:writtenRep'):
+                    match=re.match(r'ontolex:writtenRep\s+"((?:[^"\\]|\\.)*)"@it',line)
+                    written=(match.group(1),number) if match else None
+                if line.endswith('.'):
+                    if written and pos!='proper_noun':
+                        row=observation(written[0],written[1],'lemma',pos,written[0],{'language_claim':'it_from_lemma_bank'})
+                        if row:yield row
+                    pos='';written=None
+    elif kind=='complit_ttl':
+        # CompL-it (OntoLex-Lemon, gzip): solo i lemmi (ontolex:Word e MultiwordExpression), non le forme flesse né i sensi.
+        inside=False;pos='';label=None
+        with gzip.open(path,'rt',encoding='utf-8') as stream:
+            for number,line in enumerate(stream,1):
+                if line[:1] not in {' ','\t','\n','@'} and re.match(r'lex:\S+\s+a\s+ontolex:(Word|MultiwordExpression)\b',line):
+                    inside=True;pos='';label=None
+                if not inside:continue
+                text=line.strip()
+                if text.startswith('lexinfo:partOfSpeech'):
+                    pos=text.split()[1].rstrip(';.').removeprefix('lexinfo:')
+                elif text.startswith('rdfs:label'):
+                    match=re.match(r'rdfs:label\s+"((?:[^"\\]|\\.)*)"@it',text)
+                    label=(match.group(1),number) if match else None
+                if text.endswith('.'):
+                    if label and pos!='properNoun':
+                        row=observation(label[0],label[1],'lemma',pos,label[0],{'language_claim':'it_from_computational_lexicon'})
+                        if row:yield row
+                    inside=False
+    elif kind=='magic_forms':
+        # MAGIC (ILC-CNR): «->forma» e, sotto, righe «[ n] MACRO:word[l_<lemma>,<forma>,<categoria>,...]». Si leggono i soli lemmi.
+        with path.open(encoding=encoding) as stream:
+            for number,line in enumerate(stream,1):
+                at=line.find('MACRO:word[l_')
+                if at<0:continue
+                cells=line[at+len('MACRO:word['):].rstrip().rstrip(']').split(',')
+                if len(cells)<3:continue
+                row=observation(cells[0][2:],number,'lemma',cells[2],cells[0][2:],{'language_claim':'it_from_morphological_analyzer'})
+                if row:yield row
+    elif kind=='paisa_lemmas':
+        # PAISÀ (Eurac CLARIN, gzip): righe «lemma,frequenza» tratte da testi web; sotto min_frequency (registro) sono troppo rumorose.
+        threshold=int(source.get('min_frequency',1))
+        with gzip.open(path,'rt',encoding='utf-8',errors='replace') as stream:
+            for number,line in enumerate(stream,1):
+                if line.startswith('#') or not line.strip():continue
+                lemma,_,count=line.rstrip('\r\n').rpartition(',')
+                if not count.isdigit():raise ValueError(f'Frequenza PAISÀ non valida, riga {number}')
+                if int(count)<threshold:continue
+                row=observation(lemma,number,'lemma',details={'language_claim':'it_from_web_corpus','frequency':int(count)})
+                if row:yield row
+    elif kind=='colfis_lemmas':
+        # CoLFIS (CNR/SNS), file «Lemmi_rango» in un archivio zip: campi separati da due o più spazi, lemma e categoria in fondo.
+        # Escluse le categorie dei nomi propri (E), dei segni (K, Z) e dei frammenti non lessicali (X).
+        with zipfile.ZipFile(path) as archive:
+            name=next((n for n in archive.namelist() if n.lower().startswith('lemmi_rango') and n.lower().endswith('.txt') and 'read me' not in n.lower()),None)
+            if name is None:raise ValueError('CoLFIS: il file Lemmi_rango manca nell\'archivio')
+            with archive.open(name) as stream:
+                header=next(stream).decode(encoding)
+                if 'Lemma' not in header or 'Cat.Gramm' not in header:raise ValueError('CoLFIS: intestazione non riconosciuta')
+                for number,raw in enumerate(stream,2):
+                    cells=re.split(r'\s{2,}',raw.decode(encoding).strip())
+                    if len(cells)<3:continue
+                    lemma,category=cells[-2],cells[-1]
+                    if category.rstrip('@') in {'E','K','Z','X'}:continue
+                    row=observation(lemma,number,'lemma',category,lemma,{'language_claim':'it_from_frequency_lexicon','frequency':cells[1] if cells[1].isdigit() else None})
+                    if row:yield row
     elif kind=='tei_headwords':
         if source.get('dictionary_source_language')!='it':
             raise ValueError('Il dizionario TEI deve dichiarare italiano come lingua sorgente')

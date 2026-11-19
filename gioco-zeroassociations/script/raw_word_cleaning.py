@@ -63,8 +63,6 @@ def clean_existing(con, *, force=False):
     con.execute('BEGIN IMMEDIATE')
     try:
         before = con.execute('SELECT count(*) FROM parole').fetchone()[0]
-        con.execute('''CREATE TABLE IF NOT EXISTS pulizia_parole(
-            originale TEXT PRIMARY KEY,pulita TEXT,motivo TEXT NOT NULL) STRICT, WITHOUT ROWID''')
         con.execute('CREATE TEMP TABLE cleanup_map(originale TEXT PRIMARY KEY,pulita TEXT,single_word INTEGER) WITHOUT ROWID')
         changed = removed = 0
         batch = []
@@ -80,27 +78,19 @@ def clean_existing(con, *, force=False):
                 print(f'Pulizia: {number:,}/{before:,} voci',flush=True)
         if batch:
             con.executemany('INSERT INTO cleanup_map VALUES (?,?,?)',batch)
-        con.execute('''INSERT OR REPLACE INTO pulizia_parole
-            SELECT originale,pulita,CASE WHEN pulita IS NULL THEN 'voce_non_lessicale' ELSE 'pulizia_caratteri' END
-            FROM cleanup_map WHERE pulita IS NULL OR pulita<>originale''')
         con.execute('''CREATE TEMP TABLE cleaned_words AS SELECT pulita AS parola,max(single_word) AS is_single_word
                        FROM cleanup_map WHERE pulita IS NOT NULL GROUP BY pulita''')
         con.execute('''CREATE TEMP TABLE cleaned_links AS SELECT DISTINCT m.pulita AS parola,f.fonte_id
                        FROM parole_fonti f JOIN cleanup_map m ON m.originale=f.parola WHERE m.pulita IS NOT NULL''')
-        has_normalized = bool(con.execute("SELECT 1 FROM sqlite_schema WHERE name='normalizzata'").fetchone())
-        if has_normalized:
-            con.execute('''CREATE TEMP TABLE cleaned_normalized AS SELECT m.pulita AS parola,max(m.single_word) AS is_single_word
-                FROM normalizzata n JOIN cleanup_map m ON m.originale=n.parola
-                WHERE m.pulita IS NOT NULL GROUP BY m.pulita''')
-            con.execute('DELETE FROM normalizzazione_esclusioni')
-            con.execute('DELETE FROM normalizzata')
+        # normalizzata e le sue tabelle derivate si ricalcolano con "Normalizzare parole RAW" (lo stato diventa da_aggiornare).
+        tables = {r[0] for r in con.execute("SELECT name FROM sqlite_schema WHERE type='table'")}
+        for table in ('word_measurements','normalizzazione_esclusioni','normalizzata'):
+            if table in tables:
+                con.execute('DELETE FROM '+table)
         con.execute('DELETE FROM parole_fonti')
         con.execute('DELETE FROM parole')
         con.execute('INSERT INTO parole SELECT * FROM cleaned_words')
         con.execute('INSERT INTO parole_fonti SELECT * FROM cleaned_links')
-        if has_normalized:
-            con.execute('INSERT INTO normalizzata SELECT * FROM cleaned_normalized')
-            con.execute('DROP TABLE cleaned_normalized')
         after = con.execute('SELECT count(*) FROM parole').fetchone()[0]
         report = {'version':VERSION,'source_words':before,'cleaned_words':after,
                   'removed':removed,'transformed':changed,'merged_duplicates':before-removed-after}

@@ -9,18 +9,18 @@ import sqlite3
 from collect_prompt_sources import checksum
 from inventory_updates import fetch_current
 from prompt_inventory import normalize, records, SINGLE_WORD
+from raw_language_filter import foreign_language, has_italian_frequency, spelling_oddity, ITALIAN_EVIDENCE, SPELLING, VERSION as LANGUAGE_VERSION
+from raw_person_names import scan_wiktextract, LEXICAL_SOURCES, VERSION as NAMES_VERSION
 from raw_word_cleaning import clean_word, clean_existing, VERSION as CLEANUP_VERSION
 
 ROOT = Path(__file__).resolve().parents[2]
 DEFAULT_DB = ROOT / 'database/parole_ita_raw_2.0.sqlite3'
 LEGACY_DB = ROOT / 'database/parole_ita_raw.sqlite3'
 VERSION = 'parole-raw-2.0'
+OBSOLETE_TABLES = ('pulizia_parole', 'parole_straniere', 'nomi_persona')
 
 SCHEMA = '''
 CREATE TABLE IF NOT EXISTS meta(name TEXT PRIMARY KEY,value TEXT NOT NULL) STRICT;
-CREATE TABLE IF NOT EXISTS pulizia_parole(
- originale TEXT PRIMARY KEY,pulita TEXT,motivo TEXT NOT NULL
-) STRICT, WITHOUT ROWID;
 CREATE TABLE IF NOT EXISTS parole(
  parola TEXT PRIMARY KEY,is_single_word INTEGER NOT NULL CHECK(is_single_word IN (0,1))
 ) STRICT, WITHOUT ROWID;
@@ -46,6 +46,17 @@ CREATE TABLE IF NOT EXISTS inventory_http_cache(
 '''
 
 
+SAMPLE_SIZE = 200
+
+
+def sample_words(words, size=SAMPLE_SIZE):
+    """Un campione uniforme e ripetibile dell'elenco ordinato, per controllare a occhio cosa ha tolto un filtro."""
+    words = sorted(words)
+    if len(words) <= size:
+        return words
+    return [words[i * len(words) // size] for i in range(size)]
+
+
 def now():
     return datetime.now(timezone.utc).isoformat()
 
@@ -66,6 +77,8 @@ class WordDatabase:
                     raise ValueError('Il file esistente non è un archivio parole RAW 2.0')
             self.con.execute('PRAGMA foreign_keys=ON')
             self.con.executescript(SCHEMA)
+            for table in OBSOLETE_TABLES:  # eliminate il 18/11/2026: non si conservano più registri delle parole scartate
+                self.con.execute('DROP TABLE IF EXISTS '+table)
             self.con.execute("INSERT OR IGNORE INTO meta VALUES ('schema_version',?)", (VERSION,))
             if self.con.execute('SELECT count(*) FROM parole').fetchone()[0]==0:
                 self.con.execute("INSERT OR IGNORE INTO meta VALUES ('word_cleanup_version',?)",(CLEANUP_VERSION,))
@@ -114,34 +127,30 @@ class WordDatabase:
                 self.con.execute("UPDATE meta SET value='da_aggiornare' WHERE name='normalizzazione_stato'")
             return {'source':source['id'],'status':'UNCHANGED','sha256':digest,'new_words':0}
         before = self.con.execute('SELECT count(*) FROM parole').fetchone()[0]
-        count, read_count, batch, cleaning = 0, 0, {}, {}
+        count, read_count, foreign, batch = 0, 0, 0, {}
 
         def flush():
             self.con.executemany('''INSERT INTO parole VALUES (?,?) ON CONFLICT(parola)
                 DO UPDATE SET is_single_word=max(parole.is_single_word,excluded.is_single_word)''', batch.items())
             self.con.executemany('INSERT OR IGNORE INTO parole_fonti VALUES (?,?)',
                                  ((w,source['id']) for w in batch))
-            self.con.executemany('INSERT OR REPLACE INTO pulizia_parole VALUES (?,?,?)',
-                                 ((w,v,'voce_non_lessicale' if v is None else 'pulizia_caratteri') for w,v in cleaning.items()))
             batch.clear()
-            cleaning.clear()
 
         self.con.execute('BEGIN IMMEDIATE')
         try:
             for row in records(path,source):
                 read_count += 1
-                original = row['prompt']
-                word = clean_word(original)
-                if word!=original:
-                    cleaning[original] = word
+                word = clean_word(row['prompt'])
                 if word is None:
-                    if len(cleaning)>=10000: flush()
+                    continue
+                if foreign_language(word) or spelling_oddity(word) == 'hard':
+                    foreign += 1
                     continue
                 count += 1
                 batch[word] = int(bool(SINGLE_WORD.fullmatch(word)))
                 if len(batch) >= 10000:
                     flush()
-            if batch or cleaning:
+            if batch:
                 flush()
             if not read_count:
                 raise ValueError('Fonte vuota o formato non riconosciuto')
@@ -158,7 +167,100 @@ class WordDatabase:
             raise
         after = self.con.execute('SELECT count(*) FROM parole').fetchone()[0]
         return {'source':source['id'],'status':'IMPORTED','records':count,'records_read':read_count,
-                'non_lexical_records_removed':read_count-count,'sha256':digest,'new_words':after-before}
+                'non_lexical_records_removed':read_count-count-foreign,'foreign_records_skipped':foreign,'sha256':digest,'new_words':after-before}
+
+    def _delete_words(self, words):
+        """Toglie le parole da `parole`, `parole_fonti`, `normalizzata` e dal registro delle esclusioni (dentro la transazione
+        del chiamante); l'elenco si tiene solo in una tabella temporanea."""
+        self.con.execute('CREATE TEMP TABLE IF NOT EXISTS parole_da_togliere(parola TEXT PRIMARY KEY) WITHOUT ROWID')
+        self.con.execute('DELETE FROM parole_da_togliere')
+        self.con.executemany('INSERT OR IGNORE INTO parole_da_togliere VALUES (?)', ((w,) for w in words))
+        tables = {r[0] for r in self.con.execute("SELECT name FROM sqlite_schema WHERE type='table'")}
+        if 'normalizzazione_esclusioni' in tables:
+            self.con.execute('''DELETE FROM normalizzazione_esclusioni WHERE parola IN (SELECT parola FROM parole_da_togliere)
+                                OR sostituita_da IN (SELECT parola FROM parole_da_togliere)''')
+        if 'normalizzata' in tables:
+            if 'word_measurements' in tables:
+                self.con.execute('DELETE FROM word_measurements WHERE parola IN (SELECT parola FROM parole_da_togliere)')
+            self.con.execute('DELETE FROM normalizzata WHERE parola IN (SELECT parola FROM parole_da_togliere)')
+        self.con.execute('DELETE FROM parole_fonti WHERE parola IN (SELECT parola FROM parole_da_togliere)')
+        self.con.execute('DELETE FROM parole WHERE parola IN (SELECT parola FROM parole_da_togliere)')
+        self.con.execute('DROP TABLE parole_da_togliere')
+
+    def remove_foreign_words(self):
+        """Toglie dal RAW le parole non italiane (vedi raw_language_filter), con le loro attestazioni e le righe della
+        normalizzazione che le nominano. Il rapporto (e `meta.filtro_lingua`) dà i conteggi per lingua. Una sola transazione."""
+        evidence_sources = sorted(ITALIAN_EVIDENCE & {r[0] for r in self.con.execute('SELECT id FROM fonti')})
+        attested = set()
+        if evidence_sources:
+            marks = ','.join('?' * len(evidence_sources))
+            attested = {w for w, in self.con.execute(f'SELECT DISTINCT parola FROM parole_fonti WHERE fonte_id IN ({marks})', evidence_sources)}
+        foreign = []
+        for word, in self.con.execute('SELECT parola FROM parole').fetchall():
+            lang = foreign_language(word)
+            if not lang and (oddity := spelling_oddity(word)):
+                if oddity == 'hard' or (word not in attested and not has_italian_frequency(word)):
+                    lang = SPELLING
+            if lang:
+                foreign.append((word, lang))
+        self.con.execute('BEGIN IMMEDIATE')
+        try:
+            self._delete_words(w for w, _ in foreign)
+            by_language, words_by_language = {}, {}
+            for word, lang in foreign:
+                by_language[lang] = by_language.get(lang, 0) + 1
+                words_by_language.setdefault(lang, []).append(word)
+            report = {'version': LANGUAGE_VERSION, 'words_removed': len(foreign), 'by_language': by_language, 'evidence_sources': evidence_sources,
+                      'sample_removed': {lang: sample_words(words) for lang, words in sorted(words_by_language.items())}}
+            if foreign:
+                self.con.execute("UPDATE meta SET value='da_aggiornare' WHERE name='normalizzazione_stato'")
+            self.con.execute("INSERT OR REPLACE INTO meta VALUES ('filtro_lingua',?)", (json.dumps({**report, 'at_utc': now()}),))
+            if self.con.execute('PRAGMA foreign_key_check').fetchone():
+                raise ValueError('Riferimenti non validi dopo il filtro di lingua')
+            self.con.execute('COMMIT')
+        except BaseException:
+            self.con.execute('ROLLBACK')
+            raise
+        return report
+
+    def remove_person_names(self):
+        """Toglie dal RAW i nomi di battesimo e i cognomi (vedi raw_person_names), con le attestazioni e le righe della
+        normalizzazione che li nominano; i conteggi stanno nel rapporto e in `meta.filtro_nomi`. Le fonti Wiktionary senza file in cache non
+        contano e sono elencate nel rapporto. Una sola transazione."""
+        names, common, skipped = set(), set(), []
+        for source_id, in self.con.execute("SELECT id FROM fonti WHERE tipo='wiktextract' ORDER BY id").fetchall():
+            path, config = self._head_file(source_id)
+            if path is None:
+                skipped.append(source_id)
+                continue
+            found, plain = scan_wiktextract(path, (config or {}).get('encoding', 'utf-8-sig'))
+            names |= found
+            common |= plain
+        lexical = sorted(LEXICAL_SOURCES & {r[0] for r in self.con.execute('SELECT id FROM fonti')})
+        attested = set()
+        if lexical:
+            marks = ','.join('?' * len(lexical))
+            attested = {w for w, in self.con.execute(f'SELECT DISTINCT parola FROM parole_fonti WHERE fonte_id IN ({marks})', lexical)}
+        stored = {w for w, in self.con.execute('SELECT parola FROM parole')}
+        removed = sorted(w for w in names & stored if w not in common and w not in attested)
+        self.con.execute('BEGIN IMMEDIATE')
+        try:
+            if removed:
+                self._delete_words(removed)
+            report = {'version': NAMES_VERSION, 'words_removed': len(removed), 'person_names_known': len(names),
+                      'kept_as_common_words': len(names & stored) - len(removed), 'skipped_sources': skipped,
+                      'sample_removed': sample_words(removed),
+                      'sample_kept_as_common_words': sample_words(sorted(w for w in names & stored if w in common or w in attested))}
+            if removed:
+                self.con.execute("UPDATE meta SET value='da_aggiornare' WHERE name='normalizzazione_stato'")
+            self.con.execute("INSERT OR REPLACE INTO meta VALUES ('filtro_nomi',?)", (json.dumps({**report, 'at_utc': now()}),))
+            if self.con.execute('PRAGMA foreign_key_check').fetchone():
+                raise ValueError('Riferimenti non validi dopo il filtro dei nomi')
+            self.con.execute('COMMIT')
+        except BaseException:
+            self.con.execute('ROLLBACK')
+            raise
+        return report
 
     def _head_file(self, source_id):
         """Il file in cache della versione attiva di una fonte, o None se non è più sul disco."""
@@ -215,6 +317,8 @@ class WordDatabase:
                     self.con.execute('''DELETE FROM normalizzazione_esclusioni WHERE parola IN (SELECT parola FROM pruned_words)
                                         OR sostituita_da IN (SELECT parola FROM pruned_words)''')
                 if 'normalizzata' in tables:
+                    if 'word_measurements' in tables:
+                        self.con.execute('DELETE FROM word_measurements WHERE parola IN (SELECT parola FROM pruned_words)')
                     self.con.execute('DELETE FROM normalizzata WHERE parola IN (SELECT parola FROM pruned_words)')
                 self.con.execute('DELETE FROM parole WHERE parola IN (SELECT parola FROM pruned_words)')
                 self.con.execute("UPDATE meta SET value='da_aggiornare' WHERE name='normalizzazione_stato'")
