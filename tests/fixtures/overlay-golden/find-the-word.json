@@ -1,0 +1,53 @@
+[
+ {
+  "at": 0.1,
+  "texts": [
+   "FIND THE WORD",
+   "Indovina la parola scrivendo in chat",
+   "L",
+   "1/4 lettere rivelate"
+  ],
+  "trace": "cc9485c3e122ca37",
+  "calls": 37
+ },
+ {
+  "at": 3,
+  "texts": [
+   "FIND THE WORD",
+   "Indovina la parola scrivendo in chat",
+   "L",
+   "1/4 lettere rivelate"
+  ],
+  "trace": "bf5550162a0bf279",
+  "calls": 74
+ },
+ {
+  "at": 6,
+  "texts": [
+   "FIND THE WORD",
+   "Indovina la parola scrivendo in chat",
+   "L",
+   "1/4 lettere rivelate"
+  ],
+  "trace": "9f8080162cce8c3d",
+  "calls": 111
+ },
+ {
+  "at": 12,
+  "texts": [
+   "",
+   "Carla ha vinto!",
+   "C",
+   "Indovina la parola scrivendo in chat",
+   "L",
+   "U",
+   "N",
+   "A",
+   "LUNA",
+   "C",
+   "1. Carla ? 8 pt"
+  ],
+  "trace": "ce578c33b4c5460b",
+  "calls": 213
+ }
+]

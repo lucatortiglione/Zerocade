@@ -1,0 +1,54 @@
+[
+ {
+  "at": 0.1,
+  "texts": [
+   "What is 12 × 8?",
+   "A. 84",
+   "B. 96",
+   "C. 104",
+   "D. 88",
+   "Type A, B, C or D in chat"
+  ],
+  "trace": "c0ca41b3e4be26a2",
+  "calls": 45
+ },
+ {
+  "at": 3,
+  "texts": [
+   "What is 12 × 8?",
+   "A. 84",
+   "B. 96",
+   "C. 104",
+   "D. 88",
+   "Type A, B, C or D in chat"
+  ],
+  "trace": "79e6f003269f821a",
+  "calls": 90
+ },
+ {
+  "at": 6,
+  "texts": [
+   "What is 12 × 8?",
+   "A. 84",
+   "B. 96",
+   "C. 104",
+   "D. 88",
+   "Type A, B, C or D in chat"
+  ],
+  "trace": "131115fd1b3d0ade",
+  "calls": 135
+ },
+ {
+  "at": 12,
+  "texts": [
+   "What is 12 × 8?",
+   "A. 84",
+   "B. 96",
+   "C. 104",
+   "D. 88",
+   "Type A, B, C or D in chat"
+  ],
+  "trace": "ee0e0b1b584b3614",
+  "calls": 180
+ }
+]

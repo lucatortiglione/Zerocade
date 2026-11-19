@@ -1,0 +1,70 @@
+[
+ {
+  "at": 0.1,
+  "texts": [
+   "Quale pianeta è detto Pianeta Rosso?",
+   "A. Venere",
+   "B. Giove",
+   "C. Marte",
+   "D. Saturno",
+   "Rispondi in fretta: A, B, C o D"
+  ],
+  "trace": "369505b49fa0fc4b",
+  "calls": 45
+ },
+ {
+  "at": 3,
+  "texts": [
+   "Quale pianeta è detto Pianeta Rosso?",
+   "A. Venere",
+   "B. Giove",
+   "C. Marte",
+   "D. Saturno",
+   "Rispondi in fretta: A, B, C o D",
+   "A",
+   "1. Anna ? 20 pt",
+   "C",
+   "2. Carla ? 19 pt"
+  ],
+  "trace": "5b5625c4da584ed8",
+  "calls": 138
+ },
+ {
+  "at": 6,
+  "texts": [
+   "Quale pianeta è detto Pianeta Rosso?",
+   "A. Venere",
+   "B. Giove",
+   "C. Marte",
+   "D. Saturno",
+   "Rispondi in fretta: A, B, C o D",
+   "A",
+   "1. Anna ? 20 pt",
+   "C",
+   "2. Carla ? 19 pt",
+   "A",
+   "1. Anna ? 20 pt"
+  ],
+  "trace": "b239862d65281984",
+  "calls": 250
+ },
+ {
+  "at": 12,
+  "texts": [
+   "Quale pianeta è detto Pianeta Rosso?",
+   "A. Venere",
+   "B. Giove",
+   "C. Marte",
+   "D. Saturno",
+   "Risposta: C",
+   "C",
+   "2. Carla ? 19 pt",
+   "A",
+   "1. Anna ? 20 pt",
+   "C",
+   "2. Carla ? 19 pt"
+  ],
+  "trace": "19c0d6d5685b4e0e",
+  "calls": 362
+ }
+]

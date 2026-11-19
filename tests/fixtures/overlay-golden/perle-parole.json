@@ -1,0 +1,59 @@
+[
+ {
+  "at": 0.1,
+  "texts": [
+   "PERLE PAROLE",
+   "Trova la parola nelle perle",
+   "L",
+   "U",
+   "N",
+   "A"
+  ],
+  "trace": "804ff96e605ef04f",
+  "calls": 60
+ },
+ {
+  "at": 3,
+  "texts": [
+   "PERLE PAROLE",
+   "Trova la parola nelle perle",
+   "L",
+   "U",
+   "N",
+   "A"
+  ],
+  "trace": "4af24ccccb342f98",
+  "calls": 120
+ },
+ {
+  "at": 6,
+  "texts": [
+   "PERLE PAROLE",
+   "Trova la parola nelle perle",
+   "L",
+   "U",
+   "N",
+   "A"
+  ],
+  "trace": "8549f4595911e83b",
+  "calls": 180
+ },
+ {
+  "at": 12,
+  "texts": [
+   "PERLE PAROLE",
+   "Trova la parola nelle perle",
+   "L",
+   "U",
+   "N",
+   "A",
+   "",
+   "Carla ha indovinato: LUNA",
+   "C",
+   "C",
+   "1. Carla ? 4 pt"
+  ],
+  "trace": "a70327f09de81720",
+  "calls": 293
+ }
+]

@@ -1,0 +1,42 @@
+[
+ {
+  "at": 0.1,
+  "texts": [
+   "GUESS THE DRAWING",
+   "Scrivi la parola in chat",
+   "_ _ _ _ _"
+  ],
+  "trace": "ef81a53d1067fcb1",
+  "calls": 20
+ },
+ {
+  "at": 3,
+  "texts": [
+   "GUESS THE DRAWING",
+   "Scrivi la parola in chat",
+   "_ _ _ _ _"
+  ],
+  "trace": "d81f3f3dae85c134",
+  "calls": 40
+ },
+ {
+  "at": 6,
+  "texts": [
+   "GUESS THE DRAWING",
+   "Scrivi la parola in chat",
+   "_ _ _ _ _"
+  ],
+  "trace": "9d2e02c30f766752",
+  "calls": 60
+ },
+ {
+  "at": 12,
+  "texts": [
+   "GUESS THE DRAWING",
+   "Scrivi la parola in chat",
+   "_ _ _ _ _"
+  ],
+  "trace": "e0b7ed643e62eb20",
+  "calls": 80
+ }
+]

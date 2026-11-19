@@ -1,0 +1,58 @@
+[
+ {
+  "at": 0.1,
+  "texts": [
+   "4 PICS 1 WORD",
+   "What word do they share?",
+   "🌍",
+   "🌎",
+   "🌏",
+   "🪐",
+   "_ _ _ _ _ _"
+  ],
+  "trace": "182ea333c8d3c68a",
+  "calls": 63
+ },
+ {
+  "at": 3,
+  "texts": [
+   "4 PICS 1 WORD",
+   "What word do they share?",
+   "🌍",
+   "🌎",
+   "🌏",
+   "🪐",
+   "_ _ _ _ _ _"
+  ],
+  "trace": "a1de84ae0bc591a3",
+  "calls": 126
+ },
+ {
+  "at": 6,
+  "texts": [
+   "4 PICS 1 WORD",
+   "What word do they share?",
+   "🌍",
+   "🌎",
+   "🌏",
+   "🪐",
+   "_ _ _ _ _ _"
+  ],
+  "trace": "4c60fce4098d1eda",
+  "calls": 189
+ },
+ {
+  "at": 12,
+  "texts": [
+   "4 PICS 1 WORD",
+   "What word do they share?",
+   "🌍",
+   "🌎",
+   "🌏",
+   "🪐",
+   "_ _ _ _ _ _"
+  ],
+  "trace": "4c732226c3a7732a",
+  "calls": 252
+ }
+]
