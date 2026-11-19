@@ -404,6 +404,69 @@ python script/evaluate_context_ranking.py parita --profilo original      # prime
   `tests/context-evaluation*.test.ts` e `tests/context-quality-view.test.ts`. `scripts/context-evaluation-parity.ts` confronta il
   ranking del valutatore con quello del server sui profili veri.
 
+## Riordino delle posizioni (riferimento standard)
+
+Il metro di «Qualità delle posizioni» ha mostrato che i vettori mettono in alto parole *simili* alla segreta (`gatto`, `animale`, `coniglio`
+per `cane`) e non quelle che la gente *associa* (`guinzaglio`, `cuccia`, `veterinario`), e che le varianti della segreta (`cani`) occupano
+l'8% dei primi dieci posti. `riordino/` costruisce liste riordinate partendo dai candidati della Pipeline B. **Non cambia il gioco**: produce
+un profilo da misurare con `valuta --riordino`; portarlo nel gioco è un passo a parte.
+
+```
+python script/build_context_riordino.py --out riordino.json        # configurazione standard, circa 35 minuti
+python script/evaluate_context_ranking.py valuta --profilo original --riordino riordino.json --nome original+segnali --giudice no
+```
+
+**Configurazione standard** (`--vicini 1000 --segnali --tipo lineare`, nome del profilo `original+segnali`):
+
+- **Candidati:** le 1.000 parole dell'export della Pipeline B più le 1.000 più vicine nei vettori originali che l'export non aveva (con 1.000
+  vicini entra il 74% delle associazioni verificate, contro il 56% dell'export da solo). Le segrete che l'export non ha (`correre`…) hanno la lista
+  dei soli vicini: 9.905 liste su 9.905 segrete.
+- **Modello:** regressione logistica che impara quali candidati sono associazioni verificate, **solo dalle segrete di sviluppo** con associazioni
+  verificate (2.451 segrete, 27.022 esempi giusti); la misura non è mai vista. I pesi sono leggibili nel rapporto (`.report.json`).
+- **Segnali:** i quattro della Pipeline B (embedding fastText, PMI-SVD, ConceptNet, PPMI) con i flag «mancante», punteggio e posizione
+  dell'export, familiarità e frequenza della parola (raw 2.0), e quelli aggiunti dopo: coseno nei vettori originali e ABTT, **genericità** (coseno
+  medio con i 10 vicini: penalizza `autista`, `medico`…), categoria grammaticale e rango inverso.
+- **Varianti:** la segreta e le sue varianti (`cani`, `bancaria`) restano fuori dai primi 20 posti.
+
+Segrete di misura con associazioni verificate (653), nessun giudice Qwen:
+
+| Profilo | Precision@10 verificata | nDCG@20 | Verificate entro 100 | Varianti nei 10 |
+|---|---|---|---|---|
+| `original` (vettori fastText) | 0,158 | 0,170 | 34,3% | 8,4% |
+| `pipeline_b` | 0,155 | 0,159 | 31,8% | 8,8% |
+| riordino, solo candidati dell'export | 0,223 | 0,258 | 45,7% | 0,3% |
+| riordino con 1.000 vicini | 0,232 | 0,267 | 46,1% | 0,0% |
+| **riordino con vicini e segnali nuovi (standard)** | **0,243** | **0,279** | **47,5%** | **0,0%** |
+
+Test appaiato segreta per segreta, standard contro «riordino con vicini»: Precision@10 **+0,011** [+0,005, +0,018], nDCG@20 +0,012
+[+0,007, +0,017] (p≈0,001); contro `original` la Precision@10 sale del 54%. Il guadagno più grande è del riordino in sé (+0,066), i vicini e i
+segnali ne aggiungono pochi punti ciascuno.
+
+**Provato e non adottato:** modello ad alberi di decisione (`--tipo alberi`): stessa Precision@10 del lineare (+0,0005, p≈0,87), qualche parola
+fuori riferimento in più nei primi dieci (1,3% contro 0,1%) e nessun peso da leggere. Ordinando i 1.000 candidati con un segnale solo, la
+Precision@10 è 0,137 (punteggio combinato), 0,122 (embedding), 0,089 (PMI-SVD), 0,061 (ConceptNet), 0,056 (PPMI diretto): il PPMI è calcolato su
+Wikipedia italiana (317 milioni di token, finestra ±5), un testo enciclopedico dove `cane` compare con `razza` più che con `guinzaglio`.
+
+**Limiti da tenere presenti:**
+
+- Il metro conta giuste solo le associazioni verificate di ZeroAssociazioni (circa 15 per segreta): una parola sensata ma assente conta come
+  errore, quindi il punteggio vero è più alto di quello misurato e il modello può imparare lo *stile* di quell'elenco.
+- Il modello impara dal 31% delle segrete (quelle con associazioni verificate): su quelle senza il guadagno **non è misurato**. Il sottogruppo
+  delle segrete ordinarie ha 56 segrete di misura, troppe poche per decidere.
+- `--con-associazioni` mette le associazioni verificate in cima alle liste (per il gioco): su quelle segrete la misura non vale più.
+
+**Associazioni generate da un LLM** (`script/genera_associazioni_qwen.py`, `riordino/generate.py`): per le segrete senza associazioni verificate
+Qwen locale scrive solo l'elenco di parole (senza motivazioni) e le sue risposte, tenute in una cache riprendibile, vanno in cima alle liste.
+Pilota su 14 segrete di misura (Qwen non vede le associazioni verificate): Precision@10 da 0,20 a 0,36, migliora in 10 su 14, peggiora su
+parole con molti sensi o astratte (`cambio`, `certificato`, `volata`). Il Qwen 27B di ZeroAssociazioni impiega circa 60 secondi a segreta
+(6.030 segrete: oltre 100 ore); `--modello` prova un modello più piccolo, senza la verifica SHA-256 dei pesi. Non scrive in nessun database
+di ZeroAssociazioni e non esegue il suo pilota delle 32 coppie.
+
+- **Codice:** `riordino/` (`export.py` legge l'export, `features.py` le caratteristiche, `vectors.py` i vicini, `signals.py` i segnali nuovi,
+  `model.py` il modello, `build.py` le liste, `generate.py` e `qwen_cli.py` le associazioni di Qwen). `valuta --riordino FILE` misura una lista
+  calcolata fuori come profilo a sé (parole fissate subito dopo la segreta, come la Pipeline B).
+- **Test:** `python -I -m unittest discover -s riordino -t .` (ambiente `.venv-pipeline-a`: richiede scikit-learn).
+
 ## Nel codice
 
 - Server: `apps/server/src/context.ts` serve parole, vettori e collegamenti (`links.json`). `ZEROCADE_CONTEXT_DATA` può indicare un'altra

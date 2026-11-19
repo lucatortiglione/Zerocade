@@ -20,7 +20,7 @@ from valutazione import paths, ranking, split
 from valutazione.gold import Gold, fingerprint as gold_fingerprint, load_gold
 from valutazione.judge import Judge, QwenBackend, controls, judge_version, live_guard
 from valutazione.metrics import bootstrap, grade_slots, human_share, ndcg20, precision_judged, precision_verified, sense_share
-from valutazione.profiles import Profile, SCHEMAS, load_candidate, load_published
+from valutazione.profiles import Profile, SCHEMAS, load_candidate, load_pinned_json, load_published, with_pinned
 from valutazione.reference import Reference, ReferenceChanged, load_reference
 from valutazione.store import MetricRow, SampleRow, SecretMetricRow, Store
 
@@ -54,8 +54,17 @@ def load_profile(args) -> tuple[Profile, str]:
     try:
         if args.profilo:
             profile = load_published(args.profilo, giochi=Path(args.giochi), vectors_dir=Path(args.vettori_dir), pipeline_b=Path(args.pipeline_b))
-            return profile, f'giochi.sqlite3#{SCHEMAS[args.profilo]}'
-        return load_candidate(args.candidato, Path(args.vettori), Path(args.vocab), args.dim), f'candidato:{Path(args.vettori).name}'
+            origin = f'giochi.sqlite3#{SCHEMAS[args.profilo]}'
+        else:
+            profile = load_candidate(args.candidato, Path(args.vettori), Path(args.vocab), args.dim)
+            origin = f'candidato:{Path(args.vettori).name}'
+        if args.riordino:
+            # Un riordino calcolato fuori: le parole del file vanno in cima per ogni segreta, il resto resta nell'ordine dei vettori.
+            lists = json.loads(Path(args.riordino).read_text(encoding='utf-8'))
+            load_pinned_json(Path(args.riordino), profile.index)   # controlla la forma del file
+            profile = with_pinned(profile, lists, args.nome or f'{profile.name}+riordino')
+            origin += f'+riordino:{Path(args.riordino).name}'
+        return profile, origin
     except (FileNotFoundError, sqlite3.OperationalError, ValueError) as error:
         raise MissingData(str(error)) from error
 
@@ -344,6 +353,8 @@ def build_parser() -> argparse.ArgumentParser:
     profile.add_argument('--vettori', help='file float32 dei vettori unitari (candidato)')
     profile.add_argument('--vocab', help='una parola per riga, nello stesso ordine dei vettori (candidato)')
     profile.add_argument('--dim', type=int, help='dimensioni dei vettori (candidato)')
+    profile.add_argument('--riordino', help='file JSON {segreta: [parole]}: un riordino calcolato fuori, da misurare come profilo a sé')
+    profile.add_argument('--nome', help='il nome del profilo con il riordino (predefinito: <profilo>+riordino)')
 
     parser = argparse.ArgumentParser(prog='evaluate_context_ranking.py', description=__doc__)
     commands = parser.add_subparsers(dest='command', required=True)

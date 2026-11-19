@@ -115,3 +115,33 @@ def load_pinned(file: Path, words: list[str], min_pinned: int = PIPELINE_MIN_PIN
                 found.append(i)
         flush()
     return pinned
+
+
+def with_pinned(profile: Profile, lists: dict[str, list[str]], name: str) -> Profile:
+    """Lo stesso profilo (vettori, vocabolario, impronta) con, per ogni segreta, una lista di parole messa subito dopo di lei.
+
+    È il modo di misurare un riordino calcolato fuori: l'ordine delle parole non in lista resta quello dei vettori. Le parole fuori
+    vocabolario, i doppioni e la segreta stessa si saltano; una segreta sconosciuta non ha effetto. Il profilo di partenza non cambia."""
+    pinned: dict[int, list[int]] = {}
+    for secret, words in lists.items():
+        if secret not in profile.index:
+            continue
+        sid = profile.index[secret]
+        seen, found = {sid}, []
+        for word in words:
+            i = profile.index.get(word)
+            if i is not None and i not in seen:
+                seen.add(i)
+                found.append(i)
+        if found:
+            pinned[sid] = found
+    return Profile(name, profile.words, profile.index, profile.vectors, profile.sha256, pinned)
+
+
+def load_pinned_json(file: Path, index: dict[str, int]) -> dict[int, list[int]]:
+    """Legge un file JSON {segreta: [parole]} e lo traduce in indici del vocabolario (stesse regole di with_pinned)."""
+    data = json.loads(Path(file).read_text(encoding='utf-8'))
+    if not isinstance(data, dict) or not all(isinstance(k, str) and isinstance(v, list) and all(isinstance(w, str) for w in v) for k, v in data.items()):
+        raise ValueError(f'{Path(file).name}: serve un oggetto {{segreta: [parole]}}')
+    placeholder = Profile('', [], index, np.empty((0, 0), dtype=np.float32), '', None)
+    return with_pinned(placeholder, data, '').pinned or {}

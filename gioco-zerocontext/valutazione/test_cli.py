@@ -176,6 +176,29 @@ class CliTest(unittest.TestCase):
         with self.assertRaises(SystemExit):
             self.main('valuta', '--giudice', 'no')
 
+    def test_a_reranking_file_is_measured_as_its_own_profile(self):
+        self.assertEqual(self.valuta('--giudice', 'no'), 0)
+        before = self.query("SELECT value FROM v_run_metrics WHERE profilo = 'mini' AND metrica = 'precision_10_verificata' AND sottoinsieme = 'misura:con_associazioni'")[0][0]
+        pinned = self.root / 'riordino.json'
+        pinned.write_text(json.dumps({s: words for s, words in GOLD_WORDS.items()}), encoding='utf-8')   # le giuste messe in cima
+        self.assertEqual(self.valuta('--giudice', 'no', '--riordino', str(pinned), '--nome', 'mini+oro'), 0)
+        rows = self.query("SELECT value, n FROM v_run_metrics WHERE profilo = 'mini+oro' AND metrica = 'precision_10_verificata' AND sottoinsieme = 'misura:con_associazioni'")
+        self.assertEqual(len(rows), 1)
+        self.assertGreater(rows[0][0], before)
+        self.assertGreater(rows[0][0], 0.25)              # 3 giuste su 10 posti, in cima: almeno 0,3 meno le varianti
+        self.assertEqual(self.query("SELECT COUNT(DISTINCT profilo) FROM v_runs")[0][0], 2)
+
+    def test_a_reranking_file_without_a_name_gets_one(self):
+        pinned = self.root / 'riordino.json'
+        pinned.write_text('{}', encoding='utf-8')
+        self.assertEqual(self.valuta('--giudice', 'no', '--riordino', str(pinned)), 0)
+        self.assertEqual(self.query('SELECT profilo FROM v_runs')[0][0], 'mini+riordino')
+
+    def test_a_malformed_reranking_file_exits_3(self):
+        pinned = self.root / 'riordino.json'
+        pinned.write_text('[1, 2]', encoding='utf-8')
+        self.assertEqual(self.valuta('--giudice', 'no', '--riordino', str(pinned)), 3)
+
     # --- valuta con il giudice ---
 
     def test_judge_runs_on_the_sample_and_fills_the_judged_metrics(self):
