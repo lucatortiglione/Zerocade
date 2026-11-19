@@ -34,7 +34,7 @@ body.scene-host #root { display: grid; place-items: center; }
 
 /* isolation: NASA's picture (.nasa, z-index -1) goes under the canvas, not under the page. */
 .overlay { position: relative; width: 100%; height: 100%; isolation: isolate; }
-.overlay__canvas { display: block; width: 100%; height: 100%; }
+.overlay__canvas { position: absolute; left: 0; display: block; width: 100%; }
 
 /* NASA's picture of the day behind a game (NasaBackdrop.tsx): under everything else in its parent, which isolates
    it. A new picture fades in over the old one; the veil keeps the game's white text readable on bright ones. */

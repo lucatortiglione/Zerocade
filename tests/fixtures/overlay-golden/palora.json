@@ -51,9 +51,10 @@
    "Carla ha indovinato: LUNA",
    "C",
    "C",
-   "1. Carla ? 4 pt"
+   "1. Carla",
+   "4 pt"
   ],
-  "trace": "3a3e70b3c4a627b2",
-  "calls": 293
+  "trace": "f3a32a365d85aa8e",
+  "calls": 295
  }
 ]

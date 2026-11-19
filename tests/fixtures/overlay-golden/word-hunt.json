@@ -456,10 +456,11 @@
    "Trova 1/6 parole",
    "✓ SOLE",
    "A",
-   "1. Anna ? 4 pt"
+   "1. Anna",
+   "4 pt"
   ],
-  "trace": "d4388794bc81a127",
-  "calls": 4379
+  "trace": "ebcab2243ad95319",
+  "calls": 4381
  },
  {
   "at": 12,
@@ -612,9 +613,10 @@
    "Trova 1/6 parole",
    "✓ SOLE",
    "A",
-   "1. Anna ? 4 pt"
+   "1. Anna",
+   "4 pt"
   ],
-  "trace": "b5521e6fa3ae3fc4",
-  "calls": 5860
+  "trace": "86d4925e7fc58c0a",
+  "calls": 5864
  }
 ]

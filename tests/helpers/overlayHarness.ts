@@ -22,6 +22,7 @@ const round = (v: unknown): string => (typeof v === 'number' ? String(Math.round
 
 class Recorder {
   texts: string[] = []
+  fonts: string[] = []
   calls = 0
   private hash = createHash('sha1')
   add(name: string, args: unknown[]) {
@@ -40,7 +41,7 @@ const METHODS = new Set(['fillRect', 'strokeRect', 'clearRect', 'beginPath', 'cl
   'quadraticCurveTo', 'bezierCurveTo', 'fill', 'stroke', 'clip', 'save', 'restore', 'translate', 'rotate', 'scale', 'transform', 'setTransform', 'resetTransform',
   'drawImage', 'setLineDash', 'putImageData', 'fillText', 'strokeText'])
 
-function recordingContext(rec: Recorder): CanvasRenderingContext2D {
+function recordingContext(rec: Recorder, width = WIDTH, height = HEIGHT): CanvasRenderingContext2D {
   const state = new Map<string, unknown>()
   const gradient = (kind: string) => (...args: unknown[]) => { rec.add(kind, args); return { addColorStop: (...a: unknown[]) => rec.add('stop', a) } }
   return new Proxy({}, {
@@ -50,11 +51,11 @@ function recordingContext(rec: Recorder): CanvasRenderingContext2D {
       if (prop === 'createLinearGradient' || prop === 'createRadialGradient' || prop === 'createConicGradient') return gradient(prop)
       if (prop === 'createPattern') return () => ({})
       if (prop === 'getTransform') return () => ({ a: 1, b: 0, c: 0, d: 1, e: 0, f: 0 })
-      if (prop === 'canvas') return { width: WIDTH, height: HEIGHT }
+      if (prop === 'canvas') return { width, height }
       if (prop === 'isPointInPath') return () => false
       return state.get(prop)
     },
-    set(_t, prop: string, value) { state.set(prop, value); rec.add('=' + prop, [value]); return true },
+    set(_t, prop: string, value) { state.set(prop, value); if (prop === 'font') rec.fonts.push(String(value)); rec.add('=' + prop, [value]); return true },
   }) as unknown as CanvasRenderingContext2D
 }
 
@@ -77,8 +78,15 @@ function eventsAt(second: number, index: number): LiveEvent[] {
   return events
 }
 
+/** Un canvas registrato di dimensioni a scelta, per provare un pezzo di disegno da solo (il kit, la classifica…). */
+export function recordCanvas(width: number, height: number) {
+  installBrowserStubs()
+  const rec = new Recorder()
+  return { ctx: recordingContext(rec, width, height), finish: () => ({ ...rec.finish(), fonts: rec.fonts.splice(0) }) }
+}
+
 let installed = false
-function installBrowserStubs() {
+export function installBrowserStubs() {
   if (installed) return
   installed = true
   const store = new Map<string, string>()

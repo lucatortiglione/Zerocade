@@ -18,6 +18,7 @@ import { ContextTournament } from './ContextTournament'
 import { isContentReady, loadContent, subscribeContent } from './content'
 import { ScoreTicker } from './ScoreTicker'
 import { guideLine } from './guide'
+import { stageBox } from './stage'
 
 
 export function App() {
@@ -36,9 +37,13 @@ export function App() {
     if (!canvas) return
     const ctx = canvas.getContext('2d')
     if (!ctx) return
+    // Il canvas occupa solo il palco: i giochi non possono finire sotto il marchio o sotto le istruzioni.
     const resize = () => {
-      canvas.width = window.innerWidth
-      canvas.height = window.innerHeight
+      const box = stageBox(window.innerWidth, window.innerHeight)
+      canvas.width = box.width
+      canvas.height = box.height
+      canvas.style.top = `${box.top}px`
+      canvas.style.height = `${box.height}px`
     }
     resize()
     window.addEventListener('resize', resize)

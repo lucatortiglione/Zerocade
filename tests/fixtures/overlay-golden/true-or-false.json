@@ -38,10 +38,11 @@
    "0 voti",
    "Scrivi V (vero) o F (falso) in chat",
    "B",
-   "1. Bruno ? 8 pt"
+   "1. Bruno",
+   "8 pt"
   ],
-  "trace": "ed2ccb3efa5b05d0",
-  "calls": 140
+  "trace": "4a154a467987e012",
+  "calls": 142
  },
  {
   "at": 12,
@@ -54,9 +55,10 @@
    "0 voti",
    "Scrivi V (vero) o F (falso) in chat",
    "B",
-   "1. Bruno ? 8 pt"
+   "1. Bruno",
+   "8 pt"
   ],
-  "trace": "05d446c45b085ccf",
-  "calls": 206
+  "trace": "330f0fb242b639e5",
+  "calls": 210
  }
 ]
