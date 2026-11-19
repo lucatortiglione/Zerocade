@@ -1,24 +1,34 @@
+/* Barlow Semi Condensed (SIL OFL, fonts/LICENSE-Barlow-OFL.txt): incorporato nella build, funziona senza rete. */
+@font-face { font-family: 'Barlow Semi Condensed'; font-weight: 400; font-style: normal; font-display: swap; src: url('./fonts/barlow-semi-condensed-latin-400-normal.woff2') format('woff2'); }
+@font-face { font-family: 'Barlow Semi Condensed'; font-weight: 500; font-style: normal; font-display: swap; src: url('./fonts/barlow-semi-condensed-latin-500-normal.woff2') format('woff2'); }
+@font-face { font-family: 'Barlow Semi Condensed'; font-weight: 600; font-style: normal; font-display: swap; src: url('./fonts/barlow-semi-condensed-latin-600-normal.woff2') format('woff2'); }
+
 :root {
-  --bg-base: #08080c;
-  --bg-surface: #0e0e16;
-  --bg-elevated: #16161f;
-  --bg-hover: #1f1f2b;
-  --border: #24242f;
-  --border-strong: #343440;
-  --text: #f5f5f9;
-  --text-muted: #9a9aab;
-  --accent: #8b5cf6;
-  --accent-2: #6366f1;
-  --accent-hover: #a78bfa;
-  --accent-soft: rgba(139, 92, 246, 0.14);
-  --ok: #22c55e;
-  --danger: #f43f5e;
-  --warning: #f59e0b;
-  --radius: 14px;
-  --radius-sm: 10px;
+  /* Regia televisiva: banco blu-grigio, pannelli un gradino sopra. Il colore indica solo uno stato (diretta, collegamento, ok, errore). */
+  --bg-base: #222a38;
+  --bg-surface: #2a3345;
+  --bg-elevated: #323d52;
+  --bg-hover: #3b4860;
+  --border: #3a465c;
+  --border-strong: #4c5b76;
+  --text: #e9edf3;
+  --text-muted: #a9b4c6;
+  /* Selezione e tasto primario: chiaro su scuro, senza un colore di marca. Il viola resta solo nel logo. */
+  --accent: #dde5f2;
+  --accent-2: #aebbd3;
+  --accent-hover: #ffffff;
+  --accent-soft: rgba(221, 229, 242, 0.12);
+  --ink-on-accent: #1b2230;
+  --tally: #ff5a47;
+  --ok: #53c79e;
+  --danger: #f06a6a;
+  --warning: #f0b444;
+  --radius: 10px;
+  --radius-sm: 6px;
 
   color-scheme: dark;
-  font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  font-family: 'Barlow Semi Condensed', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  font-size: 16px;
   color: var(--text);
   background: var(--bg-base);
   -webkit-font-smoothing: antialiased;
@@ -29,13 +39,7 @@
 * { margin: 0; padding: 0; }
 html, body, #root { height: 100%; }
 
-body {
-  background:
-    radial-gradient(1100px 560px at 82% -8%, rgba(139, 92, 246, 0.16), transparent 60%),
-    radial-gradient(900px 520px at -6% 108%, rgba(99, 102, 241, 0.12), transparent 55%),
-    var(--bg-base);
-  background-attachment: fixed;
-}
+body { background: var(--bg-base); }
 
 button, select, input { font: inherit; color: inherit; }
 ul, ol { list-style: none; }
@@ -53,7 +57,7 @@ ul, ol { list-style: none; }
 
 /* "Salta al contenuto": hidden until it gets the keyboard focus, the first stop of Tab. */
 .skip-link { position: absolute; top: 8px; left: 8px; z-index: 1000; padding: 8px 14px; border-radius: var(--radius-sm);
-  background: var(--accent); color: #fff; font-weight: 700; text-decoration: none; transform: translateY(-200%); }
+  background: var(--accent); color: var(--ink-on-accent); font-weight: 700; text-decoration: none; transform: translateY(-200%); }
 .skip-link:focus-visible { transform: none; }
 
 @media (prefers-reduced-motion: reduce) {
@@ -88,8 +92,8 @@ ul, ol { list-style: none; }
   height: 42px;
   margin-bottom: 18px;
   border-radius: 13px;
-  background: linear-gradient(135deg, var(--accent-2), var(--accent));
-  box-shadow: 0 8px 22px rgba(139, 92, 246, 0.38);
+  background: #7c5cf0;
+  color: #fff;
   font-size: 21px;
   font-weight: 800;
   letter-spacing: -0.02em;
@@ -119,7 +123,7 @@ ul, ol { list-style: none; }
   width: 3px;
   height: 22px;
   border-radius: 0 4px 4px 0;
-  background: linear-gradient(180deg, var(--accent-2), var(--accent));
+  background: var(--accent);
 }
 .left-rail__icon { font-size: 20px; }
 
@@ -128,13 +132,9 @@ ul, ol { list-style: none; }
   height: 10px;
   margin-top: auto;
   border-radius: 50%;
-  background: var(--danger);
-  box-shadow: 0 0 0 3px rgba(244, 63, 94, 0.16);
+  background: var(--warning);
 }
-.status-dot--on {
-  background: var(--ok);
-  box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.16), 0 0 12px rgba(34, 197, 94, 0.6);
-}
+.status-dot--on { background: var(--ok); }
 
 /* ==================== Games page: three columns ==================== */
 
@@ -157,16 +157,14 @@ ul, ol { list-style: none; }
 .right-panel { border-left: 1px solid var(--border); }
 
 .section-label {
-  margin-bottom: 12px;
-  color: var(--text-muted);
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  margin-bottom: 10px;
+  color: var(--text);
+  font-size: 15px;
+  font-weight: 600;
 }
 
 .game-picker select { width: 100%; }
-.context-solution { font-size: 28px; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; text-align: center;
+.context-solution { font-size: 30px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase; text-align: center;
   padding: 14px 12px; border-radius: 12px; background: var(--bg-hover); border: 1px solid var(--border-strong); }
 .game-picker p { margin: 8px 2px 0; }
 .game-list { display: flex; flex-direction: column; gap: 8px; }
@@ -185,9 +183,9 @@ ul, ol { list-style: none; }
 .game-card:hover { background: var(--bg-hover); transform: translateX(2px); }
 .game-card:active { transform: scale(0.99); }
 .game-card--active {
-  border-color: rgba(139, 92, 246, 0.55);
+  border-color: rgba(221, 229, 242, 0.55);
   background: var(--accent-soft);
-  box-shadow: inset 0 0 0 1px rgba(139, 92, 246, 0.18);
+  box-shadow: inset 0 0 0 1px rgba(221, 229, 242, 0.18);
 }
 .game-card__thumb {
   display: grid;
@@ -222,13 +220,12 @@ ul, ol { list-style: none; }
   max-width: 420px;
 }
 .preview__title { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; color: var(--text-muted); }
-.preview__dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: var(--ok);
-  box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.16);
-}
+/* La spia di trasmissione: rossa «in diretta», ambra mentre collega, spenta altrimenti. Sempre accompagnata dal testo. */
+.preview__dot { width: 10px; height: 10px; border-radius: 50%; background: var(--border-strong); }
+.preview[data-tally='live'] .preview__dot { background: var(--tally); box-shadow: 0 0 10px var(--tally); }
+.preview[data-tally='connecting'] .preview__dot { background: var(--warning); animation: tally-pulse 1.2s ease-in-out infinite; }
+.preview__state { color: var(--text); font-weight: 600; }
+@keyframes tally-pulse { 50% { opacity: 0.25; } }
 .preview__game {
   padding: 2px 9px;
   border-radius: 999px;
@@ -243,12 +240,14 @@ ul, ol { list-style: none; }
   max-width: 100%;
   aspect-ratio: 9 / 16;
   overflow: hidden;
-  border: 1px solid var(--border-strong);
-  border-radius: 22px;
-  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55), 0 0 0 6px rgba(139, 92, 246, 0.06);
+  border: 3px solid var(--border-strong);
+  border-radius: 12px;
+  box-shadow: 0 18px 44px rgba(0, 0, 0, 0.4);
   /* Checkerboard, so the overlay's transparent areas read as transparent. */
   background: repeating-conic-gradient(#17171c 0 25%, #111115 0 50%) 0 0 / 24px 24px;
 }
+.preview[data-tally='live'] .preview__frame { border-color: var(--tally); box-shadow: 0 0 0 1px var(--tally), 0 0 30px rgba(255, 90, 71, 0.35), 0 18px 44px rgba(0, 0, 0, 0.4); }
+.preview[data-tally='connecting'] .preview__frame { border-color: var(--warning); }
 .preview__frame iframe { display: block; width: 100%; height: 100%; border: 0; }
 .preview__frame { position: relative; }
 .preview__actions { display: flex; align-items: center; gap: 8px; }
@@ -261,7 +260,7 @@ ul, ol { list-style: none; }
   padding: 8px 14px;
   border: 2px dashed var(--accent-hover);
   border-radius: 12px;
-  background: rgba(139, 92, 246, 0.35);
+  background: rgba(221, 229, 242, 0.35);
   color: #fff;
   font-size: 12px;
   font-weight: 700;
@@ -270,7 +269,7 @@ ul, ol { list-style: none; }
   touch-action: none;
   user-select: none;
 }
-.place-box--drag { cursor: grabbing; background: rgba(139, 92, 246, 0.6); }
+.place-box--drag { cursor: grabbing; background: rgba(221, 229, 242, 0.6); }
 .place-reset { position: absolute; left: 50%; bottom: 10px; transform: translateX(-50%); }
 
 /* ================================ Controls ================================ */
@@ -297,13 +296,11 @@ ul, ol { list-style: none; }
 a.btn { color: inherit; text-decoration: none; }
 .btn--primary {
   border-color: transparent;
-  background: linear-gradient(135deg, var(--accent-2), var(--accent));
-  box-shadow: 0 6px 18px rgba(139, 92, 246, 0.28);
+  background: var(--accent);
+  color: var(--ink-on-accent);
+  font-weight: 600;
 }
-.btn--primary:hover:not(:disabled) {
-  background: linear-gradient(135deg, var(--accent-2), var(--accent-hover));
-  border-color: transparent;
-}
+.btn--primary:hover:not(:disabled) { background: var(--accent-hover); border-color: transparent; }
 .btn--ghost { background: transparent; }
 
 .icon-btn {
@@ -321,7 +318,7 @@ a.btn { color: inherit; text-decoration: none; }
 }
 .icon-btn:hover { background: rgba(244, 63, 94, 0.15); color: var(--danger); }
 
-select, input[type='text'] {
+select, input[type='text'], input[type='url'] {
   min-width: 0;
   padding: 8px 10px;
   border: 1px solid var(--border);
@@ -329,7 +326,7 @@ select, input[type='text'] {
   background: var(--bg-elevated);
   transition: border-color 0.15s ease;
 }
-select:hover, input[type='text']:hover { border-color: var(--border-strong); }
+select:hover, input[type='text']:hover, input[type='url']:hover { border-color: var(--border-strong); }
 select:focus, input[type='text']:focus, input[type='url']:focus { border-color: var(--accent); }
 
 .trigger-list { display: flex; flex-direction: column; gap: 6px; margin: 12px 0; }
@@ -560,11 +557,9 @@ input[type='number']:focus { border-color: var(--accent); }
   align-items: center;
   justify-content: space-between;
   padding: 16px 16px 6px;
-  color: var(--text-muted);
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 600;
 }
 .side__link {
   border: 0;
@@ -585,11 +580,9 @@ input[type='number']:focus { border-color: var(--accent); }
   align-items: center;
   gap: 8px;
   padding: 14px 16px;
-  color: var(--text-muted);
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 600;
   list-style: none;
   cursor: pointer;
   user-select: none;
@@ -628,12 +621,11 @@ input[type='number']:focus { border-color: var(--accent); }
 }
 .side-action:disabled { opacity: 0.45; cursor: default; }
 .side-action--inline { width: auto; flex: none; white-space: nowrap; }
-.side-action--blue { border-color: rgba(59, 130, 246, 0.28); background: rgba(59, 130, 246, 0.08); color: #60a5fa; }
-.side-action--blue:hover:not(:disabled) { background: rgba(59, 130, 246, 0.16); }
-.side-action--orange { border-color: rgba(249, 115, 22, 0.3); background: rgba(249, 115, 22, 0.08); color: #fb923c; }
-.side-action--orange:hover:not(:disabled) { background: rgba(249, 115, 22, 0.16); }
-.side-action--red { border-color: rgba(244, 63, 94, 0.32); background: rgba(244, 63, 94, 0.09); color: #fb7185; }
-.side-action--red:hover:not(:disabled) { background: rgba(244, 63, 94, 0.17); }
+/* Azioni della regia: neutre, perché il colore è riservato agli stati. Solo «termina» (distruttiva) porta il colore dell'errore. */
+.side-action--blue, .side-action--orange { border-color: var(--border-strong); background: var(--bg-elevated); color: var(--text); }
+.side-action--blue:hover:not(:disabled), .side-action--orange:hover:not(:disabled) { background: var(--bg-hover); }
+.side-action--red { border-color: rgba(240, 106, 106, 0.6); background: rgba(240, 106, 106, 0.1); color: #ffb4b4; }
+.side-action--red:hover:not(:disabled) { background: rgba(240, 106, 106, 0.2); }
 
 .side-box {
   display: flex;
@@ -644,7 +636,7 @@ input[type='number']:focus { border-color: var(--accent); }
   border-radius: 12px;
   background: var(--bg-elevated);
 }
-.side-box__title { color: var(--text-muted); font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; }
+.side-box__title { color: var(--text); font-size: 14px; font-weight: 600; }
 .side-message { display: flex; gap: 6px; }
 .side-message input { flex: 1; }
 .side-controls { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
@@ -710,7 +702,7 @@ input[type='number']:focus { border-color: var(--accent); }
   cursor: help;
 }
 .form__group { display: flex; flex-direction: column; gap: 10px; margin-top: 6px; }
-.form__group-title { color: var(--text-muted); font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; }
+.form__group-title { color: var(--text); font-size: 14px; font-weight: 600; }
 .form__group-body { display: flex; flex-direction: column; gap: 12px; padding-left: 12px; border-left: 1px solid var(--border-strong); }
 .form__color {
   width: 44px;
@@ -1042,9 +1034,8 @@ input[type='number']:focus { border-color: var(--accent); }
   border-radius: 4px;
   background: var(--bg-hover);
   color: var(--text-muted);
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 700;
-  letter-spacing: 0.06em;
   text-transform: uppercase;
 }
 .chat-row__origin--tiktok { background: rgba(254, 44, 85, 0.16); color: #ff7a95; }
@@ -1110,10 +1101,8 @@ input[type='number']:focus { border-color: var(--accent); }
 .top-gift__kicker {
   overflow: hidden;
   color: color-mix(in srgb, var(--tier) 75%, #ffffff);
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  font-size: 12px;
+  font-weight: 500;
   white-space: nowrap;
   text-overflow: ellipsis;
 }
@@ -1167,10 +1156,10 @@ input[type='number']:focus { border-color: var(--accent); }
 
 .context-associations__choices { display: grid; gap: 8px; }
 .context-associations__choice { display: flex; align-items: center; gap: 10px; padding: 11px 12px; border: 1px solid var(--line, #343a46); border-radius: 10px; cursor: pointer; }
-.context-associations__choice.is-selected { border-color: var(--accent, #a78bfa); background: rgba(139, 92, 246, .12); }
+.context-associations__choice.is-selected { border-color: var(--accent); background: var(--accent-soft); }
 .context-associations__choice:has(input:disabled) { cursor: default; opacity: .6; }
 .context-associations__choice small { display: block; font-size: 11px; opacity: .7; margin-top: 3px; }
-.context-associations__choice input { accent-color: var(--accent, #a78bfa); }
+.context-associations__choice input { accent-color: var(--accent); }
 
 /* ZeroContext's tournament panel (ContextTournamentPanel.tsx). */
 .tournament-panel { display: grid; gap: 10px; }

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { GAMES, chainModeLabel, parseChainSecret, type SessionState } from '@zerocade/shared'
+import { GAMES, chainModeLabel, parseChainSecret, type BridgeStatus, type SessionState, type SourceKind, type SourceStatus } from '@zerocade/shared'
 import { PlaceBoxes } from '../components/PlaceBoxes'
 import { BivioSidebar } from '../components/BivioSidebar'
 import { ContextTournamentPanel } from '../components/ContextTournamentPanel'
@@ -171,14 +171,23 @@ function WordAssociationData() {
   )
 }
 
+// What the creator needs to see first: is the live on? Red while a source is connected, amber while one is connecting.
+function liveState(sources: Partial<Record<SourceKind, SourceStatus>>, bridge: BridgeStatus | null): 'live' | 'connecting' | 'off' {
+  if (Object.values(sources).some((s) => s?.state === 'connected') || (bridge?.state === 'connected' && (bridge.tiktok || bridge.twitch))) return 'live'
+  return Object.values(sources).some((s) => s?.state === 'connecting') ? 'connecting' : 'off'
+}
+const TALLY_TEXT = { live: 'In diretta', connecting: 'Collegamento in corso…', off: 'Non in diretta' } as const
+
 function Preview({ session }: { session: SessionState | null }) {
   const [placing, setPlacing] = useState(false)
+  const { sources, bridge } = useDashboard()
+  const tally = liveState(sources, bridge)
   return (
-    <main className="preview">
+    <main className="preview" data-tally={tally}>
       <div className="preview__head">
         <div className="preview__title">
           <span className="preview__dot" aria-hidden="true" />
-          Anteprima
+          <span className="preview__state" role="status">{TALLY_TEXT[tally]}</span>
           {session && <span className="preview__game">{GAMES.find((g) => g.id === session.gameId)?.name}</span>}
         </div>
         <div className="preview__actions">

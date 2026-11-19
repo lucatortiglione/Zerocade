@@ -2,11 +2,11 @@ import { NavLink } from 'react-router'
 import { useDashboard } from '../store'
 
 const LINKS = [
-  { to: '/', label: 'Games', icon: '🎮' },
-  { to: '/sources', label: 'Sources', icon: '📡' },
+  { to: '/', label: 'Giochi', icon: '🎮' },
+  { to: '/sources', label: 'Sorgenti', icon: '📡' },
   { to: '/dj', label: 'DJ Pad', icon: '🎚️' },
-  { to: '/gifts', label: 'Gifts', icon: '🎁' },
-  { to: '/setup', label: 'Setup', icon: '🔗' },
+  { to: '/gifts', label: 'Regali', icon: '🎁' },
+  { to: '/setup', label: 'Overlay', icon: '🔗' },
   { to: '/qualita', label: 'Qualità', icon: '🎯' },
 ]
 
