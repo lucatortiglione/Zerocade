@@ -25,14 +25,14 @@ export function TabooCardPage() {
     return () => window.clearInterval(id)
   }, [running])
 
-  if (session && session.gameId !== 'zerotaboo') return <main className="taboo-director"><p>Seleziona ZeroTaboo nella pagina dei giochi per vedere la carta.</p></main>
-  if (!taboo || !tabooAdmin) return <main className="taboo-director"><p>In attesa di ZeroTaboo…</p></main>
+  if (session && session.gameId !== 'zerotaboo') return <main className="taboo-director" id="contenuto" tabIndex={-1}><h1 className="sr-only">Carta di ZeroTaboo</h1><p>Seleziona ZeroTaboo nella pagina dei giochi per vedere la carta.</p></main>
+  if (!taboo || !tabooAdmin) return <main className="taboo-director" id="contenuto" tabIndex={-1}><h1 className="sr-only">Carta di ZeroTaboo</h1><p>In attesa di ZeroTaboo…</p></main>
   const card = tabooAdmin.card
   const left = running ? Math.max(0, seen.ms - (now - seen.at)) : taboo.remainingMs
   const category = TABOO_CATEGORIES.find((c) => c.code === card?.category)
 
   return (
-    <main className="taboo-director">
+    <main className="taboo-director" id="contenuto" tabIndex={-1}>
       <header className="taboo-director__bar">
         <span>Round {taboo.round}/{taboo.rounds}</span>
         <span className="taboo-director__time" data-low={running && left < 15_000}>{clock(left)}</span>
@@ -46,15 +46,15 @@ export function TabooCardPage() {
             {category?.name} · {TABOO_DIFFICULTY_LABEL[card.difficulty]}
             {taboo.jackpot ? ' · JACKPOT ×2' : ''}{taboo.sung ? ' · CANTATA ×2' : ''}
           </p>
-          <h1 className="taboo-director__target" aria-label="La parola da far indovinare">{card.target}</h1>
+          <h1 className="taboo-director__target"><span className="sr-only">Parola da far indovinare: </span>{card.target}</h1>
           <section className="taboo-director__taboo" aria-label="Parole che non puoi dire">
             <h2>Non dire</h2>
             <ul>{card.taboo.map((w) => <li key={w}>{w}</li>)}</ul>
           </section>
           <p className="taboo-director__rule">Non dire nemmeno le parole del bersaglio. {card.aliases.length ? `Alias accettati: ${card.aliases.join(' · ')}.` : ''}</p>
           <div className="taboo-director__buttons">
-            <button type="button" className="side-action side-action--blue" disabled={taboo.skipsLeft <= 0} onClick={() => void send({ type: 'skip', exposure: card.exposure })}>⏭ Skip</button>
-            <button type="button" className="side-action side-action--orange" onClick={() => { if (window.confirm('Violazione Taboo? La carta è persa (−1 punto).')) void send({ type: 'taboo', exposure: card.exposure }) }}>🚫 Violazione Taboo</button>
+            <button type="button" className="side-action side-action--blue" disabled={taboo.skipsLeft <= 0} onClick={() => void send({ type: 'skip', exposure: card.exposure })}><span aria-hidden="true">⏭</span> Skip</button>
+            <button type="button" className="side-action side-action--orange" onClick={() => { if (window.confirm('Violazione Taboo? La carta è persa (−1 punto).')) void send({ type: 'taboo', exposure: card.exposure }) }}><span aria-hidden="true">🚫</span> Violazione Taboo</button>
           </div>
         </>
       ) : (
@@ -64,9 +64,9 @@ export function TabooCardPage() {
           </h1>
           {taboo.notice && <p>{taboo.notice}</p>}
           {taboo.phase === 'intermission' && (
-            <button type="button" className="side-action side-action--blue" disabled={!tabooAdmin.canStartRound} onClick={() => void send({ type: 'start-round' })}>▶ Avvia round {taboo.round}</button>
+            <button type="button" className="side-action side-action--blue" disabled={!tabooAdmin.canStartRound} onClick={() => void send({ type: 'start-round' })}><span aria-hidden="true">▶</span> Avvia round {taboo.round}</button>
           )}
-          {taboo.phase === 'suspended' && <button type="button" className="side-action side-action--blue" onClick={() => void send({ type: 'resume' })}>▶ Riprendi</button>}
+          {taboo.phase === 'suspended' && <button type="button" className="side-action side-action--blue" onClick={() => void send({ type: 'resume' })}><span aria-hidden="true">▶</span> Riprendi</button>}
         </div>
       )}
       {message && <p className="side-error" role="alert">{message}</p>}

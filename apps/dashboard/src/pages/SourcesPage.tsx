@@ -1,23 +1,33 @@
 import { useEffect, useState } from 'react'
-import { type SourceKind, type SourceStatus } from '@zerocade/shared'
+import { type SourceKind, type SourceState, type SourceStatus } from '@zerocade/shared'
 import { BridgeControl } from '../components/Regia'
 import { socket } from '../socket'
 import { useDashboard } from '../store'
 
-const SOURCES: { kind: SourceKind; label: string; placeholder: string; hint: string }[] = [
+const SOURCES: { kind: SourceKind; label: string; field: string; placeholder: string; hint: string }[] = [
   {
     kind: 'tiktok',
     label: 'TikTok',
-    placeholder: '@username',
-    hint: 'TikTok LIVE username. Gifts, likes, comments, follows, shares and joins are relayed to the overlay.',
+    field: 'Nome utente TikTok',
+    placeholder: '@nomeutente…',
+    hint: 'Il nome utente della diretta TikTok. Regali, like, commenti, follow, condivisioni e ingressi arrivano all’overlay.',
   },
   {
     kind: 'twitch',
     label: 'Twitch',
-    placeholder: 'channel',
-    hint: 'Twitch channel name. Chat messages and bits (cheers) are relayed to the overlay.',
+    field: 'Canale Twitch',
+    placeholder: 'nomecanale…',
+    hint: 'Il nome del canale Twitch. Messaggi della chat e bits (cheer) arrivano all’overlay.',
   },
 ]
+
+// The connection state as the creator reads it (the server sends the internal code).
+const STATE_LABEL: Record<SourceState, string> = {
+  idle: 'Non collegato',
+  connecting: 'Collegamento in corso…',
+  connected: 'Collegato',
+  error: 'Errore',
+}
 
 export function SourcesPage() {
   const { sources, savedSources } = useDashboard()
@@ -28,10 +38,10 @@ export function SourcesPage() {
   useEffect(() => setInputs((prev) => ({ ...prev, twitch: saved.twitch })), [saved.twitch])
 
   return (
-    <div className="sources">
-      <h1>Live sources</h1>
+    <div className="sources" id="contenuto" tabIndex={-1}>
+      <h1>Sorgenti della diretta</h1>
       <p className="text-muted">
-        Connect real TikTok and Twitch channels to drive the overlay instead of the simulator.
+        Collega i canali TikTok e Twitch veri per guidare l&rsquo;overlay al posto del simulatore.
       </p>
       <section className="source-card">
         <h2>ZeroFollowerBot</h2>
@@ -46,38 +56,55 @@ export function SourcesPage() {
       {SOURCES.map((s) => {
         const st: SourceStatus | undefined = sources[s.kind]
         const busy = st?.state === 'connecting' || st?.state === 'connected'
+        const id = `source-${s.kind}`
         return (
           <section key={s.kind} className="source-card">
             <h2>{s.label}</h2>
-            <p className="text-muted small">{s.hint}</p>
+            <p className="text-muted small" id={`${id}-hint`}>{s.hint}</p>
             <div className="source-card__row">
+              <label className="sr-only" htmlFor={id}>{s.field}</label>
               <input
+                id={id}
+                name={id}
                 type="text"
+                autoComplete="off"
+                spellCheck={false}
+                aria-describedby={`${id}-hint`}
                 placeholder={s.placeholder}
                 value={inputs[s.kind]}
                 onChange={(e) => setInputs({ ...inputs, [s.kind]: e.target.value })}
                 disabled={busy}
               />
               {st?.state === 'connected' ? (
-                <button className="btn" onClick={() => socket.emit('source:disconnect', s.kind)}>
-                  Disconnect
+                <button
+                  type="button"
+                  className="btn"
+                  onClick={() => {
+                    if (window.confirm(`Scollegare ${s.label} (${st.username})? Chat ed eventi di questa diretta smettono di arrivare.`))
+                      socket.emit('source:disconnect', s.kind)
+                  }}
+                >
+                  Scollega {s.label}
                 </button>
               ) : (
                 <button
+                  type="button"
                   className="btn btn--primary"
                   disabled={!inputs[s.kind].trim() || st?.state === 'connecting'}
                   onClick={() => socket.emit('source:connect', { kind: s.kind, username: inputs[s.kind].trim() })}
                 >
-                  Connect
+                  {st?.state === 'connecting' ? 'Collegamento…' : `Collega ${s.label}`}
                 </button>
               )}
             </div>
-            {st && (
-              <div className={`source-status source-status--${st.state}`}>
-                {st.state}
-                {st.message ? `: ${st.message}` : ''}
-              </div>
-            )}
+            <div className={`source-status${st ? ` source-status--${st.state}` : ''}`} aria-live="polite">
+              {st && (
+                <>
+                  {STATE_LABEL[st.state]}
+                  {st.message ? `: ${st.message}` : ''}
+                </>
+              )}
+            </div>
           </section>
         )
       })}

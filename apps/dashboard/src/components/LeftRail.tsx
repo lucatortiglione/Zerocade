@@ -27,8 +27,8 @@ export function LeftRail() {
       <span
         className={`status-dot${connected ? ' status-dot--on' : ''}`}
         role="status"
-        title={connected ? 'Connected to server' : 'Offline'}
-        aria-label={connected ? 'Connected to server' : 'Offline'}
+        title={connected ? 'Collegato al server' : 'Server non raggiungibile'}
+        aria-label={connected ? 'Collegato al server' : 'Server non raggiungibile'}
       />
     </nav>
   )

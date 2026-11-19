@@ -18,6 +18,7 @@ function RuntimeIssue() {
 export function App() {
   return (
     <BrowserRouter>
+      <a className="skip-link" href="#contenuto">Salta al contenuto</a>
       <RuntimeIssue />
       <div className="shell">
         <LeftRail />
