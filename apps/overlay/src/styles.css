@@ -1,7 +1,21 @@
+/* Barlow Semi Condensed (SIL OFL, fonts/LICENSE-Barlow-OFL.txt): incorporato nella build, funziona senza rete. */
+@font-face { font-family: 'Barlow Semi Condensed'; font-weight: 400; font-display: swap; src: url('./fonts/barlow-semi-condensed-latin-400-normal.woff2') format('woff2'); }
+@font-face { font-family: 'Barlow Semi Condensed'; font-weight: 500; font-display: swap; src: url('./fonts/barlow-semi-condensed-latin-500-normal.woff2') format('woff2'); }
+@font-face { font-family: 'Barlow Semi Condensed'; font-weight: 600; font-display: swap; src: url('./fonts/barlow-semi-condensed-latin-600-normal.woff2') format('woff2'); }
+
+/* Grafica in onda: pannelli pieni color lavagna, leggibili anche sopra le foto; testo carta. Le misure sono in vmin perché la
+   scena (1080×1920 o 1920×1080) arriva allo spettatore ridotta: 3,7vmin ≈ 40px sul lato corto, il minimo per un telefono. */
 :root {
   color-scheme: dark;
-  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-  color: #f0f0f2;
+  --slate: #1e2a44;
+  --slate-deep: #141c30;
+  --paper: #f4f6fa;
+  --paper-muted: #c3cbdb;
+  --text-min: 3.7vmin;
+  --text-mid: 4.8vmin;
+  --text-big: 6.7vmin;
+  font-family: 'Barlow Semi Condensed', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  color: var(--paper);
 }
 
 *, *::before, *::after { box-sizing: border-box; }
@@ -44,22 +58,26 @@ body.scene-host #root { display: grid; place-items: center; }
 @keyframes nasa-fade { from { opacity: 0; } }
 @media (prefers-reduced-motion: reduce) { .nasa__photo { animation: none; } }
 
+/* Il marchio del gioco: una barra nel suo colore e il nome, su una fascia lavagna. */
 .overlay__top {
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
+  top: 1.6vmin;
+  left: 1.6vmin;
+  right: 1.6vmin;
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 14px 18px;
-  background: linear-gradient(#00000088, transparent);
+  gap: 1.6vmin;
+  padding: 1.2vmin 2vmin 1.2vmin 0;
+  border-radius: 1.2vmin;
+  background: var(--slate);
+  overflow: hidden;
 }
-.overlay__brand { font-size: 22px; }
-.overlay__title { font-weight: 700; font-size: 18px; }
+.overlay__top::before { content: ''; align-self: stretch; width: 1vmin; margin: -1.2vmin 0; background: var(--game-accent); }
+.overlay__title { font-weight: 600; font-size: var(--text-mid); line-height: 1.1; }
 
-.dot { width: 10px; height: 10px; border-radius: 50%; background: #ff5c5c; margin-left: auto; }
-.dot--on { background: #3ccf7a; }
+/* Il collegamento col server: serve a chi fa la diretta, quindi piccolo e discreto. */
+.dot { width: 1.4vmin; height: 1.4vmin; border-radius: 50%; background: #f0b444; margin-left: auto; }
+.dot--on { background: #53c79e; }
 
 /* A viewer's picture next to their name (ViewerAvatar): sized on the text around it, with
    their initial underneath for when there is no picture. */
@@ -80,30 +98,28 @@ body.scene-host #root { display: grid; place-items: center; }
 }
 .viewer-avatar img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 
+/* Come si gioca: frasi brevi in pillole piene, una per regola. */
 .overlay__guide {
   position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
+  bottom: 1.6vmin;
+  left: 1.6vmin;
+  right: 1.6vmin;
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 8px;
-  padding: 14px 18px;
-  background: linear-gradient(transparent, #000000aa);
+  gap: 1.2vmin;
 }
 .guide-chip {
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 6px 10px;
+  gap: 1.2vmin;
+  padding: 1vmin 2.4vmin;
   border-radius: 999px;
-  background: #1b1b21cc;
-  border: 1px solid #26262e;
-  font-size: 14px;
+  background: var(--slate);
+  font-size: var(--text-min);
+  font-weight: 500;
+  line-height: 1.15;
 }
-.guide-chip__label { color: #c0c0cc; }
-.guide-chip__arrow { color: #8a8a96; }
 
 /* Widgets */
 .widget {
@@ -453,12 +469,11 @@ body.bivio-see-through { background: transparent; }
   width: max-content;
   max-width: 86vw;
   padding: 1.4vmin 3.6vmin;
-  border: 0.3vmin solid #ffffff33;
-  border-radius: 3vmin;
-  background: #111322ee;
+  border-radius: 1.6vmin;
+  background: var(--slate);
   box-shadow: 0 1.6vmin 5vmin #000000aa;
-  font-size: 3.8vmin;
-  font-weight: 800;
+  font-size: var(--text-mid);
+  font-weight: 600;
   text-align: center;
   overflow-wrap: anywhere;
   transform: translateX(-50%);
@@ -1224,12 +1239,10 @@ body.incastro-on .guide-chip__arrow { color: rgb(255 255 255 / 0.45); }
   transform: translateX(-50%);
   padding: 10px 22px;
   border-radius: 999px;
-  background: rgba(10, 12, 24, 0.82);
-  border: 1px solid rgba(255, 255, 255, 0.18);
-  color: #fff;
-  font-weight: 800;
-  font-size: 22px;
-  letter-spacing: 0.04em;
+  background: var(--slate);
+  color: var(--paper);
+  font-weight: 600;
+  font-size: var(--text-mid);
   z-index: 20;
 }
 
@@ -1256,7 +1269,7 @@ body.incastro-on .guide-chip__arrow { color: rgb(255 255 255 / 0.45); }
   animation: overlay-pause-pulse 2.2s ease-in-out infinite;
 }
 .overlay-pause__icon { font-size: 12vmin; line-height: 1; }
-.overlay-pause__card strong { font-size: 9vmin; letter-spacing: 0.06em; text-transform: uppercase; }
+.overlay-pause__card strong { font-size: 9vmin; font-weight: 600; }
 .overlay-pause__card small { font-size: 3.4vmin; opacity: 0.8; }
 @keyframes overlay-pause-pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.75; } }
 @media (prefers-reduced-motion: reduce) { .overlay-pause__card { animation: none; } }

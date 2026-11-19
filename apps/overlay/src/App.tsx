@@ -1,5 +1,5 @@
-import { useEffect, useRef, useSyncExternalStore } from 'react'
-import { GAMES, activeTriggers, describeSource, sharesPhotoBackground, triggersFor, type GameCommand, type LiveEvent } from '@zerocade/shared'
+import { useEffect, useRef, useSyncExternalStore, type CSSProperties } from 'react'
+import { GAMES, activeTriggers, sharesPhotoBackground, triggersFor, type GameCommand, type LiveEvent } from '@zerocade/shared'
 import { setRoundCheer } from './audio'
 import { NasaBackdrop } from './NasaBackdrop'
 import { Engine } from './games/engine'
@@ -17,6 +17,7 @@ import { Quizzland } from './Quizzland'
 import { ContextTournament } from './ContextTournament'
 import { isContentReady, loadContent, subscribeContent } from './content'
 import { ScoreTicker } from './ScoreTicker'
+import { guideLine } from './guide'
 
 
 export function App() {
@@ -117,7 +118,8 @@ export function App() {
     : session?.gameId === 'quizzland' ? quizzland?.scores : undefined
 
   return (
-    <div className="overlay">
+    // Il colore del gioco (dal catalogo) segna il marchio in alto: è l'unico accento per gioco.
+    <div className="overlay" style={{ '--game-accent': game?.gradient[0] ?? '#8fb3ff' } as CSSProperties}>
       {photoMinutes > 0 && <NasaBackdrop minutes={photoMinutes} />}
       <canvas ref={canvasRef} className="overlay__canvas" />
       {session?.gameId === 'zerodubbi' && <Bivio />}
@@ -127,9 +129,8 @@ export function App() {
       {session?.gameId === 'zerowordhunt' && <WordHunt />}
       {tournamentOn && <ContextTournament />}
       <header className="overlay__top">
-        <span className="overlay__brand">{game?.emoji ?? '🎮'}</span>
         <span className="overlay__title">{game?.name ?? 'Zerocade'}</span>
-        <span className={`dot${connected ? ' dot--on' : ''}`} />
+        <span className={`dot${connected ? ' dot--on' : ''}`} aria-label={connected ? 'Collegato' : 'Non collegato'} />
       </header>
 
       {session?.settings.showLeaderboard !== false && scores && <ScoreTicker scores={scores} />}
@@ -161,14 +162,11 @@ export function App() {
       {session && game && !tournamentOn && (
         <footer className="overlay__guide">
           {activeTriggers(session).map((t, i) => {
-            const s = describeSource(t.source)
-            const a = game.actions.find((x) => x.id === t.action)
+            const line = guideLine(t, game)
             return (
               <div key={i} className="guide-chip">
-                <span>{s.icon}</span>
-                <span className="guide-chip__label">{s.label}</span>
-                <span className="guide-chip__arrow">→</span>
-                <span>{a?.label ?? t.action}</span>
+                <span aria-hidden="true">{line.icon}</span>
+                <span>{line.text}</span>
               </div>
             )
           })}

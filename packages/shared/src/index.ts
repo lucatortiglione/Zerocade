@@ -770,10 +770,10 @@ const GAME_DEFS: GameDef[] = [
     emoji: '🎁',
     gradient: ['#7c5cff', '#2a1f5e'],
     actions: [
-      { id: 'drop', label: 'Drop in' },
-      { id: 'rain', label: 'Heart rain' },
-      { id: 'boost', label: 'Jump!' },
-      { id: 'bomb', label: 'Bomb' },
+      { id: 'drop', label: 'Entra in gioco' },
+      { id: 'rain', label: 'Pioggia di cuori' },
+      { id: 'boost', label: 'Salta!' },
+      { id: 'bomb', label: 'Bomba' },
     ],
     settings: [
       { id: 'gravity', label: 'Gravity', kind: 'number', min: 200, max: 2000, step: 50, default: 900 },
@@ -796,10 +796,10 @@ const GAME_DEFS: GameDef[] = [
     emoji: '🥊',
     gradient: ['#ff5c5c', '#2a0a1a'],
     actions: [
-      { id: 'join-red', label: 'Join red' },
-      { id: 'join-blue', label: 'Join blue' },
-      { id: 'punch', label: 'Punch' },
-      { id: 'heal', label: 'Heal' },
+      { id: 'join-red', label: 'Squadra rossa' },
+      { id: 'join-blue', label: 'Squadra blu' },
+      { id: 'punch', label: 'Pugno' },
+      { id: 'heal', label: 'Cura' },
     ],
     settings: [
       { id: 'rounds', label: 'Rounds', kind: 'number', min: 1, max: 5, step: 1, default: 3 },
@@ -820,10 +820,10 @@ const GAME_DEFS: GameDef[] = [
     emoji: '🌙',
     gradient: ['#3ccf7a', '#0a2433'],
     actions: [
-      { id: 'jump', label: 'Jump' },
-      { id: 'power', label: 'Power-up' },
-      { id: 'obstacle', label: 'Obstacle' },
-      { id: 'speed', label: 'Boost speed' },
+      { id: 'jump', label: 'Salta' },
+      { id: 'power', label: 'Potenziamento' },
+      { id: 'obstacle', label: 'Ostacolo' },
+      { id: 'speed', label: 'Più velocità' },
     ],
     settings: [
       { id: 'speed', label: 'Base speed', kind: 'number', min: 200, max: 700, step: 25, default: 360 },
@@ -844,8 +844,8 @@ const GAME_DEFS: GameDef[] = [
     emoji: '❓',
     gradient: ['#f5b14c', '#3a2a0a'],
     actions: [
-      { id: 'answer', label: 'Answer' },
-      { id: 'skip', label: 'Skip question' },
+      { id: 'answer', label: 'Rispondi' },
+      { id: 'skip', label: 'Salta domanda' },
     ],
     settings: [
       { id: 'seconds', label: 'Seconds per question', kind: 'number', min: 5, max: 60, step: 5, default: 20 },
@@ -860,7 +860,7 @@ const GAME_DEFS: GameDef[] = [
     description: 'Viewers guess the hidden word by typing it (or single letters) in chat.',
     emoji: '🔤',
     gradient: ['#3ccf7a', '#0a2a1a'],
-    actions: [{ id: 'answer', label: 'Guess' }],
+    actions: [{ id: 'answer', label: 'Indovina' }],
     settings: [
       { id: 'seconds', label: 'Seconds per word', kind: 'number', min: 10, max: 90, step: 5, default: 45 },
     ],
@@ -873,7 +873,7 @@ const GAME_DEFS: GameDef[] = [
     description: 'A wheel of letters: viewers type any word they can build from it (Zen Word style).',
     emoji: '🌀',
     gradient: ['#3ccf7a', '#0a2a1a'],
-    actions: [{ id: 'guess', label: 'Guess word' }],
+    actions: [{ id: 'guess', label: 'Indovina la parola' }],
     settings: [
       { id: 'seconds', label: 'Seconds per round', kind: 'number', min: 20, max: 120, step: 5, default: 60 },
     ],
@@ -886,7 +886,7 @@ const GAME_DEFS: GameDef[] = [
     description: 'Four pictures, one common word: viewers type the answer in chat.',
     emoji: '🖼️',
     gradient: ['#f5b14c', '#3a2a0a'],
-    actions: [{ id: 'guess', label: 'Guess' }],
+    actions: [{ id: 'guess', label: 'Indovina' }],
     settings: [
       { id: 'seconds', label: 'Seconds per puzzle', kind: 'number', min: 10, max: 90, step: 5, default: 30 },
       {
@@ -912,7 +912,7 @@ const GAME_DEFS: GameDef[] = [
     description: 'A picture, one word: viewers guess it in chat.',
     emoji: '🧩',
     gradient: ['#3ccf7a', '#0a2a1a'],
-    actions: [{ id: 'guess', label: 'Guess' }],
+    actions: [{ id: 'guess', label: 'Indovina' }],
     settings: [
       { id: 'seconds', label: 'Seconds per picture', kind: 'number', min: 10, max: 90, step: 5, default: 30 },
       { id: 'wordsPerRound', label: 'Words per round', kind: 'number', min: 1, max: 5, step: 1, default: 3 },
@@ -939,7 +939,7 @@ const GAME_DEFS: GameDef[] = [
     description: 'Find every hidden word from the letters to complete the crossword board.',
     emoji: '🌍',
     gradient: ['#4cc3ff', '#0a1a3a'],
-    actions: [{ id: 'guess', label: 'Find word' }],
+    actions: [{ id: 'guess', label: 'Trova la parola' }],
     settings: [
       { id: 'seconds', label: 'Seconds per round', kind: 'number', min: 20, max: 120, step: 5, default: 60 },
     ],
@@ -953,7 +953,7 @@ const GAME_DEFS: GameDef[] = [
     emoji: '🟩',
     gradient: ['#3e8bff', '#0a1a3a'],
     actions: [
-      { id: 'guess', label: 'Guess' },
+      { id: 'guess', label: 'Indovina' },
       { id: 'reveal_letter', label: 'Rivela lettera', help: true },
       { id: 'find_letter', label: 'Trova lettera', help: true },
       { id: 'rule_out', label: 'Escludi lettera', help: true },
@@ -998,7 +998,7 @@ const GAME_DEFS: GameDef[] = [
     emoji: '⛓️',
     gradient: ['#ff9a3c', '#3a0a2a'],
     actions: [
-      { id: 'guess', label: 'Guess' },
+      { id: 'guess', label: 'Indovina' },
       { id: 'reveal_letter', label: 'Rivela lettera o indizio', help: true },
       { id: 'reveal_word', label: 'Rivela parola', help: true },
     ],
@@ -1052,7 +1052,7 @@ const GAME_DEFS: GameDef[] = [
     emoji: '🔎',
     gradient: ['#4cc3ff', '#0a1a3a'],
     actions: [
-      { id: 'guess', label: 'Guess' },
+      { id: 'guess', label: 'Indovina' },
       { id: 'reveal_letter', label: 'Rivela lettera', help: true },
     ],
     settings: [
@@ -1075,7 +1075,7 @@ const GAME_DEFS: GameDef[] = [
     emoji: '✅',
     gradient: ['#1e6bff', '#0a1a3a'],
     actions: [
-      { id: 'answer', label: 'Answer' },
+      { id: 'answer', label: 'Rispondi' },
       { id: 'skip_statement', label: 'Salta' },
       { id: 'extra_time', label: 'Tempo extra', help: true },
       { id: 'spotlight', label: 'Riflettore' },
@@ -1101,7 +1101,7 @@ const GAME_DEFS: GameDef[] = [
     emoji: '⏱️',
     gradient: ['#f6c945', '#3a2a0a'],
     actions: [
-      { id: 'answer', label: 'Answer' },
+      { id: 'answer', label: 'Rispondi' },
       { id: 'fifty_fifty', label: '50/50', help: true },
       { id: 'skip_question', label: 'Salta domanda' },
     ],
@@ -1127,7 +1127,7 @@ const GAME_DEFS: GameDef[] = [
     emoji: '🧠',
     gradient: ['#8b5cf6', '#1a0a3a'],
     actions: [
-      { id: 'answer', label: 'Answer' },
+      { id: 'answer', label: 'Rispondi' },
       { id: 'show_again', label: 'Rimostra', help: true },
       { id: 'extra_time', label: 'Tempo extra', help: true },
     ],
@@ -1152,7 +1152,7 @@ const GAME_DEFS: GameDef[] = [
     emoji: '🔗',
     gradient: ['#3258d4', '#0a1a3a'],
     actions: [
-      { id: 'guess', label: 'Guess' },
+      { id: 'guess', label: 'Indovina' },
       { id: 'reveal_letter', label: 'Rivela lettere', help: true },
       { id: 'next_round', label: 'Round successivo' },
     ],
@@ -1203,7 +1203,7 @@ const GAME_DEFS: GameDef[] = [
     emoji: '🔡',
     gradient: ['#3ccf7a', '#0a2a1a'],
     actions: [
-      { id: 'guess', label: 'Guess' },
+      { id: 'guess', label: 'Indovina' },
       { id: 'reveal_word', label: 'Rivela parola', help: true },
       { id: 'new_board', label: 'Nuova griglia' },
     ],
@@ -1229,7 +1229,7 @@ const GAME_DEFS: GameDef[] = [
     emoji: '✖️',
     gradient: ['#4cc3ff', '#0a1a3a'],
     actions: [
-      { id: 'guess', label: 'Find word' },
+      { id: 'guess', label: 'Trova la parola' },
       { id: 'hint', label: 'Aiuto', help: true },
       { id: 'shuffle', label: 'Mescola' },
     ],
@@ -1251,7 +1251,7 @@ const GAME_DEFS: GameDef[] = [
     emoji: '🏷️',
     gradient: ['#6b8aff', '#1a0a3a'],
     actions: [
-      { id: 'guess', label: 'Guess' },
+      { id: 'guess', label: 'Indovina' },
       { id: 'reveal_hint', label: 'Aiuto', help: true },
     ],
     settings: [
@@ -1276,7 +1276,7 @@ const GAME_DEFS: GameDef[] = [
     emoji: '🗺️',
     gradient: ['#ffc02e', '#1a1a0a'],
     actions: [
-      { id: 'guess', label: 'Guess' },
+      { id: 'guess', label: 'Indovina' },
       { id: 'reveal_letter', label: 'Rivela lettera', help: true },
       { id: 'show_continent', label: 'Mostra continente', help: true },
       { id: 'add_time', label: 'Tempo extra', help: true },
@@ -1305,7 +1305,7 @@ const GAME_DEFS: GameDef[] = [
     emoji: '🎨',
     gradient: ['#17b7a8', '#0a1a1a'],
     actions: [
-      { id: 'guess', label: 'Guess' },
+      { id: 'guess', label: 'Indovina' },
       { id: 'reveal_letter', label: 'Rivela lettera', help: true },
     ],
     settings: [
@@ -1329,7 +1329,7 @@ const GAME_DEFS: GameDef[] = [
     emoji: '🎯',
     gradient: ['#ffffff', '#2d3642'],
     actions: [
-      { id: 'guess', label: 'Guess' },
+      { id: 'guess', label: 'Indovina' },
       { id: 'reveal_closer', label: 'Rivela più vicino', help: true },
       { id: 'small_hint', label: 'Piccolo aiuto', help: true },
     ],
@@ -1395,7 +1395,7 @@ const GAME_DEFS: GameDef[] = [
     emoji: '💎',
     gradient: ['#f5b14c', '#1a0a3a'],
     actions: [
-      { id: 'vote', label: 'Vote' },
+      { id: 'vote', label: 'Vota' },
       { id: 'fifty_fifty', label: '50/50', help: true },
       { id: 'skip_question', label: 'Salta domanda' },
     ],
@@ -1420,7 +1420,7 @@ const GAME_DEFS: GameDef[] = [
     description: 'Una parola e tante parole associate nascoste: trovale in chat.',
     emoji: '🔗',
     gradient: ['#3258d4', '#0a1a3a'],
-    actions: [{ id: 'guess', label: 'Guess' }],
+    actions: [{ id: 'guess', label: 'Indovina' }],
     settings: [
       { id: 'roundSeconds', label: 'Secondi per round', kind: 'number', min: 30, max: 300, step: 10, default: 60 },
       { id: 'breakSeconds', label: 'Pausa', kind: 'number', min: 2, max: 20, step: 1, default: 5 },
@@ -1436,7 +1436,7 @@ const GAME_DEFS: GameDef[] = [
     description: 'Una griglia di lettere con parole nascoste: trovale in chat.',
     emoji: '🔠',
     gradient: ['#3ccf7a', '#0a2a1a'],
-    actions: [{ id: 'guess', label: 'Guess' }],
+    actions: [{ id: 'guess', label: 'Indovina' }],
     settings: [
       { id: 'secondsBetweenBoards', label: 'Pausa tra griglie', kind: 'number', min: 3, max: 30, step: 1, default: 8 },
       { id: 'showLeaderboard', label: 'Classifica', kind: 'toggle', default: true },
@@ -1450,7 +1450,7 @@ const GAME_DEFS: GameDef[] = [
     description: 'Un cruciverba di parole che si incrociano: trova le parole in chat.',
     emoji: '🌐',
     gradient: ['#4cc3ff', '#0a1a3a'],
-    actions: [{ id: 'guess', label: 'Find word' }],
+    actions: [{ id: 'guess', label: 'Trova la parola' }],
     settings: [
       { id: 'breakSeconds', label: 'Pausa', kind: 'number', min: 3, max: 30, step: 1, default: 8 },
       { id: 'creditWords', label: 'Accredita parole', kind: 'toggle', default: true },
@@ -1465,7 +1465,7 @@ const GAME_DEFS: GameDef[] = [
     description: 'Risolvi gli indizi: le prime lettere delle risposte formano la frase nascosta.',
     emoji: '🔤',
     gradient: ['#f5b14c', '#3a2a0a'],
-    actions: [{ id: 'guess', label: 'Guess' }],
+    actions: [{ id: 'guess', label: 'Indovina' }],
     settings: [
       { id: 'breakSeconds', label: 'Pausa', kind: 'number', min: 3, max: 30, step: 1, default: 8 },
       { id: 'pointsPerCorrect', label: 'Punti per risposta', kind: 'number', min: 1, max: 50, step: 1, default: 5 },
@@ -1481,7 +1481,7 @@ const GAME_DEFS: GameDef[] = [
     description: 'Cruciverba all’italiana con Orizzontali e Verticali: trova le parole.',
     emoji: '🧩',
     gradient: ['#8b5cf6', '#1a0a3a'],
-    actions: [{ id: 'guess', label: 'Find word' }],
+    actions: [{ id: 'guess', label: 'Trova la parola' }],
     settings: [
       { id: 'breakSeconds', label: 'Pausa', kind: 'number', min: 3, max: 30, step: 1, default: 8 },
       { id: 'creditWords', label: 'Accredita parole', kind: 'toggle', default: true },
@@ -1496,7 +1496,7 @@ const GAME_DEFS: GameDef[] = [
     description: 'Lettere mescolate: riordinale e scrivi la parola in chat.',
     emoji: '🔀',
     gradient: ['#4cc3ff', '#0a1a3a'],
-    actions: [{ id: 'guess', label: 'Guess' }],
+    actions: [{ id: 'guess', label: 'Indovina' }],
     settings: [
       { id: 'roundSeconds', label: 'Secondi per parola', kind: 'number', min: 15, max: 90, step: 5, default: 45 },
       { id: 'breakSeconds', label: 'Pausa', kind: 'number', min: 2, max: 20, step: 1, default: 5 },
@@ -1511,7 +1511,7 @@ const GAME_DEFS: GameDef[] = [
     description: 'Un tema e le risposte più popolari: indovinale e guadagna punti.',
     emoji: '🗣️',
     gradient: ['#f5b14c', '#3a2a0a'],
-    actions: [{ id: 'guess', label: 'Guess' }],
+    actions: [{ id: 'guess', label: 'Indovina' }],
     settings: [
       { id: 'roundSeconds', label: 'Secondi per round', kind: 'number', min: 30, max: 300, step: 10, default: 60 },
       { id: 'breakSeconds', label: 'Pausa', kind: 'number', min: 2, max: 20, step: 1, default: 5 },
@@ -1526,7 +1526,7 @@ const GAME_DEFS: GameDef[] = [
     description: 'Una catena di parole associate: indovina la prossima per avanzare.',
     emoji: '🃏',
     gradient: ['#3258d4', '#0a1a3a'],
-    actions: [{ id: 'guess', label: 'Guess' }],
+    actions: [{ id: 'guess', label: 'Indovina' }],
     settings: [
       { id: 'roundSeconds', label: 'Secondi per round', kind: 'number', min: 30, max: 300, step: 10, default: 60 },
       { id: 'breakSeconds', label: 'Pausa', kind: 'number', min: 2, max: 20, step: 1, default: 5 },
@@ -1542,7 +1542,7 @@ const GAME_DEFS: GameDef[] = [
     description: 'Le lettere sono perle in cerchio: trova la parola.',
     emoji: '📿',
     gradient: ['#22c55e', '#0a2a1a'],
-    actions: [{ id: 'guess', label: 'Guess' }],
+    actions: [{ id: 'guess', label: 'Indovina' }],
     settings: [
       { id: 'roundSeconds', label: 'Secondi per parola', kind: 'number', min: 15, max: 90, step: 5, default: 45 },
       { id: 'breakSeconds', label: 'Pausa', kind: 'number', min: 2, max: 20, step: 1, default: 5 },
@@ -1557,7 +1557,7 @@ const GAME_DEFS: GameDef[] = [
     description: 'Quiz rapidissimo: rispondi in fretta per il bonus velocità.',
     emoji: '⚡',
     gradient: ['#ff5c5c', '#2a0a0a'],
-    actions: [{ id: 'answer', label: 'Answer' }],
+    actions: [{ id: 'answer', label: 'Rispondi' }],
     settings: [
       { id: 'questionSeconds', label: 'Secondi per domanda', kind: 'number', min: 5, max: 30, step: 1, default: 10 },
       { id: 'revealSeconds', label: 'Secondi rivelazione', kind: 'number', min: 3, max: 15, step: 1, default: 5 },
@@ -1845,7 +1845,7 @@ const GAME_DEFS: GameDef[] = [
     description: 'Una griglia 4x4: trova più parole possibile prima che scada il tempo.',
     emoji: '🧊',
     gradient: ['#4cc3ff', '#0a1a3a'],
-    actions: [{ id: 'guess', label: 'Guess' }],
+    actions: [{ id: 'guess', label: 'Indovina' }],
     settings: [
       { id: 'roundSeconds', label: 'Secondi per round', kind: 'number', min: 30, max: 180, step: 10, default: 60 },
       { id: 'breakSeconds', label: 'Pausa', kind: 'number', min: 2, max: 20, step: 1, default: 5 },
@@ -1860,7 +1860,7 @@ const GAME_DEFS: GameDef[] = [
     description: 'Un tema, sette risposte: trovale tutte.',
     emoji: '7️⃣',
     gradient: ['#f5b14c', '#3a2a0a'],
-    actions: [{ id: 'guess', label: 'Guess' }],
+    actions: [{ id: 'guess', label: 'Indovina' }],
     settings: [
       { id: 'roundSeconds', label: 'Secondi per round', kind: 'number', min: 30, max: 300, step: 10, default: 60 },
       { id: 'breakSeconds', label: 'Pausa', kind: 'number', min: 2, max: 20, step: 1, default: 5 },
@@ -1875,7 +1875,7 @@ const GAME_DEFS: GameDef[] = [
     description: 'Una parola con una lettera nascosta: completala in chat.',
     emoji: '❓',
     gradient: ['#f5b14c', '#0a2a1a'],
-    actions: [{ id: 'guess', label: 'Guess' }],
+    actions: [{ id: 'guess', label: 'Indovina' }],
     settings: [
       { id: 'roundSeconds', label: 'Secondi per parola', kind: 'number', min: 15, max: 90, step: 5, default: 45 },
       { id: 'breakSeconds', label: 'Pausa', kind: 'number', min: 2, max: 20, step: 1, default: 5 },
@@ -1890,7 +1890,7 @@ const GAME_DEFS: GameDef[] = [
     description: 'Due metà di una parola: uniscile e scrivi la parola completa.',
     emoji: '➕',
     gradient: ['#3ccf7a', '#0a2a1a'],
-    actions: [{ id: 'guess', label: 'Guess' }],
+    actions: [{ id: 'guess', label: 'Indovina' }],
     settings: [
       { id: 'roundSeconds', label: 'Secondi per parola', kind: 'number', min: 15, max: 90, step: 5, default: 45 },
       { id: 'breakSeconds', label: 'Pausa', kind: 'number', min: 2, max: 20, step: 1, default: 5 },
@@ -2189,18 +2189,18 @@ export function describeSource(source: TriggerSource): { icon: string; label: st
   switch (source.type) {
     case 'gift': {
       const gift = source.giftId ? giftById(source.giftId) : undefined
-      return gift ? { icon: gift.emoji, label: gift.name } : { icon: '🎁', label: 'Any gift' }
+      return gift ? { icon: gift.emoji, label: gift.name } : { icon: '🎁', label: 'Un regalo qualsiasi' }
     }
     case 'like':
-      return { icon: '👍', label: 'Likes' }
+      return { icon: '👍', label: 'Like' }
     case 'follow':
-      return { icon: '➕', label: 'Follow' }
+      return { icon: '➕', label: 'Nuovo follower' }
     case 'share':
-      return { icon: '🔁', label: 'Share' }
+      return { icon: '🔁', label: 'Condivisione' }
     case 'comment':
-      return source.match ? { icon: '💬', label: `"${source.match}"` } : { icon: '💬', label: 'Any comment' }
+      return source.match ? { icon: '💬', label: `"${source.match}"` } : { icon: '💬', label: 'Un messaggio in chat' }
     case 'join':
-      return { icon: '👋', label: 'Join' }
+      return { icon: '👋', label: 'Ingresso in diretta' }
   }
 }
 
