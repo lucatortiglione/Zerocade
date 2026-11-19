@@ -372,6 +372,38 @@ vettori del gioco restano allineati e non vengono riscritti.
 
 Test: `python -m unittest discover -s . -p script/test_evaluate_context_inventory.py`.
 
+## Qualità delle posizioni
+
+Misura quanto un profilo di vettori mette nelle prime dieci posizioni le parole che la gente associa alla segreta
+(`guinzaglio` per `cane`), con sei metriche: Precision@10 (verificata e giudicata), nDCG@20, copertura, categoria
+grammaticale (solo informativa), accezione e valutazione umana. **Non cambia il ranking del gioco**: produce il metro
+con cui lo si migliora. Progetto: [la specifica](../docs/superpowers/specs/2026-11-19-zerocontext-qualita-posizioni-design.md),
+[il piano](../docs/superpowers/plans/2026-11-19-zerocontext-qualita-posizioni.md).
+
+```
+python script/evaluate_context_ranking.py campione                       # sceglie 50 segrete di misura da rivedere (poi --blocco: +25)
+python script/evaluate_context_ranking.py valuta --profilo original --giudice no
+python script/evaluate_context_ranking.py valuta --profilo abtt --giudice campione    # con Qwen locale sulle parole non coperte
+python script/evaluate_context_ranking.py valuta --candidato NOME --vettori F.bin --vocab V.txt --dim 1024   # un profilo non ancora pubblicato
+python script/evaluate_context_ranking.py ricalcola                      # dopo i verdetti dati nella pagina: niente Qwen né vettori
+python script/evaluate_context_ranking.py parita --profilo original      # prime 20 di 20 segrete, per il confronto con il server
+```
+
+- **Riferimento:** `parole_ita_raw_2.0.sqlite3` (segrete, lemmi, forme flesse) e le associazioni verificate di ZeroAssociazioni in
+  `giochi.sqlite3`, entrambi **solo in lettura**; ogni rapporto registra l'impronta dei dati letti. Se raw 2.0 cambia durante una
+  valutazione, l'esecuzione si annulla (uscita 2).
+- **Misura e sviluppo:** una segreta è di *misura* se `sha256(parola) mod 5 = 0`. Chi migliora il ranking usa solo lo sviluppo; la
+  misura serve a controllare, così il punteggio non sale per costruzione.
+- **Risultati:** `database/ZeroContext_Valutazione.sqlite3` (l'unico database in cui il valutatore scrive) e un rapporto JSON e CSV in
+  `reports/`. Un'esecuzione interrotta si riprende rilanciando lo stesso comando: i verdetti già dati non si rifanno.
+- **Giudice:** Qwen locale (llama.cpp, la stessa configurazione di ZeroAssociazioni). **Non parte durante una diretta**: si ferma se
+  Zerocade ha una sorgente collegata. Il rapporto stampa sensibilità e specificità del giudice; l'accordo con i verdetti di Luca
+  (`giudice_accordo_umano`) dice se fidarsi.
+- **Pagina:** «Qualità» nella dashboard (`/qualita`): confronto dei profili e revisione del campione, parola per parola.
+- **Test:** `python -I -m unittest discover -s valutazione -t .` da questa cartella (ambiente `.venv-pipeline-a`); lato server
+  `tests/context-evaluation*.test.ts` e `tests/context-quality-view.test.ts`. `scripts/context-evaluation-parity.ts` confronta il
+  ranking del valutatore con quello del server sui profili veri.
+
 ## Nel codice
 
 - Server: `apps/server/src/context.ts` serve parole, vettori e collegamenti (`links.json`). `ZEROCADE_CONTEXT_DATA` può indicare un'altra
