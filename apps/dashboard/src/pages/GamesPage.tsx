@@ -32,7 +32,8 @@ export function GamesPage() {
   // to the preview. Every game gets the same right column: pads, creators and latest gifts.
   if (session?.gameId === 'zerodubbi' || session?.gameId === 'incastro' || session?.gameId === 'quizzland' || session?.gameId === 'zerotaboo' || session?.gameId === 'zerowordhunt') {
     return (
-      <div className="games games--bivio">
+      <div className="games games--bivio" id="contenuto" tabIndex={-1}>
+        <h1 className="sr-only">Regia</h1>
         {session.gameId === 'zerodubbi' ? (
           <BivioSidebar session={session} />
         ) : session.gameId === 'incastro' ? (
@@ -51,10 +52,11 @@ export function GamesPage() {
   }
 
   return (
-    <div className="games">
+    <div className="games" id="contenuto" tabIndex={-1}>
+      <h1 className="sr-only">Regia</h1>
       <aside className="panel left-panel">
         <section>
-          <h2 className="section-label">Games</h2>
+          <h2 className="section-label">Giochi</h2>
           <GamePicker session={session} locked={tournamentOpen} />
         </section>
         {session?.gameId === 'context' && <ContextTournamentPanel />}
@@ -76,7 +78,7 @@ export function GamesPage() {
                 disabled={session.paused || session.ended}
                 onClick={() => socket.emit('game:command', 'next-round')}
               >
-                ⏭ Termina round
+                <span aria-hidden="true">⏭</span> Termina round
               </button>
             )}
           </section>
@@ -176,25 +178,25 @@ function Preview({ session }: { session: SessionState | null }) {
       <div className="preview__head">
         <div className="preview__title">
           <span className="preview__dot" aria-hidden="true" />
-          Live preview
+          Anteprima
           {session && <span className="preview__game">{GAMES.find((g) => g.id === session.gameId)?.name}</span>}
         </div>
         <div className="preview__actions">
           {session && (
-            <button className={`btn btn--small ${placing ? '' : 'btn--ghost'}`} onClick={() => setPlacing(!placing)}>
+            <button type="button" className={`btn btn--small ${placing ? '' : 'btn--ghost'}`} aria-pressed={placing} onClick={() => setPlacing(!placing)}>
               {placing ? 'Fatto' : 'Sposta box'}
             </button>
           )}
-          <a className="btn btn--ghost btn--small" href={overlayUrl} target="_blank" rel="noreferrer">
-            Open ↗
+          <a className="btn btn--ghost btn--small" href={overlayUrl} target="_blank" rel="noreferrer" title="Apre l'overlay in una nuova scheda">
+            Apri overlay <span aria-hidden="true">↗</span><span className="sr-only"> (nuova scheda)</span>
           </a>
         </div>
       </div>
       <div className="preview__frame">
-        <iframe title="Overlay preview" src={previewUrl} />
+        <iframe title="Anteprima dell'overlay" src={previewUrl} />
         {placing && session && <PlaceBoxes session={session} />}
       </div>
-      <p className="text-muted small">This is exactly what your viewers see on stream.</p>
+      <p className="text-muted small">È esattamente quello che vedono gli spettatori in diretta.</p>
     </main>
   )
 }

@@ -55,7 +55,7 @@ export function Simulator() {
       <section className="sim-panel">
         <h2 className="section-label">Live simulator</h2>
         <button type="button" className="btn" onClick={() => setOpen(true)}>
-          ▶ Avvia simulazione
+          <span aria-hidden="true">▶</span> Avvia simulazione
         </button>
       </section>
     )
@@ -72,7 +72,7 @@ export function Simulator() {
           setAuto(false)
         }}
       >
-        ■ Ferma simulazione
+        <span aria-hidden="true">■</span> Ferma simulazione
       </button>
       <div className="seg" role="group" aria-label="Gifts per click">
         {COUNTS.map((n) => (
