@@ -410,6 +410,16 @@ python script/evaluate_context_ranking.py parita --profilo original      # prime
   cartella per `vectors.bin`.
 - Server: `apps/server/src/context-semantic.ts` gestisce la partita semantica; `packages/shared/src/contextRanking.ts`
   calcola la classifica condivisa con il torneo.
+- Server, **thread di calcolo** (19/11/2026): vettori e classifiche stanno in un thread a parte (`apps/server/src/context-worker.ts`,
+  client `context-corpora.ts`), non in quello che serve overlay e regia. Caricare un corpus (0,5–1,8 s) e ordinare le 93.928 parole per una
+  segreta (120–270 ms) prima fermavano tutto il server («Il server è rimasto bloccato»); ora il thread principale tiene solo il vocabolario e
+  riceve le classifiche già fatte. Il round successivo si sceglie e si ordina **durante la pausa** tra i round (se la classifica arriva tardi la
+  pausa si allunga, non parte mai un round senza); il primo round dopo la scelta del gioco o delle associazioni compare come «Preparo la
+  classifica…». Nel torneo la manche successiva si prepara tra una manche e l'altra; dopo un riavvio la manche in corso riprende quando la
+  sua classifica è pronta («Riprendi» chiede di riprovare tra un istante). L'impronta del corpus salvata nei tornei non cambia. Se il thread
+  si ferma, le richieste in corso falliscono e la successiva ne avvia uno nuovo. Nel pacchetto Windows è `context-worker.mjs`.
+  Misura (19/11/2026, caricamento di originali e ABTT e 20 classifiche): thread principale fermo al massimo 17–56 ms, al livello del rumore di
+  un processo Node a vuoto su questo PC.
 - Overlay: `apps/overlay/src/games/contextSemanticGame.ts` visualizza lo stato della stanza con `contextView.ts`.
   `context.ts` mantiene il motore precedente per i corpus storici.
 
@@ -440,6 +450,25 @@ da solo con `build.py export`.
 - Limiti dichiarati: `parole`/`normalizzata` non hanno POS né accezioni (`pos`/`sense_id` vuoti, `sense_ambiguous=true`); gli ECDF
   sono stimati su un campione di coppie candidate, non su coppie annotate, quindi `score_is_calibrated=false` e nessun
   `high_confidence`; benchmark e ablazione (§8) non eseguiti. Test: `python -m unittest pipeline_a.test_pipeline_a`.
+
+## Giocare con le associazioni della Pipeline B
+
+Nella dashboard, in «Associazioni ZeroContext», la terza scelta **Pipeline B** usa l'export `database/ZeroContext_Associazioni_PipelineB.sqlite3`
+(si può indicare un altro file con `ZEROCADE_ASSOCIATIONS_B_FILE`). Il server la deriva nel thread di calcolo (`apps/server/src/context-pipeline.ts`),
+senza scrivere nulla in `giochi.sqlite3`:
+
+- **Segrete**: le parole di `ZeroContext_Segrete` presenti nell'export (le sorgenti della tabella `semantic_pair_scores`) che sono anche nel vocabolario del gioco
+  (le stesse 93.928 parole e gli stessi vettori delle associazioni originali) e hanno almeno 100 associate in quel vocabolario. Le altre sono saltate:
+  il log all'avvio dice quante.
+- **Posizioni**: le associate dell'export, in ordine di `rank`, prendono le posizioni 2, 3, … subito dopo la segreta. Le parole fuori dai top 1000 (e quelle
+  dell'export che non sono nel vocabolario) restano giocabili e seguono, ordinate dai vettori originali. Aiuti, suggerimento iniziale e «parola più vicina»
+  usano questo ordine.
+- La **temperatura** mostrata deriva ancora dalla somiglianza dei vettori, non dal punteggio della pipeline: una parola alta nell'export ma lontana nei vettori può
+  comparire fredda.
+- Il cambio di sorgente avvia un nuovo round; durante un torneo è bloccato. Un nuovo export si legge al riavvio del server. Se l'export manca, è vecchio
+  (senza la colonna `rank`) o non ha segrete utilizzabili, la scelta è disabilitata e il motivo compare sotto di essa.
+- L'identità del corpus (usata dai tornei) comprende l'impronta dell'export: un nuovo export sospende un torneo aperto, come un cambio di dati.
+- L'export scrive ora le righe una segreta alla volta (prima le teneva tutte in memoria: con 43.407 segrete non bastava la RAM).
 
 ## Associazione Parole — Pipeline B
 

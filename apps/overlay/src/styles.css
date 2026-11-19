@@ -1232,3 +1232,31 @@ body.incastro-on .guide-chip__arrow { color: rgb(255 255 255 / 0.45); }
   letter-spacing: 0.04em;
   z-index: 20;
 }
+
+/* The session is paused: the game is dimmed and a large notice says so, readable on a phone. */
+.overlay-pause {
+  position: absolute;
+  inset: 0;
+  z-index: 30;
+  display: grid;
+  place-items: center;
+  background: rgba(6, 8, 18, 0.62);
+  pointer-events: none;
+}
+.overlay-pause__card {
+  display: grid;
+  justify-items: center;
+  gap: 1vmin;
+  padding: 4vmin 8vmin;
+  border-radius: 4vmin;
+  background: rgba(10, 12, 24, 0.9);
+  border: 0.4vmin solid rgba(255, 255, 255, 0.25);
+  color: #fff;
+  text-align: center;
+  animation: overlay-pause-pulse 2.2s ease-in-out infinite;
+}
+.overlay-pause__icon { font-size: 12vmin; line-height: 1; }
+.overlay-pause__card strong { font-size: 9vmin; letter-spacing: 0.06em; text-transform: uppercase; }
+.overlay-pause__card small { font-size: 3.4vmin; opacity: 0.8; }
+@keyframes overlay-pause-pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.75; } }
+@media (prefers-reduced-motion: reduce) { .overlay-pause__card { animation: none; } }

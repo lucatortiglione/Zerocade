@@ -63,6 +63,8 @@ await build({
     server: join(root, 'apps', 'server', 'src', 'index.ts'),
     'wordgen-worker': join(root, 'apps', 'server', 'src', 'wordgen', 'worker.ts'),
     'infrastructure-worker': join(root, 'apps', 'server', 'src', 'infrastructure-worker.ts'),
+    // ZeroContext's vectors and rankings (context-corpora.ts looks for context-worker.mjs next to the server).
+    'context-worker': join(root, 'apps', 'server', 'src', 'context-worker.ts'),
   },
   outdir: app,
   outExtension: { '.js': '.mjs' },

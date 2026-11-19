@@ -1,7 +1,7 @@
 import { CONTEXT_LIMITS, CONTEXT_SEMANTIC_RULES, pickSecret, semanticMode, specialPoints, thermalScore,
   type ContextSemanticGuess, type ContextSemanticState, type GameSettings, type LiveEvent, type Viewer } from '@zerocade/shared'
-import { closerHint, lookup, rankAgainst, startHint, type Ranking } from '@zerocade/shared/contextRanking'
-import type { Corpus } from './context-tournament-ranking.js'
+import { closerHint, lookup, startHint, type Ranking } from '@zerocade/shared/contextRanking'
+import { rankLocally, type Corpus } from './context-tournament-ranking.js'
 
 interface Options {
   corpus: Corpus
@@ -14,7 +14,15 @@ interface Options {
   now?(): number
   random?(): number
   specialRoundsEnabled?: boolean
+  // A secret's ranking: by default computed here (the corpus has its vectors: tests); on the server it is asked of the
+  // ranking thread, and the round waits for it (context-corpora.ts).
+  rank?: (secret: number) => Ranking | Promise<Ranking>
+  // A ranking that could not be had (the thread failed): the game tries again a little later.
+  failed?: (error: Error) => void
 }
+
+// How long to wait before asking again for a ranking that failed.
+const RETRY_MS = 3000
 
 // One authoritative session per room. Overlays only draw snapshots; reconnecting cannot
 // reset the clock, consume another attempt, advance the ninth round or award points again.
@@ -44,12 +52,59 @@ export class ContextSemanticGame {
   private reason: ContextSemanticState['reason'] = null
   private scores = new Map<string, ContextSemanticState['leaders'][number]>()
   private lastSecond = -1
+  // The next round (`upcoming`), prepared during the break (its secret and ranking): `begin` starts it only when it is ready, so the
+  // ranking is never computed while the chat is playing. `asked` counts the requests: an old answer is ignored.
+  private upcoming: { secret: number; ranking: Ranking } | null = null
+  private asking = false
+  private asked = 0
+  private retryAt = 0
+  private disposed = false
 
   constructor(private readonly options: Options) {
     if (!options.corpus.data.semantic) throw new Error('Pool semantici assenti')
     this.now = options.now ?? (() => performance.now())
     this.settings = options.settings
-    this.begin()
+    // Until the first round is ready: an intermission with no word, shown as "preparing".
+    this.phase = 'intermission'
+    this.until = this.now()
+    this.prepare()
+    if (this.upcoming) this.begin()
+    else this.emit()
+  }
+
+  // The game is replaced (other associations, another game): an answer still on its way changes nothing.
+  dispose() { this.disposed = true }
+
+  // Chooses the next round's secret now (the one in play is excluded) and asks for its ranking.
+  private prepare() {
+    if (this.disposed) return
+    const { data } = this.options.corpus
+    const pools = data.semantic!
+    const pool = !this.specialsEnabled ? data.secrets : semanticMode(this.round + 1, this.specialsEnabled) === 'special' ? pools.special : pools.ordinary
+    const free = pool.filter((i) => i !== this.secret)
+    const secret = pickSecret(free.length ? free : pool, (i) => this.options.uses?.(data.words[i]) ?? 0,
+      (i) => this.options.lastAt?.(data.words[i]) ?? 0, this.options.random ?? Math.random)
+    const ask = ++this.asked
+    this.upcoming = null
+    let ranking: Ranking | Promise<Ranking>
+    try { ranking = this.options.rank ? this.options.rank(secret) : rankLocally(this.options.corpus, secret) }
+    catch (error) { this.fail(error); return }
+    if (!(ranking instanceof Promise)) { this.upcoming = { secret, ranking }; return }
+    this.asking = true
+    ranking.then((r) => {
+      if (this.disposed || ask !== this.asked) return
+      this.asking = false
+      this.upcoming = { secret, ranking: r }
+      this.tick() // the break may be over already
+    }, (error) => {
+      if (this.disposed || ask !== this.asked) return
+      this.asking = false
+      this.fail(error)
+    })
+  }
+  private fail(error: unknown) {
+    this.retryAt = this.now() + RETRY_MS
+    this.options.failed?.(error instanceof Error ? error : new Error(String(error)))
   }
 
   private number(name: string, fallback: number) {
@@ -63,14 +118,12 @@ export class ContextSemanticGame {
   private get hintsOff() { return this.settings.disableAllHints === true }
 
   private begin() {
+    const next = this.upcoming!
+    this.upcoming = null
     this.round++
     const { data } = this.options.corpus
-    const pools = data.semantic!
-    const pool = !this.specialsEnabled ? data.secrets : this.special ? pools.special : pools.ordinary
-    const free = pool.filter((i) => i !== this.secret)
-    this.secret = pickSecret(free.length ? free : pool, (i) => this.options.uses?.(data.words[i]) ?? 0,
-      (i) => this.options.lastAt?.(data.words[i]) ?? 0, this.options.random ?? Math.random)
-    this.ranking = rankAgainst(data, this.secret)
+    this.secret = next.secret
+    this.ranking = next.ranking
     this.phase = 'playing'
     this.attempts = 0; this.best = Infinity; this.shown = 0; this.hints = 0
     this.taken.clear(); this.rescues.clear(); this.guesses = []; this.typed = []; this.notes = []
@@ -90,6 +143,9 @@ export class ContextSemanticGame {
 
   snapshot(): ContextSemanticState {
     const at = this.pausedAt ?? this.now()
+    if (this.secret < 0) return { round: 0, mode: 'ordinary', phase: 'intermission', paused: this.pausedAt !== null, preparing: true,
+      remainingMs: null, attempts: 0, total: this.options.corpus.data.words.length, solution: null, prefix: '', wordLength: null,
+      solvedBy: null, reason: null, best: null, closest: [], last: null, typed: [], notes: [], leaders: [] }
     return { round: this.round, mode: this.special ? 'special' : 'ordinary', phase: this.phase, paused: this.pausedAt !== null,
       remainingMs: this.phase === 'playing' ? this.special ? Math.max(0, 180000 - this.elapsed(at)) : null : Math.max(0, this.until - at),
       attempts: this.attempts, total: this.options.corpus.data.words.length,
@@ -183,13 +239,15 @@ export class ContextSemanticGame {
     this.reason = reason; this.solver = user; this.completedRounds++; this.matchRounds++
     this.phase = 'intermission'
     this.until = this.now() + Math.max(0, this.number('breakSeconds', 8)) * 1000
+    this.prepare() // the next round's ranking is computed during the break
     this.emit()
   }
   next() { if (this.pausedAt === null) this.finish('creator') }
   tick() {
     if (this.pausedAt !== null || this.phase === 'completed') return
     if (this.phase === 'intermission') {
-      if (this.now() >= this.until) {
+      if (!this.upcoming && !this.asking && this.now() >= this.retryAt) this.prepare()
+      if (this.now() >= this.until && this.upcoming) {
         if (this.settings.matchEnds === 'words' && this.matchRounds >= this.number('matchWords', 10)) {
           this.scores.clear(); this.matchRounds = 0
         }

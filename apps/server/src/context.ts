@@ -1,8 +1,10 @@
+import { createHash } from 'node:crypto'
 import { existsSync, readFileSync, statSync } from 'node:fs'
 import { CONTEXT_LIMITS, CONTEXT_PROFILES, type ContextProfile } from '@zerocade/shared'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { giochiDb, openSchema, openOptionalSchema } from './schema-db.js'
+import { loadPipelineAssociations, pipelineBFile } from './context-pipeline.js'
 
 // ZeroContext's data: the playable words (vocab.txt), their vectors (vectors.bin, float32/float16 or legacy int8, one row per word, in the
 // words' order) and the words that can be secret (secrets.txt). The words live in the games' database, schema
@@ -127,11 +129,68 @@ function fromDatabase(profile: ContextProfile = 'original'): Map<string, Buffer>
 
 let words = fromDatabase()
 const variants = new Map<ContextProfile, Map<string, Buffer> | null>()
+
+// Pipeline B: the original words and vectors, the secrets and the ordered associations of the export (context-pipeline.ts). It is not
+// stored: it is derived from the original files and from the export file, and rebuilt when that file changes. A failure is
+// remembered for the same file (no repeated reads) and shown in the dashboard, never silently replaced by other words.
+const pinnedBy = new Map<ContextProfile, Map<number, number[]>>()
+const problems = new Map<ContextProfile, string>()
+let pipelineTried: string | null = null
+function fromPipelineB(): Map<string, Buffer> | null {
+  const base = words
+  if (!base) { problems.set('pipeline_b', 'Mancano le associazioni originali (parole e vettori).'); return null }
+  if (!pipelineBFile) { problems.set('pipeline_b', 'Export non trovato: esegui il task «ZeroContext : Associazione Parole PipelineB».'); return null }
+  const stamp = `${pipelineBFile}:${statSync(pipelineBFile).size}:${statSync(pipelineBFile).mtimeMs}`
+  if (stamp === pipelineTried) return null
+  try {
+    const vocab = base.get('vocab.txt')!.toString('utf8').split('\n').filter(Boolean)
+    const found = loadPipelineAssociations(pipelineBFile, vocab)
+    if (!found.pinned.size) throw new Error('nessuna segreta dell\'export è una parola del vocabolario del gioco')
+    const secrets = [...found.pinned.keys()].sort((a, b) => a - b)
+    const meta = JSON.parse(base.get('meta.json')!.toString('utf8'))
+    const links = JSON.parse(base.get('links.json')!.toString('utf8'))
+    if (!links.semantic) throw new Error('le associazioni originali non hanno i pool semantici')
+    links.associations_fingerprint = found.fingerprint // makes the corpus hash (tournaments) follow the export
+    links.semantic = { ...links.semantic, ordinary: secrets, special: [], curatedOrdinary: secrets, compatibility: [], domains: {} }
+    const revision = createHash('sha256').update(`${meta.corpus_revision}|pipeline_b|${found.fingerprint}`).digest('hex')
+    const next = { ...meta, secrets: secrets.length, ordinary: secrets.length, special: 0, legacy_preserved: 0, corpus_revision: revision,
+      associations: { source: 'pipeline_b', model_version: found.version, secrets: secrets.length, skipped: found.skipped, fingerprint: found.fingerprint } }
+    const files = new Map<string, Buffer>([
+      ['vocab.txt', base.get('vocab.txt')!],
+      ['secrets.txt', Buffer.from(secrets.map((i) => vocab[i]).join('\n') + '\n', 'utf-8')],
+      ['meta.json', Buffer.from(JSON.stringify(next, null, 2) + '\n', 'utf-8')],
+      ['links.json', Buffer.from(JSON.stringify(links), 'utf-8')],
+    ])
+    for (const [name, buffer] of files) if (buffer.byteLength > budgets[name as ContextFile]) throw new Error(`${name} too large`)
+    pinnedBy.set('pipeline_b', found.pinned)
+    problems.delete('pipeline_b')
+    console.log(`[context] Pipeline B: ${secrets.length} segrete giocabili (${found.skipped.tooFew} con troppe poche associazioni nel vocabolario, ${found.skipped.notInVocabulary} fuori vocabolario)`)
+    return files
+  } catch (error) {
+    pipelineTried = stamp
+    const message = error instanceof Error ? error.message : String(error)
+    problems.set('pipeline_b', `Export non utilizzabile: ${message}`)
+    console.error('[context] Pipeline B non disponibile:', message)
+    return null
+  }
+}
+
 function wordsFor(profile: ContextProfile) {
   if (profile === 'original') return words
+  if (profile === 'pipeline_b') {
+    // Derived from the original files and built once per run (a new export is read at the next start); a failure is retried
+    // only when the export file has changed.
+    const current = variants.get(profile)
+    if (current) return current
+    const built = fromPipelineB()
+    if (built) variants.set(profile, built)
+    return built
+  }
   if (!variants.has(profile)) variants.set(profile, fromDatabase(profile))
   return variants.get(profile) ?? null
 }
+export const contextPinned = (profile: ContextProfile) => (wordsFor(profile) ? pinnedBy.get(profile) : undefined)
+export const contextProblem = (profile: ContextProfile) => problems.get(profile)
 const dir = [process.env.ZEROCADE_CONTEXT_DATA, join(here, 'zerocontext'), join(here, '..', '..', '..', 'gioco-zerocontext', 'data')].find(
   (d): d is string => d !== undefined && existsSync(join(d, 'vectors.bin')),
 )
@@ -162,7 +221,7 @@ export function reloadContext(expectedRevision: string, profile: ContextProfile 
     if (meta.vector_format !== undefined && !['int8', 'float32', 'float16'].includes(meta.vector_format)) throw new Error('Formato vettori non valido')
     if (!path || statSync(path).size !== meta.words * meta.dim * (meta.vector_format === 'float32' ? 4 : meta.vector_format === 'float16' ? 2 : 1) || statSync(path).size > budgets['vectors.bin'])
       throw new Error('Vettori e parole del nuovo corpus non sono allineati')
-    if (profile === 'original') words = next
+    if (profile === 'original') { words = next; variants.delete('pipeline_b'); pipelineTried = null }
     else variants.set(profile, next)
     return { revision: expectedRevision, words: meta.words, dim: meta.dim }
   } catch (error) {
@@ -202,6 +261,6 @@ export function availableContextProfiles() {
     const path = vectorPath(wordsFor(id))
     const expected = meta.words * meta.dim * (meta.vector_format === 'float32' ? 4 : meta.vector_format === 'float16' ? 2 : 1)
     const available = !unavailable.has(id) && Boolean(metadata && path && existsSync(path) && statSync(path).size === expected)
-    return { id, label, available, words: meta.words ?? 0, secrets: meta.secrets ?? 0, dim: meta.dim ?? 0, revision: contextRevision(id) }
+    return { id, label, available, words: meta.words ?? 0, secrets: meta.secrets ?? 0, dim: meta.dim ?? 0, revision: contextRevision(id), ...(available ? {} : { problem: problems.get(id) }) }
   })
 }

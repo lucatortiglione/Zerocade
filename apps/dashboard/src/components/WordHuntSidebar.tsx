@@ -3,7 +3,7 @@ import { GAMES, WORDHUNT_RULES, WORDHUNT_SIZES, type WordHuntSize, defaultSettin
 import { socket } from '../socket'
 import { useDashboard } from '../store'
 import { BridgeControl, ConnectionBadge, GameSwitch, LiveSimulator, MessageComposer, StreamSettings, pick, simViewer } from './Regia'
-import { EndSession } from './GameControls'
+import { EndSession, PauseGame } from './GameControls'
 import { Section } from './Section'
 import { SettingField, SettingsForm } from './SettingsForm'
 import { useWordHuntSend, type WordHuntSend as Send } from './useWordHuntSend'
@@ -50,6 +50,7 @@ export function WordHuntSidebar({ session }: { session: SessionState }) {
       {message && <p className="side-error" role="alert">{message}</p>}
 
       <Section title="Round">
+        <PauseGame session={session} />
         <Round admin={wordhuntAdmin} send={send} />
       </Section>
 

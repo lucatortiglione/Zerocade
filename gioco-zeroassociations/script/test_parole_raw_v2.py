@@ -65,13 +65,173 @@ class PruneSourcesTests(unittest.TestCase):
                 words = {w for w, in con.execute('SELECT parola FROM parole')}
                 self.assertEqual(report['removed_sources'], ['titles'])
                 self.assertEqual(report['refiltered_sources'], {'ud': 1})
-                self.assertEqual(report['words_removed'], 2)  # house (solo dai titoli) e people (token straniero)
+                self.assertEqual(report['words_removed'], 1)  # people (token straniero); house non entra più: è inglese
                 self.assertEqual(words, {'casa', 'mela', 'case', 'storica'})
                 self.assertNotIn('titles', {f for f, in con.execute('SELECT id FROM fonti')})
                 self.assertEqual({w for w, in con.execute('SELECT parola FROM normalizzata')}, words)
                 self.assertEqual(con.execute("SELECT value FROM meta WHERE name='normalizzazione_stato'").fetchone(), ('da_aggiornare',))
                 self.assertIsNone(con.execute('PRAGMA foreign_key_check').fetchone())
                 self.assertEqual(db.prune_sources(['italian', 'ud'])['words_removed'], 0)  # idempotente
+
+
+class ItalianOnlyTests(unittest.TestCase):
+    def test_import_skips_foreign_words_and_the_filter_cleans_what_is_already_stored(self):
+        with tempfile.TemporaryDirectory() as folder, redirect_stdout(io.StringIO()):
+            folder = Path(folder)
+            path = folder/'mixed.txt'
+            path.write_text('\n'.join(['casa', 'climate', 'workshop', 'marinare', 'abaidoo', 'haus']) + '\n', encoding='utf-8')
+            with closing(WordDatabase(folder/'raw.sqlite3')) as db:
+                result = db.import_source(source('mixed', path), path)
+                words = {w for w, in db.con.execute('SELECT parola FROM parole')}
+                self.assertEqual(words, {'casa', 'marinare', 'abaidoo'})  # ortografia plausibile e senza liste: non si giudica
+                self.assertEqual(result['foreign_records_skipped'], 3)
+                # Parole straniere già presenti prima del filtro, con attestazione e riga di normalizzazione.
+                con = db.con
+                con.execute("INSERT INTO parole VALUES ('climate',1),('house',1)")
+                con.execute("INSERT INTO parole_fonti VALUES ('climate','mixed'),('house','mixed')")
+                con.executescript('''CREATE TABLE normalizzata(parola TEXT PRIMARY KEY REFERENCES parole(parola), is_single_word INTEGER NOT NULL);
+                    INSERT INTO normalizzata SELECT parola, is_single_word FROM parole;
+                    INSERT OR REPLACE INTO meta VALUES ('normalizzazione_stato','aggiornata');''')
+                report = db.remove_foreign_words()
+                self.assertEqual(report['words_removed'], 2)
+                self.assertEqual({w for w, in con.execute('SELECT parola FROM parole')}, {'casa', 'marinare', 'abaidoo'})
+                self.assertEqual(report['by_language'], {'en': 2})
+                self.assertEqual(report['sample_removed'], {'en': ['climate', 'house']})
+                self.assertEqual({w for w, in con.execute('SELECT parola FROM normalizzata')}, {'casa', 'marinare', 'abaidoo'})
+                self.assertEqual(con.execute("SELECT value FROM meta WHERE name='normalizzazione_stato'").fetchone(), ('da_aggiornare',))
+                self.assertIsNone(con.execute('PRAGMA foreign_key_check').fetchone())
+                self.assertEqual(db.remove_foreign_words()['words_removed'], 0)  # idempotente
+
+    def test_words_with_impossible_italian_spelling_are_removed_unless_attested(self):
+        with tempfile.TemporaryDirectory() as folder, redirect_stdout(io.StringIO()):
+            folder = Path(folder)
+            with closing(WordDatabase(folder/'raw.sqlite3')) as db:
+                db.register([source('morphit-048-mirror'), source('napolux-paroleitaliane')])
+                con = db.con
+                words = ['aarhus', 'aamot', 'aavv', 'cnr', 'aarden', 'zzqkx', 'pollar', 'abaidoo', 'abachista', 'casa']
+                con.executemany('INSERT INTO parole VALUES (?,1)', ((w,) for w in words))
+                con.executemany("INSERT INTO parole_fonti VALUES (?,'napolux-paroleitaliane')", ((w,) for w in words))
+                con.execute("INSERT INTO parole_fonti VALUES ('pollar','morphit-048-mirror')")  # apocope attestata: resta
+                report = db.remove_foreign_words()
+                kept = {w for w, in con.execute('SELECT parola FROM parole')}
+                self.assertEqual(kept, {'pollar', 'abaidoo', 'abachista', 'casa'})  # abaidoo: ortografia plausibile, non si giudica
+                self.assertEqual(report['by_language'], {'ortografia': 6})
+                self.assertIsNone(con.execute('PRAGMA foreign_key_check').fetchone())
+
+    def test_foreign_surnames_with_foreign_graphemes_are_removed_unless_attested(self):
+        with tempfile.TemporaryDirectory() as folder, redirect_stdout(io.StringIO()):
+            folder = Path(folder)
+            with closing(WordDatabase(folder/'raw.sqlite3')) as db:
+                db.register([source('morphit-048-mirror'), source('napolux-paroleitaliane')])
+                con = db.con
+                words = ['chaabane', 'chabroux', 'chaddaoui', 'ghanbari', 'bijlsma', 'schiavo', 'chiesa', 'ghiro', 'poiché', 'macchina', 'chaouchi']
+                con.executemany('INSERT INTO parole VALUES (?,1)', ((w,) for w in words))
+                con.executemany("INSERT INTO parole_fonti VALUES (?,'napolux-paroleitaliane')", ((w,) for w in words))
+                con.execute("INSERT INTO parole_fonti VALUES ('chaouchi','morphit-048-mirror')")  # attestata da una fonte italiana: resta
+                db.remove_foreign_words()
+                kept = {w for w, in con.execute('SELECT parola FROM parole')}
+                self.assertEqual(kept, {'schiavo', 'chiesa', 'ghiro', 'poiché', 'macchina', 'chaouchi'})
+
+    def test_person_names_and_surnames_are_removed_unless_they_are_common_words(self):
+        def entry(word, pos, gloss, tags=None):
+            return json.dumps({'lang_code': 'it', 'word': word, 'pos': pos,
+                               'senses': [{'glosses': [gloss], **({'tags': tags} if tags else {})}]})
+        with tempfile.TemporaryDirectory() as folder, redirect_stdout(io.StringIO()):
+            folder = Path(folder)
+            dump = folder/'wiktionary.jsonl'
+            dump.write_text('\n'.join([
+                entry('mario', 'name', 'male given name'), entry('ferrari', 'name', 'A surname.'),
+                entry('rossi', 'name', 'A surname.'), entry('rossi', 'adj', 'plural of rosso', ['form-of']),
+                entry('colombo', 'name', 'cognome'), entry('colombo', 'noun', 'colomba'),
+                entry('roma', 'name', 'capitale d\'Italia'), entry('casa', 'noun', 'edificio'),
+            ]) + '\n', encoding='utf-8')
+            with closing(WordDatabase(folder/'raw.sqlite3')) as db:
+                db.register([{**source('kaikki-itwiktionary'), 'kind': 'wiktextract'}, source('liita-lemma-bank')])
+                con = db.con
+                words = ['mario', 'ferrari', 'rossi', 'colombo', 'roma', 'casa', 'tortiglione']
+                con.executemany('INSERT INTO parole VALUES (?,1)', ((w,) for w in words))
+                con.executemany("INSERT INTO parole_fonti VALUES (?,'kaikki-itwiktionary')", ((w,) for w in words))
+                con.execute("INSERT INTO parole_fonti VALUES ('rossi','liita-lemma-bank')")  # fonte lessicale: parola comune
+                con.executescript('''CREATE TABLE normalizzata(parola TEXT PRIMARY KEY REFERENCES parole(parola), is_single_word INTEGER NOT NULL);
+                    INSERT INTO normalizzata SELECT parola, is_single_word FROM parole;
+                    INSERT OR REPLACE INTO meta VALUES ('normalizzazione_stato','aggiornata');''')
+                db._head_file = lambda source_id: (dump, {}) if source_id == 'kaikki-itwiktionary' else (None, None)
+                report = db.remove_person_names()
+                self.assertEqual(report['words_removed'], 2)
+                self.assertEqual(report['sample_removed'], ['ferrari', 'mario'])
+                self.assertEqual(report['sample_kept_as_common_words'], ['colombo', 'rossi'])
+                self.assertEqual({w for w, in con.execute('SELECT parola FROM parole')},
+                                 {'rossi', 'colombo', 'roma', 'casa', 'tortiglione'})
+                self.assertEqual({w for w, in con.execute('SELECT parola FROM normalizzata')},
+                                 {'rossi', 'colombo', 'roma', 'casa', 'tortiglione'})
+                self.assertEqual(con.execute("SELECT value FROM meta WHERE name='normalizzazione_stato'").fetchone(), ('da_aggiornare',))
+                self.assertEqual(db.remove_person_names()['words_removed'], 0)  # idempotente
+
+    def test_lemma_resources_liita_complit_and_colfis_are_read_as_lemmas_without_proper_names(self):
+        import gzip
+        import zipfile
+        from prompt_inventory import records
+        with tempfile.TemporaryDirectory() as folder:
+            folder = Path(folder)
+            liita = folder/'liita.ttl'
+            liita.write_text('@prefix lila: <http://lila-erc.eu/ontologies/lila/> .\n'
+                             '<http://liita.it/data/id/lemma/1>\n        a lila:Lemma ;\n        lila:hasPOS lila:noun ;\n'
+                             '        ontolex:writtenRep  "agostamento"@it .\n\n'
+                             '<http://liita.it/data/id/lemma/2>\n        a lila:Lemma ;\n        lila:hasPOS lila:proper_noun ;\n'
+                             '        ontolex:writtenRep  "Roma"@it .\n', encoding='utf-8')
+            self.assertEqual([r['prompt'] for r in records(liita, {'kind': 'liita_ttl'})], ['agostamento'])
+            complit = folder/'complit.ttl.gz'
+            with gzip.open(complit, 'wt', encoding='utf-8') as out:
+                out.write('lex:aMUSaNOUN a ontolex:Word;\n\trdfs:label "casa"@it;\n\tlexinfo:partOfSpeech lexinfo:noun;\n'
+                          '\tontolex:otherForm lex:case_f .\nlex:case_f a ontolex:Form;\n\tontolex:writtenRep "case"@it .\n'
+                          'lex:bMUSbPROPER a ontolex:Word;\n\trdfs:label "Mario"@it;\n\tlexinfo:partOfSpeech lexinfo:properNoun .\n')
+            self.assertEqual([r['prompt'] for r in records(complit, {'kind': 'complit_ttl'})], ['casa'])
+            colfis = folder/'colfis.zip'
+            header = 'N Lem      Fq Tot     Lemma      Cat.Gramm\r\n'
+            with zipfile.ZipFile(colfis, 'w') as archive:
+                archive.writestr('Lemmi_rango.txt', header + '1      100      CASA      S\r\n2      90      ROMA      E\r\n'
+                                 '3      80      A CAUSA DI      P@\r\n4      70      ,      K\r\n')
+                archive.writestr('read me Lemmi_rango txt.txt', 'Informazioni')
+            self.assertEqual([r['prompt'] for r in records(colfis, {'kind': 'colfis_lemmas', 'encoding': 'latin-1'})],
+                             ['casa', 'a causa di'])
+
+    def test_magic_and_paisa_are_read_as_lemmas_and_paisa_respects_the_minimum_frequency(self):
+        import gzip
+        from prompt_inventory import records
+        with tempfile.TemporaryDirectory() as folder:
+            folder = Path(folder)
+            magic = folder/'magic.txt'
+            magic.write_text('->al\n  [ 1] MACRO:word[l_a,al,prep_a,!,m,s,!,!,!,!]\n->scovare\n'
+                             '  [ 1] MACRO:word[l_scovare,scovare,v_nofin,!,!,!,!,!,!,pos]\n'
+                             '  [ 2] MACRO:word[l_scovare,scovo,v_fin,!,!,s,!,!,!,pos]\n', encoding='utf-8')
+            self.assertEqual([r['prompt'] for r in records(magic, {'kind': 'magic_forms'})], ['a', 'scovare', 'scovare'])
+            paisa = folder/'paisa.txt.gz'
+            with gzip.open(paisa, 'wt', encoding='utf-8') as out:
+                out.write('# licenza\ndi,16520744\ncasa,120\nrarissima,3\n')
+            self.assertEqual([r['prompt'] for r in records(paisa, {'kind': 'paisa_lemmas', 'min_frequency': 50})], ['di', 'casa'])
+            self.assertEqual(len(list(records(paisa, {'kind': 'paisa_lemmas'}))), 3)
+
+    def test_registers_of_discarded_words_are_not_kept_and_old_ones_are_dropped(self):
+        with tempfile.TemporaryDirectory() as folder:
+            path = Path(folder)/'raw.sqlite3'
+            with closing(WordDatabase(path)) as db:
+                db.con.execute('CREATE TABLE parole_straniere(parola TEXT PRIMARY KEY, lingua TEXT)')
+                db.con.execute('CREATE TABLE nomi_persona(parola TEXT PRIMARY KEY)')
+                db.con.execute('CREATE TABLE pulizia_parole(originale TEXT PRIMARY KEY, pulita TEXT, motivo TEXT)')
+            with closing(WordDatabase(path)) as db:
+                tables = {r[0] for r in db.con.execute("SELECT name FROM sqlite_schema WHERE type='table'")}
+                self.assertFalse(tables & {'parole_straniere', 'nomi_persona', 'pulizia_parole'})
+                db.con.execute("INSERT INTO parole VALUES ('climate',1)")
+                db.remove_foreign_words()
+                tables = {r[0] for r in db.con.execute("SELECT name FROM sqlite_schema WHERE type='table'")}
+                self.assertFalse(tables & {'parole_straniere', 'nomi_persona', 'pulizia_parole', 'parole_da_togliere'})
+
+    def test_common_italian_words_and_homographs_are_kept(self):
+        from raw_language_filter import foreign_language
+        for word in ('casa', 'sale', 'radio', 'data', 'pasta', 'tutto', 'pensiero', 'stoviglie', 'città', 'fare', 'case', 'area', 'date', 'scale'):
+            self.assertIsNone(foreign_language(word), word)
+        for word in ('delay', 'workshop', 'climate', 'haus', 'avant', 'hospital'):
+            self.assertIsNotNone(foreign_language(word), word)
 
 
 class RawV2Tests(unittest.TestCase):

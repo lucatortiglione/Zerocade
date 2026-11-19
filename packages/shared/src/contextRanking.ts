@@ -43,6 +43,9 @@ export interface ContextRankSource {
   // Each word's "genericity" penalty, in the scale of the dot product (gioco-zerocontext/script/hubness.py): words that
   // are close to almost everything (autista, medico...) lose it in every ranking. null: no word is penalised.
   hubs?: Int32Array | null
+  // The words an external ranking (the export of Pipeline B) puts first for a secret, in order: they take the positions 2, 3...
+  // right after the secret, whatever their vectors say; every other word follows, ordered by the vectors. Server only.
+  pinned?: ReadonlyMap<number, readonly number[]>
 }
 export interface ContextData extends ContextVocabulary, Omit<ContextRankSource, 'wordCount'> {}
 
@@ -173,6 +176,19 @@ export function parseContextData(vocab: string, vectors: ArrayBuffer, secrets: s
   return { words, dim, vectors: flat, secrets: secretIdx, index, folded, links, linkBoost, hubs, ...(norms ? { norms } : {}), ...(semantic ? { semantic } : {}) }
 }
 
+// The vocabulary without the vectors (the server's main thread: the vectors stay in its ranking thread). `words` and the
+// pools come from a corpus already checked by parseContextData; only the indices for reading guesses are rebuilt.
+export function contextVocabulary(words: string[], secrets: number[], semantic?: ContextSemanticPools): ContextVocabulary {
+  const index = new Map<string, number>()
+  const folded = new Map<string, number>()
+  words.forEach((w, i) => {
+    index.set(w, i)
+    const key = fold(w)
+    folded.set(key, folded.has(key) ? -1 : i)
+  })
+  return { words, secrets, index, folded, ...(semantic ? { semantic } : {}) }
+}
+
 // The word a chat comment names, or -1: one word only, in any case, with or without accents.
 export function lookup(data: ContextVocabulary, text: string, secret?: number): number {
   if (text.length > 256) return -1
@@ -230,7 +246,15 @@ export function rankAgainst(data: ContextData | ContextRankSource, secret: numbe
   sims[secret] = Infinity
   const order = new Uint32Array(n)
   for (let i = 0; i < n; i++) order[i] = i
-  order.sort((a, b) => sims[b] - sims[a] || a - b)
+  const pinned = data.pinned?.get(secret)
+  if (pinned?.length) {
+    // key: 0 the secret, 1.. the pinned words in their order, n + 2 the others (ordered by similarity).
+    const key = new Int32Array(n).fill(n + 2)
+    key[secret] = 0
+    let next = 1
+    for (const w of pinned) if (Number.isInteger(w) && w >= 0 && w < n && key[w] === n + 2) key[w] = next++
+    order.sort((a, b) => key[a] - key[b] || sims[b] - sims[a] || a - b)
+  } else order.sort((a, b) => sims[b] - sims[a] || a - b)
   const rankOf = new Uint32Array(n)
   for (let r = 0; r < n; r++) rankOf[order[r]] = r
   return { secret, order, rankOf, ...(similarities ? { similarities } : {}) }

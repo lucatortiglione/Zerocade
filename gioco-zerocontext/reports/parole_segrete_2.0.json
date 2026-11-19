@@ -1,13 +1,13 @@
 {
   "task": "ZeroCade : Generazione parole segrete",
-  "completed_at_utc": "2026-11-17T18:28:43.488717+00:00",
+  "completed_at_utc": "2026-11-18T13:29:00.016299+00:00",
   "database": "C:\\Progetti\\Zerocade\\database\\parole_ita_raw_2.0.sqlite3",
   "profile": "original",
   "dimensions": 300,
-  "normalization_source_sha256": "7a178ae6e55d4b1af0266654765b583d3d5fa9e258fcbeb10d1d153f39b41c05",
+  "normalization_source_sha256": "915890a9af33d72c0837f743614879961059a94d4ccbf0aac3d6a2d3a4e10a1b",
   "vectors_sha256": "7e586c7ddcfe4f19c833c657b1ee95c30ed13c8a4c65a253793d6e76c5f58dea",
   "guess_list": 93928,
-  "normalized_single_words": 1337524,
+  "normalized_single_words": 140158,
   "thresholds": {
     "ordinary": {
       "density": 0.45,
@@ -20,16 +20,16 @@
       "bridges": 15
     }
   },
-  "candidates": 8912,
-  "ordinary_pool": 3099,
+  "candidates": 8744,
+  "ordinary_pool": 3047,
   "special_pool": 3,
   "current_secrets": 9513,
-  "current_conforming": 2694,
-  "current_kept_with_exception": 6819,
-  "added": 405,
-  "secrets_total": 9918,
+  "current_conforming": 2655,
+  "current_kept_with_exception": 6858,
+  "added": 392,
+  "secrets_total": 9905,
   "rejected": {
-    "densità o ponti insufficienti": 5813
+    "densità o ponti insufficienti": 5697
   },
   "special_words": [
     "monile",
@@ -51,7 +51,6 @@
     "trentacinquesimo",
     "ventinovesimo",
     "irrequietezza",
-    "terrazzino",
     "schematico",
     "incongruente",
     "ritrosia",
@@ -63,20 +62,21 @@
     "macchinoso",
     "trentunesimo",
     "decelerare",
-    "ingegnarsi",
     "deperimento",
     "insperato",
-    "bimbetta",
     "abiezione",
     "puntualizzazione",
     "relativizzare",
     "bramosia",
     "seccante",
+    "inusitato",
     "interrelazione",
     "musicologo",
     "malavitoso",
     "tristo",
-    "nonnino"
+    "nonnino",
+    "spacchettare",
+    "indefinibile"
   ],
   "sources": {
     "nvdb": {
@@ -104,5 +104,5 @@
   "published": false,
   "plan_only": false,
   "note": "Specifica: ARCHITETTURA_VETTORI_SEMANTICI.md. Non pubblica in giochi.sqlite3 e non attiva i round speciali.",
-  "backup": "C:\\Progetti\\Zerocade\\gioco-zeroassociations\\database-backups\\parole_raw_2.0-segrete-20261117T182843511808Z.sqlite3"
+  "backup": "C:\\Progetti\\Zerocade\\gioco-zeroassociations\\database-backups\\parole_raw_2.0-segrete-20261118T132900026188Z.sqlite3"
 }

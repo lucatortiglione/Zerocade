@@ -28,7 +28,7 @@ let child, socket, profilePeer
 let logs = ''
 try {
   if (bundled) await build({
-    entryPoints: { server: join(root, 'apps/server/src/index.ts'), 'infrastructure-worker': join(root, 'apps/server/src/infrastructure-worker.ts'), 'wordgen-worker': join(root, 'apps/server/src/wordgen/worker.ts') },
+    entryPoints: { server: join(root, 'apps/server/src/index.ts'), 'infrastructure-worker': join(root, 'apps/server/src/infrastructure-worker.ts'), 'context-worker': join(root, 'apps/server/src/context-worker.ts'), 'wordgen-worker': join(root, 'apps/server/src/wordgen/worker.ts') },
     outdir: scratch, outExtension: { '.js': '.mjs' }, bundle: true,
     platform: 'node', format: 'esm', target: 'node26', external: ['better-sqlite3'],
     banner: { js: "import { createRequire as __createRequire } from 'node:module'; const require = __createRequire(import.meta.url);" },

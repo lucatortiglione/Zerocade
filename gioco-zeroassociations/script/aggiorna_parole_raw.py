@@ -151,13 +151,17 @@ def main(argv=None):
             if args.initialize_only or args.cleanup_only:
                 # Le fonti tolte dal registro perché davano parole straniere escono anche dal DB (17/11/2026).
                 pruning = db.prune_sources([s['id'] for s in sources])
+                language = db.remove_foreign_words()
+                names = db.remove_person_names()
                 initialized = {'database':str(db.file),'words_table':'parole',
-                               'download_performed':False,'seed':seed,'cleanup':cleanup,'source_pruning':pruning,**db.counts()}
+                               'download_performed':False,'seed':seed,'cleanup':cleanup,'source_pruning':pruning,'language_filter':language,'person_names_filter':names,**db.counts()}
                 args.report.write_text(json.dumps(initialized,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
                 print(json.dumps(initialized,ensure_ascii=False))
                 return 0
             report = collect_v2(db, sources, args.cache, args.report, backup, full_wordfreq)
             report['source_pruning'] = db.prune_sources([s['id'] for s in sources])
+            report['language_filter'] = db.remove_foreign_words()
+            report['person_names_filter'] = db.remove_person_names()
             report['inventory'] = db.counts()
             args.report.write_text(json.dumps(report,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')
     print("Rapporto:", args.report, flush=True)

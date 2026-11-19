@@ -25,6 +25,16 @@ export function GameControls({ session }: { session: SessionState }) {
   )
 }
 
+// The pause / resume of the game in play, for the control columns that want it next to their round buttons (the same command as the
+// generic button: the overlay dims the game and says so).
+export function PauseGame({ session }: { session: SessionState }) {
+  return (
+    <button type="button" className="side-action side-action--blue" disabled={Boolean(session.ended)} onClick={() => send(session.paused ? 'resume' : 'pause')}>
+      {session.paused ? '▶ Riprendi gioco' : '⏸ PAUSA'}
+    </button>
+  )
+}
+
 // Ends the session (the overlay shows nothing) or starts it again. Also in the control columns of the games
 // that have their own.
 export function EndSession({ ended }: { ended: boolean }) {

@@ -4,14 +4,16 @@ import { socket } from '../socket'
 
 export function ContextAssociationsPanel({ session, locked }: { session: SessionState; locked: boolean }) {
   const [available, setAvailable] = useState<Set<string> | null>(null)
+  const [reasons, setReasons] = useState<Record<string, string>>({})
   const [problem, setProblem] = useState('')
   useEffect(() => {
     const controller = new AbortController()
     void fetch('/api/context/profiles', { signal: controller.signal, cache: 'no-store' })
       .then(async (response) => {
         if (!response.ok) throw new Error('Elenco associazioni non disponibile.')
-        const rows = await response.json() as { id: string; available: boolean }[]
+        const rows = await response.json() as { id: string; available: boolean; problem?: string }[]
         setAvailable(new Set(rows.filter((r) => r.available).map((r) => r.id)))
+        setReasons(Object.fromEntries(rows.filter((r) => !r.available && r.problem).map((r) => [r.id, r.problem!])))
       })
       .catch(() => { if (!controller.signal.aborted) setProblem('Impossibile verificare le associazioni disponibili. Ricarica il pannello.') })
     return () => controller.abort()
@@ -24,7 +26,7 @@ export function ContextAssociationsPanel({ session, locked }: { session: Session
         <input type="radio" name="context-associations" value={id} checked={selected === id}
           disabled={locked || !available?.has(id)}
           onChange={() => socket.emit('settings:set', { associationSource: id })} />
-        <span>{label}{available && !available.has(id) && <small>Non disponibili</small>}</span>
+        <span>{label}{available && !available.has(id) && <small>{reasons[id] ?? 'Non disponibili'}</small>}</span>
       </label>)}
     </div>
     <p className="text-muted small">{locked ? 'La scelta resta fissa durante il torneo.' : 'Il cambio avvia un nuovo round. La classifica generale rimane e il server resta acceso.'}</p>

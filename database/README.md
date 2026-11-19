@@ -26,26 +26,27 @@ eventi, classifiche).
 Il task VS Code **ZeroCade : Aggiornamento parole RAW**, in
 [`.vscode/tasks.json`](../.vscode/tasks.json), esegue
 [`aggiorna_parole_raw.py`](../gioco-zeroassociations/script/aggiorna_parole_raw.py).
-Elabora integralmente le 46 fonti del registro, senza limiti di righe o filtri Zipf,
-e rigenera la fonte wordfreq dall'intera lista italiana `large`.
+Elabora integralmente le 9 fonti del registro (dal 18/11/2026), senza limiti di righe o filtri Zipf;
+scarta le parole straniere e i nomi di persona e cognomi.
 
 Crea il secondo database **`parole_ita_raw_2.0.sqlite3`** e la tabella **`parole`**,
 con una sola riga per parola normalizzata per Unicode, maiuscole e spazi. Conserva
 le fonti in `fonti` e le appartenenze in `parole_fonti`. Raccoglie tutte le forme,
-compresi i vecchi scarti editoriali; non applica esclusioni Zipf, di genere o numero.
+compresi i vecchi scarti editoriali; non applica esclusioni Zipf, di genere o numero (le applica il task Normalizzare).
 Il task elimina emoji e voci non lessicali, ripulisce simboli decorativi come `#`
 e unisce i duplicati risultanti mantenendo le fonti. [Criteri di pulizia](PAROLE_RAW_2.0.md#pulizia-dei-caratteri-nel-raw-20).
 Prima di aggiornare un archivio già esistente crea un backup del secondo DB.
 Il vecchio `parole_ita_raw.sqlite3` rimane separato. Non pubblica le banche dei giochi.
 Prosegue dopo una fonte fallita e restituisce errore se una fonte non viene completata.
 
-Catalogo completo: [FONTI_PAROLE_RAW.md](FONTI_PAROLE_RAW.md), con 46 fonti
-configurate e 5 fonti documentate come non importate. Il rapporto progressivo è
+Catalogo completo: [FONTI_PAROLE_RAW.md](FONTI_PAROLE_RAW.md), con le 9 fonti
+configurate e le richieste non aggiunte (GRADIT, Treccani, Zingarelli). Il rapporto progressivo è
 `gioco-zeroassociations/reports/aggiornamento_parole_raw_2.0.json`.
 Il nuovo DB contiene inizialmente **2.847.433 voci uniche** copiate dalla raccolta
 locale, senza un nuovo download. Schema, comandi e query: [PAROLE_RAW_2.0.md](PAROLE_RAW_2.0.md).
 La selezione delle forme segue la [politica di normalizzazione](PAROLE_RAW_2.0.md#normalizzazione-delle-forme-delle-parole):
-maschile equivalente se attestato e plurale solo quando più comune del singolare.
+maschile se esiste (il femminile solo senza maschile) e singolare, salvo il plurale più comune (`stoviglie`).
+A ogni parola si associa l'[IWFS](PAROLE_RAW_2.0.md#italian-word-familiarity-score-iwfs-18112026), indice di familiarità da 0 a 100.
 Il task **ZeroCade : Normalizzare parole RAW** popola la seconda tabella
 `normalizzata` nel DB 2.0, mantenendo `parole` completa e registrando le varianti
 escluse in `normalizzazione_esclusioni`.
