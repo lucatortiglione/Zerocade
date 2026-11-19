@@ -1,0 +1,74 @@
+[
+ {
+  "at": 0.1,
+  "texts": [
+   "WORD MERGE",
+   "Unisci le due parti in chat",
+   "F",
+   "A",
+   "M",
+   "I",
+   "+",
+   "G",
+   "L",
+   "I",
+   "A"
+  ],
+  "trace": "59e331d6fd9c8e4f",
+  "calls": 113
+ },
+ {
+  "at": 3,
+  "texts": [
+   "WORD MERGE",
+   "Unisci le due parti in chat",
+   "F",
+   "A",
+   "M",
+   "I",
+   "+",
+   "G",
+   "L",
+   "I",
+   "A"
+  ],
+  "trace": "a318989772e7f4df",
+  "calls": 226
+ },
+ {
+  "at": 6,
+  "texts": [
+   "WORD MERGE",
+   "Unisci le due parti in chat",
+   "F",
+   "A",
+   "M",
+   "I",
+   "+",
+   "G",
+   "L",
+   "I",
+   "A"
+  ],
+  "trace": "b7234ae6b906f7f2",
+  "calls": 339
+ },
+ {
+  "at": 12,
+  "texts": [
+   "WORD MERGE",
+   "Unisci le due parti in chat",
+   "F",
+   "A",
+   "M",
+   "I",
+   "+",
+   "G",
+   "L",
+   "I",
+   "A"
+  ],
+  "trace": "cc8d96bec60fb52f",
+  "calls": 452
+ }
+]

@@ -1,0 +1,70 @@
+[
+ {
+  "at": 0.1,
+  "texts": [
+   "CROSTIC",
+   "Risolvi gli indizi per svelare la frase",
+   "1.",
+   "Capitale della Lombardia",
+   "2.",
+   "Frutto arancione ricco di vitamina C",
+   "3.",
+   "Capitale d'Italia",
+   "4.",
+   "Il monte più alto del mondo"
+  ],
+  "trace": "d840adade5c320b6",
+  "calls": 148
+ },
+ {
+  "at": 3,
+  "texts": [
+   "CROSTIC",
+   "Risolvi gli indizi per svelare la frase",
+   "1.",
+   "Capitale della Lombardia",
+   "2.",
+   "Frutto arancione ricco di vitamina C",
+   "3.",
+   "Capitale d'Italia",
+   "4.",
+   "Il monte più alto del mondo"
+  ],
+  "trace": "07d893120a28caab",
+  "calls": 296
+ },
+ {
+  "at": 6,
+  "texts": [
+   "CROSTIC",
+   "Risolvi gli indizi per svelare la frase",
+   "1.",
+   "Capitale della Lombardia",
+   "2.",
+   "Frutto arancione ricco di vitamina C",
+   "3.",
+   "Capitale d'Italia",
+   "4.",
+   "Il monte più alto del mondo"
+  ],
+  "trace": "9de634601139a989",
+  "calls": 444
+ },
+ {
+  "at": 12,
+  "texts": [
+   "CROSTIC",
+   "Risolvi gli indizi per svelare la frase",
+   "1.",
+   "Capitale della Lombardia",
+   "2.",
+   "Frutto arancione ricco di vitamina C",
+   "3.",
+   "Capitale d'Italia",
+   "4.",
+   "Il monte più alto del mondo"
+  ],
+  "trace": "0cca0a8a50568025",
+  "calls": 592
+ }
+]

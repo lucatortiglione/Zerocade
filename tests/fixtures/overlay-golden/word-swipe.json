@@ -1,0 +1,66 @@
+[
+ {
+  "at": 0.1,
+  "texts": [
+   "WORD SWIPE",
+   "Type any word from the letters",
+   "R",
+   "E",
+   "W",
+   "D",
+   "O",
+   "N",
+   "Found 0 / 0"
+  ],
+  "trace": "5d772c0ae63ab5ce",
+  "calls": 82
+ },
+ {
+  "at": 3,
+  "texts": [
+   "WORD SWIPE",
+   "Type any word from the letters",
+   "R",
+   "E",
+   "W",
+   "D",
+   "O",
+   "N",
+   "Found 0 / 0"
+  ],
+  "trace": "baae76f8eb729d4c",
+  "calls": 164
+ },
+ {
+  "at": 6,
+  "texts": [
+   "WORD SWIPE",
+   "Type any word from the letters",
+   "R",
+   "E",
+   "W",
+   "D",
+   "O",
+   "N",
+   "Found 0 / 0"
+  ],
+  "trace": "8f5106a199aed388",
+  "calls": 246
+ },
+ {
+  "at": 12,
+  "texts": [
+   "WORD SWIPE",
+   "Type any word from the letters",
+   "R",
+   "E",
+   "W",
+   "D",
+   "O",
+   "N",
+   "Found 0 / 0"
+  ],
+  "trace": "d68529023ccc8564",
+  "calls": 328
+ }
+]

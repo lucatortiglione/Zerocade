@@ -1,0 +1,70 @@
+[
+ {
+  "at": 0.1,
+  "texts": [
+   "WILD WORDS",
+   "Completa la parola mancante",
+   "F",
+   "?",
+   "M",
+   "I",
+   "G",
+   "L",
+   "I",
+   "A"
+  ],
+  "trace": "25442c8a66c6124f",
+  "calls": 108
+ },
+ {
+  "at": 3,
+  "texts": [
+   "WILD WORDS",
+   "Completa la parola mancante",
+   "F",
+   "?",
+   "M",
+   "I",
+   "G",
+   "L",
+   "I",
+   "A"
+  ],
+  "trace": "cf0c6b2570193e28",
+  "calls": 216
+ },
+ {
+  "at": 6,
+  "texts": [
+   "WILD WORDS",
+   "Completa la parola mancante",
+   "F",
+   "?",
+   "M",
+   "I",
+   "G",
+   "L",
+   "I",
+   "A"
+  ],
+  "trace": "052252c84053f5d0",
+  "calls": 324
+ },
+ {
+  "at": 12,
+  "texts": [
+   "WILD WORDS",
+   "Completa la parola mancante",
+   "F",
+   "?",
+   "M",
+   "I",
+   "G",
+   "L",
+   "I",
+   "A"
+  ],
+  "trace": "34b7b1178f2a960c",
+  "calls": 432
+ }
+]

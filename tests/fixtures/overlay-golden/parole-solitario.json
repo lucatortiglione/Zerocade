@@ -1,0 +1,62 @@
+[
+ {
+  "at": 0.1,
+  "texts": [
+   "SPORT",
+   "Trova la parola associata",
+   "?",
+   "______",
+   "_____",
+   "_________",
+   "________",
+   "_____"
+  ],
+  "trace": "95a2d31ad3953105",
+  "calls": 57
+ },
+ {
+  "at": 3,
+  "texts": [
+   "SPORT",
+   "Trova la parola associata",
+   "?",
+   "______",
+   "_____",
+   "_________",
+   "________",
+   "_____"
+  ],
+  "trace": "dc7e5e3fad7a2b6a",
+  "calls": 114
+ },
+ {
+  "at": 6,
+  "texts": [
+   "SPORT",
+   "Trova la parola associata",
+   "?",
+   "______",
+   "_____",
+   "_________",
+   "________",
+   "_____"
+  ],
+  "trace": "30a4c3eb2c26a6fd",
+  "calls": 171
+ },
+ {
+  "at": 12,
+  "texts": [
+   "SPORT",
+   "Trova la parola associata",
+   "?",
+   "______",
+   "_____",
+   "_________",
+   "________",
+   "_____"
+  ],
+  "trace": "3e382dcabcb9dacc",
+  "calls": 228
+ }
+]

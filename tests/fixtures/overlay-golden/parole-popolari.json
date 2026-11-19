@@ -1,0 +1,42 @@
+[
+ {
+  "at": 0.1,
+  "texts": [
+   "Quali sport si giocano con una palla?",
+   "Scrivi le risposte più popolari",
+   "0/7 trovate"
+  ],
+  "trace": "87fdc4297acc2454",
+  "calls": 16
+ },
+ {
+  "at": 3,
+  "texts": [
+   "Quali sport si giocano con una palla?",
+   "Scrivi le risposte più popolari",
+   "0/7 trovate"
+  ],
+  "trace": "1338cd76196eacb1",
+  "calls": 32
+ },
+ {
+  "at": 6,
+  "texts": [
+   "Quali sport si giocano con una palla?",
+   "Scrivi le risposte più popolari",
+   "0/7 trovate"
+  ],
+  "trace": "c6df7ebc1a84fa64",
+  "calls": 48
+ },
+ {
+  "at": 12,
+  "texts": [
+   "Quali sport si giocano con una palla?",
+   "Scrivi le risposte più popolari",
+   "0/7 trovate"
+  ],
+  "trace": "ac8627b0127b54d5",
+  "calls": 64
+ }
+]

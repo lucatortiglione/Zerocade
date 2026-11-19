@@ -1,0 +1,43 @@
+[
+ {
+  "at": 0.1,
+  "texts": [
+   "Guess the word!",
+   "Wrong guesses: 0/6"
+  ],
+  "trace": "472825fe7e9cef32",
+  "calls": 33
+ },
+ {
+  "at": 3,
+  "texts": [
+   "Guess the word!",
+   "R",
+   "Wrong guesses: 2/6"
+  ],
+  "trace": "9b68417599bece76",
+  "calls": 69
+ },
+ {
+  "at": 6,
+  "texts": [
+   "Guess the word!",
+   "R",
+   "O",
+   "Wrong guesses: 4/6"
+  ],
+  "trace": "2a1cc676b1565ba2",
+  "calls": 108
+ },
+ {
+  "at": 12,
+  "texts": [
+   "Guess the word!",
+   "R",
+   "O",
+   "Wrong guesses: 6/6"
+  ],
+  "trace": "99f1cedd63e7ae45",
+  "calls": 147
+ }
+]

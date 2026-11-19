@@ -1,0 +1,38 @@
+[
+ {
+  "at": 0.1,
+  "texts": [
+   "🌙",
+   "Score 3"
+  ],
+  "trace": "382ae9e8f963dde7",
+  "calls": 139
+ },
+ {
+  "at": 3,
+  "texts": [
+   "🌙",
+   "Score 107"
+  ],
+  "trace": "ade756c8d4f9c40e",
+  "calls": 279
+ },
+ {
+  "at": 6,
+  "texts": [
+   "🌙",
+   "Score 100"
+  ],
+  "trace": "eeebdb001c99fe3a",
+  "calls": 420
+ },
+ {
+  "at": 12,
+  "texts": [
+   "🌙",
+   "Score 54"
+  ],
+  "trace": "8b03df08a48d37cb",
+  "calls": 563
+ }
+]

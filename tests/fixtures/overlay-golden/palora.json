@@ -1,0 +1,59 @@
+[
+ {
+  "at": 0.1,
+  "texts": [
+   "PALORA",
+   "Riordina le lettere in chat",
+   "A",
+   "U",
+   "N",
+   "L"
+  ],
+  "trace": "a949c4bbffbb506f",
+  "calls": 60
+ },
+ {
+  "at": 3,
+  "texts": [
+   "PALORA",
+   "Riordina le lettere in chat",
+   "A",
+   "U",
+   "N",
+   "L"
+  ],
+  "trace": "36907c0b648e3951",
+  "calls": 120
+ },
+ {
+  "at": 6,
+  "texts": [
+   "PALORA",
+   "Riordina le lettere in chat",
+   "A",
+   "U",
+   "N",
+   "L"
+  ],
+  "trace": "dd1559c09a1fb064",
+  "calls": 180
+ },
+ {
+  "at": 12,
+  "texts": [
+   "PALORA",
+   "Riordina le lettere in chat",
+   "A",
+   "U",
+   "N",
+   "L",
+   "",
+   "Carla ha indovinato: LUNA",
+   "C",
+   "C",
+   "1. Carla ? 4 pt"
+  ],
+  "trace": "3a3e70b3c4a627b2",
+  "calls": 293
+ }
+]
