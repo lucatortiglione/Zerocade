@@ -61,6 +61,7 @@ import {
 import { getContent, wordAssociation } from './content.js'
 import { contextFileBudget, contextResource, contextRevision, isContextFile, reloadContext } from './context.js'
 import { giochiDb } from './schema-db.js'
+import { registerContextEvaluationRoutes } from './context-evaluation.js'
 import { isWordleFile, wordleFile } from './wordle.js'
 import { chainKeys, chains } from './chains.js'
 import { nasaPhotos } from './nasa.js'
@@ -222,6 +223,8 @@ app.get('/api/content', async () => getContent())
 // ZeroContext's words and vectors: static files, cached by the browser until the next build.
 // Asked of the ranking thread: checking Pipeline B reads its export, which must not stop this thread.
 app.get('/api/context/profiles', async () => contextCorpora.profiles())
+// «Qualità posizioni»: legge i risultati di gioco-zerocontext/script/evaluate_context_ranking.py; `live` dice se c'è una diretta collegata.
+registerContextEvaluationRoutes(app, { giochi: giochiDb, live: () => [...sources.values()].some((room) => room.live().length > 0) })
 app.get('/api/context/:file', async (req, reply) => {
   const name = (req.params as { file: string }).file
   const requested = (req.query as { profile?: unknown }).profile

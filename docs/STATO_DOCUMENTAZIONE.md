@@ -62,6 +62,8 @@ I paragrafi successivi sono il registro cronologico delle scelte precedenti.
 | [docs/DIRETTIVE-audit-2026-11-14.md](DIRETTIVE-audit-2026-11-14.md) | Rapporto datato |
 | [docs/DIRETTIVE-sorgenti-giochi-2026-11-15.md](DIRETTIVE-sorgenti-giochi-2026-11-15.md) | Rapporto datato |
 | [docs/ZeroContext-direttive-2026-11-14.md](ZeroContext-direttive-2026-11-14.md) | Rapporto datato |
+| [docs/superpowers/specs/2026-11-19-zerocontext-qualita-posizioni-design.md](superpowers/specs/2026-11-19-zerocontext-qualita-posizioni-design.md) | Progetto: misura della qualità delle posizioni di ZeroContext |
+| [docs/superpowers/plans/2026-11-19-zerocontext-qualita-posizioni.md](superpowers/plans/2026-11-19-zerocontext-qualita-posizioni.md) | Piano di implementazione del progetto precedente |
 | [gioco-dilemmi/README.md](../gioco-dilemmi/README.md) | Guida e stato operativo |
 | [gioco-dilemmi/TODO.md](../gioco-dilemmi/TODO.md) | Backlog e rilevazione storica |
 | [gioco-parole/ALGORITMO.md](../gioco-parole/ALGORITMO.md) | Guida e stato operativo |

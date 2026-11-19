@@ -5,3 +5,5 @@ __pycache__/
 .venv-contexts/
 .venv-vectors/
 .venv-pipeline-a/
+# Uscita di `evaluate_context_ranking.py parita`: si rigenera ogni volta.
+reports/parita_*.json
