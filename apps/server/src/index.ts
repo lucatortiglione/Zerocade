@@ -2,7 +2,7 @@ import { contextProfile, isContextProfile } from '@zerocade/shared'
 import { spawn } from 'node:child_process'
 import { createReadStream } from 'node:fs'
 import { mkdir, rename, rm, stat, writeFile } from 'node:fs/promises'
-import { existsSync, readFileSync } from 'node:fs'
+import { existsSync } from 'node:fs'
 import { randomUUID } from 'node:crypto'
 import { dirname, join, resolve } from 'node:path'
 import { monitorEventLoopDelay } from 'node:perf_hooks'
@@ -82,6 +82,7 @@ import { ContextTournaments, sanitizeTournamentCommand } from './context-tournam
 import { TabooRooms } from './taboo.js'
 import { loadDeck } from './taboo-deck.js'
 import { WordHuntRooms } from './wordhunt.js'
+import wordhuntFixture from './wordhunt-fixture.json' with { type: 'json' }
 import type { FixtureFile } from './wordhunt-domain.js'
 import { ContextCorpora } from './context-corpora.js'
 import { ContextSemanticGame } from './context-semantic.js'
@@ -706,14 +707,13 @@ function loadWordHuntWords(): void {
     })
     .finally(() => { wordHuntLoading = false; wordhunt.dictionaryLoaded() })
 }
-const wordhuntFixture = JSON.parse(readFileSync(join(dirname(fileURLToPath(import.meta.url)), 'wordhunt-fixture.json'), 'utf-8')) as FixtureFile
 const wordhunt = new WordHuntRooms({
   store: wordHuntStore,
   dictionary: () => {
     if (wordHuntWords === undefined) loadWordHuntWords()
     return wordHuntWords
   },
-  fixture: () => wordhuntFixture,
+  fixture: () => wordhuntFixture as FixtureFile,
   monotonicNow: () => performance.now(),
   wallNow: () => Date.now(),
   setTimer: (fn, ms) => setTimeout(fn, ms),

@@ -5,7 +5,7 @@ import assert from 'node:assert/strict'
 import { spawn } from 'node:child_process'
 import { once } from 'node:events'
 import { request } from 'node:http'
-import { mkdtemp, mkdir, rm } from 'node:fs/promises'
+import { copyFile, mkdtemp, mkdir, rm } from 'node:fs/promises'
 import { createServer } from 'node:net'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -26,26 +26,32 @@ const candidate = process.argv.find((a) => a.startsWith('--context-candidate='))
 const gameFile = candidate ? join(resolve(candidate), 'giochi.sqlite3') : join(root, 'database/giochi.sqlite3')
 let child, socket, profilePeer
 let logs = ''
+const bundleDir = join(scratch, 'app')
 try {
   if (bundled) await build({
     entryPoints: { server: join(root, 'apps/server/src/index.ts'), 'infrastructure-worker': join(root, 'apps/server/src/infrastructure-worker.ts'), 'context-worker': join(root, 'apps/server/src/context-worker.ts'), 'wordgen-worker': join(root, 'apps/server/src/wordgen/worker.ts') },
-    outdir: scratch, outExtension: { '.js': '.mjs' }, bundle: true,
+    outdir: bundleDir, outExtension: { '.js': '.mjs' }, bundle: true,
     platform: 'node', format: 'esm', target: 'node26', external: ['better-sqlite3'],
     banner: { js: "import { createRequire as __createRequire } from 'node:module'; const require = __createRequire(import.meta.url);" },
     logLevel: 'warning',
   })
+  if (bundled) {
+    for (const name of ['giochi_v2.sqlite3', 'ZeroDubbi.sqlite3', 'ZeroQuizz.sqlite3', 'ZeroTaboo.sqlite3']) {
+      await copyFile(join(root, 'database', name), join(bundleDir, name))
+    }
+  }
   const env = { ...process.env }
   for (const key of Object.keys(env)) if (/^(ZEROCADE_|TWITCH_|NASA_)/i.test(key)) delete env[key]
   Object.assign(env, { PORT: String(port), LOG_LEVEL: 'warn', ZEROCADE_SKIP_HOSTS: '1', ZEROCADE_OPEN: '0',
     ZEROCADE_TEST_SHUTDOWN: '1', ZEROCADE_DB: join(scratch, 'live.db'), ZEROCADE_CONTENT_DB: join(scratch, 'content.db'),
     ZEROCADE_GIOCHI_FILE: gameFile,
     ZEROCADE_CONTEXT_DATA: candidate ? resolve(candidate) : join(root, 'gioco-zerocontext/data') })
-  child = spawn(process.execPath, bundled ? [join(scratch, 'server.mjs')] : ['--import', 'tsx', 'apps/server/src/index.ts'], {
+  child = spawn(process.execPath, bundled ? [join(bundleDir, 'server.mjs')] : ['--import', 'tsx', 'apps/server/src/index.ts'], {
     cwd: root, env, windowsHide: true, stdio: ['ignore', 'pipe', 'pipe', 'ipc'],
   })
   for (const stream of [child.stdout, child.stderr]) stream.on('data', (chunk) => { logs = (logs + chunk.toString()).slice(-12000) })
   const closed = once(child, 'exit')
-  const get = (path, init = {}) => fetch(base + path, { ...init, signal: AbortSignal.timeout(3000) })
+  const get = (path, init = {}) => fetch(base + path, { signal: AbortSignal.timeout(3000), ...init })
   const until = Date.now() + 30000
   while (true) {
     if (child.exitCode !== null) throw new Error(`Server exited ${child.exitCode}`)
@@ -111,6 +117,21 @@ try {
   await ranking
   const feed = await (await get('/api/feed')).json()
   assert.ok(feed.gifts.some((gift) => gift.count === 2))
+  const generatedBoard = new Promise((done, reject) => {
+    const timer = setTimeout(() => reject(new Error('ZeroWordHunt generated board timeout')), 20000)
+    const listener = (admin) => {
+      if (!admin?.state.mode) return
+      clearTimeout(timer)
+      socket.off('wordhunt:admin', listener)
+      done(admin)
+    }
+    socket.on('wordhunt:admin', listener)
+  })
+  socket.emit('game:select', 'zerowordhunt')
+  const wordhunt = await generatedBoard
+  assert.equal(wordhunt.state.mode, 'generated', 'the shipped dictionary must produce a playable grid')
+  assert.ok(wordhunt.dictionaryReady && wordhunt.targets.length > 0)
+  console.log('ZeroWordHunt smoke: generated grid with the distributed dictionary passed.')
   if (contextMetaResponse.ok && (await (await get('/api/context/meta.json')).json()).pipeline === 'context-semantic-1') {
     const waitState = (predicate) => new Promise((done, reject) => {
       const timer = setTimeout(() => { socket.off('context:semantic', listener); reject(new Error('Semantic state timeout')) }, 10000)
@@ -146,9 +167,14 @@ try {
     assert.equal(found.attempts, 1); assert.equal(found.solution, solution)
     assert.equal(found.leaders[0].pts, 100)
     console.log('Semantic smoke: corpus, server authority, ninth round remains ordinary, invalid word and finder points passed.')
-    const profiles = await (await get('/api/context/profiles')).json()
-    if (profiles.length === 2 && profiles.every((p) => p.available)) {
-      assert.deepEqual(profiles.map((p) => p.id), ['original', 'abtt'])
+    // A locally installed Pipeline B can take as long as the corpus worker's profiles job to inspect.
+    const profiles = await (await get('/api/context/profiles', { signal: AbortSignal.timeout(185000) })).json()
+    const baselineProfiles = ['original', 'abtt'].map((id) => {
+      const profile = profiles.find((p) => p.id === id)
+      assert.ok(profile, `missing association profile: ${id}`)
+      return profile
+    })
+    if (baselineProfiles.every((p) => p.available)) {
       const processId = child.pid
       profilePeer = io(base, { auth: { clientType: 'dashboard', key: key + '-profiles' }, transports: ['websocket'], reconnection: false })
       let peerSession
@@ -173,7 +199,7 @@ try {
       assert.equal(scoresBefore.sessione[0].name, 'Semantic')
       assert.equal(scoresBefore.sessione[0].points, 100)
       const revisions = new Set()
-      for (const profile of profiles) {
+      for (const profile of baselineProfiles) {
         const response = await get(`/api/context/meta.json?profile=${profile.id}`)
         assert.equal(response.headers.get('x-zerocontext-profile'), profile.id)
         revisions.add(response.headers.get('x-zerocontext-revision'))
@@ -211,6 +237,8 @@ try {
       for (const retired of ['turbox', 'harrier']) assert.equal((await get(`/api/context/meta.json?profile=${retired}`)).status, 400)
       assert.equal((await get('/api/context/meta.json?profile=unknown')).status, 400)
       console.log('Association smoke: original/ABTT, five live switches, retired profiles rejected, room isolation, preserved scores, reconnect persistence and the same server process passed.')
+    } else {
+      console.log('Association switches skipped: unavailable corpus for ' + baselineProfiles.filter((p) => !p.available).map((p) => p.id).join(', '))
     }
   }
   const save = await get(`/api/pads/${key}`, { method: 'POST', headers: { 'content-type': 'application/json' },

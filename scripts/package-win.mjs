@@ -12,6 +12,7 @@
 //   app/giochi.sqlite3              the games' database (database/giochi.sqlite3), one schema per game:
 //                                   Bivio's dilemmas, word lists, ZeroAssociazioni's verified pools, ZeroWords'
 //                                   lexicon and the other games' content
+//   app/giochi_v2.sqlite3           dictionary for generated ZeroWordHunt boards
 //   app/ZeroDubbi.sqlite3           Bivio's dilemmas (database/ZeroDubbi.sqlite3), a database of their own
 //   app/ZeroTaboo.sqlite3           ZeroTaboo's deck of 62 cards (database/ZeroTaboo.sqlite3), read only
 //   app/ZeroQuizz.sqlite3           ZeroQuizz's questions and answers (database/ZeroQuizz.sqlite3), a database
@@ -113,6 +114,7 @@ const profileVectors = new Set()
   }
 }
 copyFileSync(giochi, join(app, 'giochi.sqlite3'))
+copyFileSync(join(root, 'database', 'giochi_v2.sqlite3'), join(app, 'giochi_v2.sqlite3'))
 // ZeroDubbi: Bivio's dilemmas are a database of their own (apps/server/src/bivio.ts), read by the server.
 const zeroDubbi = join(root, 'database', 'ZeroDubbi.sqlite3')
 {
