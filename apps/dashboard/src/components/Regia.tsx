@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { DEFAULT_WIDGETS, GAMES, type LiveEvent, type SessionState, type Viewer, type WidgetId } from '@zerocade/shared'
 import { socket } from '../socket'
+import { connectionLabels, connectionStatus } from '../connectionStatus'
 import { useDashboard } from '../store'
 
 // Pieces shared by the control columns of the server-driven games (Bivio, Incastro): the
@@ -33,11 +34,8 @@ export function GameSwitch({ session }: { session: SessionState }) {
 }
 
 export function ConnectionBadge() {
-  const { connected, sources, bridge } = useDashboard()
-  const fromBridge = bridge?.state === 'connected' && Boolean(bridge.tiktok || bridge.twitch)
-  const live = sources.tiktok?.state === 'connected' || sources.twitch?.state === 'connected' || fromBridge
-  const label = !connected ? 'Offline' : live ? 'Live' : 'Pronto'
-  return <span className={`side-badge side-badge--${label.toLowerCase()}`}>{label}</span>
+  const status = connectionStatus(useDashboard())
+  return <span className={`side-badge side-badge--${status}`}>{connectionLabels[status]}</span>
 }
 
 export function TiktokAccount() {

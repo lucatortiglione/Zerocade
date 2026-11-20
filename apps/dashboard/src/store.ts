@@ -142,7 +142,7 @@ function marked(feed: FeedItem[], moments: IncastroMoment[]): FeedItem[] {
 
 // A new connection gets the server's latest events again.
 socket.on('connect', () => update({ connected: true, feed: [] }))
-socket.on('disconnect', () => update({ connected: false }))
+socket.on('disconnect', () => update({ connected: false, sources: {}, bridge: null }))
 socket.on('feed:events', (items) => update({ feed: [...state.feed, ...items].slice(-FEED_KEPT) }))
 socket.on('session:state', (session) =>
   update({ session, gameSecret: session.gameId === state.session?.gameId ? state.gameSecret : null }),

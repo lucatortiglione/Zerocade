@@ -220,9 +220,9 @@ ul, ol { list-style: none; }
   max-width: 420px;
 }
 .preview__title { display: flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600; color: var(--text-muted); }
-/* La spia di trasmissione: rossa «in diretta», ambra mentre collega, spenta altrimenti. Sempre accompagnata dal testo. */
+/* Spia della sorgente: rossa se collegata, ambra mentre si collega. */
 .preview__dot { width: 10px; height: 10px; border-radius: 50%; background: var(--border-strong); }
-.preview[data-tally='live'] .preview__dot { background: var(--tally); box-shadow: 0 0 10px var(--tally); }
+.preview[data-tally='connected'] .preview__dot { background: var(--tally); box-shadow: 0 0 10px var(--tally); }
 .preview[data-tally='connecting'] .preview__dot { background: var(--warning); animation: tally-pulse 1.2s ease-in-out infinite; }
 .preview__state { color: var(--text); font-weight: 600; }
 @keyframes tally-pulse { 50% { opacity: 0.25; } }
@@ -246,7 +246,7 @@ ul, ol { list-style: none; }
   /* Checkerboard, so the overlay's transparent areas read as transparent. */
   background: repeating-conic-gradient(#17171c 0 25%, #111115 0 50%) 0 0 / 24px 24px;
 }
-.preview[data-tally='live'] .preview__frame { border-color: var(--tally); box-shadow: 0 0 0 1px var(--tally), 0 0 30px rgba(255, 90, 71, 0.35), 0 18px 44px rgba(0, 0, 0, 0.4); }
+.preview[data-tally='connected'] .preview__frame { border-color: var(--tally); box-shadow: 0 0 0 1px var(--tally), 0 0 30px rgba(255, 90, 71, 0.35), 0 18px 44px rgba(0, 0, 0, 0.4); }
 .preview[data-tally='connecting'] .preview__frame { border-color: var(--warning); }
 .preview__frame iframe { display: block; width: 100%; height: 100%; border: 0; }
 .preview__frame { position: relative; }
@@ -596,8 +596,9 @@ input[type='number']:focus { border-color: var(--accent); }
 
 .side-badge { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; }
 .side-badge::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
-.side-badge--pronto { color: var(--text-muted); }
-.side-badge--live { color: var(--ok); }
+.side-badge--idle { color: var(--text-muted); }
+.side-badge--connecting { color: var(--warning); }
+.side-badge--connected { color: var(--ok); }
 .side-badge--offline { color: var(--danger); }
 
 .side-account { display: flex; align-items: center; gap: 8px; }
