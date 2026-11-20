@@ -14,7 +14,7 @@ import type { ContextSemanticState } from './contextSemantic.js'
 export { pickSecret } from './secretPick.js'
 import type { ContextTournamentAdmin, ContextTournamentState, TournamentCommand, TournamentReply, TournamentRow, TournamentSummary } from './contextTournament.js'
 import { TABOO_RULES, type TabooAdminState, type TabooCommand, type TabooPublicState, type TabooReply } from './taboo.js'
-import { WORDHUNT_RULES, WORDHUNT_SIZES, WORDHUNT_SIZE_DEFAULT, type WordHuntSize, type WordHuntAdminState, type WordHuntCommand, type WordHuntPublicState, type WordHuntReply } from './wordhunt.js'
+import { WORDHUNT_RULES, WORDHUNT_SIZES, WORDHUNT_SIZE_DEFAULT, WORDHUNT_HINT_TIERS, type WordHuntSize, type WordHuntAdminState, type WordHuntCommand, type WordHuntPublicState, type WordHuntReply, type WordHuntSound } from './wordhunt.js'
 
 export {
   WORD_ASSOCIATION_MAX_WORDS,
@@ -283,6 +283,7 @@ export type GameSetting = SettingBase &
     | { kind: 'multi'; options: { value: string; label: string }[]; default: string }
     | { kind: 'color'; default: string }
     | { kind: 'image'; default: string }
+    | { kind: 'wordhunt-tiers'; default: string }
   )
 
 export type GameSettings = Record<string, number | boolean | string>
@@ -1740,9 +1741,10 @@ const GAME_DEFS: GameDef[] = [
       'Cerca-parole per la diretta: una griglia 20×15, la chat scrive le parole nascoste e il primo messaggio valido le conquista. La parola prende un colore e nella casella accanto compare l’avatar di chi l’ha trovata.',
     emoji: '🔎',
     gradient: ['#22d3ee', '#0a1f2a'],
-    // Le risposte sono i commenti della chat: il server li legge direttamente, senza trigger né aiuti del pubblico.
+    // Il server legge direttamente le risposte e i tap per gli indizi.
     actions: [{ id: 'guess', label: 'Risposta' }],
     settings: [
+      { id: 'wordhuntHintTiers', label: 'Aiutino con i tap', kind: 'wordhunt-tiers', default: WORDHUNT_HINT_TIERS },
       {
         id: 'wordhuntSeconds',
         label: 'Durata massima del round (secondi)',
@@ -1764,7 +1766,25 @@ const GAME_DEFS: GameDef[] = [
         default: WORDHUNT_RULES.countdownSecondsDefault,
       },
       {
+        id: 'wordhuntThemeVote', label: 'Voto sul tema', kind: 'toggle', default: false,
+        hint: 'Tra i round la chat vota 1 o 2. Il tema scelto vale per la prossima griglia generata.',
+      },
+      {
+        id: 'wordhuntProgression',
+        label: 'Difficoltà dei round',
+        hint: 'Scegli il livello di partenza. Ogni griglia generata giocata porta al livello successivo, fino ad Avanzato.',
+        kind: 'select',
+        default: 'quick',
+        options: [
+          { value: 'quick', label: 'Dal livello Base · orizzontali e verticali' },
+          { value: 'standard', label: 'Dal livello Intermedio · anche diagonali' },
+          { value: 'large', label: 'Dal livello Avanzato · anche al contrario' },
+          { value: 'manual', label: 'Personalizzata · scegli dimensione e direzioni' },
+        ],
+      },
+      {
         id: 'wordhuntReverse',
+        when: { id: 'wordhuntProgression', value: 'manual' },
         label: 'Parole al contrario',
         hint: 'Le parole possono essere scritte anche da destra a sinistra e dal basso in alto. Con le diagonali attive, anche quelle possono essere al contrario. Vale dal round successivo.',
         kind: 'toggle',
@@ -1772,6 +1792,7 @@ const GAME_DEFS: GameDef[] = [
       },
       {
         id: 'wordhuntDiagonal',
+        when: { id: 'wordhuntProgression', value: 'manual' },
         label: 'Parole in diagonale',
         hint: 'Le parole possono essere scritte anche in diagonale. Con «Parole al contrario» attivo, anche al contrario. L’avatar sta sempre nella casella dopo l’ultima lettera o prima della prima, lungo la diagonale. Vale dal round successivo.',
         kind: 'toggle',
@@ -1779,6 +1800,7 @@ const GAME_DEFS: GameDef[] = [
       },
       {
         id: 'wordhuntSize',
+        when: { id: 'wordhuntProgression', value: 'manual' },
         label: 'Dimensione tabellone',
         hint: 'Colonne × righe e parole da trovare. Il tempo del round si adatta in proporzione alle parole (il valore sotto è per 24). Vale dal round successivo; la griglia di riferimento è sempre 15 × 20.',
         kind: 'select',
@@ -1791,7 +1813,7 @@ const GAME_DEFS: GameDef[] = [
       {
         id: 'wordhuntAuto',
         label: 'Round automatici',
-        hint: 'Il primo round parte da solo alla scelta del gioco e un nuovo round parte dopo ogni round, con un “Tabellone Grande” da 24 parole. “Chiudi” in regia ferma l’automatismo.',
+        hint: 'Il primo round parte alla scelta del gioco. I successivi seguono la difficoltà impostata. “Chiudi” in regia ferma i round automatici.',
         kind: 'toggle',
         default: true,
       },
@@ -2408,6 +2430,7 @@ export interface ServerToClientEvents {
   'taboo:admin': (admin: TabooAdminState | null) => void
   // ZeroWordHunt (wordhunt.ts): the public state (letters, found words, avatars) for every client; targets and paths to dashboards only.
   'wordhunt:state': (state: WordHuntPublicState | null) => void
+  'wordhunt:sound': (sound: WordHuntSound) => void
   'wordhunt:admin': (admin: WordHuntAdminState | null) => void
   // ZeroContext's secret word of the room: dashboards show it to the creator, and every overlay
   // (the preview too) plays the same one.

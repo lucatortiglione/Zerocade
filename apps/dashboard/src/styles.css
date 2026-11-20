@@ -1232,3 +1232,7 @@ input[type='number']:focus { border-color: var(--accent); }
 .quality__verdicts { display: inline-flex; gap: 6px; }
 .quality__verdicts .btn.is-picked { border-color: var(--accent); background: var(--accent-soft); color: var(--text); }
 @media (max-width: 760px) { .quality { padding: 24px 16px; } .quality__word { grid-template-columns: 26px minmax(0, 1fr); } .quality__verdicts, .quality__none { grid-column: 2; } }
+.wordhunt-hint-settings { min-width: 0; margin: 0; padding: .6rem; border: 1px solid currentColor; border-radius: .5rem; }
+.wordhunt-hint-settings table { width: 100%; margin-bottom: .6rem; border-spacing: .25rem; }
+.wordhunt-hint-settings th { text-align: left; font-size: .8rem; }
+.wordhunt-hint-settings input { width: 100%; min-width: 0; box-sizing: border-box; }

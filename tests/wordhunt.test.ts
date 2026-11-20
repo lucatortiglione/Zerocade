@@ -2,6 +2,8 @@ import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 import { test } from 'node:test'
 import Database from 'better-sqlite3'
+import { defaultSettings, GAMES, parseWordHuntCell } from '../packages/shared/src/index.ts'
+import { sanitizeSettings } from '../apps/server/src/validate.ts'
 import {
   WORDHUNT_RULES, WORDHUNT_SIZES, WORDHUNT_DIRECTIONS, wordHuntDirections, isWordHuntSize, wordHuntCanvas, wordHuntPoints, type GameSettings, type Viewer, type WordHuntAdminState, type WordHuntCommand, type WordHuntPublicState,
 } from '../packages/shared/src/index.ts'
@@ -12,6 +14,7 @@ import {
   type FixtureFile,
 } from '../apps/server/src/wordhunt-domain.ts'
 import { Clock } from './helpers/tabooHarness.ts'
+import { WORDHUNT_TOPICS } from '../apps/server/src/wordhunt-topics.ts'
 
 const fixtureFile = JSON.parse(readFileSync(new URL('../apps/server/src/wordhunt-fixture.json', import.meta.url), 'utf-8')) as FixtureFile
 // A larger list for the boards of 24 words (the real one has about 16,700).
@@ -143,6 +146,7 @@ function setup(opts: { auto?: boolean; settings?: GameSettings; dictionary?: rea
   const publics: WordHuntPublicState[] = []
   const admins: WordHuntAdminState[] = []
   const issues: string[] = []
+  const sounds: string[] = []
   let ids = 0
   const settings: GameSettings = opts.settings ?? { wordhuntCountdown: 0 }
   const deps: WordHuntDeps = {
@@ -151,6 +155,7 @@ function setup(opts: { auto?: boolean; settings?: GameSettings; dictionary?: rea
     setTimer: (fn, ms) => clock.add(fn, ms), clearTimer: (h) => clock.cancel(h),
     newId: () => `round-${++ids}`, newSeed: () => `seed-${ids}`,
     emitPublic: (_k, s) => publics.push(s), emitAdmin: (_k, a) => admins.push(a),
+    emitSound: (_key, sound) => sounds.push(sound),
     allowed: (_k, u) => (opts.allow ? opts.allow(u) : true), settings: () => settings, autoplay: () => opts.auto ?? false, issue: (_k, m) => issues.push(m), log: () => undefined,
   }
   const room = new WordHuntRoom('room', deps)
@@ -160,8 +165,244 @@ function setup(opts: { auto?: boolean; settings?: GameSettings; dictionary?: rea
     assert.deepEqual(cmd({ type: 'create-round', mode, ...extra } as never), { ok: true })
     assert.deepEqual(cmd({ type: 'start' }), { ok: true })
   }
-  return { room, deps, clock, store, db, publics, admins, issues, cmd, say, begin, state: () => room.state(), admin: () => room.admin() }
+  return { room, deps, clock, store, db, publics, admins, issues, sounds, cmd, say, begin, state: () => room.state(), admin: () => room.admin() }
 }
+
+test('a live topic ballot counts one vote per viewer and generates the next grid from the winner', () => {
+  const settings = { wordhuntCountdown: 0, wordhuntThemeVote: true }
+  const dictionary = WORDHUNT_TOPICS.flatMap(topic => topic.words)
+  const h = setup({ settings, dictionary })
+  h.begin()
+  assert.equal(h.state().ballot, null)
+  h.cmd({ type: 'finish' })
+  const options = h.state().ballot!.options
+  h.say(viewer('alice'), '2')
+  h.say(viewer('alice'), '2')
+  h.say(viewer('bob'), '1')
+  h.say(viewer('bob'), '2')
+  assert.deepEqual(h.state().ballot?.votes, [0, 2])
+  h.begin('generated')
+  assert.equal(h.state().ballot, null)
+  assert.equal(h.state().topic, options[1])
+  const pool = WORDHUNT_TOPICS.find(topic => topic.name === options[1])!.words
+  assert.ok(h.admin().targets.every(t => pool.includes(t.word)))
+  h.cmd({ type: 'finish' })
+  settings.wordhuntThemeVote = false
+  h.room.settingsChanged()
+  assert.equal(h.state().ballot, null)
+  h.begin('generated')
+  assert.equal(h.state().topic, null)
+})
+
+test('the automatic next round uses the winning topic and remains open-themed without votes', () => {
+  const settings = { wordhuntCountdown: 0, wordhuntThemeVote: true, wordhuntPauseSeconds: 5, wordhuntProgression: 'quick' }
+  const h = setup({ auto: true, settings, dictionary: WORDHUNT_TOPICS.flatMap(topic => topic.words) })
+  h.begin()
+  h.cmd({ type: 'finish' })
+  const expected = h.state().ballot!.options[0]
+  h.say(viewer('voter'), '1')
+  h.clock.advance(5000)
+  assert.equal(h.state().phase, 'active')
+  assert.equal(h.state().topic, expected)
+  h.cmd({ type: 'finish' })
+  h.clock.advance(5000)
+  assert.equal(h.state().phase, 'active')
+  assert.equal(h.state().topic, null)
+})
+
+test('team records compare completed grids at the same level and exclude paused time', () => {
+  const settings = { wordhuntCountdown: 0, wordhuntProgression: 'large' }
+  const h = setup({ settings, dictionary: DICTIONARY_BIG })
+  for (const [duration, best, improved] of [[5100, 5100, true], [7500, 5100, false], [4100, 4100, true]] as const) {
+    h.begin('generated')
+    h.clock.advance(duration)
+    h.room.pause(true)
+    h.clock.advance(9000)
+    h.room.pause(false)
+    for (const t of h.admin().targets) h.say(viewer(t.word), t.word)
+    assert.deepEqual(h.state().teamTime, { level: 'large', bestMs: best, elapsedMs: duration, improved })
+  }
+  settings.wordhuntProgression = 'standard'
+  h.begin('generated')
+  assert.equal(h.state().teamTime?.bestMs, null)
+  h.cmd({ type: 'finish' })
+  assert.equal(h.state().teamTime?.elapsedMs, null)
+  h.begin()
+  assert.equal(h.state().teamTime, null)
+})
+
+test('sound follows the opening, each confirmed word, then the completed grid', () => {
+  const h = setup({ settings: { wordhuntCountdown: 1 } })
+  h.begin()
+  assert.deepEqual(h.sounds, [])
+  h.clock.advance(1000)
+  assert.deepEqual(h.sounds, ['start'])
+  const targets = h.admin().targets
+  for (const t of targets) {
+    h.say(viewer(t.word), t.word)
+    h.say(viewer('duplicate'), t.word)
+    h.room.publishNow()
+  }
+  assert.deepEqual(h.sounds, ['start', ...targets.map(() => 'found'), 'complete'])
+})
+
+test('time limit and director stop each play the celebration once', () => {
+  for (const end of ['timeout', 'stopped']) {
+    const h = setup()
+    h.begin('fixture', { durationSeconds: 30 })
+    if (end === 'stopped') h.cmd({ type: 'finish' })
+    h.clock.advance(30000)
+    h.room.publishNow()
+    assert.equal(h.state().end, end)
+    assert.deepEqual(h.sounds, ['start', 'complete'])
+  }
+})
+
+test('last word keeps its rectangle and reveals its length by taps or idle time', () => {
+  for (const unlock of ['taps', 'timer']) {
+    const h = setup()
+    h.begin()
+    const targets = h.admin().targets
+    for (const t of targets.slice(0, -1)) h.say(viewer(t.word), t.word)
+    h.room.tap(60)
+    const zone = h.state().hint?.zone
+    assert.equal(h.state().hint?.wordLength, undefined)
+    h.clock.advance(2000)
+    h.room.pause(true)
+    h.clock.advance(30000)
+    h.room.pause(false)
+    if (unlock === 'taps') h.room.tap(30)
+    else h.clock.advance(18000)
+    assert.equal(h.state().hint?.stage, 3)
+    assert.equal(h.state().hint?.wordLength, targets.at(-1)!.word.length)
+    assert.deepEqual(h.state().hint?.zone, zone)
+    h.room.tap(10000)
+    h.say(viewer('final'), targets.at(-1)!.word)
+    assert.equal(h.admin().metrics.lastWordMs, unlock === 'taps' ? 2000 : 20000)
+  }
+})
+
+test('generated rounds climb from the selected level, cap at large, and ignore fixture rounds', () => {
+  const settings = { wordhuntCountdown: 0, wordhuntProgression: 'quick' }
+  const h = setup({ settings, dictionary: DICTIONARY_BIG })
+  for (const level of ['quick', 'standard', 'large', 'large'] as const) {
+    h.begin()
+    h.cmd({ type: 'finish' })
+    h.begin('generated')
+    const { rows, cols, words } = WORDHUNT_SIZES[level]
+    assert.deepEqual([h.state().rows, h.state().cols, h.state().total], [rows, cols, words])
+    assert.ok(h.admin().targets.every(t => wordHuntDirections(level === 'large', level !== 'quick').includes(t.direction)))
+    h.cmd({ type: 'finish' })
+  }
+  settings.wordhuntProgression = 'standard'
+  h.room.settingsChanged()
+  h.begin('generated')
+  assert.equal(h.state().total, 20)
+})
+
+test('automatic difficulty advances only when a generated grid actually opens', () => {
+  const h = setup({ auto: true, dictionary: DICTIONARY_BIG, settings: { wordhuntCountdown: 1, wordhuntProgression: 'standard', wordhuntPauseSeconds: 5 } })
+  h.room.kick()
+  h.clock.advance(WORDHUNT_RULES.autoStartDelayMs)
+  assert.equal(h.admin().level, 'standard')
+  assert.equal(h.state().phase, 'countdown')
+  h.cmd({ type: 'finish' })
+  h.clock.advance(6000)
+  assert.equal(h.state().phase, 'active')
+  assert.equal(h.admin().level, 'standard')
+  h.cmd({ type: 'finish' })
+  h.clock.advance(6000)
+  assert.equal(h.admin().level, 'large')
+})
+
+test('reopening a word removes the length clue and restarts the measurement at the next penultimate answer', () => {
+  const h = setup()
+  h.begin()
+  const targets = h.admin().targets
+  for (const t of targets.slice(0, -1)) h.say(viewer(t.word), t.word)
+  h.room.tap(90)
+  const reopened = targets[0]!
+  h.cmd({ type: 'revoke', target: reopened.target, reason: 'Correzione' } as WordHuntCommand)
+  assert.equal(h.state().hint?.stage, 0)
+  h.room.tap(999)
+  assert.equal(h.state().hint?.stage, 2)
+  assert.equal(h.state().hint?.wordLength, undefined)
+  h.clock.advance(9000)
+  h.say(viewer('nuovo'), reopened.word)
+  h.clock.advance(500)
+  h.say(viewer('ultimo'), targets.at(-1)!.word)
+  assert.equal(h.admin().metrics.lastWordMs, 500)
+  h.begin()
+  h.cmd({ type: 'finish' })
+  assert.equal(h.admin().metrics.lastWordMs, null)
+  assert.equal(h.admin().metrics.meanLastWordMs, 500)
+  assert.equal(h.admin().metrics.timedFinishes, 1)
+})
+
+test('hint settings accept legacy sessions, sort custom tiers and reject overlapping limits', () => {
+  const settings = defaultSettings(GAMES.find(game => game.id === 'zerowordhunt')!.settings)
+  delete settings.wordhuntHintTiers
+  const sanitize = (patch: GameSettings) => sanitizeSettings('zerowordhunt', { ...settings, ...patch })
+  assert.equal(sanitize({})?.wordhuntHintTiers, '1:30,2:60,3:100')
+  assert.equal(sanitize({ wordhuntHintTiers: '8:100,1:5' })?.wordhuntHintTiers, '1:5,8:100')
+  assert.equal(sanitize({ wordhuntHintTiers: '' })?.wordhuntHintTiers, '')
+  for (const value of ['3:10,3:20', '1:0', '25:100', '3:2.5']) {
+    assert.equal(sanitize({ wordhuntHintTiers: value }), null)
+  }
+})
+
+test('hint tiers count collective taps, narrow twice, and reset on every claim', () => {
+  const h = setup()
+  h.begin()
+  h.room.tap(500)
+  assert.equal(h.state().hint, null)
+  const targets = h.admin().targets
+  for (const t of targets.slice(0, 5)) h.say(viewer(t.word), t.word)
+  assert.equal(h.state().hint?.threshold, 100)
+  h.room.tap(65)
+  h.room.tap(40)
+  const half = h.state().hint!
+  assert.equal(half.stage, 1)
+  assert.equal(half.taps, 5)
+  h.room.tap(95)
+  const zone = h.state().hint!.zone!
+  assert.equal(h.state().hint?.stage, 2)
+  assert.ok(zone.top >= half.zone!.top && zone.bottom <= half.zone!.bottom)
+  assert.equal((zone.bottom-zone.top+1)*(zone.right-zone.left+1), 20)
+  const start = parseWordHuntCell(targets[5]!.cells[0]!)!
+  assert.ok(start.row >= zone.top && start.row <= zone.bottom && start.col >= zone.left && start.col <= zone.right)
+  h.say(viewer('next'), targets[5]!.word)
+  assert.deepEqual(h.state().hint, { threshold: 60, taps: 0, stage: 0, zone: null })
+  h.say(viewer('another'), targets[6]!.word)
+  assert.equal(h.state().hint?.threshold, 30)
+})
+
+test('custom hint tier advances on idle time, freezes on pause, and ends with the round', () => {
+  const settings = { wordhuntCountdown: 0, wordhuntHintTiers: '1:3,8:9' }
+  const h = setup({ settings })
+  h.begin()
+  h.clock.advance(15000)
+  h.room.pause(true)
+  h.room.tap(9)
+  h.clock.advance(40000)
+  assert.equal(h.state().hint?.stage, 0)
+  h.room.pause(false)
+  h.clock.advance(4999)
+  assert.equal(h.state().hint?.stage, 0)
+  h.clock.advance(1)
+  assert.equal(h.state().hint?.stage, 1)
+  h.clock.advance(20000)
+  assert.equal(h.state().hint?.stage, 2)
+  settings.wordhuntHintTiers = ''
+  h.room.settingsChanged()
+  assert.equal(h.state().hint, null)
+  settings.wordhuntHintTiers = '8:4'
+  h.room.settingsChanged()
+  assert.equal(h.state().hint?.threshold, 4)
+  h.cmd({ type: 'finish' })
+  h.clock.advance(60000)
+  assert.equal(h.state().hint, null)
+})
 
 test('a round: create, start (no countdown), the first valid message takes the word, colour and avatar come with it', () => {
   const h = setup()
@@ -306,6 +547,30 @@ test('§10.3: the public state never holds a word that is not found, its path or
   const admin = h.admin()
   assert.equal(admin.targets.length, 8)
   assert.equal(admin.targets.find((t) => t.word === 'PENSIERO')!.found, false)
+})
+
+test('pausing the countdown preserves its remaining time and the full round duration', () => {
+  const h = setup({ settings: { wordhuntCountdown: 5 } })
+  h.begin('fixture', { durationSeconds: 60 })
+  h.clock.advance(2_000)
+  h.room.pause(true)
+  h.clock.advance(70_000)
+  h.say(viewer('early'), 'pensiero')
+  assert.equal(h.state().phase, 'countdown')
+  assert.equal(h.state().paused, true)
+  assert.equal(h.state().remainingMs, 3_000)
+  assert.equal(h.state().found, 0)
+
+  h.room.pause(false)
+  h.clock.advance(2_999)
+  assert.equal(h.state().phase, 'countdown')
+  assert.equal(h.state().remainingMs, 1)
+  h.clock.advance(1)
+  assert.equal(h.state().phase, 'active')
+  assert.equal(h.state().paused, false)
+  assert.equal(h.state().remainingMs, 60_000)
+  h.say(viewer('player'), 'pensiero')
+  assert.equal(h.state().found, 1)
 })
 
 test('pause stops the clock and the answers; resume gives the time that was left', () => {
@@ -737,6 +1002,48 @@ test('colours: one per player, the same for all their words and in the next roun
 })
 
 // ---- A busy database does not lose a word ----
+
+function holdClaimWrites(store: WordHuntStore): () => void {
+  const claim = store.claim.bind(store)
+  store.claim = () => { throw Object.assign(new Error('database is locked'), { code: 'SQLITE_BUSY' }) }
+  return () => { store.claim = claim }
+}
+
+test('queued words keep their arrival order and their players’ colours when the lock clears', () => {
+  const h = setup()
+  h.begin()
+  const unlock = holdClaimWrites(h.store)
+  h.say(viewer('anna'), 'obbligo')
+  unlock()
+  h.say(viewer('bruno'), 'pensiero')
+  h.say(viewer('anna'), 'stagno')
+  h.clock.advance(200)
+  assert.deepEqual(h.publics.flatMap((s) => s.lastClaim ? [s.lastClaim.word] : []), ['OBBLIGO', 'PENSIERO', 'STAGNO'])
+  const claims = h.store.claims('round-1')
+  assert.deepEqual(claims.map((c) => c.word), ['OBBLIGO', 'PENSIERO', 'STAGNO'])
+  assert.notEqual(claims[0]!.color, claims[1]!.color)
+  assert.equal(claims[0]!.color, claims[2]!.color)
+})
+
+for (const end of ['timeout', 'stopped'] as const) {
+  test(`a round ending by ${end} counts queued words and refuses later answers`, () => {
+    const h = setup()
+    h.begin('fixture', { durationSeconds: 30 })
+    h.clock.advance(29_950)
+    const unlock = holdClaimWrites(h.store)
+    h.say(viewer('anna'), 'obbligo')
+    if (end === 'timeout') h.clock.advance(50)
+    else assert.deepEqual(h.cmd({ type: 'finish' }), { ok: true })
+    assert.equal(h.room.listening(), false)
+    h.say(viewer('bruno'), 'pensiero')
+    unlock()
+    h.clock.advance(300)
+    assert.equal(h.state().end, end)
+    assert.deepEqual(h.store.claims('round-1').map((c) => c.word), ['OBBLIGO'])
+    assert.deepEqual(h.state().sessionLeaders.map((l) => l.points), [16])
+    assert.equal(h.issues.length, 0)
+  })
+}
 
 test('a busy database: the word waits, is saved as soon as the lock clears, and nobody takes it meanwhile', async () => {
   const { mkdtempSync } = await import('node:fs')

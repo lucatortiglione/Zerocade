@@ -3,6 +3,7 @@ import { apiFetch, UnconfirmedRequestError } from '@zerocade/browser-runtime'
 import { BACKGROUND_GAMES, GAMES, backgroundPath, settingVisible, type GameSetting, type SessionState } from '@zerocade/shared'
 import { overlayKey } from '../overlayKey'
 import { socket } from '../socket'
+import { WordHuntHintTiers } from './WordHuntHintTiers'
 
 // A game's settings as a form: one field per setting, in order, with each `group` under
 // its own sub-heading. Numbers are typed rather than slid, and only saved on blur/Enter.
@@ -95,6 +96,8 @@ function Field({
   onChange: (v: Value) => void
 }) {
   switch (setting.kind) {
+    case 'wordhunt-tiers':
+      return <WordHuntHintTiers key={String(value)} value={String(value)} save={onChange} />
     case 'toggle':
       return (
         <label className="form__row switch-row">

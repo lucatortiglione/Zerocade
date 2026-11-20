@@ -16,7 +16,7 @@ import {
   type Viewer,
 } from '@zerocade/shared'
 import { socket } from './socket'
-import { playSound, stopSounds } from './audio'
+import { playSound, playWordHuntSound, stopSounds, stopWordHuntSounds } from './audio'
 import { noteSecretUse, setSecretLast, setSecretUses } from './games/secretUses'
 
 interface OverlayState {
@@ -92,8 +92,14 @@ function update(patch: Partial<OverlayState>) {
 }
 
 socket.on('connect', () => update({ connected: true }))
-socket.on('disconnect', () => update({ connected: false }))
-socket.on('session:state', (session) => update({ session }))
+socket.on('disconnect', () => {
+  stopWordHuntSounds()
+  update({ connected: false })
+})
+socket.on('session:state', (session) => {
+  if (session.gameId !== 'zerowordhunt' || session.ended || session.run !== state.session?.run) stopWordHuntSounds()
+  update({ session })
+})
 socket.on('ranking:update', (ranking) => update({ ranking }))
 socket.on('live:event', (event) => {
   const patch: Partial<OverlayState> = { event, seq: state.seq + 1 }
@@ -113,6 +119,9 @@ socket.on('context:tournament', (contextTournament) => update({ contextTournamen
 socket.on('context:semantic', (contextSemantic) => update({ contextSemantic, contextSemanticAt: performance.now() }))
 socket.on('taboo:state', (taboo) => update({ taboo, tabooAt: performance.now() }))
 socket.on('wordhunt:state', (wordhunt) => update({ wordhunt, wordhuntAt: performance.now() }))
+socket.on('wordhunt:sound', (sound) => {
+  if (state.session?.gameId === 'zerowordhunt' && !state.session.ended) playWordHuntSound(sound)
+})
 socket.on('context:secret-uses', (uses) => setSecretUses(uses))
 socket.on('context:secret-used', ({ word, uses, at }) => noteSecretUse(word, uses, at))
 socket.on('context:secret-last', (last) => setSecretLast(last))

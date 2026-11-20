@@ -1,7 +1,7 @@
 import '@fontsource-variable/fredoka'
 import '@fontsource-variable/nunito'
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties } from 'react'
-import { WORDHUNT_REFERENCE as REF, parseWordHuntCell, wordHuntCanvas, type WordHuntClaim, type WordHuntLeader, type WordHuntPublicState, type WordHuntWinner } from '@zerocade/shared'
+import { WORDHUNT_REFERENCE as REF, parseWordHuntCell, wordHuntCanvas, wordHuntLastHintStage, wordHuntTeamResult, type WordHuntClaim, type WordHuntLeader, type WordHuntPublicState, type WordHuntWinner } from '@zerocade/shared'
 import { useOverlay } from './store'
 import { ViewerAvatar } from './ViewerAvatar'
 import '@fontsource/opendyslexic/latin-700.css'
@@ -79,7 +79,7 @@ function customColors(settings: Record<string, unknown> | undefined): CSSPropert
   const board = pickColor(settings.wordhuntBoardColor, '#12141c')
   return {
     ...base, '--wh-letter': letter, '--wh-tile': tile, '--wh-bg': board,
-    '--wh-border': `color-mix(in srgb, ${tile} 80%, ${letter})`, '--wh-coord': `color-mix(in srgb, ${board} 35%, ${letter})`,
+    '--wh-border': `color-mix(in srgb, ${tile} 80%, ${letter})`,
   } as CSSProperties
 }
 
@@ -104,6 +104,7 @@ function Board({ state, animated, theme, colors }: { state: WordHuntPublicState;
   }, [state.claims])
   const rows = Array.from({ length: state.rows }, (_, r) => r)
   const cols = Array.from({ length: state.cols }, (_, c) => c)
+  const zone = state.hint?.zone
   return (
     <div className="wordhunt-fit" ref={ref}>
       <div className="wordhunt-frame" style={{ width: canvas.width * scale, height: canvas.height * scale }}>
@@ -123,6 +124,10 @@ function Board({ state, animated, theme, colors }: { state: WordHuntPublicState;
               </div>
             )
           }))}
+          {zone && <div className="wordhunt-zone" aria-hidden="true" style={{
+            top: py(zone.top) - 1, left: px(zone.left) - 1, width: (zone.right - zone.left + 1) * REF.step,
+            height: (zone.bottom - zone.top + 1) * REF.step,
+          }} />}
           {state.claims.map((claim) => {
             const cell = parseWordHuntCell(claim.avatarCell)
             return cell ? <Avatar key={claim.target} winner={claim.winner} style={{ left: px(cell.col), top: py(cell.row) }} /> : null
@@ -172,12 +177,33 @@ function Standings({ leaders }: { leaders: WordHuntLeader[] }) {
   )
 }
 
+function ChatInvite() {
+  const [visible, setVisible] = useState(true)
+  useEffect(() => {
+    const timer = window.setTimeout(() => setVisible(!visible), visible ? 6000 : 39000)
+    return () => window.clearTimeout(timer)
+  }, [visible])
+  return <div className="wordhunt-hint" style={{ visibility: visible ? 'visible' : 'hidden' }}>Trova una parola e scrivila in chat</div>
+}
+
+function RoundExtras({ state }: { state: WordHuntPublicState }) {
+  const ballot = state.ballot
+  const record = wordHuntTeamResult(state)
+  return <>
+    {record && <div className="wordhunt-hint wordhunt-record">{record}</div>}
+    {ballot && <section className="wordhunt-ballot">
+      <strong>Vota il prossimo tema in chat</strong>
+      <div>{ballot.options.map((name, i) => <span key={name}><b>{i + 1}</b> {name} <small>{ballot.votes[i]} voti</small></span>)}</div>
+    </section>}
+  </>
+}
+
 export function WordHunt() {
   const { wordhunt, wordhuntAt, session } = useOverlay()
   const [now, setNow] = useState(() => performance.now())
   const theme = useTheme(session?.settings.wordhuntTheme)
   const colors = customColors(session?.settings)
-  const counting = wordhunt !== null && (wordhunt.phase === 'countdown' || (wordhunt.phase === 'active' && !wordhunt.paused) || (wordhunt.phase === 'finished' && wordhunt.nextRoundMs !== null))
+  const counting = wordhunt !== null && !wordhunt.paused && (wordhunt.phase === 'countdown' || wordhunt.phase === 'active' || (wordhunt.phase === 'finished' && wordhunt.nextRoundMs !== null))
   useEffect(() => {
     if (!counting) return
     const id = window.setInterval(() => setNow(performance.now()), 250)
@@ -185,9 +211,10 @@ export function WordHunt() {
   }, [counting])
   if (!wordhunt) return <div className="wordhunt wordhunt--wait">ZeroWordHunt</div>
   const animated = session?.settings.wordhuntAnimations !== false
-  const leftMs = counting ? Math.max(0, wordhunt.remainingMs - (now - wordhuntAt)) : wordhunt.remainingMs
+  const elapsed = counting ? Math.max(0, now - wordhuntAt) : 0
+  const leftMs = Math.max(0, wordhunt.remainingMs - elapsed)
   const showLeaders = session?.settings.showLeaderboard !== false && wordhunt.leaders.length > 0
-  const nextInMs = wordhunt.nextRoundMs === null ? null : Math.max(0, wordhunt.nextRoundMs - (now - wordhuntAt))
+  const nextInMs = wordhunt.nextRoundMs === null ? null : Math.max(0, wordhunt.nextRoundMs - elapsed)
   const showStandings = session?.settings.showLeaderboard !== false && wordhunt.phase === 'finished' && nextInMs !== null && nextInMs <= STANDINGS_MS && wordhunt.sessionLeaders.length > 0
   // Before every round (nothing yet, a round made and waiting, the countdown) the board stays away and NASA's picture is shown whole, with no
   // veil and nothing over it but a caption; the picture comes from the overlay's background (App.tsx), so only with that background chosen.
@@ -197,6 +224,7 @@ export function WordHunt() {
     return (
       <div className="wordhunt wordhunt--photo" data-phase={wordhunt.phase} data-nasa={nasa}>
         <p className="wordhunt-caption" aria-live="polite">
+          {wordhunt.topic && `${wordhunt.topic} · `}
           {wordhunt.phase === 'countdown'
             ? <>Si parte tra <strong>{Math.max(1, Math.ceil(leftMs / 1000))}</strong></>
             : wordhunt.phase === 'ready' ? 'Il round sta per iniziare' : wordhunt.notice ?? 'ZeroWordHunt'}
@@ -208,6 +236,7 @@ export function WordHunt() {
     return (
       <div className="wordhunt wordhunt--standings" data-phase={wordhunt.phase} data-nasa={nasa}>
         <Standings leaders={wordhunt.sessionLeaders} />
+        <RoundExtras state={wordhunt} />
         <p className="wordhunt-caption">Nuovo round tra <strong>{Math.max(1, Math.ceil((nextInMs ?? 0) / 1000))}</strong></p>
       </div>
     )
@@ -215,16 +244,29 @@ export function WordHunt() {
   return (
     <div className="wordhunt" data-phase={wordhunt.phase} data-nasa={nasa}>
       <header className="wordhunt-head">
+        {wordhunt.topic && <b>Tema · {wordhunt.topic}</b>}
         {wordhunt.phase === 'countdown' && <div className="wordhunt-timer">Si parte tra {Math.max(1, Math.ceil(leftMs / 1000))}</div>}
         {wordhunt.phase === 'active' && (wordhunt.limited || wordhunt.paused) && <div className="wordhunt-timer" data-low={wordhunt.limited && leftMs < 15_000 && !wordhunt.paused}>{wordhunt.paused ? 'In pausa' : clock(leftMs)}</div>}
         {wordhunt.phase === 'finished' && (
           <div className="wordhunt-timer">
             {wordhunt.end ? END_LABEL[wordhunt.end] : 'Round concluso'}
-            {wordhunt.nextRoundMs !== null && <small className="wordhunt-next"> · nuovo round tra {Math.max(1, Math.ceil(Math.max(0, wordhunt.nextRoundMs - (now - wordhuntAt)) / 1000))}</small>}
+            {nextInMs !== null && <small className="wordhunt-next"> · nuovo round tra {Math.max(1, Math.ceil(nextInMs / 1000))}</small>}
           </div>
         )}
         {wordhunt.total > 0 && <div className="wordhunt-count" aria-label="Parole trovate"><strong>{wordhunt.found}</strong>/{wordhunt.total}</div>}
       </header>
+      <RoundExtras state={wordhunt} />
+      {wordhunt.phase === 'active' && !wordhunt.paused && !wordhunt.hint && <ChatInvite key={wordhunt.roundId} />}
+      {wordhunt.hint && <div className="wordhunt-hint">
+        <strong>{!wordhunt.hint.zone ? 'Restringi la ricerca' : wordhunt.hint.stage === 1
+          ? `Prima lettera nella metà ${wordhunt.hint.zone.top === 0 ? 'alta' : 'bassa'}`
+          : `Prima lettera tra ${String.fromCharCode(65 + wordhunt.hint.zone.top)}${wordhunt.hint.zone.left + 1} e ${String.fromCharCode(65 + wordhunt.hint.zone.bottom)}${wordhunt.hint.zone.right + 1}`}</strong>
+        {wordhunt.hint.wordLength && <strong>Cerca una parola di {wordhunt.hint.wordLength} lettere</strong>}
+        {!wordhunt.paused && wordhunt.hint.stage < wordHuntLastHintStage(wordhunt.total - wordhunt.found) && <span>
+          {wordhunt.hint.threshold - wordhunt.hint.taps === 1 ? 'Manca 1 tap' : `Mancano ${wordhunt.hint.threshold - wordhunt.hint.taps} tap`}{' '}
+          {wordhunt.hint.stage === 2 ? 'per scoprire la lunghezza' : 'per restringere la zona'}
+        </span>}
+      </div>}
       {wordhunt.letters.length > 0 ? (
         <Board state={wordhunt} animated={animated} theme={theme} colors={colors} />
       ) : (

@@ -578,6 +578,8 @@ function broadcastEvent(key: string, received: LiveEvent, origin: EventOrigin = 
   feeds.set(key, [...(feeds.get(key) ?? []).slice(1 - FEED_KEPT), item])
   io.to(dashboardRoom(key)).emit('feed:events', [item])
   countEvent(key, event, origin)
+  if (event.type === 'like' && origin !== 'twitch' && session.gameId === 'zerowordhunt' && !session.paused && !session.ended)
+    wordhunt.get(key)?.tap(event.count)
   // A moderator's "!next" ends the round (not in a ZeroContext tournament, whose controls are its own); it is never read as an answer.
   if (isEndRoundCommand(event)) {
     if (plays && !session.paused && !session.ended && !tournaments.isOpen(key)) endRound(key, session.gameId)
@@ -587,7 +589,7 @@ function broadcastEvent(key: string, received: LiveEvent, origin: EventOrigin = 
   // "Aiuti dal pubblico" switched off: those triggers give no help (activeTriggers).
   if (room && plays && !session.ended) for (const t of triggersFor(activeTriggers(session), event)) room.action(t.action, event)
   // ZeroWordHunt takes the chat's comments from every source: the first one that arrives here wins the word (the room orders them).
-  if (event.type === 'comment' && plays && !session.ended && session.gameId === 'zerowordhunt')
+  if (event.type === 'comment' && plays && !session.ended && !session.paused && session.gameId === 'zerowordhunt')
     wordhunt.get(key)?.offer({ user: event.user, text: event.text, messageId: '', platform: origin === 'sim' ? 'local' : origin })
   if (session.gameId === 'context' && plays && !session.paused && !session.ended) {
     const semantic = ensureSemantic(key)
@@ -715,6 +717,7 @@ const wordhunt = new WordHuntRooms({
   newId: randomUUID,
   newSeed: () => randomUUID().slice(0, 8),
   emitPublic: (key, state) => io.to(key).emit('wordhunt:state', state),
+  emitSound: (key, sound) => io.to(key).emit('wordhunt:sound', sound),
   emitAdmin: (key, admin) => io.to(dashboardRoom(key)).emit('wordhunt:admin', admin),
   allowed: (key, user) => allowedToPlay(getSession(key).settings, user),
   settings: (key) => getSession(key).settings,
@@ -1016,7 +1019,7 @@ io.on('connection', (socket) => {
         }
       }
     }
-    if (command === 'end') clearSemantic(key)
+    if (command === 'end') { clearSemantic(key); wordhunt.endSession(key) }
     else ensureSemantic(key)?.pause(command === 'pause')
   })
 

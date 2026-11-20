@@ -66,7 +66,9 @@ function loadState(key: string): SessionState {
   if (row) {
     try {
       const game = GAMES.find((g) => g.id === (RENAMED[row.game_id] ?? row.game_id)) ?? GAMES[0]
-      const settings = { ...defaultSettings(game.settings), ...(JSON.parse(row.settings) as GameSettings) }
+      const saved = JSON.parse(row.settings) as GameSettings
+      const settings = { ...defaultSettings(game.settings), ...saved }
+      if (game.id === 'zerowordhunt' && saved.wordhuntProgression === undefined) settings.wordhuntProgression = 'manual'
       if (game.id === 'context') Object.assign(settings, normalizeContextColors(settings))
       return {
         gameId: game.id,

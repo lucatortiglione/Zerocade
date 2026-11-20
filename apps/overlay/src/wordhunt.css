@@ -33,14 +33,34 @@
 .wordhunt-next { font-size: 0.55em; font-weight: 700; opacity: 0.85; }
 .wordhunt-count { font-size: 4vmin; font-weight: 700; }
 .wordhunt-count strong { font-size: 5vmin; }
+.wordhunt-hint { align-self: center; display: flex; flex-wrap: wrap; justify-content: center; gap: .3em 1em; flex: none;
+  padding: .25em .75em; border-radius: .5em; background: #132637; color: #fff; font-size: 2.8vmin; text-align: center; }
+.wordhunt-hint span { color: #9eeaff; font-variant-numeric: tabular-nums; }
+.wordhunt-ballot { align-self: center; padding: .35em .85em; border-radius: .5em; color: #fff; background: #132637; font-size: 2.8vmin; text-align: center; }
+.wordhunt-ballot div { display: flex; justify-content: center; gap: 1.25em; }
+.wordhunt-ballot b { color: #9eeaff; }
+.wordhunt-ballot small { font-variant-numeric: tabular-nums; }
+.wordhunt-record { color: #ffe295; }
+@media (orientation: landscape) {
+  .wordhunt--standings:has(.wordhunt-ballot, .wordhunt-record) { gap: 1vmin; }
+  .wordhunt--standings:has(.wordhunt-ballot, .wordhunt-record) .wordhunt-standings ol { gap: .4vmin; }
+}
+.wordhunt-zone { position: absolute; z-index: 3; pointer-events: none; box-sizing: border-box; border: 3px dashed var(--wh-row);
+  outline: 1px solid var(--wh-axis-bg); border-radius: 5px; }
 .wordhunt-center { flex: 1; display: flex; align-items: center; justify-content: center; font-size: 4vmin; text-align: center; }
 .wordhunt-notice { margin: 0; text-align: center; font-size: 2.4vmin; opacity: 0.85; flex: none; }
 
 /* The two colour schemes of the board (WordHunt.tsx picks one by the hour, or the setting). Evening: a slate that is dark without being black
    and letters a little off white, so the glare of white on black does not tire the eyes over a long live. Day: warm paper with ink-dark
    letters (about 13:1), easier than a dark board in a bright room. The found words keep their own colours, with black letters on them. */
-.wordhunt-board[data-theme='night'] { --wh-bg: #12141c; --wh-tile: #1c2030; --wh-border: #272c3e; --wh-letter: #e4e7ef; --wh-coord: #aab1c6; }
-.wordhunt-board[data-theme='day'] { --wh-bg: #e9e3d3; --wh-tile: #f7f3e8; --wh-border: #d6cdb8; --wh-letter: #2b2a33; --wh-coord: #5c5748; }
+.wordhunt-board[data-theme='night'] {
+  --wh-axis-bg: #12141c; --wh-row: #67e8f9; --wh-col: #fde047;
+  --wh-bg: var(--wh-axis-bg); --wh-tile: #1c2030; --wh-border: #272c3e; --wh-letter: #e4e7ef;
+}
+.wordhunt-board[data-theme='day'] {
+  --wh-axis-bg: #e9e3d3; --wh-row: #07566a; --wh-col: #743a05;
+  --wh-bg: var(--wh-axis-bg); --wh-tile: #f7f3e8; --wh-border: #d6cdb8; --wh-letter: #2b2a33;
+}
 
 /* The box the board must fit; the frame inside has the exact scaled size, so nothing is deformed. */
 .wordhunt-fit { flex: 1; min-height: 0; display: flex; align-items: center; justify-content: center; }
@@ -76,9 +96,10 @@
 }
 .wordhunt-tile[data-found='true'] { background: var(--word-color); color: #000; border-color: var(--word-color); }
 .wordhunt-board--anim .wordhunt-tile { transition: background-color 180ms ease-out, color 180ms ease-out; }
-.wordhunt-coord { position: absolute; color: var(--wh-coord); font-weight: 800; text-align: center; pointer-events: none; text-shadow: none; }
-.wordhunt-coord--col { font-size: 15px; }
-.wordhunt-coord--row { font-size: 18px; }
+/* The backing stays paired with its inks even when the director changes the board colour. */
+.wordhunt-coord { position: absolute; background: var(--wh-axis-bg); border-radius: 4px; font-weight: 800; text-align: center; pointer-events: none; text-shadow: none; }
+.wordhunt-coord--col { color: var(--wh-col); font-size: 15px; }
+.wordhunt-coord--row { color: var(--wh-row); font-size: 18px; }
 .wordhunt-avatar {
   position: absolute;
   z-index: 2;

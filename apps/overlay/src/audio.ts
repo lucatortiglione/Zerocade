@@ -1,4 +1,4 @@
-import { DJ_SOUNDS, type DjPlay } from '@zerocade/shared'
+import { DJ_SOUNDS, type DjPlay, type WordHuntSound } from '@zerocade/shared'
 
 // Built-in DJ sounds are synthesized with the Web Audio API, so there are no
 // binary assets to ship and no network requests on the overlay.
@@ -192,6 +192,44 @@ export function quizSound(kind: QuizSound) {
 // silent, and each game's "Applauso a fine round" setting (roundCheer) turns it off.
 const CHEER_URL = new URL('../../../audio/dragon-studio-crowd-cheer-406646.mp3', import.meta.url).href
 const PREVIEW = typeof window !== 'undefined' && new URLSearchParams(window.location.search).has('preview')
+
+const wordHuntClips: Record<WordHuntSound, string> = {
+  start: new URL('../../../audio/zerowordhunt/ZeroWordHunt-via.wav', import.meta.url).href,
+  found: new URL('../../../audio/zerowordhunt/ZeroWordHunt-colpo.wav', import.meta.url).href,
+  complete: new URL('../../../audio/zerowordhunt/ZeroWordHunt-griglia-completa.wav', import.meta.url).href,
+  end: new URL('../../../audio/zerowordhunt/Fine-round-neutra.wav', import.meta.url).href,
+}
+const wordHuntQueue: WordHuntSound[] = []
+let wordHuntClip: HTMLAudioElement | null = null
+
+function playNextWordHuntClip() {
+  if (wordHuntClip) return
+  const next = wordHuntQueue.shift()
+  if (!next) return
+  const clip = new Audio(wordHuntClips[next])
+  wordHuntClip = clip
+  const advance = () => {
+    if (wordHuntClip !== clip) return
+    wordHuntClip = null
+    playNextWordHuntClip()
+  }
+  clip.onended = clip.onerror = advance
+  void clip.play().catch(advance)
+}
+
+export function stopWordHuntSounds() {
+  wordHuntQueue.length = 0
+  wordHuntClip?.pause()
+  wordHuntClip = null
+}
+
+export function playWordHuntSound(sound: WordHuntSound) {
+  if (PREVIEW || typeof Audio === 'undefined') return
+  if (sound === 'start') stopWordHuntSounds()
+  wordHuntQueue.push(sound)
+  playNextWordHuntClip()
+}
+
 let cheerOn = true
 let cheer: HTMLAudioElement | null = null
 
@@ -210,6 +248,7 @@ export function roundCheer() {
 }
 
 export function stopSounds() {
+  stopWordHuntSounds()
   for (const a of playing) a.pause()
   playing.clear()
   master?.disconnect()

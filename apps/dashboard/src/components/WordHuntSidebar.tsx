@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react'
-import { GAMES, WORDHUNT_RULES, WORDHUNT_SIZES, type WordHuntSize, defaultSettings, type LiveEvent, type SessionState, type WordHuntAdminState, type WordHuntMode } from '@zerocade/shared'
+import { GAMES, WORDHUNT_RULES, WORDHUNT_SIZES, WORDHUNT_LEVEL_NAMES, wordHuntTeamResult, type WordHuntSize, defaultSettings, type LiveEvent, type SessionState, type WordHuntAdminState, type WordHuntMode } from '@zerocade/shared'
 import { socket } from '../socket'
 import { useDashboard } from '../store'
 import { BridgeControl, ConnectionBadge, GameSwitch, LiveSimulator, MessageComposer, StreamSettings, pick, simViewer } from './Regia'
@@ -50,8 +50,9 @@ export function WordHuntSidebar({ session }: { session: SessionState }) {
       {message && <p className="side-error" role="alert">{message}</p>}
 
       <Section title="Round">
+        <SettingField session={session} id="wordhuntThemeVote" />
         <PauseGame session={session} />
-        <Round admin={wordhuntAdmin} send={send} />
+        <Round admin={wordhuntAdmin} send={send} manualSize={session.settings.wordhuntProgression === 'manual'} />
       </Section>
 
       <Section title="Parole nascoste">
@@ -67,14 +68,14 @@ export function WordHuntSidebar({ session }: { session: SessionState }) {
       </Section>
 
       <Section title="Impostazioni gioco">
-        <SettingsForm session={session} />
+        <SettingsForm session={session} omit={['wordhuntThemeVote']} />
         <p className="text-muted small">Durata e conto alla rovescia valgono dal round successivo.</p>
       </Section>
     </aside>
   )
 }
 
-function Round({ admin, send }: { admin: WordHuntAdminState | null; send: Send }) {
+function Round({ admin, send, manualSize }: { admin: WordHuntAdminState | null; send: Send; manualSize: boolean }) {
   // Until the director chooses, the grid is a generated one (the size comes from the settings); the 8-word reference board only when
   // the dictionary is not available or when it is picked by hand.
   const [picked, setMode] = useState<WordHuntMode | null>(null)
@@ -92,7 +93,11 @@ function Round({ admin, send }: { admin: WordHuntAdminState | null; send: Send }
         {state.phase === 'countdown' && `Conto alla rovescia · trovate ${state.found}/${state.total}`}
         {state.phase === 'active' && `${state.paused ? 'Round in pausa' : 'Round in corso'} · trovate ${state.found}/${state.total}`}
         {state.phase === 'finished' && `Round finito · trovate ${state.found}/${state.total}`}
+        {admin.level && ` · Livello ${WORDHUNT_LEVEL_NAMES[admin.level]}`}
+        {state.topic && ` · Tema ${state.topic}`}
       </p>
+      {state.ballot && <p className="small">Voti per il prossimo tema · {state.ballot.options.map((name, i) => `${i+1}. ${name} (${state.ballot!.votes[i]})`).join(' · ')}</p>}
+      {state.teamTime?.bestMs != null && <p className="small">{wordHuntTeamResult(state)}</p>}
       {state.notice && <p className="text-muted small">{state.notice}</p>}
       <p className="text-muted small">
         {admin.auto
@@ -108,7 +113,7 @@ function Round({ admin, send }: { admin: WordHuntAdminState | null; send: Send }
               <option value="generated" disabled={!admin.dictionaryReady}>Generata{admin.dictionaryReady ? '' : ' (dizionario non disponibile)'}</option>
             </select>
           </label>
-          {mode === 'generated' && (
+          {mode === 'generated' && manualSize && (
             <label className="small">
               Dimensione{' '}
               <select value={size} onChange={(e) => setSize(e.target.value as WordHuntSize | '')}>
@@ -122,7 +127,7 @@ function Round({ admin, send }: { admin: WordHuntAdminState | null; send: Send }
           {mode === 'generated' && (
             <input className="input" maxLength={WORDHUNT_RULES.maxSeedChars} placeholder="Seme (facoltativo, per ripetere la griglia)" value={seed} onChange={(e) => setSeed(e.target.value)} />
           )}
-          <button type="button" className="side-action side-action--blue" onClick={() => void send({ type: 'create-round', mode, ...(mode === 'generated' && size ? { size } : {}), ...(mode === 'generated' && seed.trim() ? { seed: seed.trim() } : {}) })}>
+          <button type="button" className="side-action side-action--blue" onClick={() => void send({ type: 'create-round', mode, ...(mode === 'generated' && manualSize && size ? { size } : {}), ...(mode === 'generated' && seed.trim() ? { seed: seed.trim() } : {}) })}>
             ＋ Crea round
           </button>
         </>
@@ -169,9 +174,12 @@ function Words({ admin, send }: { admin: WordHuntAdminState | null; send: Send }
 function Info({ admin }: { admin: WordHuntAdminState | null }) {
   if (!admin) return null
   const { metrics } = admin
+  const seconds = (ms: number) => `${(ms / 1000).toLocaleString('it-IT', { maximumFractionDigits: 1 })} s`
   return (
     <>
       <p className="small"><b>Messaggi:</b> {metrics.received} · <b>Tentativi su una parola:</b> {metrics.guesses}</p>
+      {metrics.lastWordMs != null && <p className="small">Dalla penultima all’ultima parola · <b>{seconds(metrics.lastWordMs)}</b></p>}
+      {metrics.meanLastWordMs != null && <p className="small text-muted">Media della sessione · {seconds(metrics.meanLastWordMs)} su {metrics.timedFinishes} {metrics.timedFinishes === 1 ? 'round completato' : 'round completati'}</p>}
       <p className="small text-muted">Ignorati: {Object.entries(metrics.ignored).map(([k, v]) => `${k} ${v}`).join(', ') || 'nessuno'}</p>
       {admin.seed && <p className="small text-muted">Seme: {admin.seed} · controllo {admin.checksum?.slice(0, 12)}</p>}
     </>
@@ -198,6 +206,8 @@ function Simulator({ admin }: { admin: WordHuntAdminState | null }) {
   return (
     <>
       <LiveSimulator makeEvent={makeEvent} />
+      <button type="button" className="btn btn--small" disabled={!admin?.state.hint || admin.state.paused || admin.state.hint.stage === 2}
+        onClick={() => socket.emit('sim:event', { type: 'like', user: simViewer(), count: 10 })}>Simula 10 tap</button>
       <form className="side-message" onSubmit={(e) => { e.preventDefault(); sendText() }}>
         <input type="text" value={text} maxLength={140} placeholder="Scrivi come spettatore finto…" aria-label="Messaggio di uno spettatore finto" onChange={(e) => setText(e.target.value)} />
         <button type="submit" className="side-action side-action--blue" disabled={!text.trim()}>Invia</button>

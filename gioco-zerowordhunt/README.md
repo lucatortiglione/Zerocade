@@ -28,6 +28,26 @@ prende un colore e nella casella adiacente compare l'avatar di chi l'ha trovata.
 
 ## Differenze rispetto alla specifica
 
+### Aiutino con i tap
+
+In **Impostazioni gioco → Aiutino con i tap** la regia imposta il limite di parole rimaste e i tap richiesti per ciascuno scaglione, poi preme **Applica**. Si usa il primo limite che comprende il numero di parole rimaste. I valori iniziali sono 100 tap con tre parole, 60 con due e 30 con una. Con quattro o più parole l’aiutino è spento. Rimuovere tutte le righe lo disattiva anche nel finale.
+
+Il primo indizio contorna la metà della griglia che contiene la prima lettera di un bersaglio. Il secondo restringe il bordo a quattro righe e cinque colonne nella stessa metà. Ogni passaggio richiede la soglia di tap oppure 20 secondi di gioco attivo senza ritrovamenti. Un ritrovamento o una riapertura azzera la ricerca; la pausa congela tempo e contatore. I punti seguono la normale assegnazione al primo messaggio valido. Il pulsante **Simula 10 tap** permette di provare la soglia in regia.
+
+Quando resta una sola parola, un terzo indizio mostra la sua lunghezza e mantiene il rettangolo. Durante la ricerca l’overlay indica quanti tap mancano al prossimo indizio. Quando l’aiutino è spento, ogni 45 secondi compare per 6 secondi l’invito a scrivere una parola in chat.
+
+### Difficoltà e tempo sull’ultima parola
+
+In **Impostazioni gioco → Difficoltà dei round** la regia sceglie il livello di partenza. Base usa la griglia rapida da 14 parole, in orizzontale e verticale. Intermedio passa a 20 parole e aggiunge le diagonali. Avanzato usa 24 parole e permette anche le direzioni inverse. La progressione riguarda le griglie generate, sia manuali sia automatiche. Dopo Avanzato si continua allo stesso livello. La griglia di riferimento e quelle chiuse prima di giocare non consumano livelli.
+
+Le nuove sessioni partono da Base. Le sessioni salvate con le impostazioni precedenti conservano dimensione e direzioni in modalità **Personalizzata**. In **Metriche** si leggono il tempo di gioco tra la penultima e l’ultima risposta valida del round e la media della sessione, calcolata sui round completati con almeno due parole. Le pause sono escluse.
+
+### Regole e comportamento del round
+
+Nella colonna sinistra, **Round → Voto sul tema** apre la votazione durante la pausa. L’overlay mostra due temi a rotazione fra Cucina, Viaggi e Natura. Ogni spettatore può scrivere **1** o **2** e cambiare scelta fino alla creazione della prossima griglia. A parità si sorteggia fra i due temi. Senza voti la griglia viene generata dal dizionario completo. Il voto si applica alle griglie generate e si può disattivare anche durante la pausa.
+
+Al completamento di una griglia generata di livello Base, Intermedio o Avanzato, l’overlay mostra il tempo collettivo e il record della diretta per quel livello. Il tempo va dall’apertura delle risposte all’arrivo dell’ultima soluzione, escludendo le pause. Il record resta disponibile cambiando gioco e si azzera terminando la sessione o riavviando il server.
+
 - **Protocollo:** lo stato pubblico è sempre uno snapshot completo (`wordhunt:state`) con `version` ed `eventSeq`, non una sequenza di
   eventi `WORD_CLAIMED`: un client che perde un pacchetto si riallinea al successivo. L'ordine degli eventi è comunque nel registro
   `wordhunt_events`. Non ci sono API REST: i comandi passano dal socket della regia, con `expectedVersion`, come ZeroTaboo.

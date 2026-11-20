@@ -14,6 +14,7 @@ import {
   TABOO_RULES,
   WORDHUNT_RULES,
   isWordHuntSize,
+  parseWordHuntHintTiers,
   type WordHuntSize,
   type WordHuntCommand,
   type SourceConfig,
@@ -103,6 +104,12 @@ export function sanitizeSettings(gameId: string, raw: unknown): GameSettings | n
   for (const s of game.settings) {
     const v = r[s.id]
     switch (s.kind) {
+      case 'wordhunt-tiers': {
+        const tiers = parseWordHuntHintTiers(v === undefined ? s.default : v)
+        if (!tiers) return null
+        out[s.id] = tiers.map(t => `${t.remaining}:${t.taps}`).join(',')
+        break
+      }
       case 'number':
         if (typeof v !== 'number' || !Number.isFinite(v)) return null
         out[s.id] = Math.min(s.max, Math.max(s.min, v))

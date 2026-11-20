@@ -81,6 +81,17 @@ export const WORDHUNT_PALETTE: readonly string[] = Object.freeze([
 // The sizes of the generated board, as "cols x rows, words" (the size menu of the games this one is modelled on). The large one is the
 // 20 rows (A-T) by 15 columns (1-15) of the reference screenshot; the others are smaller in the same geometry.
 export type WordHuntSize = 'quick' | 'standard' | 'large'
+export const WORDHUNT_LEVEL_NAMES = { quick: 'Base', standard: 'Intermedio', large: 'Avanzato' } as const
+
+export function wordHuntTeamResult(state: WordHuntPublicState): string | null {
+  const time = state.teamTime
+  if (time?.bestMs == null) return null
+  const format = (ms: number) => `${Math.floor(ms / 60000)}:${String(Math.floor(ms / 1000) % 60).padStart(2, '0')},${Math.floor(ms / 100) % 10}`
+  const level = WORDHUNT_LEVEL_NAMES[time.level]
+  if (time.elapsedMs === null) return `Record da battere · ${level} · ${format(time.bestMs)}`
+  const result = `${state.total} parole in ${format(time.elapsedMs)}`
+  return time.improved ? `${result} · Record della diretta · ${level}` : `${result} · Record ${level} ${format(time.bestMs)}`
+}
 export const WORDHUNT_SIZES: Readonly<Record<WordHuntSize, { label: string; cols: number; rows: number; words: number }>> = Object.freeze({
   quick: { label: 'Rapido', cols: 13, rows: 15, words: 14 },
   standard: { label: 'Standard', cols: 15, rows: 17, words: 20 },
@@ -114,6 +125,29 @@ export type WordHuntMode = 'fixture' | 'generated'
 // §8.1 without the states the room never rests in: CREATED and READY are one, ARCHIVED is the end of the stored record.
 export type WordHuntPhase = 'idle' | 'ready' | 'countdown' | 'active' | 'finished'
 export type WordHuntEnd = 'completed' | 'timeout' | 'stopped'
+export type WordHuntSound = 'start' | 'found' | 'complete' | 'end'
+
+export const WORDHUNT_HINT_TIERS = '1:30,2:60,3:100'
+export const WORDHUNT_HINT_WAIT_MS = 20_000
+export const WORDHUNT_MAX_HINT_TAPS = 1_000_000
+export interface WordHuntHintTier { remaining: number; taps: number }
+// Upper bounds, in ascending order. An empty list turns off both ways to reveal a zone.
+export function parseWordHuntHintTiers(value: unknown): WordHuntHintTier[] | null {
+  if (value === '') return []
+  if (typeof value !== 'string' || value.length > 256) return null
+  const tiers: WordHuntHintTier[] = []
+  for (const row of value.split(',')) {
+    if (!/^[1-9]\d?:[1-9]\d{0,6}$/.test(row)) return null
+    const [remaining, taps] = row.split(':').map(Number) as [number, number]
+    if (remaining > WORDHUNT_RULES.targetMax || taps > WORDHUNT_MAX_HINT_TAPS || tiers.some(t => t.remaining === remaining)) return null
+    tiers.push({ remaining, taps })
+  }
+  return tiers.sort((a, b) => a.remaining - b.remaining)
+}
+
+export interface WordHuntZone { top: number; bottom: number; left: number; right: number }
+export interface WordHuntHint { threshold: number; taps: number; stage: 0 | 1 | 2 | 3; zone: WordHuntZone | null; wordLength?: number }
+export const wordHuntLastHintStage = (remaining: number) => remaining === 1 ? 3 : 2
 
 export type WordHuntErrorCode = 'stale-version' | 'wrong-phase' | 'bad-input' | 'no-dictionary' | 'generation-failed' | 'not-found' | 'unavailable'
 export type WordHuntReply = { ok: true } | { ok: false; error: WordHuntErrorCode; message: string }
@@ -151,6 +185,9 @@ export interface WordHuntLeader {
 }
 
 export interface WordHuntPublicState {
+  topic: string | null
+  ballot: { options: [string, string]; votes: [number, number] } | null
+  teamTime: { level: WordHuntSize; bestMs: number | null; elapsedMs: number | null; improved: boolean } | null
   version: number
   eventSeq: number // grows with every claim and every change of phase: a client that sees a jump asks for the snapshot again
   roundId: string | null
@@ -161,6 +198,7 @@ export interface WordHuntPublicState {
   letters: string[] // `rows` strings of `cols` letters; the cells of the avatars hold their filler letter until they are found
   total: number
   found: number
+  hint: WordHuntHint | null
   claims: WordHuntClaim[]
   paused: boolean
   limited: boolean // false: the round has no time limit (remainingMs is 0 and there is no clock)
@@ -186,13 +224,14 @@ export interface WordHuntAdminTarget {
 
 export interface WordHuntAdminState {
   state: WordHuntPublicState
+  level: WordHuntSize | null
   seed: string | null
   checksum: string | null
   targets: WordHuntAdminTarget[]
   decoys: { word: string; cells: string[] }[] // real words in the grid that are not answers (the chat's guess of one is simply wrong)
   dictionaryReady: boolean
   auto: boolean // rounds start by themselves (the setting is on and "Chiudi" has not stopped them)
-  metrics: { received: number; ignored: Record<string, number>; guesses: number; overflow: number }
+  metrics: { received: number; ignored: Record<string, number>; guesses: number; overflow: number; lastWordMs: number | null; timedFinishes: number; meanLastWordMs: number | null }
 }
 
 // The coordinates of a cell as the headers show them (§2.1): rows A-T, columns 1-15.
