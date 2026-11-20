@@ -2,6 +2,78 @@
   "version": "2.0.0",
   "tasks": [
     {
+      "label": "ZeroContext : Associazioni - Prova le associazioni umane direzionali",
+      "type": "process",
+      "command": "${workspaceFolder}/gioco-zerocontext/.venv-pipeline-a/Scripts/python.exe",
+      "args": ["-B", "-X", "utf8", "${workspaceFolder}/scripts/context-vscode.py", "umane"],
+      "options": { "cwd": "${workspaceFolder}" },
+      "detail": "Confronta Riordino con le prime risposte italiane di persone distinte. Genera export, misure indipendenti e scheda A/B.",
+      "problemMatcher": [],
+      "runOptions": { "instanceLimit": 1 }
+    },
+    {
+      "label": "ZeroContext : Associazioni - Esegui ciclo completo",
+      "type": "process",
+      "command": "${workspaceFolder}/gioco-zerocontext/.venv-pipeline-a/Scripts/python.exe",
+      "args": ["-B", "-X", "utf8", "${workspaceFolder}/scripts/context-vscode.py", "ciclo"],
+      "options": { "cwd": "${workspaceFolder}" },
+      "detail": "Parte dagli export presenti. Genera il pilota su varietà e parole ambigue, confronta i tre profili sui 50 indizi e prepara scheda cieca e revisione dei tentativi.",
+      "problemMatcher": [],
+      "runOptions": { "instanceLimit": 1 },
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true }
+    },
+    {
+      "label": "ZeroContext : Associazioni - Ricalcola Riordino e avvia il ciclo",
+      "type": "process",
+      "command": "${workspaceFolder}/gioco-zerocontext/.venv-pipeline-a/Scripts/python.exe",
+      "args": ["-B", "-X", "utf8", "${workspaceFolder}/scripts/context-vscode.py", "ricalcola"],
+      "options": { "cwd": "${workspaceFolder}" },
+      "detail": "Riaddestra Riordino dalla Pipeline B e confronta il nuovo standard con il pilota. Richiede circa 12 GB di memoria. Salva gli export nella cartella della prova.",
+      "problemMatcher": [],
+      "runOptions": { "instanceLimit": 1 },
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true }
+    },
+    {
+      "label": "ZeroContext : Associazioni - Confronta i 50 indizi",
+      "type": "process",
+      "command": "${workspaceFolder}/gioco-zerocontext/.venv-pipeline-a/Scripts/python.exe",
+      "args": ["-B", "-X", "utf8", "${workspaceFolder}/scripts/context-vscode.py", "confronti"],
+      "options": { "cwd": "${workspaceFolder}" },
+      "detail": "Misura Pipeline B e Riordino standard con il motore di gioco e salva reports/confronti_indizi.json.",
+      "problemMatcher": [],
+      "runOptions": { "instanceLimit": 1 },
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true }
+    },
+    {
+      "label": "ZeroContext : Associazioni - Rivedi i tentativi dei tornei",
+      "type": "process",
+      "command": "${workspaceFolder}/gioco-zerocontext/.venv-pipeline-a/Scripts/python.exe",
+      "args": ["-B", "-X", "utf8", "${workspaceFolder}/scripts/context-vscode.py", "revisioni"],
+      "options": { "cwd": "${workspaceFolder}" },
+      "detail": "Mostra le associazioni da revisionare usando i round conclusi nel database locale.",
+      "problemMatcher": [],
+      "runOptions": { "instanceLimit": 1 },
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true }
+    },
+    {
+      "label": "ZeroContext : Associazioni - Conteggia voti A e B",
+      "type": "process",
+      "command": "${workspaceFolder}/gioco-zerocontext/.venv-pipeline-a/Scripts/python.exe",
+      "args": ["-B", "-X", "utf8", "${workspaceFolder}/scripts/context-vscode.py", "voti"],
+      "options": { "cwd": "${workspaceFolder}" },
+      "detail": "Legge le schede confronto.tsv e riporta preferenze per standard e pilota, parità e voti mancanti per ogni prova.",
+      "problemMatcher": [],
+      "runOptions": { "instanceLimit": 1 },
+      "presentation": { "reveal": "always", "panel": "dedicated", "clear": true }
+    },
+    {
+      "label": "ZeroContext : Associazioni - Rigenera da Pipeline B",
+      "dependsOrder": "sequence",
+      "dependsOn": ["ZeroContext : Associazione Parole PipelineB", "ZeroContext : Associazioni - Ricalcola Riordino e avvia il ciclo"],
+      "detail": "Aggiorna l’export della Pipeline B con il task esistente, quindi riaddestra Riordino ed esegue il ciclo completo.",
+      "problemMatcher": []
+    },
+    {
       "label": "ZeroCade : Aggiornamento parole RAW",
       "type": "process",
       "command": "${workspaceFolder}/gioco-zerocontext/.venv-vectors/Scripts/python.exe",

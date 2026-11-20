@@ -1,0 +1,33 @@
+{
+  "fonte": "Jonauskaite et al. (2025), Free Association Database for a 62-Word Dataset, doi:10.5334/jopd.140, OSF xzcbg, CC BY 4.0. Trasformazione: prime risposte italiane aggregate.",
+  "url": "https://osf.io/download/m7xb9/",
+  "sha256": "3667aac25a6c1e1eebbce36217dad307b114b579f00a4b978672c1776d1f4d32",
+  "base": "riordino:f543ea2fadfc",
+  "export": {
+    "segrete": 9513,
+    "fuori_pool": 0,
+    "senza_lista": 0,
+    "versione": "riordino:111ea71345ce"
+  },
+  "stimoli": 62,
+  "partecipanti_segnale": 41,
+  "partecipanti_test": 13,
+  "segrete_modificate": 196,
+  "misura": {
+    "segrete_misura": 65,
+    "coppie_test": 85,
+    "presenti_base": 40,
+    "presenti_pilota": 48,
+    "recuperate": 8,
+    "perse": 0,
+    "top10_base": 15,
+    "top10_pilota": 24,
+    "entrate_top10": 9,
+    "uscite_top10": 0,
+    "segrete_con_gold": 653,
+    "gruppi_gold_top10_base": 1579,
+    "gruppi_gold_top10_pilota": 1581
+  },
+  "schede_disponibili": 17,
+  "metodo": "Coppie distinte della partizione di misura, osservate nei partecipanti di test. Rango 1 = prima associazione giocabile. Null = assente dalla lista esportata."
+}

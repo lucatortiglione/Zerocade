@@ -32,6 +32,7 @@ function spawnWorker(): Worker {
 type JobInput = ContextJob extends infer J ? J extends { id: number } ? Omit<J, 'id'> : never : never
 
 export class ContextCorpora {
+  readonly profilesTimeoutMs = TIMEOUT_MS.profiles
   private worker: Worker | null = null
   private serial = 0
   private readonly pending = new Map<number, Pending>()

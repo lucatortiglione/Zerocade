@@ -470,7 +470,23 @@ senza scrivere nulla in `giochi.sqlite3`:
 - L'identità del corpus (usata dai tornei) comprende l'impronta dell'export: un nuovo export sospende un torneo aperto, come un cambio di dati.
 - L'export scrive ora le righe una segreta alla volta (prima le teneva tutte in memoria: con 43.407 segrete non bastava la RAM).
 
+## Task VS Code per il ciclo delle associazioni
+
+Aprire la cartella ZeroCade in VS Code e scegliere **Terminale → Esegui attività → ZeroContext : Associazioni - Esegui ciclo completo**. Il task legge gli export correnti di Pipeline B e Riordino e crea una nuova cartella `gioco-zerocontext/reports/pilota_piste_<data_ora>`. Il terminale stampa il percorso della scheda. Il codice del pilota viene cercato prima nel workspace e poi nei worktree registrati del repository. In questa configurazione proviene dal worktree `feat/zerocontext-riordino`; dati e ambiente Python provengono dal workspace principale.
+
+| Task sotto **ZeroContext : Associazioni** | Quando usarlo |
+|---|---|
+| Esegui ciclo completo | Genera l'export pilota, misura la varietà, verifica le parole ambigue, confronta i tre profili sui 50 indizi e prepara il voto alla cieca. Con un archivio tornei disponibile produce anche `revisioni.json`. |
+| Conteggia voti A e B | Dopo aver compilato l'ultima colonna di `confronto.tsv` con A, B o pari. Stampa i risultati e i voti mancanti per ogni scheda. |
+| Prova le associazioni umane direzionali | Confronta Riordino standard con il segnale tentativo → segreta. Scrive export, misure, confronto sui 50 indizi e scheda cieca in una nuova cartella `reports/pilota_umane_*`. |
+| Confronta i 50 indizi | Aggiorna il rapporto tra Pipeline B e Riordino standard. Il totale confrontabile usa le segrete giocabili in entrambi i profili. |
+| Rivedi i tentativi dei tornei | Mostra le coppie ricorrenti nell'archivio `apps/server/data/zerocade.db`. La variabile `ZEROCADE_DB` permette di indicare l'archivio della diretta. |
+| Ricalcola Riordino e avvia il ciclo | Parte dall'export della Pipeline B, riaddestra il modello standard e conserva lo standard ricalcolato e il pilota nella cartella della prova. |
+| Rigenera da Pipeline B | Esegue il task esistente di generazione della Pipeline B e prosegue con il riaddestramento e il ciclo. Usarlo quando cambiano i dati a monte. |
+
 ## Associazione Parole — Pipeline B
+
+Il pilota direzionale usa le prime risposte del CSV italiano di Jonauskaite et al. (2025), CC BY 4.0. Il task scarica il file in cache e verifica lo SHA-256. Delle 56 persone, 54 hanno una sola riga identificata come prima risposta. Il seme 42 assegna 41 persone al segnale e 13 al test. Il denominatore include tutte le prime risposte disponibili per lo stimolo, anche quelle fuori vocabolario. Alla parola tentata viene assegnato un bonus pari al limite inferiore di Wilson al 95% quando almeno due persone hanno risposto con la segreta. Il punteggio iniziale è `1/(5 + rango)` per le parole dello standard e zero per le nuove. La misura usa la partizione fissa delle segrete e coppie distinte osservate nei 13 partecipanti riservati al test. I ranghi nel rapporto partono dalla prima parola associata; sullo schermo la posizione 1 appartiene alla soluzione. [Studio](https://doi.org/10.5334/jopd.140) · [Dati](https://osf.io/xzcbg/)
 
 [`pipeline_b/`](pipeline_b/) implementa [`PIPELINE_B_FastText_PMI-SVD_ConceptNet_PPMI_v1.0.md`](../database/PIPELINE_B_FastText_PMI-SVD_ConceptNet_PPMI_v1.0.md).
 Come chiede la specifica per un confronto equo con la A, cambia **solo** il backend `E`: vocabolario (tabella `parole`), corpus,

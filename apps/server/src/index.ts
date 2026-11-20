@@ -222,7 +222,11 @@ app.get('/api/games', async () => GAMES)
 app.get('/api/content', async () => getContent())
 // ZeroContext's words and vectors: static files, cached by the browser until the next build.
 // Asked of the ranking thread: checking Pipeline B reads its export, which must not stop this thread.
-app.get('/api/context/profiles', async () => contextCorpora.profiles())
+app.get('/api/context/profiles', async (request) => {
+  // The first inspection of a full Pipeline B export can outlast the ordinary 30 s connection timeout.
+  request.raw.setTimeout(contextCorpora.profilesTimeoutMs + 5_000)
+  return contextCorpora.profiles()
+})
 // «Qualità posizioni»: legge i risultati di gioco-zerocontext/script/evaluate_context_ranking.py; `live` dice se c'è una diretta collegata.
 registerContextEvaluationRoutes(app, { giochi: giochiDb, live: () => [...sources.values()].some((room) => room.live().length > 0) })
 app.get('/api/context/:file', async (req, reply) => {

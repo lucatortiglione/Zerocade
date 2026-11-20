@@ -1,0 +1,1043 @@
+[
+  {
+    "segreta": "fastidio",
+    "indizio": "lilla",
+    "voti_test": 1,
+    "diretta": [
+      0,
+      41
+    ],
+    "inversa": null,
+    "rango_base": null,
+    "rango_pilota": null
+  },
+  {
+    "segreta": "fastidio",
+    "indizio": "rabbia",
+    "voti_test": 1,
+    "diretta": [
+      0,
+      41
+    ],
+    "inversa": null,
+    "rango_base": null,
+    "rango_pilota": null
+  },
+  {
+    "segreta": "esempio",
+    "indizio": "ammirazione",
+    "voti_test": 1,
+    "diretta": [
+      1,
+      41
+    ],
+    "inversa": null,
+    "rango_base": null,
+    "rango_pilota": null
+  },
+  {
+    "segreta": "sentimento",
+    "indizio": "compassione",
+    "voti_test": 1,
+    "diretta": [
+      2,
+      41
+    ],
+    "inversa": null,
+    "rango_base": 14,
+    "rango_pilota": 11
+  },
+  {
+    "segreta": "sentimento",
+    "indizio": "paura",
+    "voti_test": 1,
+    "diretta": [
+      0,
+      41
+    ],
+    "inversa": null,
+    "rango_base": 27,
+    "rango_pilota": 27
+  },
+  {
+    "segreta": "sentimento",
+    "indizio": "rabbia",
+    "voti_test": 1,
+    "diretta": [
+      0,
+      41
+    ],
+    "inversa": null,
+    "rango_base": 23,
+    "rango_pilota": 23
+  },
+  {
+    "segreta": "rifiuto",
+    "indizio": "disgusto",
+    "voti_test": 1,
+    "diretta": [
+      1,
+      41
+    ],
+    "inversa": null,
+    "rango_base": null,
+    "rango_pilota": null
+  },
+  {
+    "segreta": "dolore",
+    "indizio": "amore",
+    "voti_test": 1,
+    "diretta": [
+      0,
+      41
+    ],
+    "inversa": null,
+    "rango_base": 51,
+    "rango_pilota": 51
+  },
+  {
+    "segreta": "dolore",
+    "indizio": "rimpianto",
+    "voti_test": 1,
+    "diretta": [
+      4,
+      41
+    ],
+    "inversa": null,
+    "rango_base": 24,
+    "rango_pilota": 9
+  },
+  {
+    "segreta": "dolore",
+    "indizio": "sollievo",
+    "voti_test": 1,
+    "diretta": [
+      0,
+      41
+    ],
+    "inversa": null,
+    "rango_base": 14,
+    "rango_pilota": 15
+  },
+  {
+    "segreta": "depressione",
+    "indizio": "colpevolezza",
+    "voti_test": 1,
+    "diretta": [
+      0,
+      41
+    ],
+    "inversa": null,
+    "rango_base": null,
+    "rango_pilota": null
+  },
+  {
+    "segreta": "abitudine",
+    "indizio": "routine",
+    "voti_test": 1,
+    "diretta": [
+      4,
+      41
+    ],
+    "inversa": null,
+    "rango_base": 47,
+    "rango_pilota": 13
+  },
+  {
+    "segreta": "indifferenza",
+    "indizio": "disprezzo",
+    "voti_test": 1,
+    "diretta": [
+      0,
+      41
+    ],
+    "inversa": null,
+    "rango_base": 4,
+    "rango_pilota": 4
+  },
+  {
+    "segreta": "odio",
+    "indizio": "disprezzo",
+    "voti_test": 3,
+    "diretta": [
+      5,
+      41
+    ],
+    "inversa": [
+      5,
+      41
+    ],
+    "rango_base": 4,
+    "rango_pilota": 2
+  },
+  {
+    "segreta": "scuola",
+    "indizio": "corridoio",
+    "voti_test": 1,
+    "diretta": [
+      0,
+      41
+    ],
+    "inversa": null,
+    "rango_base": null,
+    "rango_pilota": null
+  },
+  {
+    "segreta": "montagna",
+    "indizio": "eco",
+    "voti_test": 3,
+    "diretta": [
+      6,
+      41
+    ],
+    "inversa": null,
+    "rango_base": null,
+    "rango_pilota": 10
+  },
+  {
+    "segreta": "bosco",
+    "indizio": "scoiattolo",
+    "voti_test": 1,
+    "diretta": [
+      1,
+      41
+    ],
+    "inversa": null,
+    "rango_base": null,
+    "rango_pilota": null
+  },
+  {
+    "segreta": "cibo",
+    "indizio": "fieno",
+    "voti_test": 1,
+    "diretta": [
+      1,
+      41
+    ],
+    "inversa": null,
+    "rango_base": null,
+    "rango_pilota": null
+  },
+  {
+    "segreta": "cibo",
+    "indizio": "formaggio",
+    "voti_test": 1,
+    "diretta": [
+      0,
+      41
+    ],
+    "inversa": null,
+    "rango_base": null,
+    "rango_pilota": null
+  },
+  {
+    "segreta": "cibo",
+    "indizio": "piacere",
+    "voti_test": 3,
+    "diretta": [
+      4,
+      41
+    ],
+    "inversa": null,
+    "rango_base": null,
+    "rango_pilota": 22
+  },
+  {
+    "segreta": "lavoro",
+    "indizio": "domestico",
+    "voti_test": 1,
+    "diretta": [
+      1,
+      41
+    ],
+    "inversa": null,
+    "rango_base": null,
+    "rango_pilota": null
+  },
+  {
+    "segreta": "conoscere",
+    "indizio": "piacere",
+    "voti_test": 1,
+    "diretta": [
+      0,
+      41
+    ],
+    "inversa": null,
+    "rango_base": 13,
+    "rango_pilota": 13
+  },
+  {
+    "segreta": "letto",
+    "indizio": "bianco",
+    "voti_test": 1,
+    "diretta": [
+      0,
+      41
+    ],
+    "inversa": null,
+    "rango_base": null,
+    "rango_pilota": null
+  },
+  {
+    "segreta": "letto",
+    "indizio": "tristezza",
+    "voti_test": 1,
+    "diretta": [
+      0,
+      41
+    ],
+    "inversa": null,
+    "rango_base": null,
+    "rango_pilota": null
+  },
+  {
+    "segreta": "prosperità",
+    "indizio": "pace",
+    "voti_test": 1,
+    "diretta": [
+      0,
+      41
+    ],
+    "inversa": null,
+    "rango_base": 1,
+    "rango_pilota": 1
+  },
+  {
+    "segreta": "pace",
+    "indizio": "bianco",
+    "voti_test": 1,
+    "diretta": [
+      0,
+      41
+    ],
+    "inversa": [
+      2,
+      41
+    ],
+    "rango_base": null,
+    "rango_pilota": null
+  },
+  {
+    "segreta": "pace",
+    "indizio": "simbolo",
+    "voti_test": 1,
+    "diretta": [
+      2,
+      41
+    ],
+    "inversa": [
+      0,
+      41
+    ],
+    "rango_base": null,
+    "rango_pilota": 70
+  },
+  {
+    "segreta": "amicizia",
+    "indizio": "compassione",
+    "voti_test": 1,
+    "diretta": [
+      0,
+      41
+    ],
+    "inversa": null,
+    "rango_base": 38,
+    "rango_pilota": 38
+  },
+  {
+    "segreta": "luce",
+    "indizio": "giallo",
+    "voti_test": 1,
+    "diretta": [
+      1,
+      41
+    ],
+    "inversa": null,
+    "rango_base": null,
+    "rango_pilota": null
+  },
+  {
+    "segreta": "legno",
+    "indizio": "cesto",
+    "voti_test": 1,
+    "diretta": [
+      0,
+      41
+    ],
+    "inversa": null,
+    "rango_base": null,
+    "rango_pilota": null
+  },
+  {
+    "segreta": "albero",
+    "indizio": "scoiattolo",
+    "voti_test": 3,
+    "diretta": [
+      6,
+      41
+    ],
+    "inversa": null,
+    "rango_base": 77,
+    "rango_pilota": 8
+  },
+  {
+    "segreta": "albero",
+    "indizio": "verde",
+    "voti_test": 1,
+    "diretta": [
+      1,
+      41
+    ],
+    "inversa": null,
+    "rango_base": null,
+    "rango_pilota": null
+  },
+  {
+    "segreta": "foglia",
+    "indizio": "verde",
+    "voti_test": 1,
+    "diretta": [
+      1,
+      41
+    ],
+    "inversa": null,
+    "rango_base": 69,
+    "rango_pilota": 69
+  },
+  {
+    "segreta": "natale",
+    "indizio": "cesto",
+    "voti_test": 1,
+    "diretta": [
+      1,
+      41
+    ],
+    "inversa": null,
+    "rango_base": null,
+    "rango_pilota": null
+  },
+  {
+    "segreta": "ammissione",
+    "indizio": "colpevolezza",
+    "voti_test": 1,
+    "diretta": [
+      1,
+      41
+    ],
+    "inversa": null,
+    "rango_base": 13,
+    "rango_pilota": 13
+  },
+  {
+    "segreta": "curiosità",
+    "indizio": "interesse",
+    "voti_test": 2,
+    "diretta": [
+      4,
+      41
+    ],
+    "inversa": null,
+    "rango_base": 6,
+    "rango_pilota": 3
+  },
+  {
+    "segreta": "personale",
+    "indizio": "soddisfazione",
+    "voti_test": 1,
+    "diretta": [
+      1,
+      41
+    ],
+    "inversa": null,
+    "rango_base": 64,
+    "rango_pilota": 64
+  },
+  {
+    "segreta": "buio",
+    "indizio": "corridoio",
+    "voti_test": 2,
+    "diretta": [
+      1,
+      41
+    ],
+    "inversa": null,
+    "rango_base": 13,
+    "rango_pilota": 14
+  },
+  {
+    "segreta": "buio",
+    "indizio": "nero",
+    "voti_test": 2,
+    "diretta": [
+      6,
+      41
+    ],
+    "inversa": null,
+    "rango_base": 80,
+    "rango_pilota": 8
+  },
+  {
+    "segreta": "buio",
+    "indizio": "paura",
+    "voti_test": 1,
+    "diretta": [
+      6,
+      41
+    ],
+    "inversa": null,
+    "rango_base": 5,
+    "rango_pilota": 1
+  },
+  {
+    "segreta": "buio",
+    "indizio": "tristezza",
+    "voti_test": 1,
+    "diretta": [
+      1,
+      41
+    ],
+    "inversa": null,
+    "rango_base": null,
+    "rango_pilota": null
+  },
+  {
+    "segreta": "arcobaleno",
+    "indizio": "pace",
+    "voti_test": 1,
+    "diretta": [
+      7,
+      41
+    ],
+    "inversa": null,
+    "rango_base": null,
+    "rango_pilota": 7
+  },
+  {
+    "segreta": "arcobaleno",
+    "indizio": "turchese",
+    "voti_test": 1,
+    "diretta": [
+      1,
+      41
+    ],
+    "inversa": null,
+    "rango_base": null,
+    "rango_pilota": null
+  },
+  {
+    "segreta": "persona",
+    "indizio": "ammirazione",
+    "voti_test": 1,
+    "diretta": [
+      0,
+      41
+    ],
+    "inversa": null,
+    "rango_base": null,
+    "rango_pilota": null
+  },
+  {
+    "segreta": "persona",
+    "indizio": "delusione",
+    "voti_test": 1,
+    "diretta": [
+      0,
+      41
+    ],
+    "inversa": null,
+    "rango_base": null,
+    "rango_pilota": null
+  },
+  {
+    "segreta": "persona",
+    "indizio": "gioia",
+    "voti_test": 1,
+    "diretta": [
+      0,
+      41
+    ],
+    "inversa": null,
+    "rango_base": null,
+    "rango_pilota": null
+  },
+  {
+    "segreta": "regola",
+    "indizio": "routine",
+    "voti_test": 1,
+    "diretta": [
+      0,
+      41
+    ],
+    "inversa": null,
+    "rango_base": null,
+    "rango_pilota": null
+  },
+  {
+    "segreta": "religione",
+    "indizio": "simbolo",
+    "voti_test": 1,
+    "diretta": [
+      3,
+      41
+    ],
+    "inversa": null,
+    "rango_base": null,
+    "rango_pilota": 35
+  },
+  {
+    "segreta": "notte",
+    "indizio": "paura",
+    "voti_test": 1,
+    "diretta": [
+      0,
+      41
+    ],
+    "inversa": null,
+    "rango_base": 46,
+    "rango_pilota": 47
+  },
+  {
+    "segreta": "dito",
+    "indizio": "unghia",
+    "voti_test": 3,
+    "diretta": [
+      3,
+      41
+    ],
+    "inversa": null,
+    "rango_base": 6,
+    "rango_pilota": 4
+  },
+  {
+    "segreta": "giudizio",
+    "indizio": "colpevolezza",
+    "voti_test": 2,
+    "diretta": [
+      0,
+      41
+    ],
+    "inversa": null,
+    "rango_base": 29,
+    "rango_pilota": 29
+  },
+  {
+    "segreta": "peperoncino",
+    "indizio": "fagiolo",
+    "voti_test": 1,
+    "diretta": [
+      0,
+      41
+    ],
+    "inversa": null,
+    "rango_base": 13,
+    "rango_pilota": 13
+  },
+  {
+    "segreta": "lunghezza",
+    "indizio": "corridoio",
+    "voti_test": 1,
+    "diretta": [
+      1,
+      41
+    ],
+    "inversa": null,
+    "rango_base": null,
+    "rango_pilota": null
+  },
+  {
+    "segreta": "chiarezza",
+    "indizio": "colpevolezza",
+    "voti_test": 1,
+    "diretta": [
+      0,
+      41
+    ],
+    "inversa": null,
+    "rango_base": null,
+    "rango_pilota": null
+  },
+  {
+    "segreta": "stima",
+    "indizio": "ammirazione",
+    "voti_test": 3,
+    "diretta": [
+      9,
+      41
+    ],
+    "inversa": null,
+    "rango_base": 3,
+    "rango_pilota": 1
+  },
+  {
+    "segreta": "dipinto",
+    "indizio": "azzurro",
+    "voti_test": 1,
+    "diretta": [
+      0,
+      41
+    ],
+    "inversa": null,
+    "rango_base": null,
+    "rango_pilota": null
+  },
+  {
+    "segreta": "dipinto",
+    "indizio": "blu",
+    "voti_test": 1,
+    "diretta": [
+      1,
+      41
+    ],
+    "inversa": null,
+    "rango_base": null,
+    "rango_pilota": null
+  },
+  {
+    "segreta": "serpente",
+    "indizio": "veleno",
+    "voti_test": 2,
+    "diretta": [
+      8,
+      41
+    ],
+    "inversa": null,
+    "rango_base": 11,
+    "rango_pilota": 2
+  },
+  {
+    "segreta": "urlo",
+    "indizio": "eco",
+    "voti_test": 1,
+    "diretta": [
+      0,
+      41
+    ],
+    "inversa": null,
+    "rango_base": null,
+    "rango_pilota": null
+  },
+  {
+    "segreta": "orgoglio",
+    "indizio": "soddisfazione",
+    "voti_test": 1,
+    "diretta": [
+      4,
+      41
+    ],
+    "inversa": null,
+    "rango_base": 13,
+    "rango_pilota": 6
+  },
+  {
+    "segreta": "pietà",
+    "indizio": "compassione",
+    "voti_test": 1,
+    "diretta": [
+      10,
+      41
+    ],
+    "inversa": null,
+    "rango_base": 1,
+    "rango_pilota": 1
+  },
+  {
+    "segreta": "disprezzo",
+    "indizio": "odio",
+    "voti_test": 1,
+    "diretta": [
+      5,
+      41
+    ],
+    "inversa": [
+      5,
+      41
+    ],
+    "rango_base": 1,
+    "rango_pilota": 1
+  },
+  {
+    "segreta": "motivazione",
+    "indizio": "interesse",
+    "voti_test": 2,
+    "diretta": [
+      0,
+      41
+    ],
+    "inversa": null,
+    "rango_base": null,
+    "rango_pilota": null
+  },
+  {
+    "segreta": "vicinanza",
+    "indizio": "compassione",
+    "voti_test": 1,
+    "diretta": [
+      1,
+      41
+    ],
+    "inversa": null,
+    "rango_base": null,
+    "rango_pilota": null
+  },
+  {
+    "segreta": "passato",
+    "indizio": "paura",
+    "voti_test": 1,
+    "diretta": [
+      0,
+      41
+    ],
+    "inversa": null,
+    "rango_base": null,
+    "rango_pilota": null
+  },
+  {
+    "segreta": "passato",
+    "indizio": "rimpianto",
+    "voti_test": 3,
+    "diretta": [
+      6,
+      41
+    ],
+    "inversa": null,
+    "rango_base": 31,
+    "rango_pilota": 6
+  },
+  {
+    "segreta": "nozze",
+    "indizio": "bianco",
+    "voti_test": 1,
+    "diretta": [
+      1,
+      41
+    ],
+    "inversa": null,
+    "rango_base": null,
+    "rango_pilota": null
+  },
+  {
+    "segreta": "speranza",
+    "indizio": "verde",
+    "voti_test": 2,
+    "diretta": [
+      10,
+      41
+    ],
+    "inversa": null,
+    "rango_base": null,
+    "rango_pilota": 3
+  },
+  {
+    "segreta": "soddisfazione",
+    "indizio": "fierezza",
+    "voti_test": 1,
+    "diretta": [
+      3,
+      41
+    ],
+    "inversa": [
+      0,
+      41
+    ],
+    "rango_base": null,
+    "rango_pilota": 35
+  },
+  {
+    "segreta": "vendetta",
+    "indizio": "odio",
+    "voti_test": 1,
+    "diretta": [
+      1,
+      41
+    ],
+    "inversa": null,
+    "rango_base": 4,
+    "rango_pilota": 4
+  },
+  {
+    "segreta": "giornata",
+    "indizio": "routine",
+    "voti_test": 1,
+    "diretta": [
+      1,
+      41
+    ],
+    "inversa": null,
+    "rango_base": null,
+    "rango_pilota": null
+  },
+  {
+    "segreta": "nebbia",
+    "indizio": "grigio",
+    "voti_test": 1,
+    "diretta": [
+      0,
+      41
+    ],
+    "inversa": null,
+    "rango_base": 92,
+    "rango_pilota": 92
+  },
+  {
+    "segreta": "viola",
+    "indizio": "lilla",
+    "voti_test": 1,
+    "diretta": [
+      4,
+      41
+    ],
+    "inversa": [
+      1,
+      41
+    ],
+    "rango_base": 48,
+    "rango_pilota": 13
+  },
+  {
+    "segreta": "viola",
+    "indizio": "veleno",
+    "voti_test": 1,
+    "diretta": [
+      2,
+      41
+    ],
+    "inversa": [
+      0,
+      41
+    ],
+    "rango_base": null,
+    "rango_pilota": 70
+  },
+  {
+    "segreta": "legume",
+    "indizio": "fagiolo",
+    "voti_test": 2,
+    "diretta": [
+      4,
+      41
+    ],
+    "inversa": null,
+    "rango_base": 1,
+    "rango_pilota": 1
+  },
+  {
+    "segreta": "stress",
+    "indizio": "rabbia",
+    "voti_test": 1,
+    "diretta": [
+      0,
+      41
+    ],
+    "inversa": null,
+    "rango_base": 42,
+    "rango_pilota": 42
+  },
+  {
+    "segreta": "stress",
+    "indizio": "unghia",
+    "voti_test": 1,
+    "diretta": [
+      0,
+      41
+    ],
+    "inversa": null,
+    "rango_base": null,
+    "rango_pilota": null
+  },
+  {
+    "segreta": "smalto",
+    "indizio": "unghia",
+    "voti_test": 3,
+    "diretta": [
+      12,
+      41
+    ],
+    "inversa": null,
+    "rango_base": 1,
+    "rango_pilota": 1
+  },
+  {
+    "segreta": "ballo",
+    "indizio": "divertimento",
+    "voti_test": 1,
+    "diretta": [
+      1,
+      41
+    ],
+    "inversa": null,
+    "rango_base": 39,
+    "rango_pilota": 39
+  },
+  {
+    "segreta": "gonna",
+    "indizio": "beige",
+    "voti_test": 1,
+    "diretta": [
+      0,
+      41
+    ],
+    "inversa": null,
+    "rango_base": null,
+    "rango_pilota": null
+  },
+  {
+    "segreta": "finanziaria",
+    "indizio": "matematica",
+    "voti_test": 1,
+    "diretta": [
+      0,
+      41
+    ],
+    "inversa": null,
+    "rango_base": null,
+    "rango_pilota": null
+  },
+  {
+    "segreta": "poltrona",
+    "indizio": "beige",
+    "voti_test": 2,
+    "diretta": [
+      0,
+      41
+    ],
+    "inversa": null,
+    "rango_base": null,
+    "rango_pilota": null
+  },
+  {
+    "segreta": "contentezza",
+    "indizio": "soddisfazione",
+    "voti_test": 1,
+    "diretta": [
+      1,
+      41
+    ],
+    "inversa": null,
+    "rango_base": 3,
+    "rango_pilota": 3
+  },
+  {
+    "segreta": "svago",
+    "indizio": "divertimento",
+    "voti_test": 2,
+    "diretta": [
+      1,
+      41
+    ],
+    "inversa": null,
+    "rango_base": 1,
+    "rango_pilota": 1
+  },
+  {
+    "segreta": "monotonia",
+    "indizio": "routine",
+    "voti_test": 1,
+    "diretta": [
+      1,
+      41
+    ],
+    "inversa": null,
+    "rango_base": 1,
+    "rango_pilota": 1
+  }
+]

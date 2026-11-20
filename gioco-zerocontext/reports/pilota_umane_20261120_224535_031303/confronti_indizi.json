@@ -1,0 +1,1072 @@
+{
+  "corpus": "72a18775a9b7c70dc72de3b8a69c3cef65a7915a8a38770844ab1c1df457e71b",
+  "versioni": {
+    "pipeline_b": "balanced:b47719e2cbf4",
+    "riordino": "riordino:f543ea2fadfc",
+    "pilota": "riordino:111ea71345ce"
+  },
+  "soglie_associazioni_giocabili": {
+    "pipeline_b": 100,
+    "riordino": 40,
+    "pilota": 40
+  },
+  "confronti_giocabili_comuni": 48,
+  "preferenze_rispettate_sui_comuni": {
+    "pipeline_b": 15,
+    "riordino": 17,
+    "pilota": 17
+  },
+  "metodo": "Casi editoriali di sviluppo. Posizione 1 = segreta. Le parole giocabili elencate da ciascun export precedono le altre, ordinate dal motore originale. Sotto la soglia del server le posizioni sono simulate.",
+  "casi": [
+    {
+      "ambito": "arte e sport",
+      "segreta": "tromba",
+      "indizio": "pistone",
+      "categoria": "clarinetto",
+      "pipeline_b": {
+        "posizione_indizio": 215,
+        "posizione_categoria": 4,
+        "associazioni_giocabili": 678
+      },
+      "riordino": {
+        "posizione_indizio": 324,
+        "posizione_categoria": 19,
+        "associazioni_giocabili": 100
+      },
+      "pilota": {
+        "posizione_indizio": 324,
+        "posizione_categoria": 19,
+        "associazioni_giocabili": 100
+      }
+    },
+    {
+      "ambito": "arte e sport",
+      "segreta": "tamburo",
+      "indizio": "bacchetta",
+      "categoria": "flauto",
+      "pipeline_b": {
+        "posizione_indizio": 68,
+        "posizione_categoria": 55,
+        "associazioni_giocabili": 828
+      },
+      "riordino": {
+        "posizione_indizio": 8,
+        "posizione_categoria": 7,
+        "associazioni_giocabili": 99
+      },
+      "pilota": {
+        "posizione_indizio": 8,
+        "posizione_categoria": 7,
+        "associazioni_giocabili": 99
+      }
+    },
+    {
+      "ambito": "arte e sport",
+      "segreta": "fisarmonica",
+      "indizio": "mantice",
+      "categoria": "violino",
+      "pipeline_b": {
+        "posizione_indizio": 103,
+        "posizione_categoria": 4,
+        "associazioni_giocabili": 657
+      },
+      "riordino": {
+        "posizione_indizio": 74,
+        "posizione_categoria": 6,
+        "associazioni_giocabili": 99
+      },
+      "pilota": {
+        "posizione_indizio": 74,
+        "posizione_categoria": 6,
+        "associazioni_giocabili": 99
+      }
+    },
+    {
+      "ambito": "arte e sport",
+      "segreta": "clarinetto",
+      "indizio": "ancia",
+      "categoria": "tromba",
+      "pipeline_b": {
+        "posizione_indizio": 68,
+        "posizione_categoria": 18,
+        "associazioni_giocabili": 616
+      },
+      "riordino": {
+        "posizione_indizio": 174,
+        "posizione_categoria": 12,
+        "associazioni_giocabili": 97
+      },
+      "pilota": {
+        "posizione_indizio": 174,
+        "posizione_categoria": 12,
+        "associazioni_giocabili": 97
+      }
+    },
+    {
+      "ambito": "arte e sport",
+      "segreta": "arpa",
+      "indizio": "corda",
+      "categoria": "trombone",
+      "pipeline_b": {
+        "posizione_indizio": 95,
+        "posizione_categoria": 21,
+        "associazioni_giocabili": 701
+      },
+      "riordino": {
+        "posizione_indizio": 12,
+        "posizione_categoria": 68,
+        "associazioni_giocabili": 100
+      },
+      "pilota": {
+        "posizione_indizio": 12,
+        "posizione_categoria": 68,
+        "associazioni_giocabili": 100
+      }
+    },
+    {
+      "ambito": "arte e sport",
+      "segreta": "teatro",
+      "indizio": "sipario",
+      "categoria": "cinema",
+      "pipeline_b": {
+        "posizione_indizio": 64,
+        "posizione_categoria": 6,
+        "associazioni_giocabili": 657
+      },
+      "riordino": {
+        "posizione_indizio": 20,
+        "posizione_categoria": 2,
+        "associazioni_giocabili": 100
+      },
+      "pilota": {
+        "posizione_indizio": 20,
+        "posizione_categoria": 2,
+        "associazioni_giocabili": 100
+      }
+    },
+    {
+      "ambito": "arte e sport",
+      "segreta": "cinema",
+      "indizio": "pellicola",
+      "categoria": "teatro",
+      "pipeline_b": {
+        "posizione_indizio": 18,
+        "posizione_categoria": 6,
+        "associazioni_giocabili": 796
+      },
+      "riordino": {
+        "posizione_indizio": 7,
+        "posizione_categoria": 3,
+        "associazioni_giocabili": 100
+      },
+      "pilota": {
+        "posizione_indizio": 7,
+        "posizione_categoria": 3,
+        "associazioni_giocabili": 100
+      }
+    },
+    {
+      "ambito": "arte e sport",
+      "segreta": "pittore",
+      "indizio": "tavolozza",
+      "categoria": "scultore",
+      "pipeline_b": {
+        "posizione_indizio": 304,
+        "posizione_categoria": 2,
+        "associazioni_giocabili": 750
+      },
+      "riordino": {
+        "posizione_indizio": 733,
+        "posizione_categoria": 3,
+        "associazioni_giocabili": 100
+      },
+      "pilota": {
+        "posizione_indizio": 733,
+        "posizione_categoria": 3,
+        "associazioni_giocabili": 100
+      }
+    },
+    {
+      "ambito": "arte e sport",
+      "segreta": "calcio",
+      "indizio": "rigore",
+      "categoria": "pallavolo",
+      "pipeline_b": {
+        "posizione_indizio": 150,
+        "posizione_categoria": 5,
+        "associazioni_giocabili": 745
+      },
+      "riordino": {
+        "posizione_indizio": 23,
+        "posizione_categoria": 7,
+        "associazioni_giocabili": 100
+      },
+      "pilota": {
+        "posizione_indizio": 23,
+        "posizione_categoria": 7,
+        "associazioni_giocabili": 100
+      }
+    },
+    {
+      "ambito": "arte e sport",
+      "segreta": "scherma",
+      "indizio": "fioretto",
+      "categoria": "pugilato",
+      "pipeline_b": {
+        "posizione_indizio": 10,
+        "posizione_categoria": 2,
+        "associazioni_giocabili": 730
+      },
+      "riordino": {
+        "posizione_indizio": 23,
+        "posizione_categoria": 6,
+        "associazioni_giocabili": 100
+      },
+      "pilota": {
+        "posizione_indizio": 23,
+        "posizione_categoria": 6,
+        "associazioni_giocabili": 100
+      }
+    },
+    {
+      "ambito": "trasporti",
+      "segreta": "nave",
+      "indizio": "ancora",
+      "categoria": "treno",
+      "pipeline_b": {
+        "posizione_indizio": 7369,
+        "posizione_categoria": 825,
+        "associazioni_giocabili": 736
+      },
+      "riordino": {
+        "posizione_indizio": 7251,
+        "posizione_categoria": 337,
+        "associazioni_giocabili": 99
+      },
+      "pilota": {
+        "posizione_indizio": 7251,
+        "posizione_categoria": 337,
+        "associazioni_giocabili": 99
+      }
+    },
+    {
+      "ambito": "trasporti",
+      "segreta": "aereo",
+      "indizio": "ala",
+      "categoria": "treno",
+      "pipeline_b": {
+        "posizione_indizio": 102,
+        "posizione_categoria": 544,
+        "associazioni_giocabili": 789
+      },
+      "riordino": {
+        "posizione_indizio": 71,
+        "posizione_categoria": 53,
+        "associazioni_giocabili": 100
+      },
+      "pilota": {
+        "posizione_indizio": 71,
+        "posizione_categoria": 53,
+        "associazioni_giocabili": 100
+      }
+    },
+    {
+      "ambito": "trasporti",
+      "segreta": "elicottero",
+      "indizio": "rotore",
+      "categoria": "motocicletta",
+      "pipeline_b": {
+        "posizione_indizio": 147,
+        "posizione_categoria": 266,
+        "associazioni_giocabili": 831
+      },
+      "riordino": {
+        "posizione_indizio": 66,
+        "posizione_categoria": 49,
+        "associazioni_giocabili": 100
+      },
+      "pilota": {
+        "posizione_indizio": 66,
+        "posizione_categoria": 49,
+        "associazioni_giocabili": 100
+      }
+    },
+    {
+      "ambito": "trasporti",
+      "segreta": "barca",
+      "indizio": "remo",
+      "categoria": "slitta",
+      "pipeline_b": {
+        "posizione_indizio": 182,
+        "posizione_categoria": 144,
+        "associazioni_giocabili": 738
+      },
+      "riordino": {
+        "posizione_indizio": 39,
+        "posizione_categoria": 1244,
+        "associazioni_giocabili": 98
+      },
+      "pilota": {
+        "posizione_indizio": 39,
+        "posizione_categoria": 1244,
+        "associazioni_giocabili": 98
+      }
+    },
+    {
+      "ambito": "trasporti",
+      "segreta": "veliero",
+      "indizio": "vela",
+      "categoria": "motoscafo",
+      "pipeline_b": {
+        "posizione_indizio": 32,
+        "posizione_categoria": 19,
+        "associazioni_giocabili": 754
+      },
+      "riordino": {
+        "posizione_indizio": 4,
+        "posizione_categoria": 56,
+        "associazioni_giocabili": 98
+      },
+      "pilota": {
+        "posizione_indizio": 4,
+        "posizione_categoria": 56,
+        "associazioni_giocabili": 98
+      }
+    },
+    {
+      "ambito": "trasporti",
+      "segreta": "razzo",
+      "indizio": "propulsore",
+      "categoria": "camion",
+      "pipeline_b": {
+        "posizione_indizio": 57,
+        "posizione_categoria": 368,
+        "associazioni_giocabili": 843
+      },
+      "riordino": {
+        "posizione_indizio": 40,
+        "posizione_categoria": 180,
+        "associazioni_giocabili": 99
+      },
+      "pilota": {
+        "posizione_indizio": 40,
+        "posizione_categoria": 180,
+        "associazioni_giocabili": 99
+      }
+    },
+    {
+      "ambito": "trasporti",
+      "segreta": "ferrovia",
+      "indizio": "binario",
+      "categoria": "autostrada",
+      "pipeline_b": {
+        "posizione_indizio": 27,
+        "posizione_categoria": 10,
+        "associazioni_giocabili": 677
+      },
+      "riordino": {
+        "posizione_indizio": 35,
+        "posizione_categoria": 6,
+        "associazioni_giocabili": 100
+      },
+      "pilota": {
+        "posizione_indizio": 35,
+        "posizione_categoria": 6,
+        "associazioni_giocabili": 100
+      }
+    },
+    {
+      "ambito": "trasporti",
+      "segreta": "porto",
+      "indizio": "molo",
+      "categoria": "aeroporto",
+      "pipeline_b": {
+        "posizione_indizio": 2,
+        "posizione_categoria": 151,
+        "associazioni_giocabili": 676
+      },
+      "riordino": {
+        "posizione_indizio": 3,
+        "posizione_categoria": 27,
+        "associazioni_giocabili": 100
+      },
+      "pilota": {
+        "posizione_indizio": 3,
+        "posizione_categoria": 27,
+        "associazioni_giocabili": 100
+      }
+    },
+    {
+      "ambito": "trasporti",
+      "segreta": "aeroporto",
+      "indizio": "decollo",
+      "categoria": "stazione",
+      "pipeline_b": {
+        "posizione_indizio": 67,
+        "posizione_categoria": 46,
+        "associazioni_giocabili": 547
+      },
+      "riordino": {
+        "posizione_indizio": 21,
+        "posizione_categoria": 8,
+        "associazioni_giocabili": 99
+      },
+      "pilota": {
+        "posizione_indizio": 21,
+        "posizione_categoria": 8,
+        "associazioni_giocabili": 99
+      }
+    },
+    {
+      "ambito": "trasporti",
+      "segreta": "funivia",
+      "indizio": "cavo",
+      "categoria": "treno",
+      "pipeline_b": {
+        "posizione_indizio": 196,
+        "posizione_categoria": 231,
+        "associazioni_giocabili": 717
+      },
+      "riordino": {
+        "posizione_indizio": 22,
+        "posizione_categoria": 27,
+        "associazioni_giocabili": 98
+      },
+      "pilota": {
+        "posizione_indizio": 22,
+        "posizione_categoria": 27,
+        "associazioni_giocabili": 98
+      }
+    },
+    {
+      "ambito": "oggetti",
+      "segreta": "frullatore",
+      "indizio": "lama",
+      "categoria": "tostapane",
+      "pipeline_b": {
+        "posizione_indizio": 1431,
+        "posizione_categoria": 207,
+        "associazioni_giocabili": 616
+      },
+      "riordino": {
+        "posizione_indizio": 904,
+        "posizione_categoria": 73,
+        "associazioni_giocabili": 99
+      },
+      "pilota": {
+        "posizione_indizio": 904,
+        "posizione_categoria": 73,
+        "associazioni_giocabili": 99
+      }
+    },
+    {
+      "ambito": "oggetti",
+      "segreta": "tostapane",
+      "indizio": "fetta",
+      "categoria": "frullatore",
+      "pipeline_b": {
+        "posizione_indizio": 4100,
+        "posizione_categoria": 85,
+        "associazioni_giocabili": 723
+      },
+      "riordino": {
+        "posizione_indizio": 3515,
+        "posizione_categoria": 98,
+        "associazioni_giocabili": 100
+      },
+      "pilota": {
+        "posizione_indizio": 3515,
+        "posizione_categoria": 98,
+        "associazioni_giocabili": 100
+      }
+    },
+    {
+      "ambito": "oggetti",
+      "segreta": "martello",
+      "indizio": "chiodo",
+      "categoria": "pinza",
+      "pipeline_b": {
+        "posizione_indizio": 46,
+        "posizione_categoria": 106,
+        "associazioni_giocabili": 860
+      },
+      "riordino": {
+        "posizione_indizio": 12,
+        "posizione_categoria": 24,
+        "associazioni_giocabili": 100
+      },
+      "pilota": {
+        "posizione_indizio": 12,
+        "posizione_categoria": 24,
+        "associazioni_giocabili": 100
+      }
+    },
+    {
+      "ambito": "oggetti",
+      "segreta": "trapano",
+      "indizio": "punta",
+      "categoria": "martello",
+      "pipeline_b": {
+        "posizione_indizio": 75,
+        "posizione_categoria": 10,
+        "associazioni_giocabili": 847
+      },
+      "riordino": {
+        "posizione_indizio": 10,
+        "posizione_categoria": 3,
+        "associazioni_giocabili": 100
+      },
+      "pilota": {
+        "posizione_indizio": 10,
+        "posizione_categoria": 3,
+        "associazioni_giocabili": 100
+      }
+    },
+    {
+      "ambito": "oggetti",
+      "segreta": "bottone",
+      "indizio": "asola",
+      "categoria": "cerniera",
+      "pipeline_b": {
+        "posizione_indizio": 155,
+        "posizione_categoria": 75,
+        "associazioni_giocabili": 906
+      },
+      "riordino": {
+        "posizione_indizio": 29,
+        "posizione_categoria": 9,
+        "associazioni_giocabili": 99
+      },
+      "pilota": {
+        "posizione_indizio": 29,
+        "posizione_categoria": 9,
+        "associazioni_giocabili": 99
+      }
+    },
+    {
+      "ambito": "oggetti",
+      "segreta": "scarpa",
+      "indizio": "suola",
+      "categoria": "guanto",
+      "pipeline_b": {
+        "posizione_indizio": 4,
+        "posizione_categoria": 19,
+        "associazioni_giocabili": 873
+      },
+      "riordino": {
+        "posizione_indizio": 5,
+        "posizione_categoria": 31,
+        "associazioni_giocabili": 100
+      },
+      "pilota": {
+        "posizione_indizio": 5,
+        "posizione_categoria": 31,
+        "associazioni_giocabili": 100
+      }
+    },
+    {
+      "ambito": "oggetti",
+      "segreta": "camicia",
+      "indizio": "colletto",
+      "categoria": "gonna",
+      "pipeline_b": {
+        "posizione_indizio": 21,
+        "posizione_categoria": 748,
+        "associazioni_giocabili": 746
+      },
+      "riordino": {
+        "posizione_indizio": 19,
+        "posizione_categoria": 104,
+        "associazioni_giocabili": 100
+      },
+      "pilota": {
+        "posizione_indizio": 19,
+        "posizione_categoria": 104,
+        "associazioni_giocabili": 100
+      }
+    },
+    {
+      "ambito": "oggetti",
+      "segreta": "cintura",
+      "indizio": "fibbia",
+      "categoria": "sciarpa",
+      "pipeline_b": {
+        "posizione_indizio": 4,
+        "posizione_categoria": 7,
+        "associazioni_giocabili": 880
+      },
+      "riordino": {
+        "posizione_indizio": 2,
+        "posizione_categoria": 67,
+        "associazioni_giocabili": 100
+      },
+      "pilota": {
+        "posizione_indizio": 2,
+        "posizione_categoria": 67,
+        "associazioni_giocabili": 100
+      }
+    },
+    {
+      "ambito": "oggetti",
+      "segreta": "candela",
+      "indizio": "stoppino",
+      "categoria": "lampada",
+      "pipeline_b": {
+        "posizione_indizio": 89,
+        "posizione_categoria": 4,
+        "associazioni_giocabili": 923
+      },
+      "riordino": {
+        "posizione_indizio": 101,
+        "posizione_categoria": 5,
+        "associazioni_giocabili": 99
+      },
+      "pilota": {
+        "posizione_indizio": 101,
+        "posizione_categoria": 5,
+        "associazioni_giocabili": 99
+      }
+    },
+    {
+      "ambito": "oggetti",
+      "segreta": "lampadina",
+      "indizio": "filamento",
+      "categoria": "torcia",
+      "pipeline_b": {
+        "posizione_indizio": 87,
+        "posizione_categoria": 8,
+        "associazioni_giocabili": 885
+      },
+      "riordino": {
+        "posizione_indizio": 16,
+        "posizione_categoria": 19,
+        "associazioni_giocabili": 100
+      },
+      "pilota": {
+        "posizione_indizio": 16,
+        "posizione_categoria": 19,
+        "associazioni_giocabili": 100
+      }
+    },
+    {
+      "ambito": "natura",
+      "segreta": "fiume",
+      "indizio": "foce",
+      "categoria": "lago",
+      "pipeline_b": {
+        "posizione_indizio": 3,
+        "posizione_categoria": 7,
+        "associazioni_giocabili": 560
+      },
+      "riordino": {
+        "posizione_indizio": 7,
+        "posizione_categoria": 4,
+        "associazioni_giocabili": 99
+      },
+      "pilota": {
+        "posizione_indizio": 7,
+        "posizione_categoria": 4,
+        "associazioni_giocabili": 99
+      }
+    },
+    {
+      "ambito": "natura",
+      "segreta": "ghiacciaio",
+      "indizio": "crepaccio",
+      "categoria": "collina",
+      "pipeline_b": {
+        "posizione_indizio": 8,
+        "posizione_categoria": 207,
+        "associazioni_giocabili": 748
+      },
+      "riordino": {
+        "posizione_indizio": 8,
+        "posizione_categoria": 323,
+        "associazioni_giocabili": 100
+      },
+      "pilota": {
+        "posizione_indizio": 8,
+        "posizione_categoria": 323,
+        "associazioni_giocabili": 100
+      }
+    },
+    {
+      "ambito": "natura",
+      "segreta": "deserto",
+      "indizio": "duna",
+      "categoria": "pianura",
+      "pipeline_b": {
+        "posizione_indizio": 34,
+        "posizione_categoria": 31,
+        "associazioni_giocabili": 839
+      },
+      "riordino": {
+        "posizione_indizio": 33,
+        "posizione_categoria": 50,
+        "associazioni_giocabili": 99
+      },
+      "pilota": {
+        "posizione_indizio": 33,
+        "posizione_categoria": 50,
+        "associazioni_giocabili": 99
+      }
+    },
+    {
+      "ambito": "natura",
+      "segreta": "grotta",
+      "indizio": "stalattite",
+      "categoria": "galleria",
+      "pipeline_b": {
+        "posizione_indizio": 23,
+        "posizione_categoria": 457,
+        "associazioni_giocabili": 785
+      },
+      "riordino": {
+        "posizione_indizio": 49,
+        "posizione_categoria": 46,
+        "associazioni_giocabili": 98
+      },
+      "pilota": {
+        "posizione_indizio": 49,
+        "posizione_categoria": 46,
+        "associazioni_giocabili": 98
+      }
+    },
+    {
+      "ambito": "natura",
+      "segreta": "terremoto",
+      "indizio": "epicentro",
+      "categoria": "alluvione",
+      "pipeline_b": {
+        "posizione_indizio": 16,
+        "posizione_categoria": 7,
+        "associazioni_giocabili": 851
+      },
+      "riordino": {
+        "posizione_indizio": 5,
+        "posizione_categoria": 13,
+        "associazioni_giocabili": 100
+      },
+      "pilota": {
+        "posizione_indizio": 5,
+        "posizione_categoria": 13,
+        "associazioni_giocabili": 100
+      }
+    },
+    {
+      "ambito": "natura",
+      "segreta": "temporale",
+      "indizio": "tuono",
+      "categoria": "nebbia",
+      "pipeline_b": {
+        "posizione_indizio": 11,
+        "posizione_categoria": 106,
+        "associazioni_giocabili": 905
+      },
+      "riordino": {
+        "posizione_indizio": 15,
+        "posizione_categoria": 67,
+        "associazioni_giocabili": 96
+      },
+      "pilota": {
+        "posizione_indizio": 15,
+        "posizione_categoria": 67,
+        "associazioni_giocabili": 96
+      }
+    },
+    {
+      "ambito": "natura",
+      "segreta": "neve",
+      "indizio": "fiocco",
+      "categoria": "grandine",
+      "pipeline_b": {
+        "posizione_indizio": 154,
+        "posizione_categoria": 13,
+        "associazioni_giocabili": 808
+      },
+      "riordino": {
+        "posizione_indizio": 12,
+        "posizione_categoria": 17,
+        "associazioni_giocabili": 100
+      },
+      "pilota": {
+        "posizione_indizio": 13,
+        "posizione_categoria": 18,
+        "associazioni_giocabili": 100
+      }
+    },
+    {
+      "ambito": "natura",
+      "segreta": "ragno",
+      "indizio": "ragnatela",
+      "categoria": "formica",
+      "pipeline_b": {
+        "posizione_indizio": 11,
+        "posizione_categoria": 117,
+        "associazioni_giocabili": 805
+      },
+      "riordino": {
+        "posizione_indizio": 2,
+        "posizione_categoria": 19,
+        "associazioni_giocabili": 100
+      },
+      "pilota": {
+        "posizione_indizio": 2,
+        "posizione_categoria": 19,
+        "associazioni_giocabili": 100
+      }
+    },
+    {
+      "ambito": "natura",
+      "segreta": "gallina",
+      "indizio": "uovo",
+      "categoria": "anatra",
+      "pipeline_b": {
+        "posizione_indizio": 5,
+        "posizione_categoria": 6,
+        "associazioni_giocabili": 0
+      },
+      "riordino": {
+        "posizione_indizio": 2,
+        "posizione_categoria": 53,
+        "associazioni_giocabili": 100
+      },
+      "pilota": {
+        "posizione_indizio": 2,
+        "posizione_categoria": 53,
+        "associazioni_giocabili": 100
+      }
+    },
+    {
+      "ambito": "natura",
+      "segreta": "pecora",
+      "indizio": "lana",
+      "categoria": "capra",
+      "pipeline_b": {
+        "posizione_indizio": 18,
+        "posizione_categoria": 2,
+        "associazioni_giocabili": 0
+      },
+      "riordino": {
+        "posizione_indizio": 8,
+        "posizione_categoria": 61,
+        "associazioni_giocabili": 100
+      },
+      "pilota": {
+        "posizione_indizio": 8,
+        "posizione_categoria": 61,
+        "associazioni_giocabili": 100
+      }
+    },
+    {
+      "ambito": "mestieri",
+      "segreta": "sarto",
+      "indizio": "orlo",
+      "categoria": "calzolaio",
+      "pipeline_b": {
+        "posizione_indizio": 4185,
+        "posizione_categoria": 4,
+        "associazioni_giocabili": 708
+      },
+      "riordino": {
+        "posizione_indizio": 3982,
+        "posizione_categoria": 5,
+        "associazioni_giocabili": 99
+      },
+      "pilota": {
+        "posizione_indizio": 3982,
+        "posizione_categoria": 5,
+        "associazioni_giocabili": 99
+      }
+    },
+    {
+      "ambito": "mestieri",
+      "segreta": "falegname",
+      "indizio": "pialla",
+      "categoria": "muratore",
+      "pipeline_b": {
+        "posizione_indizio": 276,
+        "posizione_categoria": 5,
+        "associazioni_giocabili": 800
+      },
+      "riordino": {
+        "posizione_indizio": 144,
+        "posizione_categoria": 4,
+        "associazioni_giocabili": 99
+      },
+      "pilota": {
+        "posizione_indizio": 144,
+        "posizione_categoria": 4,
+        "associazioni_giocabili": 99
+      }
+    },
+    {
+      "ambito": "mestieri",
+      "segreta": "fabbro",
+      "indizio": "incudine",
+      "categoria": "falegname",
+      "pipeline_b": {
+        "posizione_indizio": 200,
+        "posizione_categoria": 6,
+        "associazioni_giocabili": 710
+      },
+      "riordino": {
+        "posizione_indizio": 31,
+        "posizione_categoria": 2,
+        "associazioni_giocabili": 100
+      },
+      "pilota": {
+        "posizione_indizio": 31,
+        "posizione_categoria": 2,
+        "associazioni_giocabili": 100
+      }
+    },
+    {
+      "ambito": "mestieri",
+      "segreta": "chirurgo",
+      "indizio": "bisturi",
+      "categoria": "infermiere",
+      "pipeline_b": {
+        "posizione_indizio": 178,
+        "posizione_categoria": 13,
+        "associazioni_giocabili": 859
+      },
+      "riordino": {
+        "posizione_indizio": 82,
+        "posizione_categoria": 7,
+        "associazioni_giocabili": 97
+      },
+      "pilota": {
+        "posizione_indizio": 82,
+        "posizione_categoria": 7,
+        "associazioni_giocabili": 97
+      }
+    },
+    {
+      "ambito": "mestieri",
+      "segreta": "dentista",
+      "indizio": "carie",
+      "categoria": "medico",
+      "pipeline_b": {
+        "posizione_indizio": 1067,
+        "posizione_categoria": 19,
+        "associazioni_giocabili": 908
+      },
+      "riordino": {
+        "posizione_indizio": 424,
+        "posizione_categoria": 4,
+        "associazioni_giocabili": 100
+      },
+      "pilota": {
+        "posizione_indizio": 424,
+        "posizione_categoria": 4,
+        "associazioni_giocabili": 100
+      }
+    },
+    {
+      "ambito": "mestieri",
+      "segreta": "fotografo",
+      "indizio": "obiettivo",
+      "categoria": "pittore",
+      "pipeline_b": {
+        "posizione_indizio": 3233,
+        "posizione_categoria": 13,
+        "associazioni_giocabili": 870
+      },
+      "riordino": {
+        "posizione_indizio": 3044,
+        "posizione_categoria": 7,
+        "associazioni_giocabili": 100
+      },
+      "pilota": {
+        "posizione_indizio": 3044,
+        "posizione_categoria": 7,
+        "associazioni_giocabili": 100
+      }
+    },
+    {
+      "ambito": "mestieri",
+      "segreta": "panettiere",
+      "indizio": "farina",
+      "categoria": "macellaio",
+      "pipeline_b": {
+        "posizione_indizio": 1253,
+        "posizione_categoria": 6,
+        "associazioni_giocabili": 775
+      },
+      "riordino": {
+        "posizione_indizio": 779,
+        "posizione_categoria": 16,
+        "associazioni_giocabili": 99
+      },
+      "pilota": {
+        "posizione_indizio": 779,
+        "posizione_categoria": 16,
+        "associazioni_giocabili": 99
+      }
+    },
+    {
+      "ambito": "mestieri",
+      "segreta": "pescatore",
+      "indizio": "lenza",
+      "categoria": "cacciatore",
+      "pipeline_b": {
+        "posizione_indizio": 61,
+        "posizione_categoria": 127,
+        "associazioni_giocabili": 726
+      },
+      "riordino": {
+        "posizione_indizio": 18,
+        "posizione_categoria": 4,
+        "associazioni_giocabili": 96
+      },
+      "pilota": {
+        "posizione_indizio": 18,
+        "posizione_categoria": 4,
+        "associazioni_giocabili": 96
+      }
+    },
+    {
+      "ambito": "mestieri",
+      "segreta": "pompiere",
+      "indizio": "incendio",
+      "categoria": "poliziotto",
+      "pipeline_b": {
+        "posizione_indizio": 79,
+        "posizione_categoria": 5,
+        "associazioni_giocabili": 881
+      },
+      "riordino": {
+        "posizione_indizio": 4,
+        "posizione_categoria": 2,
+        "associazioni_giocabili": 100
+      },
+      "pilota": {
+        "posizione_indizio": 4,
+        "posizione_categoria": 2,
+        "associazioni_giocabili": 100
+      }
+    },
+    {
+      "ambito": "mestieri",
+      "segreta": "barbiere",
+      "indizio": "rasoio",
+      "categoria": "sarto",
+      "pipeline_b": {
+        "posizione_indizio": 241,
+        "posizione_categoria": 75,
+        "associazioni_giocabili": 673
+      },
+      "riordino": {
+        "posizione_indizio": 5,
+        "posizione_categoria": 3,
+        "associazioni_giocabili": 99
+      },
+      "pilota": {
+        "posizione_indizio": 5,
+        "posizione_categoria": 3,
+        "associazioni_giocabili": 99
+      }
+    }
+  ]
+}

@@ -1,0 +1,51 @@
+ambito,segreta,indizio,categoria
+arte e sport,tromba,pistone,clarinetto
+arte e sport,tamburo,bacchetta,flauto
+arte e sport,fisarmonica,mantice,violino
+arte e sport,clarinetto,ancia,tromba
+arte e sport,arpa,corda,trombone
+arte e sport,teatro,sipario,cinema
+arte e sport,cinema,pellicola,teatro
+arte e sport,pittore,tavolozza,scultore
+arte e sport,calcio,rigore,pallavolo
+arte e sport,scherma,fioretto,pugilato
+trasporti,nave,ancora,treno
+trasporti,aereo,ala,treno
+trasporti,elicottero,rotore,motocicletta
+trasporti,barca,remo,slitta
+trasporti,veliero,vela,motoscafo
+trasporti,razzo,propulsore,camion
+trasporti,ferrovia,binario,autostrada
+trasporti,porto,molo,aeroporto
+trasporti,aeroporto,decollo,stazione
+trasporti,funivia,cavo,treno
+oggetti,frullatore,lama,tostapane
+oggetti,tostapane,fetta,frullatore
+oggetti,martello,chiodo,pinza
+oggetti,trapano,punta,martello
+oggetti,bottone,asola,cerniera
+oggetti,scarpa,suola,guanto
+oggetti,camicia,colletto,gonna
+oggetti,cintura,fibbia,sciarpa
+oggetti,candela,stoppino,lampada
+oggetti,lampadina,filamento,torcia
+natura,fiume,foce,lago
+natura,ghiacciaio,crepaccio,collina
+natura,deserto,duna,pianura
+natura,grotta,stalattite,galleria
+natura,terremoto,epicentro,alluvione
+natura,temporale,tuono,nebbia
+natura,neve,fiocco,grandine
+natura,ragno,ragnatela,formica
+natura,gallina,uovo,anatra
+natura,pecora,lana,capra
+mestieri,sarto,orlo,calzolaio
+mestieri,falegname,pialla,muratore
+mestieri,fabbro,incudine,falegname
+mestieri,chirurgo,bisturi,infermiere
+mestieri,dentista,carie,medico
+mestieri,fotografo,obiettivo,pittore
+mestieri,panettiere,farina,macellaio
+mestieri,pescatore,lenza,cacciatore
+mestieri,pompiere,incendio,poliziotto
+mestieri,barbiere,rasoio,sarto

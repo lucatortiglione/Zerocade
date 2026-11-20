@@ -1,0 +1,857 @@
+{
+  "base": "riordino:f543ea2fadfc",
+  "export": {
+    "segrete": 9513,
+    "fuori_pool": 0,
+    "senza_lista": 0,
+    "versione": "riordino:ad82ffd0ef76"
+  },
+  "top10_modificate": 7701,
+  "accezioni_promosse": [
+    {
+      "segreta": "guanto",
+      "parola": "lama",
+      "posizione": 10,
+      "precedente": 65
+    },
+    {
+      "segreta": "abboccare",
+      "parola": "rete",
+      "posizione": 10,
+      "precedente": null
+    },
+    {
+      "segreta": "esca",
+      "parola": "rete",
+      "posizione": 10,
+      "precedente": 83
+    },
+    {
+      "segreta": "pesca",
+      "parola": "rete",
+      "posizione": 10,
+      "precedente": 48
+    },
+    {
+      "segreta": "selvaggina",
+      "parola": "rete",
+      "posizione": 10,
+      "precedente": null
+    },
+    {
+      "segreta": "nave",
+      "parola": "ancora",
+      "posizione": 10,
+      "precedente": null
+    },
+    {
+      "segreta": "imbarcazione",
+      "parola": "ancora",
+      "posizione": 10,
+      "precedente": null
+    },
+    {
+      "segreta": "immagine",
+      "parola": "obiettivo",
+      "posizione": 10,
+      "precedente": null
+    },
+    {
+      "segreta": "posa",
+      "parola": "obiettivo",
+      "posizione": 10,
+      "precedente": null
+    },
+    {
+      "segreta": "stiva",
+      "parola": "ancora",
+      "posizione": 10,
+      "precedente": null
+    },
+    {
+      "segreta": "taglia",
+      "parola": "lama",
+      "posizione": 10,
+      "precedente": 87
+    },
+    {
+      "segreta": "galleria",
+      "parola": "obiettivo",
+      "posizione": 10,
+      "precedente": null
+    },
+    {
+      "segreta": "orchestra",
+      "parola": "tasto",
+      "posizione": 10,
+      "precedente": null
+    },
+    {
+      "segreta": "pedale",
+      "parola": "tasto",
+      "posizione": 10,
+      "precedente": 66
+    },
+    {
+      "segreta": "istantanea",
+      "parola": "obiettivo",
+      "posizione": 10,
+      "precedente": null
+    },
+    {
+      "segreta": "batteria",
+      "parola": "tasto",
+      "posizione": 10,
+      "precedente": null
+    },
+    {
+      "segreta": "cacciavite",
+      "parola": "lama",
+      "posizione": 10,
+      "precedente": null
+    },
+    {
+      "segreta": "sensore",
+      "parola": "obiettivo",
+      "posizione": 10,
+      "precedente": 77
+    },
+    {
+      "segreta": "documentare",
+      "parola": "obiettivo",
+      "posizione": 10,
+      "precedente": null
+    },
+    {
+      "segreta": "filo",
+      "parola": "lama",
+      "posizione": 10,
+      "precedente": 73
+    },
+    {
+      "segreta": "sardina",
+      "parola": "rete",
+      "posizione": 10,
+      "precedente": null
+    },
+    {
+      "segreta": "tonno",
+      "parola": "rete",
+      "posizione": 10,
+      "precedente": null
+    },
+    {
+      "segreta": "gambero",
+      "parola": "rete",
+      "posizione": 10,
+      "precedente": null
+    },
+    {
+      "segreta": "anguilla",
+      "parola": "rete",
+      "posizione": 10,
+      "precedente": null
+    },
+    {
+      "segreta": "salmone",
+      "parola": "rete",
+      "posizione": 10,
+      "precedente": null
+    },
+    {
+      "segreta": "aragosta",
+      "parola": "rete",
+      "posizione": 10,
+      "precedente": null
+    },
+    {
+      "segreta": "spigola",
+      "parola": "rete",
+      "posizione": 10,
+      "precedente": null
+    },
+    {
+      "segreta": "ostrica",
+      "parola": "rete",
+      "posizione": 10,
+      "precedente": null
+    },
+    {
+      "segreta": "vongola",
+      "parola": "rete",
+      "posizione": 10,
+      "precedente": null
+    },
+    {
+      "segreta": "merluzzo",
+      "parola": "rete",
+      "posizione": 10,
+      "precedente": null
+    },
+    {
+      "segreta": "taglio",
+      "parola": "lama",
+      "posizione": 10,
+      "precedente": 16
+    },
+    {
+      "segreta": "fotografia",
+      "parola": "obiettivo",
+      "posizione": 10,
+      "precedente": null
+    },
+    {
+      "segreta": "chitarra",
+      "parola": "tasto",
+      "posizione": 10,
+      "precedente": null
+    },
+    {
+      "segreta": "illustrazione",
+      "parola": "obiettivo",
+      "posizione": 10,
+      "precedente": null
+    },
+    {
+      "segreta": "pianoforte",
+      "parola": "tasto",
+      "posizione": 10,
+      "precedente": null
+    },
+    {
+      "segreta": "cartolina",
+      "parola": "obiettivo",
+      "posizione": 10,
+      "precedente": null
+    },
+    {
+      "segreta": "ritratto",
+      "parola": "obiettivo",
+      "posizione": 10,
+      "precedente": null
+    },
+    {
+      "segreta": "collage",
+      "parola": "obiettivo",
+      "posizione": 10,
+      "precedente": null
+    },
+    {
+      "segreta": "mostra",
+      "parola": "obiettivo",
+      "posizione": 10,
+      "precedente": null
+    },
+    {
+      "segreta": "arpa",
+      "parola": "tasto",
+      "posizione": 10,
+      "precedente": null
+    },
+    {
+      "segreta": "corallo",
+      "parola": "rete",
+      "posizione": 10,
+      "precedente": null
+    },
+    {
+      "segreta": "arnese",
+      "parola": "lama",
+      "posizione": 10,
+      "precedente": null
+    },
+    {
+      "segreta": "musicista",
+      "parola": "tasto",
+      "posizione": 10,
+      "precedente": null
+    },
+    {
+      "segreta": "assolo",
+      "parola": "tasto",
+      "posizione": 10,
+      "precedente": null
+    },
+    {
+      "segreta": "fisarmonica",
+      "parola": "tasto",
+      "posizione": 10,
+      "precedente": null
+    },
+    {
+      "segreta": "solista",
+      "parola": "tasto",
+      "posizione": 10,
+      "precedente": null
+    },
+    {
+      "segreta": "concerto",
+      "parola": "tasto",
+      "posizione": 10,
+      "precedente": null
+    },
+    {
+      "segreta": "sinfonia",
+      "parola": "tasto",
+      "posizione": 10,
+      "precedente": null
+    },
+    {
+      "segreta": "pellicola",
+      "parola": "obiettivo",
+      "posizione": 10,
+      "precedente": null
+    },
+    {
+      "segreta": "copertina",
+      "parola": "obiettivo",
+      "posizione": 10,
+      "precedente": null
+    },
+    {
+      "segreta": "motoscafo",
+      "parola": "ancora",
+      "posizione": 10,
+      "precedente": null
+    },
+    {
+      "segreta": "crociera",
+      "parola": "ancora",
+      "posizione": 10,
+      "precedente": null
+    },
+    {
+      "segreta": "equipaggio",
+      "parola": "ancora",
+      "posizione": 10,
+      "precedente": null
+    },
+    {
+      "segreta": "navigazione",
+      "parola": "ancora",
+      "posizione": 10,
+      "precedente": null
+    },
+    {
+      "segreta": "barca",
+      "parola": "ancora",
+      "posizione": 10,
+      "precedente": null
+    },
+    {
+      "segreta": "canto",
+      "parola": "tasto",
+      "posizione": 10,
+      "precedente": null
+    },
+    {
+      "segreta": "ritoccare",
+      "parola": "obiettivo",
+      "posizione": 10,
+      "precedente": null
+    },
+    {
+      "segreta": "scatto",
+      "parola": "obiettivo",
+      "posizione": 10,
+      "precedente": null
+    },
+    {
+      "segreta": "pescatore",
+      "parola": "rete",
+      "posizione": 10,
+      "precedente": null
+    },
+    {
+      "segreta": "pesco",
+      "parola": "rete",
+      "posizione": 10,
+      "precedente": null
+    },
+    {
+      "segreta": "video",
+      "parola": "obiettivo",
+      "posizione": 10,
+      "precedente": null
+    },
+    {
+      "segreta": "carpa",
+      "parola": "rete",
+      "posizione": 10,
+      "precedente": null
+    },
+    {
+      "segreta": "vela",
+      "parola": "ancora",
+      "posizione": 10,
+      "precedente": null
+    },
+    {
+      "segreta": "sbarco",
+      "parola": "ancora",
+      "posizione": 10,
+      "precedente": null
+    },
+    {
+      "segreta": "trota",
+      "parola": "rete",
+      "posizione": 10,
+      "precedente": null
+    },
+    {
+      "segreta": "luccio",
+      "parola": "rete",
+      "posizione": 10,
+      "precedente": null
+    },
+    {
+      "segreta": "gondola",
+      "parola": "ancora",
+      "posizione": 10,
+      "precedente": null
+    },
+    {
+      "segreta": "kayak",
+      "parola": "rete",
+      "posizione": 10,
+      "precedente": null
+    },
+    {
+      "segreta": "inquadratura",
+      "parola": "obiettivo",
+      "posizione": 10,
+      "precedente": null
+    },
+    {
+      "segreta": "grafica",
+      "parola": "obiettivo",
+      "posizione": 10,
+      "precedente": null
+    },
+    {
+      "segreta": "telescopio",
+      "parola": "lente",
+      "posizione": 10,
+      "precedente": 46
+    },
+    {
+      "segreta": "fregata",
+      "parola": "ancora",
+      "posizione": 10,
+      "precedente": null
+    },
+    {
+      "segreta": "salpare",
+      "parola": "ancora",
+      "posizione": 10,
+      "precedente": null
+    },
+    {
+      "segreta": "fotografare",
+      "parola": "obiettivo",
+      "posizione": 10,
+      "precedente": null
+    },
+    {
+      "segreta": "ritrarre",
+      "parola": "obiettivo",
+      "posizione": 10,
+      "precedente": null
+    },
+    {
+      "segreta": "microscopio",
+      "parola": "lente",
+      "posizione": 10,
+      "precedente": 27
+    },
+    {
+      "segreta": "attraccare",
+      "parola": "ancora",
+      "posizione": 10,
+      "precedente": null
+    },
+    {
+      "segreta": "banchina",
+      "parola": "ancora",
+      "posizione": 10,
+      "precedente": null
+    },
+    {
+      "segreta": "telecamera",
+      "parola": "obiettivo",
+      "posizione": 10,
+      "precedente": null
+    },
+    {
+      "segreta": "fotogramma",
+      "parola": "obiettivo",
+      "posizione": 10,
+      "precedente": null
+    },
+    {
+      "segreta": "pescare",
+      "parola": "rete",
+      "posizione": 10,
+      "precedente": null
+    },
+    {
+      "segreta": "fotografo",
+      "parola": "obiettivo",
+      "posizione": 10,
+      "precedente": null
+    },
+    {
+      "segreta": "apnea",
+      "parola": "rete",
+      "posizione": 10,
+      "precedente": null
+    },
+    {
+      "segreta": "arpione",
+      "parola": "rete",
+      "posizione": 10,
+      "precedente": null
+    },
+    {
+      "segreta": "scafo",
+      "parola": "ancora",
+      "posizione": 10,
+      "precedente": null
+    },
+    {
+      "segreta": "orchestrazione",
+      "parola": "tasto",
+      "posizione": 10,
+      "precedente": null
+    },
+    {
+      "segreta": "tamburello",
+      "parola": "tasto",
+      "posizione": 10,
+      "precedente": null
+    },
+    {
+      "segreta": "xilofono",
+      "parola": "tasto",
+      "posizione": 10,
+      "precedente": null
+    },
+    {
+      "segreta": "timone",
+      "parola": "ancora",
+      "posizione": 10,
+      "precedente": null
+    },
+    {
+      "segreta": "violinista",
+      "parola": "tasto",
+      "posizione": 10,
+      "precedente": null
+    },
+    {
+      "segreta": "machete",
+      "parola": "lama",
+      "posizione": 10,
+      "precedente": null
+    },
+    {
+      "segreta": "riff",
+      "parola": "tasto",
+      "posizione": 10,
+      "precedente": null
+    },
+    {
+      "segreta": "videocamera",
+      "parola": "obiettivo",
+      "posizione": 10,
+      "precedente": null
+    },
+    {
+      "segreta": "utensile",
+      "parola": "lama",
+      "posizione": 10,
+      "precedente": 34
+    },
+    {
+      "segreta": "fotomodella",
+      "parola": "obiettivo",
+      "posizione": 10,
+      "precedente": null
+    },
+    {
+      "segreta": "reportage",
+      "parola": "obiettivo",
+      "posizione": 10,
+      "precedente": null
+    },
+    {
+      "segreta": "valzer",
+      "parola": "tasto",
+      "posizione": 10,
+      "precedente": null
+    },
+    {
+      "segreta": "poppa",
+      "parola": "ancora",
+      "posizione": 10,
+      "precedente": null
+    },
+    {
+      "segreta": "quartetto",
+      "parola": "tasto",
+      "posizione": 10,
+      "precedente": null
+    },
+    {
+      "segreta": "trio",
+      "parola": "tasto",
+      "posizione": 10,
+      "precedente": null
+    },
+    {
+      "segreta": "gommone",
+      "parola": "ancora",
+      "posizione": 10,
+      "precedente": null
+    },
+    {
+      "segreta": "regata",
+      "parola": "ancora",
+      "posizione": 10,
+      "precedente": null
+    },
+    {
+      "segreta": "zattera",
+      "parola": "ancora",
+      "posizione": 10,
+      "precedente": null
+    },
+    {
+      "segreta": "peschereccio",
+      "parola": "rete",
+      "posizione": 10,
+      "precedente": null
+    },
+    {
+      "segreta": "percussionista",
+      "parola": "tasto",
+      "posizione": 10,
+      "precedente": null
+    },
+    {
+      "segreta": "yacht",
+      "parola": "ancora",
+      "posizione": 10,
+      "precedente": null
+    },
+    {
+      "segreta": "fotocamera",
+      "parola": "obiettivo",
+      "posizione": 10,
+      "precedente": 82
+    },
+    {
+      "segreta": "binocolo",
+      "parola": "lente",
+      "posizione": 10,
+      "precedente": 15
+    },
+    {
+      "segreta": "tagliando",
+      "parola": "lama",
+      "posizione": 10,
+      "precedente": null
+    },
+    {
+      "segreta": "zoom",
+      "parola": "obiettivo",
+      "posizione": 10,
+      "precedente": 83
+    },
+    {
+      "segreta": "flash",
+      "parola": "obiettivo",
+      "posizione": 10,
+      "precedente": null
+    },
+    {
+      "segreta": "jazz",
+      "parola": "tasto",
+      "posizione": 10,
+      "precedente": null
+    },
+    {
+      "segreta": "trancio",
+      "parola": "lama",
+      "posizione": 10,
+      "precedente": null
+    },
+    {
+      "segreta": "filetto",
+      "parola": "lama",
+      "posizione": 10,
+      "precedente": null
+    },
+    {
+      "segreta": "corazzata",
+      "parola": "ancora",
+      "posizione": 10,
+      "precedente": null
+    },
+    {
+      "segreta": "seghetto",
+      "parola": "lama",
+      "posizione": 10,
+      "precedente": 61
+    },
+    {
+      "segreta": "taglierino",
+      "parola": "lama",
+      "posizione": 10,
+      "precedente": 75
+    },
+    {
+      "segreta": "ribes",
+      "parola": "rete",
+      "posizione": 10,
+      "precedente": null
+    },
+    {
+      "segreta": "cargo",
+      "parola": "ancora",
+      "posizione": 10,
+      "precedente": null
+    },
+    {
+      "segreta": "petroliera",
+      "parola": "ancora",
+      "posizione": 10,
+      "precedente": null
+    },
+    {
+      "segreta": "persico",
+      "parola": "rete",
+      "posizione": 10,
+      "precedente": null
+    },
+    {
+      "segreta": "intagliare",
+      "parola": "lama",
+      "posizione": 10,
+      "precedente": null
+    },
+    {
+      "segreta": "forbici",
+      "parola": "lama",
+      "posizione": 10,
+      "precedente": 36
+    },
+    {
+      "segreta": "cernia",
+      "parola": "rete",
+      "posizione": 10,
+      "precedente": null
+    },
+    {
+      "segreta": "concertista",
+      "parola": "tasto",
+      "posizione": 10,
+      "precedente": null
+    },
+    {
+      "segreta": "pescato",
+      "parola": "rete",
+      "posizione": 10,
+      "precedente": 29
+    },
+    {
+      "segreta": "cutter",
+      "parola": "lama",
+      "posizione": 10,
+      "precedente": 94
+    },
+    {
+      "segreta": "tagliata",
+      "parola": "lama",
+      "posizione": 10,
+      "precedente": 28
+    },
+    {
+      "segreta": "immortalare",
+      "parola": "obiettivo",
+      "posizione": 10,
+      "precedente": null
+    },
+    {
+      "segreta": "veliero",
+      "parola": "ancora",
+      "posizione": 10,
+      "precedente": null
+    },
+    {
+      "segreta": "pescivendolo",
+      "parola": "rete",
+      "posizione": 10,
+      "precedente": null
+    },
+    {
+      "segreta": "pelapatate",
+      "parola": "lama",
+      "posizione": 10,
+      "precedente": null
+    },
+    {
+      "segreta": "laser",
+      "parola": "lama",
+      "posizione": 10,
+      "precedente": 81
+    },
+    {
+      "segreta": "pescheria",
+      "parola": "rete",
+      "posizione": 10,
+      "precedente": null
+    },
+    {
+      "segreta": "ultravioletto",
+      "parola": "lente",
+      "posizione": 10,
+      "precedente": null
+    },
+    {
+      "segreta": "tagliere",
+      "parola": "lama",
+      "posizione": 10,
+      "precedente": null
+    },
+    {
+      "segreta": "ricciola",
+      "parola": "rete",
+      "posizione": 10,
+      "precedente": null
+    },
+    {
+      "segreta": "sforbiciare",
+      "parola": "lama",
+      "posizione": 10,
+      "precedente": null
+    },
+    {
+      "segreta": "selfie",
+      "parola": "obiettivo",
+      "posizione": 10,
+      "precedente": null
+    }
+  ],
+  "top10_con_parole_diverse": 4715,
+  "coppie_di_vicini_reciproci_top10": {
+    "base": 27720,
+    "pilota": 20879
+  },
+  "segrete_di_misura_con_riferimento": 653,
+  "gruppi_verificati_esatti_nei_primi_10": {
+    "base": 1579,
+    "varieta": 1577,
+    "entrambe": 1577
+  }
+}
