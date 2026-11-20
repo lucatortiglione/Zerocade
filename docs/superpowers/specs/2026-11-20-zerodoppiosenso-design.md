@@ -24,6 +24,14 @@ Per la prima prova propongo che un gruppo di like possa caricare più tacche, co
 
 Anche con zero tap, ogni frammento appare automaticamente. I tap abbreviano l'attesa per quello successivo. Per la prima prova si propone un intervallo di 15 secondi a zero tap, da misurare dall'apertura del round o dall'ultima rivelazione. I tempi sono valori di prova da calibrare in live.
 
+## Difficoltà crescente
+
+La banca pilota contiene 50 round ordinati. Per la prima partita si leggono i quesiti in ordine di numero, da 1 a 50. Ogni dieci round si sale di livello. Il primo livello usa oggetti e gesti quotidiani, il secondo ammette più risposte plausibili al primo indizio, il terzo introduce significati figurati o di ambiti diversi, il quarto richiede di collegare contesti più distanti e il quinto introduce allusioni e accezioni meno frequenti. L'ultimo frammento deve rendere riconoscibile il secondo significato a ogni livello. I tempi di rivelazione seguono la stessa regola per tutta la partita.
+
+L'ordine iniziale è una valutazione editoriale. Nella prova con giocatori si confrontano per livello la quota di round risolti al solo primo indizio, il numero di frammenti già visibili alla risposta e i round rimasti senza soluzione. Questi dati servono a individuare i quesiti da spostare o riscrivere.
+
+La banca si trova in [ZeroDoppioSenso.sqlite3](../../../database/ZeroDoppioSenso.sqlite3); il [sorgente SQL](../../../gioco-zerodoppiosenso/quesiti.sql) permette di ricrearla in un database vuoto.
+
 ## Prima prova
 
 Verificare con parole a doppio senso che entrambi gli indizi portino alla stessa forma scritta e che almeno un frammento intermedio aggiunga informazione utile. Con zero tap, osservare la comparsa in ordine di tutti i frammenti. Ripetere con pochi tap e verificare che il primo frammento arrivi prima. Provare anche una risposta esatta dal solo primo indizio e un gruppo di like sufficiente per più tacche. In quest'ultimo caso verificare che resti possibile vincere tra due rivelazioni e che il round successivo riparta a barra vuota.
