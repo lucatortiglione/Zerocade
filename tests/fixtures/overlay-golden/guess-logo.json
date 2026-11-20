@@ -1,0 +1,46 @@
+[
+ {
+  "at": 0.1,
+  "texts": [
+   "GUESS THE LOGO",
+   "Scrivi il nome del brand in chat",
+   "🍄",
+   "N"
+  ],
+  "trace": "5c6512805cb9b148",
+  "calls": 31
+ },
+ {
+  "at": 3,
+  "texts": [
+   "GUESS THE LOGO",
+   "Scrivi il nome del brand in chat",
+   "🍄",
+   "N"
+  ],
+  "trace": "9cd3646696303b97",
+  "calls": 62
+ },
+ {
+  "at": 6,
+  "texts": [
+   "GUESS THE LOGO",
+   "Scrivi il nome del brand in chat",
+   "🍄",
+   "N"
+  ],
+  "trace": "7ae5d31f0331e6cc",
+  "calls": 93
+ },
+ {
+  "at": 12,
+  "texts": [
+   "GUESS THE LOGO",
+   "Scrivi il nome del brand in chat",
+   "🍄",
+   "N"
+  ],
+  "trace": "2976a83dd9ab4177",
+  "calls": 124
+ }
+]

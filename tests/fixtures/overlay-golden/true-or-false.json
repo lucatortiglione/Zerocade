@@ -1,0 +1,62 @@
+[
+ {
+  "at": 0.1,
+  "texts": [
+   "TRUE OR FALSE",
+   "Il corpo umano adulto ha 206 ossa.",
+   "VERO",
+   "0 voti",
+   "FALSO",
+   "0 voti",
+   "Scrivi V (vero) o F (falso) in chat"
+  ],
+  "trace": "653cc9860f48e4e0",
+  "calls": 37
+ },
+ {
+  "at": 3,
+  "texts": [
+   "TRUE OR FALSE",
+   "Il corpo umano adulto ha 206 ossa.",
+   "VERO",
+   "0 voti",
+   "FALSO",
+   "0 voti",
+   "Scrivi V (vero) o F (falso) in chat"
+  ],
+  "trace": "d4d577e7c602528d",
+  "calls": 74
+ },
+ {
+  "at": 6,
+  "texts": [
+   "TRUE OR FALSE",
+   "Il corpo umano adulto ha 206 ossa.",
+   "VERO",
+   "1 voti",
+   "FALSO",
+   "0 voti",
+   "Scrivi V (vero) o F (falso) in chat",
+   "B",
+   "1. Bruno ? 8 pt"
+  ],
+  "trace": "ed2ccb3efa5b05d0",
+  "calls": 140
+ },
+ {
+  "at": 12,
+  "texts": [
+   "TRUE OR FALSE",
+   "Il corpo umano adulto ha 206 ossa.",
+   "VERO",
+   "1 voti",
+   "FALSO",
+   "0 voti",
+   "Scrivi V (vero) o F (falso) in chat",
+   "B",
+   "1. Bruno ? 8 pt"
+  ],
+  "trace": "05d446c45b085ccf",
+  "calls": 206
+ }
+]

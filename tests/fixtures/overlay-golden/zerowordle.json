@@ -1,0 +1,42 @@
+[
+ {
+  "at": 0.1,
+  "texts": [
+   "ZERO",
+   "WORDLE",
+   "Carico le parole.."
+  ],
+  "trace": "2921c4764ca02940",
+  "calls": 28
+ },
+ {
+  "at": 3,
+  "texts": [
+   "ZERO",
+   "WORDLE",
+   "Carico le parole..."
+  ],
+  "trace": "ea25facda3df73a1",
+  "calls": 56
+ },
+ {
+  "at": 6,
+  "texts": [
+   "ZERO",
+   "WORDLE",
+   "Carico le parole.."
+  ],
+  "trace": "297a2315e798ddd4",
+  "calls": 84
+ },
+ {
+  "at": 12,
+  "texts": [
+   "ZERO",
+   "WORDLE",
+   "Carico le parole.."
+  ],
+  "trace": "4235a4b491c4da5c",
+  "calls": 112
+ }
+]

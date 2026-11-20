@@ -1,0 +1,55 @@
+[
+ {
+  "at": 0.1,
+  "texts": [
+   "🗼",
+   "GUESS THE LOCATION",
+   "Indizio: Torre Eiffel",
+   "EUROPA",
+   "PAESE",
+   "CITTÀ"
+  ],
+  "trace": "77f9d7dfe835b42a",
+  "calls": 94
+ },
+ {
+  "at": 3,
+  "texts": [
+   "🗼",
+   "GUESS THE LOCATION",
+   "Indizio: Torre Eiffel",
+   "EUROPA",
+   "PAESE",
+   "CITTÀ"
+  ],
+  "trace": "7b3056d540724222",
+  "calls": 188
+ },
+ {
+  "at": 6,
+  "texts": [
+   "🗼",
+   "GUESS THE LOCATION",
+   "Indizio: Torre Eiffel",
+   "EUROPA",
+   "PAESE",
+   "CITTÀ"
+  ],
+  "trace": "cfed4ea21e49beaf",
+  "calls": 282
+ },
+ {
+  "at": 12,
+  "texts": [
+   "🗼",
+   "GUESS THE LOCATION",
+   "Indizio: Torre Eiffel",
+   "EUROPA",
+   "PAESE",
+   "F",
+   "CITTÀ"
+  ],
+  "trace": "a6d286d448e3f604",
+  "calls": 381
+ }
+]

@@ -1,0 +1,46 @@
+[
+ {
+  "at": 0.1,
+  "texts": [
+   "MEMORY MAESTRO",
+   "Livello 1 — 1 cifre",
+   "5",
+   "Memorizza la sequenza…"
+  ],
+  "trace": "c13ea67ea0fab143",
+  "calls": 22
+ },
+ {
+  "at": 3,
+  "texts": [
+   "MEMORY MAESTRO",
+   "Livello 1 — 1 cifre",
+   "_",
+   "Scrivi la sequenza in chat!"
+  ],
+  "trace": "2f5b0a4e05f3b6a8",
+  "calls": 40
+ },
+ {
+  "at": 6,
+  "texts": [
+   "MEMORY MAESTRO",
+   "Livello 1 — 1 cifre",
+   "_",
+   "Scrivi la sequenza in chat!"
+  ],
+  "trace": "1856edfed9ec4122",
+  "calls": 58
+ },
+ {
+  "at": 12,
+  "texts": [
+   "MEMORY MAESTRO",
+   "Livello 1 — 1 cifre",
+   "_",
+   "Scrivi la sequenza in chat!"
+  ],
+  "trace": "b2e0f1a3ba1b364e",
+  "calls": 76
+ }
+]

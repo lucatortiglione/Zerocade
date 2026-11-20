@@ -1,0 +1,66 @@
+[
+ {
+  "at": 0.1,
+  "texts": [
+   "SPORT",
+   "Scrivi una parola associata in chat",
+   "______",
+   "______",
+   "_____",
+   "_________",
+   "________",
+   "_____",
+   "0/6 trovate"
+  ],
+  "trace": "cd190dc32cf91c51",
+  "calls": 58
+ },
+ {
+  "at": 3,
+  "texts": [
+   "SPORT",
+   "Scrivi una parola associata in chat",
+   "______",
+   "______",
+   "_____",
+   "_________",
+   "________",
+   "_____",
+   "0/6 trovate"
+  ],
+  "trace": "acfd091c76a4bbc0",
+  "calls": 116
+ },
+ {
+  "at": 6,
+  "texts": [
+   "SPORT",
+   "Scrivi una parola associata in chat",
+   "______",
+   "______",
+   "_____",
+   "_________",
+   "________",
+   "_____",
+   "0/6 trovate"
+  ],
+  "trace": "c2b04f25c12673a2",
+  "calls": 174
+ },
+ {
+  "at": 12,
+  "texts": [
+   "SPORT",
+   "Scrivi una parola associata in chat",
+   "______",
+   "______",
+   "_____",
+   "_________",
+   "________",
+   "_____",
+   "0/6 trovate"
+  ],
+  "trace": "a320c9c315675f24",
+  "calls": 232
+ }
+]

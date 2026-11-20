@@ -1,0 +1,42 @@
+[
+ {
+  "at": 0.1,
+  "texts": [
+   "ZERO",
+   "REAZIONE A CATENA",
+   "Carico le catene.."
+  ],
+  "trace": "cb87fddbdd64a511",
+  "calls": 28
+ },
+ {
+  "at": 3,
+  "texts": [
+   "ZERO",
+   "REAZIONE A CATENA",
+   "Carico le catene..."
+  ],
+  "trace": "bdd3c5281566e7cd",
+  "calls": 56
+ },
+ {
+  "at": 6,
+  "texts": [
+   "ZERO",
+   "REAZIONE A CATENA",
+   "Carico le catene.."
+  ],
+  "trace": "365577b73bc4e6ee",
+  "calls": 84
+ },
+ {
+  "at": 12,
+  "texts": [
+   "ZERO",
+   "REAZIONE A CATENA",
+   "Carico le catene.."
+  ],
+  "trace": "05b5aa296ee954fa",
+  "calls": 112
+ }
+]
