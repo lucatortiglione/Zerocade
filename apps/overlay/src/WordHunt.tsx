@@ -1,7 +1,7 @@
 import '@fontsource-variable/fredoka'
 import '@fontsource-variable/nunito'
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties } from 'react'
-import { WORDHUNT_REFERENCE as REF, parseWordHuntCell, wordHuntCanvas, wordHuntLastHintStage, wordHuntTeamResult, type WordHuntClaim, type WordHuntLeader, type WordHuntPublicState, type WordHuntWinner } from '@zerocade/shared'
+import { WORDHUNT_REFERENCE as REF, wordHuntRowLabels, parseWordHuntCell, wordHuntCell, wordHuntCanvas, wordHuntLastHintStage, wordHuntTeamResult, type WordHuntClaim, type WordHuntLeader, type WordHuntPublicState, type WordHuntWinner } from '@zerocade/shared'
 import { useOverlay } from './store'
 import { ViewerAvatar } from './ViewerAvatar'
 import '@fontsource/opendyslexic/latin-700.css'
@@ -102,6 +102,7 @@ function Board({ state, animated, theme, colors }: { state: WordHuntPublicState;
     for (const claim of state.claims) for (const cell of claim.cells) colors.set(cell, claim.color)
     return colors
   }, [state.claims])
+  const rowLabels = wordHuntRowLabels(state.rows)
   const rows = Array.from({ length: state.rows }, (_, r) => r)
   const cols = Array.from({ length: state.cols }, (_, c) => c)
   const zone = state.hint?.zone
@@ -113,10 +114,10 @@ function Board({ state, animated, theme, colors }: { state: WordHuntPublicState;
             <span key={`c${c}`} className="wordhunt-coord wordhunt-coord--col" style={{ left: px(c), top: 22, width: REF.tile }}>{c + 1}</span>
           ))}
           {rows.map((r) => (
-            <span key={`r${r}`} className="wordhunt-coord wordhunt-coord--row" style={{ left: 2, top: py(r), width: 20, height: REF.tile, lineHeight: `${REF.tile}px` }}>{String.fromCharCode(65 + r)}</span>
+            <span key={`r${r}`} className="wordhunt-coord wordhunt-coord--row" style={{ left: 2, top: py(r), width: 20, height: REF.tile, lineHeight: `${REF.tile}px` }}>{rowLabels[r]}</span>
           ))}
           {rows.map((r) => cols.map((c) => {
-            const name = `${String.fromCharCode(65 + r)}${c + 1}`
+            const name = wordHuntCell(r, c, state.rows)
             const color = found.get(name)
             return (
               <div key={name} className="wordhunt-tile" data-found={color ? 'true' : 'false'} style={{ left: px(c), top: py(r), ...(color ? { '--word-color': color } : {}) } as CSSProperties}>
@@ -129,7 +130,7 @@ function Board({ state, animated, theme, colors }: { state: WordHuntPublicState;
             height: (zone.bottom - zone.top + 1) * REF.step,
           }} />}
           {state.claims.map((claim) => {
-            const cell = parseWordHuntCell(claim.avatarCell)
+            const cell = parseWordHuntCell(claim.avatarCell, state.rows)
             return cell ? <Avatar key={claim.target} winner={claim.winner} style={{ left: px(cell.col), top: py(cell.row) }} /> : null
           })}
         </div>
@@ -242,7 +243,7 @@ export function WordHunt() {
     )
   }
   return (
-    <div className="wordhunt" data-phase={wordhunt.phase} data-nasa={nasa}>
+    <div className="wordhunt" data-rows={wordhunt.rows} data-phase={wordhunt.phase} data-nasa={nasa}>
       <header className="wordhunt-head">
         {wordhunt.topic && <b>Tema · {wordhunt.topic}</b>}
         {wordhunt.phase === 'countdown' && <div className="wordhunt-timer">Si parte tra {Math.max(1, Math.ceil(leftMs / 1000))}</div>}
@@ -260,7 +261,7 @@ export function WordHunt() {
       {wordhunt.hint && <div className="wordhunt-hint">
         <strong>{!wordhunt.hint.zone ? 'Restringi la ricerca' : wordhunt.hint.stage === 1
           ? `Prima lettera nella metà ${wordhunt.hint.zone.top === 0 ? 'alta' : 'bassa'}`
-          : `Prima lettera tra ${String.fromCharCode(65 + wordhunt.hint.zone.top)}${wordhunt.hint.zone.left + 1} e ${String.fromCharCode(65 + wordhunt.hint.zone.bottom)}${wordhunt.hint.zone.right + 1}`}</strong>
+          : `Prima lettera tra ${wordHuntCell(wordhunt.hint.zone.top, wordhunt.hint.zone.left, wordhunt.rows)} e ${wordHuntCell(wordhunt.hint.zone.bottom, wordhunt.hint.zone.right, wordhunt.rows)}`}</strong>
         {wordhunt.hint.wordLength && <strong>Cerca una parola di {wordhunt.hint.wordLength} lettere</strong>}
         {!wordhunt.paused && wordhunt.hint.stage < wordHuntLastHintStage(wordhunt.total - wordhunt.found) && <span>
           {wordhunt.hint.threshold - wordhunt.hint.taps === 1 ? 'Manca 1 tap' : `Mancano ${wordhunt.hint.threshold - wordhunt.hint.taps} tap`}{' '}

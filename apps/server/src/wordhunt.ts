@@ -12,7 +12,7 @@ import {
 import { RoomParticipants } from './gameRooms.js'
 import { availableTopics } from './wordhunt-topics.js'
 import {
-  WordHuntGenerationError, cellName, fixtureBoard, generateBoard, nextColor, normalizeGuess, seededRandom,
+  WordHuntGenerationError, cellNameFor, fixtureBoard, generateBoard, nextColor, normalizeGuess, seededRandom,
   type Board, type BoardTarget, type FixtureFile,
 } from './wordhunt-domain.js'
 import { isBusyError, type ClaimInput, type WordHuntStore } from './wordhunt-db.js'
@@ -133,6 +133,7 @@ export class WordHuntRoom {
   // ---- Reads (copies: what is emitted is never an array this room goes on changing, DIRETTIVE §6) ----
 
   private claimOf(h: Held): WordHuntClaim {
+    const cellName = cellNameFor(this.board!.rows)
     return {
       target: h.target.id, word: h.target.word, cells: h.target.cells.map(cellName), avatarCell: cellName(h.target.anchor),
       color: h.color, winner: copyWinner(h.winner), points: h.points, seq: h.seq,
@@ -216,6 +217,7 @@ export class WordHuntRoom {
 
   admin(): WordHuntAdminState {
     const board = this.board
+    const cellName = cellNameFor(board?.rows ?? WORDHUNT_RULES.rows)
     const targets: WordHuntAdminTarget[] = (board?.targets ?? []).map((t) => ({
       target: t.id, word: t.word, cells: t.cells.map(cellName), avatarCell: cellName(t.anchor), direction: t.direction,
       found: this.held.has(t.id), winner: this.held.get(t.id)?.winner.nickname ?? null,
@@ -431,7 +433,7 @@ export class WordHuntRoom {
           seed: command.seed ?? this.deps.newSeed(),
           targetCount: targets, rows: size.rows, cols: size.cols,
           minWordLength: WORDHUNT_RULES.minWordLength,
-          directions: level ? wordHuntDirections(level === 'large', level !== 'quick') :
+          directions: level ? wordHuntDirections(level !== 'quick' && level !== 'standard', level !== 'quick') :
             wordHuntDirections(settings.wordhuntReverse !== false, settings.wordhuntDiagonal !== false),
           // The Tabellone Grande: with many words they are kept short so that all of them, and the avatars, fit.
           maxWordLength: targets > WORDHUNT_RULES.denseTargets ? WORDHUNT_RULES.denseMaxWordLength : WORDHUNT_RULES.maxWordLength,
@@ -485,7 +487,10 @@ export class WordHuntRoom {
     if (this.disposed || (this.phase !== 'ready' && this.phase !== 'countdown')) return
     this.phase = 'active'
     this.activeStart = this.deps.monotonicNow() - this.pausedTotalMs
-    if (this.level && this.level === this.nextLevel) this.nextLevel = this.level === 'quick' ? 'standard' : 'large'
+    if (this.level === this.nextLevel) {
+      if (this.level === 'quick') this.nextLevel = 'standard'
+      if (this.level === 'standard') this.nextLevel = 'large'
+    }
     this.startClock(this.durationMs === 0 ? Infinity : this.durationMs)
     this.resetHint()
     this.store((s, row) => s.setStatus(row, 'active', this.deps.wallNow()))

@@ -39,6 +39,7 @@ export class WordHuntGenerationError extends Error {
 }
 
 export const cellName = (c: Cell): string => wordHuntCell(c.row, c.col)
+export const cellNameFor = (rows: number) => (c: Cell): string => wordHuntCell(c.row, c.col, rows)
 const key = (c: Cell): string => `${c.row},${c.col}`
 
 // §7.2: the same function for the guesses and for the targets. Accents are kept, there is no stemming and no plural.
@@ -135,6 +136,7 @@ function occurrences(letters: string[][], word: string): number {
 export function auditBoard(board: Board): string[] {
   const problems: string[] = []
   const { rows, cols, letters, targets } = board
+  const cellName = cellNameFor(rows)
   if (letters.length !== rows || letters.some((line) => line.length !== cols)) problems.push(`la griglia non è ${rows}×${cols}`)
   const words = new Set<string>()
   const wordCells = new Map<string, number>()
@@ -180,14 +182,16 @@ export function auditBoard(board: Board): string[] {
   return problems
 }
 
-const checksumOf = (rows: number, cols: number, letters: string[][], targets: BoardTarget[], decoys: BoardDecoy[]): string =>
-  createHash('sha256')
+const checksumOf = (rows: number, cols: number, letters: string[][], targets: BoardTarget[], decoys: BoardDecoy[]): string => {
+  const cellName = cellNameFor(rows)
+  return createHash('sha256')
     .update(JSON.stringify({
       rows, cols, letters: letters.map((l) => l.join('')),
       targets: targets.map((t) => [t.word, cellName(t.start), t.direction, cellName(t.anchor)]),
       decoys: decoys.map((d) => [d.word, cellName(d.start), d.direction]),
     }))
     .digest('hex')
+}
 
 // How many decoys a board with this many targets gets (WORDHUNT_RULES.decoyRatio, capped).
 export const decoyCountFor = (targetCount: number): number => Math.min(WORDHUNT_RULES.decoyMax, Math.round(targetCount * WORDHUNT_RULES.decoyRatio))

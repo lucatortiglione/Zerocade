@@ -79,9 +79,9 @@ export const WORDHUNT_PALETTE: readonly string[] = Object.freeze([
 ])
 
 // The sizes of the generated board, as "cols x rows, words" (the size menu of the games this one is modelled on). The large one is the
-// 20 rows (A-T) by 15 columns (1-15) of the reference screenshot; the others are smaller in the same geometry.
-export type WordHuntSize = 'quick' | 'standard' | 'large'
-export const WORDHUNT_LEVEL_NAMES = { quick: 'Base', standard: 'Intermedio', large: 'Avanzato' } as const
+// 20 rows (A-T) by 15 columns (1-15) of the reference screenshot. XL extends it by three rows.
+export type WordHuntSize = 'quick' | 'standard' | 'large' | 'xl' | 'xxl'
+export const WORDHUNT_LEVEL_NAMES = { quick: 'Base', standard: 'Intermedio', large: 'Avanzato', xl: 'XL', xxl: 'XXL' } as const
 
 export function wordHuntTeamResult(state: WordHuntPublicState): string | null {
   const time = state.teamTime
@@ -96,6 +96,8 @@ export const WORDHUNT_SIZES: Readonly<Record<WordHuntSize, { label: string; cols
   quick: { label: 'Rapido', cols: 13, rows: 15, words: 14 },
   standard: { label: 'Standard', cols: 15, rows: 17, words: 20 },
   large: { label: 'Grande', cols: 15, rows: 20, words: 24 },
+  xl: { label: 'XL', cols: 15, rows: 23, words: 24 },
+  xxl: { label: 'XXL', cols: 15, rows: 26, words: 24 },
 })
 export const WORDHUNT_SIZE_DEFAULT: WordHuntSize = 'large'
 export const isWordHuntSize = (value: unknown): value is WordHuntSize => typeof value === 'string' && Object.hasOwn(WORDHUNT_SIZES, value)
@@ -234,11 +236,16 @@ export interface WordHuntAdminState {
   metrics: { received: number; ignored: Record<string, number>; guesses: number; overflow: number; lastWordMs: number | null; timedFinishes: number; meanLastWordMs: number | null }
 }
 
-// The coordinates of a cell as the headers show them (§2.1): rows A-T, columns 1-15.
-export const wordHuntCell = (row: number, col: number): string => `${String.fromCharCode(65 + row)}${col + 1}`
-export const parseWordHuntCell = (cell: string): { row: number; col: number } | null => {
+// XL continues directly from V to Z. XXL uses the full alphabet.
+export const WORDHUNT_ROW_LABELS = 'ABCDEFGHIJKLMNOPQRSTUVZ'
+export const wordHuntRowLabels = (rows: number): string =>
+  rows === WORDHUNT_SIZES.xl.rows ? WORDHUNT_ROW_LABELS : 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.slice(0, rows)
+export const wordHuntCell = (row: number, col: number, rows = WORDHUNT_SIZES.xl.rows): string => `${wordHuntRowLabels(rows)[row]}${col + 1}`
+export const parseWordHuntCell = (cell: string, rows = WORDHUNT_SIZES.xl.rows): { row: number; col: number } | null => {
   const m = /^([A-Z])([1-9][0-9]?)$/.exec(cell)
-  return m ? { row: m[1]!.charCodeAt(0) - 65, col: Number(m[2]) - 1 } : null
+  if (!m) return null
+  const row = wordHuntRowLabels(rows).indexOf(m[1]!)
+  return row === -1 ? null : { row, col: Number(m[2]) - 1 }
 }
 
 // The points of a word (§8.2): longer words are worth more.

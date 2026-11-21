@@ -1781,6 +1781,8 @@ const GAME_DEFS: GameDef[] = [
           { value: 'quick', label: 'Dal livello Base · orizzontali e verticali' },
           { value: 'standard', label: 'Dal livello Intermedio · anche diagonali' },
           { value: 'large', label: 'Dal livello Avanzato · anche al contrario' },
+          { value: 'xl', label: 'XL · 15 colonne e 23 righe, anche al contrario' },
+          { value: 'xxl', label: 'XXL · 15 colonne e 26 righe da A a Z, anche al contrario' },
           { value: 'manual', label: 'Personalizzata · scegli dimensione e direzioni' },
         ],
       },

@@ -38,6 +38,10 @@ Quando resta una sola parola, un terzo indizio mostra la sua lunghezza e mantien
 
 ### Difficoltà e tempo sull’ultima parola
 
+Il formato **XXL** aggiunge le righe W, X e Y fra V e Z. Si gioca con 15 colonne, tutte le 26 righe da A a Z e 24 parole. Scegli **Impostazioni gioco → Difficoltà dei round → XXL** per mantenere questo formato e il suo record dedicato. In modalità Personalizzata, XXL è disponibile anche in **Dimensione tabellone**.
+
+Per giocare su una griglia **XL**, scegli **Impostazioni gioco → Difficoltà dei round → XL**. Ogni griglia XL ha 15 colonne, 23 righe e 24 parole. Le ultime tre righe sono U, V e Z. Il livello XL ha un proprio record collettivo e resta attivo nei round successivi. In modalità Personalizzata si può anche scegliere XL come sola dimensione e impostare le direzioni.
+
 In **Impostazioni gioco → Difficoltà dei round** la regia sceglie il livello di partenza. Base usa la griglia rapida da 14 parole, in orizzontale e verticale. Intermedio passa a 20 parole e aggiunge le diagonali. Avanzato usa 24 parole e permette anche le direzioni inverse. La progressione riguarda le griglie generate, sia manuali sia automatiche. Dopo Avanzato si continua allo stesso livello. La griglia di riferimento e quelle chiuse prima di giocare non consumano livelli.
 
 Le nuove sessioni partono da Base. Le sessioni salvate con le impostazioni precedenti conservano dimensione e direzioni in modalità **Personalizzata**. In **Metriche** si leggono il tempo di gioco tra la penultima e l’ultima risposta valida del round e la media della sessione, calcolata sui round completati con almeno due parole. Le pause sono escluse.

@@ -2,7 +2,7 @@ import assert from 'node:assert/strict'
 import { readFileSync } from 'node:fs'
 import { test } from 'node:test'
 import Database from 'better-sqlite3'
-import { defaultSettings, GAMES, parseWordHuntCell } from '../packages/shared/src/index.ts'
+import { defaultSettings, GAMES, parseWordHuntCell, wordHuntCell } from '../packages/shared/src/index.ts'
 import { sanitizeSettings } from '../apps/server/src/validate.ts'
 import {
   WORDHUNT_RULES, WORDHUNT_SIZES, WORDHUNT_DIRECTIONS, wordHuntDirections, isWordHuntSize, wordHuntCanvas, wordHuntPoints, type GameSettings, type Viewer, type WordHuntAdminState, type WordHuntCommand, type WordHuntPublicState,
@@ -842,8 +842,48 @@ test('the dictionary is read off the main thread: until it is there a manual rou
 
 // ---- The sizes of the board ----
 
-test('sizes: quick 13 x 15 with 14 words, standard 15 x 17 with 20, large 15 x 20 with 24 (the real dictionary words are 5 to 8 letters)', () => {
-  assert.deepEqual(Object.entries(WORDHUNT_SIZES).map(([k, v]) => [k, v.cols, v.rows, v.words]), [['quick', 13, 15, 14], ['standard', 15, 17, 20], ['large', 15, 20, 24]])
+test('XL adds U, V and Z after T, including the bottom-right cell Z15', () => {
+  for (const [i, label] of [...'TUVZ'].entries()) {
+    assert.equal(wordHuntCell(i + 19, 14), label + '15')
+    assert.deepEqual(parseWordHuntCell(label + '15'), { row: i + 19, col: 14 })
+  }
+  assert.equal(parseWordHuntCell('W1'), null)
+  const h = setup({ dictionary: DICTIONARY_BIG, settings: { wordhuntCountdown: 0, wordhuntProgression: 'xl' } })
+  for (let i = 0; i < 2; i++) {
+    h.begin('generated')
+    assert.deepEqual([h.admin().level, h.state().rows, h.state().cols, h.state().total], ['xl', 23, 15, 24])
+    h.cmd({ type: 'finish' })
+  }
+})
+
+test('XXL labels A to Z in order for players, the director and avatars', () => {
+  const h = setup({ dictionary: DICTIONARY_BIG, settings: { wordhuntCountdown: 0, wordhuntProgression: 'xxl' } })
+  h.begin('generated', { seed: 'XXL' })
+  const { rows, cols, total, letters, teamTime } = h.state()
+  assert.deepEqual([rows, cols, total, teamTime?.level], [26, 15, 24, 'xxl'])
+  for (const [row, label] of [...'ABCDEFGHIJKLMNOPQRSTUVWXYZ'].entries()) {
+    assert.equal(wordHuntCell(row, 14, rows), label + '15')
+    assert.deepEqual(parseWordHuntCell(label + '15', rows), { row, col: 14 })
+  }
+  const targets = h.admin().targets
+  assert.ok(targets.some(t => t.cells.some(c => /^[WXYZ]/.test(c))))
+  for (const t of targets) {
+    const word = t.cells.map(c => {
+      const pos = parseWordHuntCell(c, rows)!
+      return letters[pos.row]![pos.col]
+    }).join('')
+    assert.equal(word, t.word)
+    assert.ok(parseWordHuntCell(t.avatarCell, rows))
+    h.say(viewer(t.word), t.word)
+    assert.deepEqual(h.state().lastClaim?.cells, t.cells)
+    assert.equal(h.state().lastClaim?.avatarCell, t.avatarCell)
+  }
+  h.begin('generated')
+  assert.equal(h.state().rows, 26)
+})
+
+test('generated board dimensions and target counts for every size', () => {
+  assert.deepEqual(Object.entries(WORDHUNT_SIZES).map(([k, v]) => [k, v.cols, v.rows, v.words]), [['quick', 13, 15, 14], ['standard', 15, 17, 20], ['large', 15, 20, 24], ['xl', 15, 23, 24], ['xxl', 15, 26, 24]])
   for (const [name, size] of Object.entries(WORDHUNT_SIZES)) {
     for (let i = 0; i < 15; i++) {
       const board = generateBoard(DICTIONARY_BIG, { seed: `${name}${i}`, targetCount: size.words, minWordLength: 5, maxWordLength: 8, directions: DEFAULT_DIRECTIONS, rows: size.rows, cols: size.cols })

@@ -8,7 +8,7 @@
 // synchronous; the claim is one `BEGIN IMMEDIATE` transaction (§9.3). Nothing here awaits or does network.
 import type Database from 'better-sqlite3'
 import { WORDHUNT_RULES, type WordHuntEnd, type WordHuntMode } from '@zerocade/shared'
-import { cellName, type Board } from './wordhunt-domain.js'
+import { cellNameFor, type Board } from './wordhunt-domain.js'
 
 const DAY_MS = 86_400_000
 export const WORDHUNT_SCHEMA_VERSION = 1
@@ -139,6 +139,7 @@ export class WordHuntStore {
         const end = t.cells[t.cells.length - 1]!
         target.run(round, t.id, t.word, this.lookup('wordhunt_directions', t.direction), t.start.row, t.start.col, end.row, end.col, t.anchor.row, t.anchor.col, this.lookup('wordhunt_sides', t.side))
       }
+      const cellName = cellNameFor(board.rows)
       this.event(round, 'ROUND_CREATED', { id: input.id, mode: input.mode, seed: board.seed, checksum: board.checksum, targets: board.targets.map((t) => [t.word, cellName(t.start), cellName(t.anchor)]) }, input.now)
       return round
     }).immediate()
