@@ -17,6 +17,9 @@ export const pipelineBFile = [process.env.ZEROCADE_ASSOCIATIONS_B_FILE, join(her
 
 // A secret with fewer associated words in the vocabulary than this is not played: its ranking would be the vectors' again.
 export const PIPELINE_MIN_PINNED = 100
+export const RIORDINO_MIN_PINNED = 40
+export const riordinoFile = [process.env.ZEROCADE_ASSOCIATIONS_RIORDINO_FILE, join(here, 'ZeroContext_Associazioni_Riordino.sqlite3'),
+  join(here, '..', '..', '..', 'database', 'ZeroContext_Associazioni_Riordino.sqlite3')].find((p): p is string => p !== undefined && existsSync(p))
 
 export interface PipelineAssociations {
   version: string
@@ -31,7 +34,7 @@ export function loadPipelineAssociations(file: string, vocab: readonly string[],
   try {
     db.pragma('busy_timeout = 5000')
     const columns = db.prepare<[], { name: string }>("SELECT name FROM pragma_table_info('semantic_pair_scores')").all().map((c) => c.name)
-    if (!columns.includes('rank')) throw new Error("l'export non ha la colonna rank: rilancia il task «ZeroContext : Associazione Parole PipelineB»")
+    if (!columns.includes('rank')) throw new Error("l'export delle associazioni non ha la colonna rank")
     const version = db.prepare<[], { value: string }>("SELECT value FROM pipeline_meta WHERE name = 'model_version'").get()?.value
     if (!version) throw new Error("l'export non ha model_version")
     const index = new Map(vocab.map((w, i) => [w, i]))

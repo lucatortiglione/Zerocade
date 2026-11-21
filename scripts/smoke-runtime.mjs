@@ -133,10 +133,10 @@ try {
   assert.ok(wordhunt.dictionaryReady && wordhunt.targets.length > 0)
   console.log('ZeroWordHunt smoke: generated grid with the distributed dictionary passed.')
   if (contextMetaResponse.ok && (await (await get('/api/context/meta.json')).json()).pipeline === 'context-semantic-1') {
-    const waitState = (predicate) => new Promise((done, reject) => {
-      const timer = setTimeout(() => { socket.off('context:semantic', listener); reject(new Error('Semantic state timeout')) }, 10000)
-      const listener = (state) => { if (state && predicate(state)) { clearTimeout(timer); socket.off('context:semantic', listener); done(state) } }
-      socket.on('context:semantic', listener)
+    const waitState = (predicate, client = socket) => new Promise((done, reject) => {
+      const timer = setTimeout(() => { client.off('context:semantic', listener); reject(new Error('Semantic state timeout')) }, 10000)
+      const listener = (state) => { if (state && predicate(state)) { clearTimeout(timer); client.off('context:semantic', listener); done(state) } }
+      client.on('context:semantic', listener)
     })
     let solution
     socket.on('secret:word', ({ word }) => { solution = word })
@@ -144,12 +144,44 @@ try {
     socket.emit('game:select', 'context')
     const first = await waiting
     assert.equal(first.mode, 'ordinary'); assert.equal(first.remainingMs, null); assert.equal(first.solution, null)
+    const review = (client) => client.timeout(5000).emitWithAck('context:live-review')
+    assert.equal((await review(socket)).ok, false, 'no review secrets during an active live')
     const settings = new Promise((done) => {
-      const listener = (s) => { if (s.gameId === 'context' && s.settings.breakSeconds === 3) { socket.off('session:state', listener); done() } }
+      const listener = (s) => { if (s.gameId === 'context' && s.settings.breakSeconds === 3) { socket.off('session:state', listener); done(s) } }
       socket.on('session:state', listener)
     })
-    socket.emit('settings:set', { breakSeconds: 3, closestPoints: 'none', disableAllHints: true })
-    await Promise.race([settings, new Promise((_, reject) => setTimeout(() => reject(new Error('Settings timeout')), 5000).unref())])
+    socket.emit('settings:set', { breakSeconds: 3, closestPoints: 'none', disableAllHints: false })
+    const { run } = await Promise.race([settings, new Promise((_, reject) => setTimeout(() => reject(new Error('Settings timeout')), 5000).unref())])
+    const vocab = (await (await get('/api/context/vocab.txt')).text()).trim().split(/\s+/)
+    const viewer = { id: 'semantic-user', nickname: 'Semantic' }
+    let stalled = first
+    for (let i = 0; i < Math.min(vocab.length, 128) && !stalled.contextHint?.available; i++) {
+      const word = vocab[Math.floor(i * vocab.length / Math.min(128, vocab.length))]
+      if (word.slice(0, 3) === solution.slice(0, 3)) continue
+      const received = waitState(s => s.typed.at(-1)?.text === word)
+      socket.emit('sim:event', { type: 'comment', text: word, user: viewer })
+      stalled = await received
+    }
+    assert.ok(stalled.contextHint.available)
+    assert.equal(stalled.contextHint.text, null)
+    const spectator = io(base, { transports: ['websocket'], auth: { key, clientType: 'overlay' }, autoConnect: false, reconnection: false })
+    try {
+      const joined = waitState(s => s.round === stalled.round, spectator)
+      spectator.connect()
+      assert.equal((await joined).contextHint.text, null)
+      assert.equal((await review(spectator)).ok, false, 'the ballot is reserved to the director')
+      spectator.emit('context:release-hint', stalled.round, run)
+      assert.equal((await waitState(s => s.round === stalled.round, spectator)).contextHint.text, null, 'an overlay cannot release the clue')
+      const published = waitState(s => s.contextHint?.text, spectator)
+      socket.emit('context:release-hint', stalled.round, run)
+      const clue = (await published).contextHint.text
+      assert.ok(clue)
+      spectator.disconnect()
+      const restored = waitState(s => s.round === stalled.round, spectator)
+      spectator.connect()
+      assert.equal((await restored).contextHint.text, clue, 'a reconnect sees the same published clue')
+    } finally { spectator.close() }
+    socket.emit('settings:set', { disableAllHints: true })
     for (let round = 2; round <= 9; round++) {
       waiting = waitState((s) => s.round === round && s.phase === 'playing')
       socket.emit('game:command', 'next-round')
@@ -240,6 +272,8 @@ try {
     } else {
       console.log('Association switches skipped: unavailable corpus for ' + baselineProfiles.filter((p) => !p.available).map((p) => p.id).join(', '))
     }
+    socket.emit('game:control', 'end')
+    assert.deepEqual(await review(socket), { ok: true, pairs: [] }, 'simulator guesses never enter the blind ballot')
   }
   const save = await get(`/api/pads/${key}`, { method: 'POST', headers: { 'content-type': 'application/json' },
     body: JSON.stringify({ kind: 'gif', slot: 0, label: 'Smoke', color: '#7c5cff', upload: { type: 'image/gif', data: Buffer.from('GIF89a').toString('base64') } }) })

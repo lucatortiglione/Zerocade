@@ -8,6 +8,7 @@ export * from './contextTournament.js'
 export * from './contextSemantic.js'
 export * from './contextProfiles.js'
 export * from './contextEvaluation.js'
+import type { LivePairVerdict, LiveReviewReply } from './contextEvaluation.js'
 export * from './taboo.js'
 export * from './wordhunt.js'
 import type { ContextSemanticState } from './contextSemantic.js'
@@ -1338,6 +1339,7 @@ const GAME_DEFS: GameDef[] = [
       { id: 'associationSource', label: 'Associazioni', kind: 'select', default: 'original', options: [
         { value: 'original', label: 'Associazioni originali' },
         { value: 'abtt', label: 'Associazioni ABTT' },
+        { value: 'riordino', label: 'Riordino (legami specifici)' },
         { value: 'pipeline_b', label: 'Pipeline B (fastText + PMI-SVD + ConceptNet)' },
       ], hint: 'Il cambio avvia un nuovo round senza riavviare il server. La classifica generale è conservata.' },
       { id: 'disableAllHints', label: 'Disabilita tutti gli aiuti', kind: 'toggle', default: false, hint: 'Blocca regali, comandi, suggerimenti automatici e iniziali e lettere rivelate. Nasconde gli aiuti già mostrati, conservando i tentativi dei giocatori.' },
@@ -2459,6 +2461,7 @@ export interface ServerToClientEvents {
 }
 
 export interface ClientToServerEvents {
+  'context:release-hint': (round: number, run: number) => void
   'sim:event': (event: LiveEvent) => void
   'game:select': (gameId: string) => void
   'triggers:set': (triggers: Trigger[]) => void
@@ -2504,6 +2507,8 @@ export interface ClientToServerEvents {
   // The dashboard: ZeroWordHunt's commands (checked on the server; each carries the version the director saw).
   'wordhunt:control': (command: WordHuntCommand, ack: (reply: WordHuntReply) => void) => void
   'context:tournament-history': (ack: (history: TournamentSummary[]) => void) => void
+  'context:live-review': (ack: (reply: LiveReviewReply) => void) => void
+  'context:live-vote': (id: string, verdict: LivePairVerdict, ack: (reply: LiveReviewReply) => void) => void
   'context:tournament-standings': (id: string, ack: (rows: TournamentRow[] | null) => void) => void
   // The copies of the standings saved after every round in a separate SQLite file (latest first), and the restore
   // from one of them (snapshot id; null = the latest).

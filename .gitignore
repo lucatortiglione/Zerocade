@@ -7,6 +7,7 @@ data
 *.log
 *.csv
 !gioco-zerocontext/resources/confronti_indizi.csv
+!gioco-zerocontext/resources/confronti_indizi_misura.csv
 # Archivio RAW 2.0 generato dalle fonti, come la raccolta RAW locale.
 database/parole_ita_raw_2.0.sqlite3*
 .env

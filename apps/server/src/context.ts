@@ -4,7 +4,8 @@ import { CONTEXT_LIMITS, CONTEXT_PROFILES, type ContextProfile } from '@zerocade
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { giochiDb, openSchema, openOptionalSchema } from './schema-db.js'
-import { loadPipelineAssociations, pipelineBFile } from './context-pipeline.js'
+import { rerankRiordino } from './context-relations.js'
+import { loadPipelineAssociations, pipelineBFile, PIPELINE_MIN_PINNED, riordinoFile, RIORDINO_MIN_PINNED } from './context-pipeline.js'
 
 // ZeroContext's data: the playable words (vocab.txt), their vectors (vectors.bin, float32/float16 or legacy int8, one row per word, in the
 // words' order) and the words that can be secret (secrets.txt). The words live in the games' database, schema
@@ -130,59 +131,68 @@ function fromDatabase(profile: ContextProfile = 'original'): Map<string, Buffer>
 let words = fromDatabase()
 const variants = new Map<ContextProfile, Map<string, Buffer> | null>()
 
-// Pipeline B: the original words and vectors, the secrets and the ordered associations of the export (context-pipeline.ts). It is not
-// stored: it is derived from the original files and from the export file, and rebuilt when that file changes. A failure is
-// remembered for the same file (no repeated reads) and shown in the dashboard, never silently replaced by other words.
+// Both derived profiles share the original vocabulary and vectors. Their playable secrets and first positions come from the export.
+type DerivedProfile = 'riordino' | 'pipeline_b'
+const DERIVED: Record<DerivedProfile, { file: string | undefined; minPinned: number; name: string; missing: string }> = {
+  pipeline_b: { file: pipelineBFile, minPinned: PIPELINE_MIN_PINNED, name: 'Pipeline B', missing: 'Export non trovato: esegui il task «ZeroContext : Associazione Parole PipelineB».' },
+  riordino: { file: riordinoFile, minPinned: RIORDINO_MIN_PINNED, name: 'Riordino', missing: 'Manca il database ZeroContext_Associazioni_Riordino.sqlite3.' },
+}
 const pinnedBy = new Map<ContextProfile, Map<number, number[]>>()
 const problems = new Map<ContextProfile, string>()
-let pipelineTried: string | null = null
-function fromPipelineB(): Map<string, Buffer> | null {
+const derivedTried = new Map<DerivedProfile, string>()
+function fromDerived(profile: DerivedProfile): Map<string, Buffer> | null {
+  const { file, minPinned, name, missing } = DERIVED[profile]
   const base = words
-  if (!base) { problems.set('pipeline_b', 'Mancano le associazioni originali (parole e vettori).'); return null }
-  if (!pipelineBFile) { problems.set('pipeline_b', 'Export non trovato: esegui il task «ZeroContext : Associazione Parole PipelineB».'); return null }
-  const stamp = `${pipelineBFile}:${statSync(pipelineBFile).size}:${statSync(pipelineBFile).mtimeMs}`
-  if (stamp === pipelineTried) return null
+  if (!base) { problems.set(profile, 'Mancano le associazioni originali (parole e vettori).'); return null }
+  const stat = file && statSync(file, { throwIfNoEntry: false })
+  if (!file || !stat) { problems.set(profile, missing); return null }
+  const stamp = `${file}:${stat.size}:${stat.mtimeMs}`
+  if (stamp === derivedTried.get(profile)) return null
   try {
     const vocab = base.get('vocab.txt')!.toString('utf8').split('\n').filter(Boolean)
-    const found = loadPipelineAssociations(pipelineBFile, vocab)
+    const found = loadPipelineAssociations(file, vocab, minPinned)
     if (!found.pinned.size) throw new Error('nessuna segreta dell\'export è una parola del vocabolario del gioco')
+    if (profile === 'riordino') {
+      const relations = rerankRiordino(vocab, found.pinned)
+      found.fingerprint = createHash('sha256').update(found.fingerprint).update(relations).digest('hex')
+    }
     const secrets = [...found.pinned.keys()].sort((a, b) => a - b)
     const meta = JSON.parse(base.get('meta.json')!.toString('utf8'))
     const links = JSON.parse(base.get('links.json')!.toString('utf8'))
     if (!links.semantic) throw new Error('le associazioni originali non hanno i pool semantici')
     links.associations_fingerprint = found.fingerprint // makes the corpus hash (tournaments) follow the export
     links.semantic = { ...links.semantic, ordinary: secrets, special: [], curatedOrdinary: secrets, compatibility: [], domains: {} }
-    const revision = createHash('sha256').update(`${meta.corpus_revision}|pipeline_b|${found.fingerprint}`).digest('hex')
+    const revision = createHash('sha256').update(`${meta.corpus_revision}|${profile}|${found.fingerprint}`).digest('hex')
     const next = { ...meta, secrets: secrets.length, ordinary: secrets.length, special: 0, legacy_preserved: 0, corpus_revision: revision,
-      associations: { source: 'pipeline_b', model_version: found.version, secrets: secrets.length, skipped: found.skipped, fingerprint: found.fingerprint } }
+      associations: { source: profile, model_version: found.version, secrets: secrets.length, skipped: found.skipped, fingerprint: found.fingerprint } }
     const files = new Map<string, Buffer>([
       ['vocab.txt', base.get('vocab.txt')!],
       ['secrets.txt', Buffer.from(secrets.map((i) => vocab[i]).join('\n') + '\n', 'utf-8')],
       ['meta.json', Buffer.from(JSON.stringify(next, null, 2) + '\n', 'utf-8')],
       ['links.json', Buffer.from(JSON.stringify(links), 'utf-8')],
     ])
-    for (const [name, buffer] of files) if (buffer.byteLength > budgets[name as ContextFile]) throw new Error(`${name} too large`)
-    pinnedBy.set('pipeline_b', found.pinned)
-    problems.delete('pipeline_b')
-    console.log(`[context] Pipeline B: ${secrets.length} segrete giocabili (${found.skipped.tooFew} con troppe poche associazioni nel vocabolario, ${found.skipped.notInVocabulary} fuori vocabolario)`)
+    for (const [fileName, buffer] of files) if (buffer.byteLength > budgets[fileName as ContextFile]) throw new Error(`${fileName} too large`)
+    pinnedBy.set(profile, found.pinned)
+    problems.delete(profile)
+    console.log(`[context] ${name}: ${secrets.length} segrete giocabili (${found.skipped.tooFew} con troppe poche associazioni nel vocabolario, ${found.skipped.notInVocabulary} fuori vocabolario)`)
     return files
   } catch (error) {
-    pipelineTried = stamp
+    derivedTried.set(profile, stamp)
     const message = error instanceof Error ? error.message : String(error)
-    problems.set('pipeline_b', `Export non utilizzabile: ${message}`)
-    console.error('[context] Pipeline B non disponibile:', message)
+    problems.set(profile, `Export non utilizzabile: ${message}`)
+    console.error(`[context] ${name} non disponibile:`, message)
     return null
   }
 }
 
 function wordsFor(profile: ContextProfile) {
   if (profile === 'original') return words
-  if (profile === 'pipeline_b') {
+  if (profile === 'riordino' || profile === 'pipeline_b') {
     // Derived from the original files and built once per run (a new export is read at the next start); a failure is retried
     // only when the export file has changed.
     const current = variants.get(profile)
     if (current) return current
-    const built = fromPipelineB()
+    const built = fromDerived(profile)
     if (built) variants.set(profile, built)
     return built
   }
@@ -221,7 +231,13 @@ export function reloadContext(expectedRevision: string, profile: ContextProfile 
     if (meta.vector_format !== undefined && !['int8', 'float32', 'float16'].includes(meta.vector_format)) throw new Error('Formato vettori non valido')
     if (!path || statSync(path).size !== meta.words * meta.dim * (meta.vector_format === 'float32' ? 4 : meta.vector_format === 'float16' ? 2 : 1) || statSync(path).size > budgets['vectors.bin'])
       throw new Error('Vettori e parole del nuovo corpus non sono allineati')
-    if (profile === 'original') { words = next; variants.delete('pipeline_b'); pipelineTried = null }
+    if (profile === 'original') {
+      words = next
+      variants.delete('riordino')
+      variants.delete('pipeline_b')
+      derivedTried.clear()
+      pinnedBy.clear()
+    }
     else variants.set(profile, next)
     return { revision: expectedRevision, words: meta.words, dim: meta.dim }
   } catch (error) {

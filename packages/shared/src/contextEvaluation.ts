@@ -6,6 +6,16 @@
 export type HumanVerdict = 'naturale' | 'non_naturale' | 'non_so'
 export const HUMAN_VERDICTS: readonly HumanVerdict[] = ['naturale', 'non_naturale', 'non_so']
 
+export type LivePairVerdict = 'a' | 'b' | 'tie'
+export interface ContextLivePair {
+  id: string
+  secret: string
+  a: string
+  b: string
+  verdict: LivePairVerdict | null
+}
+export type LiveReviewReply = { ok: true; pairs: ContextLivePair[] } | { ok: false; error: string }
+
 export interface EvaluationMetric { metric: string; subset: string; value: number | null; low: number | null; high: number | null; n: number }
 
 /** L'ultima esecuzione completa di un profilo, con tutte le sue metriche. */

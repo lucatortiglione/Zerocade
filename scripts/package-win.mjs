@@ -154,6 +154,7 @@ const zeroTaboo = join(root, 'database', 'ZeroTaboo.sqlite3')
   }
 }
 copyFileSync(zeroTaboo, join(app, 'ZeroTaboo.sqlite3'))
+copyFileSync(join(root, 'database', 'ZeroContext_Associazioni_Riordino.sqlite3'), join(app, 'ZeroContext_Associazioni_Riordino.sqlite3'))
 // ZeroContext: the vectors of the playable words, in their order (apps/server/src/context.ts).
 mkdirSync(join(app, 'zerocontext'), { recursive: true })
 copyFileSync(join(root, 'gioco-zerocontext', 'data', contextVectors), join(app, 'zerocontext', contextVectors))

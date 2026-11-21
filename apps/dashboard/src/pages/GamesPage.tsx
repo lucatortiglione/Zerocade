@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { GAMES, chainModeLabel, parseChainSecret, type SessionState } from '@zerocade/shared'
+import { Link } from 'react-router'
+import { CONTEXT_HINT_STALL, GAMES, chainModeLabel, parseChainSecret, type ContextSemanticState, type SessionState } from '@zerocade/shared'
 import { connectionLabels, connectionStatus } from '../connectionStatus'
 import { PlaceBoxes } from '../components/PlaceBoxes'
 import { BivioSidebar } from '../components/BivioSidebar'
@@ -24,7 +25,7 @@ import { timesOut } from '../format'
 import { useDashboard } from '../store'
 
 export function GamesPage() {
-  const { session, gameSecret, tournament, secretUses } = useDashboard()
+  const { session, gameSecret, tournament, secretUses, contextSemantic, connected } = useDashboard()
   // ZeroContext's tournament (shown, or still running): the classic round controls step aside.
   const tournamentShown = session?.gameId === 'context' && Boolean(tournament)
   const tournamentOpen = tournamentShown && tournament?.state.phase !== 'completed' && tournament?.state.phase !== 'cancelled'
@@ -85,6 +86,11 @@ export function GamesPage() {
           </section>
         )}
         {session && !tournamentOpen && <GameControls session={session} />}
+        {session?.gameId === 'context' && session.ended && (
+          <Link className="btn btn--small" to="/qualita">Valuta i confronti di fine live</Link>
+        )}
+        {session?.gameId === 'context' && !tournamentShown && contextSemantic?.contextHint &&
+          <ContextHintPanel session={session} state={contextSemantic} connected={connected} />}
         <section>
           <h2 className="section-label">Chat Twitch e TikTok</h2>
           <p className="text-muted small">
@@ -112,6 +118,33 @@ export function GamesPage() {
       <LiveColumn />
     </div>
   )
+}
+
+function ContextHintPanel({ session, state, connected }: { session: SessionState; state: ContextSemanticState; connected: boolean }) {
+  const hint = state.contextHint!
+  const result = state.lastHintResult
+  const playing = state.phase === 'playing'
+  const enabled = session.settings.disableAllHints !== true
+  const waiting = playing && enabled && hint.guessesAfterRelease === null
+  const guesses = (n: number) => n === 1 ? '1 tentativo' : `${n} tentativi`
+  return <section>
+    <h2 className="section-label">Indizio contestuale</h2>
+    {!enabled && <p className="text-muted small">Gli aiuti sono disattivati.</p>}
+    {waiting && <>
+      <p className="text-muted small">{guesses(hint.stalled)} senza migliorare la posizione. Servono {CONTEXT_HINT_STALL} parole distinte.</p>
+      <button type="button" className="btn btn--small" disabled={!connected || !hint.available || session.ended || session.paused}
+        onClick={() => socket.emit('context:release-hint', state.round, session.run ?? 0)}>Pubblica indizio</button>
+      {!state.paused && hint.stalled >= CONTEXT_HINT_STALL && !hint.available && <p className="text-muted small">Aiuti del round esauriti.</p>}
+    </>}
+    {hint.text && <p>{hint.text}</p>}
+    {playing && hint.guessesAfterRelease !== null && <p className="text-muted small">{hint.guessesToImprovement === null
+      ? `${guesses(hint.guessesAfterRelease)} dopo l’indizio. In attesa di una posizione migliore.`
+      : `Posizione migliorata dopo ${guesses(hint.guessesToImprovement)}.`}</p>}
+    {!playing && hint.guessesAfterRelease === null && <p className="text-muted small">Round concluso senza indizio.</p>}
+    {result && <p className="text-muted small">Round {result.round} · {result.improved
+      ? `Posizione migliorata dopo ${guesses(result.guesses)}.`
+      : `${guesses(result.guesses)} dopo l’indizio, nessun miglioramento.`}</p>}
+  </section>
 }
 
 // The round's secret as the creator reads it: ZeroReazioniACatena's with its mode and round, the hidden

@@ -53,7 +53,8 @@ def load_profile(args) -> tuple[Profile, str]:
     """Il profilo scelto e da dove viene (si salva nel database dei risultati)."""
     try:
         if args.profilo:
-            profile = load_published(args.profilo, giochi=Path(args.giochi), vectors_dir=Path(args.vettori_dir), pipeline_b=Path(args.pipeline_b))
+            profile = load_published(args.profilo, giochi=Path(args.giochi), vectors_dir=Path(args.vettori_dir),
+                                     pipeline_b=Path(args.pipeline_b), riordino=Path(args.export_riordino))
             return profile, f'giochi.sqlite3#{SCHEMAS[args.profilo]}'
         return load_candidate(args.candidato, Path(args.vettori), Path(args.vocab), args.dim), f'candidato:{Path(args.vettori).name}'
     except (FileNotFoundError, sqlite3.OperationalError, ValueError) as error:
@@ -87,7 +88,8 @@ def cmd_campione(args, backend, live_guard_fn) -> int:
 
 def considered_secrets(ref: Reference, gold: Gold, profile: Profile) -> list[str]:
     """Tutte le segrete di misura e, dello sviluppo, solo quelle con associazioni verificate (spec, passo 2 di valuta)."""
-    return sorted(s for s in ref.secrets if s in profile.index and (split.is_measure(s) or s in gold))
+    return sorted(s for s in ref.secrets if s in profile.index and (split.is_measure(s) or s in gold)
+                  and (profile.name != 'riordino' or profile.index[s] in (profile.pinned or {})))
 
 
 def rank_secrets(store: Store, run: int, profile: Profile, ref: Reference, gold: Gold, secrets: list[str]) -> None:
@@ -313,7 +315,7 @@ def cmd_ricalcola(args, backend, live_guard_fn) -> int:
 def cmd_parita(args, backend, live_guard_fn) -> int:
     ref, _ = load_inputs(args)
     profile, _ = load_profile(args)
-    secrets = sorted(s for s in ref.secrets if s in profile.index and split.is_measure(s))[:args.segrete]
+    secrets = [s for s in considered_secrets(ref, {}, profile) if split.is_measure(s)][:args.segrete]
     data = {'profile': profile.name, 'vectors_sha256': profile.sha256,
             'secrets': [{'secret': s, 'top': [profile.words[i] for i in ranking.top(profile, profile.index[s], k=20)]} for s in secrets]}
     out = Path(args.rapporti)
@@ -335,6 +337,7 @@ def build_parser() -> argparse.ArgumentParser:
     common.add_argument('--rapporti', default=str(paths.REPORTS), help='cartella dei rapporti JSON e CSV')
     common.add_argument('--vettori-dir', default=str(paths.VECTORS_DIR))
     common.add_argument('--pipeline-b', default=str(paths.PIPELINE_B))
+    common.add_argument('--export-riordino', default=str(paths.RIORDINO))
     common.add_argument('--server', default='http://127.0.0.1:3001', help='Zerocade, per sapere se c\'è una diretta')
 
     profile = argparse.ArgumentParser(add_help=False)

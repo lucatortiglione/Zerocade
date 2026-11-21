@@ -10,6 +10,7 @@ export interface ContextView {
   revealed: boolean; lettersShown: number; showWordLength: boolean; solver: Viewer | null; revealAt: number; best: number
   redUntil: number; orangeUntil: number; yellowUntil: number; cyanUntil: number
   showBoard: boolean; last: ContextGuess | null; closest: readonly ContextGuess[]
+  contextHint?: string | null
   matchOver: boolean; leaders: readonly Score[]; typed: readonly ContextTypedGuess[]
   // Set by the tournament, which is drawn with this same view: its extras and its own readings of the round.
   tournament?: TournamentLayer
@@ -263,6 +264,13 @@ export function paintContext(ctx: CanvasRenderingContext2D, now: number, width: 
       const boardH = board ? 84 : 0
       const boardTop = bottom - boardH - 12
       let y = cy + 46
+      if (view.contextHint && !revealed) {
+        ctx.textAlign = 'center'
+        ctx.fillStyle = '#f5c542'
+        ctx.font = '700 24px system-ui'
+        ctx.fillText(`Indizio · ${view.contextHint}`, cx, y + 16, panelW - 24)
+        y += 46
+      }
       const notes = T?.notes ?? []
       // The classic game's end-of-round lines (who found it, the match winner) sit under the list.
       const endLines = !T && revealed && matchOver && leaders[0] ? 40 : 0

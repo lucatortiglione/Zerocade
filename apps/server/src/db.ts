@@ -21,6 +21,7 @@ import {
 } from '@zerocade/shared'
 import { REPORT_MAX_BYTES } from './csv.js'
 import { ContextTournamentStore } from './context-tournament-db.js'
+import { ContextLiveReviews } from './context-live-reviews.js'
 import { TabooStore } from './taboo-db.js'
 import { WordHuntStore } from './wordhunt-db.js'
 import { TournamentBackup } from './context-tournament-backup.js'
@@ -946,6 +947,7 @@ try {
   console.warn(`[db] backup della classifica dei tornei non attivo (${tournamentBackupPath}): ${err instanceof Error ? err.message : String(err)}`)
 }
 export const contextTournamentStore = new ContextTournamentStore(db, tournamentBackup)
+export const contextLiveReviews = new ContextLiveReviews(db)
 // ZeroTaboo's matches, exposures, winners and score events (the deck is a file of its own, database/ZeroTaboo.sqlite3).
 // The schema is created here with IF NOT EXISTS: the infrastructure worker imports this module too, so it must stay idempotent.
 export const tabooStore = new TabooStore(db)

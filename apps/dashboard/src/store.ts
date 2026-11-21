@@ -5,6 +5,7 @@ import {
   type BivioState,
   type BridgeStatus,
   type ContextTournamentAdmin,
+  type ContextSemanticState,
   type FeedEvent,
   type Gifter,
   type IncastroMoment,
@@ -59,6 +60,7 @@ interface DashboardState {
   wordhuntAdmin: WordHuntAdminState | null
   // ZeroContext's secret word of the round in play.
   gameSecret: string | null
+  contextSemantic: ContextSemanticState | null
   // ZeroContext's tournament as its organiser sees it (secret, full standings), and the last refused command.
   tournament: ContextTournamentAdmin | null
   tournamentAt: number
@@ -90,6 +92,7 @@ let state: DashboardState = {
   wordhunt: null,
   wordhuntAdmin: null,
   gameSecret: null,
+  contextSemantic: null,
   tournament: null,
   tournamentAt: 0,
   tournamentError: null,
@@ -168,6 +171,7 @@ socket.on('wordhunt:state', (wordhunt) => update({ wordhunt }))
 socket.on('wordhunt:admin', (wordhuntAdmin) => update({ wordhuntAdmin }))
 socket.on('pads:state', (pads) => update({ pads }))
 socket.on('context:tournament-admin', (tournament) => update({ tournament, tournamentAt: performance.now() }))
+socket.on('context:semantic', (contextSemantic) => update({ contextSemantic }))
 socket.on('context:tournament-error', ({ message }) => update({ tournamentError: message }))
 socket.on('context:secret-uses', (secretUses) => update({ secretUses }))
 socket.on('context:secret-used', ({ word, uses }) => update({ secretUses: { ...state.secretUses, [word]: uses } }))

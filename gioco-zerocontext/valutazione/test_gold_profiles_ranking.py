@@ -171,6 +171,18 @@ class ProfilesTest(unittest.TestCase):
             self.load('pipeline_b', pipeline_b=Path(self.tmp.name) / 'manca.sqlite3')
         self.assertIn('Pipeline B', str(caught.exception))
 
+    def test_riordino_promotes_lexical_evidence_after_playability_filtering(self):
+        rows = [(1, 2, 'v1', 1), (1, 4, 'v1', 2), (2, 1, 'v1', 1)]
+        export = self.make_export(rows)
+        for file, table, column in [(self.giochi, 'context_original__vocab', 'word'), (export, 'lexemes', 'lemma')]:
+            with closing(sqlite3.connect(file)) as con:
+                for old, new in [('cane','accendino'),('guinzaglio','serbatoio')]:
+                    con.execute(f'UPDATE {table} SET {column}=? WHERE {column}=?', (new, old))
+                con.commit()
+        p = self.load('riordino', riordino=export, min_riordino=2)
+        self.assertEqual(p.pinned, {0: [2, 1]})
+        self.assertNotEqual(p.sha256, self.sha)
+
 
 def fixture_profile(data, case) -> profiles.Profile:
     n, dim = data['words'], data['dim']

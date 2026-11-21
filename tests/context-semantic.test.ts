@@ -3,6 +3,7 @@ import { test } from 'node:test'
 import { semanticMode, specialPoints, thermalScore, type ContextSemanticState, type LiveEvent } from '@zerocade/shared'
 import { contextHalf, parseContextData, rankAgainst } from '@zerocade/shared/contextRanking'
 import { ContextSemanticGame } from '../apps/server/src/context-semantic.ts'
+import { createSemanticContext } from '../apps/overlay/src/games/contextSemanticGame.ts'
 
 const word = (n: number) => `voce${String.fromCharCode(97 + Math.floor(n / 676), 97 + Math.floor(n / 26) % 26, 97 + n % 26)}`
 const words = Array.from({ length: 1400 }, (_, i) => word(i))
@@ -16,15 +17,31 @@ const linked = { boost: 0, links: {}, vector_format: 'float32', dim: 300,
 const parse = (buffer = vectors.slice().buffer, links: unknown = linked) => parseContextData(words.join('\n'), buffer, `${words[0]}\n${words[1]}`, links)
 const data = parse()
 
-function fixture() {
+function fixture(roundCompleted?: (secret: string, words: string[]) => void) {
   let now = 0
   const states: ContextSemanticState[] = [], awards: number[] = [], secrets: string[] = []
   const game = new ContextSemanticGame({ corpus: { data, hash: 'fixture' }, specialRoundsEnabled: true, settings: { breakSeconds: 0, closestPoints: 'none' },
-    now: () => now, random: () => 0, emit: (s) => states.push(s), award: (_, p) => awards.push(p), secret: (s) => secrets.push(s) })
+    roundCompleted, now: () => now, random: () => 0, emit: (s) => states.push(s), award: (_, p) => awards.push(p), secret: (s) => secrets.push(s) })
   return { game, states, awards, secrets, advance(ms: number) { now += ms; game.tick() },
     ninth() { for (let i = 1; i < 9; i++) { game.next(); now++; game.tick() } },
-    guess(i: number | string) { const event: LiveEvent = { type: 'comment', text: typeof i === 'number' ? words[i] : i, user: { id: 'p', nickname: 'Giocatore' } }; game.action('guess', event) } }
+    guess(i: number | string) { const event: LiveEvent = { type: 'comment', text: typeof i === 'number' ? words[i] : i, user: { id: 'p', nickname: 'Giocatore' } }; game.action('guess', event, 'twitch') } }
 }
+
+test('reviews receive only accepted live guesses after a round completes, omitting hints, simulator and solution', () => {
+  const rounds: { secret: string; words: string[] }[] = []
+  const f = fixture((secret, words) => rounds.push({ secret, words }))
+  const user = { id: 'sim', nickname: 'Simulatore' }
+  f.game.action('guess', { type: 'comment', text: words[1000], user }, 'sim')
+  f.guess(1300)
+  f.guess(1300)
+  f.guess('due parole')
+  f.game.action('reveal_closer', { type: 'gift', giftId: 'rose', count: 1, user })
+  assert.deepEqual(rounds, [])
+  f.guess(f.secrets[0])
+  assert.deepEqual(rounds, [{ secret: f.secrets[0], words: [words[1300]] }])
+  f.game.dispose()
+  assert.equal(rounds.length, 1)
+})
 
 test('FP32 rows are normalized, finite and dimensioned explicitly; int8 remains supported', () => {
   assert.ok(data.vectors instanceof Float32Array)
@@ -39,6 +56,21 @@ test('FP32 rows are normalized, finite and dimensioned explicitly; int8 remains 
   assert.throws(() => parse(vectors.buffer, { ...linked, vector_format: 'float64' }), /Formato/)
   assert.throws(() => parse(vectors.buffer.slice(1)), /troncati/)
   assert.ok(parseContextData('mare\nonda', new Int8Array([100, 0, 95, 30]).buffer, 'mare').vectors instanceof Int8Array)
+})
+
+test('ending the session closes its last paused round once, while changing games discards unfinished guesses', () => {
+  const rounds: string[][] = []
+  const f = fixture((_, words) => rounds.push(words))
+  f.guess(1300)
+  f.guess(1299)
+  f.game.pause(true)
+  f.game.endSession()
+  f.game.endSession()
+  assert.deepEqual(rounds, [[words[1300], words[1299]]])
+  const abandoned = fixture((_, words) => rounds.push(words))
+  abandoned.guess(1301)
+  abandoned.game.dispose()
+  assert.equal(rounds.length, 1)
 })
 
 test('pools must cover all secrets and the special pool must have actual domains', () => {
@@ -154,4 +186,103 @@ test('production disables specials, including the ninth round, and keeps former 
   assert.equal(game.snapshot().mode, 'ordinary')
   assert.equal(game.snapshot().remainingMs, null)
   assert.equal(semanticMode(9), 'ordinary')
+})
+
+test('the director can release one contextual clue only after five distinct guesses without a record', () => {
+  const f = fixture()
+  const hint = () => f.game.snapshot().contextHint!
+  f.guess(100)
+  for (const guess of [101, 102, 103, 104, 104, 'inesistente', 'due parole']) f.guess(guess)
+  assert.equal(hint()?.stalled, 4)
+  f.game.releaseContextHint(1)
+  assert.equal(hint().text, null)
+  f.guess(90)
+  assert.equal(hint().stalled, 0)
+  for (const guess of [110, 111, 112, 113, 114]) f.guess(guess)
+  assert.equal(hint().available, true)
+  assert.equal(hint().text, null)
+  f.game.pause(true)
+  f.game.releaseContextHint(1)
+  f.guess(87)
+  assert.equal(hint().text, null)
+  f.game.pause(false)
+  f.game.releaseContextHint(2)
+  assert.equal(hint().text, null)
+  f.game.releaseContextHint(1)
+  assert.ok(hint().text)
+  assert.ok(!hint().text!.includes(words[0]))
+  assert.equal(hint().available, false)
+  f.guess(115)
+  f.game.releaseContextHint(1)
+  f.guess(115); f.guess('inesistente')
+  assert.equal(hint().guessesAfterRelease, 1)
+  f.guess(80); f.guess(75)
+  assert.equal(hint().guessesToImprovement, 2)
+  f.game.next()
+  assert.equal(hint().guessesToImprovement, 2)
+  f.advance(1)
+  assert.equal(hint().text, null)
+  assert.equal(hint().guessesAfterRelease, null)
+  assert.deepEqual(f.game.snapshot().lastHintResult, { round: 1, guesses: 2, improved: true })
+})
+
+test('a disabled clue stays hidden and a round without a subsequent record is counted separately', () => {
+  const f = fixture()
+  f.game.settingsChanged({ disableAllHints: true })
+  for (let i = 10; i <= 20; i++) f.guess(i)
+  f.game.releaseContextHint(1)
+  assert.equal(f.game.snapshot().contextHint?.stalled, 0)
+  f.game.settingsChanged({ disableAllHints: false })
+  for (let i = 21; i <= 25; i++) f.guess(i)
+  f.game.releaseContextHint(1)
+  assert.ok(f.game.snapshot().contextHint!.text)
+  f.game.settingsChanged({ disableAllHints: true })
+  assert.equal(f.game.snapshot().contextHint!.text, null)
+  f.guess(26); f.game.next()
+  assert.deepEqual(f.game.snapshot().lastHintResult, { round: 1, guesses: 1, improved: false })
+})
+
+test('an overlay reconnecting mid-round draws the released clue in portrait and landscape', () => {
+  const f = fixture()
+  for (let i = 10; i <= 15; i++) f.guess(i)
+  f.game.releaseContextHint(1)
+  const contextSemantic = f.game.snapshot()
+  const clue = contextSemantic.contextHint!.text!
+  for (const [width, height] of [[1080, 1920], [1920, 1080]]) {
+    const renderer = createSemanticContext(() => ({ contextSemantic, contextSemanticAt: 0 }))
+    renderer.reset({}, width, height)
+    const lines: { text: string; x: number; y: number; font: string; maxWidth: number }[] = []
+    const canvas = new Proxy({
+      font: '',
+      fillText(text: string, x: number, y: number, maxWidth: number) { lines.push({ text, x, y, font: this.font, maxWidth }) },
+      measureText: (text: string) => ({ width: text.length * 12 }),
+      createLinearGradient: () => ({ addColorStop() {} }),
+    }, { get: (target, key) => key in target ? Reflect.get(target, key) : () => {} }) as unknown as CanvasRenderingContext2D
+    renderer.draw(canvas, 100)
+    const line = lines.find(l => l.text.includes(clue))
+    assert.ok(line, 'the reconnect snapshot supplies the public clue')
+    assert.equal(line.x, width / 2)
+    assert.ok(line.y > 56 && line.y < height - 132)
+    assert.ok(line.maxWidth <= width - 48)
+    assert.match(line.font, /2[0-9]px/)
+    const nextGuess = lines.find(l => l.text === contextSemantic.last!.word)
+    assert.ok(nextGuess && nextGuess.y > line.y + 30, 'the guess card stays below the clue')
+  }
+})
+
+test('the pittore clue suggests tools without giving a ranked word and the winning plural counts as the next record', () => {
+  const vocab = [...words]
+  vocab[0] = 'pittore'
+  vocab[1] = 'cavalletto'
+  const corpus = parseContextData(vocab.join('\n'), vectors.slice().buffer, 'pittore\ncavalletto', linked)
+  const game = new ContextSemanticGame({ corpus: { data: corpus, hash: 'pittore' }, settings: {}, random: () => 0,
+    emit() {}, secret() {}, award() {} })
+  const guess = (text: string) => game.action('guess', { type: 'comment', text, user: { id: 'p', nickname: 'P' } })
+  for (let i = 10; i <= 15; i++) guess(words[i])
+  game.releaseContextHint(1)
+  assert.match(game.snapshot().contextHint!.text!, /strument/i)
+  assert.doesNotMatch(game.snapshot().contextHint!.text!, /pittor|cavalletto|tavolozza/i)
+  guess('pittori')
+  assert.equal(game.snapshot().reason, 'found')
+  assert.deepEqual(game.snapshot().lastHintResult, { round: 1, guesses: 1, improved: true })
 })

@@ -2,6 +2,32 @@
   "version": "2.0.0",
   "tasks": [
     {
+      "label": "ZeroCade : Crea pacchetto Windows con Riordino",
+      "type": "process",
+      "command": "node",
+      "args": ["scripts/package-win.mjs"],
+      "options": { "cwd": "${workspaceFolder}" },
+      "detail": "Ricrea release/zerocade-win-x64 includendo il database Riordino di ZeroContext. Chiudi prima la copia di ZeroCade avviata da quella cartella.",
+      "problemMatcher": [],
+      "runOptions": { "instanceLimit": 1 }
+    },
+    {
+      "label": "ZeroContext : Verifica Riordino",
+      "dependsOrder": "sequence",
+      "dependsOn": ["ZeroContext : Associazioni - Confronta i 50 indizi", "ZeroContext : Valuta Riordino con i voti delle live"],
+      "detail": "Esegue il confronto editoriale, la misura sulle segrete riservate e la lettura dei voti effettivi della regia.",
+      "problemMatcher": []
+    },
+    {
+      "label": "ZeroContext : Valuta Riordino con i voti delle live",
+      "type": "process",
+      "command": "node",
+      "args": ["--import", "tsx", "scripts/context-evaluate-live-votes.ts"],
+      "options": { "cwd": "${workspaceFolder}" },
+      "detail": "Confronta il Riordino precedente e quello con legami specifici sulle stesse preferenze cieche raccolte in regia.",
+      "problemMatcher": []
+    },
+    {
       "label": "ZeroContext : Associazioni - Prova le associazioni umane direzionali",
       "type": "process",
       "command": "${workspaceFolder}/gioco-zerocontext/.venv-pipeline-a/Scripts/python.exe",
@@ -39,7 +65,7 @@
       "command": "${workspaceFolder}/gioco-zerocontext/.venv-pipeline-a/Scripts/python.exe",
       "args": ["-B", "-X", "utf8", "${workspaceFolder}/scripts/context-vscode.py", "confronti"],
       "options": { "cwd": "${workspaceFolder}" },
-      "detail": "Misura Pipeline B e Riordino standard con il motore di gioco e salva reports/confronti_indizi.json.",
+      "detail": "Confronta Pipeline B, Riordino precedente e Riordino con legami specifici sui 50 casi editoriali e sul campione separato. Salva reports/confronti_indizi.json.",
       "problemMatcher": [],
       "runOptions": { "instanceLimit": 1 },
       "presentation": { "reveal": "always", "panel": "dedicated", "clear": true }

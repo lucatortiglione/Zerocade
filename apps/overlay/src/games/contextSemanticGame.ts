@@ -1,12 +1,11 @@
-import { normalizeContextColors, type ContextSemanticGuess, type GameSettings } from '@zerocade/shared'
+import { normalizeContextColors, type ContextSemanticGuess, type ContextSemanticState, type GameSettings } from '@zerocade/shared'
 import { roundCheer } from '../audio'
-import { overlaySnapshot } from '../store'
 import { clamp } from './common'
 import { bandColor } from './contextRanking'
 import { paintContext, type ContextGuess, type ContextView } from './contextView'
 
 // Pure presentation: the server owns clock, attempts, solutions, hints and points.
-export function createSemanticContext() {
+export function createSemanticContext(snapshot: () => { contextSemantic: ContextSemanticState | null; contextSemanticAt: number }) {
   let width = 0, height = 0
   let settings: GameSettings = {}
   let round = 0
@@ -24,7 +23,7 @@ export function createSemanticContext() {
     update() {},
     draw(ctx: CanvasRenderingContext2D, now: number) {
       ctx.clearRect(0, 0, width, height)
-      const { contextSemantic: state, contextSemanticAt } = overlaySnapshot()
+      const { contextSemantic: state, contextSemanticAt } = snapshot()
       if (!state) return
       if (round !== state.round) { round = state.round; seen.clear(); revealed = state.solution !== null }
       if (!revealed && state.solution !== null) { revealAt = now; if (state.solvedBy) roundCheer() }
@@ -43,7 +42,7 @@ export function createSemanticContext() {
         showWordLength: state.wordLength !== null, solver: state.solvedBy, revealAt,
         best: state.best ?? Infinity, ...colors, showBoard: settings.showLeaderboard !== false,
         last: state.last ? guess(state.last, now) : null, closest: state.closest.map((g) => guess(g, now)),
-        matchOver: false, leaders: state.leaders, typed: state.typed,
+        matchOver: false, leaders: state.leaders, typed: state.typed, contextHint: state.contextHint?.text,
         tournament: {
           showTilesDuringRound: true,
           mode: `ROUND ${state.round} · ${special ? 'SPECIALE — SURVIVAL ZIPF 1.9' : 'ORDINARIO'}`,

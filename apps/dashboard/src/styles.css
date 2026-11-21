@@ -1231,6 +1231,7 @@ input[type='number']:focus { border-color: var(--accent); }
 .quality__tag--ok { background: rgba(34, 197, 94, 0.15); color: var(--ok); }
 .quality__disagree { color: var(--warning); }
 .quality__verdicts { display: inline-flex; gap: 6px; }
+.quality__pair { margin-top: 8px; flex-wrap: wrap; }
 .quality__verdicts .btn.is-picked { border-color: var(--accent); background: var(--accent-soft); color: var(--text); }
 @media (max-width: 760px) { .quality { padding: 24px 16px; } .quality__word { grid-template-columns: 26px minmax(0, 1fr); } .quality__verdicts, .quality__none { grid-column: 2; } }
 .wordhunt-hint-settings { min-width: 0; margin: 0; padding: .6rem; border: 1px solid currentColor; border-radius: .5rem; }

@@ -1,7 +1,8 @@
-import { CONTEXT_LIMITS, CONTEXT_SEMANTIC_RULES, pickSecret, semanticMode, specialPoints, thermalScore,
-  type ContextSemanticGuess, type ContextSemanticState, type GameSettings, type LiveEvent, type Viewer } from '@zerocade/shared'
+import { CONTEXT_HINT_STALL, CONTEXT_LIMITS, CONTEXT_SEMANTIC_RULES, pickSecret, semanticMode, specialPoints, thermalScore,
+  type ContextSemanticGuess, type ContextSemanticState, type EventOrigin, type GameSettings, type LiveEvent, type Viewer } from '@zerocade/shared'
 import { closerHint, lookup, startHint, type Ranking } from '@zerocade/shared/contextRanking'
 import { rankLocally, type Corpus } from './context-tournament-ranking.js'
+import { riordinoRelationClues } from './context-relations.js'
 
 interface Options {
   corpus: Corpus
@@ -9,6 +10,7 @@ interface Options {
   emit(state: ContextSemanticState): void
   award(user: Viewer, points: number): void
   secret(word: string): void
+  roundCompleted?(secret: string, words: string[]): void
   uses?(word: string): number
   lastAt?(word: string): number
   now?(): number
@@ -42,12 +44,16 @@ export class ContextSemanticGame {
   private best = Infinity
   private taken = new Set<number>()
   private guesses: ContextSemanticGuess[] = []
+  private liveGuesses: string[] = []
   private typed: ContextSemanticState['typed'] = []
   private notes: string[] = []
   private rescues = new Set<number>()
   private shown = 0
   private hints = 0
   private hintAt = 0
+  private stalled = 0
+  private releasedHint: { text: string; atAttempt: number; guessesToImprovement: number | null } | null = null
+  private lastHintResult: ContextSemanticState['lastHintResult'] = null
   private solver: Viewer | null = null
   private reason: ContextSemanticState['reason'] = null
   private scores = new Map<string, ContextSemanticState['leaders'][number]>()
@@ -74,6 +80,15 @@ export class ContextSemanticGame {
 
   // The game is replaced (other associations, another game): an answer still on its way changes nothing.
   dispose() { this.disposed = true }
+
+  // The director closes the live explicitly, including a paused final round.
+  endSession() {
+    if (!this.disposed && this.phase === 'playing') {
+      this.phase = 'completed'
+      this.options.roundCompleted?.(this.word, this.liveGuesses)
+    }
+    this.dispose()
+  }
 
   // Chooses the next round's secret now (the one in play is excluded) and asks for its ranking.
   private prepare() {
@@ -116,16 +131,22 @@ export class ContextSemanticGame {
   private get word() { return this.options.corpus.data.words[this.secret] }
   private elapsed(at = this.pausedAt ?? this.now()) { return Math.max(0, at - this.started) }
   private get hintsOff() { return this.settings.disableAllHints === true }
+  private get contextHintAvailable() {
+    return this.phase === 'playing' && this.pausedAt === null && !this.hintsOff && !this.releasedHint
+      && this.stalled >= CONTEXT_HINT_STALL && this.hints < this.number('maxHintsPerRound', 5)
+  }
 
   private begin() {
     const next = this.upcoming!
     this.upcoming = null
     this.round++
+    this.liveGuesses = []
     const { data } = this.options.corpus
     this.secret = next.secret
     this.ranking = next.ranking
     this.phase = 'playing'
     this.attempts = 0; this.best = Infinity; this.shown = 0; this.hints = 0
+    this.stalled = 0; this.releasedHint = null
     this.taken.clear(); this.rescues.clear(); this.guesses = []; this.typed = []; this.notes = []
     this.solver = null; this.reason = null
     this.started = this.now(); this.hintAt = this.started; this.lastSecond = -1
@@ -145,13 +166,17 @@ export class ContextSemanticGame {
     const at = this.pausedAt ?? this.now()
     if (this.secret < 0) return { round: 0, mode: 'ordinary', phase: 'intermission', paused: this.pausedAt !== null, preparing: true,
       remainingMs: null, attempts: 0, total: this.options.corpus.data.words.length, solution: null, prefix: '', wordLength: null,
-      solvedBy: null, reason: null, best: null, closest: [], last: null, typed: [], notes: [], leaders: [] }
+      solvedBy: null, reason: null, best: null, closest: [], last: null, typed: [], notes: [], leaders: [], contextHint: null, lastHintResult: null }
     return { round: this.round, mode: this.special ? 'special' : 'ordinary', phase: this.phase, paused: this.pausedAt !== null,
       remainingMs: this.phase === 'playing' ? this.special ? Math.max(0, 180000 - this.elapsed(at)) : null : Math.max(0, this.until - at),
       attempts: this.attempts, total: this.options.corpus.data.words.length,
       solution: this.phase === 'playing' ? null : this.word, prefix: this.word.slice(0, this.shown),
       wordLength: !this.hintsOff && this.settings.showWordLength !== false ? this.word.length : null,
       solvedBy: this.solver, reason: this.reason, best: Number.isFinite(this.best) ? this.best : null,
+      contextHint: { stalled: this.stalled, available: this.contextHintAvailable, text: this.hintsOff ? null : this.releasedHint?.text ?? null,
+        guessesAfterRelease: this.releasedHint ? this.attempts - this.releasedHint.atAttempt : null,
+        guessesToImprovement: this.releasedHint?.guessesToImprovement ?? null },
+      lastHintResult: this.lastHintResult,
       closest: [...this.guesses].sort((a, b) => a.rank - b.rank).slice(0, 10), last: this.guesses.at(-1) ?? null,
       typed: [...this.typed], notes: [...this.notes], leaders: [...this.scores.values()].sort((a, b) => b.pts - a.pts).slice(0, 10) }
   }
@@ -164,6 +189,7 @@ export class ContextSemanticGame {
       this.taken = new Set(this.guesses.map((g) => this.options.corpus.data.index.get(g.word)!))
       this.best = this.guesses.reduce((best, g) => Math.min(best, g.rank), Infinity)
       this.shown = 0; this.notes = []
+      this.stalled = 0
     }
     this.emit()
   }
@@ -180,6 +206,8 @@ export class ContextSemanticGame {
     if (this.taken.has(i)) return
     this.taken.add(i)
     const rank = this.ranking.rankOf[i]
+    if (rank < this.best) this.stalled = 0
+    else if (by && !this.hintsOff && !this.releasedHint) this.stalled++
     this.guesses.push({ word: this.options.corpus.data.words[i], rank, by,
       temperature: thermalScore(this.ranking.similarities?.[i] ?? 0, this.special), at: this.now() })
     this.best = Math.min(this.best, rank)
@@ -190,7 +218,7 @@ export class ContextSemanticGame {
     this.scores.set(user.id, { id: user.id, name: user.nickname, avatar: user.avatar, pts: (current?.pts ?? 0) + points })
     this.options.award(user, points)
   }
-  action(action: string, event: LiveEvent) {
+  action(action: string, event: LiveEvent, origin: EventOrigin = 'sim') {
     this.tick()
     if (this.pausedAt !== null || this.phase !== 'playing') return
     if (action === 'reveal_closer') { this.hint(); this.emit(); return }
@@ -206,7 +234,11 @@ export class ContextSemanticGame {
     if (this.attempts >= CONTEXT_LIMITS.guesses) { this.finish('attempts'); return }
     const improved = this.ranking.rankOf[i] < this.best
     this.attempts++
+    if (improved && this.releasedHint && this.releasedHint.guessesToImprovement === null) {
+      this.releasedHint.guessesToImprovement = this.attempts - this.releasedHint.atAttempt
+    }
     this.place(i, user)
+    if (origin !== 'sim' && i !== this.secret) this.liveGuesses.push(this.options.corpus.data.words[i])
     if (i === this.secret) {
       this.award(user, this.special ? specialPoints(this.elapsed() / 1000, this.attempts) : this.number('finderPoints', 100))
       this.finish('found', user)
@@ -234,11 +266,42 @@ export class ContextSemanticGame {
     const rank = closerHint(this.ranking, this.best, this.taken, Math.max(1, this.number('hintClosest', 4) - 1))
     if (rank > 0) { this.place(this.ranking.order[rank], null); this.hints++ }
   }
+  releaseContextHint(round: number) {
+    this.tick()
+    if (round !== this.round || !this.contextHintAvailable) return
+    const text = this.contextClue()
+    this.releasedHint = { text, atAttempt: this.attempts, guessesToImprovement: null }
+    this.hints++
+    this.emit()
+  }
+  private contextClue() {
+    const data = this.options.corpus.data
+    const candidates: string[] = []
+    for (const { word, kind } of riordinoRelationClues(this.word)) {
+      const index = lookup(data, word, this.secret)
+      if (index < 0 || index === this.secret) continue
+      candidates.push(kind === 'strumento' ? 'Pensa agli strumenti che si usano in questa situazione.'
+        : kind === 'parte' ? 'Pensa al legame fra una parte e il suo insieme.'
+        : 'Pensa a un gesto o a un’attività legata alla parola.')
+      break
+    }
+    const domain = data.semantic!.domains[this.secret]
+    if (domain) candidates.push(`Pensa al tema «${domain}».`)
+    const closest = data.words[this.ranking.order[this.best]]
+    candidates.push(`In quale situazione useresti «${closest}»?`, 'Riparti dalla parola più vicina e immagina dove la incontreresti.')
+    return candidates.find(text => text.split(/[^\p{L}]+/u).every(token => lookup(data, token, this.secret) !== this.secret))
+      ?? 'Cerca un esempio concreto.'
+  }
   private finish(reason: NonNullable<ContextSemanticState['reason']>, user: Viewer | null = null) {
     if (this.phase !== 'playing') return
+    if (this.releasedHint) {
+      const improvedAt = this.releasedHint.guessesToImprovement
+      this.lastHintResult = { round: this.round, improved: improvedAt !== null, guesses: improvedAt ?? this.attempts - this.releasedHint.atAttempt }
+    }
     this.reason = reason; this.solver = user; this.completedRounds++; this.matchRounds++
     this.phase = 'intermission'
     this.until = this.now() + Math.max(0, this.number('breakSeconds', 8)) * 1000
+    this.options.roundCompleted?.(this.word, this.liveGuesses)
     this.prepare() // the next round's ranking is computed during the break
     this.emit()
   }

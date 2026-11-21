@@ -63,7 +63,7 @@ export function serverCorpus(profile: ContextProfile = 'original'): LoadedCorpus
       const pinned = corpus ? contextPinned(profile) : undefined
       if (corpus && pinned) corpus.data.pinned = pinned
       // A derived profile that cannot be built yet (no export) is tried again at the next request, not remembered as missing.
-      if (!corpus && profile === 'pipeline_b') return null
+      if (!corpus && (profile === 'pipeline_b' || profile === 'riordino')) return null
       cache.set(profile, corpus)
     } catch (error) {
       console.error('[torneo] corpus di ZeroContext non leggibile:', error instanceof Error ? error.message : error)

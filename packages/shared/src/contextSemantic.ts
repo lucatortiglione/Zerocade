@@ -1,6 +1,7 @@
 import type { Viewer } from './index.js'
 
 export const CONTEXT_SEMANTIC_RULES = Object.freeze({ specialRoundsEnabled: false, every: 9, seconds: 180, attempts: 100, basePoints: 2500 })
+export const CONTEXT_HINT_STALL = 5
 export const semanticMode = (round: number, enabled: boolean = CONTEXT_SEMANTIC_RULES.specialRoundsEnabled): 'ordinary' | 'special' =>
   enabled && round > 0 && round % 9 === 0 ? 'special' : 'ordinary'
 export function thermalScore(cosine: number, special: boolean): number {
@@ -14,6 +15,14 @@ export function specialPoints(elapsedSeconds: number, attempts: number): number 
   return Math.floor(2500 * (1 + .6 * (180 - time) / 180 + .4 * (100 - used) / 100))
 }
 export interface ContextSemanticGuess { word: string; rank: number; temperature: number; by: Viewer | null; at: number }
+export interface ContextRoundHint {
+  stalled: number
+  available: boolean
+  text: string | null
+  guessesAfterRelease: number | null
+  guessesToImprovement: number | null
+}
+export interface ContextHintResult { round: number; guesses: number; improved: boolean }
 export interface ContextSemanticState {
   round: number
   // The first round is being prepared (the server's ranking thread is loading the words or ranking the secret).
@@ -34,5 +43,7 @@ export interface ContextSemanticState {
   last: ContextSemanticGuess | null
   typed: { text: string; user: Viewer; rank: number | null }[]
   notes: string[]
+  contextHint: ContextRoundHint | null
+  lastHintResult: ContextHintResult | null
   leaders: { id: string; name: string; pts: number; avatar?: string }[]
 }

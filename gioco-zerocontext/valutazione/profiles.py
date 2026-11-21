@@ -3,6 +3,7 @@ from __future__ import annotations
 
 from contextlib import closing
 from dataclasses import dataclass
+import hashlib
 import json
 from pathlib import Path
 import sqlite3
@@ -16,7 +17,8 @@ from valutazione.common import connect_ro, sha256_file
 # Lo stesso minimo di apps/server/src/context-pipeline.ts (PIPELINE_MIN_PINNED).
 PIPELINE_MIN_PINNED = 100
 # profilo -> schema di giochi.sqlite3 (packages/shared/src/contextProfiles.ts): pipeline_b ha i vettori dell'originale.
-SCHEMAS = {'original': 'context_original', 'abtt': 'context_abtt', 'pipeline_b': 'context_original'}
+SCHEMAS = {'original': 'context_original', 'abtt': 'context_abtt', 'pipeline_b': 'context_original', 'riordino': 'context_original'}
+RIORDINO_MIN_PINNED = 40
 
 
 @dataclass
@@ -40,9 +42,10 @@ def _vectors(file: Path, n: int, dim: int) -> np.ndarray:
     return np.memmap(file, dtype='<f4', mode='r', shape=(n, dim))
 
 
-def load_published(name: Literal['original', 'abtt', 'pipeline_b'], giochi: Path = paths.GIOCHI,
+def load_published(name: Literal['original', 'abtt', 'pipeline_b', 'riordino'], giochi: Path = paths.GIOCHI,
                    vectors_dir: Path = paths.VECTORS_DIR, pipeline_b: Path = paths.PIPELINE_B,
-                   min_pinned: int = PIPELINE_MIN_PINNED) -> Profile:
+                   min_pinned: int = PIPELINE_MIN_PINNED, riordino: Path = paths.RIORDINO,
+                   min_riordino: int = RIORDINO_MIN_PINNED) -> Profile:
     if name not in SCHEMAS:
         raise ValueError(f'Profilo sconosciuto: {name}')
     schema = SCHEMAS[name]
@@ -67,7 +70,20 @@ def load_published(name: Literal['original', 'abtt', 'pipeline_b'], giochi: Path
             pinned = load_pinned(pipeline_b, words, min_pinned)
         except (OSError, sqlite3.Error, ValueError) as error:
             raise ValueError(f'Esportazione della Pipeline B non disponibile ({pipeline_b.name}): {error}') from error
-    return Profile(name, words, _index(words), vectors, sha, pinned)
+    index = _index(words)
+    if name == 'riordino':
+        pinned = load_pinned(riordino, words, min_riordino)
+        relations = json.loads((paths.REPO/'apps/server/src/context-relations.json').read_text(encoding='utf8'))['ranking']
+        digest = hashlib.sha256(sha.encode('ascii'))
+        for secret, base in sorted(pinned.items()):
+            lexical = dict.fromkeys(index[w] for w, _ in relations.get(words[secret], ()) if w in index and index[w] != secret)
+            first = list(dict.fromkeys([*(i for i in base if i in lexical), *lexical]))[:3]
+            promoted = set(first)
+            pinned[secret] = (first + [i for i in base if i not in promoted])[:len(base)]
+            digest.update(f"{secret}:{','.join(map(str, pinned[secret]))}\n".encode('ascii'))
+        # Results are indexed by this digest; a run cannot resume with a changed ranking.
+        sha = digest.hexdigest()
+    return Profile(name, words, index, vectors, sha, pinned)
 
 
 def load_candidate(name: str, vectors: Path, vocab: Path, dim: int) -> Profile:

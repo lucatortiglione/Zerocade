@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
+import { ContextLiveReview } from '../components/ContextLiveReview'
 import type { EvaluationRun, EvaluationSample, EvaluationSampleWord, HumanVerdict } from '@zerocade/shared'
 import { DEFAULT_SUBSET, comparisonRows, disagrees, formatInterval, formatValue, reviewProgress, subsetNames, type Cell } from '../qualityView'
 
@@ -15,7 +16,7 @@ const SUBSET_LABELS: Record<string, string> = {
   'sviluppo:con_associazioni': 'Sviluppo · con associazioni verificate', 'sviluppo:senza_associazioni': 'Sviluppo · senza associazioni verificate',
   'sviluppo:ordinaria': 'Sviluppo · ordinarie', 'sviluppo:deroga': 'Sviluppo · con deroga', 'sviluppo:aggiunta': 'Sviluppo · aggiunte il 18 novembre', tutte: 'Tutte',
 }
-const PROFILE_LABELS: Record<string, string> = { original: 'Originale', abtt: 'ABTT (BGE-M3)', pipeline_b: 'Pipeline B' }
+const PROFILE_LABELS: Record<string, string> = { original: 'Originale', abtt: 'ABTT (BGE-M3)', pipeline_b: 'Pipeline B', riordino: 'Riordino' }
 const subsetLabel = (name: string) => SUBSET_LABELS[name] ?? name
 const profileLabel = (name: string) => PROFILE_LABELS[name] ?? name
 
@@ -113,6 +114,7 @@ export function ContextQualityPage() {
         calcola lo script di valutazione; qui li confronti e rivedi a mano un campione.
       </p>
 
+      <ContextLiveReview />
       {problem && <p className="quality__problem" role="alert">{problem}</p>}
       {!problem && runs === null && <p className="text-muted" aria-live="polite">Caricamento…</p>}
 

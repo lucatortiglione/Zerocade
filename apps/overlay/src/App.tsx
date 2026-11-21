@@ -72,7 +72,7 @@ export function App() {
       engineRef.current?.setGame(createContextTournament(), session.settings)
       return
     }
-    if (semanticOn) { engineRef.current?.setGame(createSemanticContext(), session.settings); return }
+    if (semanticOn) { engineRef.current?.setGame(createSemanticContext(overlaySnapshot), session.settings); return }
     const game = GAMES.find((g) => g.id === session.gameId)
     const instance = game ? createGame(game.id) : null
     if (game && instance) engineRef.current?.setGame(instance, session.settings)

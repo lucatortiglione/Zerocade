@@ -44,6 +44,7 @@ import { QuizzlandRooms, quizzlandStats } from './quizzland.js'
 import {
   closeDb,
   contextTournamentStore,
+  contextLiveReviews,
   tabooStore,
   wordHuntStore,
   contextSecretLast,
@@ -62,6 +63,7 @@ import { getContent, wordAssociation } from './content.js'
 import { contextFileBudget, contextResource, contextRevision, isContextFile, reloadContext } from './context.js'
 import { giochiDb } from './schema-db.js'
 import { registerContextEvaluationRoutes } from './context-evaluation.js'
+import { registerContextLiveReviews } from './context-live-review-socket.js'
 import { isWordleFile, wordleFile } from './wordle.js'
 import { chainKeys, chains } from './chains.js'
 import { nasaPhotos } from './nasa.js'
@@ -598,7 +600,7 @@ function broadcastEvent(key: string, received: LiveEvent, origin: EventOrigin = 
     wordhunt.get(key)?.offer({ user: event.user, text: event.text, messageId: '', platform: origin === 'sim' ? 'local' : origin })
   if (session.gameId === 'context' && plays && !session.paused && !session.ended) {
     const semantic = ensureSemantic(key)
-    if (semantic) for (const t of triggersFor(activeTriggers(session), event)) semantic.action(t.action, event)
+    if (semantic) for (const t of triggersFor(activeTriggers(session), event)) semantic.action(t.action, event, origin)
   }
 }
 
@@ -868,6 +870,13 @@ function ensureSemantic(key: string): ContextSemanticGame | null {
   const corpus = roomCorpus(key)
   if (!corpus?.data.semantic) return null
   const game = new ContextSemanticGame({ corpus, settings: session.settings,
+    roundCompleted: (secret, guesses) => {
+      try { contextLiveReviews.recordRound(key, sessionSince(key, 'context'), secret, guesses) }
+      catch (error) {
+        app.log.error({ err: error }, 'ZeroContext: confronti del round non salvati')
+        io.to(dashboardRoom(key)).emit('runtime:issue', { component: 'persistence', message: 'I tentativi di questo round non sono stati salvati per la revisione.', at: Date.now() })
+      }
+    },
     rank: (secret) => contextCorpora.rank(corpus, secret),
     failed: (error) => app.log.warn({ err: error.message }, 'ZeroContext: classifica del round non calcolata, riprovo'),
     emit: (state) => {
@@ -901,7 +910,7 @@ function semanticState(key: string): ContextSemanticState | null {
 }
 const PREPARING_STATE: ContextSemanticState = { round: 0, mode: 'ordinary', phase: 'intermission', paused: false, preparing: true,
   remainingMs: null, attempts: 0, total: 0, solution: null, prefix: '', wordLength: null, solvedBy: null, reason: null, best: null,
-  closest: [], last: null, typed: [], notes: [], leaders: [] }
+  closest: [], last: null, typed: [], notes: [], leaders: [], contextHint: null, lastHintResult: null }
 const contextRooms = () => new Set([roomKey, ...semanticGames.keys(), ...[...io.sockets.sockets.values()].map((s) => (s.handshake.auth as HandshakeAuth).key)])
 // A corpus is ready (or found unavailable): the rooms waiting for it start, a restored tournament gets its round's ranking.
 contextCorpora.onLoaded((profile) => {
@@ -957,6 +966,12 @@ io.on('connection', (socket) => {
   const { clientType, key } = socket.handshake.auth as HandshakeAuth
   void socket.join(key)
   if (clientType === 'dashboard') void socket.join(dashboardRoom(key))
+  registerContextLiveReviews(socket, { clientType, key }, contextLiveReviews, () => {
+    const current = getSession(key)
+    // A disk error when ending the live is retried when its director opens the review.
+    if (current.gameId === 'context' && current.ended) contextLiveReviews.end(key, sessionSince(key, 'context'))
+    return current.gameId === 'context' && !current.ended
+  }, error => app.log.error({ err: error }, 'ZeroContext: revisione non disponibile'))
   const session = getSession(key)
   socket.emit('session:state', session)
   const secret = roomSecrets.get(key)
@@ -995,6 +1010,14 @@ io.on('connection', (socket) => {
   socket.on('game:control', (command: unknown) => {
     if (clientType !== 'dashboard' || typeof command !== 'string' || !['pause', 'resume', 'restart', 'end', 'start'].includes(command)) return
     if (tournamentLocks('Questo comando del gioco')) return
+    if (command === 'end' && getSession(key).gameId === 'context') {
+      semanticGames.get(key)?.endSession()
+      try { contextLiveReviews.end(key, sessionSince(key, 'context')) }
+      catch (error) {
+        app.log.error({ err: error }, 'ZeroContext: confronti di fine sessione non salvati')
+        socket.emit('runtime:issue', { component: 'persistence', message: 'I confronti non sono ancora pronti. Apri Qualità posizioni per riprovare.', at: Date.now() })
+      }
+    }
     if (command === 'restart' || command === 'start') {
       roomSecrets.delete(key)
       revealedSecrets.delete(key)
@@ -1112,6 +1135,13 @@ io.on('connection', (socket) => {
 
   // Otherwise overlays only listen; everything that changes state comes from the dashboard.
   if (clientType !== 'dashboard') return
+
+  socket.on('context:release-hint', (round: unknown, run: unknown) => {
+    const current = getSession(key)
+    if (typeof round !== 'number' || !Number.isSafeInteger(round) || run !== (current.run ?? 0) || current.gameId !== 'context'
+      || current.paused || current.ended || tournaments.has(key)) return
+    semanticGames.get(key)?.releaseContextHint(round)
+  })
 
   const words = incastro.get(key)
   if (words) socket.emit('incastro:solution', words.solution())
