@@ -1,9 +1,7 @@
 # ZeroContext — Strategie per ampliare segrete, vocabolario e vettori
 
 La pipeline subword e il retrofitting descritti fra queste strategie sono implementati.
-Il corpus dispone ora dei tre profili originale, TurboX e Harrier, selezionabili dalla regia:
-93.928 tentativi e 9.513 segrete per profilo; originale 300 float32, TurboX/Harrier 256 float32.
-Tutte le 6.838 segrete precedenti sono conservate; vedi [PROFILI_ASSOCIAZIONI.md](PROFILI_ASSOCIAZIONI.md).
+Il vocabolario di gioco comprende 93.928 parole. Il corpus originale conserva tutte le 6.838 segrete precedenti tra le sue 9.513 segrete. Per scegliere fra Originali, ABTT, Pipeline B e Riordino consulta la [guida ai profili](PROFILI_ASSOCIAZIONI.md).
 Vedi [implementazione corrente](IMPLEMENTAZIONE_VETTORI_SEMANTICI.md). Le proposte sotto conservano il
 confronto con la precedente pipeline FastText/ConceptNet/LSA e non descrivono tutte il runtime attivo.
 

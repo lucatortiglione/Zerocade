@@ -6,6 +6,8 @@ Le dimensioni sono quelle del workspace locale; le ottimizzazioni descritte più
 | File | Peso | In Git | A che cosa serve |
 | --- | ---: | :---: | --- |
 | `giochi.sqlite3` | 53,00 MB | sì | Il DB dei giochi di parole: uno schema per gioco, letto dal server e dal pacchetto Windows |
+| `ZeroContext_Associazioni_Riordino.sqlite3` | 43,77 MB | sì | Associazioni ordinate per 9.513 segrete. La regia le carica con **Riordino (legami specifici)**. Il task Windows copia il file nella cartella `app` del pacchetto. |
+| `ZeroContext_Associazioni_PipelineB.sqlite3` | 3,58 GB | no | Export locale del profilo Pipeline B. Il numero di segrete giocabili dipende dalla copertura del vocabolario. |
 | `parole_ita_raw.sqlite3` | 3,43 GB | no | Il DB di lavoro di ZeroAssociazioni: i sei DB storici, più candidati e valutazioni |
 | `parole_ita_raw_2.0.sqlite3` | 631,04 MB | no | Seconda raccolta: tabella `parole` con 2.847.433 voci uniche da tutte le fonti, senza scarti editoriali; [schema e task](PAROLE_RAW_2.0.md) |
 | `ZeroQuizz.sqlite3` | 7 MB | sì | Il DB di ZeroQuizz: domande e risposte, un gioco a sé (era `gioco-quizzland/data/domande.db`, poi lo schema `quizz` di `giochi.sqlite3`). Lo leggono il server e il pacchetto Windows |
@@ -51,10 +53,7 @@ la stessa scrittura del server, e leggono e scrivono qui. Il nome storico del fi
 perché compare nei metadati e nelle ricevute già scritti, ma i file con quei nomi non esistono più. Da qui
 `script/giochi.py aggiorna associazioni` copia i bacini del gioco, prendendoli dallo schema `validi`.
 
-Per ZeroContext la generazione attiva contiene 93.928 tentativi e 9.513 segrete,
-con tre profili selezionabili nella regia: originale (300 float32), TurboX e Harrier (256 float32).
-I profili sono integrati negli schemi context_original, context_turbox e context_harrier;
-vedi [PROFILI_ASSOCIAZIONI.md](../gioco-zerocontext/PROFILI_ASSOCIAZIONI.md).
+Il vocabolario di ZeroContext contiene 93.928 parole giocabili. Originali e ABTT leggono i rispettivi schemi in `giochi.sqlite3`. Riordino e Pipeline B condividono i vettori originali e leggono ciascuno il proprio export SQLite. [Profili delle associazioni](../gioco-zerocontext/PROFILI_ASSOCIAZIONI.md)
 L'importazione diretta conserva le regressioni semantiche descritte in [Python/README.md](../Python/README.md).
 La pubblicazione aggiorna solo lo schema
 `context` e il riferimento a un file immutabile `vectors.<sha256>.bin`, conservando un backup.

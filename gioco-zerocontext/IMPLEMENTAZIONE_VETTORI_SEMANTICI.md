@@ -8,13 +8,11 @@ La successiva richiesta dell'utente **sospende i round speciali**.
 Il DB `database/giochi.sqlite3`, schema `context`, contiene **93.928 tentativi e 9.513 segrete**.
 Tutte le segrete appartengono al pool ordinario; il pool speciale è vuoto. Anche *monile*, *probità*
 e *suppellettile* restano estraibili. Non sono stati rimossi vocaboli o segrete.
-Sono disponibili tre profili selezionabili dalla regia, senza riavvio a ogni cambio:
+Nella pubblicazione del 16 novembre qui documentata la regia offriva tre profili:
 originale FastText + retrofitting (300 float32), TurboX e Harrier Model2Vec (256 float32).
-L'originale è predefinito. Ogni profilo conserva 93.928 parole e tutte le 9.513 segrete;
-le classifiche e le altre stanze non cambiano quando si sostituisce il round.
-I profili sono negli schemi `context_original`, `context_turbox`, `context_harrier`;
-lo schema `context` precedente resta invariato. Origini, backup e uso sono descritti in
-[PROFILI_ASSOCIAZIONI.md](PROFILI_ASSOCIAZIONI.md).
+I tre profili conservavano 93.928 parole e tutte le 9.513 segrete negli schemi `context_original`, `context_turbox` e `context_harrier`.
+
+Oggi il pannello propone Originali, ABTT, Pipeline B e Riordino. Per il database Riordino e le istruzioni di selezione in regia consulta la [guida ai profili attivi](PROFILI_ASSOCIAZIONI.md).
 
 Le regressioni semantiche misurate per TurboX e Harrier restano registrate. Le vecchie
 misure geometriche sono archiviate nei loro dettagli e non ricalcolate per i nuovi spazi.

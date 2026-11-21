@@ -12,9 +12,9 @@ Le cache dei modelli, gli ambienti virtuali, le dipendenze e gli artefatti di bu
 | Catalogo | 40 giochi in `packages/shared` |
 | Runtime locale | Node 26.13.1, npm 12.2.2, better-sqlite3 13.2.0, SQLite caricato 3.54.1 |
 | ZeroContext | 93.928 tentativi, 9.513 segrete; tutte le precedenti 6.838 conservate; ordinario 9.513, speciale 0 |
-| Pipeline ZeroContext | Tre profili: originale 300 float32, TurboX e Harrier 256 float32; cambio dalla regia senza riavvio; round speciali sospesi |
+| Profili ZeroContext (21 novembre 2026) | Originali, ABTT, Pipeline B e Riordino. Per le associazioni con legami specifici la regia usa `ZeroContext_Associazioni_Riordino.sqlite3`. |
 | Pipeline di associazione A/B | `gioco-zerocontext/pipeline_a` (BGE-M3) e `pipeline_b` (fastText) calcolano i top 1000 per ogni parola di `ZeroContext_Segrete` tra le parole della tabella `parole` del RAW 2.0; i task VS Code esportano a fine build in `database/ZeroContext_Associazioni_PipelineA/B.sqlite3` |
-| File vettoriale attivo | 112.713.600 byte originale; 96.182.272 byte ciascuno TurboX/Harrier; riferimento nei metadati di ogni profilo |
+| Matrici dei profili ZeroContext | Originale da 112.713.600 byte, condivisa con Pipeline B e Riordino. ABTT da 384.729.088 byte. |
 | ZeroAssociazioni pubblicato | 3.941 prompt, 11.847 parole, 58.551 collegamenti |
 | ZeroWordle | 8.630 soluzioni e 105.310 tentativi |
 | ZeroQuizz | 26.715 domande, tutte attive nel DB locale |
@@ -98,6 +98,7 @@ I paragrafi successivi sono il registro cronologico delle scelte precedenti.
 | [gioco-zeroassociations/resources/LEGGIMI.md](../gioco-zeroassociations/resources/LEGGIMI.md) | Guida e stato operativo |
 | [gioco-zerocatene/README.md](../gioco-zerocatene/README.md) | Guida e stato operativo |
 | [gioco-zerocontext/README.md](../gioco-zerocontext/README.md) | Guida e stato operativo |
+| [Profili delle associazioni di ZeroContext](../gioco-zerocontext/PROFILI_ASSOCIAZIONI.md) | Scelta del database in regia, segrete giocabili e disponibilità dei profili |
 | [gioco-zerocontext/REGOLAMENTO_CONTEXT_TORNEO_v2_3.md](../gioco-zerocontext/REGOLAMENTO_CONTEXT_TORNEO_v2_3.md) | Regole e direttive |
 | [gioco-zerocontext/STRATEGIE_ESPANSIONE.md](../gioco-zerocontext/STRATEGIE_ESPANSIONE.md) | Guida e stato operativo |
 | [gioco-zerocontext/VALUTAZIONE_INVENTARIO.md](../gioco-zerocontext/VALUTAZIONE_INVENTARIO.md) | Rapporto datato |

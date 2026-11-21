@@ -113,10 +113,9 @@ Lunar Dash e Guess the Location ne restano senza, perché la loro scena occupa t
 - [database/DB.md](database/DB.md) spiega ogni file e il percorso di una parola dalla raccolta al gioco.
 - I dati della diretta (sessioni, eventi, classifiche, voti) stanno in `apps/server/data/zerocade.db`, sul PC.
 
-ZeroContext usa **93.928 parole e 9.513 segrete**, conservando tutte le precedenti 6.838.
-Il pannello della regia sceglie fra associazioni **originali e ABTT**, senza riavviare
-il server a ogni cambio. Ogni profilo conserva tutte le parole e le segrete; cambia solo il corpus
-usato per le associazioni. Dettagli in [PROFILI_ASSOCIAZIONI.md](gioco-zerocontext/PROFILI_ASSOCIAZIONI.md).
+Per giocare con le associazioni riordinate, seleziona **ZeroContext → Associazioni ZeroContext → Riordino (legami specifici)** in regia. Il server legge `database/ZeroContext_Associazioni_Riordino.sqlite3`, incluso nel progetto. Il cambio avvia un nuovo round.
+
+ZeroContext accetta **93.928 parole**. Originali, ABTT e l’export Riordino incluso hanno **9.513 segrete**. Per Pipeline B il numero dipende dall’export disponibile. [Guida ai profili](gioco-zerocontext/PROFILI_ASSOCIAZIONI.md) · [Istruzioni per il pacchetto Windows](gioco-zerocontext/README.md#usare-riordino-su-windows)
 Tutti i round sono ordinari: gli speciali sono sospesi.
 Codice e task sono aggiornati a Model2Vec, fallback FastText e retrofitting con margine;
 la nuova rigenerazione completa non è ancora stata eseguita. I task principali

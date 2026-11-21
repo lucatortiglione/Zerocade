@@ -82,9 +82,7 @@ Il server apre uno schema con viste temporanee sui nomi senza prefisso, per le t
 
 ## Copie e origini
 
-Il corpus `context` attivo al 16 novembre contiene **93.928 parole**, **9.513 segrete** e
-tre profili di associazioni: originali (300 float32), TurboX e Harrier (256 float32).
-La regia cambia profilo per stanza senza riavviare il server: vedi [PROFILI_ASSOCIAZIONI.md](../gioco-zerocontext/PROFILI_ASSOCIAZIONI.md).
+Il corpus `context` contiene **93.928 parole** e **9.513 segrete**. Per giocare con Riordino, la regia usa l’export `database/ZeroContext_Associazioni_Riordino.sqlite3` insieme al vocabolario e ai vettori originali. Il profilo si sceglie per stanza. [Guida ai profili](../gioco-zerocontext/PROFILI_ASSOCIAZIONI.md)
 I controlli strutturali passano; restano le regressioni semantiche documentate in [Python/README.md](../Python/README.md).
 La pubblicazione conserva un backup consistente e sostituisce
 solo questo schema; il file immutabile dei vettori esiste prima del commit che lo attiva.
@@ -228,7 +226,7 @@ cambierebbero. Non fatto neppure JSONB sulle attestazioni (circa il 9% del testo
 Lo schema `context` comprende ora `targets`, con appartenenza ai pool ordinario/speciale,
 frequenze, densità, ponti e deroghe per conservare le vecchie segrete. Il corpus ha 93.928
 tentativi e 9.513 segrete; i vettori esterni dipendono dal profilo selezionato: originale 300 float32, ABTT 1.024 float32.
-Gli schemi selezionabili sono `context_original` e `context_abtt`; TurboX e Harrier sono stati rimossi.
+Gli schemi vettoriali sono `context_original` e `context_abtt`. I profili Riordino e Pipeline B leggono dal proprio export le segrete e le associazioni ordinate.
 Le densità e i ponti della vecchia matrice sono archiviati nei dettagli e non ricalcolati per Harrier. La pubblicazione impedisce
 la rimozione di segrete esistenti. I vecchi strumenti di riscrittura dello schema rifiutano
 di sovrascrivere un corpus semantico privo di questa gestione dei target.

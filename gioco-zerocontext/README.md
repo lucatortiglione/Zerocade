@@ -2,8 +2,8 @@
 
 Stato del **16 novembre 2026**: **93.928 parole giocabili e 9.513 segrete**, con tutte le
 **6.838 segrete precedenti conservate** e 2.675 aggiunte. Il pannello **Associazioni ZeroContext**
-permette di scegliere fra **originali e ABTT**, senza riavviare il server a ogni cambio.
-Tutti i profili conservano le stesse parole: originale 300 float32 (112.713.600 byte),
+permette di scegliere fra **originali**, **ABTT**, **Pipeline B** e **Riordino**. Gli ultimi due profili usano le segrete giocabili dei rispettivi export.
+Originale e ABTT conservano le stesse parole: originale 300 float32 (112.713.600 byte),
 ABTT 1.024 float32 (384.729.088 byte), senza riduzione della matrice valutata.
 Tutte le **9.513 segrete sono ordinarie**: i round speciali sono sospesi e nessuna parola è stata rimossa.
 La scelta predefinita è l'originale. TurboX e Harrier sono stati rimossi dal DB e dal selettore.
@@ -12,6 +12,35 @@ Procedura, origini e backup in [PROFILI_ASSOCIAZIONI.md](PROFILI_ASSOCIAZIONI.md
 La pipeline configurata BGE-M3 con contesti e retrofitting non è ancora stata eseguita sull'intero corpus.
 Stato, task e dettagli in [IMPLEMENTAZIONE_VETTORI_SEMANTICI.md](IMPLEMENTAZIONE_VETTORI_SEMANTICI.md).
 Fanno fede `context__meta`, `context__targets` e il file indicato da `vectors_file`.
+
+## Riordino, indizi e confronti di fine live
+
+Nel pannello **Associazioni ZeroContext** puoi scegliere **Riordino (legami specifici)**. Il profilo usa l’export `database/ZeroContext_Associazioni_Riordino.sqlite3` e dà più peso a legami come un mestiere e il suo strumento, un oggetto e una sua parte, o un soggetto e una sua azione tipica. Le sale che usano un altro profilo mantengono la propria scelta.
+
+### Usare Riordino su Windows
+
+Se avvii ZeroCade dai sorgenti, apri la regia e seleziona **ZeroContext → Associazioni ZeroContext → Riordino (legami specifici)**. Il database è già presente nella cartella `database`.
+
+Se usi la versione Windows e la voce Riordino manca, aggiorna il pacchetto prima della live.
+
+1. Chiudi la copia di ZeroCade avviata da `release\zerocade-win-x64`.
+2. In VS Code apri la cartella principale del progetto, quella che contiene `.vscode/tasks.json`.
+3. Scegli **Terminale → Esegui attività…**, cerca **pacchetto Windows** ed esegui **ZeroCade : Crea pacchetto Windows con Riordino**. Da terminale puoi eseguire lo stesso script con `npm run package:win`.
+4. Al termine avvia `release\zerocade-win-x64\Avvia Zerocade.cmd` e scegli **Riordino (legami specifici)** in regia.
+
+### Indizi e voti della live
+
+Durante un round, dopo **cinque parole valide e distinte consecutive** che lasciano invariata la posizione migliore, la regia può premere **Pubblica indizio**. La pista appare sull’overlay e consuma un aiuto del round. La regia conta i tentativi validi fino al primo miglioramento e mostra l’esito anche nel round successivo. La pausa, il limite degli aiuti e **Disabilita tutti gli aiuti** valgono anche per questo comando.
+
+L’indizio attuale parte dalla segreta o dalla parola più vicina già sul tabellone. L’idea di far indovinare una parola intermedia ancora da giocare è una proposta per una versione successiva.
+
+Dopo **Termina sessione**, apri **Valuta i confronti di fine live** oppure **Qualità → Confronti di fine live**. Per ogni segreta puoi scegliere quale delle due parole giocate in chat è più vicina, oppure **Pari**. La scheda contiene fino a cinque confronti, senza nomi né posizioni. Le parole del simulatore e gli aiuti sono esclusi.
+
+Il task VS Code **ZeroContext : Valuta Riordino con i voti delle live** confronta il vecchio e il nuovo ordine sulle stesse preferenze. Mostra quante preferenze rispetta ciascun profilo e quanti confronti migliorano o peggiorano. Parità e coppie fuori dal vocabolario o dal pool giocabile hanno conteggi separati. Per valutare l’archivio di una regia diversa usa `node --import tsx scripts/context-evaluate-live-votes.ts --db <percorso-zerocade.db>`.
+
+Il task **ZeroContext : Associazioni - Confronta i 50 indizi** esegue anche la misura separata su dodici segrete tenute fuori dall’addestramento di base. Il rapporto include le posizioni di ciascuna parola, le soglie di giocabilità e i risultati per campione. [Rapporto sui confronti](reports/confronti_indizi.json)
+
+Per eseguire entrambi i confronti insieme, scegli **Terminale → Esegui attività → ZeroContext : Verifica Riordino**.
 
 ## Mostrare o nascondere il numero di lettere
 
@@ -111,10 +140,7 @@ o vettori, con `python script/build_context_plurals.py` dalla cartella del
 gioco, dopo `python script/fetch_morphit.py`. L'overlay lo include nella build:
 ricompilare e ricaricare la sorgente browser per applicare la regola.
 
-Il corpus viene scelto dal pannello **Associazioni ZeroContext**:
-originale FastText + retrofitting oppure BGE-M3 Italian con ABTT. La selezione è per stanza.
-Ogni parola ha un vettore unitario completo. Non si applicano boost dei collegamenti
-o penalità di genericità dopo il calcolo del coseno.
+La selezione nel pannello **Associazioni ZeroContext** vale per la stanza. Originali e ABTT usano rispettivamente i vettori FastText con retrofitting e BGE-M3 Italian con ABTT. Pipeline B e Riordino usano i vettori originali e assegnano le prime posizioni alle associazioni dell’export. Riordino può promuovere fino a tre parole con un legame specifico. [Guida ai profili](PROFILI_ASSOCIAZIONI.md)
 
 Il **generatore storico** `script/build_context_data.py`, ancora disponibile, costruisce invece
 la vicinanza con questi passaggi:
@@ -383,6 +409,7 @@ con cui lo si migliora. Progetto: [la specifica](../docs/superpowers/specs/2026-
 ```
 python script/evaluate_context_ranking.py campione                       # sceglie 50 segrete di misura da rivedere (poi --blocco: +25)
 python script/evaluate_context_ranking.py valuta --profilo original --giudice no
+python script/evaluate_context_ranking.py valuta --profilo riordino --giudice no
 python script/evaluate_context_ranking.py valuta --profilo abtt --giudice campione    # con Qwen locale sulle parole non coperte
 python script/evaluate_context_ranking.py valuta --candidato NOME --vettori F.bin --vocab V.txt --dim 1024   # un profilo non ancora pubblicato
 python script/evaluate_context_ranking.py ricalcola                      # dopo i verdetti dati nella pagina: niente Qwen né vettori
@@ -479,7 +506,7 @@ Aprire la cartella ZeroCade in VS Code e scegliere **Terminale → Esegui attivi
 | Esegui ciclo completo | Genera l'export pilota, misura la varietà, verifica le parole ambigue, confronta i tre profili sui 50 indizi e prepara il voto alla cieca. Con un archivio tornei disponibile produce anche `revisioni.json`. |
 | Conteggia voti A e B | Dopo aver compilato l'ultima colonna di `confronto.tsv` con A, B o pari. Stampa i risultati e i voti mancanti per ogni scheda. |
 | Prova le associazioni umane direzionali | Confronta Riordino standard con il segnale tentativo → segreta. Scrive export, misure, confronto sui 50 indizi e scheda cieca in una nuova cartella `reports/pilota_umane_*`. |
-| Confronta i 50 indizi | Aggiorna il rapporto tra Pipeline B e Riordino standard. Il totale confrontabile usa le segrete giocabili in entrambi i profili. |
+| Confronta i 50 indizi | Aggiorna il rapporto tra Pipeline B, Riordino precedente e Riordino con legami specifici. Riporta anche il risultato sul campione separato. |
 | Rivedi i tentativi dei tornei | Mostra le coppie ricorrenti nell'archivio `apps/server/data/zerocade.db`. La variabile `ZEROCADE_DB` permette di indicare l'archivio della diretta. |
 | Ricalcola Riordino e avvia il ciclo | Parte dall'export della Pipeline B, riaddestra il modello standard e conserva lo standard ricalcolato e il pilota nella cartella della prova. |
 | Rigenera da Pipeline B | Esegue il task esistente di generazione della Pipeline B e prosegue con il riaddestramento e il ciclo. Usarlo quando cambiano i dati a monte. |

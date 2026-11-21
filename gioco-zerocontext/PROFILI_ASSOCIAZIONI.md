@@ -1,15 +1,17 @@
-# Originali e ABTT: associazioni di ZeroContext
+# Profili delle associazioni di ZeroContext
 
-Dal 16 novembre 2026 la regia mostra **Associazioni ZeroContext**, con due scelte:
+Per usare il database delle associazioni riordinate, scegli **Riordino (legami specifici)** nel pannello **Associazioni ZeroContext**. Tutti e quattro i profili accettano lo stesso vocabolario di 93.928 parole.
 
-| Scelta | Schema in `database/giochi.sqlite3` | Vettori | Parole / segrete |
+| Scelta in regia | Origine delle associazioni | Vettori | Segrete giocabili |
 | --- | --- | --- | --- |
-| Associazioni originali, predefinite | `context_original` | FastText + retrofitting, 300 float32 | 93.928 / 9.513 |
-| Associazioni ABTT | `context_abtt` | BGE-M3 Italian + ABTT, 1.024 float32 | 93.928 / 9.513 |
+| Associazioni originali (predefinite) | Schema `context_original` in `database/giochi.sqlite3` | FastText + retrofitting, 300 float32 | 9.513 |
+| Associazioni ABTT | Schema `context_abtt` in `database/giochi.sqlite3` | BGE-M3 Italian + ABTT, 1.024 float32 | 9.513 |
+| Pipeline B (fastText + PMI-SVD + ConceptNet) | `database/ZeroContext_Associazioni_PipelineB.sqlite3` | Originali | Segrete con almeno 100 associazioni nel vocabolario |
+| Riordino (legami specifici) | `database/ZeroContext_Associazioni_Riordino.sqlite3` e relazioni lessicali | Originali | 9.513 nell’export incluso, con almeno 40 associazioni ciascuna nel vocabolario |
 
 Lo schema `context` precedente è conservato e rimane compatibile con gli strumenti
-esistenti. Ogni profilo ha metadati, indici, pool e riferimento al proprio file
-immutabile. Tutte le segrete sono ordinarie; i round speciali restano sospesi.
+esistenti. Ogni profilo ha una revisione del corpus e un elenco di segrete giocabili.
+Tutte le segrete sono ordinarie; i round speciali restano sospesi.
 I modelli non vengono mescolati nello stesso spazio vettoriale.
 
 ## Uso nella regia
@@ -24,9 +26,7 @@ La scelta resta bloccata mentre un torneo è aperto: concluderlo o annullarlo
 prima di cambiare. I tornei usano il profilo selezionato nella propria stanza;
 il controllo dell'impronta del corpus continua a proteggere le manche salvate.
 
-Le due versioni si caricano nello stesso processo: non serve riavviare il server
-a ogni cambio. Per installare questo nuovo codice su un processo già aperto
-serve un solo riavvio iniziale, quindi ricaricare la regia.
+Il server carica il profilo scelto al cambio di round. Per aggiornare una vecchia copia Windows, esegui il task **ZeroCade : Crea pacchetto Windows con Riordino**. [Procedura per Windows](README.md#usare-riordino-su-windows)
 
 ## Origine dei dati e backup
 
@@ -56,10 +56,10 @@ per ABTT: Spearman × 100, STS22.v2 italiano, 407 coppie, `wordmean-full-v1`.
 ## Caricamento e verifica
 
 `GET /api/context/profiles` elenca disponibilità e conteggi. Le risorse
-`/api/context/:file?profile=original|abtt` sono fissate a un profilo e
+`/api/context/:file` accettano il parametro `profile` con i valori `original`, `abtt`, `pipeline_b` o `riordino` e
 portano intestazioni di profilo e revisione. L'overlay rifiuta file mescolati.
 Il server conserva cache distinte e sceglie il corpus dalla sessione della stanza.
-Il pacchetto Windows include le matrici originali e ABTT. Gli ID TurboX/Harrier
+Il pacchetto Windows include le matrici originali e ABTT e copia l’export Riordino in `app\ZeroContext_Associazioni_Riordino.sqlite3`. Gli ID TurboX/Harrier
 sono rifiutati dalle API; vecchie impostazioni di stanza ricadono sull'originale.
 
 `tests/context-profiles.test.ts` verifica inventari, cache distinte e download
